@@ -8,7 +8,8 @@
 # __email__ = "thibault.dayris@gustaveroussy.fr"
 # __license__ = "MIT"
 
-base::library(package = "DESeq2");     # Differential Gene expression
+# Differential Gene expression
+base::library(package = "DESeq2", quietly = TRUE);
 
 # Load DESeq2 dataset
 dds_path <- base::as.character(

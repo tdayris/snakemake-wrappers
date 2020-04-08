@@ -1843,6 +1843,13 @@ def test_deseq2_nbinomWaldTest():
     )
 
 
+def test_deseq2_plotma():
+    run(
+        "bio/deseq2/plotMA",
+        ["snakemake", "--cores", "1", "MAplot.png", "--use-conda", "-F"]
+    )
+
+
 def test_cp():
     run(
         "bio/cp",

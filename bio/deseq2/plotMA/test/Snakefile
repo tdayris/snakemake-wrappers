@@ -1,0 +1,20 @@
+rule test_deseq2_plotma:
+    input:
+        res = "res.tsv"
+    output:
+        png = "MAplot.png"
+    message:
+        "Testing MAplot with DESeq2"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 2048)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 20)
+        )
+    log:
+        "logs/test_deseq2_plotma.log"
+    wrapper:
+        "master/bio/deseq2/plotMA"
