@@ -1,0 +1,138 @@
+.. _`DESeqDataSetFromTximport`:
+
+DESEQDATASETFROMTXIMPORT
+========================
+
+Import counts from Tximport into DESeq2
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconductor-tximport==1.14.0
+
+* r-readr==1.3.1
+
+* r-jsonlite==1.6
+
+* bioconductor-deseq2==1.26.0
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_DESeqDataSetFromTximport:
+        input:
+            tximport = "txi.RDS",
+            coldata = "coldata.tsv"
+        output:
+            dds = "deseq2/dds.RDS"
+        message:
+            "Testing DESeqDataSetFromTximport"
+        log:
+            "logs/deseq2/DESeqDataSetFromTximport.logs"
+        params:
+            design = "~Cond"
+        wrapper:
+            "https://raw.githubusercontent.com/tdayris-perso/snakemake-wrappers/deseq2_dataset/bio/deseq2/DESeqDataSetFromTximport/"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Depending on your formula, your design file can contain any number of
+optional columns
+
+Parameters:
+
+* design: the R formulae used to performs differential expression
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script takes a tximport object and builds a deseq2 dataset
+    # for each formula given to snakemake.
+
+    # Perform actual count importation in R
+    base::library(package = "tximport", quietly = TRUE);
+    # Read faster!
+    base::library(package = "readr", quietly = TRUE);
+    # Importing inferential replicates
+    base::library(package = "jsonlite", quietly = TRUE);
+    # Differential Gene expression
+    base::library(package = "DESeq2", quietly = TRUE);
+
+    base::write("Libraries loaded.", stderr());
+
+    # Load txi object
+    txi_rds_path <- base::as.character(x = snakemake@input[["tximport"]]);
+    txi <- base::readRDS(
+      file = txi_rds_path
+    );
+
+    # Load experimental design
+    coldata_path <- base::as.character(x = snakemake@input[["coldata"]]);
+    coldata <- utils::read.table(
+      file = coldata_path,
+      sep = "\t",
+      header = TRUE
+    );
+    rownames(coldata) <- coldata$Sample_id;
+
+    # Cast formula as formula instead of string
+    formula <- stats::as.formula(
+      object = snakemake@params[["design"]]
+    );
+
+    base::message("Input dataset and options recovered.");
+
+    # Create dds object
+    dds <- DESeq2::DESeqDataSetFromTximport(
+      txi = txi,
+      colData = coldata,
+      design = formula
+    );
+    base::write("DESeqDataSet built.", stderr());
+
+    # Save as RDS
+    output_path <- base::as.character(x = snakemake@output[["dds"]]);
+    base::saveRDS(
+      obj = dds,
+      file = output_path
+    );
+
+    base::write("Process over.", stderr());

@@ -1,0 +1,74 @@
+.. _`bcftools concat`:
+
+BCFTOOLS CONCAT
+===============
+
+Concatenate vcf/bcf files with bcftools.
+
+
+
+Software dependencies
+---------------------
+
+
+* bcftools ==1.10
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bcftools_concat:
+        input:
+            calls=["a.bcf", "b.bcf"]
+        output:
+            "all.bcf"
+        params:
+            ""  # optional parameters for bcftools concat (except -o)
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bcftools/concat"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "koester@jimmy.harvard.edu"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    shell(
+        "bcftools concat {snakemake.params} -o {snakemake.output[0]} "
+        "{snakemake.input.calls}"
+    )

@@ -1,0 +1,69 @@
+.. _`samtools flagstat`:
+
+SAMTOOLS FLAGSTAT
+=================
+
+Use samtools to create a flagstat file from a bam or sam file.
+
+
+
+Software dependencies
+---------------------
+
+
+* samtools ==1.9
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule samtools_flagstat:
+        input:
+            "mapped/{sample}.bam"
+        output:
+            "mapped/{sample}.bam.flagstat"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/samtools/flagstat"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Christopher Preusch
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Christopher Preusch"
+    __copyright__ = "Copyright 2017, Christopher Preusch"
+    __email__ = "cpreusch[at]ust.hk"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    shell("samtools flagstat {snakemake.input[0]} > {snakemake.output[0]}")

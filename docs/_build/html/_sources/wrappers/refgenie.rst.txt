@@ -1,0 +1,87 @@
+.. _`refgenie`:
+
+REFGENIE
+========
+
+Deploy biomedical reference datasets via refgenie.
+
+
+
+Software dependencies
+---------------------
+
+
+* refgenie =0.8.2
+
+* refgenconf =0.6.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule obtain_asset:
+        output:
+            # the name refers to the refgenie seek key (see attributes on http://refgenomes.databio.org)
+            fai="refs/genome.fasta"
+            # Multiple outputs/seek keys are possible here.
+        params:
+            genome="human_alu",
+            asset="fasta",
+            tag="default"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/refgenie"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2019, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    import os
+    import refgenconf
+
+    genome = snakemake.params.genome
+    asset = snakemake.params.asset
+    tag = snakemake.params.tag
+
+    conf_path = os.environ["REFGENIE"]
+
+    rgc = refgenconf.RefGenConf(conf_path, writable=True)
+
+    # pull asset if necessary
+    gat, archive_data, server_url = rgc.pull_asset(genome, asset, tag, force=False)
+
+    for seek_key, out in snakemake.output.items():
+        path = rgc.get_asset(genome, asset, tag, seek_key=seek_key)
+        os.symlink(path, out)

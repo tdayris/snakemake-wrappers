@@ -1,0 +1,88 @@
+.. _`picard CollectTargetedPcrMetrics`:
+
+PICARD COLLECTTARGETEDPCRMETRICS
+================================
+
+Collect metric information for target pcr metrics runs, with picard tools.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* picard ==2.22.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule CollectTargetedPcrMetrics:
+        input:
+            bam="mapped/{sample}.bam",
+            amplicon_intervals="amplicon.list",
+            target_intervals="target.list"
+        output:
+            "stats/{sample}.pcr.txt"
+        log:
+            "logs/picard/collecttargetedpcrmetrics/{sample}.log"
+        params:
+            extra=""
+        wrapper:
+            "0.50.4-3-ga47e758/bio/picard/collecttargetedpcrmetrics"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Patrik Smeds
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Patrik Smeds"
+    __copyright__ = "Copyright 2019, Patrik Smeds"
+    __email__ = "patrik.smeds@mail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    log = snakemake.log_fmt_shell()
+
+    extra = snakemake.params.get("extra", "")
+
+    shell(
+        "picard CollectTargetedPcrMetrics "
+        "{extra} "
+        "INPUT={snakemake.input.bam} "
+        "OUTPUT={snakemake.output[0]} "
+        "AMPLICON_INTERVALS={snakemake.input.amplicon_intervals} "
+        "TARGET_INTERVALS={snakemake.input.target_intervals} "
+        "{log}"
+    )

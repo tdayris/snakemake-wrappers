@@ -1,0 +1,128 @@
+.. _`ngs-disambiguate`:
+
+NGS-DISAMBIGUATE
+================
+
+Disambiguation algorithm for reads aligned to two species (e.g. human
+and mouse genomes) from Tophat, Hisat2, STAR or BWA mem.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* ngs-disambiguate ==2016.11.10
+
+* bamtools ==2.4.0
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule disambiguate:
+        input:
+            a="mapped/{sample}.a.bam",
+            b="mapped/{sample}.b.bam"
+        output:
+            a_ambiguous='disambiguate/{sample}.graft.ambiguous.bam',
+            b_ambiguous='disambiguate/{sample}.host.ambiguous.bam',
+            a_disambiguated='disambiguate/{sample}.graft.bam',
+            b_disambiguated='disambiguate/{sample}.host.bam',
+            summary='qc/disambiguate/{sample}.txt'
+        params:
+            algorithm="bwa",
+            # optional: Prefix to use for output. If omitted, a
+            # suitable value is guessed from the output paths. Prefix
+            # is used for the intermediate output paths, as well as
+            # sample name in summary file.
+            prefix="{sample}",
+            extra=""
+        wrapper:
+            "0.50.4-3-ga47e758/bio/ngs-disambiguate"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Julian de Ruiter
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for ngs-disambiguate (from Astrazeneca)."""
+
+    __author__ = "Julian de Ruiter"
+    __copyright__ = "Copyright 2017, Julian de Ruiter"
+    __email__ = "julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from os import path
+
+    from snakemake.shell import shell
+
+
+    # Extract arguments.
+    prefix = snakemake.params.get("prefix", None)
+    extra = snakemake.params.get("extra", "")
+
+    output_dir = path.dirname(snakemake.output.a_ambiguous)
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    # If prefix is not given, we use the summary path to derive the most
+    # probable sample name (as the summary path is least likely to contain)
+    # additional suffixes. This is better than using a random id as prefix,
+    # the prefix is also used as the sample name in the summary file.
+    if prefix is None:
+        prefix = path.splitext(path.basename(snakemake.output.summary))[0]
+
+    # Run command.
+    shell(
+        "ngs_disambiguate"
+        " {extra}"
+        " -o {output_dir}"
+        " -s {prefix}"
+        " -a {snakemake.params.algorithm}"
+        " {snakemake.input.a}"
+        " {snakemake.input.b}"
+    )
+
+    # Move outputs into expected positions.
+    output_base = path.join(output_dir, prefix)
+
+    output_map = {
+        output_base + ".ambiguousSpeciesA.bam": snakemake.output.a_ambiguous,
+        output_base + ".ambiguousSpeciesB.bam": snakemake.output.b_ambiguous,
+        output_base + ".disambiguatedSpeciesA.bam": snakemake.output.a_disambiguated,
+        output_base + ".disambiguatedSpeciesB.bam": snakemake.output.b_disambiguated,
+        output_base + "_summary.txt": snakemake.output.summary,
+    }
+
+    for src, dest in output_map.items():
+        if src != dest:
+            shell("mv {src} {dest}")

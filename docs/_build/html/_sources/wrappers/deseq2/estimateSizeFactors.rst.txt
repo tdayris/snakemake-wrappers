@@ -1,0 +1,116 @@
+.. _`estimateSizeFactors`:
+
+ESTIMATESIZEFACTORS
+===================
+
+
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconductor-deseq2==1.26.0
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_estimateSizeFactor:
+        input:
+            dds = "dds.RDS"
+        output:
+            dds = "esf.RDS"
+        message:
+            "Testing estimateSizeFactor"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 2048)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 10, 20)
+            )
+        log:
+            "logs/test_estimateSizeFactor.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/deseq2/estimateSizeFactors"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Any R parameters can be given to extra.
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script takes a deseq2 dataset object and estimates
+    # size factors for further normalization
+
+    base::library("DESeq2");     # Differential Gene expression
+
+    # Cast input path as character
+    dds_path <- base::as.character(x = snakemake@input[["dds"]]);
+    dds <- base::readRDS(dds_path);
+
+
+    # Check if user provided optional parameters
+    extra <- "";
+    if ("extra" %in% names(snakemake@params)) {
+      extra <- base::paste0(
+        ", ",
+        base::as.character(x = snakemake@params[["extra"]])
+      );
+    }
+
+
+    # Create object
+    dds <- base::eval(
+      base::parse(
+        text = base::paste0(
+          "DESeq2::estimateSizeFactors(dds", extra, ");"
+        )
+      )
+    );
+
+    # Save as RDS
+    output_path <- base::as.character(snakemake@output[["dds"]]);
+    base::saveRDS(
+      obj = dds,
+      file = output_path
+    );

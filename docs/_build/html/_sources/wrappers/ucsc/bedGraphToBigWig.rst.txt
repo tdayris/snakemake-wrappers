@@ -1,0 +1,81 @@
+.. _`bedGraphToBigWig`:
+
+BEDGRAPHTOBIGWIG
+================
+
+Convert *.bedGraph file to *.bw file (see http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/FOOTER.txt)
+
+
+
+
+Software dependencies
+---------------------
+
+
+* ucsc-bedgraphtobigwig == 377
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bedGraphToBigWig:
+        input:
+            bedGraph="{sample}.bedGraph",
+            chromsizes="genome.chrom.sizes"
+        output:
+            "{sample}.bw"
+        params:
+            "" # optional params string
+        wrapper:
+            "0.50.4-3-ga47e758/bio/ucsc/bedGraphToBigWig"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Roman Cherniatchik
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for *.bedGraph to *.bw conversion using UCSC bedGraphToBigWig tool."""
+    # http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/FOOTER.txt
+
+    __author__ = "Roman Chernyatchik"
+    __copyright__ = "Copyright (c) 2019 JetBrains"
+    __email__ = "roman.chernyatchik@jetbrains.com"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    shell(
+        "bedGraphToBigWig {extra}"
+        " {snakemake.input.bedGraph} {snakemake.input.chromsizes}"
+        " {snakemake.output} {log}"
+    )

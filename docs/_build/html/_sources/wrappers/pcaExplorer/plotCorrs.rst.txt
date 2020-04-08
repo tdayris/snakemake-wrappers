@@ -1,0 +1,160 @@
+.. _`pcaExplorer PCA Correlation`:
+
+PCAEXPLORER PCA CORRELATION
+===========================
+
+Plot PCA axes correlations
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconda:bioconductor-deseq2=1.26.0
+
+* bioconda:bioconductor-pcaexplorer=2.12.0
+
+* bioconda:bioconductor-delayedarray=0.12.0
+
+* conda-forge:r-readr=1.3.1
+
+* conda-forge:r-jsonlite=1.6.1
+
+* bioconda:bioconductor-summarizedexperiment=1.16.0
+
+* bioconda:bioconductor-iranges=2.20.0
+
+* conda-forge:cairo=1.16.0
+
+* conda-forge:r-cairo=1.5_11
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_pcaexplorer_pcacorrs:
+        input:
+            dst = "vst.RDS",
+            dds = "dds.RDS"
+        output:
+            png = "plot.png"
+        message:
+            "Testing pcaExplorer PCA Correlations"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 10240)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 20, 200)
+            )
+        log:
+            "logs/test_pcaexplorer_pcacorrs.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/pcaExplorer/plotCorrs"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Parameters:
+
+* extra (str) Command line arguments (interpreted by R)
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script takes a deseq2 transform object and performs
+    # a pca on it before plotting loadings
+
+
+    base::library(package = "DESeq2");        # Differential analysis
+    base::library(package = "pcaExplorer");   # Handles PCAs
+    base::library(package = "Cairo");         # Graphic library
+
+    # Overload output defaults in order to avoid
+    # X11 foreward errors on cluster nodes
+    options(bitmapType="cairo");
+
+    # Load specified input files
+    dst_path <- base::as.character(
+      x = snakemake@input[["dst"]]
+    );
+    dst <- base::readRDS(file = dst_path);
+    pca <- stats::prcomp(t(SummarizedExperiment::assay(dst)))
+
+    dds_path <- base::as.character(
+      x = snakemake@input[["dds"]]
+    );
+    dds <- base::readRDS(file = dds_path);
+
+    corrs_pca <- pcaExplorer::correlatePCs(pca, colData(dds))
+
+    # Load extra parameters
+    extra <- "corrs_pca"
+    if ("extra" %in% names(snakemake@params)) {
+      extra <- base::paste(
+          extra,
+          snakemake@params[["extra"]],
+          sep = ", "
+      );
+    }
+
+    # Build plot
+    png(
+      filename = snakemake@output[["png"]],
+      width = 1024,
+      height = 768,
+      units = "px",
+      type = "cairo"
+    );
+
+    command <- base::paste0(
+      "pcaExplorer::plotPCcorrs(",
+      extra,
+      ");"
+    );
+
+    base::message(command);
+
+    base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+    dev.off()

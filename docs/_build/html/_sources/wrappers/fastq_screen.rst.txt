@@ -1,0 +1,184 @@
+.. _`fastq_screen`:
+
+FASTQ_SCREEN
+============
+
+`fastq_screen <http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen>`_
+screens a library of sequences in FASTQ format against a set of sequence
+databases so you can see if the composition of the library matches with what
+you expect.
+
+This wrapper allows the configuration to be passed as a filename or as
+a dictionary in the rule's  `params.fastq_screen_config` of the rule. So the
+following configuration file::
+
+  DATABASE	ecoli	/data/Escherichia_coli/Bowtie2Index/genome	BOWTIE2
+  DATABASE	ecoli	/data/Escherichia_coli/Bowtie2Index/genome	BOWTIE
+  DATABASE	hg19	/data/hg19/Bowtie2Index/genome	BOWTIE2
+  DATABASE	mm10	/data/mm10/Bowtie2Index/genome	BOWTIE2
+  BOWTIE	/path/to/bowtie
+  BOWTIE2	/path/to/bowtie2
+
+becomes::
+
+  fastq_screen_config = {
+   'database': {
+     'ecoli': {
+       'bowtie2': '/data/Escherichia_coli/Bowtie2Index/genome',
+       'bowtie': '/data/Escherichia_coli/BowtieIndex/genome'},
+     'hg19': {
+       'bowtie2': '/data/hg19/Bowtie2Index/genome'},
+     'mm10': {
+       'bowtie2': '/data/mm10/Bowtie2Index/genome'}
+   },
+   'aligner_paths': {'bowtie': 'bowtie', 'bowtie2': 'bowtie2'}
+  }
+
+By default, the wrapper will use bowtie2 as the aligner and a subset of 100000
+reads.  These can be overridden using ``params.aligner`` and ``params.subset``
+respectively. Furthermore, `params.extra` can be used to pass additional
+arguments verbatim to ``fastq_screen``, for example ``extra="--illumina1_3"`` or
+``extra="--bowtie2 '--trim5=8'"``.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* fastq-screen ==0.5.2
+
+* bowtie2 ==2.2.6
+
+* bowtie ==1.1.2
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule fastq_screen:
+        input:
+            "samples/{sample}.fastq.gz"
+        output:
+            txt="qc/{sample}.fastq_screen.txt",
+            png="qc/{sample}.fastq_screen.png"
+        params:
+            fastq_screen_config=fastq_screen_config,
+            subset=100000,
+            aligner='bowtie2'
+        threads: 8
+        wrapper:
+            "0.50.4-3-ga47e758/bio/fastq_screen"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+* ``fastq_screen`` hard-codes the output filenames. This wrapper moves the
+  hard-coded output files to those specified by the rule.
+* While the dictionary form of ``fastq_screen_config`` is convenient, the
+  unordered nature of the dictionary may cause ``snakemake --list-params-changed``
+  to incorrectly report changed parameters even though the contents remain the
+  same. If you plan on using ``--list-params-changed`` then it will be better to
+  write a config file and pass that as `fastq_screen_config`. This problem will
+  disappear with Python 3.6.
+* When providing the dictionary form of ``fastq_screen_config``, the wrapper will
+  write a temp file using Python's ``tempfile`` module. To control the temp file
+  directory, make sure the `$TMPDIR` environmental variable is set (see the `tempfile
+  docs <https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp>`_) for
+  details). One way of doing this is by adding  something like
+  ``shell.prefix("export TMPDIR=/scratch; ")`` to the snakefile calling this
+  wrapper.
+
+
+
+
+Authors
+-------
+
+
+* Ryan Dale
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    import os
+    from snakemake.shell import shell
+    import tempfile
+
+    __author__ = "Ryan Dale"
+    __copyright__ = "Copyright 2016, Ryan Dale"
+    __email__ = "dalerr@niddk.nih.gov"
+    __license__ = "MIT"
+
+    _config = snakemake.params["fastq_screen_config"]
+
+    subset = snakemake.params.get("subset", 100000)
+    aligner = snakemake.params.get("aligner", "bowtie2")
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell()
+
+    # snakemake.params.fastq_screen_config can be either a dict or a string. If
+    # string, interpret as a filename pointing to the fastq_screen config file.
+    # Otherwise, create a new tempfile out of the contents of the dict:
+    if isinstance(_config, dict):
+        tmp = tempfile.NamedTemporaryFile(delete=False).name
+        with open(tmp, "w") as fout:
+            for label, indexes in _config["database"].items():
+                for aligner, index in indexes.items():
+                    fout.write(
+                        "\t".join(["DATABASE", label, index, aligner.upper()]) + "\n"
+                    )
+            for aligner, path in _config["aligner_paths"].items():
+                fout.write("\t".join([aligner.upper(), path]) + "\n")
+        config_file = tmp
+    else:
+        config_file = _config
+
+    # fastq_screen hard-codes filenames according to this prefix. We will send
+    # hard-coded output to a temp dir, and then move them later.
+    prefix = os.path.basename(snakemake.input[0].split(".fastq")[0])
+    tempdir = tempfile.mkdtemp()
+
+    shell(
+        "fastq_screen --outdir {tempdir} "
+        "--force "
+        "--aligner {aligner} "
+        "--conf {config_file} "
+        "--subset {subset} "
+        "--threads {snakemake.threads} "
+        "{extra} "
+        "{snakemake.input[0]} "
+        "{log}"
+    )
+
+    # Move output to the filenames specified by the rule
+    shell("mv {tempdir}/{prefix}_screen.txt {snakemake.output.txt}")
+    shell("mv {tempdir}/{prefix}_screen.png {snakemake.output.png}")
+
+    # Clean up temp
+    shell("rm -r {tempdir}")
+    if isinstance(_config, dict):
+        shell("rm {tmp}")

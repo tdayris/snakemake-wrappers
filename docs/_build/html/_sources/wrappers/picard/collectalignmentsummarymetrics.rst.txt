@@ -1,0 +1,85 @@
+.. _`picard CollectAlignmentSummaryMetrics`:
+
+PICARD COLLECTALIGNMENTSUMMARYMETRICS
+=====================================
+
+Collect metrics on aligned reads with picard tools.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* picard ==2.22.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule alignment_summary:
+        input:
+            ref="genome.fasta",
+            bam="mapped/{sample}.bam"
+        output:
+            "stats/{sample}.summary.txt"
+        log:
+            "logs/picard/alignment-summary/{sample}.log"
+        params:
+            # optional parameters (e.g. relax checks as below)
+            "VALIDATION_STRINGENCY=LENIENT "
+            "METRIC_ACCUMULATION_LEVEL=null "
+            "METRIC_ACCUMULATION_LEVEL=SAMPLE"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/picard/collectalignmentsummarymetrics"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "johannes.koester@protonmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    log = snakemake.log_fmt_shell()
+
+
+    shell(
+        "picard CollectAlignmentSummaryMetrics {snakemake.params} "
+        "INPUT={snakemake.input.bam} OUTPUT={snakemake.output[0]} "
+        "REFERENCE_SEQUENCE={snakemake.input.ref} {log}"
+    )

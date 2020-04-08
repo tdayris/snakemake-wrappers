@@ -1,0 +1,88 @@
+.. _`jannovar`:
+
+JANNOVAR
+========
+
+Annotate predicted effect of nucleotide changes with Jannovar
+
+
+
+Software dependencies
+---------------------
+
+
+* jannovar-cli ==0.31
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule jannovar:
+        input:
+            vcf="{sample}.vcf",
+            pedigree="pedigree_ar.ped" # optional, contains familial relationships
+        output:
+            "jannovar/{sample}.vcf.gz"
+        log:
+            "logs/jannovar/{sample}.log"
+        params:
+            database="hg19_ucsc.ser", # path to jannovar reference dataset
+            extra="--show-all"         # optional parameters
+        wrapper:
+            "0.50.4-3-ga47e758/bio/jannovar"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Bradford Powell
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Bradford Powell"
+    __copyright__ = "Copyright 2018, Bradford Powell"
+    __email__ = "bpow@unc.edu"
+    __license__ = "BSD"
+
+
+    from snakemake.shell import shell
+
+    shell.executable("bash")
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+
+    pedigree = snakemake.input.get("pedigree", "")
+    if pedigree:
+        pedigree = '--pedigree-file "%s"' % pedigree
+
+    shell(
+        "jannovar annotate-vcf --database {snakemake.params.database}"
+        " --input-vcf {snakemake.input.vcf} --output-vcf {snakemake.output}"
+        " {pedigree} {extra} {log}"
+    )

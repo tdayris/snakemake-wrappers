@@ -1,0 +1,87 @@
+.. _`clustalo`:
+
+CLUSTALO
+========
+
+Multiple alignment of nucleic acid and protein sequences.
+
+
+
+Software dependencies
+---------------------
+
+
+* clustalo ==1.2.4
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule clustalo:
+        input:
+            "{sample}.fa"
+        output:
+            "{sample}.msa.fa"
+        params:
+            extra=""
+        log:
+            "logs/clustalo/test/{sample}.log"
+        threads: 8
+        wrapper:
+            "0.50.4-3-ga47e758/bio/clustalo"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Michael Hall
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for clustal omega."""
+
+    __author__ = "Michael Hall"
+    __copyright__ = "Copyright 2019, Michael Hall"
+    __email__ = "mbhall88@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    # Placeholder for optional parameters
+    extra = snakemake.params.get("extra", "")
+    # Formats the log redrection string
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    # Executed shell command
+    shell(
+        "clustalo {extra}"
+        " --threads={snakemake.threads}"
+        " --in {snakemake.input[0]}"
+        " --out {snakemake.output[0]} "
+        " {log}"
+    )

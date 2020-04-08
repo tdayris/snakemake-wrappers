@@ -1,0 +1,83 @@
+.. _`bedtools merge`:
+
+BEDTOOLS MERGE
+==============
+
+Merge entries in one or multiple BED/BAM/VCF/GFF files with bedtools.
+
+
+
+Software dependencies
+---------------------
+
+
+* bedtools =2.29.0
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bedtools_merge:
+        input:
+            "A.bed"
+        output:
+            "A.merged.bed"
+        params:
+            ## Add optional parameters 
+            extra="-c 1 -o count" ## In this example, we want to count how many input lines we merged per output line
+        log:
+            "logs/merge/A.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bedtools/merge"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Jan Forster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2019, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    ## Extract arguments
+    extra = snakemake.params.get("extra", "")
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "( bedtools merge"
+        " {extra}"
+        " -i {snakemake.input}"
+        " > {snakemake.output})"
+        " {log}"
+    )

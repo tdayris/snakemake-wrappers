@@ -1,0 +1,95 @@
+.. _`RUBIC`:
+
+RUBIC
+=====
+
+`RUBIC <http://ccb.nki.nl/software/rubic/doc/>`_
+detects recurrent copy number alterations using copy number breaks.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* r-base =3.4.1
+
+* r-rubic =1.0.3
+
+* r-data.table =1.10.4
+
+* r-pracma =2.0.4
+
+* r-ggplot2 =2.2.1
+
+* r-gtable =0.2.0
+
+* r-codetools =0.2_15
+
+* r-digest =0.6.12
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule rubic:
+        input:
+            seg="{samples}/segments.txt",
+            markers="{samples}/markers.txt"
+        output:
+            out_gains="{samples}/gains.txt",
+            out_losses="{samples}/losses.txt",
+            out_plots=directory("{samples}/plots") #only possible to provide output directory for plots
+        params:
+            fdr="",
+            genefile=""
+        wrapper:
+            "0.50.4-3-ga47e758/bio/rubic"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Beatrice F. Tan
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    # __author__ = "Beatrice F. Tan"
+    # __copyright__ = "Copyright 2018, Beatrice F. Tan"
+    # __email__ = "beatrice.ftan@gmail.com"
+    # __license__ = "LUMC"
+
+    library(RUBIC)
+
+    all_genes <- if (snakemake@params[["genefile"]] == "") system.file("extdata", "genes.tsv", package="RUBIC") else snakemake@params[["genefile"]]
+    fdr <- if (snakemake@params[["fdr"]] == "") 0.25 else snakemake@params[["fdr"]]
+
+    rbc <- rubic(fdr, snakemake@input[["seg"]], snakemake@input[["markers"]], genes=all_genes)
+    rbc$save.focal.gains(snakemake@output[["out_gains"]])
+    rbc$save.focal.losses(snakemake@output[["out_losses"]])
+    rbc$save.plots(snakemake@output[["out_plots"]])

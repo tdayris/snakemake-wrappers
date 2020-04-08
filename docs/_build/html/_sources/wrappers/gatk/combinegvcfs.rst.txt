@@ -1,0 +1,99 @@
+.. _`gatk CombineGVCFs`:
+
+GATK COMBINEGVCFS
+=================
+
+Run gatk CombineGVCFs.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* gatk4 ==4.1.4.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule genotype_gvcfs:
+        input:
+            gvcfs=["calls/a.g.vcf", "calls/b.g.vcf"],
+            ref="genome.fasta"
+        output:
+            gvcf="calls/all.g.vcf",
+        log:
+            "logs/gatk/combinegvcfs.log"
+        params:
+            extra="",  # optional
+            java_opts="",  # optional
+        wrapper:
+            "0.50.4-3-ga47e758/bio/gatk/combinegvcfs"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+* The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
+* The `extra` param alllows for additional program arguments.
+* For more inforamtion see, https://software.broadinstitute.org/gatk/documentation/article?id=11050
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+* Jake VanCampen
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2018, Johannes Köster"
+    __email__ = "johannes.koester@protonmail.com"
+    __license__ = "MIT"
+
+
+    import os
+
+    from snakemake.shell import shell
+
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = snakemake.params.get("java_opts", "")
+    gvcfs = list(map("-V {}".format, snakemake.input.gvcfs))
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    shell(
+        "gatk --java-options '{java_opts}' CombineGVCFs {extra} "
+        "{gvcfs} "
+        "-R {snakemake.input.ref} "
+        "-O {snakemake.output.gvcf} {log}"
+    )

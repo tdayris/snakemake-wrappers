@@ -1,0 +1,119 @@
+.. _`ensembl-sequence`:
+
+ENSEMBL-SEQUENCE
+================
+
+Download sequences (e.g. genome) from ENSEMBL FTP servers, and store them in a single .fasta file.
+
+
+
+Software dependencies
+---------------------
+
+
+* curl
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule get_genome:
+        output:
+            "refs/genome.fasta"
+        params:
+            species="saccharomyces_cerevisiae",
+            datatype="dna",
+            build="R64-1-1",
+            release="98"
+        log:
+            "logs/get_genome.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/reference/ensembl-sequence"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2019, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    import subprocess as sp
+    from snakemake.shell import shell
+
+    species = snakemake.params.species.lower()
+    release = snakemake.params.release
+    build = snakemake.params.build
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    suffixes = ""
+    datatype = snakemake.params.get("datatype", "")
+    if datatype == "dna":
+        suffixes = ["dna.primary_assembly.fa.gz", "dna.toplevel.fa.gz"]
+    elif datatype == "cdna":
+        suffixes = ["cdna.all.fa.gz"]
+    elif datatype == "cds":
+        suffixes = ["cds.all.fa.gz"]
+    elif datatype == "ncrna":
+        suffixes = ["ncrna.fa.gz"]
+    elif datatype == "pep":
+        suffixes = ["pep.all.fa.gz"]
+    else:
+        raise ValueError("invalid datatype, must be one of dna, cdna, cds, ncrna, pep")
+
+    success = False
+    for suffix in suffixes:
+        url = "ftp://ftp.ensembl.org/pub/release-{release}/fasta/{species}/{datatype}/{species_cap}.{build}.{suffix}".format(
+            release=release,
+            species=species,
+            datatype=datatype,
+            build=build,
+            suffix=suffix,
+            species_cap=species.capitalize(),
+        )
+
+        try:
+            shell("curl -sSf {url} > /dev/null 2> /dev/null")
+        except sp.CalledProcessError:
+            continue
+
+        shell("(curl -L {url} | gzip -d > {snakemake.output[0]}) {log}")
+        success = True
+        break
+
+    if not success:
+        raise ValueError(
+            "Requested sequence does not seem to exist on ensembl FTP servers or servers are unavailable (url {})".format(
+                url
+            )
+        )

@@ -1,0 +1,71 @@
+.. _`samtools faidx`:
+
+SAMTOOLS FAIDX
+==============
+
+index reference sequence in FASTA format from reference sequence
+
+
+
+Software dependencies
+---------------------
+
+
+* samtools ==1.9
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule samtools_index:
+        input:
+            "{sample}.fa"
+        output:
+            "{sample}.fa.fai"
+        params:
+            "" # optional params string
+        wrapper:
+            "0.50.4-3-ga47e758/bio/samtools/faidx"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Michael Chambers
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Michael Chambers"
+    __copyright__ = "Copyright 2019, Michael Chambers"
+    __email__ = "greenkidneybean@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    shell("samtools faidx {snakemake.params} {snakemake.input[0]} > {snakemake.output[0]}")

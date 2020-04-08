@@ -1,0 +1,100 @@
+.. _`bismark_genome_preparation`:
+
+BISMARK_GENOME_PREPARATION
+==========================
+
+Generate indexes for Bismark (see https://github.com/FelixKrueger/Bismark/blob/master/bismark_genome_preparation).
+
+
+
+
+Software dependencies
+---------------------
+
+
+* bowtie2 == 2.3.4.3
+
+* bismark == 0.22.1
+
+* samtools == 1.9
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    # For *.fa file
+    rule bismark_genome_preparation_fa:
+        input:
+            "indexes/{genome}/{genome}.fa"
+        output:
+            directory("indexes/{genome}/Bisulfite_Genome")
+        log:
+            "logs/indexes/{genome}/Bisulfite_Genome.log"
+        params:
+            ""  # optional params string
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bismark/bismark_genome_preparation"
+
+    # Fo *.fa.gz file:
+    rule bismark_genome_preparation_fa_gz:
+        input:
+            "indexes/{genome}/{genome}.fa.gz"
+        output:
+            directory("indexes/{genome}/Bisulfite_Genome")
+        log:
+            "logs/indexes/{genome}/Bisulfite_Genome.log"
+        params:
+            ""  # optional params string
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bismark/bismark_genome_preparation"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Roman Cherniatchik
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for Bismark indexes preparing using bismark_genome_preparation."""
+    # https://github.com/FelixKrueger/Bismark/blob/master/bismark_genome_preparation
+
+    __author__ = "Roman Chernyatchik"
+    __copyright__ = "Copyright (c) 2019 JetBrains"
+    __email__ = "roman.chernyatchik@jetbrains.com"
+    __license__ = "MIT"
+
+
+    from os import path
+    from snakemake.shell import shell
+
+    input_dir = path.dirname(snakemake.input[0])
+
+    params_extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell("bismark_genome_preparation --verbose --bowtie2 {params_extra} {input_dir} {log}")

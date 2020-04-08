@@ -1,0 +1,81 @@
+.. _`samtools stats`:
+
+SAMTOOLS STATS
+==============
+
+Generate stats using samtools.
+
+
+
+Software dependencies
+---------------------
+
+
+* samtools ==1.9
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule samtools_stats:
+        input:
+            "mapped/{sample}.bam"
+        output:
+            "samtools_stats/{sample}.txt"
+        params:
+            extra="",                       # Optional: extra arguments.
+            region="1:1000000-2000000"      # Optional: region string.
+        log:
+            "logs/samtools_stats/{sample}.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/samtools/stats"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Julian de Ruiter
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for trimming paired-end reads using cutadapt."""
+
+    __author__ = "Julian de Ruiter"
+    __copyright__ = "Copyright 2017, Julian de Ruiter"
+    __email__ = "julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    extra = snakemake.params.get("extra", "")
+    region = snakemake.params.get("region", "")
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+
+    shell("samtools stats {extra} {snakemake.input}" " {region} > {snakemake.output} {log}")

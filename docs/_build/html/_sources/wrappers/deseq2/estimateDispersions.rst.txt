@@ -1,0 +1,114 @@
+.. _`estimateDispersions`:
+
+ESTIMATEDISPERSIONS
+===================
+
+Estimate the dispersions for a DESeqDataSet
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconductor-deseq2==1.26.0
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_estimateDispersions:
+        input:
+            dds = "esf.RDS"
+        output:
+            disp = "disp.RDS"
+        message:
+            "Testing estimateDispersions"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 2048)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 10, 20)
+            )
+        log:
+            "logs/test_estimateDispersions.log"
+        params:
+            extra = "fitType='local'"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/deseq2/estimateDispersions"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Besides the RDS object, you can add any arguments in extra, they
+shall be interpreted within the "..." argument in R.
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/bin/R
+    # among samples for further normalization
+
+    base::library("DESeq2");     # Differential Gene expression
+
+    # Cast input path as character
+    dds_path <- base::as.character(x = snakemake@input[["dds"]]);
+    dds <- base::readRDS(dds_path);
+
+    # Cast locfunc as function name
+    extra <- "";
+    if ("extra" %in% names(snakemake@params)) {
+      extra <- base::paste0(
+        ", ",
+        base::as.character(x = snakemake@params[["extra"]])
+      );
+    }
+    # Create object
+    dds <- base::eval(
+      base::parse(
+        text = base::paste0(
+          "DESeq2::estimateDispersions(dds", extra, ");"
+        )
+      )
+    );
+
+    # Save as RDS
+    output_path <- base::as.character(x = snakemake@output[["disp"]]);
+    base::saveRDS(
+      obj = dds,
+      file = output_path
+    );

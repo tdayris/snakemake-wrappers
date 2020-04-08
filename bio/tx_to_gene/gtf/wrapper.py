@@ -1,3 +1,6 @@
+#!/usr/bin/python3.8
+# conding: utf-8
+
 """
 This script extracts a tsv from a GTF. This tsv contains gene_id,
 transcript_id, gene_name. Optionaly, headers and positions can

@@ -1,0 +1,100 @@
+.. _`ensembl-annotation`:
+
+ENSEMBL-ANNOTATION
+==================
+
+Download annotation of genomic sites (e.g. transcripts) from ENSEMBL FTP servers, and store them in a single .gtf or .gff3 file.
+
+
+
+Software dependencies
+---------------------
+
+
+* curl
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule get_annotation:
+        output:
+            "refs/annotation.gtf"
+        params:
+            species="homo_sapiens",
+            release="98",
+            build="GRCh38",
+            fmt="gtf",
+            flavor="" # optional, e.g. chr_patch_hapl_scaff, see Ensembl FTP.
+        log:
+            "logs/get_annotation.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/reference/ensembl-annotation"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2019, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    species = snakemake.params.species.lower()
+    release = snakemake.params.release
+    fmt = snakemake.params.fmt
+    build = snakemake.params.build
+    flavor = snakemake.params.get("flavor", "")
+
+    if flavor:
+        flavor += "."
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    suffix = ""
+    if fmt == "gtf":
+        suffix = "gtf.gz"
+    elif fmt == "gff3":
+        suffix = "gff3.gz"
+
+    url = "ftp://ftp.ensembl.org/pub/release-{release}/{fmt}/{species}/{species_cap}.{build}.{release}.{flavor}{suffix}".format(
+        release=release,
+        build=build,
+        species=species,
+        fmt=fmt,
+        species_cap=species.capitalize(),
+        suffix=suffix,
+        flavor=flavor,
+    )
+
+    shell("(curl -L {url} | gzip -d > {snakemake.output[0]}) {log}")

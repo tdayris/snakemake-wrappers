@@ -1,7 +1,12 @@
 #!/usr/bin/R
 
+# __author__ = "Thibault Dayris"
+# __copyright__ = "Copyright 2020, Thibault Dayris"
+# __email__ = "thibault.dayris@gustaveroussy.fr"
+# __license__ = "MIT"
+
 # This script takes a deseq2 transform object and performs
-# a pca on it before plotting loadings
+# a plot over pca loadings
 
 
 base::library(package = "DESeq2");        # Differential analysis

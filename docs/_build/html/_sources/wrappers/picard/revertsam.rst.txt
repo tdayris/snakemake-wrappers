@@ -1,0 +1,85 @@
+.. _`picard RevertSam`:
+
+PICARD REVERTSAM
+================
+
+Reverts SAM or BAM files to a previous state. .
+
+
+
+
+Software dependencies
+---------------------
+
+
+* picard ==2.22.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule revert_bam:
+        input:
+            "mapped/{sample}.bam"
+        output:
+            "revert/{sample}.bam"
+        log:
+            "logs/picard/revert_sam/{sample}.log"
+        params:
+            extra="SANITIZE=true" # optional: Extra arguments for picard.
+        wrapper:
+            "0.50.4-3-ga47e758/bio/picard/revertsam"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Patrik Smeds
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for picard RevertSam."""
+
+    __author__ = "Patrik Smeds"
+    __copyright__ = "Copyright 2018, Patrik Smeds"
+    __email__ = "patrik.smeds@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell(
+        "picard"
+        " RevertSam"
+        " {extra}"
+        " INPUT={snakemake.input[0]}"
+        " OUTPUT={snakemake.output[0]}"
+        " {log}"
+    )

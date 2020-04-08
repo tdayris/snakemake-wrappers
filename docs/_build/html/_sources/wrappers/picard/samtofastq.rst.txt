@@ -1,0 +1,100 @@
+.. _`picard SomToFastq`:
+
+PICARD SOMTOFASTQ
+=================
+
+Converts a SAM or BAM file to FASTQ.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* picard ==2.22.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bam_to_fastq:
+        input:
+            "mapped/{sample}.bam"
+        output:
+            fastq1="reads/{sample}.R1.fastq",
+            fastq2="reads/{sample}.R2.fastq"
+        log:
+            "logs/picard/sam_to_fastq/{sample}.log"
+        params:
+            extra="" # optional: Extra arguments for picard.
+        wrapper:
+            "0.50.4-3-ga47e758/bio/picard/samtofastq"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Patrik Smeds
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for picard SortSam."""
+
+    __author__ = "Julian de Ruiter"
+    __copyright__ = "Copyright 2017, Julian de Ruiter"
+    __email__ = "julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    fastq1 = snakemake.output.fastq1
+    fastq2 = snakemake.output.get("fastq2", None)
+    fastq_unpaired = snakemake.output.get("unpaired_fastq", None)
+
+    if not isinstance(fastq1, str):
+        raise ValueError("f1 needs to be provided")
+
+    output = " FASTQ=" + fastq1
+
+    if isinstance(fastq2, str):
+        output += " SECOND_END_FASTQ=" + fastq2
+
+    if isinstance(fastq_unpaired, str):
+        if not isinstance(fastq2, str):
+            raise ValueError("f2 is required if fastq_unpaired is set")
+        else:
+            output += " UNPAIRED_FASTQ=" + fastq_unpaired
+
+    shell(
+        "picard" " SamToFastq" " {extra}" " INPUT={snakemake.input[0]}" " {output}" " {log}"
+    )

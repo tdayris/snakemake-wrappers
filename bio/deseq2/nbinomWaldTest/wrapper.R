@@ -3,6 +3,11 @@
 # This script takes a deseq2 dataset object and performs
 # a negative binomial wald test on it
 
+# __author__ = "Thibault Dayris"
+# __copyright__ = "Copyright 2020, Thibault Dayris"
+# __email__ = "thibault.dayris@gustaveroussy.fr"
+# __license__ = "MIT"
+
 base::library(package = "DESeq2");     # Differential Gene expression
 
 # Load DESeq2 dataset

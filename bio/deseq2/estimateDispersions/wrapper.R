@@ -1,5 +1,11 @@
 #!/bin/R
-# among samples for further normalization
+
+# __author__ = "Thibault Dayris"
+# __copyright__ = "Copyright 2020, Thibault Dayris"
+# __email__ = "thibault.dayris@gustaveroussy.fr"
+# __license__ = "MIT"
+
+# Perform sample dispertion estimates
 
 base::library("DESeq2");     # Differential Gene expression
 

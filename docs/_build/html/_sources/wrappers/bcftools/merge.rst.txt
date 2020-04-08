@@ -1,0 +1,73 @@
+.. _`bcftools merge`:
+
+BCFTOOLS MERGE
+==============
+
+Merge vcf/bcf files with bcftools.
+
+
+
+Software dependencies
+---------------------
+
+
+* bcftools ==1.10
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bcftools_merge:
+        input:
+            calls=["a.bcf", "b.bcf"]
+        output:
+            "all.bcf"
+        params:
+            ""  # optional parameters for bcftools concat (except -o)
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bcftools/merge"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Patrik Smeds
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Patrik Smeds"
+    __copyright__ = "Copyright 2018, Patrik Smeds"
+    __email__ = "patrik.smeds@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    shell(
+        "bcftools merge {snakemake.params} -o {snakemake.output[0]} "
+        "{snakemake.input.calls}"
+    )

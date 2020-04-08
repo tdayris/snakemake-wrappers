@@ -1,0 +1,100 @@
+.. _`bcftools reheader`:
+
+BCFTOOLS REHEADER
+=================
+
+Change header or sample names of vcf/bcf file.
+
+
+
+Software dependencies
+---------------------
+
+
+* bcftools ==1.10
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bcftools_reheader:
+        input:
+            vcf="a.bcf",
+            ## new header, can be omitted if "samples" is set
+            header="header.txt",
+            ## file containing new sample names, can be omitted if "header" is set
+            samples="samples.tsv"
+        output:
+            "a.reheader.bcf"
+        params:
+            extra="",  # optional parameters for bcftools reheader
+            view_extra="-O b"  # add output format for internal bcftools view call
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bcftools/reheader"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Jan Forster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2020, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    ## Extract arguments
+    header = snakemake.input.get("header", "")
+    if header:
+        header_cmd = "-h " + header
+    else:
+        header_cmd = ""
+
+    samples = snakemake.input.get("samples", "")
+    if samples:
+        samples_cmd = "-s " + samples
+    else:
+        samples_cmd = ""
+
+    extra = snakemake.params.get("extra", "")
+    view_extra = snakemake.params.get("view_extra", "")
+
+    shell(
+        "bcftools reheader "
+        "{extra} "
+        "{header_cmd} "
+        "{samples_cmd} "
+        "{snakemake.input.vcf} "
+        "| bcftools view "
+        "{view_extra} "
+        "> {snakemake.output}"
+    )

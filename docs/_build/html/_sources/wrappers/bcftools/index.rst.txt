@@ -1,0 +1,73 @@
+.. _`bcftools index`:
+
+BCFTOOLS INDEX
+==============
+
+Index vcf/bcf file.
+
+
+
+Software dependencies
+---------------------
+
+
+* bcftools ==1.10
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bcftools_index:
+        input:
+            "a.bcf"
+        output:
+            "a.bcf.csi"
+        params:
+            extra=""  # optional parameters for bcftools index
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bcftools/index"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Jan Forster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "koester@jimmy.harvard.edu"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    ## Extract arguments
+    extra = snakemake.params.get("extra", "")
+
+    shell("bcftools index" " {extra}" " {snakemake.input[0]}")

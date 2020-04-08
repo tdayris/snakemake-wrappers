@@ -1,0 +1,160 @@
+.. _`bismark2report`:
+
+BISMARK2REPORT
+==============
+
+Generate graphical HTML report from Bismark reports (see https://github.com/FelixKrueger/Bismark/blob/master/bismark2report).
+
+
+
+
+Software dependencies
+---------------------
+
+
+* bowtie2 == 2.3.4.3
+
+* bismark == 0.22.1
+
+* samtools == 1.9
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    # Example: Pair-ended reads
+    rule bismark2report_pe:
+        input:
+            alignment_report="bams/{sample}_{genome}_PE_report.txt",
+            nucleotide_report="bams/{sample}_{genome}_pe.nucleotide_stats.txt",
+            dedup_report="bams/{sample}_{genome}_pe.deduplication_report.txt",
+            mbias_report="meth/{sample}_{genome}_pe.deduplicated.M-bias.txt",
+            splitting_report="meth/{sample}_{genome}_pe.deduplicated_splitting_report.txt"
+        output:
+            html="qc/meth/{sample}_{genome}.bismark2report.html",
+        log:
+            "logs/qc/meth/{sample}_{genome}.bismark2report.html.log",
+        params:
+            skip_optional_reports=True
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bismark/bismark2report"
+
+    # Example: Single-ended reads
+    rule bismark2report_se:
+        input:
+            alignment_report="bams/{sample}_{genome}_SE_report.txt",
+            nucleotide_report="bams/{sample}_{genome}.nucleotide_stats.txt",
+            dedup_report="bams/{sample}_{genome}.deduplication_report.txt",
+            mbias_report="meth/{sample}_{genome}.deduplicated.M-bias.txt",
+            splitting_report="meth/{sample}_{genome}.deduplicated_splitting_report.txt"
+        output:
+            html="qc/meth/{sample}_{genome}.bismark2report.html",
+        log:
+            "logs/qc/meth/{sample}_{genome}.bismark2report.html.log",
+        params:
+            skip_optional_reports=True
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bismark/bismark2report"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Roman Cherniatchik
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper to generate graphical HTML report from Bismark reports."""
+    # https://github.com/FelixKrueger/Bismark/blob/master/bismark2report
+
+    __author__ = "Roman Chernyatchik"
+    __copyright__ = "Copyright (c) 2019 JetBrains"
+    __email__ = "roman.chernyatchik@jetbrains.com"
+    __license__ = "MIT"
+
+    import os
+    from snakemake.shell import shell
+
+
+    def answer2bool(v):
+        return str(v).lower() in ("yes", "true", "t", "1")
+
+
+    extra = snakemake.params.get("extra", "")
+    cmds = ["bismark2report {extra}"]
+
+    # output
+    html_file = snakemake.output.get("html", "")
+    output_dir = snakemake.output.get("html_dir", None)
+    if output_dir is None:
+        if html_file:
+            output_dir = os.path.dirname(html_file)
+    else:
+        if html_file:
+            raise ValueError(
+                "bismark/bismark2report: Choose one: 'html=...' for a single dir or 'html_dir=...' for batch processing."
+            )
+
+    if output_dir is None:
+        raise ValueError(
+            "bismark/bismark2report: Output file or directory not specified. "
+            "Use 'html=...' for a single dir or 'html_dir=...' for batch "
+            "processing."
+        )
+
+    if output_dir:
+        cmds.append("--dir {output_dir:q}")
+
+    if html_file:
+        html_file_name = os.path.basename(html_file)
+        cmds.append("--output {html_file_name:q}")
+
+    # reports
+    reports = [
+        "alignment_report",
+        "dedup_report",
+        "splitting_report",
+        "mbias_report",
+        "nucleotide_report",
+    ]
+    skip_optional_reports = answer2bool(
+        snakemake.params.get("skip_optional_reports", False)
+    )
+    for report_name in reports:
+        path = snakemake.input.get(report_name, "")
+        if path:
+            locals()[report_name] = path
+            cmds.append("--{0} {{{1}:q}}".format(report_name, report_name))
+        elif skip_optional_reports:
+            cmds.append("--{0} 'none'".format(report_name))
+
+    # log
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    cmds.append("{log}")
+
+    # run shell command:
+    shell(" ".join(cmds))

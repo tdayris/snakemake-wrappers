@@ -1,0 +1,88 @@
+.. _`GATK Mutect2`:
+
+GATK MUTECT2
+============
+
+Call somatic SNVs and indels via local assembly of haplotypes
+
+
+
+Software dependencies
+---------------------
+
+
+* gatk4 ==4.1.4.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule mutect2:
+        input:
+            fasta = "genome/genome.fasta",
+            map = "mapped/{sample}.bam"
+        output:
+            vcf = "variant/{sample}.vcf"
+        message:
+            "Testing Mutect2 with {wildcards.sample}"
+        threads:
+            1
+        log:
+            "logs/mutect_{sample}.log"
+        wrapper:
+             "0.50.4-3-ga47e758/bio/gatk/mutect"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for GATK4 Mutect2"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2019, Dayris Thibault"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    from snakemake.utils import makedirs
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+
+    shell(
+        "gatk Mutect2 "  # Tool and its subprocess
+        "--input {snakemake.input.map} "  # Path to input mapping file
+        "--output {snakemake.output.vcf} "  # Path to output vcf file
+        "--reference {snakemake.input.fasta} "  # Path to reference fasta file
+        "{extra} "  # Extra parameters
+        "{log}"  # Logging behaviour
+    )

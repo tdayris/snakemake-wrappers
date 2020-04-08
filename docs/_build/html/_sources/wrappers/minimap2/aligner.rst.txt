@@ -1,0 +1,82 @@
+.. _`minimap2`:
+
+MINIMAP2
+========
+
+A versatile pairwise aligner for genomic and spliced nucleotide sequences https://lh3.github.io/minimap2
+
+
+
+Software dependencies
+---------------------
+
+
+* minimap2 ==2.5
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule minimap2:
+        input:
+            target="target/{input1}.mmi", # can be either genome index or genome fasta
+            query=["query/reads1.fasta", "query/reads2.fasta"]
+        output:
+            "aligned/{input1}_aln.paf"
+        log:
+            "logs/minimap2/{input1}.log"
+        params:
+            extra="-x map-pb"  # optional
+        threads: 3
+        wrapper:
+            "0.50.4-3-ga47e758/bio/minimap2/aligner"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Tom Poorten
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Tom Poorten"
+    __copyright__ = "Copyright 2017, Tom Poorten"
+    __email__ = "tom.poorten@gmail.com"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    inputQuery = " ".join(snakemake.input.query)
+
+    shell(
+        "(minimap2 -t {snakemake.threads} {extra} "
+        "{snakemake.input.target} {inputQuery} >"
+        "{snakemake.output[0]}) {log}"
+    )

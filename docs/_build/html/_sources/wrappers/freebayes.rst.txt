@@ -1,0 +1,103 @@
+.. _`freebayes`:
+
+FREEBAYES
+=========
+
+Call small genomic variants with freebayes.
+
+
+
+Software dependencies
+---------------------
+
+
+* freebayes ==1.3.1
+
+* bcftools ==1.10
+
+* parallel ==20190522
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule freebayes:
+        input:
+            ref="genome.fasta",
+            # you can have a list of samples here
+            samples="mapped/{sample}.bam"
+        output:
+            "calls/{sample}.vcf"  # either .vcf or .bcf
+        log:
+            "logs/freebayes/{sample}.log"
+        params:
+            extra="",         # optional parameters
+            chunksize=100000  # reference genome chunk size for parallelization (default: 100000)
+        threads: 2
+        wrapper:
+            "0.50.4-3-ga47e758/bio/freebayes"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2017, Johannes Köster"
+    __email__ = "johannes.koester@protonmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    shell.executable("bash")
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    params = snakemake.params.get("extra", "")
+
+    pipe = ""
+    if snakemake.output[0].endswith(".bcf"):
+        pipe = "| bcftools view -Ob -"
+
+    if snakemake.threads == 1:
+        freebayes = "freebayes"
+    else:
+        chunksize = snakemake.params.get("chunksize", 100000)
+        freebayes = (
+            "freebayes-parallel <(fasta_generate_regions.py "
+            "{snakemake.input.ref}.fai {chunksize}) "
+            "{snakemake.threads}"
+        ).format(snakemake=snakemake, chunksize=chunksize)
+
+    shell(
+        "({freebayes} {params} -f {snakemake.input.ref}"
+        " {snakemake.input.samples} {pipe} > {snakemake.output[0]}) {log}"
+    )

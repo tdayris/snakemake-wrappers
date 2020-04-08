@@ -1,0 +1,162 @@
+.. _`Add Genes`:
+
+ADD GENES
+=========
+
+Add a gene/transcript column to a given tsv
+
+
+
+Software dependencies
+---------------------
+
+
+* conda-forge:python=3.8.2
+
+* conda-forge:pandas=1.0.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_add_genes:
+        input:
+            tx2gene = "tx2gene.tsv",
+            tsv = "table.tsv"
+        output:
+            tsv = "result.tsv"
+        message:
+            "Testing add genes wrapper"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 512, 1024)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 10, 20)
+            )
+        log:
+            "logs/test_add_genes.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/pandas/add_genes"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Parameters:
+
+* header: There is a header in the tx2gene table
+* genes: Work on genes rather than transcripts
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3.8
+    # conding: utf-8
+
+    """
+    Join multiple two tsv files on a given column. One of
+    these tsv file if formatted as follows:
+
+    1: gene_id
+    2: transcript_id
+    3: gene_name
+
+    Optional columns can be:
+
+    4: chr
+    5: start
+    6: end
+    """
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    import logging
+    import pandas
+
+    from os.path import basename, dirname
+    from snakemake.utils import makedirs
+
+    if (outdir := dirname(snakemake.output["tsv"])) != "":
+        makedirs(outdir)
+
+    genes = snakemake.params.get("genes", False)
+
+    annot = pandas.read_csv(
+        snakemake.input["tx2gene"],
+        sep="\t",
+        header=(
+            0
+            if snakemake.params.get("header", None) is not None
+            else None
+        ),
+        index_col=None,
+        dtype=str
+    )
+    annot.columns = (
+        ["Ensembl_ID", "Hugo_ID"]
+        if genes is True
+        else ["Ensembl_ID", "Transcript_ID", "Hugo_ID"]
+    )
+
+    tsv = pandas.read_csv(
+        snakemake.input["tsv"],
+        sep="\t",
+        header=0,
+        index_col=0
+    )
+
+    merged_frame = pandas.merge(
+        tsv,
+        annot,
+        left_index=True,
+        right_on=(
+            "Ensembl_ID"
+            if genes is True
+            else "Transcript_ID"
+        ),
+        how="left"
+    )
+
+    merged_frame.to_csv(
+        snakemake.output["tsv"],
+        sep="\t",
+        index=False,
+        header=True
+    )

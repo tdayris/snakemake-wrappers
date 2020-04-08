@@ -1,0 +1,73 @@
+.. _`bcftools view`:
+
+BCFTOOLS VIEW
+=============
+
+View vcf/bcf file in a different format.
+
+
+
+Software dependencies
+---------------------
+
+
+* bcftools ==1.10
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bcf_to_vcf:
+        input:
+            "{prefix}.bcf"
+        output:
+            "{prefix}.vcf"
+        params:
+            ""  # optional parameters for bcftools view (except -o)
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bcftools/view"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "koester@jimmy.harvard.edu"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    shell(
+        "bcftools view {snakemake.params} {snakemake.input[0]} " "-o {snakemake.output[0]}"
+    )

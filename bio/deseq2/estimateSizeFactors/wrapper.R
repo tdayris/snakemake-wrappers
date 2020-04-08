@@ -3,6 +3,11 @@
 # This script takes a deseq2 dataset object and estimates
 # size factors for further normalization
 
+# __author__ = "Thibault Dayris"
+# __copyright__ = "Copyright 2020, Thibault Dayris"
+# __email__ = "thibault.dayris@gustaveroussy.fr"
+# __license__ = "MIT"
+
 base::library("DESeq2");     # Differential Gene expression
 
 # Cast input path as character

@@ -1,0 +1,116 @@
+.. _`varscan mpileup2indel`:
+
+VARSCAN MPILEUP2INDEL
+=====================
+
+Detect indel in NGS data from mpileup files
+
+
+
+Software dependencies
+---------------------
+
+
+* varscan ==2.4.3
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule mpileup_to_vcf:
+        input:
+            "mpileup/{sample}.mpileup.gz"
+        output:
+            "vcf/{sample}.vcf"
+        message:
+            "Calling Indel with Varscan2"
+        threads:  # Varscan does not take any threading information
+            1     # However, mpileup might have to be unzipped.
+                  # Keep threading value to one for unzipped mpileup input
+                  # Set it to two for zipped mipileup files
+        log:
+            "logs/varscan_{sample}.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/varscan/mpileup2indel"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Varscan does not take any threading information by itself. However, mpileup
+files given as input, might be gzipped.
+
+If so, it's recommended to use two threads:
+
+* 1 for varscan itself
+* 1 for zcat
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for Varscan2 mpileup2indel"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2019, Dayris Thibault"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    import os.path as op
+    from snakemake.shell import shell
+    from snakemake.utils import makedirs
+
+    # Gathering extra parameters and logging behaviour
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    # In case input files are gzipped mpileup files,
+    # they are being unzipped and piped
+    # In that case, it is recommended to use at least 2 threads:
+    # - One for unzipping with zcat
+    # - One for running varscan
+    pileup = (
+        " cat {} ".format(snakemake.input[0])
+        if not snakemake.input[0].endswith("gz")
+        else " zcat {} ".format(snakemake.input[0])
+    )
+
+    # Building output directories
+    makedirs(op.dirname(snakemake.output[0]))
+
+    shell(
+        "varscan mpileup2indel "  # Tool and its subprocess
+        "{extra} "  # Extra parameters
+        "<( {pileup} ) "
+        "> {snakemake.output[0]} "  # Path to vcf file
+        "{log}"  # Logging behaviour
+    )

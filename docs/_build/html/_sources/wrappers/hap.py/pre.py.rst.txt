@@ -1,0 +1,89 @@
+.. _`pre.py`:
+
+PRE.PY
+======
+
+Preprocessing/normalisation of vcf/bcf files. Part of the hap.py suite by Illumina (see https://github.com/Illumina/hap.py/blob/master/doc/normalisation.md).
+
+
+
+Software dependencies
+---------------------
+
+
+* hap.py =0.3.10
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule preprocess_variants:
+        input:
+            ##vcf/bcf
+            variants="variants.vcf"
+        output:
+            "normalized/variants.vcf"
+        params:
+            ## path to reference genome
+            genome="genome.fasta",
+            ## parameters such as -L to left-align variants
+            extra="-L"
+        threads: 2
+        wrapper:
+            "0.50.4-3-ga47e758/bio/hap.py/pre.py"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Jan Forster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2019, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+    from os import path
+
+    from snakemake.shell import shell
+
+    ## Extract arguments
+    extra = snakemake.params.get("extra", "")
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell(
+        "(pre.py"
+        " --threads {snakemake.threads}"
+        " -r {snakemake.params.genome}"
+        " {extra}"
+        " {snakemake.input.variants}"
+        " {snakemake.output})"
+        " {log}"
+    )

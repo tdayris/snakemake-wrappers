@@ -1,0 +1,91 @@
+.. _`multiqc`:
+
+MULTIQC
+=======
+
+Generate qc report using multiqc.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* multiqc ==1.8
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule multiqc:
+        input:
+            expand("samtools_stats/{sample}.txt", sample=["a", "b"])
+        output:
+            "qc/multiqc.html"
+        params:
+            ""  # Optional: extra parameters for multiqc.
+        log:
+            "logs/multiqc.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/multiqc"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Julian de Ruiter
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for trimming paired-end reads using cutadapt."""
+
+    __author__ = "Julian de Ruiter"
+    __copyright__ = "Copyright 2017, Julian de Ruiter"
+    __email__ = "julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from os import path
+
+    from snakemake.shell import shell
+
+
+    input_dirs = set(path.dirname(fp) for fp in snakemake.input)
+    output_dir = path.dirname(snakemake.output[0])
+    output_name = path.basename(snakemake.output[0])
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "multiqc"
+        " {snakemake.params}"
+        " --force"
+        " -o {output_dir}"
+        " -n {output_name}"
+        " {input_dirs}"
+        " {log}"
+    )

@@ -1,0 +1,73 @@
+.. _`bcftools norm`:
+
+BCFTOOLS NORM
+=============
+
+Left-align and normalize indels, check if REF alleles match the reference, split multiallelic sites into multiple rows; recover multiallelics from multiple rows.
+
+
+
+Software dependencies
+---------------------
+
+
+* bcftools ==1.10
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule norm_vcf:
+        input:
+            "{prefix}.vcf"
+        output:
+            "{prefix}.vcf"
+        params:
+            ""  # optional parameters for bcftools norm (except -o)
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bcftools/norm"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Dayne Filer
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Dayne Filer"
+    __copyright__ = "Copyright 2019, Dayne Filer"
+    __email__ = "dayne.filer@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    shell(
+        "bcftools norm {snakemake.params} {snakemake.input[0]} " "-o {snakemake.output[0]}"
+    )

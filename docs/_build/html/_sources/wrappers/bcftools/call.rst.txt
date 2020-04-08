@@ -1,0 +1,87 @@
+.. _`bcftools call`:
+
+BCFTOOLS CALL
+=============
+
+Call variants with bcftools.
+
+
+
+Software dependencies
+---------------------
+
+
+* samtools ==1.10
+
+* bcftools ==1.10
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bcftools_call:
+        input:
+            ref="genome.fasta",
+            samples=expand("mapped/{sample}.sorted.bam", sample=config["samples"]),
+            indexes=expand("mapped/{sample}.sorted.bam.bai", sample=config["samples"])
+        output:
+            # Here, we optionally use a region as wildcard and constrain it to the
+            # format accepted by samtools mpileup.
+            "called/{region,.+(:[0-9]+-[0-9]+)?}.bcf"
+        params:
+            # Optional parameters for samtools mpileup (except -g, -f).
+            # In this example, we forward the region wildcard from the output file to mpileup.
+            mpileup="--region {region}",
+            # Optional parameters for bcftools call (except -v, -o, -m).
+            call=""
+        log:
+            "logs/bcftools_call/{region}.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bcftools/call"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "koester@jimmy.harvard.edu"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    shell(
+        "(samtools mpileup {snakemake.params.mpileup} {snakemake.input.samples} "
+        "--fasta-ref {snakemake.input.ref} --BCF --uncompressed | "
+        "bcftools call -m {snakemake.params.call} -o {snakemake.output[0]} -v -) 2> {snakemake.log}"
+    )

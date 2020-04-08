@@ -1,0 +1,86 @@
+.. _`picard MergeSamFiles`:
+
+PICARD MERGESAMFILES
+====================
+
+Merge sam/bam files using picard tools.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* picard ==2.22.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule merge_bams:
+        input:
+            expand("mapped/{sample}.bam", sample=["a", "b"])
+        output:
+            "merged.bam"
+        log:
+            "logs/picard_mergesamfiles.log"
+        params:
+            "VALIDATION_STRINGENCY=LENIENT"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/picard/mergesamfiles"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Julian de Ruiter
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for picard MergeSamFiles."""
+
+    __author__ = "Julian de Ruiter"
+    __copyright__ = "Copyright 2017, Julian de Ruiter"
+    __email__ = "julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    inputs = " ".join("INPUT={}".format(in_) for in_ in snakemake.input)
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell(
+        "picard"
+        " MergeSamFiles"
+        " {snakemake.params}"
+        " {inputs}"
+        " OUTPUT={snakemake.output[0]}"
+        " {log}"
+    )

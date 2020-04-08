@@ -1,0 +1,99 @@
+.. _`bwa index`:
+
+BWA INDEX
+=========
+
+Creates a BWA index.
+
+
+
+Software dependencies
+---------------------
+
+
+* bwa ==0.7.17
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bwa_index:
+        input:
+            "{genome}.fasta"
+        output:
+            "{genome}.amb",
+            "{genome}.ann",
+            "{genome}.bwt",
+            "{genome}.pac",
+            "{genome}.sa"
+        log:
+            "logs/bwa_index/{genome}.log"
+        params:
+            prefix="{genome}",
+            algorithm="bwtsw"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/bwa/index"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Patrik Smeds
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Patrik Smeds"
+    __copyright__ = "Copyright 2016, Patrik Smeds"
+    __email__ = "patrik.smeds@gmail.com"
+    __license__ = "MIT"
+
+    from os import path
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    # Check inputs/arguments.
+    if len(snakemake.input) == 0:
+        raise ValueError("A reference genome has to be provided!")
+    elif len(snakemake.input) > 1:
+        raise ValueError("Only one reference genome can be inputed!")
+
+    # Prefix that should be used for the database
+    prefix = snakemake.params.get("prefix", "")
+
+    if len(prefix) > 0:
+        prefix = "-p " + prefix
+
+    # Contrunction algorithm that will be used to build the database, default is bwtsw
+    construction_algorithm = snakemake.params.get("algorithm", "")
+
+    if len(construction_algorithm) != 0:
+        construction_algorithm = "-a " + construction_algorithm
+
+    shell(
+        "bwa index" " {prefix}" " {construction_algorithm}" " {snakemake.input[0]}" " {log}"
+    )

@@ -1,0 +1,91 @@
+.. _`samtools sort`:
+
+SAMTOOLS SORT
+=============
+
+Sort bam file with samtools.
+
+
+
+Software dependencies
+---------------------
+
+
+* samtools ==1.9
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule samtools_sort:
+        input:
+            "mapped/{sample}.bam"
+        output:
+            "mapped/{sample}.sorted.bam"
+        params:
+            "-m 4G"
+        threads:  # Samtools takes additional threads through its option -@
+            8     # This value - 1 will be sent to -@.
+        wrapper:
+            "0.50.4-3-ga47e758/bio/samtools/sort"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+* Samtools -@/--threads takes one integer as input. This is the number of additional threads and not raw threads.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "koester@jimmy.harvard.edu"
+    __license__ = "MIT"
+
+
+    import os
+    from snakemake.shell import shell
+
+
+    prefix = os.path.splitext(snakemake.output[0])[0]
+
+    # Samtools takes additional threads through its option -@
+    # One thread for samtools
+    # Other threads are *additional* threads passed to the argument -@
+    threads = "" if snakemake.threads <= 1 else " -@ {} ".format(snakemake.threads - 1)
+
+    shell(
+        "samtools sort {snakemake.params} {threads} -o {snakemake.output[0]} "
+        "-T {prefix} {snakemake.input[0]}"
+    )

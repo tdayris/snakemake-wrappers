@@ -1,0 +1,104 @@
+.. _`sourmash_compute`:
+
+SOURMASH_COMPUTE
+================
+
+Build a MinHash signature for a transcriptome, genome, or reads 
+
+
+
+
+Software dependencies
+---------------------
+
+
+* sourmash==2.0.0a7
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule sourmash_reads:
+        input:
+            "reads/a.fastq"
+        output:
+            "reads.sig"
+        log:
+            "logs/sourmash/sourmash_compute_reads.log"
+        threads: 2
+        params:
+            # optional parameters
+            k = "31",
+            scaled = "1000",
+            extra = ""
+        wrapper:
+            "0.50.4-3-ga47e758/bio/sourmash/compute"
+
+
+    rule sourmash_transcriptome:
+        input:
+            "assembly/transcriptome.fasta"
+        output:
+            "transcriptome.sig"
+        log:
+            "logs/sourmash/sourmash_compute_transcriptome.log"
+        threads: 2
+        params:
+            # optional parameters
+            k = "31",
+            scaled = "1000",
+            extra = ""
+        wrapper:
+            "0.50.4-3-ga47e758/bio/sourmash/compute"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Lisa K. Johnson
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for sourmash compute."""
+
+    __author__ = "Lisa K. Johnson"
+    __copyright__ = "Copyright 2018, Lisa K. Johnson"
+    __email__ = "ljcohen@ucdavis.edu"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    scaled = snakemake.params.get("scaled", "1000")
+    k = snakemake.params.get("k", "31")
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "sourmash compute --scaled {scaled} -k {k} {snakemake.input} -o {snakemake.output}"
+        " {extra} {log}"
+    )

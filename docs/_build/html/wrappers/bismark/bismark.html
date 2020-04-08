@@ -1,0 +1,490 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>BISMARK &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="BISMARK2BEDGRAPH" href="bismark2bedGraph.html" />
+    <link rel="prev" title="BAM2NUC" href="bam2nuc.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Snakemake Wrappers
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                heads/Unofficial
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Wrappers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../arriba.html">ARRIBA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../art.html">ART</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bcftools.html">BCFTOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bedtools.html">BEDTOOLS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../bismark.html">BISMARK</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="bam2nuc.html">BAM2NUC</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">BISMARK</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bismark2bedGraph.html">BISMARK2BEDGRAPH</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bismark2report.html">BISMARK2REPORT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bismark2summary.html">BISMARK2SUMMARY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bismark_genome_preparation.html">BISMARK_GENOME_PREPARATION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bismark_methylation_extractor.html">BISMARK_METHYLATION_EXTRACTOR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deduplicate_bismark.html">DEDUPLICATE_BISMARK</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../bowtie2.html">BOWTIE2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../busco.html">BUSCO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bwa.html">BWA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cairosvg.html">CAIROSVG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clustalo.html">CLUSTALO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epic.html">EPIC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fastp.html">FASTP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fastqc.html">FASTQC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fgbio.html">FGBIO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../filtlong.html">FILTLONG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../freebayes.html">FREEBAYES</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gatk.html">GATK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gatk3.html">GATK3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hap.py.html">HAP.PY</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hisat2.html">HISAT2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hmmer.html">HMMER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../igv-reports.html">IGV-REPORTS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../infernal.html">INFERNAL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../jannovar.html">JANNOVAR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kallisto.html">KALLISTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../last.html">LAST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lofreq.html">LOFREQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nanosim-h.html">NANOSIM-H</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ngs-disambiguate.html">NGS-DISAMBIGUATE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pandas.html">PANDAS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pcaExplorer.html">PCAEXPLORER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pear.html">PEAR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../picard.html">PICARD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pindel.html">PINDEL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plass.html">PLASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../primerclip.html">PRIMERCLIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pyfastaq.html">PYFASTAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference.html">REFERENCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../refgenie.html">REFGENIE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rubic.html">RUBIC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../salmon.html">SALMON</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sambamba.html">SAMBAMBA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../samtools.html">SAMTOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../seaborn.html">SEABORN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sickle.html">SICKLE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../snp-mutator.html">SNP-MUTATOR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../snpsift.html">SNPSIFT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sourmash.html">SOURMASH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sra-tools.html">SRA-TOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../star.html">STAR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../strelka.html">STRELKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tabix.html">TABIX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transdecoder.html">TRANSDECODER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../varscan.html">VARSCAN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Snakemake Wrappers</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../bismark.html">BISMARK</a> &raquo;</li>
+        
+      <li>BISMARK</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/wrappers/bismark/bismark.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="bismark">
+<span id="id1"></span><h1>BISMARK<a class="headerlink" href="#bismark" title="Permalink to this headline">¶</a></h1>
+<p>Align BS-Seq reads using Bismark (see <a class="reference external" href="https://github.com/FelixKrueger/Bismark/blob/master/bismark">https://github.com/FelixKrueger/Bismark/blob/master/bismark</a>).</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>bowtie2 == 2.3.4.3</p></li>
+<li><p>bismark == 0.22.1</p></li>
+<li><p>samtools == 1.9</p></li>
+</ul>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>This wrapper can be used in the following way:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Pair-ended reads</span>
+<span class="n">rule</span> <span class="n">bismark_pe</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">fq_1</span><span class="o">=</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.1.fastq&quot;</span><span class="p">,</span>
+        <span class="n">fq_2</span><span class="o">=</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.2.fastq&quot;</span><span class="p">,</span>
+        <span class="n">genome</span><span class="o">=</span><span class="s2">&quot;indexes/</span><span class="si">{genome}</span><span class="s2">/</span><span class="si">{genome}</span><span class="s2">.fa&quot;</span><span class="p">,</span>
+        <span class="n">bismark_indexes_dir</span><span class="o">=</span><span class="s2">&quot;indexes/</span><span class="si">{genome}</span><span class="s2">/Bisulfite_Genome&quot;</span><span class="p">,</span>
+        <span class="n">genomic_freq</span><span class="o">=</span><span class="s2">&quot;indexes/</span><span class="si">{genome}</span><span class="s2">/genomic_nucleotide_frequencies.txt&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">_pe.bam&quot;</span><span class="p">,</span>
+        <span class="n">report</span><span class="o">=</span><span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">_PE_report.txt&quot;</span><span class="p">,</span>
+        <span class="n">nucleotide_stats</span><span class="o">=</span><span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">_pe.nucleotide_stats.txt&quot;</span><span class="p">,</span>
+        <span class="n">bam_unmapped_1</span><span class="o">=</span><span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">_unmapped_reads_1.fq.gz&quot;</span><span class="p">,</span>
+        <span class="n">bam_unmapped_2</span><span class="o">=</span><span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">_unmapped_reads_2.fq.gz&quot;</span><span class="p">,</span>
+        <span class="n">ambiguous_1</span><span class="o">=</span><span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">_ambiguous_reads_1.fq.gz&quot;</span><span class="p">,</span>
+        <span class="n">ambiguous_2</span><span class="o">=</span><span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">_ambiguous_reads_2.fq.gz&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="c1"># optional params string, e.g: -L32 -N0 -X400 --gzip</span>
+        <span class="c1"># Useful options to tune:</span>
+        <span class="c1"># (for bowtie2)</span>
+        <span class="c1"># -N: The maximum number of mismatches permitted in the &quot;seed&quot;, i.e. the first L base pairs</span>
+        <span class="c1"># of the read (deafault: 1)</span>
+        <span class="c1"># -L: The &quot;seed length&quot; (deafault: 28)</span>
+        <span class="c1"># -I: The minimum insert size for valid paired-end alignments. ~ min fragment size filter (for</span>
+        <span class="c1"># PE reads)</span>
+        <span class="c1"># -X: The maximum insert size for valid paired-end alignments. ~ max fragment size filter (for</span>
+        <span class="c1"># PE reads)</span>
+        <span class="c1"># --gzip: Gzip intermediate fastq files</span>
+        <span class="c1"># --ambiguous --unmapped</span>
+        <span class="c1"># -p: bowtie2 parallel execution</span>
+        <span class="c1"># --multicore: bismark parallel execution</span>
+        <span class="c1"># --temp_dir: tmp dir for intermediate files instead of output directory</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s1">&#39; --ambiguous --unmapped --nucleotide_coverage&#39;</span><span class="p">,</span>
+        <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{sample}</span><span class="s1">_</span><span class="si">{genome}</span><span class="s1">&#39;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.50.4-3-ga47e758/bio/bismark/bismark&quot;</span>
+
+<span class="c1"># Example: Single-ended reads</span>
+<span class="n">rule</span> <span class="n">bismark_se</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">fq</span><span class="o">=</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.fq.gz&quot;</span><span class="p">,</span>
+        <span class="n">genome</span><span class="o">=</span><span class="s2">&quot;indexes/</span><span class="si">{genome}</span><span class="s2">/</span><span class="si">{genome}</span><span class="s2">.fa&quot;</span><span class="p">,</span>
+        <span class="n">bismark_indexes_dir</span><span class="o">=</span><span class="s2">&quot;indexes/</span><span class="si">{genome}</span><span class="s2">/Bisulfite_Genome&quot;</span><span class="p">,</span>
+        <span class="n">genomic_freq</span><span class="o">=</span><span class="s2">&quot;indexes/</span><span class="si">{genome}</span><span class="s2">/genomic_nucleotide_frequencies.txt&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">report</span><span class="o">=</span><span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">_SE_report.txt&quot;</span><span class="p">,</span>
+        <span class="n">nucleotide_stats</span><span class="o">=</span><span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">.nucleotide_stats.txt&quot;</span><span class="p">,</span>
+        <span class="n">bam_unmapped</span><span class="o">=</span><span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">_unmapped_reads.fq.gz&quot;</span><span class="p">,</span>
+        <span class="n">ambiguous</span><span class="o">=</span><span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">_ambiguous_reads.fq.gz&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bams/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">.log&quot;</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="c1"># optional params string</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s1">&#39; --ambiguous --unmapped --nucleotide_coverage&#39;</span><span class="p">,</span>
+        <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{sample}</span><span class="s1">_</span><span class="si">{genome}</span><span class="s1">&#39;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.50.4-3-ga47e758/bio/bismark/bismark&quot;</span>
+</pre></div>
+</div>
+<p>Note that input, output and log file paths can be chosen freely.
+When running with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
+</pre></div>
+</div>
+<p>the software dependencies will be automatically deployed into an isolated environment before execution.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Roman Cherniatchik</p></li>
+</ul>
+</div>
+<div class="section" id="code">
+<h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Snakemake wrapper for aligning methylation BS-Seq data using Bismark.&quot;&quot;&quot;</span>
+<span class="c1"># https://github.com/FelixKrueger/Bismark/blob/master/bismark</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Roman Chernyatchik&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright (c) 2019 JetBrains&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;roman.chernyatchik@jetbrains.com&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+
+
+<span class="k">def</span> <span class="nf">basename_without_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns basename of file path, without the file extension.&quot;&quot;&quot;</span>
+
+    <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+    <span class="n">split_ind</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">base</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.gz&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="n">split_ind</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">base</span>
+
+
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">cmdline_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bismark </span><span class="si">{extra}</span><span class="s2"> --bowtie2&quot;</span><span class="p">]</span>
+
+<span class="n">outdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">bam</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">outdir</span><span class="p">:</span>
+    <span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--output_dir </span><span class="si">{outdir}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">genome_indexes_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">bismark_indexes_dir</span><span class="p">)</span>
+<span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{genome_indexes_dir}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bam&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;bismark/bismark: Error &#39;bam&#39; output file isn&#39;t specified.&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;report&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;bismark/bismark: Error &#39;report&#39; output file isn&#39;t specified.&quot;</span><span class="p">)</span>
+
+<span class="c1"># basename</span>
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;basename&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--basename {snakemake.params.basename:q}&quot;</span><span class="p">)</span>
+    <span class="n">basename</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">basename</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">basename</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># reads input</span>
+<span class="n">single_end_mode</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fq&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">single_end_mode</span><span class="p">:</span>
+    <span class="c1"># for SE data, you only have to specify read1 input by -i or --in1, and</span>
+    <span class="c1"># specify read1 output by -o or --out1.</span>
+    <span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--se {snakemake.input.fq:q}&quot;</span><span class="p">)</span>
+    <span class="n">mode_prefix</span> <span class="o">=</span> <span class="s2">&quot;se&quot;</span>
+    <span class="k">if</span> <span class="n">basename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">basename_without_ext</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">fq</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># for PE data, you should also specify read2 input by -I or --in2, and</span>
+    <span class="c1"># specify read2 output by -O or --out2.</span>
+    <span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-1 {snakemake.input.fq_1:q} -2 {snakemake.input.fq_2:q}&quot;</span><span class="p">)</span>
+    <span class="n">mode_prefix</span> <span class="o">=</span> <span class="s2">&quot;pe&quot;</span>
+
+    <span class="k">if</span> <span class="n">basename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># default basename</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">basename_without_ext</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">fq_1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_bismark_bt2&quot;</span>
+
+<span class="c1"># log</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># run</span>
+<span class="n">shell</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmdline_args</span><span class="p">))</span>
+
+<span class="c1"># Move outputs into proper position.</span>
+<span class="n">expected_2_actual_paths</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span>
+        <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">bam</span><span class="p">,</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">outdir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">.bam&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">basename</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">single_end_mode</span> <span class="k">else</span> <span class="s2">&quot;_pe&quot;</span><span class="p">)</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="p">(</span>
+        <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">report</span><span class="p">,</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">outdir</span><span class="p">,</span>
+            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_report.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">basename</span><span class="p">,</span> <span class="s2">&quot;SE&quot;</span> <span class="k">if</span> <span class="n">single_end_mode</span> <span class="k">else</span> <span class="s2">&quot;PE&quot;</span><span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="p">(</span>
+        <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nucleotide_stats&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">outdir</span><span class="p">,</span>
+            <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">.nucleotide_stats.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">basename</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">single_end_mode</span> <span class="k">else</span> <span class="s2">&quot;_pe&quot;</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+<span class="n">log_append</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">exp_path</span><span class="p">,</span> <span class="n">actual_path</span><span class="p">)</span> <span class="ow">in</span> <span class="n">expected_2_actual_paths</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">exp_path</span> <span class="ow">and</span> <span class="p">(</span><span class="n">exp_path</span> <span class="o">!=</span> <span class="n">actual_path</span><span class="p">):</span>
+        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv {actual_path:q} {exp_path:q} </span><span class="si">{log_append}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="bismark2bedGraph.html" class="btn btn-neutral float-right" title="BISMARK2BEDGRAPH" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="bam2nuc.html" class="btn btn-neutral float-left" title="BAM2NUC" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, The Snakemake team
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

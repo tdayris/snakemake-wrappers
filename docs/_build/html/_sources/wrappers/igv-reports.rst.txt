@@ -1,0 +1,88 @@
+.. _`igv-reports`:
+
+IGV-REPORTS
+===========
+
+Create self-contained igv.js HTML pages.
+
+
+
+Software dependencies
+---------------------
+
+
+* igv-reports =0.9.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule igv_report:
+        input:
+            fasta="minigenome.fa",
+            vcf="variants.vcf",
+            # any number of additional optional tracks, see igv-reports manual
+            tracks=["alignments.bam"]
+        output:
+            "igv-report.html"
+        params:
+            extra=""  # optional params, see igv-reports manual
+        log:
+            "logs/igv-report.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/igv-reports"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for igv-reports."""
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2019, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    tracks = snakemake.input.get("tracks", [])
+    if tracks:
+        if isinstance(tracks, str):
+            tracks = [tracks]
+        tracks = "--tracks {}".format(" ".join(tracks))
+
+    shell(
+        "create_report {extra} --standalone --output {snakemake.output[0]} {snakemake.input.vcf} {snakemake.input.fasta} {tracks} {log}"
+    )

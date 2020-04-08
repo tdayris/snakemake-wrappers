@@ -1,0 +1,75 @@
+.. _`sambamba sort`:
+
+SAMBAMBA SORT
+=============
+
+Sort bam file with sambamba
+
+
+
+Software dependencies
+---------------------
+
+
+* sambamba ==0.6.6
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule sambamba_sort:
+        input:
+            "mapped/{sample}.bam"
+        output:
+            "mapped/{sample}.sorted.bam"
+        params:
+            ""  # optional parameters
+        threads: 8
+        wrapper:
+            "0.50.4-3-ga47e758/bio/sambamba/sort"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "koester@jimmy.harvard.edu"
+    __license__ = "MIT"
+
+
+    import os
+    from snakemake.shell import shell
+
+    shell(
+        "sambamba sort {snakemake.params} -t {snakemake.threads} "
+        "-o {snakemake.output[0]} {snakemake.input[0]}"
+    )

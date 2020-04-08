@@ -1,0 +1,86 @@
+.. _`MSIsensor Scan`:
+
+MSISENSOR SCAN
+==============
+
+Scan homopolymers and microsatelites with MSIsensor
+
+
+
+Software dependencies
+---------------------
+
+
+* msisensor ==0.5
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_msisensor_scan:
+        input:
+            "genome.fasta"
+        output:
+            "microsat.list"
+        message:
+            "Testing MSISensor scan"
+        threads:
+            1
+        params:
+            extra = ""
+        log:
+            "logs/msisensor_scan.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/msisensor/scan"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake script for MSISensor Scan"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Dayris Thibault"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    # Extra parameters default value is an empty string
+    extra = snakemake.params.get("extra", "")
+
+    shell(
+        "msisensor scan "  # Tool and its sub-command
+        "-d {snakemake.input} "  # Path to fasta file
+        "-o {snakemake.output} "  # Path to output file
+        "{extra} "  # Optional extra parameters
+        "{log}"  # Logging behavior
+    )

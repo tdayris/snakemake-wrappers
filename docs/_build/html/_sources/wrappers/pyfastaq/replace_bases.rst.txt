@@ -1,0 +1,83 @@
+.. _`pyfastaq replace_bases`:
+
+PYFASTAQ REPLACE_BASES
+======================
+
+Replaces all occurrences of one letter with another.
+
+
+
+Software dependencies
+---------------------
+
+
+* pyfastaq ==3.17.0
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule replace_bases:
+        input:
+            "{sample}.rna.fa"
+        output:
+            "{sample}.dna.fa",
+        params:
+            old_base = "U",
+            new_base = "T",
+        log:
+            "logs/fastaq/replace_bases/test/{sample}.log"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/pyfastaq/replace_bases"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Michael Hall
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Michael Hall"
+    __copyright__ = "Copyright 2019, Michael Hall"
+    __email__ = "michael@mbh.sh"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell(
+        "fastaq replace_bases"
+        " {snakemake.input[0]}"
+        " {snakemake.output[0]}"
+        " {snakemake.params.old_base}"
+        " {snakemake.params.new_base}"
+        " {log}"
+    )

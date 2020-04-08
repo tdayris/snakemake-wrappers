@@ -1,0 +1,123 @@
+.. _`cp (bash)`:
+
+CP (BASH)
+=========
+
+Simple cp from bash.
+
+
+
+Software dependencies
+---------------------
+
+
+* bash ==4.4.18
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule cp_target:
+        input:
+            "source/{input}"
+        output:
+            "destination/{input}"
+        params:
+            extra = "",
+            cold_storage = "../cold_storage.yaml"
+        threads: 1
+        conda: "../environment.yaml"
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 256, 768)
+            )
+        message:
+            "Testing cp"
+        log:
+            "logs/cp/{input}.logs"
+        wrapper:
+            "0.50.4-3-ga47e758/bio/cp/"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Why ? I just wanted to test a simple case. Thus it's fair for hard copy over
+symbolic linking automatic choices
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3.7
+    # -*- coding: utf-8 -*-
+
+    """Snakemake wrapper for bash copy"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Fish_n_CHIP 2019"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "GPLV3"
+
+    import os.path as op
+    import yaml
+
+    from snakemake.shell import shell
+
+    # No node can access a cold storage
+    # these files must be copied. However,
+    # any file else where should be symlinked!
+    if isinstance(snakemake.params.cold_storage, list):
+        cold_storage = snakemake.params.cold_storage
+    else:
+        with open(snakemake.params.cold_storage, "r") as cold_list:
+            cold_storage = yaml.load(cold_list)
+
+    # Prepare logging
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    output_directory = op.realpath(op.dirname(snakemake.output[0]))
+
+    shell_cmd = f"mkdir --parents {output_directory} && "
+    for f in snakemake.input:
+        symlink = any(f.startswith(cs) for cs in cold_storage)
+        shell_cmd += (
+            "cp "                                        # Tool
+            "{extra} "                                   # Optionnal parameters
+            f"{'' if symlink else '--symbolic-link'} "   # Symlink if needed
+            f"{op.realpath(f)} "                         # Path to input file
+            f"{op.realpath(snakemake.output[0])} "       # Path to output file
+            "{log}; "                                    # Logging
+        )
+
+    shell(shell_cmd)

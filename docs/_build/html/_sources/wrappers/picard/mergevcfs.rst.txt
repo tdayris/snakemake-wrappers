@@ -1,0 +1,87 @@
+.. _`picard MergeVcfs`:
+
+PICARD MERGEVCFS
+================
+
+Merge vcf files using picard tools.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* picard ==2.22.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule merge_vcfs:
+        input:
+            vcfs=["snvs.chr1.vcf", "snvs.chr2.vcf"]
+        output:
+            "snvs.vcf"
+        log:
+            "logs/picard/mergevcfs.log"
+        params:
+            extra=""
+        wrapper:
+            "0.50.4-3-ga47e758/bio/picard/mergevcfs"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for picard MergeSamFiles."""
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2018, Johannes Köster"
+    __email__ = "johannes.koester@protonmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    inputs = " ".join("INPUT={}".format(f) for f in snakemake.input.vcfs)
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    shell(
+        "picard"
+        " MergeVcfs"
+        " {extra}"
+        " {inputs}"
+        " OUTPUT={snakemake.output[0]}"
+        " {log}"
+    )

@@ -2,8 +2,13 @@
 # conding: utf-8
 
 """
-Plot a clustered heatmap of multiple sample
+Plot a pairwise scatterplot with KDE on the diagonal
 """
+
+__author__ = "Thibault Dayris"
+__copyright__ = "Copyright 2020, Thibault Dayris"
+__email__ = "thibault.dayris@gustaveroussy.fr"
+__license__ = "MIT"
 
 import logging
 import matplotlib

@@ -1,0 +1,82 @@
+.. _`infernal cmpress`:
+
+INFERNAL CMPRESS
+================
+
+Starting from a CM database <cmfile> in standard Infernal-1.1 format, construct binary compressed datafiles for cmscan. Infernal ('INFERence of RNA ALignment') is for searching DNA sequence databases for RNA structure and sequence similarities. It is an implementation of a special case of profile stochastic context-free grammars called covariance models (CMs). A CM is like a sequence profile, but it scores a combination of sequence consensus and RNA secondary structure consensus, so in many cases, it is more capable of identifying RNA homologs that conserve their secondary structure more than their primary sequence.
+
+
+
+Software dependencies
+---------------------
+
+
+* infernal=1.1.2
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule infernal_cmpress:
+        input:
+            "test-covariance-model.cm"
+        output:
+            "test-covariance-model.cm.i1i",
+            "test-covariance-model.cm.i1f",
+            "test-covariance-model.cm.i1m",
+            "test-covariance-model.cm.i1p"
+        log:
+            "logs/cmpress.log"
+        params:
+            extra="",
+        wrapper:
+            "0.50.4-3-ga47e758/bio/infernal/cmpress"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* N. Tessa Pierce
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for Infernal CMpress"""
+
+    __author__ = "N. Tessa Pierce"
+    __copyright__ = "Copyright 2019, N. Tessa Pierce"
+    __email__ = "ntpierce@gmail.com"
+    __license__ = "MIT"
+
+    from os import path
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    # -F enables overwrite of old (otherwise cmpress will fail if old versions exist)
+    shell("cmpress -F {snakemake.input} {log}")
