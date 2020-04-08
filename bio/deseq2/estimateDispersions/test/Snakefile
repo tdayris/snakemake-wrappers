@@ -1,0 +1,22 @@
+rule test_estimateDispersions:
+    input:
+        dds = "esf.RDS"
+    output:
+        disp = "disp.RDS"
+    message:
+        "Testing estimateDispersions"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 2048)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 20)
+        )
+    log:
+        "logs/test_estimateDispersions.log"
+    params:
+        extra = "fitType='local'"
+    wrapper:
+        "master/bio/deseq2/estimateDispersions"

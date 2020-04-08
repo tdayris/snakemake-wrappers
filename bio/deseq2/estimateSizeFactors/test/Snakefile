@@ -1,0 +1,20 @@
+rule test_estimateSizeFactor:
+    input:
+        dds = "dds.RDS"
+    output:
+        dds = "esf.RDS"
+    message:
+        "Testing estimateSizeFactor"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 2048)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 20)
+        )
+    log:
+        "logs/test_estimateSizeFactor.log"
+    wrapper:
+        "master/bio/deseq2/estimateSizeFactors"

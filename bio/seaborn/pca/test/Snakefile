@@ -1,0 +1,23 @@
+rule test_seaborn_pca:
+    input:
+        counts = "table.tsv"
+    output:
+        png = ["pca_PC1_PC2.png", "pca_PC2_PC1.png"]
+    message:
+        "Testing Seaborn PCA"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 512, 1024)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 20)
+        )
+    params:
+        conditions = {"A": "CondA", "B": "CondB"},
+        axes = [1, 2]
+    log:
+        "logs/test_seaborn_pca.log"
+    wrapper:
+        "master/bio/seaborn/pca"

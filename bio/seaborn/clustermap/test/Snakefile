@@ -1,0 +1,23 @@
+rule seaborn_clustermap:
+    input:
+        counts = "table.tsv"
+    output:
+        png = "clustermap.png"
+    message:
+        "Testing the seaborn clustermap wrapper"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 512, 1024)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 20)
+        )
+    params:
+        conditions = {"a": "CondA", "b": "CondB"},
+        factor = "Condition_Test"
+    log:
+        "logs/seaborn_clustermap.log"
+    wrapper:
+        "master/bio/seaborn/clustermap"

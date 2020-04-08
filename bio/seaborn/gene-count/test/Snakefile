@@ -1,0 +1,28 @@
+rule test_gene_box_count:
+    input:
+        counts = "table.tsv"
+    output:
+        dir = directory("gene_plots")
+    message:
+        "Testing boxp lot of normalized counts"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 512, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 5, 200)
+        )
+    params:
+        targets = ["ENST00000002596.5", "ENST00000001146.6"],
+        condition = {"Sample_01": "A",
+                     "Sample_02": "A",
+                     "Sample_03": "A",
+                     "Sample_07": "B",
+                     "Sample_08": "B",
+                     "Sample_09": "B",}
+    log:
+        "logs/test_box_count.log"
+    wrapper:
+        "master/bio/seaborn/gene-count"

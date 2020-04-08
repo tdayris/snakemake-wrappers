@@ -1,0 +1,20 @@
+rule test_pcaexplorer_pair_corr:
+    input:
+        dst = "vst.RDS"
+    output:
+        png = "plot.png"
+    message:
+        "Testing pcaExplorer pair_corr"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 20, 200)
+        )
+    log:
+        "logs/test_pcaexplorer_distro_expr.log"
+    wrapper:
+        "master/bio/pcaExplorer/pair_corr"

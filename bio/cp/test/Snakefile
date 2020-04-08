@@ -1,0 +1,20 @@
+rule cp_target:
+    input:
+        "source/{input}"
+    output:
+        "destination/{input}"
+    params:
+        extra = "",
+        cold_storage = "../cold_storage.yaml"
+    threads: 1
+    conda: "../environment.yaml"
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 256, 768)
+        )
+    message:
+        "Testing cp"
+    log:
+        "logs/cp/{input}.logs"
+    wrapper:
+        "master/bio/cp/"

@@ -1660,5 +1660,191 @@ def test_bwa_mem_samblaster():
 def test_snpsift_vartype():
     run(
         "bio/snpsift/varType",
-        ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"]
+        ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"],
+    )
+
+
+def test_pandas_merge_salmon():
+    run(
+        "bio/pandas/salmon",
+        ["snakemake", "--cores", "1", "table.tsv", "--use-conda", "-F"],
+    )
+
+
+def test_pandas_add_genes():
+    run(
+        "bio/pandas/add_genes",
+        ["snakemake", "--cores", "1", "result.tsv", "--use-conda", "-F"],
+    )
+
+
+def test_seaborn_clustermap():
+    run(
+        "bio/seaborn/clustermap",
+        ["snakemake", "--cores", "1", "clustermap.png", "--use-conda", "-F"],
+    )
+
+
+def test_seaborn_pca():
+    run(
+        "bio/seaborn/pca",
+        ["snakemake", "--cores", "1", "pca_PC1_PC2.png", "--use-conda", "-F"],
+    )
+
+
+def test_pariwise_scatterplot():
+    run(
+        "bio/seaborn/pairwise-scatterplot",
+        ["snakemake", "--cores", "1", "plot.png", "--use-conda", "-F"],
+    )
+
+
+def test_volcano_deseq():
+    run(
+        "bio/EnhancedVolcano/volcano-deseq2",
+        ["snakemake", "--cores", "1", "Volcano.png", "--use-conda", "-F"],
+    )
+
+
+def test_box_count():
+    run(
+        "bio/seaborn/box-counts",
+        ["snakemake", "--cores", "1", "--use-conda", "plot.png", "-F"],
+    )
+
+
+def test_box_count_drop_null():
+    run(
+        "bio/seaborn/box-counts",
+        ["snakemake", "--cores", "1", "--use-conda", "plot_null_dropped.png", "-F"],
+    )
+
+
+def test_gene_box_count():
+    run(
+        "bio/seaborn/gene-count",
+        ["snakemake", "--cores", "1", "--use-conda", "gene_plots", "-F"],
+    )
+
+
+def test_pval_hist():
+    run(
+        "bio/seaborn/pval-histogram",
+        ["snakemake", "--cores", "1", "--use-conda", "plot.png", "-F"],
+    )
+
+
+def test_filter_design():
+    run(
+        "bio/pandas/filter_design",
+        ["snakemake", "--use-conda", "--core", "1", "-F", "filtered/design.tsv"],
+    )
+
+
+def test_deseq2_to_gseaapp():
+    run(
+        "bio/pandas/deseq2_to_gseaapp",
+        ["snakemake", "results/complete.tsv", "--use-conda", "-F", "--cores", "1"],
+    )
+
+
+def test_tx_to_gene():
+    run(
+        "bio/tx_to_gene/gtf",
+        ["snakemake", "--cores", "1", "tx2gene.tsv", "--use-conda", "-F"],
+    )
+
+
+def test_pcaexplorer_annotation():
+    run(
+        "bio/pcaExplorer/annotation",
+        ["snakemake", "--cores", "1", "annot.RDS", "--use-conda", "-F"],
+    )
+
+
+def test_pcaexplorer_limmago():
+    run(
+        "bio/pcaExplorer/limmago",
+        ["snakemake", "--cores", "1", "limmago.RDS", "--use-conda", "-F"],
+    )
+
+
+def test_pcaexplorer_pcaplot():
+    run(
+        "bio/pcaExplorer/PCA",
+        ["snakemake", "--cores", "1", "plot.png", "--use-conda", "-F"],
+    )
+
+
+def test_pcaexplorer_pcascree():
+    run(
+        "bio/pcaExplorer/PCAScree",
+        ["snakemake", "--cores", "1", "plot.png", "--use-conda", "-F"],
+    )
+
+
+def test_pcaexplorer_plotCorrs():
+    run(
+        "bio/pcaExplorer/plotCorrs",
+        ["snakemake", "--cores", "1", "plot.png", "--use-conda", "-F"],
+    )
+
+
+def test_pcaexplorer_distro_expr():
+    run(
+        "bio/pcaExplorer/distro_expr",
+        ["snakemake", "--cores", "1", "plot.png", "--use-conda", "-F"],
+    )
+
+
+def test_pcaexplorer_pair_corr():
+    run(
+        "bio/pcaExplorer/pair_corr",
+        ["snakemake", "--cores", "1", "plot.png", "--use-conda", "-F"],
+    )
+
+
+def test_deseq2_deseq_dataset_from_tximport():
+    run(
+        "bio/deseq2/DESeqDataSetFromTximport",
+        ["snakemake", "--cores", "1", "deseq2/dds.RDS", "--use-conda", "-F"],
+    )
+
+
+def test_deseq2_estimateDispersions():
+    run(
+        "bio/deseq2/estimateDispersions",
+        ["snakemake", "--cores", "1", "disp.RDS", "--use-conda", "-F"],
+    )
+
+
+def test_deseq2_estimateSizeFactor():
+    run(
+        "bio/deseq2/estimateSizeFactors",
+        ["snakemake", "--cores", "1", "esf.RDS", "--use-conda", "-F"],
+    )
+
+
+def test_deseq2_rlog():
+    run(
+        "bio/deseq2/rlog",
+        ["snakemake", "--cores", "1", "rlog.tsv", "--use-conda", "-F"],
+    )
+
+
+def test_deseq2_vst():
+    run("bio/deseq2/vst", ["snakemake", "--cores", "1", "vst.tsv", "--use-conda", "-F"])
+
+
+def test_deseq2_nbinomWaldTest():
+    run(
+        "bio/deseq2/nbinomWaldTest",
+        ["snakemake", "--cores", "1", "wald.RDS", "--use-conda", "-F"],
+    )
+
+
+def test_cp():
+    run(
+        "bio/cp",
+        ["snakemake", "--cores", "1", "destination/A.txt", "--use-conda", "-F"],
     )

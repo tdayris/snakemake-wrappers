@@ -1,0 +1,23 @@
+rule test_filter_design:
+    input:
+        design = "design.tsv"
+    output:
+        tsv = "filtered/design.tsv"
+    message:
+        "Testing design filter"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 512, 1024)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 20)
+        )
+    params:
+        keep_column = ["Cond"],
+        keep_sample = ["SRR493366_1.fastq", "SRR493369_1.fastq"]
+    log:
+        "logs/filter_design.log"
+    wrapper:
+        "master/bio/pandas/filter_design"

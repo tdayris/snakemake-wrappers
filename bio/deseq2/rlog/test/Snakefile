@@ -1,0 +1,21 @@
+rule test_rlog:
+    input:
+        dds = "dds.RDS"
+    output:
+        rds = "rlog.RDS",
+        tsv = "rlog.tsv"
+    message:
+        "Testing DESeq2 rlogTransformation"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 2048)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 20)
+        )
+    log:
+        "logs/test_rlog.log"
+    wrapper:
+        "master/bio/deseq2/rlog"

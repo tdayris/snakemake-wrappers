@@ -1,0 +1,23 @@
+rule test_pcaexplorer_limmago:
+    input:
+        dds = "dds.RDS",
+        dst = "VST.RDS"
+    output:
+        limmago = "limmago.RDS"
+    message:
+        "Testing pcaExplorer limmago"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 20, 200)
+        )
+    params:
+        extra = " organism = 'Hs', pca_ngenes = 100, inputType = 'SYMBOL'"
+    log:
+        "logs/test_pcaexplorer_limmago.log"
+    wrapper:
+        "master/bio/pcaExplorer/limmago"

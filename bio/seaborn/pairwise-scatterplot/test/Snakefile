@@ -1,0 +1,20 @@
+rule test_pariwise_scatterplot:
+    input:
+        counts = "table.tsv"
+    output:
+        png = "plot.png"
+    message:
+        "Testing Pairwise_scatterplot wrapper"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 512, 1024)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 20)
+        )
+    log:
+        "logs/test_pariwise_scatterplot.log"
+    wrapper:
+        "master/bio/seaborn/pairwise-scatterplot"

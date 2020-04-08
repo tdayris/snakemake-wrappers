@@ -1,0 +1,20 @@
+rule test_pval_hist:
+    input:
+        deseq2 = "table.tsv"
+    output:
+        png = "plot.png"
+    message:
+        "Testing pval histogramm"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 20, 200)
+        )
+    log:
+        "logs/test_pval_hist.log"
+    wrapper:
+        "master/bio/seaborn/pval-histogram"

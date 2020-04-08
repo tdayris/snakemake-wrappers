@@ -1,0 +1,21 @@
+rule test_vst:
+    input:
+        dds = "dds.RDS"
+    output:
+        rds = "vst.RDS",
+        tsv = "vst.tsv"
+    message:
+        "Testing DESeq2 VST"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 2048)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 20)
+        )
+    log:
+        "logs/test_vst.log"
+    wrapper:
+        "master/bio/deseq2/vst"

@@ -1,0 +1,21 @@
+rule pandas_merge_salmon:
+    input:
+        quant = expand("{sample}/quant.sf", sample=["A", "B"]),
+        tx2gene = "tx2gene.tsv"
+    output:
+        tsv = "table.tsv"
+    message:
+        "Testing pandas merge salmon"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 512, 1024)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 20)
+        )
+    log:
+        "logs/pandas_merge_salmon.log"
+    wrapper:
+        "master/bio/pandas/salmon"

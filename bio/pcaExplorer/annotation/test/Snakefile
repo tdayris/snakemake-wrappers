@@ -1,0 +1,21 @@
+rule test_pcaexplorer_annotation:
+    input:
+        dds = "dds.RDS",
+        tr2gene = "tr2gene.tsv"
+    output:
+        annotation  = "annot.RDS"
+    message:
+        "Testing annotation wrapper"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 20, 200)
+        )
+    log:
+        "logs/test_pcaexplorer_annotation.log"
+    wrapper:
+        "master/bio/pcaExplorer/annotation"

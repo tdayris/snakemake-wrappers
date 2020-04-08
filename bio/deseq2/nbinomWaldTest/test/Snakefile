@@ -1,0 +1,21 @@
+rule test_nbinomWaldTest:
+    input:
+        dds = "dds.RDS"
+    output:
+        rds = "wald.RDS",
+        tsv = directory("tsv")
+    message:
+        "Testing DESeq2 nbinomWaldTest"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 2048)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 20)
+        )
+    log:
+        "logs/test_nbinomWaldTest.log"
+    wrapper:
+        "master/bio/deseq2/nbinomWaldTest"

@@ -1,0 +1,24 @@
+rule test_deseq2_to_gseapp:
+    input:
+        tsv = "result_example.csv"
+    output:
+        fc_sig = "results/fc_sig.tsv",
+        fc_fc = "results/fc_fc.tsv",
+        padj_sig = "results/padj_sig.tsv",
+        padj_fc = "results/padj_fc.tsv",
+        complete = "results/complete.tsv"
+    message:
+        "Testing the deseq2 to gseapp wrapper"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 20, 200)
+        )
+    log:
+        "logs/test_deseq2_to_gseapp.log"
+    wrapper:
+        "master/bio/pandas/deseq2_to_gseaapp"

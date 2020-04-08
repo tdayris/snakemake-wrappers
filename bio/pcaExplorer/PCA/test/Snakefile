@@ -1,0 +1,22 @@
+rule test_pcaexplorer_pcaplot:
+    input:
+        dst = "vst.RDS"
+    output:
+        png = "plot.png"
+    message:
+        "Testing pcaExplorer PCA"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 20, 200)
+        )
+    params:
+        extra = "intgroup = c('Cond'), ntop = 100, pcX = 1, pcY = 2, ellipse = FALSE"
+    log:
+        "logs/test_pcaexplorer_pcaplot.log"
+    wrapper:
+        "master/bio/pcaExplorer/PCA"
