@@ -7,7 +7,8 @@
 
 # Perform sample dispertion estimates
 
-base::library("DESeq2");     # Differential Gene expression
+# Differential Gene expression
+base::library(package = "DESeq2", quietly = TRUE);
 
 # Cast input path as character
 dds_path <- base::as.character(x = snakemake@input[["dds"]]);
