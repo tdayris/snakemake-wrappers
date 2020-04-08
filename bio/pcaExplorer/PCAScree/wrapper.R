@@ -35,14 +35,6 @@ if ("extra" %in% names(snakemake@params)) {
   );
 }
 
-# Build plot
-png(
-  filename = snakemake@output[["png"]],
-  width = 1024,
-  height = 768,
-  units = "px",
-  type = "cairo"
-);
 
 command <- base::paste0(
   "pcaExplorer::pcascree(",
@@ -51,6 +43,15 @@ command <- base::paste0(
 );
 
 base::message(command);
+
+# Build plot
+png(
+  filename = snakemake@output[["png"]],
+  width = 1024,
+  height = 768,
+  units = "px",
+  type = "cairo"
+);
 
 base::eval(
   base::parse(
