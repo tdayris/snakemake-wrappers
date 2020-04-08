@@ -1,0 +1,24 @@
+---
+name: CDNA Corrections
+description: Remove pipes and dots in transcripts names from CDNA fasta file
+authors:
+  - Thibault Dayris
+input:
+  - A (gzipped?) fasta file
+output:
+  - A (gzipped?) fasta file
+notes: |
+  If the input is gzipped, then add one thread to the initial one for decompression.
+  If the output is gzipped, then add one thread to the final one for decompression.
+
+  +----------------------+-----------------------+---------+
+  | Input                | Output                | Threads |
+  +======================+=======================+=========+
+  | Input not compressed | Output not compressed | 1       |
+  +----------------------+-----------------------+---------+
+  | Input compressed     | Output not compressed | 2       |
+  +----------------------+-----------------------+---------+
+  | Input not compressed | Output compressed     | 2       |
+  +----------------------+-----------------------+---------+
+  | Input compressed     | Output compressed     | 3       |
+  +----------------------+-----------------------+---------+

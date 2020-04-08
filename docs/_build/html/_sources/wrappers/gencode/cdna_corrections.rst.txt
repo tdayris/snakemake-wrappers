@@ -1,0 +1,130 @@
+.. _`CDNA Corrections`:
+
+CDNA CORRECTIONS
+================
+
+Remove pipes and dots in transcripts names from CDNA fasta file
+
+
+
+Software dependencies
+---------------------
+
+
+* conda-forge:bash=5.0.011
+
+* conda-forge:python=3.8.2
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_gencode_corrections:
+        input:
+            fasta = "test.fasta"
+        output:
+            fasta = "corrected.fasta"
+        message:
+            "Testing the gencode corrections on CDNA fasta files"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 10240)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 20, 200)
+            )
+        log:
+            "logs/test_gencode_corrections.log"
+        wrapper:
+            "0.50.4-5-g87e8958/bio/gencode/cdna_corrections"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+If the input is gzipped, then add one thread to the initial one for decompression.
+If the output is gzipped, then add one thread to the final one for decompression.
+
++----------------------+-----------------------+---------+
+| Input                | Output                | Threads |
++======================+=======================+=========+
+| Input not compressed | Output not compressed | 1       |
++----------------------+-----------------------+---------+
+| Input compressed     | Output not compressed | 2       |
++----------------------+-----------------------+---------+
+| Input not compressed | Output compressed     | 2       |
++----------------------+-----------------------+---------+
+| Input compressed     | Output compressed     | 3       |
++----------------------+-----------------------+---------+
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/bin/python3.8
+    # conding: utf-8
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    """
+    Corrects transcripts names from the CDNA fasta file from gencode
+    """
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+    input_stream =  snakemake.input["fasta"]
+    output_stream = f"> {snakemake.output['fasta']}"
+    min_threads = 1
+
+    if snakemake.input["fasta"].endswith("gz"):
+        input_stream = f"<(gunzip -c {snakemake.input['fasta']})"
+        min_threads += 1
+
+    if snakemake.output["fasta"].endswith("gz"):
+        output_stream = f"| gzip -c > {snakemake.output['fasta']})"
+        min_threads += 1
+
+    if snakemake.threads < min_threads:
+        raise ValueError(
+            f"At least {min_threads} are required for gencode corretions"
+        )
+
+
+    cmd = "sed 's/|.*//g' {input_stream} {output_stream} {log}"
+    print(cmd)
+    shell(cmd)

@@ -1848,3 +1848,10 @@ def test_cp():
         "bio/cp",
         ["snakemake", "--cores", "1", "destination/A.txt", "--use-conda", "-F"],
     )
+
+
+def test_gencode_corrections():
+    run(
+        "bio/gencode/cdna_corrections",
+        ["snakemake", "--cores", "1", "corrected.fasta", "--use-conda", "-F"]
+    )
