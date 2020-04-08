@@ -1862,3 +1862,10 @@ def test_gencode_corrections():
         "bio/gencode/cdna_corrections",
         ["snakemake", "--cores", "1", "corrected.fasta", "--use-conda", "-F"]
     )
+
+
+def test_deseq2_to_genelist():
+    run(
+        "bio/clusterProfiler/DESeq2_to_geneList",
+        ["snakemake", "--cores", "1", "geneList.RDS", "--use-conda", "-F"]
+    )
