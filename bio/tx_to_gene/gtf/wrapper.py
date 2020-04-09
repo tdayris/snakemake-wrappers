@@ -24,7 +24,8 @@ with open(gtf_in, "r") as gtf, open(tsv_out, "w") as tsv:
             if snakemake.params.get("positions", False) is True else
             ["Gene_ID", "Transcript_ID", "Gene_Name"]
         )
-        tsv.write(f"{'\t'.join(cols)}\n")
+        tsv.write('\t'.join(cols)})
+        tsv.write("\n")
 
     for line in gtf:
         if line.startswith("#"):
