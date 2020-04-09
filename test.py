@@ -1879,6 +1879,13 @@ def test_gencode_corrections():
     )
 
 
+def test_ensembl_remove_patch_cdna():
+    run(
+        "bio/ensembl/remove_patch_cdna",
+        ["snakemake", "--cores", "1", "corrected.fasta", "--use-conda", "-F"]
+    )
+
+
 def test_deseq2_to_genelist():
     run(
         "bio/clusterProfiler/DESeq2_to_geneList",
