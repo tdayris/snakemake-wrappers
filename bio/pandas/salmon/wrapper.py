@@ -39,11 +39,17 @@ def read_tx2gene(path: str,
         header=(0 if header is True else None),
         dtype=str
     )
-    t2g.columns = ["Ensembl_Gene_ID", "Ensembl_Transcript_ID", "Hugo_ID"]
+    if len(t2g.columns.tolist()) == 3:
+        t2g.columns = ["Ensembl_Gene_ID", "Ensembl_Transcript_ID", "Hugo_ID"]
+    else:
+        t2g.columns = ["Ensembl_Gene_ID", "Ensembl_Transcript_ID", "Hugo_ID", "Chromosome", "Start", "End"]
 
     if genes is True:
         logging.debug("Keeping only genes from tx2gene DataFrame")
-        t2g = t2g[["Ensembl_Gene_ID", "Hugo_ID"]].drop_duplicates()
+        if len(t2g.columns.tolist()) == 3:
+            t2g = t2g[["Ensembl_Gene_ID", "Hugo_ID"]].drop_duplicates()
+        else:
+            t2g = t2g[["Ensembl_Gene_ID", "Hugo_ID", "Chromosome", "Start", "End"]].drop_duplicates()
         return t2g.set_index("Ensembl_Gene_ID")
 
     return t2g.set_index("Ensembl_Transcript_ID")

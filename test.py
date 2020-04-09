@@ -1670,6 +1670,11 @@ def test_pandas_merge_salmon():
         ["snakemake", "--cores", "1", "table.tsv", "--use-conda", "-F"],
     )
 
+    run(
+        "bio/pandas/salmon",
+        ["snakemake", "--cores", "1", "table2.tsv", "--use-conda", "-F"]
+    )
+
 
 def test_pandas_add_genes():
     run(
