@@ -1667,12 +1667,22 @@ def test_snpsift_vartype():
 def test_pandas_merge_salmon():
     run(
         "bio/pandas/salmon",
-        ["snakemake", "--cores", "1", "table.tsv", "--use-conda", "-F"],
+        ["snakemake", "--cores", "1", "table_tr.tsv", "--use-conda", "-F"],
     )
 
     run(
         "bio/pandas/salmon",
-        ["snakemake", "--cores", "1", "table2.tsv", "--use-conda", "-F"]
+        ["snakemake", "--cores", "1", "table_tr_pos.tsv", "--use-conda", "-F"]
+    )
+
+    run(
+        "bio/pandas/salmon",
+        ["snakemake", "--cores", "1", "table_genes.tsv", "--use-conda", "-F"]
+    )
+
+    run(
+        "bio/pandas/salmon",
+        ["snakemake", "--cores", "1", "table_genes_pos.tsv", "--use-conda", "-F"]
     )
 
 

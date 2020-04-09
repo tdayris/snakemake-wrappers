@@ -39,20 +39,28 @@ def read_tx2gene(path: str,
         header=(0 if header is True else None),
         dtype=str
     )
-    if len(t2g.columns.tolist()) == 3:
-        t2g.columns = ["Ensembl_Gene_ID", "Ensembl_Transcript_ID", "Hugo_ID"]
-    else:
-        t2g.columns = ["Ensembl_Gene_ID", "Ensembl_Transcript_ID", "Hugo_ID", "Chromosome", "Start", "End"]
-
-    if genes is True:
-        logging.debug("Keeping only genes from tx2gene DataFrame")
+    try:
         if len(t2g.columns.tolist()) == 3:
-            t2g = t2g[["Ensembl_Gene_ID", "Hugo_ID"]].drop_duplicates()
+            t2g.columns = ["Ensembl_Gene_ID", "Ensembl_Transcript_ID", "Hugo_ID"]
         else:
-            t2g = t2g[["Ensembl_Gene_ID", "Hugo_ID", "Chromosome", "Start", "End"]].drop_duplicates()
-        return t2g.set_index("Ensembl_Gene_ID")
+            t2g.columns = ["Ensembl_Gene_ID", "Ensembl_Transcript_ID", "Hugo_ID", "Chromosome", "Start", "End", "Strand"]
 
-    return t2g.set_index("Ensembl_Transcript_ID")
+        if genes is True:
+            logging.debug("Keeping only genes from tx2gene DataFrame")
+            if len(t2g.columns.tolist()) == 3:
+                t2g = t2g[["Ensembl_Gene_ID", "Hugo_ID"]].drop_duplicates()
+            else:
+                t2g = t2g[["Ensembl_Gene_ID", "Hugo_ID", "Chromosome", "Start", "End", "Strand"]].drop_duplicates()
+            t2g.set_index("Ensembl_Gene_ID", inplace = True)
+        else:
+            t2g.set_index("Ensembl_Transcript_ID", inplace = True)
+    except ValueError:
+        logging.debug("Wrong tx_to_gene column format?")
+        logging.debug(t2g.columns.tolist())
+        raise
+
+    return t2g
+
 
 
 def read_salmon(path: str) -> pandas.DataFrame:

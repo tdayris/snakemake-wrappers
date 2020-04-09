@@ -1,43 +1,61 @@
-rule pandas_merge_salmon:
+rule pandas_merge_salmon_tr:
     input:
         quant = expand("{sample}/quant.sf", sample=["A", "B"]),
         tx2gene = "tx2gene.tsv"
     output:
-        tsv = "table.tsv"
+        tsv = "table_tr.tsv"
     message:
         "Testing pandas merge salmon"
-    threads:
-        1
-    resources:
-        mem_mb = (
-            lambda wildcards, attempt: min(attempt * 512, 1024)
-        ),
-        time_min = (
-            lambda wildcards, attempt: min(attempt * 10, 20)
-        )
     log:
         "logs/pandas_merge_salmon.log"
     wrapper:
         "master/bio/pandas/salmon"
 
 
-rule pandas_merge_salmon2:
+rule pandas_merge_salmon_tr_positions:
     input:
         quant = expand("{sample}/quant.sf", sample=["A", "B"]),
         tx2gene = "tx2gene2.tsv"
     output:
-        tsv = "table2.tsv"
+        tsv = "table_tr_pos.tsv"
     message:
         "Testing pandas merge salmon"
-    threads:
-        1
-    resources:
-        mem_mb = (
-            lambda wildcards, attempt: min(attempt * 512, 1024)
-        ),
-        time_min = (
-            lambda wildcards, attempt: min(attempt * 10, 20)
-        )
+    params:
+        index_label = True
+    log:
+        "logs/pandas_merge_salmon.log"
+    wrapper:
+        "master/bio/pandas/salmon"
+
+
+rule pandas_merge_salmon_genes:
+    input:
+        quant = expand("{sample}/quant.genes.sf", sample=["A", "B"]),
+        tx2gene = "tx2gene.tsv"
+    output:
+        tsv = "table_genes.tsv"
+    message:
+        "Testing pandas merge salmon"
+    params:
+        genes = True,
+        index_label = True
+    log:
+        "logs/pandas_merge_salmon.log"
+    wrapper:
+        "master/bio/pandas/salmon"
+
+
+rule pandas_merge_salmon_genes_positions:
+    input:
+        quant = expand("{sample}/quant.genes.sf", sample=["A", "B"]),
+        tx2gene = "tx2gene2.tsv"
+    output:
+        tsv = "table_genes_pos.tsv"
+    message:
+        "Testing pandas merge salmon"
+    params:
+        index_label = True,
+        genes = True
     log:
         "logs/pandas_merge_salmon.log"
     wrapper:
