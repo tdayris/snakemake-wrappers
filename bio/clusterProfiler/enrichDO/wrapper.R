@@ -21,10 +21,10 @@ geneList <- base::readRDS(
 );
 
 extra <- "gene = geneList, readable = FALSE, universe = names(geneList)";
-if ("enrichdo_extra" %in% snakemake@params) {
+if ("enrichDO_extra" %in% snakemake@params) {
   extra <- base::paste(
     extra,
-    snakemake@params[["enrichdo_extra"]],
+    snakemake@params[["enrichDO_extra"]],
     sep = ", "
   )
 }
