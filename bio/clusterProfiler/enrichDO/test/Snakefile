@@ -1,0 +1,16 @@
+rule test_enrichDO:
+    input:
+        rds = "geneList.RDS"
+    output:
+        rds = "enrichDO.RDS",
+        tsv = "enrichDO.tsv"
+    message:
+        "Testing enrichDO"
+    threads:
+        1
+    params:
+        enrichDO_extra = "ont = 'DOLite'"
+    log:
+        "logs/test_enrichDO.log"
+    wrapper:
+        "master/bio/clusterProfiler/enrichDO"

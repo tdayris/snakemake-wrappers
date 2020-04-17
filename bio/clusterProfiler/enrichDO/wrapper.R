@@ -9,6 +9,7 @@
 # __license__ = "MIT"
 
 # Perform gene enrichment
+base::library(package = "DOSE", quietly = TRUE);
 base::library(package = "clusterProfiler", quietly = TRUE);
 # Loading databases
 base::library(package = "org.Hs.eg.db", quietly = TRUE);
@@ -20,17 +21,20 @@ geneList <- base::readRDS(
   file = snakemake@input[["rds"]]
 );
 
-extra <- "gene = geneList, readable = FALSE, universe = names(geneList)";
-if ("enrichDO_extra" %in% snakemake@params) {
+extra <- "gene = base::names(geneList), readable = TRUE";
+if ("enrichDO_extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
     extra,
     snakemake@params[["enrichDO_extra"]],
     sep = ", "
-  )
+  );
+  base::message("Extra parameters accounted");
+} else {
+  base::message("No extra parameters provided");
 }
 
 command <- base::paste0(
-  "clusterProfiler::enrichDO(",
+  "DOSE::enrichDO(",
   extra,
   ")"
 );
@@ -42,12 +46,6 @@ edo <- base::eval(
   base::parse(
     text = command
   )
-);
-
-edo <- clusterProfiler::setReadable(
-    edo,
-    organism,
-    keytype = "ENTREZ"
 );
 
 # Saving results
