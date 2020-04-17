@@ -1,0 +1,16 @@
+rule test_enrichNCG:
+    input:
+        rds = "geneList.RDS"
+    output:
+        rds = "enrichNCG.RDS",
+        tsv = "enrichNCG.tsv"
+    message:
+        "Testing enrichNCG"
+    threads:
+        1
+    params:
+        enrichDO_extra = "ont = 'DOLite'"
+    log:
+        "logs/test_enrichNCG.log"
+    wrapper:
+        "master/bio/clusterProfiler/enrichNCG"
