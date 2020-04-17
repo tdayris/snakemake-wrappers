@@ -13,7 +13,6 @@ base::library(package = "clusterProfiler", quietly = TRUE);
 base::library(package = "DOSE", quietly = TRUE);
 # Loading databases
 base::library(package = "org.Hs.eg.db", quietly = TRUE);
-base::library(package = "org.Mm.eg.db", quietly = TRUE);
 
 
 # Loading input dataset
@@ -22,7 +21,7 @@ geneList <- base::readRDS(
 );
 
 extra <- "geneList, verbose = TRUE";
-if ("gseDGN_extra" %in% snakemake@params) {
+if ("gseDGN_extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
     extra,
     snakemake@params[["gseDGN_extra"]],
