@@ -41,7 +41,7 @@ if ("msigdb_extra" %in% snakemake@params) {
 
 command <- base::paste0(
   "msigdbr::msigdbr(",
-  extra,
+  msigdb_extra,
   ")"
 )
 
@@ -60,8 +60,8 @@ gsea <- clusterProfiler::GSEA(
 
 gsea <- clusterProfiler::setReadable(
     gsea,
-    organism,
-    keytype = "ENTREZ"
+    OrgDb = organism,
+    keyType = "ENTREZID"
 );
 
 # Saving results
