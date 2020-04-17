@@ -13,20 +13,12 @@ base::library(package = "DOSE", quietly = TRUE);
 base::library(package = "clusterProfiler", quietly = TRUE);
 # Loading databases
 base::library(package = "org.Hs.eg.db", quietly = TRUE);
-base::library(package = "org.Mm.eg.db", quietly = TRUE);
 
 
 # Loading input dataset
 geneList <- base::readRDS(
   file = snakemake@input[["rds"]]
 );
-
-organism <- org.Hs.eg.db;
-if ("organism" %in% base::names(snakemake@params)) {
-  if (snakemake@params[["organism"]] == "Mm") {
-    organism <- org.Mm.eg.db;
-  }
-}
 
 extra <- "gene = base::names(geneList), readable = TRUE";
 if ("enrichNCG_extra" %in% snakemake@params) {
