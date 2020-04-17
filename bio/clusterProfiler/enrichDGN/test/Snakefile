@@ -1,0 +1,16 @@
+rule test_enrichDGN:
+    input:
+        rds = "geneList.RDS"
+    output:
+        rds = "enrichDGN.RDS",
+        tsv = "enrichDGN.tsv"
+    message:
+        "Testing enrichDGN"
+    threads:
+        1
+    params:
+        enrichDGN_extra = "ont = 'DOLite'"
+    log:
+        "logs/test_enrichDGN.log"
+    wrapper:
+        "master/bio/clusterProfiler/enrichDGN"

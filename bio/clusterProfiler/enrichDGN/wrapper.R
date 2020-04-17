@@ -9,6 +9,7 @@
 # __license__ = "MIT"
 
 # Perform gene enrichment
+base::library(package = "DOSE", quietly = TRUE);
 base::library(package = "clusterProfiler", quietly = TRUE);
 # Loading databases
 base::library(package = "org.Hs.eg.db", quietly = TRUE);
@@ -27,17 +28,17 @@ if ("organism" %in% base::names(snakemake@params)) {
   }
 }
 
-extra <- "gene = geneList, readable = FALSE, universe = names(geneList)";
-if ("enrichDNG_extra" %in% snakemake@params) {
+extra <- "gene = base::names(geneList), readable = TRUE";
+if ("enrichDGN_extra" %in% snakemake@params) {
   extra <- base::paste(
     extra,
-    snakemake@params[["enrichDNG_extra"]],
+    snakemake@params[["enrichDGN_extra"]],
     sep = ", "
   )
 }
 
 command <- base::paste0(
-  "clusterProfiler::enrichDGN(",
+  "DOSE::enrichDGN(",
   extra,
   ")"
 );
@@ -49,12 +50,6 @@ edgn <- base::eval(
   base::parse(
     text = command
   )
-);
-
-edgn <- clusterProfiler::setReadable(
-    edgn,
-    organism,
-    keytype = "ENTREZ"
 );
 
 # Saving results
