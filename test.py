@@ -1891,3 +1891,48 @@ def test_deseq2_to_genelist():
         "bio/clusterProfiler/DESeq2_to_geneList",
         ["snakemake", "--cores", "1", "geneList.RDS", "--use-conda", "-F"]
     )
+
+def test_clusterprofiler_enrichDO():
+    run(
+        "bio/clusterProfiler/enrichDO",
+        ["snakemake", "--cores", "1", "enrichDO.RDS", "--use-conda", "-F"]
+    )
+
+def test_clusterprofiler_enrichNCG():
+    run(
+        "bio/clusterProfiler/enrichNCG",
+        ["snakemake", "--cores", "1", "enrichNCG.RDS", "--use-conda", "-F"]
+    )
+
+
+def test_clusterprofiler_enrichDGN():
+    run(
+        "bio/clusterProfiler/enrichDGN",
+        ["snakemake", "--cores", "1", "enrichDGN.RDS", "--use-conda", "-F"]
+    )
+
+def test_clusterprofiler_gseDGN():
+    run(
+        "bio/clusterProfiler/gseDGN",
+        ["snakemake", "--cores", "1", "gseDGN.RDS", "--use-conda", "-F"]
+    )
+
+
+def test_clusterprofiler_gseDO():
+    run(
+        "bio/clusterProfiler/gseDO",
+        ["snakemake", "--cores", "1", "gseDO.RDS", "--use-conda", "-F"]
+    )
+
+def test_clusterprofiler_gseNCG():
+    run(
+        "bio/clusterProfiler/gseNCG",
+        ["snakemake", "--cores", "1", "gseNCG.RDS", "--use-conda", "-F"]
+    )
+
+
+def test_clusterprofiler_msigdb_gsea():
+    run(
+        "bio/clusterProfiler/msigdb_gsea",
+        ["snakemake", "--cores", "1", "msigdb_gsea.RDS", "--use-conda", "-F"]
+    )
