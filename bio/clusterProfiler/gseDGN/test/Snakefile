@@ -1,0 +1,16 @@
+rule test_gseDGN:
+    input:
+        rds = "geneList.RDS"
+    output:
+        rds = "gseDGN.RDS",
+        tsv = "gseDGN.tsv"
+    message:
+        "Testing enrichDO"
+    threads:
+        1
+    params:
+        gseDGN_extra = "pvalueCutoff  = 1, pAdjustMethod = 'BH'"
+    log:
+        "logs/test_gseDGN.log"
+    wrapper:
+        "master/bio/clusterProfiler/gseDGN"
