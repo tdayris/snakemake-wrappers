@@ -21,7 +21,7 @@ geneList <- base::readRDS(
 );
 
 extra <- "geneList, verbose = TRUE";
-if ("gseDO_extra" %in% snakemake@params) {
+if ("gseDO_extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
     extra,
     snakemake@params[["gseDO_extra"]],
