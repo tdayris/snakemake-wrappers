@@ -35,9 +35,9 @@ This wrapper can be used in the following way:
 
     rule test_deseq2_to_genelist:
         input:
-            rds = "res.tsv"
+            rds = "dds.RDS"
         output:
-            rds = "geneList.RDS"
+            gene_lists = directory("geneLists")
         message:
             "Testing geneList creation from DESeq2 output"
         threads:
@@ -52,7 +52,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_deseq2_to_genelist.log"
         wrapper:
-            "0.50.4-46-g68c4a5c/bio/clusterProfiler/DESeq2_to_geneList"
+            "0.50.4-48-ga564007/bio/clusterProfiler/DESeq2_to_geneList"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -145,9 +145,18 @@ Code
       object = rds
     );
 
+    if (! base::file.exists(snakemake@output[["gene_lists"]])) {
+      base::dir.create(snakemake@output[["gene_lists"]]);
+    }
+
     # Building geneLists iteratively
     for (resultname in res_names) {
       base::message(base::paste("Building geneList for", resultname))
+
+      out_name <- base::file.path(
+        snakemake@output[["gene_lists"]],
+        base::paste0(resultname, ".RDS")
+      );
 
       res <- DESeq2::results(
         object = rds,
@@ -162,7 +171,7 @@ Code
       res$entrez <- mapIds(
         organism,
         keys=row.names(rds),
-        column="ENTREZ",
+        column="ENTREZID",
         keytype="ENSEMBL",
         multiVals="first"
       );
@@ -182,7 +191,7 @@ Code
 
       base::saveRDS(
         object = geneList,
-        file = snakemake@output[["rds"]]
+        file = out_name
       );
     }
     base::message("Process over");
