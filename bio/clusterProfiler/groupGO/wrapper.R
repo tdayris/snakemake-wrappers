@@ -51,11 +51,6 @@ gse_do <- base::eval(
   )
 );
 
-# gse_do <- clusterProfiler::setReadable(
-#     x = gse_do,
-#     OrgDb = organism
-# );
-
 # Saving results
 base::saveRDS(
   obj = gse_do,
