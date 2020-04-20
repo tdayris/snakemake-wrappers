@@ -1948,3 +1948,10 @@ def test_clusterprofiler_enrich_go():
         "bio/clusterProfiler/enrichGO",
         ["snakemake", "--cores", "1", "enrichGO.RDS", "--use-conda", "-F"]
     )
+
+
+def test_clusterprofiler_gse_go():
+    run(
+        "bio/clusterProfiler/gseGO",
+        ["snakemake", "--cores", "1", "gseGO.RDS", "--use-conda", "-F"]
+    )
