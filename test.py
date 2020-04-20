@@ -1889,7 +1889,7 @@ def test_ensembl_remove_patch_cdna():
 def test_deseq2_to_genelist():
     run(
         "bio/clusterProfiler/DESeq2_to_geneList",
-        ["snakemake", "--cores", "1", "geneList.RDS", "--use-conda", "-F"]
+        ["snakemake", "--cores", "1", "geneLists", "--use-conda", "-F"]
     )
 
 def test_clusterprofiler_enrichDO():
