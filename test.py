@@ -1936,3 +1936,9 @@ def test_clusterprofiler_msigdb_gsea():
         "bio/clusterProfiler/msigdb_gsea",
         ["snakemake", "--cores", "1", "msigdb_gsea.RDS", "--use-conda", "-F"]
     )
+
+def test_clusterprofiler_group_go():
+    run(
+        "bio/clusterProfiler/groupGO",
+        ["snakemake", "--cores", "1", "groupGO.RDS", "--use-conda", "-F"]
+    )
