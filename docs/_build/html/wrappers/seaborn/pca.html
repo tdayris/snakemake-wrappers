@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../epic.html">EPIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fastp.html">FASTP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
@@ -281,7 +282,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_seaborn_pca.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-12-ga500302/bio/seaborn/pca&quot;</span>
+        <span class="s2">&quot;0.50.4-42-gc53b3fd/bio/seaborn/pca&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -360,7 +361,7 @@ When running with</p>
 <span class="n">skvar</span> <span class="o">=</span> <span class="n">skpca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="n">sktransform</span><span class="p">,</span>
-    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{i}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nbc</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nbc</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span>
     <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 <span class="p">)</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
@@ -380,11 +381,11 @@ When running with</p>
         <span class="n">height</span><span class="o">=</span><span class="mi">13</span>
     <span class="p">)</span>
 
-    <span class="n">name_ax1</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{ax1}</span><span class="s2">&quot;</span>
+    <span class="n">name_ax1</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{</span><span class="n">ax1</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">skvar_ax1</span> <span class="o">=</span> <span class="n">skvar</span><span class="p">[</span><span class="n">ax1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
-    <span class="n">name_ax2</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{ax2}</span><span class="s2">&quot;</span>
+    <span class="n">name_ax2</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{</span><span class="n">ax2</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">skvar_ax2</span> <span class="o">=</span> <span class="n">skvar</span><span class="p">[</span><span class="n">ax2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Building plot: </span><span class="si">{output_prefix}</span><span class="s2">_</span><span class="si">{name_ax1}</span><span class="s2">_</span><span class="si">{name_ax2}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Building plot: </span><span class="si">{</span><span class="n">output_prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name_ax1</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name_ax2</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
 
     <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
         <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">,</span>
@@ -394,7 +395,7 @@ When running with</p>
     <span class="p">)</span>
 
     <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{name_ax1}</span><span class="s2"> (</span><span class="si">{skvar_ax1:.2f}</span><span class="s2">) and </span><span class="si">{name_ax2}</span><span class="s2"> (skvar_ax2:.2f)&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name_ax1</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">skvar_ax1</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">) and </span><span class="si">{</span><span class="n">name_ax2</span><span class="si">}</span><span class="s2"> (skvar_ax2:.2f)&quot;</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;samples_names&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -420,7 +421,7 @@ When running with</p>
     <span class="n">frame</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
 
     <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{output_prefix}</span><span class="s2">_</span><span class="si">{name_ax1}</span><span class="s2">_</span><span class="si">{name_ax2}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name_ax1</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name_ax2</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
         <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
     <span class="p">)</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Process over&quot;</span><span class="p">)</span>

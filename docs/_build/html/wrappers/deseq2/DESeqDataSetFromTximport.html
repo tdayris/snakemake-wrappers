@@ -117,6 +117,7 @@
 <li class="toctree-l2"><a class="reference internal" href="vst.html">VST</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../epic.html">EPIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fastp.html">FASTP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
@@ -319,13 +320,13 @@ optional columns</p>
 <span class="n">base</span><span class="o">::</span><span class="nf">write</span><span class="p">(</span><span class="s">&quot;Libraries loaded.&quot;</span><span class="p">,</span> <span class="nf">stderr</span><span class="p">());</span>
 
 <span class="c1"># Load txi object</span>
-<span class="n">txi_rds_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input[[</span><span class="s">&quot;tximport&quot;</span><span class="n">]]</span><span class="p">);</span>
+<span class="n">txi_rds_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;tximport&quot;</span><span class="p">]]);</span>
 <span class="n">txi</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">readRDS</span><span class="p">(</span>
   <span class="n">file</span> <span class="o">=</span> <span class="n">txi_rds_path</span>
 <span class="p">);</span>
 
 <span class="c1"># Load experimental design</span>
-<span class="n">coldata_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input[[</span><span class="s">&quot;coldata&quot;</span><span class="n">]]</span><span class="p">);</span>
+<span class="n">coldata_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;coldata&quot;</span><span class="p">]]);</span>
 <span class="n">coldata</span> <span class="o">&lt;-</span> <span class="n">utils</span><span class="o">::</span><span class="nf">read.table</span><span class="p">(</span>
   <span class="n">file</span> <span class="o">=</span> <span class="n">coldata_path</span><span class="p">,</span>
   <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;\t&quot;</span><span class="p">,</span>
@@ -335,7 +336,7 @@ optional columns</p>
 
 <span class="c1"># Cast formula as formula instead of string</span>
 <span class="n">formula</span> <span class="o">&lt;-</span> <span class="n">stats</span><span class="o">::</span><span class="nf">as.formula</span><span class="p">(</span>
-  <span class="n">object</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params[[</span><span class="s">&quot;design&quot;</span><span class="n">]]</span>
+  <span class="n">object</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;design&quot;</span><span class="p">]]</span>
 <span class="p">);</span>
 
 <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Input dataset and options recovered.&quot;</span><span class="p">);</span>
@@ -349,7 +350,7 @@ optional columns</p>
 <span class="n">base</span><span class="o">::</span><span class="nf">write</span><span class="p">(</span><span class="s">&quot;DESeqDataSet built.&quot;</span><span class="p">,</span> <span class="nf">stderr</span><span class="p">());</span>
 
 <span class="c1"># Save as RDS</span>
-<span class="n">output_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output[[</span><span class="s">&quot;dds&quot;</span><span class="n">]]</span><span class="p">);</span>
+<span class="n">output_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;dds&quot;</span><span class="p">]]);</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">saveRDS</span><span class="p">(</span>
   <span class="n">obj</span> <span class="o">=</span> <span class="n">dds</span><span class="p">,</span>
   <span class="n">file</span> <span class="o">=</span> <span class="n">output_path</span>

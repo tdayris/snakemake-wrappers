@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../epic.html">EPIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fastp.html">FASTP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
@@ -268,7 +269,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_gencode_corrections.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-12-ga500302/bio/gencode/cdna_corrections&quot;</span>
+        <span class="s2">&quot;0.50.4-42-gc53b3fd/bio/gencode/cdna_corrections&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -338,20 +339,20 @@ If the output is gzipped, then add one thread to the final one for decompression
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">input_stream</span> <span class="o">=</span>  <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span>
-<span class="n">output_stream</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&gt; </span><span class="si">{snakemake.output[&#39;fasta&#39;]}</span><span class="s2">&quot;</span>
+<span class="n">output_stream</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&gt; </span><span class="si">{</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;fasta&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="n">min_threads</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;gz&quot;</span><span class="p">):</span>
-    <span class="n">input_stream</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;(gunzip -c </span><span class="si">{snakemake.input[&#39;fasta&#39;]}</span><span class="s2">)&quot;</span>
+    <span class="n">input_stream</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;(gunzip -c </span><span class="si">{</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s1">&#39;fasta&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
     <span class="n">min_threads</span> <span class="o">+=</span> <span class="mi">1</span>
 
 <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;gz&quot;</span><span class="p">):</span>
-    <span class="n">output_stream</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;| gzip -c &gt; </span><span class="si">{snakemake.output[&#39;fasta&#39;]}</span><span class="s2">)&quot;</span>
+    <span class="n">output_stream</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;| gzip -c &gt; </span><span class="si">{</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;fasta&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
     <span class="n">min_threads</span> <span class="o">+=</span> <span class="mi">1</span>
 
 <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">threads</span> <span class="o">&lt;</span> <span class="n">min_threads</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;At least </span><span class="si">{min_threads}</span><span class="s2"> are required for gencode corretions&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;At least </span><span class="si">{</span><span class="n">min_threads</span><span class="si">}</span><span class="s2"> are required for gencode corretions&quot;</span>
     <span class="p">)</span>
 
 

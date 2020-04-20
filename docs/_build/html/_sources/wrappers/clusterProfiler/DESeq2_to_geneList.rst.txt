@@ -11,11 +11,17 @@ Software dependencies
 ---------------------
 
 
-* r:r-base=3.6.1
+* r:r-base=3.6.2
 
 * bioconda:bioconductor-org.mm.eg.db=3.10.0
 
 * bioconda:bioconductor-org.hs.eg.db=3.10.0
+
+* bioconda:bioconductor-deseq2=1.26.0
+
+* bioconda:bioconductor-delayedarray=0.12.0
+
+* bioconda:bioconductor-summarizedexperiment=1.16.0
 
 
 
@@ -29,7 +35,7 @@ This wrapper can be used in the following way:
 
     rule test_deseq2_to_genelist:
         input:
-            res = "res.tsv"
+            rds = "res.tsv"
         output:
             rds = "geneList.RDS"
         message:
@@ -46,7 +52,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_deseq2_to_genelist.log"
         wrapper:
-            "0.50.4-12-ga500302/bio/clusterProfiler/DESeq2_to_geneList"
+            "0.50.4-42-gc53b3fd/bio/clusterProfiler/DESeq2_to_geneList"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -62,6 +68,13 @@ the software dependencies will be automatically deployed into an isolated enviro
 
 Notes
 -----
+
+The geneList contains three features:
+
+* numeric vector: fold change or other type of numerical variable
+* named vector: every number was named by the corresponding gene ID
+* sorted vector: number should be sorted in decreasing order
+
 
 Parameters:
 
@@ -94,43 +107,82 @@ Code
     # __license__ = "MIT"
 
 
+    # Loading DESeq2 for dds object handling
+    base::library(package = "DESeq2", quietly = TRUE);
     # Loading databases
     base::library(package = "org.Hs.eg.db", quietly = TRUE);
     base::library(package = "org.Mm.eg.db", quietly = TRUE);
 
     # Loading input file
-    res <- utils::read.table(
-      file = snakemake@input[["res"]],
-      sep = "\t",
-      header = TRUE
+    rds <- base::readRDS(
+      file=snakemake@input[["rds"]]
     );
 
+    organism <- org.Hs.eg.db;
+    if ("organism" %in% base::names(snakemake@params)) {
+      if (snakemake@params[["organism"]] == "Mm") {
+        organism <- org.Mm.eg.db;
+      }
+    }
 
-    # Setting alpha thresholds
+    # Setting alpha and fold change thresholds
     alpha_threshold <- 0.05
     if ("alpha_threshold" %in% base::names(snakemake@params)) {
       alpha_threshold <- base::as.numeric(
           x = snakemake@params[["alpha_threshold"]]
-      )
+      );
     }
+    fc_threshold <- 0.001;
+    if ("fc_threshold" %in% names(snakemake@params)) {
+      fc_threshold <- base::as.numeric(
+        x = snakemake@params[["fc_threshold"]]
+      );
+    }
+    base::message("Dataset and libraries loaded");
 
-    # Subsetting initial data
-    res <- res[res$padj <= alpha_threshold, ];
-
-    # Buiding geneList object
-    geneList <- res[, "log2FoldChange"];
-    base::names(geneList) <- base::names(res);
-    geneList <- sort(
-      x = geneList,
-      decreasing = TRUE,
-      na.last = NA
+    # Gathering results contained within the object
+    res_names <- DESeq2::resultsNames(
+      object = rds
     );
 
-    base::message(
-      utils::head(x = geneList)
-    );
+    # Building geneLists iteratively
+    for (resultname in res_names) {
+      base::message(base::paste("Building geneList for", resultname))
 
-    base::saveRDS(
-      object = geneList,
-      file = snakemake@output[["rds"]]
-    );
+      res <- DESeq2::results(
+        object = rds,
+        name = resultname,
+        independentFiltering = TRUE,
+        alpha = alpha_threshold,
+        lfcThreshold = fc_threshold,
+        pAdjustMethod = "BH",
+        cooksCutoff = TRUE
+      );
+
+      res$entrez <- mapIds(
+        organism,
+        keys=row.names(rds),
+        column="ENTREZ",
+        keytype="ENSEMBL",
+        multiVals="first"
+      );
+
+      # Buiding geneList object
+      geneList <- res[, "log2FoldChange"];
+      base::names(geneList) <- res$entrez;
+      geneList <- sort(
+        x = geneList,
+        decreasing = TRUE,
+        na.last = NA
+      );
+
+      base::message(
+        utils::head(x = geneList)
+      );
+
+      base::saveRDS(
+        object = geneList,
+        file = snakemake@output[["rds"]]
+      );
+    }
+    base::message("Process over");

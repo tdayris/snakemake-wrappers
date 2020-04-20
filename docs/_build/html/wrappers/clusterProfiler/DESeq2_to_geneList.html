@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="CP (BASH)" href="../cp.html" />
+    <link rel="next" title="DGN ENRICHMENT" href="enrichDGN.html" />
     <link rel="prev" title="CLUSTERPROFILER" href="../clusterProfiler.html" /> 
 </head>
 
@@ -105,12 +105,22 @@
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="enrichDGN.html">DGN ENRICHMENT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enrichDO.html">DOSE ENRICHMENT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enrichGO.html">GO ENRICHMENT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enrichNCG.html">NCG ENRICHMENT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="groupGO.html">GROUP GO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gseDGN.html">GSEA DNG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gseDO.html">DOSE GSEA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gseNCG.html">GSEA NCG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="msigdb_gsea.html">MSIGDB GSEA</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../epic.html">EPIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fastp.html">FASTP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
@@ -242,9 +252,12 @@
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>r:r-base=3.6.1</p></li>
+<li><p>r:r-base=3.6.2</p></li>
 <li><p>bioconda:bioconductor-org.mm.eg.db=3.10.0</p></li>
 <li><p>bioconda:bioconductor-org.hs.eg.db=3.10.0</p></li>
+<li><p>bioconda:bioconductor-deseq2=1.26.0</p></li>
+<li><p>bioconda:bioconductor-delayedarray=0.12.0</p></li>
+<li><p>bioconda:bioconductor-summarizedexperiment=1.16.0</p></li>
 </ul>
 </div>
 <div class="section" id="example">
@@ -252,7 +265,7 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_deseq2_to_genelist</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;res.tsv&quot;</span>
+        <span class="n">rds</span> <span class="o">=</span> <span class="s2">&quot;res.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">rds</span> <span class="o">=</span> <span class="s2">&quot;geneList.RDS&quot;</span>
     <span class="n">message</span><span class="p">:</span>
@@ -269,7 +282,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_deseq2_to_genelist.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-12-ga500302/bio/clusterProfiler/DESeq2_to_geneList&quot;</span>
+        <span class="s2">&quot;0.50.4-42-gc53b3fd/bio/clusterProfiler/DESeq2_to_geneList&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -281,6 +294,12 @@ When running with</p>
 </div>
 <div class="section" id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<p>The geneList contains three features:</p>
+<ul class="simple">
+<li><p>numeric vector: fold change or other type of numerical variable</p></li>
+<li><p>named vector: every number was named by the corresponding gene ID</p></li>
+<li><p>sorted vector: number should be sorted in decreasing order</p></li>
+</ul>
 <p>Parameters:</p>
 <ul class="simple">
 <li><p>alpha_threshold: The padj threshold used to filter non significative events</p></li>
@@ -305,46 +324,85 @@ When running with</p>
 <span class="c1"># __license__ = &quot;MIT&quot;</span>
 
 
+<span class="c1"># Loading DESeq2 for dds object handling</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;DESeq2&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
 <span class="c1"># Loading databases</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;org.Mm.eg.db&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
 
 <span class="c1"># Loading input file</span>
-<span class="n">res</span> <span class="o">&lt;-</span> <span class="n">utils</span><span class="o">::</span><span class="nf">read.table</span><span class="p">(</span>
-  <span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input[[</span><span class="s">&quot;res&quot;</span><span class="n">]]</span><span class="p">,</span>
-  <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;\t&quot;</span><span class="p">,</span>
-  <span class="n">header</span> <span class="o">=</span> <span class="kc">TRUE</span>
+<span class="n">rds</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">readRDS</span><span class="p">(</span>
+  <span class="n">file</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;rds&quot;</span><span class="p">]]</span>
 <span class="p">);</span>
 
+<span class="n">organism</span> <span class="o">&lt;-</span> <span class="n">org.Hs.eg.db</span><span class="p">;</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;organism&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="nf">if </span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;organism&quot;</span><span class="p">]]</span> <span class="o">==</span> <span class="s">&quot;Mm&quot;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">organism</span> <span class="o">&lt;-</span> <span class="n">org.Mm.eg.db</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 
-<span class="c1"># Setting alpha thresholds</span>
+<span class="c1"># Setting alpha and fold change thresholds</span>
 <span class="n">alpha_threshold</span> <span class="o">&lt;-</span> <span class="m">0.05</span>
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;alpha_threshold&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
   <span class="n">alpha_threshold</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.numeric</span><span class="p">(</span>
-      <span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params[[</span><span class="s">&quot;alpha_threshold&quot;</span><span class="n">]]</span>
-  <span class="p">)</span>
+      <span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;alpha_threshold&quot;</span><span class="p">]]</span>
+  <span class="p">);</span>
 <span class="p">}</span>
+<span class="n">fc_threshold</span> <span class="o">&lt;-</span> <span class="m">0.001</span><span class="p">;</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;fc_threshold&quot;</span> <span class="o">%in%</span> <span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">fc_threshold</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.numeric</span><span class="p">(</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;fc_threshold&quot;</span><span class="p">]]</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Dataset and libraries loaded&quot;</span><span class="p">);</span>
 
-<span class="c1"># Subsetting initial data</span>
-<span class="n">res</span> <span class="o">&lt;-</span> <span class="n">res[res</span><span class="o">$</span><span class="n">padj</span> <span class="o">&lt;=</span> <span class="n">alpha_threshold</span><span class="p">,</span> <span class="n">]</span><span class="p">;</span>
-
-<span class="c1"># Buiding geneList object</span>
-<span class="n">geneList</span> <span class="o">&lt;-</span> <span class="n">res[</span><span class="p">,</span> <span class="s">&quot;log2FoldChange&quot;</span><span class="n">]</span><span class="p">;</span>
-<span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">geneList</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">res</span><span class="p">);</span>
-<span class="n">geneList</span> <span class="o">&lt;-</span> <span class="nf">sort</span><span class="p">(</span>
-  <span class="n">x</span> <span class="o">=</span> <span class="n">geneList</span><span class="p">,</span>
-  <span class="n">decreasing</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span>
-  <span class="n">na.last</span> <span class="o">=</span> <span class="kc">NA</span>
+<span class="c1"># Gathering results contained within the object</span>
+<span class="n">res_names</span> <span class="o">&lt;-</span> <span class="n">DESeq2</span><span class="o">::</span><span class="nf">resultsNames</span><span class="p">(</span>
+  <span class="n">object</span> <span class="o">=</span> <span class="n">rds</span>
 <span class="p">);</span>
 
-<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span>
-  <span class="n">utils</span><span class="o">::</span><span class="nf">head</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">geneList</span><span class="p">)</span>
-<span class="p">);</span>
+<span class="c1"># Building geneLists iteratively</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">resultname</span> <span class="n">in</span> <span class="n">res_names</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span><span class="s">&quot;Building geneList for&quot;</span><span class="p">,</span> <span class="n">resultname</span><span class="p">))</span>
 
-<span class="n">base</span><span class="o">::</span><span class="nf">saveRDS</span><span class="p">(</span>
-  <span class="n">object</span> <span class="o">=</span> <span class="n">geneList</span><span class="p">,</span>
-  <span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output[[</span><span class="s">&quot;rds&quot;</span><span class="n">]]</span>
-<span class="p">);</span>
+  <span class="n">res</span> <span class="o">&lt;-</span> <span class="n">DESeq2</span><span class="o">::</span><span class="nf">results</span><span class="p">(</span>
+    <span class="n">object</span> <span class="o">=</span> <span class="n">rds</span><span class="p">,</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">resultname</span><span class="p">,</span>
+    <span class="n">independentFiltering</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha_threshold</span><span class="p">,</span>
+    <span class="n">lfcThreshold</span> <span class="o">=</span> <span class="n">fc_threshold</span><span class="p">,</span>
+    <span class="n">pAdjustMethod</span> <span class="o">=</span> <span class="s">&quot;BH&quot;</span><span class="p">,</span>
+    <span class="n">cooksCutoff</span> <span class="o">=</span> <span class="kc">TRUE</span>
+  <span class="p">);</span>
+
+  <span class="n">res</span><span class="o">$</span><span class="n">entrez</span> <span class="o">&lt;-</span> <span class="nf">mapIds</span><span class="p">(</span>
+    <span class="n">organism</span><span class="p">,</span>
+    <span class="n">keys</span><span class="o">=</span><span class="nf">row.names</span><span class="p">(</span><span class="n">rds</span><span class="p">),</span>
+    <span class="n">column</span><span class="o">=</span><span class="s">&quot;ENTREZ&quot;</span><span class="p">,</span>
+    <span class="n">keytype</span><span class="o">=</span><span class="s">&quot;ENSEMBL&quot;</span><span class="p">,</span>
+    <span class="n">multiVals</span><span class="o">=</span><span class="s">&quot;first&quot;</span>
+  <span class="p">);</span>
+
+  <span class="c1"># Buiding geneList object</span>
+  <span class="n">geneList</span> <span class="o">&lt;-</span> <span class="n">res</span><span class="p">[,</span> <span class="s">&quot;log2FoldChange&quot;</span><span class="p">];</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">geneList</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">res</span><span class="o">$</span><span class="n">entrez</span><span class="p">;</span>
+  <span class="n">geneList</span> <span class="o">&lt;-</span> <span class="nf">sort</span><span class="p">(</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">geneList</span><span class="p">,</span>
+    <span class="n">decreasing</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span>
+    <span class="n">na.last</span> <span class="o">=</span> <span class="kc">NA</span>
+  <span class="p">);</span>
+
+  <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span>
+    <span class="n">utils</span><span class="o">::</span><span class="nf">head</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">geneList</span><span class="p">)</span>
+  <span class="p">);</span>
+
+  <span class="n">base</span><span class="o">::</span><span class="nf">saveRDS</span><span class="p">(</span>
+    <span class="n">object</span> <span class="o">=</span> <span class="n">geneList</span><span class="p">,</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;rds&quot;</span><span class="p">]]</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Process over&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -358,7 +416,7 @@ When running with</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../cp.html" class="btn btn-neutral float-right" title="CP (BASH)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="enrichDGN.html" class="btn btn-neutral float-right" title="DGN ENRICHMENT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../clusterProfiler.html" class="btn btn-neutral float-left" title="CLUSTERPROFILER" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

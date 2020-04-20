@@ -1,0 +1,165 @@
+.. _`MSigDB GSEA`:
+
+MSIGDB GSEA
+===========
+
+Perform GSEA analysis on MSigDB
+
+
+
+Software dependencies
+---------------------
+
+
+* conda-forge:r-msigdbr=7.0.1
+
+* bioconda:bioconductor-clusterprofiler=3.14.0
+
+* conda-forge:r-dplyr=0.8.5
+
+* bioconda:bioconductor-org.mm.eg.db=3.10.0
+
+* bioconda:bioconductor-org.hs.eg.db=3.10.0
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_msigdb_gsea:
+        input:
+            rds = "geneList.RDS"
+        output:
+            rds = "msigdb_gsea.RDS",
+            tsv = "msigdb_gsea.tsv"
+        message:
+            "Testing enrichDO"
+        threads:
+            1
+        log:
+            "logs/test_msigdb_gsea.log"
+        wrapper:
+            "0.50.4-42-gc53b3fd/bio/clusterProfiler/msigdb_gsea"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+The geneList object if described in the
+DESeq2_to_geneList wrapper
+
+see available organisms from MSigDB with:
+msigdbr_show_species()
+
+Parameters:
+  * msigdb_extra: Extra parameters for msigdbr::msigdbr
+  * organism: Either Hs or Mm
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script takes a geneList object and performs
+    # an enrichment analysis based on msigdb
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # MSigDB package used to load the pathways
+    base::library(package = "msigdbr", quietly = TRUE);
+    # Perform gene enrichment
+    base::library(package = "clusterProfiler", quietly = TRUE);
+    # Handling large datasets
+    base::library(package = "dplyr", quietly = TRUE);
+    # Loading databases
+    base::library(package = "org.Hs.eg.db", quietly = TRUE);
+    base::library(package = "org.Mm.eg.db", quietly = TRUE);
+
+
+    # Loading input dataset
+    geneList <- base::readRDS(
+      file = snakemake@input[["rds"]]
+    );
+
+    organism <- org.Hs.eg.db;
+    if ("organism" %in% base::names(snakemake@params)) {
+      if (snakemake@params[["organism"]] == "Mm") {
+        organism <- org.Mm.eg.db;
+      }
+    }
+
+    # Loading MSigDB
+    msigdb_extra <- 'species = "Homo sapiens"';
+    if ("msigdb_extra" %in% snakemake@params) {
+      msigdb_extra <- base::as.character(
+        x = snakemake@params[["msigdb_extra"]]
+      );
+    }
+
+    command <- base::paste0(
+      "msigdbr::msigdbr(",
+      msigdb_extra,
+      ")"
+    )
+
+    db <- base::eval(
+      base::parse(
+        text = command
+      )
+    ) %>% dplyr::select(gs_name, entrez_gene)
+    base::message("Libraries, datasets and database retrieved");
+
+    # Performing GSEA
+    gsea <- clusterProfiler::GSEA(
+      geneList,
+      TERM2GENE = db
+    );
+
+    gsea <- clusterProfiler::setReadable(
+        gsea,
+        OrgDb = organism,
+        keyType = "ENTREZID"
+    );
+
+    # Saving results
+    base::saveRDS(
+      obj = gsea,
+      file = snakemake@output[["rds"]]
+    );
+
+    utils::write.table(
+      x = gsea,
+      file = snakemake@output[["tsv"]]
+    );

@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../epic.html">EPIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fastp.html">FASTP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
@@ -262,7 +263,7 @@
         <span class="c1">#score_threshold=50, # Instead of thresholding per-CM output on E-value, report target sequences with a bit score of &gt;= &lt;x&gt;.</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-12-ga500302/bio/infernal/cmscan&quot;</span>
+        <span class="s2">&quot;0.50.4-42-gc53b3fd/bio/infernal/cmscan&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -317,9 +318,9 @@ When running with</p>
 <span class="n">score_threshold</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;score_threshold&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">score_threshold</span><span class="p">:</span>
-    <span class="n">thresh_cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; -T {float(score_threshold)} &quot;</span>
+    <span class="n">thresh_cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; -T </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">score_threshold</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">thresh_cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; -E {float(evalue_threshold)} &quot;</span>
+    <span class="n">thresh_cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; -E </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">evalue_threshold</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
 
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 

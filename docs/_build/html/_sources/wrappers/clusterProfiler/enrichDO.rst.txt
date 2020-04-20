@@ -1,0 +1,146 @@
+.. _`DOSE enrichment`:
+
+DOSE ENRICHMENT
+===============
+
+Perform enrichment analysis on DOSE
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconda:bioconductor-clusterprofiler=3.14.0
+
+* bioconda:bioconductor-org.mm.eg.db=3.10.0
+
+* bioconda:bioconductor-org.hs.eg.db=3.10.0
+
+* bioconda:bioconductor-dose=3.12.0
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_enrichDO:
+        input:
+            rds = "geneList.RDS"
+        output:
+            rds = "enrichDO.RDS",
+            tsv = "enrichDO.tsv"
+        message:
+            "Testing enrichDO"
+        threads:
+            1
+        params:
+            enrichDO_extra = "ont = 'DOLite'"
+        log:
+            "logs/test_enrichDO.log"
+        wrapper:
+            "0.50.4-42-gc53b3fd/bio/clusterProfiler/enrichDO"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+The geneList object if described in the
+DESeq2_to_geneList wrapper
+
+Parameters:
+  * enrichDO_extra: Extra parameters for enrichDO, besides "gene", and "readable"
+  * organism: Either Hs or Mm
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script takes a geneList object and performs
+    # an enrichment analysis based on DOSE database
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # Perform gene enrichment
+    base::library(package = "DOSE", quietly = TRUE);
+    base::library(package = "clusterProfiler", quietly = TRUE);
+    # Loading databases
+    base::library(package = "org.Hs.eg.db", quietly = TRUE);
+    base::library(package = "org.Mm.eg.db", quietly = TRUE);
+
+
+    # Loading input dataset
+    geneList <- base::readRDS(
+      file = snakemake@input[["rds"]]
+    );
+
+    extra <- "gene = base::names(geneList), readable = TRUE";
+    if ("enrichDO_extra" %in% base::names(snakemake@params)) {
+      extra <- base::paste(
+        extra,
+        snakemake@params[["enrichDO_extra"]],
+        sep = ", "
+      );
+      base::message("Extra parameters accounted");
+    } else {
+      base::message("No extra parameters provided");
+    }
+
+    command <- base::paste0(
+      "DOSE::enrichDO(",
+      extra,
+      ")"
+    );
+    base::message("Libraries and datasets loaded");
+    base::message(command);
+
+    # Performing DOSE enrichment
+    edo <- base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+    # Saving results
+    base::saveRDS(
+      obj = edo,
+      file = snakemake@output[["rds"]]
+    );
+
+    utils::write.table(
+      x = edo,
+      file = snakemake@output[["tsv"]]
+    );

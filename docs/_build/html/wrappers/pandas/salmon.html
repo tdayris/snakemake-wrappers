@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../epic.html">EPIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fastp.html">FASTP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
@@ -253,27 +254,68 @@
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">pandas_merge_salmon</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">pandas_merge_salmon_tr</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">quant</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]),</span>
         <span class="n">tx2gene</span> <span class="o">=</span> <span class="s2">&quot;tx2gene.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;table.tsv&quot;</span>
+        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;table_tr.tsv&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Testing pandas merge salmon&quot;</span>
-    <span class="n">threads</span><span class="p">:</span>
-        <span class="mi">1</span>
-    <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
-        <span class="p">),</span>
-        <span class="n">time_min</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-        <span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/pandas_merge_salmon.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-12-ga500302/bio/pandas/salmon&quot;</span>
+        <span class="s2">&quot;0.50.4-42-gc53b3fd/bio/pandas/salmon&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">pandas_merge_salmon_tr_positions</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">quant</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]),</span>
+        <span class="n">tx2gene</span> <span class="o">=</span> <span class="s2">&quot;tx2gene2.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;table_tr_pos.tsv&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Testing pandas merge salmon&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">index_label</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/pandas_merge_salmon.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.50.4-42-gc53b3fd/bio/pandas/salmon&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">pandas_merge_salmon_genes</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">quant</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]),</span>
+        <span class="n">tx2gene</span> <span class="o">=</span> <span class="s2">&quot;tx2gene.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;table_genes.tsv&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Testing pandas merge salmon&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">index_label</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/pandas_merge_salmon.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.50.4-42-gc53b3fd/bio/pandas/salmon&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">pandas_merge_salmon_genes_positions</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">quant</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]),</span>
+        <span class="n">tx2gene</span> <span class="o">=</span> <span class="s2">&quot;tx2gene2.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;table_genes_pos.tsv&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Testing pandas merge salmon&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">index_label</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/pandas_merge_salmon.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.50.4-42-gc53b3fd/bio/pandas/salmon&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -347,14 +389,28 @@ When running with</p>
         <span class="n">header</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
         <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span>
     <span class="p">)</span>
-    <span class="n">t2g</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Ensembl_Gene_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Ensembl_Transcript_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Hugo_ID&quot;</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t2g</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">t2g</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Ensembl_Gene_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Ensembl_Transcript_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Hugo_ID&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t2g</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Ensembl_Gene_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Ensembl_Transcript_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Hugo_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Chromosome&quot;</span><span class="p">,</span> <span class="s2">&quot;Start&quot;</span><span class="p">,</span> <span class="s2">&quot;End&quot;</span><span class="p">,</span> <span class="s2">&quot;Strand&quot;</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="n">genes</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Keeping only genes from tx2gene DataFrame&quot;</span><span class="p">)</span>
-        <span class="n">t2g</span> <span class="o">=</span> <span class="n">t2g</span><span class="p">[[</span><span class="s2">&quot;Ensembl_Gene_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Hugo_ID&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">t2g</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Ensembl_Gene_ID&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">genes</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Keeping only genes from tx2gene DataFrame&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t2g</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">t2g</span> <span class="o">=</span> <span class="n">t2g</span><span class="p">[[</span><span class="s2">&quot;Ensembl_Gene_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Hugo_ID&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">t2g</span> <span class="o">=</span> <span class="n">t2g</span><span class="p">[[</span><span class="s2">&quot;Ensembl_Gene_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Hugo_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Chromosome&quot;</span><span class="p">,</span> <span class="s2">&quot;Start&quot;</span><span class="p">,</span> <span class="s2">&quot;End&quot;</span><span class="p">,</span> <span class="s2">&quot;Strand&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+            <span class="n">t2g</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Ensembl_Gene_ID&quot;</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t2g</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Ensembl_Transcript_ID&quot;</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Wrong tx_to_gene column format?&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">t2g</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="k">raise</span>
 
-    <span class="k">return</span> <span class="n">t2g</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Ensembl_Transcript_ID&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">t2g</span>
+
 
 
 <span class="k">def</span> <span class="nf">read_salmon</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
@@ -387,14 +443,14 @@ When running with</p>
 <span class="n">merged_frame</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;quant&quot;</span><span class="p">]:</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading </span><span class="si">{quant}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading </span><span class="si">{</span><span class="n">quant</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">read_salmon</span><span class="p">(</span><span class="n">quant</span><span class="p">)</span>
 
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Cleaning dataframe&quot;</span><span class="p">)</span>
     <span class="n">sample_id</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="n">quant</span><span class="p">))</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">suffix</span> <span class="p">:</span><span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;suffix&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">suffix</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;suffix&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">sample_id</span> <span class="o">=</span> <span class="n">sample_id</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">suffix</span><span class="p">)]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span> <span class="p">:</span><span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prefix&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prefix&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">sample_id</span> <span class="o">=</span> <span class="n">sample_id</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">):]</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;column&quot;</span><span class="p">,</span> <span class="s2">&quot;TPM&quot;</span><span class="p">)]]</span>
@@ -429,7 +485,7 @@ When running with</p>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Removing NA values&quot;</span><span class="p">)</span>
     <span class="n">merged_frame</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="p">(</span><span class="n">tr2gene_path</span> <span class="p">:</span><span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tx2gene&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">tr2gene_path</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tx2gene&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding gene names&quot;</span><span class="p">)</span>
 
     <span class="n">t2g</span> <span class="o">=</span> <span class="n">read_tx2gene</span><span class="p">(</span>

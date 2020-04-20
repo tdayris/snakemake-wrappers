@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cutadapt.html">CUTADAPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deseq2.html">DESEQ2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="epic.html">EPIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fastp.html">FASTP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fastq_screen.html">FASTQ_SCREEN</a></li>
@@ -256,7 +257,7 @@ and gene-level analysis.</p>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;type=&#39;salmon&#39;, txOut=TRUE&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-12-ga500302/bio/tximport&quot;</span>
+        <span class="s2">&quot;0.50.4-42-gc53b3fd/bio/tximport&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -288,7 +289,7 @@ R wrapper. Supplementary options will cause unknown parameters error.</p>
 
 <span class="c1"># Cast input paths as character to avoid errors</span>
 <span class="n">samples_paths</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span>               <span class="c1"># Sequentially apply</span>
-  <span class="n">snakemake</span><span class="o">@</span><span class="n">input[[</span><span class="s">&quot;quant&quot;</span><span class="n">]]</span><span class="p">,</span>          <span class="c1"># ... to all quantification paths</span>
+  <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;quant&quot;</span><span class="p">]],</span>          <span class="c1"># ... to all quantification paths</span>
   <span class="nf">function</span><span class="p">(</span><span class="n">quant</span><span class="p">)</span> <span class="nf">as.character</span><span class="p">(</span><span class="n">quant</span><span class="p">)</span>  <span class="c1"># ... a cast as character</span>
 <span class="p">);</span>
 
@@ -300,7 +301,7 @@ R wrapper. Supplementary options will cause unknown parameters error.</p>
 
 <span class="c1"># Check if user provided optional transcript to gene table</span>
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;tx_to_gene&quot;</span> <span class="o">%in%</span> <span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">))</span> <span class="p">{</span>
-  <span class="n">tx2gene</span> <span class="o">&lt;-</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input[[</span><span class="s">&quot;tx_to_gene&quot;</span><span class="n">]]</span><span class="p">);</span>
+  <span class="n">tx2gene</span> <span class="o">&lt;-</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;tx_to_gene&quot;</span><span class="p">]]);</span>
   <span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span>
     <span class="n">extra</span><span class="p">,</span>                 <span class="c1"># Foreward existing arguments</span>
     <span class="s">&quot;, tx2gene = &quot;</span><span class="p">,</span>        <span class="c1"># Argument name</span>
@@ -310,10 +311,10 @@ R wrapper. Supplementary options will cause unknown parameters error.</p>
 
 <span class="c1"># Add user defined arguments</span>
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;extra&quot;</span> <span class="o">%in%</span> <span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
-  <span class="nf">if </span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params[[</span><span class="s">&quot;extra&quot;</span><span class="n">]]</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">if </span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;extra&quot;</span><span class="p">]]</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span>
       <span class="n">extra</span><span class="p">,</span>                       <span class="c1"># Foreward existing parameters</span>
-      <span class="n">snakemake</span><span class="o">@</span><span class="n">params[[</span><span class="s">&quot;extra&quot;</span><span class="n">]]</span><span class="p">,</span> <span class="c1"># Add user parameters</span>
+      <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;extra&quot;</span><span class="p">]],</span> <span class="c1"># Add user parameters</span>
       <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;, &quot;</span>                   <span class="c1"># Field separator</span>
     <span class="p">);</span>
   <span class="p">}</span>
@@ -333,7 +334,7 @@ R wrapper. Supplementary options will cause unknown parameters error.</p>
 <span class="c1"># Save results</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">saveRDS</span><span class="p">(</span>                       <span class="c1"># Save R object</span>
   <span class="n">object</span> <span class="o">=</span> <span class="n">txi</span><span class="p">,</span>                      <span class="c1"># The txi object</span>
-  <span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output[[</span><span class="s">&quot;txi&quot;</span><span class="n">]]</span>   <span class="c1"># Output path is provided by Snakemake</span>
+  <span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;txi&quot;</span><span class="p">]]</span>   <span class="c1"># Output path is provided by Snakemake</span>
 <span class="p">);</span>
 </pre></div>
 </div>

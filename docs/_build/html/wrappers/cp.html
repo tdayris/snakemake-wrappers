@@ -36,7 +36,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="CUTADAPT" href="cutadapt.html" />
-    <link rel="prev" title="DESEQ2 TO GENELIST" href="clusterProfiler/DESeq2_to_geneList.html" /> 
+    <link rel="prev" title="MSIGDB GSEA" href="clusterProfiler/msigdb_gsea.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -108,6 +108,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cutadapt.html">CUTADAPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deseq2.html">DESEQ2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="epic.html">EPIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fastp.html">FASTP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fastq_screen.html">FASTQ_SCREEN</a></li>
@@ -262,7 +263,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/cp/</span><span class="si">{input}</span><span class="s2">.logs&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-12-ga500302/bio/cp/&quot;</span>
+        <span class="s2">&quot;0.50.4-42-gc53b3fd/bio/cp/&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -315,15 +316,15 @@ symbolic linking automatic choices</p>
 
 <span class="n">output_directory</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 
-<span class="n">shell_cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;mkdir --parents </span><span class="si">{output_directory}</span><span class="s2"> &amp;&amp; &quot;</span>
+<span class="n">shell_cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;mkdir --parents </span><span class="si">{</span><span class="n">output_directory</span><span class="si">}</span><span class="s2"> &amp;&amp; &quot;</span>
 <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">:</span>
     <span class="n">symlink</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">cs</span><span class="p">)</span> <span class="k">for</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">cold_storage</span><span class="p">)</span>
     <span class="n">shell_cmd</span> <span class="o">+=</span> <span class="p">(</span>
         <span class="s2">&quot;cp &quot;</span>                                        <span class="c1"># Tool</span>
         <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> &quot;</span>                                   <span class="c1"># Optionnal parameters</span>
-        <span class="sa">f</span><span class="s2">&quot;{&#39;&#39; if symlink else &#39;--symbolic-link&#39;} &quot;</span>   <span class="c1"># Symlink if needed</span>
-        <span class="sa">f</span><span class="s2">&quot;{op.realpath(f)} &quot;</span>                         <span class="c1"># Path to input file</span>
-        <span class="sa">f</span><span class="s2">&quot;{op.realpath(snakemake.output[0])} &quot;</span>       <span class="c1"># Path to output file</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">symlink</span> <span class="k">else</span> <span class="s1">&#39;--symbolic-link&#39;</span><span class="si">}</span><span class="s2"> &quot;</span>   <span class="c1"># Symlink if needed</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>                         <span class="c1"># Path to input file</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2"> &quot;</span>       <span class="c1"># Path to output file</span>
         <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">; &quot;</span>                                    <span class="c1"># Logging</span>
     <span class="p">)</span>
 
@@ -344,7 +345,7 @@ symbolic linking automatic choices</p>
         <a href="cutadapt.html" class="btn btn-neutral float-right" title="CUTADAPT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="clusterProfiler/DESeq2_to_geneList.html" class="btn btn-neutral float-left" title="DESEQ2 TO GENELIST" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="clusterProfiler/msigdb_gsea.html" class="btn btn-neutral float-left" title="MSIGDB GSEA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

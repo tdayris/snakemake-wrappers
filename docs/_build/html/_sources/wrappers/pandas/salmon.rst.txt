@@ -27,27 +27,68 @@ This wrapper can be used in the following way:
 
 .. code-block:: python
 
-    rule pandas_merge_salmon:
+    rule pandas_merge_salmon_tr:
         input:
             quant = expand("{sample}/quant.sf", sample=["A", "B"]),
             tx2gene = "tx2gene.tsv"
         output:
-            tsv = "table.tsv"
+            tsv = "table_tr.tsv"
         message:
             "Testing pandas merge salmon"
-        threads:
-            1
-        resources:
-            mem_mb = (
-                lambda wildcards, attempt: min(attempt * 512, 1024)
-            ),
-            time_min = (
-                lambda wildcards, attempt: min(attempt * 10, 20)
-            )
         log:
             "logs/pandas_merge_salmon.log"
         wrapper:
-            "0.50.4-12-ga500302/bio/pandas/salmon"
+            "0.50.4-42-gc53b3fd/bio/pandas/salmon"
+
+
+    rule pandas_merge_salmon_tr_positions:
+        input:
+            quant = expand("{sample}/quant.sf", sample=["A", "B"]),
+            tx2gene = "tx2gene2.tsv"
+        output:
+            tsv = "table_tr_pos.tsv"
+        message:
+            "Testing pandas merge salmon"
+        params:
+            index_label = True
+        log:
+            "logs/pandas_merge_salmon.log"
+        wrapper:
+            "0.50.4-42-gc53b3fd/bio/pandas/salmon"
+
+
+    rule pandas_merge_salmon_genes:
+        input:
+            quant = expand("{sample}/quant.genes.sf", sample=["A", "B"]),
+            tx2gene = "tx2gene.tsv"
+        output:
+            tsv = "table_genes.tsv"
+        message:
+            "Testing pandas merge salmon"
+        params:
+            genes = True,
+            index_label = True
+        log:
+            "logs/pandas_merge_salmon.log"
+        wrapper:
+            "0.50.4-42-gc53b3fd/bio/pandas/salmon"
+
+
+    rule pandas_merge_salmon_genes_positions:
+        input:
+            quant = expand("{sample}/quant.genes.sf", sample=["A", "B"]),
+            tx2gene = "tx2gene2.tsv"
+        output:
+            tsv = "table_genes_pos.tsv"
+        message:
+            "Testing pandas merge salmon"
+        params:
+            index_label = True,
+            genes = True
+        log:
+            "logs/pandas_merge_salmon.log"
+        wrapper:
+            "0.50.4-42-gc53b3fd/bio/pandas/salmon"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -133,14 +174,28 @@ Code
             header=(0 if header is True else None),
             dtype=str
         )
-        t2g.columns = ["Ensembl_Gene_ID", "Ensembl_Transcript_ID", "Hugo_ID"]
+        try:
+            if len(t2g.columns.tolist()) == 3:
+                t2g.columns = ["Ensembl_Gene_ID", "Ensembl_Transcript_ID", "Hugo_ID"]
+            else:
+                t2g.columns = ["Ensembl_Gene_ID", "Ensembl_Transcript_ID", "Hugo_ID", "Chromosome", "Start", "End", "Strand"]
 
-        if genes is True:
-            logging.debug("Keeping only genes from tx2gene DataFrame")
-            t2g = t2g[["Ensembl_Gene_ID", "Hugo_ID"]].drop_duplicates()
-            return t2g.set_index("Ensembl_Gene_ID")
+            if genes is True:
+                logging.debug("Keeping only genes from tx2gene DataFrame")
+                if len(t2g.columns.tolist()) == 3:
+                    t2g = t2g[["Ensembl_Gene_ID", "Hugo_ID"]].drop_duplicates()
+                else:
+                    t2g = t2g[["Ensembl_Gene_ID", "Hugo_ID", "Chromosome", "Start", "End", "Strand"]].drop_duplicates()
+                t2g.set_index("Ensembl_Gene_ID", inplace = True)
+            else:
+                t2g.set_index("Ensembl_Transcript_ID", inplace = True)
+        except ValueError:
+            logging.debug("Wrong tx_to_gene column format?")
+            logging.debug(t2g.columns.tolist())
+            raise
 
-        return t2g.set_index("Ensembl_Transcript_ID")
+        return t2g
+
 
 
     def read_salmon(path: str) -> pandas.DataFrame:

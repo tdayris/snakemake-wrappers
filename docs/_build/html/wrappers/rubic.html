@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cutadapt.html">CUTADAPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deseq2.html">DESEQ2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="epic.html">EPIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fastp.html">FASTP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fastq_screen.html">FASTQ_SCREEN</a></li>
@@ -262,7 +263,7 @@ detects recurrent copy number alterations using copy number breaks.</p>
         <span class="n">fdr</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">genefile</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-12-ga500302/bio/rubic&quot;</span>
+        <span class="s2">&quot;0.50.4-42-gc53b3fd/bio/rubic&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -287,13 +288,13 @@ When running with</p>
 
 <span class="nf">library</span><span class="p">(</span><span class="n">RUBIC</span><span class="p">)</span>
 
-<span class="n">all_genes</span> <span class="o">&lt;-</span> <span class="nf">if </span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params[[</span><span class="s">&quot;genefile&quot;</span><span class="n">]]</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="nf">system.file</span><span class="p">(</span><span class="s">&quot;extdata&quot;</span><span class="p">,</span> <span class="s">&quot;genes.tsv&quot;</span><span class="p">,</span> <span class="n">package</span><span class="o">=</span><span class="s">&quot;RUBIC&quot;</span><span class="p">)</span> <span class="n">else</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params[[</span><span class="s">&quot;genefile&quot;</span><span class="n">]]</span>
-<span class="n">fdr</span> <span class="o">&lt;-</span> <span class="nf">if </span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params[[</span><span class="s">&quot;fdr&quot;</span><span class="n">]]</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="m">0.25</span> <span class="n">else</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params[[</span><span class="s">&quot;fdr&quot;</span><span class="n">]]</span>
+<span class="n">all_genes</span> <span class="o">&lt;-</span> <span class="nf">if </span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;genefile&quot;</span><span class="p">]]</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="nf">system.file</span><span class="p">(</span><span class="s">&quot;extdata&quot;</span><span class="p">,</span> <span class="s">&quot;genes.tsv&quot;</span><span class="p">,</span> <span class="n">package</span><span class="o">=</span><span class="s">&quot;RUBIC&quot;</span><span class="p">)</span> <span class="n">else</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;genefile&quot;</span><span class="p">]]</span>
+<span class="n">fdr</span> <span class="o">&lt;-</span> <span class="nf">if </span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;fdr&quot;</span><span class="p">]]</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="m">0.25</span> <span class="n">else</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;fdr&quot;</span><span class="p">]]</span>
 
-<span class="n">rbc</span> <span class="o">&lt;-</span> <span class="nf">rubic</span><span class="p">(</span><span class="n">fdr</span><span class="p">,</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input[[</span><span class="s">&quot;seg&quot;</span><span class="n">]]</span><span class="p">,</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input[[</span><span class="s">&quot;markers&quot;</span><span class="n">]]</span><span class="p">,</span> <span class="n">genes</span><span class="o">=</span><span class="n">all_genes</span><span class="p">)</span>
-<span class="n">rbc</span><span class="o">$</span><span class="nf">save.focal.gains</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output[[</span><span class="s">&quot;out_gains&quot;</span><span class="n">]]</span><span class="p">)</span>
-<span class="n">rbc</span><span class="o">$</span><span class="nf">save.focal.losses</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output[[</span><span class="s">&quot;out_losses&quot;</span><span class="n">]]</span><span class="p">)</span>
-<span class="n">rbc</span><span class="o">$</span><span class="nf">save.plots</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output[[</span><span class="s">&quot;out_plots&quot;</span><span class="n">]]</span><span class="p">)</span>
+<span class="n">rbc</span> <span class="o">&lt;-</span> <span class="nf">rubic</span><span class="p">(</span><span class="n">fdr</span><span class="p">,</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;seg&quot;</span><span class="p">]],</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;markers&quot;</span><span class="p">]],</span> <span class="n">genes</span><span class="o">=</span><span class="n">all_genes</span><span class="p">)</span>
+<span class="n">rbc</span><span class="o">$</span><span class="nf">save.focal.gains</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;out_gains&quot;</span><span class="p">]])</span>
+<span class="n">rbc</span><span class="o">$</span><span class="nf">save.focal.losses</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;out_losses&quot;</span><span class="p">]])</span>
+<span class="n">rbc</span><span class="o">$</span><span class="nf">save.plots</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;out_plots&quot;</span><span class="p">]])</span>
 </pre></div>
 </div>
 </div>
