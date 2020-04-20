@@ -28,9 +28,6 @@ if ("enrichDO_extra" %in% base::names(snakemake@params)) {
     snakemake@params[["enrichDO_extra"]],
     sep = ", "
   );
-  base::message("Extra parameters accounted");
-} else {
-  base::message("No extra parameters provided");
 }
 
 command <- base::paste0(

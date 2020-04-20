@@ -1,7 +1,7 @@
 #!/usr/bin/R
 
 # This script takes a geneList object and performs
-# an enrichment analysis based on DOSE database
+# an enrichment analysis based on NCG database
 
 # __author__ = "Thibault Dayris"
 # __copyright__ = "Copyright 2020, Thibault Dayris"

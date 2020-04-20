@@ -47,6 +47,7 @@ res_names <- DESeq2::resultsNames(
   object = rds
 );
 
+# Building output directory
 if (! base::file.exists(snakemake@output[["gene_lists"]])) {
   base::dir.create(snakemake@output[["gene_lists"]]);
 }
@@ -70,6 +71,7 @@ for (resultname in res_names) {
     cooksCutoff = TRUE
   );
 
+  # Adding ENTREZ identifiers
   res$entrez <- mapIds(
     organism,
     keys=row.names(rds),

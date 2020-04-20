@@ -1,7 +1,7 @@
 #!/usr/bin/R
 
 # This script takes a geneList object and performs
-# an enrichment analysis based on DOSE database
+# an enrichment analysis based on GO database
 
 # __author__ = "Thibault Dayris"
 # __copyright__ = "Copyright 2020, Thibault Dayris"
@@ -37,7 +37,7 @@ command <- base::paste0(
 base::message("Libraries and datasets loaded");
 base::message(command);
 
-# Performing DOSE enrichment
+# Performing GO enrichment
 gse_do <- base::eval(
   base::parse(
     text = command

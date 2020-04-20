@@ -1,7 +1,7 @@
 #!/usr/bin/R
 
 # This script takes a geneList object and performs
-# an enrichment analysis based on DOSE database
+# an classification based on GO
 
 # __author__ = "Thibault Dayris"
 # __copyright__ = "Copyright 2020, Thibault Dayris"
@@ -27,7 +27,7 @@ if ("organism" %in% base::names(snakemake@params)) {
   }
 }
 
-extra <- "gene = names(geneList), OrgDb = organism, readable = TRUE";
+extra <- "gene = base::names(geneList), OrgDb = organism, readable = TRUE";
 if ("groupGO_extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
     extra,
