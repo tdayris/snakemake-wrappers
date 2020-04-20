@@ -35,12 +35,8 @@ This wrapper can be used in the following way:
         output:
             rds = "groupGO.RDS",
             tsv = "groupGO.tsv"
-        message:
-            "Testing enrichDO"
-        log:
-            "logs/test_groupGO.log"
         wrapper:
-            "0.50.4-48-ga564007/bio/clusterProfiler/groupGO"
+            "0.50.4-50-g7af9553/bio/clusterProfiler/groupGO"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -83,7 +79,7 @@ Code
     #!/usr/bin/R
 
     # This script takes a geneList object and performs
-    # an enrichment analysis based on DOSE database
+    # an classification based on GO
 
     # __author__ = "Thibault Dayris"
     # __copyright__ = "Copyright 2020, Thibault Dayris"
@@ -109,7 +105,7 @@ Code
       }
     }
 
-    extra <- "gene = names(geneList), OrgDb = organism, readable = TRUE";
+    extra <- "gene = base::names(geneList), OrgDb = organism, readable = TRUE";
     if ("groupGO_extra" %in% base::names(snakemake@params)) {
       extra <- base::paste(
         extra,

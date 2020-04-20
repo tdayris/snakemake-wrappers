@@ -38,21 +38,8 @@ This wrapper can be used in the following way:
             rds = "dds.RDS"
         output:
             gene_lists = directory("geneLists")
-        message:
-            "Testing geneList creation from DESeq2 output"
-        threads:
-            1
-        resources:
-            mem_mb = (
-                lambda wildcards, attempt: min(attempt * 1024, 10240)
-            ),
-            time_min = (
-                lambda wildcards, attempt: min(attempt * 20, 200)
-            )
-        log:
-            "logs/test_deseq2_to_genelist.log"
         wrapper:
-            "0.50.4-48-ga564007/bio/clusterProfiler/DESeq2_to_geneList"
+            "0.50.4-50-g7af9553/bio/clusterProfiler/DESeq2_to_geneList"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -79,6 +66,7 @@ The geneList contains three features:
 Parameters:
 
 * alpha_threshold: The padj threshold used to filter non significative events
+* fc_threshold: The fold change threshold used to filter non significative events
 
 
 
@@ -145,6 +133,7 @@ Code
       object = rds
     );
 
+    # Building output directory
     if (! base::file.exists(snakemake@output[["gene_lists"]])) {
       base::dir.create(snakemake@output[["gene_lists"]]);
     }
@@ -168,6 +157,7 @@ Code
         cooksCutoff = TRUE
       );
 
+      # Adding ENTREZ identifiers
       res$entrez <- mapIds(
         organism,
         keys=row.names(rds),
