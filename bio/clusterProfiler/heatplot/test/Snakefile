@@ -1,0 +1,17 @@
+rule test_enrich_heatplot:
+    input:
+        rds = "enriched.RDS"
+    output:
+        png = "heatplot.png"
+    wrapper:
+        "master/bio/clusterProfiler/heatplot"
+
+
+rule test_enrich_heatplot_with_fc:
+    input:
+        rds = "enriched.RDS",
+        gene_list = "geneList.RDS"
+    output:
+        png = "heatplot_fc.png"
+    wrapper:
+        "master/bio/clusterProfiler/heatplot"
