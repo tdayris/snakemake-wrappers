@@ -1,0 +1,17 @@
+rule test_enrich_cnetplot:
+    input:
+        rds = "enriched.RDS"
+    output:
+        png = "cnetplot.png"
+    wrapper:
+        "master/bio/clusterProfiler/cnetplot"
+
+
+rule test_enrich_cnetplot_with_fc:
+    input:
+        rds = "enriched.RDS",
+        gene_list = "geneList.RDS"
+    output:
+        png = "cnetplot_fc.png"
+    wrapper:
+        "master/bio/clusterProfiler/cnetplot"
