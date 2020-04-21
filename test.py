@@ -1955,3 +1955,40 @@ def test_clusterprofiler_gse_go():
         "bio/clusterProfiler/gseGO",
         ["snakemake", "--cores", "1", "gseGO.RDS", "--use-conda", "-F"]
     )
+
+
+def test_clusterprofiler_enriched_barplot():
+    run(
+        "bio/clusterProfiler/barplot",
+        ["snakemake", "--cores", "1", "barplot.png", "--use-conda", "-F"]
+    )
+
+def test_clusterprofiler_enriched_dotplot():
+    run(
+        "bio/clusterProfiler/dotplot",
+        ["snakemake", "--cores", "1", "dotplot.png", "--use-conda", "-F"]
+    )
+
+
+def test_clusterprofiler_enriched_cnetplot():
+    run(
+        "bio/clusterProfiler/cnetplot",
+        ["snakemake", "--cores", "1", "cnetplot.png", "--use-conda", "-F"]
+    )
+
+    run(
+        "bio/clusterProfiler/cnetplot",
+        ["snakemake", "--cores", "1", "cnetplot_fc.png", "--use-conda", "-F"]
+    )
+
+
+def test_clusterprofiler_enriched_heatplot():
+    run(
+        "bio/clusterProfiler/heatplot",
+        ["snakemake", "--cores", "1", "heatplot.png", "--use-conda", "-F"]
+    )
+
+    run(
+        "bio/clusterProfiler/heatplot",
+        ["snakemake", "--cores", "1", "heatplot_fc.png", "--use-conda", "-F"]
+    )
