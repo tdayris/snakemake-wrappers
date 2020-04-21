@@ -1992,3 +1992,9 @@ def test_clusterprofiler_enriched_heatplot():
         "bio/clusterProfiler/heatplot",
         ["snakemake", "--cores", "1", "heatplot_fc.png", "--use-conda", "-F"]
     )
+
+def test_clusterprofiler_enriched_upsetplot():
+    run(
+        "bio/clusterProfiler/upsetplot",
+        ["snakemake", "--cores", "1", "upsetplot.png", "--use-conda", "-F"]
+    )
