@@ -39,7 +39,7 @@ This wrapper can be used in the following way:
         output:
             gene_lists = directory("geneLists")
         wrapper:
-            "0.50.4-50-g7af9553/bio/clusterProfiler/DESeq2_to_geneList"
+            "0.50.4-62-g6050183/bio/clusterProfiler/DESeq2_to_geneList"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -67,6 +67,7 @@ Parameters:
 
 * alpha_threshold: The padj threshold used to filter non significative events
 * fc_threshold: The fold change threshold used to filter non significative events
+* keytype: The type of genes identifiers used in DESeq2 eg: ENSEMBL, SYMBOL, ...
 
 
 
@@ -126,6 +127,13 @@ Code
         x = snakemake@params[["fc_threshold"]]
       );
     }
+
+    gene_id <- "ENSEMBL";
+    if ("gene_id" %in% base::names(snakemake@params)) {
+      gene_id <- base::as.character(
+        x = snakemake@params[["gene_id"]]
+      );
+    }
     base::message("Dataset and libraries loaded");
 
     # Gathering results contained within the object
@@ -162,7 +170,7 @@ Code
         organism,
         keys=row.names(rds),
         column="ENTREZID",
-        keytype="ENSEMBL",
+        keytype=gene_id,
         multiVals="first"
       );
 

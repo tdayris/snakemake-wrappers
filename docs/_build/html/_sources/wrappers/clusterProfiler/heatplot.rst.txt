@@ -1,0 +1,148 @@
+.. _`Heatmap`:
+
+HEATMAP
+=======
+
+Draw a heatmap from enriched terms
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconda:bioconductor-enrichplot=1.6.0
+
+* bioconda:bioconductor-clusterprofiler=3.14.0
+
+* conda-forge:r-cairo=1.5_12
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_enrich_heatplot:
+        input:
+            rds = "enriched.RDS"
+        output:
+            png = "heatplot.png"
+        wrapper:
+            "0.50.4-62-g6050183/bio/clusterProfiler/heatplot"
+
+
+    rule test_enrich_heatplot_with_fc:
+        input:
+            rds = "enriched.RDS",
+            gene_list = "geneList.RDS"
+        output:
+            png = "heatplot_fc.png"
+        wrapper:
+            "0.50.4-62-g6050183/bio/clusterProfiler/heatplot"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Use clusterProfiler enrichXXX to get enriched terms. This may also be used
+with gseXXX, but you might want to consider GSEA-like plots.
+
+Parameters:
+  * heatplot_extra: Extra parameters for heatplot, besides "x",
+  and "foldChange"
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script takes an enriched terms object from clusterProfiler
+    # and builds a heatplot of most enriched terms or provided list of
+    # pathways
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # Handle enrichment
+    base::library(package = "clusterProfiler", quietly = TRUE);
+    # Handle graphics
+    base::library(package = "Cairo", quietly = TRUE);
+    base::library(package = "enrichplot", quietly = TRUE);
+
+    enriched <- base::readRDS(
+      file = base::as.character(x = snakemake@input[["rds"]])
+    );
+
+    fc <- NULL;
+    if ("gene_list" %in% base::names(snakemake@input)) {
+      fc <- readRDS(
+        file = base::as.character(snakemake@input[["gene_list"]])
+      );
+    }
+
+    heatplot_extra <- "x = enriched, foldChange = fc";
+    if ("heatplot_extra" %in% base::names(snakemake@params)) {
+      heatplot_extra <- base::paste(
+        heatplot_extra,
+        snakemake@params[["heatplot_extra"]],
+        sep = ", "
+      );
+    }
+    base::message("Libraries and input data loaded");
+
+    # Build command line
+    command <- base::paste0(
+      "enrichplot::heatplot(",
+      heatplot_extra,
+      ")"
+    );
+    base::message(command);
+
+    # Build plot
+    png(
+      filename = snakemake@output[["png"]],
+      width = 1024,
+      height = 768,
+      units = "px",
+      type = "cairo"
+    );
+
+
+    base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+    dev.off()

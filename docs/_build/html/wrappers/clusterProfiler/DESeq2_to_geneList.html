@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="DGN ENRICHMENT" href="enrichDGN.html" />
+    <link rel="next" title="BARPLOT" href="barplot.html" />
     <link rel="prev" title="CLUSTERPROFILER" href="../clusterProfiler.html" /> 
 </head>
 
@@ -105,6 +105,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="barplot.html">BARPLOT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cnetplot.html">CNETPLOT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dotplot.html">DOTPLOT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="enrichDGN.html">DGN ENRICHMENT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="enrichDO.html">DOSE ENRICHMENT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="enrichGO.html">GO ENRICHMENT</a></li>
@@ -114,7 +117,9 @@
 <li class="toctree-l2"><a class="reference internal" href="gseDO.html">GSEA DOSE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gseGO.html">GSEA GO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gseNCG.html">GSEA NCG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="heatplot.html">HEATMAP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="msigdb_gsea.html">GSEA MSIGDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upsetplot.html">UPSET PLOT</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
@@ -270,7 +275,7 @@
     <span class="n">output</span><span class="p">:</span>
         <span class="n">gene_lists</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;geneLists&quot;</span><span class="p">)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-50-g7af9553/bio/clusterProfiler/DESeq2_to_geneList&quot;</span>
+        <span class="s2">&quot;0.50.4-62-g6050183/bio/clusterProfiler/DESeq2_to_geneList&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -292,6 +297,7 @@ When running with</p>
 <ul class="simple">
 <li><p>alpha_threshold: The padj threshold used to filter non significative events</p></li>
 <li><p>fc_threshold: The fold change threshold used to filter non significative events</p></li>
+<li><p>keytype: The type of genes identifiers used in DESeq2 eg: ENSEMBL, SYMBOL, …</p></li>
 </ul>
 </div>
 <div class="section" id="authors">
@@ -344,6 +350,13 @@ When running with</p>
     <span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;fc_threshold&quot;</span><span class="p">]]</span>
   <span class="p">);</span>
 <span class="p">}</span>
+
+<span class="n">gene_id</span> <span class="o">&lt;-</span> <span class="s">&quot;ENSEMBL&quot;</span><span class="p">;</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;gene_id&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">gene_id</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;gene_id&quot;</span><span class="p">]]</span>
+  <span class="p">);</span>
+<span class="p">}</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Dataset and libraries loaded&quot;</span><span class="p">);</span>
 
 <span class="c1"># Gathering results contained within the object</span>
@@ -380,7 +393,7 @@ When running with</p>
     <span class="n">organism</span><span class="p">,</span>
     <span class="n">keys</span><span class="o">=</span><span class="nf">row.names</span><span class="p">(</span><span class="n">rds</span><span class="p">),</span>
     <span class="n">column</span><span class="o">=</span><span class="s">&quot;ENTREZID&quot;</span><span class="p">,</span>
-    <span class="n">keytype</span><span class="o">=</span><span class="s">&quot;ENSEMBL&quot;</span><span class="p">,</span>
+    <span class="n">keytype</span><span class="o">=</span><span class="n">gene_id</span><span class="p">,</span>
     <span class="n">multiVals</span><span class="o">=</span><span class="s">&quot;first&quot;</span>
   <span class="p">);</span>
 
@@ -416,7 +429,7 @@ When running with</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="enrichDGN.html" class="btn btn-neutral float-right" title="DGN ENRICHMENT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="barplot.html" class="btn btn-neutral float-right" title="BARPLOT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../clusterProfiler.html" class="btn btn-neutral float-left" title="CLUSTERPROFILER" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
