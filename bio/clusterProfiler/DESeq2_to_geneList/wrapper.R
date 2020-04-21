@@ -40,6 +40,13 @@ if ("fc_threshold" %in% names(snakemake@params)) {
     x = snakemake@params[["fc_threshold"]]
   );
 }
+
+gene_id <- "ENSEMBL";
+if ("gene_id" %in% base::names(snakemake@params)) {
+  gene_id <- base::as.character(
+    x = snakemake@params[["gene_id"]]
+  );
+}
 base::message("Dataset and libraries loaded");
 
 # Gathering results contained within the object
@@ -76,7 +83,7 @@ for (resultname in res_names) {
     organism,
     keys=row.names(rds),
     column="ENTREZID",
-    keytype="ENSEMBL",
+    keytype=gene_id,
     multiVals="first"
   );
 
