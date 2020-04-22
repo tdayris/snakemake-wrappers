@@ -2042,3 +2042,31 @@ def test_deseq2_report():
         "bio/deseq2/report",
         ["snakemake", "--cores", "1", "Report.html", "--use-conda", "-F"]
     )
+
+
+def test_snpsift_annotate():
+    run(
+        "bio/snpsift/annotate",
+        ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"]
+    )
+
+
+def test_snpsift_gwascat():
+    run(
+        "bio/snpsift/gwasCat",
+        ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"]
+    )
+
+
+def test_snpsift_dbnsfp():
+    run(
+        "bio/snpsift/dbnsfp",
+        ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"]
+    )
+
+
+def test_snpsift_genesets():
+    run(
+        "bio/snpsift/geneSets",
+        ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"]
+    )
