@@ -1998,3 +1998,10 @@ def test_clusterprofiler_enriched_upsetplot():
         "bio/clusterProfiler/upsetplot",
         ["snakemake", "--cores", "1", "upsetplot.png", "--use-conda", "-F"]
     )
+
+
+def test_deseq2_report():
+    run(
+        "bio/deseq2/report",
+        ["snakemake", "--cores", "1", "Report.html", "--use-conda", "-F"]
+    )
