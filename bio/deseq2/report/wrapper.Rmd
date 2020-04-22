@@ -45,6 +45,21 @@ if (! base::startsWith("/", pvalue_hist_path)) {
   pvalue_hist_path <- base::file.path(getwd(), pvalue_hist_path);
 }
 
+pca_scree_path <- base::as.character(x = snakemake@input[["pca_scree"]]);
+if (! base::startsWith("/", pca_scree_path)) {
+  pca_scree_path <- base::file.path(getwd(), pca_scree_path);
+}
+
+pca_corrs_path <- base::as.character(x = snakemake@input[["pca_corrs"]]);
+if (! base::startsWith("/", pca_corrs_path)) {
+  pca_corrs_path <- base::file.path(getwd(), pca_corrs_path);
+}
+
+distro_expr_path <- base::as.character(x = snakemake@input[["distro_expr"]]);
+if (! base::startsWith("/", distro_expr_path)) {
+  distro_expr_path <- base::file.path(getwd(), distro_expr_path);
+}
+
 maplot_path <- base::as.character(x = snakemake@input[["maplot"]]);
 if (! base::startsWith("/", maplot_path)) {
   maplot_path <- base::file.path(getwd(), maplot_path);
@@ -132,19 +147,33 @@ In a PCA, we try to represent the samples on a two dimension graph, while preser
 knitr::include_graphics(pca_path);
 ```
 
+There are many axis on a PCA; at most, there are one minus the number of tests, so one minus the number of genes tested, so around 50.000 axes. Below, you shall find the loadings of each axes and the corresponding percentage of explained variance they represent.
+
+This offers an insight of the future possible results of a differential analysis. In fact, the higher the axe percentage of variance explained is, the better the differential analysis will be. With cell strains, one can often see a strong first axe related to the initial hypothesis. With samples obtained from patients, this is more noisy.
+
+```{r pca_scree}
+knitr::include_graphics(pca_scree_path);
+```
+
+For each axe, one can compute correlations with experimental design and hypothesis. You can find these correlation results below. Remember, correlation is not causality.
+
+```{r pca_corrs}
+knitr::include_graphics(pca_corrs_path);
+```
+
 ### Gene table
 
 Please find below the list of analyzed genes. Genes with no expression in all samples were filtered out, so that the page is a bit smaller. Genes with no P-Value (for any reason) were filtered out, so that the page is a bit smaller.
 
 The table below has the following columns:
 
-*   Gene: The name of the gene
-*   Log2_FC: The Log2(Fold Change), see Frequently Asked Questions below for more information.
-*   Adjusted_PValue: The adjusted P-Value, see Frequently Asked Questions below for more information.
-*   Regulation: A character string giving you a hint on the regulation flow
-*   Significance: A character string giving you a hint on the differential expression result
-*   Pubmed: A link to pubmed articles on this gene. Click to open a new page in your web browser.
-*   GeneCards: A link to this gene card on GeneCards. Click to open a new page in your web browser.
+*   *Gene*: The name of the gene
+*   *Log2_FC*: The Log2(Fold Change), see Frequently Asked Questions below for more information.
+*   *Adjusted_PValue*: The adjusted P-Value, see Frequently Asked Questions below for more information.
+*   *Regulation*: A character string giving you a hint on the regulation flow
+*   *Significance*: A character string giving you a hint on the differential expression result
+*   *Pubmed*: A link to pubmed articles on this gene. Click to open a new page in your web browser.
+*   *GeneCards*: A link to this gene card on GeneCards. Click to open a new page in your web browser.
 
 ```{r datatable_deseq2, results = "asis"}
 DT::datatable(
@@ -164,6 +193,14 @@ Your bioinformatician can highlight any number of genes of interest on this grap
 
 ```{r volcano}
 knitr::include_graphics(volcano_path);
+```
+
+### Expression distribution
+
+The distribution of the expression values is a good insight of potential normalization fails and/or sequencing bias. A "good" distribution shows comparable means and overlapping percentiles. Any important variation may lead to bias in the differential analysis.
+
+```{r distro_expr}
+knitr::include_graphics(distro_expr_path);
 ```
 
 ### P-Value Histogram
@@ -231,7 +268,7 @@ The differential expression is more likely to be between samples 1, 3, and 6 in 
 
 In conclusion, there is indeed a variation. This variation seems not related to our hypothesis, rather than an unknown factor. This unknown factor is called "confounding factor". In this case, the adjusted P-Value will be high and, therefore, non significant.
 
-**Case 2: Simpson Paradox**
+**Case 3: Simpson Paradox**
 
 In this case, we have nested conditions. Let's imagine a tumor, which can be treated by either chemotherapy or surgery. We want to know which one perform better. For the last 1000 treated patients, you will find below the success rate of each of these methods:
 
