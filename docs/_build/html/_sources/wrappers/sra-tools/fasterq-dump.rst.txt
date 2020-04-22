@@ -11,7 +11,7 @@ Software dependencies
 ---------------------
 
 
-* sra-tools =2.*
+* sra-tools >2.9.1
 
 
 
@@ -31,8 +31,9 @@ This wrapper can be used in the following way:
         params:
             # optional extra arguments
             extra=""
+        threads: 6  # defaults to 6
         wrapper:
-            "0.50.4-66-g2ede3b1/bio/sra-tools/fasterq-dump"
+            "0.51.3-69-gcfe7ad5/bio/sra-tools/fasterq-dump"
 
 
     rule get_fastq_se:
@@ -40,8 +41,9 @@ This wrapper can be used in the following way:
             "data/{accession}.fastq"
         params:
             extra=""
+        threads: 6
         wrapper:
-            "0.50.4-66-g2ede3b1/bio/sra-tools/fasterq-dump"
+            "0.51.3-69-gcfe7ad5/bio/sra-tools/fasterq-dump"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -62,6 +64,8 @@ Authors
 
 * Johannes Köster
 
+* Derek Croote
+
 
 
 Code
@@ -69,7 +73,7 @@ Code
 
 .. code-block:: python
 
-    __author__ = "Johannes Köster"
+    __author__ = "Johannes Köster, Derek Croote"
     __copyright__ = "Copyright 2020, Johannes Köster"
     __email__ = "johannes.koester@uni-due.de"
     __license__ = "MIT"
@@ -88,5 +92,6 @@ Code
 
     with tempfile.TemporaryDirectory() as tmp:
         shell(
-            "fasterq-dump --temp {tmp} {extra} {outdir} {snakemake.wildcards.accession} {log}"
+            "fasterq-dump --temp {tmp} --threads {snakemake.threads} "
+            "{extra} {outdir} {snakemake.wildcards.accession} {log}"
         )

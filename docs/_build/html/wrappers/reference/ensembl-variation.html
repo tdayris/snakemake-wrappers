@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="REFGENIE" href="../refgenie.html" />
+    <link rel="next" title="SNPEFF-DATABASE" href="snpEff-database.html" />
     <link rel="prev" title="ENSEMBL-SEQUENCE" href="ensembl-sequence.html" /> 
 </head>
 
@@ -146,6 +146,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="snpEff-database.html">SNPEFF-DATABASE</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../refgenie.html">REFGENIE</a></li>
@@ -246,6 +247,7 @@
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>bcftools &gt;=1.10</p></li>
+<li><p>curl</p></li>
 </ul>
 </div>
 <div class="section" id="example">
@@ -263,7 +265,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/get_variation.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-66-g2ede3b1/bio/reference/ensembl-variation&quot;</span>
+        <span class="s2">&quot;0.51.3-69-gcfe7ad5/bio/reference/ensembl-variation&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -320,16 +322,20 @@ When running with</p>
     <span class="k">for</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="n">suffixes</span>
 <span class="p">]</span>
 
+<span class="n">download</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;bcftools concat -Oz </span><span class="si">{urls}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;curl -L </span><span class="si">{urls}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">urls</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
+<span class="p">)</span>
+
 <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fai&quot;</span><span class="p">):</span>
     <span class="c1"># in case of a given .fai, reheader the VCF such that contig lengths are defined</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
         <span class="n">shell</span><span class="p">(</span>
-            <span class="s2">&quot;(bcftools concat -Ob </span><span class="si">{urls}</span><span class="s2"> &gt; </span><span class="si">{tmpdir}</span><span class="s2">/out.bcf &amp;&amp; &quot;</span>
-            <span class="s2">&quot; bcftools reheader --fai </span><span class="si">{snakemake.input.fai}</span><span class="s2"> </span><span class="si">{tmpdir}</span><span class="s2">/out.bcf | bcftools view -Oz -o </span><span class="si">{snakemake.output[0]}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;(</span><span class="si">{download}</span><span class="s2"> &gt; </span><span class="si">{tmpdir}</span><span class="s2">/out.vcf.gz &amp;&amp; &quot;</span>
+            <span class="s2">&quot; bcftools reheader --fai </span><span class="si">{snakemake.input.fai}</span><span class="s2"> </span><span class="si">{tmpdir}</span><span class="s2">/out.vcf.gz | bcftools view -Oz -o </span><span class="si">{snakemake.output[0]}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="c1"># without .fai, just concatenate</span>
-    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;bcftools concat -Oz </span><span class="si">{urls}</span><span class="s2"> &gt; </span><span class="si">{snakemake.output[0]}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{download}</span><span class="s2"> &gt; </span><span class="si">{snakemake.output[0]}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -343,7 +349,7 @@ When running with</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../refgenie.html" class="btn btn-neutral float-right" title="REFGENIE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="snpEff-database.html" class="btn btn-neutral float-right" title="SNPEFF-DATABASE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="ensembl-sequence.html" class="btn btn-neutral float-left" title="ENSEMBL-SEQUENCE" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

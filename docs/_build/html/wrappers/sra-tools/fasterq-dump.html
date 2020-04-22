@@ -243,7 +243,7 @@
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>sra-tools =2.*</p></li>
+<li><p>sra-tools &gt;2.9.1</p></li>
 </ul>
 </div>
 <div class="section" id="example">
@@ -257,8 +257,9 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="c1"># optional extra arguments</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">6</span>  <span class="c1"># defaults to 6</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-66-g2ede3b1/bio/sra-tools/fasterq-dump&quot;</span>
+        <span class="s2">&quot;0.51.3-69-gcfe7ad5/bio/sra-tools/fasterq-dump&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">get_fastq_se</span><span class="p">:</span>
@@ -266,8 +267,9 @@
         <span class="s2">&quot;data/</span><span class="si">{accession}</span><span class="s2">.fastq&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">6</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-66-g2ede3b1/bio/sra-tools/fasterq-dump&quot;</span>
+        <span class="s2">&quot;0.51.3-69-gcfe7ad5/bio/sra-tools/fasterq-dump&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -281,11 +283,12 @@ When running with</p>
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Johannes Köster</p></li>
+<li><p>Derek Croote</p></li>
 </ul>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Johannes Köster&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Johannes Köster, Derek Croote&quot;</span>
 <span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, Johannes Köster&quot;</span>
 <span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;johannes.koester@uni-due.de&quot;</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
@@ -304,7 +307,8 @@ When running with</p>
 
 <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
     <span class="n">shell</span><span class="p">(</span>
-        <span class="s2">&quot;fasterq-dump --temp </span><span class="si">{tmp}</span><span class="s2"> </span><span class="si">{extra}</span><span class="s2"> </span><span class="si">{outdir}</span><span class="s2"> </span><span class="si">{snakemake.wildcards.accession}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;fasterq-dump --temp </span><span class="si">{tmp}</span><span class="s2"> --threads </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> </span><span class="si">{outdir}</span><span class="s2"> </span><span class="si">{snakemake.wildcards.accession}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
     <span class="p">)</span>
 </pre></div>
 </div>

@@ -283,17 +283,17 @@ arguments verbatim to <code class="docutils literal notranslate"><span class="pr
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">fastq_screen</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;samples/</span><span class="si">{sample}</span><span class="s2">.fastq.gz&quot;</span>
+        <span class="s2">&quot;samples/</span><span class="si">{sample}</span><span class="s2">.fastq&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;qc/</span><span class="si">{sample}</span><span class="s2">.fastq_screen.txt&quot;</span><span class="p">,</span>
         <span class="n">png</span><span class="o">=</span><span class="s2">&quot;qc/</span><span class="si">{sample}</span><span class="s2">.fastq_screen.png&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">fastq_screen_config</span><span class="o">=</span><span class="n">fastq_screen_config</span><span class="p">,</span>
+        <span class="n">fastq_screen_config</span><span class="o">=</span><span class="s2">&quot;fastq_screen.conf&quot;</span><span class="p">,</span>
         <span class="n">subset</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
         <span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;bowtie2&#39;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">8</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.50.4-66-g2ede3b1/bio/fastq_screen&quot;</span>
+        <span class="s2">&quot;0.51.3-69-gcfe7ad5/bio/fastq_screen&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -332,6 +332,7 @@ wrapper.</p></li>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 
@@ -366,7 +367,8 @@ wrapper.</p></li>
 
 <span class="c1"># fastq_screen hard-codes filenames according to this prefix. We will send</span>
 <span class="c1"># hard-coded output to a temp dir, and then move them later.</span>
-<span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.fastq&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">prefix</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.fastq|.fq|.txt|.seq&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+
 <span class="n">tempdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 
 <span class="n">shell</span><span class="p">(</span>
