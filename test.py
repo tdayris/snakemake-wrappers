@@ -1716,7 +1716,7 @@ def test_pariwise_scatterplot():
 
 def test_volcano_deseq():
     run(
-        "bio/EnhancedVolcano/volcano-deseq2",
+        "bio/enhancedVolcano/volcano-deseq2",
         ["snakemake", "--cores", "1", "Volcano.png", "--use-conda", "-F"],
     )
 
