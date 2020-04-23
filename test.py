@@ -2070,3 +2070,16 @@ def test_snpsift_genesets():
         "bio/snpsift/geneSets",
         ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"]
     )
+
+
+def test_clusterprofiler_gseaplot():
+    run(
+        "bio/clusterProfiler/gseaplot",
+        ["snakemake", "--cores", "1", "gsea.png", "--use-conda", "-F"]
+    )
+
+def test_clusterprofiler_pathview():
+    run(
+        "bio/clusterProfiler/pathview",
+        ["snakemake", "--cores", "1", "pathview.png", "--use-conda", "-F"]
+    )
