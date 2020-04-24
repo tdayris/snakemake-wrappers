@@ -55,7 +55,7 @@ command <- base::paste0(
 
 base::message(command);
 
-base::eval(
+limmago <- base::eval(
   base::parse(
     text = command
   )
