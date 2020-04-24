@@ -2083,3 +2083,10 @@ def test_clusterprofiler_pathview():
         "bio/clusterProfiler/pathview",
         ["snakemake", "--cores", "1", "pathview.png", "--use-conda", "-F"]
     )
+
+
+def test_isoformSwitchAnalyseR_importIsoformExpression():
+    run(
+        "bio/isoformSwitchAnalyseR/importIsoformExpression",
+        ["snakemake", "--cores", "1", "importIsoformExpression.RDS", "--use-conda", "-F"]
+    )
