@@ -2039,7 +2039,14 @@ def test_clusterprofiler_enriched_upsetplot():
 
 def test_deseq2_report():
     run(
-        "bio/deseq2/report",
+        "bio/BiGR/deseq2_report",
+        ["snakemake", "--cores", "1", "Report.html", "--use-conda", "-F"]
+    )
+
+
+def test_sample_description():
+    run(
+        "bio/BiGR/sample_description",
         ["snakemake", "--cores", "1", "Report.html", "--use-conda", "-F"]
     )
 

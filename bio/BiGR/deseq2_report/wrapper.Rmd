@@ -23,9 +23,8 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 );
-base::library(package = "DESeq2", quietly = TRUE);
 base::library(package = "DT", quietly = TRUE);
-
+base::library(package = "readr", quietly = TRUE);
 ```
 
 ## DESeq2 result
@@ -66,7 +65,8 @@ if (! base::startsWith("/", maplot_path)) {
 }
 
 coldata_path <- base::as.character(x = snakemake@input[["coldata"]]);
-if (! base::startsWith("/", coldata_path)) {
+if ((! base::startsWith("/", coldata_path)) & (! file.exists(coldata_path))) {
+  print(coldata_path)
   coldata_path <- base::file.path(getwd(), coldata_path);
 }
 
