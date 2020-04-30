@@ -37,7 +37,7 @@ if (cols := snakemake.params.get("keep_column", None)) is not None:
 
 if (not_cols := snakemake.params.get("filter_column")) is not None:
     logging.debug(f"The following columns are droped out: {not_cols}")
-    data = data[list(set(data.column.tolist()) - set(not_cols))]
+    data = data[list(set(data.columns.tolist()) - set(not_cols))]
 
 logging.debug(f"Head of the final DataFrame:\n{data.head()}")
 
