@@ -78,6 +78,28 @@ def run(wrapper, cmd, check_log=None):
             os.chdir(origdir)
 
 
+def test_seqtk_subsample_se():
+    run(
+        "bio/seqtk/subsample/se",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "a.subsampled.fastq.gz"],
+    )
+
+
+def test_seqtk_subsample_pe():
+    run(
+        "bio/seqtk/subsample/pe",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "a.1.subsampled.fastq.gz",
+            "a.2.subsampled.fastq.gz",
+        ],
+    )
+
+
 def test_arriba():
     run(
         "bio/arriba",
@@ -146,7 +168,32 @@ def test_bedtools_intersect():
 def test_bedtools_merge():
     run(
         "bio/bedtools/merge",
-        ["snakemake", "--cores", "1", "A.merged.bed", "--use-conda", "-F"],
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "A.merged.bed",
+            "--use-conda",
+            "-F",
+            "-s",
+            "Snakefile",
+        ],
+    )
+
+
+def test_bedtools_merge_multi():
+    run(
+        "bio/bedtools/merge",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "AB.merged.bed",
+            "--use-conda",
+            "-F",
+            "-s",
+            "Snakefile_multi",
+        ],
     )
 
 
@@ -504,6 +551,31 @@ def test_freebayes_bed():
         )
 
 
+def test_gdc_api_bam_slicing():
+    def check_log(log):
+        assert "error" in log and "token" in log
+
+    run(
+        "bio/gdc-api/bam-slicing",
+        ["snakemake", "--cores", "1", "raw/testing_sample.bam", "--use-conda", "-F"],
+        check_log=check_log,
+    )
+
+
+def test_gdc_download():
+    run(
+        "bio/gdc-client/download",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "raw/testing_sample.maf.gz",
+            "--use-conda",
+            "-F",
+        ],
+    )
+
+
 def test_happy_prepy():
     run(
         "bio/hap.py/pre.py",
@@ -529,6 +601,27 @@ def test_hisat2_align():
     run(
         "bio/hisat2/align",
         ["snakemake", "--cores", "1", "mapped/A.bam", "--use-conda", "-F"],
+    )
+
+
+def test_homer_getDifferentialPeaks():
+    run(
+        "bio/homer/getDifferentialPeaks",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "a_diffPeaks.txt"],
+    )
+
+
+def test_homer_findPeaks():
+    run(
+        "bio/homer/findPeaks",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "a_peaks.txt"],
+    )
+
+
+def test_homer_makeTagDirectory():
+    run(
+        "bio/homer/makeTagDirectory",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "tagDir/a"],
     )
 
 
@@ -687,6 +780,34 @@ def test_pindel_pindel2vcf_multi_input():
     )
 
 
+def test_prosolo_calling():
+    run(
+        "bio/prosolo/single-cell-bulk",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "variant_calling/single_cell.bulk.prosolo.bcf",
+            "--use-conda",
+            "-F",
+        ],
+    )
+
+
+def test_prosolo_fdr():
+    run(
+        "bio/prosolo/control-fdr",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "fdr_control/single_cell.bulk.prosolo.fdr.bcf",
+            "--use-conda",
+            "-F",
+        ],
+    )
+
+
 def test_samtools_fixmate():
     run(
         "bio/samtools/fixmate",
@@ -698,6 +819,13 @@ def test_pyfastaq_replace_bases():
     run(
         "bio/pyfastaq/replace_bases",
         ["snakemake", "--cores", "1", "sample1.dna.fa", "--use-conda", "-F"],
+    )
+
+
+def test_samtools_depth():
+    run(
+        "bio/samtools/depth",
+        ["snakemake", "--cores", "1", "depth.txt", "--use-conda", "-F"],
     )
 
 
@@ -746,6 +874,13 @@ def test_samtools_flagstat():
     run(
         "bio/samtools/flagstat",
         ["snakemake", "--cores", "1", "mapped/a.bam.flagstat", "--use-conda", "-F"],
+    )
+
+
+def test_samtools_idxstats():
+    run(
+        "bio/samtools/idxstats",
+        ["snakemake", "--cores", "1", "mapped/a.sorted.bam.idxstats", "--use-conda", "-F"],
     )
 
 
@@ -820,16 +955,30 @@ def test_star_index():
     run("bio/star/index", ["snakemake", "--cores", "1", "genome", "--use-conda", "-F"])
 
 
-def test_snpeff():
+def test_snpeff_annotate():
     run(
-        "bio/snpeff",
+        "bio/snpeff/annotate",
         ["snakemake", "--cores", "1", "snpeff/fake_KJ660346.vcf", "--use-conda", "-F"],
+    )
+
+
+def test_snpeff_download():
+    run(
+        "bio/snpeff/download",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "resources/snpeff/ebola_zaire",
+            "--use-conda",
+            "-F",
+        ],
     )
 
 
 def test_snpeff_nostats():
     run(
-        "bio/snpeff",
+        "bio/snpeff/annotate",
         [
             "snakemake",
             "--cores",
@@ -840,13 +989,6 @@ def test_snpeff_nostats():
             "-s",
             "Snakefile_nostats",
         ],
-    )
-
-
-def test_snpeff_database():
-    run(
-        "bio/reference/snpEff-database",
-        ["snakemake", "--cores", "1", "--use-conda", "-F"],
     )
 
 
@@ -1025,17 +1167,6 @@ def test_delly():
 
 
 def test_jannovar():
-    #    env_file = "bio/jannovar/environment.yaml"
-    #    env = ".envs/jannovar"
-    #    subprocess.run(
-    #        f"conda env create -f {env_file} --prefix {env}", shell=True, executable="bash"
-    #    )
-    #    subprocess.run(
-    #        f"source activate {env}; jannovar download -d hg19/ucsc",
-    #        shell=True,
-    #        executable="bash",
-    #    )
-    #    shutil.move("data/hg19_ucsc.ser", "bio/jannovar/test")
     run(
         "bio/jannovar",
         [
@@ -1485,6 +1616,13 @@ def test_ensembl_sequence():
     )
 
 
+def test_ensembl_sequence_old_release():
+    run(
+        "bio/reference/ensembl-sequence",
+        ["snakemake", "-s", "old_release.smk", "--cores", "1", "--use-conda", "-F"],
+    )
+
+
 def test_ensembl_annotation():
     run(
         "bio/reference/ensembl-annotation",
@@ -1496,6 +1634,21 @@ def test_ensembl_variation():
     run(
         "bio/reference/ensembl-variation",
         ["snakemake", "--cores", "1", "--use-conda", "-F"],
+    )
+
+
+def test_ensembl_variation_old_release():
+    run(
+        "bio/reference/ensembl-variation",
+        ["snakemake", "-s", "old_release.smk", "--cores", "1", "--use-conda", "-F"],
+    )
+
+
+@pytest.mark.skip(reason="needs too much time")
+def test_ensembl_variation_grch37():
+    run(
+        "bio/reference/ensembl-variation",
+        ["snakemake", "-s", "grch37.smk", "--cores", "1", "--use-conda", "-F"],
     )
 
 
@@ -1699,6 +1852,40 @@ def test_snpsift_vartype():
         "bio/snpsift/varType",
         ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"],
     )
+
+
+def test_ptrimmer_se():
+    run(
+        "bio/ptrimmer",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "ptrimmer_se"],
+    )
+
+
+def test_ptrimmer_pe():
+    run(
+        "bio/ptrimmer",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "ptrimmer_pe"],
+    )
+
+
+def test_vep_cache():
+    run(
+        "bio/vep/cache",
+        ["snakemake", "--cores", "1", "resources/vep/cache", "--use-conda", "-F"],
+    )
+
+
+def test_vep_plugins():
+    run(
+        "bio/vep/plugins",
+        ["snakemake", "--cores", "1", "resources/vep/plugins", "--use-conda", "-F"],
+    )
+
+
+def test_vep_annotate():
+    run(
+        "bio/vep/annotate",
+        ["snakemake", "--cores", "1", "variants.annotated.bcf", "--use-conda", "-F"],
 
 
 def test_pandas_merge_salmon():
