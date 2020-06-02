@@ -16,6 +16,8 @@ extra = snakemake.params.get("extra", "")
 incall = snakemake.input.incall
 if incall.endswith(".bcf"):
     incall = "< <(bcftools view {})".format(incall)
+elif incall.endswith(".vcf.gz"):
+    incall = "< <(gunzip -c {})".format(incall)
 
 shell(
     "SnpSift annotate"  # Tool and its subcommand
