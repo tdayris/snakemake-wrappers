@@ -35,9 +35,8 @@ This wrapper can be used in the following way:
             fasta = "data/genome.fasta",
             fasta_index = "data/genome.fasta.fai"
         output:
+            # Strelka output - can be directory or full file path
             directory("{tumor}_vcf")
-        message:
-            "Testing Strelka"
         threads:
             1
         params:
@@ -46,7 +45,7 @@ This wrapper can be used in the following way:
         log:
             "logs/strelka_{tumor}.log"
         wrapper:
-            "0.51.3-78-gb0b606f9/bio/strelka/somatic"
+            "0.59.2-89-g00c45215/bio/strelka/somatic"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -81,6 +80,7 @@ Code
     __email__ = "thibault.dayris@gustaveroussy.fr"
     __license__ = "MIT"
 
+    from pathlib import Path
     from snakemake.shell import shell
     from snakemake.utils import makedirs
 
@@ -99,17 +99,22 @@ Code
         else ""
     )
 
-    makedirs(snakemake.output)
+    if snakemake.output[0].endswith("vcf.gz"):
+        run_dir = Path(snakemake.output[0]).parents[2]
+    else:
+        run_dir = snakemake.output
 
     shell(
         "(configureStrelkaSomaticWorkflow.py "  # Configuration script
         "{normal} "  # Path to normal bam (if any)
         "--tumorBam {snakemake.input.tumor} "  # Path to tumor bam
         "--referenceFasta {snakemake.input.fasta} "  # Path to fasta file
-        "--runDir {snakemake.output} "  # Path to output directory
+        "--runDir {run_dir} "  # Path to output directory
+        "{config_extra} "  # Extra parametersfor configuration
         " && "
-        "{snakemake.output}/runWorkflow.py "  # Run the pipeline
+        "{run_dir}/runWorkflow.py "  # Run the pipeline
         "--mode local "  # Stop internal job submission
-        "--jobs {snakemake.threads}) "  # Nomber of threads
+        "--jobs {snakemake.threads} "  # Nomber of threads
+        "{run_extra}) "  # Extra parameters for runWorkflow
         "{log}"  # Logging behaviour
     )

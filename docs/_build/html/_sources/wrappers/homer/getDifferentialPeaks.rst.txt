@@ -1,0 +1,89 @@
+.. _`Homer getDifferentialPeaks`:
+
+HOMER GETDIFFERENTIALPEAKS
+==========================
+
+Detect differentially bound peaks between samples
+
+
+
+Software dependencies
+---------------------
+
+
+* homer ==4.11
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule homer_getDifferentialPeaks:
+        input:
+            # peak/bed file to be tested
+            peaks="{sample}.peaks.bed",
+            # tagDirectory of first sample
+            first="tagDir/{sample}",
+            # tagDirectory of sample to compare
+            second="tagDir/second"
+        output:
+            "{sample}_diffPeaks.txt"
+        params:
+            extra=""  # optional params, see homer manual
+        log:
+            "logs/diffPeaks/{sample}.log"
+        wrapper:
+            "0.59.2-89-g00c45215/bio/homer/getDifferentialPeaks"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Jan Forster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2020, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    import os.path as path
+    import sys
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "(getDifferentialPeaks"
+        " {snakemake.input.peaks}"
+        " {snakemake.input.first}"
+        " {snakemake.input.second}"
+        " {extra}"
+        " > {snakemake.output})"
+        " {log}"
+    )

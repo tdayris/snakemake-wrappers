@@ -112,10 +112,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../freebayes.html">FREEBAYES</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gatk.html">GATK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gatk3.html">GATK3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gdc-api.html">GDC-API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gdc-client.html">GDC-CLIENT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gencode.html">GENCODE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hap.py.html">HAP.PY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hisat2.html">HISAT2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hmmer.html">HMMER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../homer.html">HOMER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../igv-reports.html">IGV-REPORTS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../infernal.html">INFERNAL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../isoformSwitchAnalyseR.html">ISOFORMSWITCHANALYSER</a></li>
@@ -136,6 +139,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../pindel.html">PINDEL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plass.html">PLASS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../primerclip.html">PRIMERCLIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prosolo.html">PROSOLO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ptrimmer.html">PTRIMMER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pyfastaq.html">PYFASTAQ</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../reference.html">REFERENCE</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ensembl-annotation.html">ENSEMBL-ANNOTATION</a></li>
@@ -147,7 +152,6 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ensembl-variation.html">ENSEMBL-VARIATION</a></li>
-<li class="toctree-l2"><a class="reference internal" href="snpEff-database.html">SNPEFF-DATABASE</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../refgenie.html">REFGENIE</a></li>
@@ -156,6 +160,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../sambamba.html">SAMBAMBA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../samtools.html">SAMTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../seaborn.html">SEABORN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../seqtk.html">SEQTK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sickle.html">SICKLE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../snp-mutator.html">SNP-MUTATOR</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
@@ -175,6 +180,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../varscan.html">VARSCAN</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vep.html">VEP</a></li>
 </ul>
 
             
@@ -263,8 +269,9 @@
         <span class="n">release</span><span class="o">=</span><span class="s2">&quot;98&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/get_genome.log&quot;</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.51.3-78-gb0b606f9/bio/reference/ensembl-sequence&quot;</span>
+        <span class="s2">&quot;0.59.2-89-g00c45215/bio/reference/ensembl-sequence&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -288,13 +295,24 @@ When running with</p>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
 <span class="kn">import</span> <span class="nn">subprocess</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
 <span class="n">species</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<span class="n">release</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">release</span>
+<span class="n">release</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">release</span><span class="p">)</span>
 <span class="n">build</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">build</span>
 
+<span class="n">branch</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="n">release</span> <span class="o">&gt;=</span> <span class="mi">81</span> <span class="ow">and</span> <span class="n">build</span> <span class="o">==</span> <span class="s2">&quot;GRCh37&quot;</span><span class="p">:</span>
+    <span class="c1"># use the special grch37 branch for new releases</span>
+    <span class="n">branch</span> <span class="o">=</span> <span class="s2">&quot;grch37/&quot;</span>
+
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">spec</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">{build}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">release</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">75</span> <span class="k">else</span> <span class="s2">&quot;</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="n">release</span>
+<span class="p">)</span>
 
 <span class="n">suffixes</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 <span class="n">datatype</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;datatype&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -313,13 +331,14 @@ When running with</p>
 
 <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="k">for</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="n">suffixes</span><span class="p">:</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;ftp://ftp.ensembl.org/pub/release-</span><span class="si">{release}</span><span class="s2">/fasta/</span><span class="si">{species}</span><span class="s2">/</span><span class="si">{datatype}</span><span class="s2">/</span><span class="si">{species_cap}</span><span class="s2">.</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{suffix}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;ftp://ftp.ensembl.org/pub/</span><span class="si">{branch}</span><span class="s2">release-</span><span class="si">{release}</span><span class="s2">/fasta/</span><span class="si">{species}</span><span class="s2">/</span><span class="si">{datatype}</span><span class="s2">/</span><span class="si">{species_cap}</span><span class="s2">.</span><span class="si">{spec}</span><span class="s2">.</span><span class="si">{suffix}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">release</span><span class="o">=</span><span class="n">release</span><span class="p">,</span>
         <span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">,</span>
         <span class="n">datatype</span><span class="o">=</span><span class="n">datatype</span><span class="p">,</span>
-        <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">,</span>
+        <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="n">release</span><span class="p">),</span>
         <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
         <span class="n">species_cap</span><span class="o">=</span><span class="n">species</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span>
+        <span class="n">branch</span><span class="o">=</span><span class="n">branch</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
@@ -332,11 +351,12 @@ When running with</p>
     <span class="k">break</span>
 
 <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-        <span class="s2">&quot;Requested sequence does not seem to exist on ensembl FTP servers or servers are unavailable (url </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">url</span>
-        <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;Unable to download requested sequence data from Ensembl. &quot;</span>
+        <span class="s2">&quot;Did you check that this combination of species, build, and release is actually provided?&quot;</span><span class="p">,</span>
+        <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

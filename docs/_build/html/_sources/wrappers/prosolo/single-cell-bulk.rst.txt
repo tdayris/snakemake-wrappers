@@ -1,0 +1,94 @@
+.. _`ProSolo`:
+
+PROSOLO
+=======
+
+ProSolo calls variants or other events (like allele dropout) in a single cell sample against a bulk background sample. The single cell should stem from the same population of cells as the bulk background sample. The single cell sample should be amplified using multiple displacement amplification to match ProSolo's statistical model.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* prosolo ==0.6.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule prosolo_calling:
+        input:
+            single_cell = "data/mapped/{sc}.sorted.bam",
+            single_cell_index = "data/mapped/{sc}.sorted.bam.bai",
+            bulk = "data/mapped/{bulk}.sorted.bam",
+            bulk_index = "data/mapped/{bulk}.sorted.bam.bai",
+            ref = "data/genome.fa",
+            ref_idx = "data/genome.fa.fai",
+            candidates = "data/{sc}.{bulk}.prosolo_candidates.bcf",
+        output:
+            "variant_calling/{sc}.{bulk}.prosolo.bcf"
+        params:
+            extra = ""
+        threads:
+            1
+        log:
+            "logs/prosolo_{sc}_{bulk}.log"
+        wrapper:
+            "0.59.2-89-g00c45215/bio/prosolo/single-cell-bulk"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* David Lähnemann
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for ProSolo single-cell-bulk calling"""
+
+    __author__ = "David Lähnemann"
+    __copyright__ = "Copyright 2020, David Lähnemann"
+    __email__ = "david.laehnemann@uni-due.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "( prosolo single-cell-bulk "
+        "--omit-indels "
+        " {snakemake.params.extra} "
+        "--candidates {snakemake.input.candidates} "
+        "--output {snakemake.output} "
+        "{snakemake.input.single_cell} "
+        "{snakemake.input.bulk} "
+        "{snakemake.input.ref} ) "
+        "{log} "
+    )

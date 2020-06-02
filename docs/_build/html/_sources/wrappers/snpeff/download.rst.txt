@@ -1,0 +1,77 @@
+.. _`snpeff download`:
+
+SNPEFF DOWNLOAD
+===============
+
+Download snpeff DB for a given species.
+
+
+
+Software dependencies
+---------------------
+
+
+* snpeff ==4.3.1t
+
+* bcftools =1.10
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule snpeff_download:
+        output:
+            # wildcard {reference} may be anything listed in `snpeff databases`
+            directory("resources/snpeff/{reference}")
+        log:
+            "logs/snpeff/download/{reference}.log"
+        params:
+            reference="{reference}"
+        wrapper:
+            "0.59.2-89-g00c45215/bio/snpeff/download"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2020, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    from pathlib import Path
+
+    reference = snakemake.params.reference
+    outdir = Path(snakemake.output[0]).parent.resolve()
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell("snpEff download -dataDir {outdir} {reference} {log}")

@@ -112,10 +112,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../freebayes.html">FREEBAYES</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gatk.html">GATK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gatk3.html">GATK3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gdc-api.html">GDC-API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gdc-client.html">GDC-CLIENT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gencode.html">GENCODE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hap.py.html">HAP.PY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hisat2.html">HISAT2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hmmer.html">HMMER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../homer.html">HOMER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../igv-reports.html">IGV-REPORTS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../infernal.html">INFERNAL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../isoformSwitchAnalyseR.html">ISOFORMSWITCHANALYSER</a></li>
@@ -136,6 +139,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../pindel.html">PINDEL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plass.html">PLASS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../primerclip.html">PRIMERCLIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prosolo.html">PROSOLO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ptrimmer.html">PTRIMMER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pyfastaq.html">PYFASTAQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference.html">REFERENCE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../refgenie.html">REFGENIE</a></li>
@@ -144,6 +149,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../sambamba.html">SAMBAMBA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../samtools.html">SAMTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../seaborn.html">SEABORN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../seqtk.html">SEQTK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sickle.html">SICKLE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../snp-mutator.html">SNP-MUTATOR</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
@@ -173,6 +179,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../varscan.html">VARSCAN</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vep.html">VEP</a></li>
 </ul>
 
             
@@ -262,9 +269,8 @@
         <span class="n">fasta</span> <span class="o">=</span> <span class="s2">&quot;data/genome.fasta&quot;</span><span class="p">,</span>
         <span class="n">fasta_index</span> <span class="o">=</span> <span class="s2">&quot;data/genome.fasta.fai&quot;</span>
     <span class="n">output</span><span class="p">:</span>
+        <span class="c1"># Strelka output - can be directory or full file path</span>
         <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{tumor}</span><span class="s2">_vcf&quot;</span><span class="p">)</span>
-    <span class="n">message</span><span class="p">:</span>
-        <span class="s2">&quot;Testing Strelka&quot;</span>
     <span class="n">threads</span><span class="p">:</span>
         <span class="mi">1</span>
     <span class="n">params</span><span class="p">:</span>
@@ -273,7 +279,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/strelka_</span><span class="si">{tumor}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.51.3-78-gb0b606f9/bio/strelka/somatic&quot;</span>
+        <span class="s2">&quot;0.59.2-89-g00c45215/bio/strelka/somatic&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -298,6 +304,7 @@ When running with</p>
 <span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;thibault.dayris@gustaveroussy.fr&quot;</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 <span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">makedirs</span>
 
@@ -316,18 +323,23 @@ When running with</p>
     <span class="k">else</span> <span class="s2">&quot;&quot;</span>
 <span class="p">)</span>
 
-<span class="n">makedirs</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;vcf.gz&quot;</span><span class="p">):</span>
+    <span class="n">run_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">run_dir</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;(configureStrelkaSomaticWorkflow.py &quot;</span>  <span class="c1"># Configuration script</span>
     <span class="s2">&quot;</span><span class="si">{normal}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to normal bam (if any)</span>
     <span class="s2">&quot;--tumorBam </span><span class="si">{snakemake.input.tumor}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to tumor bam</span>
     <span class="s2">&quot;--referenceFasta </span><span class="si">{snakemake.input.fasta}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to fasta file</span>
-    <span class="s2">&quot;--runDir </span><span class="si">{snakemake.output}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to output directory</span>
+    <span class="s2">&quot;--runDir </span><span class="si">{run_dir}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to output directory</span>
+    <span class="s2">&quot;</span><span class="si">{config_extra}</span><span class="s2"> &quot;</span>  <span class="c1"># Extra parametersfor configuration</span>
     <span class="s2">&quot; &amp;&amp; &quot;</span>
-    <span class="s2">&quot;</span><span class="si">{snakemake.output}</span><span class="s2">/runWorkflow.py &quot;</span>  <span class="c1"># Run the pipeline</span>
+    <span class="s2">&quot;</span><span class="si">{run_dir}</span><span class="s2">/runWorkflow.py &quot;</span>  <span class="c1"># Run the pipeline</span>
     <span class="s2">&quot;--mode local &quot;</span>  <span class="c1"># Stop internal job submission</span>
-    <span class="s2">&quot;--jobs </span><span class="si">{snakemake.threads}</span><span class="s2">) &quot;</span>  <span class="c1"># Nomber of threads</span>
+    <span class="s2">&quot;--jobs </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>  <span class="c1"># Nomber of threads</span>
+    <span class="s2">&quot;</span><span class="si">{run_extra}</span><span class="s2">) &quot;</span>  <span class="c1"># Extra parameters for runWorkflow</span>
     <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span>  <span class="c1"># Logging behaviour</span>
 <span class="p">)</span>
 </pre></div>

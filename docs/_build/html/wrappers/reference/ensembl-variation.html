@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="SNPEFF-DATABASE" href="snpEff-database.html" />
+    <link rel="next" title="REFGENIE" href="../refgenie.html" />
     <link rel="prev" title="ENSEMBL-SEQUENCE" href="ensembl-sequence.html" /> 
 </head>
 
@@ -112,10 +112,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../freebayes.html">FREEBAYES</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gatk.html">GATK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gatk3.html">GATK3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gdc-api.html">GDC-API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gdc-client.html">GDC-CLIENT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gencode.html">GENCODE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hap.py.html">HAP.PY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hisat2.html">HISAT2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hmmer.html">HMMER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../homer.html">HOMER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../igv-reports.html">IGV-REPORTS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../infernal.html">INFERNAL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../isoformSwitchAnalyseR.html">ISOFORMSWITCHANALYSER</a></li>
@@ -136,6 +139,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../pindel.html">PINDEL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plass.html">PLASS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../primerclip.html">PRIMERCLIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prosolo.html">PROSOLO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ptrimmer.html">PTRIMMER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pyfastaq.html">PYFASTAQ</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../reference.html">REFERENCE</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ensembl-annotation.html">ENSEMBL-ANNOTATION</a></li>
@@ -147,7 +152,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="snpEff-database.html">SNPEFF-DATABASE</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../refgenie.html">REFGENIE</a></li>
@@ -156,6 +160,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../sambamba.html">SAMBAMBA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../samtools.html">SAMTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../seaborn.html">SEABORN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../seqtk.html">SEQTK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sickle.html">SICKLE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../snp-mutator.html">SNP-MUTATOR</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
@@ -175,6 +180,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../varscan.html">VARSCAN</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vep.html">VEP</a></li>
 </ul>
 
             
@@ -247,7 +253,7 @@
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>bcftools &gt;=1.10</p></li>
+<li><p>bcftools =1.10</p></li>
 <li><p>curl</p></li>
 </ul>
 </div>
@@ -257,16 +263,19 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">get_variation</span><span class="p">:</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;refs/variation.vcf.gz&quot;</span>
-        <span class="c1"># optional: add fai to get VCF with annotated contig lengths (as required by GATK)</span>
+        <span class="c1"># Optional: add fai to get VCF with annotated contig lengths (as required by GATK)</span>
+        <span class="c1"># and properly sorted VCFs.</span>
         <span class="c1"># fai=&quot;refs/genome.fasta.fai&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">species</span><span class="o">=</span><span class="s2">&quot;saccharomyces_cerevisiae&quot;</span><span class="p">,</span>
-        <span class="n">release</span><span class="o">=</span><span class="s2">&quot;98&quot;</span><span class="p">,</span>
+        <span class="n">release</span><span class="o">=</span><span class="s2">&quot;98&quot;</span><span class="p">,</span> <span class="c1"># releases &lt;98 are unsupported</span>
+        <span class="n">build</span><span class="o">=</span><span class="s2">&quot;R64-1-1&quot;</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;all&quot;</span> <span class="c1"># one of &quot;all&quot;, &quot;somatic&quot;, &quot;structural_variation&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/get_variation.log&quot;</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.51.3-78-gb0b606f9/bio/reference/ensembl-variation&quot;</span>
+        <span class="s2">&quot;0.59.2-89-g00c45215/bio/reference/ensembl-variation&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -290,16 +299,30 @@ When running with</p>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
 <span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+<span class="kn">from</span> <span class="nn">snakemake.exceptions</span> <span class="kn">import</span> <span class="n">WorkflowError</span>
 
 <span class="n">species</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<span class="n">release</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">release</span>
+<span class="n">release</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">release</span><span class="p">)</span>
+<span class="n">build</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">build</span>
 <span class="nb">type</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">type</span>
+
+<span class="k">if</span> <span class="n">release</span> <span class="o">&lt;</span> <span class="mi">98</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ensembl releases &lt;98 are unsupported.&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;w&quot;</span><span class="p">))</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">branch</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="n">release</span> <span class="o">&gt;=</span> <span class="mi">81</span> <span class="ow">and</span> <span class="n">build</span> <span class="o">==</span> <span class="s2">&quot;GRCh37&quot;</span><span class="p">:</span>
+    <span class="c1"># use the special grch37 branch for new releases</span>
+    <span class="n">branch</span> <span class="o">=</span> <span class="s2">&quot;grch37/&quot;</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">species</span> <span class="o">==</span> <span class="s2">&quot;homo_sapiens&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">species</span> <span class="o">==</span> <span class="s2">&quot;homo_sapiens&quot;</span> <span class="ow">and</span> <span class="n">release</span> <span class="o">&gt;=</span> <span class="mi">93</span><span class="p">:</span>
         <span class="n">suffixes</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s2">&quot;-chr</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chrom</span><span class="p">)</span> <span class="k">for</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">23</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;MT&quot;</span><span class="p">]</span>
         <span class="p">]</span>
@@ -316,27 +339,48 @@ When running with</p>
         <span class="p">)</span>
     <span class="p">)</span>
 
+<span class="n">species_filename</span> <span class="o">=</span> <span class="n">species</span> <span class="k">if</span> <span class="n">release</span> <span class="o">&gt;=</span> <span class="mi">91</span> <span class="k">else</span> <span class="n">species</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span>
+
 <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;ftp://ftp.ensembl.org/pub/release-</span><span class="si">{release}</span><span class="s2">/variation/vcf/</span><span class="si">{species}</span><span class="s2">/</span><span class="si">{species}{suffix}</span><span class="s2">.vcf.gz&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">release</span><span class="o">=</span><span class="n">release</span><span class="p">,</span> <span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span>
+    <span class="s2">&quot;ftp://ftp.ensembl.org/pub/</span><span class="si">{branch}</span><span class="s2">release-</span><span class="si">{release}</span><span class="s2">/variation/vcf/</span><span class="si">{species}</span><span class="s2">/</span><span class="si">{species_filename}{suffix}</span><span class="s2">.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">release</span><span class="o">=</span><span class="n">release</span><span class="p">,</span>
+        <span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">,</span>
+        <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
+        <span class="n">species_filename</span><span class="o">=</span><span class="n">species_filename</span><span class="p">,</span>
+        <span class="n">branch</span><span class="o">=</span><span class="n">branch</span><span class="p">,</span>
+        <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="n">suffixes</span>
+    <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;vcf.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;vcf.gz.csi&quot;</span><span class="p">]</span>
 <span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span> <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.gz&quot;</span><span class="p">)]</span>
 
-<span class="n">download</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;bcftools concat -Oz </span><span class="si">{urls}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;curl -L </span><span class="si">{urls}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-    <span class="n">urls</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
-<span class="p">)</span>
-
-<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fai&quot;</span><span class="p">):</span>
-    <span class="c1"># in case of a given .fai, reheader the VCF such that contig lengths are defined</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">gather</span> <span class="o">=</span> <span class="s2">&quot;curl </span><span class="si">{urls}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">urls</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="s2">&quot;-O </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">urls</span><span class="p">)))</span>
+    <span class="n">workdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
-        <span class="n">shell</span><span class="p">(</span>
-            <span class="s2">&quot;(</span><span class="si">{download}</span><span class="s2"> &gt; </span><span class="si">{tmpdir}</span><span class="s2">/out.vcf.gz &amp;&amp; &quot;</span>
-            <span class="s2">&quot; bcftools reheader --fai </span><span class="si">{snakemake.input.fai}</span><span class="s2"> </span><span class="si">{tmpdir}</span><span class="s2">/out.vcf.gz | bcftools view -Oz -o </span><span class="si">{snakemake.output[0]}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="c1"># without .fai, just concatenate</span>
-    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{download}</span><span class="s2"> &gt; </span><span class="si">{snakemake.output[0]}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fai&quot;</span><span class="p">):</span>
+            <span class="n">shell</span><span class="p">(</span>
+                <span class="s2">&quot;(cd </span><span class="si">{tmpdir}</span><span class="s2">; </span><span class="si">{gather}</span><span class="s2"> &amp;&amp; &quot;</span>
+                <span class="s2">&quot;bcftools concat -Oz --naive </span><span class="si">{names}</span><span class="s2"> &gt; concat.vcf.gz &amp;&amp; &quot;</span>
+                <span class="s2">&quot;bcftools reheader --fai </span><span class="si">{workdir}</span><span class="s2">/</span><span class="si">{snakemake.input.fai}</span><span class="s2"> concat.vcf.gz &quot;</span>
+                <span class="s2">&quot;&gt; </span><span class="si">{workdir}</span><span class="s2">/</span><span class="si">{snakemake.output}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shell</span><span class="p">(</span>
+                <span class="s2">&quot;(cd </span><span class="si">{tmpdir}</span><span class="s2">; </span><span class="si">{gather}</span><span class="s2"> &amp;&amp; &quot;</span>
+                <span class="s2">&quot;bcftools concat -Oz --naive </span><span class="si">{names}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;&gt; </span><span class="si">{workdir}</span><span class="s2">/</span><span class="si">{snakemake.output}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+<span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;Unable to download variation data from Ensembl. &quot;</span>
+        <span class="s2">&quot;Did you check that this combination of species, build, and release is actually provided? &quot;</span><span class="p">,</span>
+        <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -350,7 +394,7 @@ When running with</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="snpEff-database.html" class="btn btn-neutral float-right" title="SNPEFF-DATABASE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../refgenie.html" class="btn btn-neutral float-right" title="REFGENIE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="ensembl-sequence.html" class="btn btn-neutral float-left" title="ENSEMBL-SEQUENCE" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

@@ -25,7 +25,7 @@ This wrapper can be used in the following way:
 
     rule test_snpsift_annotate:
         input:
-            vcf = "in.vcf",
+            incall = "in.vcf",
             database = "annotation.vcf"
         output:
             vcf = "annotated/out.vcf"
@@ -34,7 +34,7 @@ This wrapper can be used in the following way:
         log:
             "annotate.log"
         wrapper:
-            "0.51.3-78-gb0b606f9/bio/snpsift/annotate"
+            "0.59.2-89-g00c45215/bio/snpsift/annotate"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -76,13 +76,18 @@ Code
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
     extra = snakemake.params.get("extra", "")
-    makedirs(dirname(snakemake.output.vcf))
+
+    incall = snakemake.input.incall
+    if incall.endswith(".bcf"):
+        incall = "< <(bcftools view {})".format(incall)
+    elif incall.endswith(".vcf.gz"):
+        incall = "< <(gunzip -c {})".format(incall)
 
     shell(
         "SnpSift annotate"  # Tool and its subcommand
         " {extra}"  # Extra parameters
         " {snakemake.input.database}"  # Path to annotation vcf file
-        " {snakemake.input.vcf}"  # Path to input vcf file
+        " {incall}"  # Path to input vcf file
         " > {snakemake.output.vcf}"  # Path to output vcf file
         " {log}"  # Logging behaviour
     )

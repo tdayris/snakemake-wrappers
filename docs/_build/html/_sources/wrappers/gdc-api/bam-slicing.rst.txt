@@ -1,0 +1,124 @@
+.. _`GDC API-based data download of BAM slices`:
+
+GDC API-BASED DATA DOWNLOAD OF BAM SLICES
+=========================================
+
+Download slices of GDC BAM files using `curl <https://curl.haxx.se/>`_ and the `GDC API for BAM Slicing <https://docs.gdc.cancer.gov/API/Users_Guide/BAM_Slicing/>`_.
+
+
+
+Software dependencies
+---------------------
+
+
+* curl ==7.69.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule gdc_api_bam_slice_download:
+        output:
+            bam="raw/{sample}.bam",
+        log:
+            "logs/gdc-api/bam-slicing/{sample}.log"
+        params:
+            # to use this rule flexibly, make uuid a function that maps your
+            # sample names of choice to the UUIDs they correspond to (they are
+            # the column `id` in the GDC manifest files, which can be used to
+            # systematically construct sample sheets)
+            uuid="092c8a6d-aad5-41bf-b186-e68e613c0e89",
+            # a gdc_token is required for controlled access and all BAM files
+            # on GDC seem to be controlled access (adjust if this changes)
+            gdc_token="gdc/gdc-user-token.2020-05-07T10_00_00.555Z.txt",
+            # provide wanted `region=` or `gencode=` slices joined with `&`
+            slices="region=chr22&region=chr5:1000-2000&region=unmapped&gencode=BRCA2",
+            # extra command line arguments passed to curl
+            extra=""
+        wrapper:
+            "0.59.2-89-g00c45215/bio/gdc-api/bam-slicing"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+- BAM file UUIDs can be found via the `GDC repository query <https://portal.gdc.cancer.gov/repository?filters=%7B%22op%22%3A%22and%22%2C%22content%22%3A%5B%7B%22op%22%3A%22in%22%2C%22content%22%3A%7B%22field%22%3A%22files.data_format%22%2C%22value%22%3A%5B%22bam%22%5D%7D%7D%5D%7D>`_, either by clicking on individual files or systematically by creating a cart and downloading a manifest file.
+- Slicing can be performed using `region syntax like 'region=chr20:3000-4000' <https://docs.gdc.cancer.gov/API/Users_Guide/BAM_Slicing/#examples-specifying-a-region>`_, `gene name syntax like 'gencode=BRCA2' <https://docs.gdc.cancer.gov/API/Users_Guide/BAM_Slicing/#examples-specifying-a-gene>`_ (this uses `Gene symbols of GENCODE v22 <https://www.gencodegenes.org/human/release_22.html>`_) or `'region=unmapped' to get unmapped reads <https://docs.gdc.cancer.gov/API/Users_Guide/BAM_Slicing/#examples-specifying-unmapped-reads>`_. Multiple such entries can be joined with ampersands (e.g. ``region=chr5:200-300&region=unmapped&gencode=BRCA1``).
+- All BAM data files in GDC are controlled access according to `this GDC repository query <https://portal.gdc.cancer.gov/repository?filters=%7B%22op%22%3A%22and%22%2C%22content%22%3A%5B%7B%22op%22%3A%22in%22%2C%22content%22%3A%7B%22field%22%3A%22files.data_format%22%2C%22value%22%3A%5B%22bam%22%5D%7D%7D%5D%7D>`_, thus a GDC access token file is always required and must be provided via ``params: gdc_token: "path/to/access_token.txt"``. Should this change in the future, feel free to adjust this wrapper or contact the original author.
+
+
+
+
+Authors
+-------
+
+
+* David Lähnemann
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "David Lähnemann"
+    __copyright__ = "Copyright 2020, David Lähnemann"
+    __email__ = "david.laehnemann@uni-due.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    import os.path as path
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    uuid = snakemake.params.get("uuid", "")
+    if uuid == "":
+        raise ValueError("You need to provide a GDC UUID via the 'uuid' in 'params'.")
+
+    token = snakemake.params.get("gdc_token", "")
+    if token == "":
+        raise ValueError(
+            "You need to provide a GDC data access token via the 'token' in 'params'."
+        )
+
+    slices = snakemake.params.get("slices", "")
+    if slices == "":
+        raise ValueError(
+            "You need to provide 'region=chr1:1000-2000' or 'gencode=BRCA2' slice(s)  via the 'slices' in 'params'."
+        )
+
+    extra = snakemake.params.get("extra", "")
+
+    shell(
+        "curl --silent"
+        " --header 'X-Auth-Token: {token}'"
+        " 'https://api.gdc.cancer.gov/slicing/view/{uuid}?{slices}'"
+        " {extra}"
+        " --output {snakemake.output.bam} {log}"
+    )
+
+    if path.getsize(snakemake.output.bam) < 100000:
+        with open(snakemake.output.bam) as f:
+            if "error" in f.read():
+                shell("cat {snakemake.output.bam} {log}")
+                raise RuntimeError(
+                    "Your GDC API request returned an error, check your log file for the error message."
+                )

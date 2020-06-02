@@ -1,0 +1,125 @@
+.. _`ptrimmer`:
+
+PTRIMMER
+========
+
+Tool to trim off the primer sequence from mutiplex amplicon sequencing
+
+
+
+Software dependencies
+---------------------
+
+
+* ptrimmer ==1.3.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule ptrimmer_pe:
+        input:
+            r1="resources/a.lane1_R1.fastq.gz",
+            r2="resources/a.lane1_R2.fastq.gz"
+        output:
+            r1="results/a.lane1_R1.fq.gz",
+            r2="results/a.lane1_R2.fq.gz"
+        params:
+            primers="resources/primers.txt"
+        log:
+            "logs/ptrimmer/a.lane.log"
+        wrapper:
+            "0.59.2-89-g00c45215/bio/ptrimmer"
+
+    rule ptrimmer_se:
+        input:
+            r1="resources/a.lane1_R1.fastq.gz",
+        output:
+            r1="results/a.lane1_R1.fq",
+        params:
+            primers="resources/primers.txt"
+        log:
+            "logs/ptrimmer/a.lane1.log"
+        wrapper:
+            "0.59.2-89-g00c45215/bio/ptrimmer"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Felix Mölder
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Felix Mölder"
+    __copyright__ = "Copyright 2020, Felix Mölder"
+    __email__ = "felix.moelder@uni-due.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    from pathlib import Path
+    import ntpath
+
+    reads = "-f {r1}".format(r1=snakemake.input.r1)
+    read_prefix = ntpath.basename(snakemake.input.r1).split("_R1")[0]
+    intermediate_output_r1 = snakemake.output.r1.strip(".gz")
+
+    if snakemake.input.get("r2", ""):
+        seqmode = "pair"
+        reads = "{reads} -r {r2}".format(reads=reads, r2=snakemake.input.r2)
+        intermediate_output_r2 = snakemake.output.r2.strip(".gz")
+    else:
+        seqmode = "single"
+
+    primers = snakemake.params.primers
+    outdir = Path(snakemake.output[0]).parent.resolve()
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+
+    ptrimmer_params = "-s {mode} {reads} -a {primers} -o {out}".format(
+        mode=seqmode, reads=reads, primers=primers, out=outdir
+    )
+
+    process_r1 = "mv {outdir}/{prefix}_trim_R1.fq {out}".format(
+        outdir=outdir, prefix=read_prefix, out=intermediate_output_r1
+    )
+    if snakemake.output.r1.endswith(".gz"):
+        process_r1 = "{process_r1} && gzip -9 {out}".format(
+            process_r1=process_r1, out=intermediate_output_r1
+        )
+
+    process_r2 = ""
+    if snakemake.input.get("r2", ""):
+        process_r2 = "&& mv {outdir}/{prefix}_trim_R2.fq {out}".format(
+            outdir=outdir, prefix=read_prefix, out=intermediate_output_r2
+        )
+        if snakemake.output.r2.endswith(".gz"):
+            process_r2 = "{process_r2} && gzip -9 {out}".format(
+                process_r2=process_r2, out=intermediate_output_r2
+            )
+
+    shell("(ptrimmer {ptrimmer_params} && {process_r1} {process_r2}) {log}")

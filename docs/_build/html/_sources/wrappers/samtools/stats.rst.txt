@@ -11,7 +11,7 @@ Software dependencies
 ---------------------
 
 
-* samtools ==1.9
+* samtools ==1.10
 
 
 
@@ -30,11 +30,11 @@ This wrapper can be used in the following way:
             "samtools_stats/{sample}.txt"
         params:
             extra="",                       # Optional: extra arguments.
-            region="1:1000000-2000000"      # Optional: region string.
+            region="xx:1000000-2000000"      # Optional: region string.
         log:
             "logs/samtools_stats/{sample}.log"
         wrapper:
-            "0.51.3-78-gb0b606f9/bio/samtools/stats"
+            "0.59.2-89-g00c45215/bio/samtools/stats"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -78,4 +78,4 @@ Code
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 
-    shell("samtools stats {extra} {snakemake.input}" " {region} > {snakemake.output} {log}")
+    shell("samtools stats {extra} {snakemake.input} {region} > {snakemake.output} {log}")

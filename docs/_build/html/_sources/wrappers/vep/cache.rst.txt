@@ -1,0 +1,84 @@
+.. _`vep download cache`:
+
+VEP DOWNLOAD CACHE
+==================
+
+Download VEP cache for given species, build and release.
+
+
+
+Software dependencies
+---------------------
+
+
+* ensembl-vep
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule get_vep_cache:
+        output:
+            directory("resources/vep/cache")
+        params:
+            species="saccharomyces_cerevisiae",
+            build="R64-1-1",
+            release="98"
+        log:
+            "logs/vep/cache.log"
+        cache: True  # save space and time with between workflow caching (see docs)
+        wrapper:
+            "0.59.2-89-g00c45215/bio/vep/cache"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2020, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    from pathlib import Path
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "vep_install --AUTO cf "
+        "--SPECIES {snakemake.params.species} "
+        "--ASSEMBLY {snakemake.params.build} "
+        "--CACHE_VERSION {snakemake.params.release} "
+        "--CACHEDIR {snakemake.output} "
+        "--CONVERT "
+        "--NO_UPDATE {log}"
+    )
