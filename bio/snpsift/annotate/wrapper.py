@@ -12,13 +12,16 @@ from snakemake.utils import makedirs
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 extra = snakemake.params.get("extra", "")
-makedirs(dirname(snakemake.output.vcf))
+
+incall = snakemake.input.incall
+if incall.endswith(".bcf"):
+    incall = "< <(bcftools view {})".format(incall)
 
 shell(
     "SnpSift annotate"  # Tool and its subcommand
     " {extra}"  # Extra parameters
     " {snakemake.input.database}"  # Path to annotation vcf file
-    " {snakemake.input.vcf}"  # Path to input vcf file
+    " {incall}"  # Path to input vcf file
     " > {snakemake.output.vcf}"  # Path to output vcf file
     " {log}"  # Logging behaviour
 )
