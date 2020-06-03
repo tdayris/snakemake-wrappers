@@ -57,21 +57,24 @@ tsv = pandas.read_csv(
     index_col=0
 )
 
+col_interest = (
+    "Ensembl_ID"
+    if genes is True
+    else "Transcript_ID"
+)
 merged_frame = pandas.merge(
     tsv,
     annot,
     left_index=True,
-    right_on=(
-        "Ensembl_ID"
-        if genes is True
-        else "Transcript_ID"
-    ),
+    right_on=col_interest,
     how="left"
 )
+
+del merged_frame[col_interest]
 
 merged_frame.to_csv(
     snakemake.output["tsv"],
     sep="\t",
-    index=False,
+    index=(snakemake.params.get("write_index", False) is True),
     header=True
 )
