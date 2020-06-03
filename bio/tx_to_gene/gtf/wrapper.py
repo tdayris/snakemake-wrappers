@@ -50,7 +50,7 @@ with open(gtf_in, "r") as gtf, open(tsv_out, "w") as tsv:
             if attr != '' and '"' in attr
         }
 
-        if snakemake.params.get("gencore", False) is True:
+        if snakemake.params.get("gencode", False) is True:
             chomp["gene_id"] = chomp["gene_id"].split(".")[0]
             chomp["transcript_id"] = chomp["transcript_id"].split(".")[0]
 
