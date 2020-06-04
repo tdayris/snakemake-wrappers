@@ -118,7 +118,7 @@ data["Cluster_Sig"] = [
 
 if "fc_sig" in snakemake.output.keys():
     logging.debug("Prining the log2(FC) / Significance table")
-    tmp = data[["log2FoldChange", "Cluster_Sig"]]
+    tmp = data[data["Cluster_Sig"] != "Non-Significative"]
     tmp.rename(
         columns={
             "index": "GeneIdentifier",
@@ -152,6 +152,7 @@ if "fc_fc" in snakemake.output.keys():
 
 if "padj_sig" in snakemake.output.keys():
     logging.debug("Prining the adjusted P-Value / Significance table")
+    tmp = data[data["Cluster_Sig"] != "Non-Significative"]
     tmp.rename(
         columns={
             "padj": "stat_change",
