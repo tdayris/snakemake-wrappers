@@ -57,11 +57,54 @@ data = pandas.read_csv(
     }
 )
 
+print(data.head())
+
+if (tx2gene := snakemake.input.get("tx2gene", None)) is not None:
+    txtable = pandas.read_csv(
+        tx2gene,
+        sep="\t",
+        header=0,
+        index_col=None,
+        dtype={
+            1: str,
+            2: str,
+            3: str,
+            4: int,
+            5: int,
+            6: str,
+            7: str
+        }
+    )
+
+    txtable = txtable[[
+        "Gene_ID", "Gene_Name", "Chromosome", "Start", "Stop", "Strand"
+    ]].drop_duplicates()
+    print(txtable.head())
+
+
+    data = pandas.merge(
+        data.copy(),
+        txtable,
+        left_index=True,
+        right_on="Gene_ID",
+        how="left"
+    )
+
+    data = data[[
+        "log2FoldChange", "padj", "Gene_ID", "Gene_Name",
+        "Chromosome", "Start", "Stop", "Strand"
+    ]]
+    data.rename(columns={"Gene_ID": "index"}, inplace=True)
+else:
+    data.reset_index(inplace=True)
+    data = data[["index", "log2FoldChange", "padj"]]
+
+print(data.head())
+
 padjthreshold = float(snakemake.params.get("alpha", 0.05))
 fc_threshold = float(snakemake.params.get("fold_change", 0.01))
 general_table_only = snakemake.params.get("general_table_only", False)
 
-data = data[["log2FoldChange", "padj"]]
 
 data["Cluster_FC"] = [
     get_fc_cluster(fc, fc_threshold)
@@ -76,8 +119,14 @@ data["Cluster_Sig"] = [
 if "fc_sig" in snakemake.output.keys():
     logging.debug("Prining the log2(FC) / Significance table")
     tmp = data[["log2FoldChange", "Cluster_Sig"]]
-    tmp.reset_index(inplace=True)
-    tmp.columns = ["gene_name", "stat_change", "cluster"]
+    tmp.rename(
+        columns={
+            "index": "GeneIdentifier",
+            "log2FoldChange": "stat_change",
+            "Cluster_Sig": "cluster"
+        },
+        inplace=True
+    )
     tmp.to_csv(
         snakemake.output.fc_sig,
         sep="\t",
@@ -87,10 +136,14 @@ if "fc_sig" in snakemake.output.keys():
 if "fc_fc" in snakemake.output.keys():
     logging.debug("Prining the log2(FC) / FC cluster table")
     tmp = data[data["Cluster_Sig"] != "Non-Significative"]
-    tmp = tmp[["log2FoldChange", "Cluster_FC"]]
     tmp = tmp[tmp["Cluster_FC"] != "Non-Significative"]
-    tmp.reset_index(inplace=True)
-    tmp.columns = ["gene_name", "stat_change", "cluster"]
+    tmp.rename(
+        columns={
+            "log2FoldChange": "stat_change",
+            "Cluster_FC": "cluster",
+            "index": "GeneIdentifier"
+        }
+    )
     tmp.to_csv(
         snakemake.output.fc_fc,
         sep="\t",
@@ -99,9 +152,14 @@ if "fc_fc" in snakemake.output.keys():
 
 if "padj_sig" in snakemake.output.keys():
     logging.debug("Prining the adjusted P-Value / Significance table")
-    tmp = data[["padj", "Cluster_Sig"]]
-    tmp.reset_index(inplace=True)
-    tmp.columns = ["gene_name", "stat_change", "cluster"]
+    tmp.rename(
+        columns={
+            "padj": "stat_change",
+            "Cluster_Sig": "cluster",
+            "index": "GeneIdentifier"
+        },
+        inplace=True
+    )
     tmp.to_csv(
         snakemake.output.padj_sig,
         sep="\t",
@@ -111,9 +169,14 @@ if "padj_sig" in snakemake.output.keys():
 if "padj_fc" in snakemake.output.keys():
     logging.debug("Prining the adjusted P-Value / FoldChange table")
     tmp = data[data["Cluster_FC"] != "Non-Significative"]
-    tmp = tmp[["padj", "Cluster_FC"]]
-    tmp.reset_index(inplace=True)
-    tmp.columns = ["gene_name", "stat_change", "cluster"]
+    tmp.rename(
+        columns={
+            "padj": "stat_change",
+            "index": "GeneIdentifier",
+            "Cluster_FC": "cluster"
+        },
+        inplace=True
+    )
     tmp.to_csv(
         snakemake.output.padj_fc,
         sep="\t",
@@ -122,9 +185,16 @@ if "padj_fc" in snakemake.output.keys():
 
 if "complete" in snakemake.output.keys():
     logging.debug("Prining the complete table")
-    tmp = data[["log2FoldChange", "padj", "Cluster_FC", "Cluster_Sig"]]
-    tmp.reset_index(inplace=True)
-    tmp.columns = ["gene_name", "stat_change", "padj", "cluster", "significance"]
+    tmp.rename(
+        columns={
+            "log2FoldChange": "stat_change",
+            "index": "GeneIdentifier",
+            "Cluster_FC": "cluster",
+            "Cluster_Sig": "significance",
+            "padj": "Adjuster_PValue"
+        },
+        inplace=True
+    )
     tmp.to_csv(
         snakemake.output.complete,
         sep="\t",
