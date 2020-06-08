@@ -1885,7 +1885,8 @@ def test_vep_plugins():
 def test_vep_annotate():
     run(
         "bio/vep/annotate",
-        ["snakemake", "--cores", "1", "variants.annotated.bcf", "--use-conda", "-F"],
+        ["snakemake", "--cores", "1", "variants.annotated.bcf", "--use-conda", "-F"]
+    )
 
 
 def test_pandas_merge_salmon():
@@ -2283,4 +2284,11 @@ def test_isoformSwitchAnalyseR_importIsoformExpression():
     run(
         "bio/isoformSwitchAnalyseR/importIsoformExpression",
         ["snakemake", "--cores", "1", "importIsoformExpression.RDS", "--use-conda", "-F"]
+    )
+
+
+def test_bigr_multiqc():
+    run(
+        "bio/BiGR/multiqc_rnaseq_report",
+        ["snakemake", "--cores", "1", "multiqc_config.yaml", "--use-conda", "-F"]
     )
