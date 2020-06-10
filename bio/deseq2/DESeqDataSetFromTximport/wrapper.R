@@ -34,6 +34,15 @@ coldata <- utils::read.table(
 );
 rownames(coldata) <- coldata$Sample_id;
 
+count_filter <- 0;
+if ("count_filter" %in% names(snakemake@params)) {
+  count_filter <- base::as.numeric(
+    x = snakemake@params[["count_filter"]]
+  );
+}
+keep <- rowSums(counts(dds)) > count_filter;
+dds <- dds[keep, ];
+
 # Cast formula as formula instead of string
 formula <- stats::as.formula(
   object = snakemake@params[["design"]]
@@ -48,6 +57,8 @@ dds <- DESeq2::DESeqDataSetFromTximport(
   design = formula
 );
 base::write("DESeqDataSet built.", stderr());
+
+
 
 # Save as RDS
 output_path <- base::as.character(x = snakemake@output[["dds"]]);
