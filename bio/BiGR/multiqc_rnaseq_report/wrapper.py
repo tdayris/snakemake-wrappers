@@ -24,7 +24,7 @@ def link_data(
     Perform the linking and builds the config dict
     """
     log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
-    shell("ln -s {abs_in} {abs_out} {log} ")
+    shell("ln --force -s {abs_in} {abs_out} {log} ")
     return {
         section_id: {
             "section_name": section_name,
@@ -33,7 +33,7 @@ def link_data(
     }
 
 
-def link_clustermap_sample(png_path: Path) -> Dict[str, Any]:
+def link_clustermap_sample(png_path: Path, output_dir: Path) -> Dict[str, Any]:
     """
     Link the provided png_path so this would be included within MultiQC
     automatically
@@ -46,11 +46,14 @@ def link_clustermap_sample(png_path: Path) -> Dict[str, Any]:
         "(identical) to blue (different). Samples are named using the "
         "following scheme: condition - sample_id",
         str(png_path.absolute()),
-        f"{png_path.absolute().parent}/clustermap_sample_mqc.png",
+        f"{output_dir}/clustermap_sample_mqc.png",
     )
 
 
-def link_pca_axes_correlation(png_path: Path) -> Dict[str, Any]:
+def link_pca_axes_correlation(
+        png_path: Path,
+        output_dir: Path
+    ) -> Dict[str, Any]:
     """
     Link the provided png_path so this would be included within MultiQC
     automatically
@@ -64,11 +67,14 @@ def link_pca_axes_correlation(png_path: Path) -> Dict[str, Any]:
         "This does not foresee anything for the upcomming differential "
         "analysis.",
         str(png_path.absolute()),
-        f"{png_path.absolute().parent}/pca_axes_correlation_mqc.png"
+        f"{output_dir}/pca_axes_correlation_mqc.png"
     )
 
 
-def link_pairwise_scatterplot(png_path: Path) -> Dict[str, Any]:
+def link_pairwise_scatterplot(
+        png_path: Path,
+        output_dir: Path
+    ) -> Dict[str, Any]:
     """
     Link the provided png_path so this would be included within MultiQC
     automatically
@@ -84,11 +90,11 @@ def link_pairwise_scatterplot(png_path: Path) -> Dict[str, Any]:
         "0.95 and 0.80 shows average similarities. A lesser value shows "
         "noticable dissimilarities.",
         str(png_path.absolute()),
-        f"{png_path.absolute().parent}/pairwise_scatterplot_mqc.png"
+        f"{output_dir}/pairwise_scatterplot_mqc.png"
     )
 
 
-def link_pca_plot(png_path: Path) -> Dict[str, Any]:
+def link_pca_plot(png_path: Path, output_dir: Path) -> Dict[str, Any]:
     """
     Link the provided png_path so this would be included within MultiQC
     automatically
@@ -102,7 +108,7 @@ def link_pca_plot(png_path: Path) -> Dict[str, Any]:
         "each others. Two points, that are apart from each others, are "
         "different.",
         str(png_path.absolute()),
-        f"{png_path.absolute().parent}/pca_plot_mqc.png"
+        f"{output_dir}/pca_plot_mqc.png"
     )
 
 
@@ -116,25 +122,38 @@ def write_yaml(output_yaml: Path, data: Dict[str, Any]) -> None:
 
 mqc_config = {"custom_data": {}}
 mqc_config.update(snakemake.params)
+config_outpath = Path(snakemake.output["multiqc_config"])
 
 if "clustermap_sample" in snakemake.input.keys():
     mqc_config["custom_data"].update(
-        link_clustermap_sample(Path(snakemake.input["clustermap_sample"]))
+        link_clustermap_sample(
+            Path(snakemake.input["clustermap_sample"]),
+            config_outpath.absolute().parent
+        )
     )
 
 if "pairwise_scatterplot" in snakemake.input.keys():
     mqc_config["custom_data"].update(
-        link_pairwise_scatterplot(Path(snakemake.input["pairwise_scatterplot"]))
+        link_pairwise_scatterplot(
+            Path(snakemake.input["pairwise_scatterplot"]),
+            config_outpath.absolute().parent
+        )
     )
 
 if "pca_plot" in snakemake.input.keys():
     mqc_config["custom_data"].update(
-        link_pca_plot(Path(snakemake.input["pca_plot"]))
+        link_pca_plot(
+            Path(snakemake.input["pca_plot"]),
+            config_outpath.absolute().parent
+        )
     )
 
 if "pca_axes_correlation" in snakemake.input.keys():
     mqc_config["custom_data"].update(
-        link_pca_axes_correlation(Path(snakemake.input["pca_axes_correlation"]))
+        link_pca_axes_correlation(
+            Path(snakemake.input["pca_axes_correlation"]),
+            config_outpath.absolute().parent
+        )
     )
 
 write_yaml(
