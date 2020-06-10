@@ -40,8 +40,6 @@ if ("count_filter" %in% names(snakemake@params)) {
     x = snakemake@params[["count_filter"]]
   );
 }
-keep <- rowSums(counts(dds)) > count_filter;
-dds <- dds[keep, ];
 
 # Cast formula as formula instead of string
 formula <- stats::as.formula(
@@ -59,6 +57,9 @@ dds <- DESeq2::DESeqDataSetFromTximport(
 base::write("DESeqDataSet built.", stderr());
 
 
+keep <- rowSums(counts(dds)) > count_filter;
+dds <- dds[keep, ];
+base::write("Low counts in DESeqDataSet were filtered.", stderr());
 
 # Save as RDS
 output_path <- base::as.character(x = snakemake@output[["dds"]]);
