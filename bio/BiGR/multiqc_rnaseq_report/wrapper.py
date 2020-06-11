@@ -24,7 +24,7 @@ def link_data(
     Perform the linking and builds the config dict
     """
     log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
-    shell("ln --force -s {abs_in} {abs_out} {log} ")
+    shell("cp --force --verbose --symbolic-link {abs_in} {abs_out} {log} ")
     return {
         section_id: {
             "section_name": section_name,
@@ -112,6 +112,23 @@ def link_pca_plot(png_path: Path, output_dir: Path) -> Dict[str, Any]:
     )
 
 
+def link_volano_plot(png_path: Path, output_dir: Path) -> Dict[str, Any]:
+    """
+    Link the provided png_path so this would be included within MultiQC
+    automatically
+    """
+    return link_data(
+        "pca_plot",
+        "volcanoplot",
+        "A Volano plot shows how differentially expressed targets behave "
+        "comparatively with each others. It is a common quality control. "
+        "<br><br>You may ask your bioinformatician if you'd like to highlight "
+        "a given target, or a small set of targets.",
+        str(png_path.absolute()),
+        f"{output_dir}/volcanoplot_mqc.png"
+    )
+
+
 def write_yaml(output_yaml: Path, data: Dict[str, Any]) -> None:
     """
     Save given dictionnary as Yaml-formatted text file
@@ -152,6 +169,15 @@ if "pca_axes_correlation" in snakemake.input.keys():
     mqc_config["custom_data"].update(
         link_pca_axes_correlation(
             Path(snakemake.input["pca_axes_correlation"]),
+            config_outpath.absolute().parent
+        )
+    )
+
+
+if "volcanoplot" in snakemake.input.keys():
+    mqc_config["custom_data"].update(
+        link_volano_plot(
+            Path(snakemake.input["volcanoplot"]),
             config_outpath.absolute().parent
         )
     )
