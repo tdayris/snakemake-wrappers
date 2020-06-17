@@ -2292,3 +2292,10 @@ def test_bigr_multiqc():
         "bio/BiGR/multiqc_rnaseq_report",
         ["snakemake", "--cores", "1", "multiqc_config.yaml", "--use-conda", "-F"]
     )
+
+
+def test_pcaexplorer_writelaunchscript():
+    run(
+        "bio/pcaExplorer/writeLaunchScript",
+        ["snakemake", "--cores", "1", "pcaExplorer.R", "--use-conda", "-F"]
+    )
