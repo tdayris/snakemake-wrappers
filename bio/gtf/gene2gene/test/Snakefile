@@ -1,0 +1,20 @@
+rule gene_to_gene:
+    input:
+        gtf = "file.gtf"
+    output:
+        tsv = "gene2gene.tsv"
+    message:
+        "Testing gene_to_gene"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 512, 1024)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 15)
+        )
+    log:
+        "logs/gene_to_gene.log"
+    wrapper:
+        "master/bio/gtf/gene2gene"

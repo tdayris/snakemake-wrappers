@@ -1,10 +1,10 @@
-rule tx_to_gene:
+rule gene_length:
     input:
         gtf = "file.gtf"
     output:
-        tsv = "tx2gene.tsv"
+        tsv = "genelength.tsv"
     message:
-        "Testing tx_to_gene"
+        "Testing gene_length wrapper"
     threads:
         1
     resources:
@@ -14,7 +14,10 @@ rule tx_to_gene:
         time_min = (
             lambda wildcards, attempt: min(attempt * 10, 15)
         )
+    params:
+        header = True,
+        positions = True
     log:
-        "logs/tx_to_gene.log"
+        "logs/gene_length.log"
     wrapper:
-        "master/bio/tx_to_gene/gtf"
+        "master/bio/gtf/gene_length"

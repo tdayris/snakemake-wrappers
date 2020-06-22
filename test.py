@@ -1990,8 +1990,22 @@ def test_deseq2_to_gseaapp():
 
 def test_tx_to_gene():
     run(
-        "bio/tx_to_gene/gtf",
+        "bio/gtf/tx2gene",
         ["snakemake", "--cores", "1", "tx2gene.tsv", "--use-conda", "-F"],
+    )
+
+
+def test_gene_to_gene():
+    run(
+        "bio/gtf/gene2gene",
+        ["snakemake", "--cores", "1", "gene2gene.tsv", "--use-conda", "-F"],
+    )
+
+
+def test_gene_length():
+    run(
+        "bio/gtf/gene_length",
+        ["snakemake", "--cores", "1", "genelength.tsv", "--use-conda", "-F"],
     )
 
 
