@@ -2313,3 +2313,24 @@ def test_pcaexplorer_writelaunchscript():
         "bio/pcaExplorer/writeLaunchScript",
         ["snakemake", "--cores", "1", "pcaExplorer.R", "--use-conda", "-F"]
     )
+
+
+def test_variant_distribution_position():
+    run(
+        "bio/variant_distribution/position",
+        ["snakemake", "--cores", "1", "fake_KJ660346.tsv", "--use-conda", "-F"]
+    )
+
+
+def test_variant_distribution_frequency():
+    run(
+        "bio/variant_distribution/frequency",
+        ["snakemake", "--cores", "1", "frequency.tsv", "--use-conda", "-F"]
+    )
+
+
+def test_pandas_variant_density():
+    run(
+        "bio/pandas/variant_density",
+        ["snakemake", "--cores", "1", "filtered.vcf", "--use-conda", "-F"]
+    )

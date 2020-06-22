@@ -1,0 +1,20 @@
+rule test_variant_distribution_position:
+    input:
+        vcf = "fake_KJ660346.vcf"
+    output:
+        tsv = "fake_KJ660346.tsv"
+    message:
+        "Tsting variant_distribution_position"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 20, 200)
+        )
+    log:
+        "logs/test_variant_distribution_position.log"
+    wrapper:
+        "master/bio/variant_distribution/position"

@@ -1,0 +1,21 @@
+rule test_variant_distribution_frequency:
+    input:
+        gene_length = "length.tsv",
+        variant_positions = "positions.tsv"
+    output:
+        tsv = "frequency.tsv"
+    message:
+        "Testing the variant distribution frequency wrapper"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 20, 200)
+        )
+    log:
+        "logs/test_variant_distribution_frequency.log"
+    wrapper:
+        "master/bio/variant_distribution/frequency"

@@ -1,0 +1,22 @@
+rule test_variant_density:
+    input:
+        vcf = "in.vcf"
+    output:
+        vcf = "filtered.vcf"
+    message:
+        "Testing variant density filter"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 20, 200)
+        )
+    params:
+        filter_vcf = True
+    log:
+        "logs/test_variant_density.log"
+    wrapper:
+        "master/bio/pandas/variant_density"
