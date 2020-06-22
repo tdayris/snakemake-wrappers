@@ -37,7 +37,7 @@ This wrapper can be used in the following way:
             "logs/delly.log"
         threads: 2  # It is best to use as many threads as samples
         wrapper:
-            "0.59.2-89-g00c45215/bio/delly"
+            "0.60.1-107-g7e19fc2d/bio/delly"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -74,11 +74,9 @@ Code
     from snakemake.shell import shell
 
 
-    try:
-        exclude = "-x " + snakemake.input.exclude
-    except AttributeError:
-        exclude = ""
-
+    exclude = (
+        "-x {}".format(snakemake.input.exlude) if snakemake.input.get("exlude", "") else ""
+    )
 
     extra = snakemake.params.get("extra", "")
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)

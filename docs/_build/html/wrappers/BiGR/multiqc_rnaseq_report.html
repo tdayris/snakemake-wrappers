@@ -1,0 +1,570 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MULTIQC_RNASEQ_REPORT &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ARRIBA" href="../arriba.html" />
+    <link rel="prev" title="BIGR" href="../BiGR.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Snakemake Wrappers
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                heads/Unofficial
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Wrappers</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../BiGR.html">BIGR</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MULTIQC_RNASEQ_REPORT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../arriba.html">ARRIBA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../art.html">ART</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bamtools.html">BAMTOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bcftools.html">BCFTOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bedtools.html">BEDTOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bismark.html">BISMARK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bowtie2.html">BOWTIE2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../busco.html">BUSCO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bwa.html">BWA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cairosvg.html">CAIROSVG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clustalo.html">CLUSTALO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../epic.html">EPIC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fastp.html">FASTP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fastqc.html">FASTQC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fgbio.html">FGBIO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../filtlong.html">FILTLONG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../freebayes.html">FREEBAYES</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gatk.html">GATK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gatk3.html">GATK3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gdc-api.html">GDC-API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gdc-client.html">GDC-CLIENT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gencode.html">GENCODE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gtf.html">GTF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hap.py.html">HAP.PY</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hisat2.html">HISAT2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hmmer.html">HMMER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../homer.html">HOMER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../igv-reports.html">IGV-REPORTS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../infernal.html">INFERNAL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../isoformSwitchAnalyseR.html">ISOFORMSWITCHANALYSER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../jannovar.html">JANNOVAR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kallisto.html">KALLISTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../last.html">LAST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lofreq.html">LOFREQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nanosim-h.html">NANOSIM-H</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ngs-disambiguate.html">NGS-DISAMBIGUATE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pandas.html">PANDAS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pcaExplorer.html">PCAEXPLORER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pear.html">PEAR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../picard.html">PICARD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pindel.html">PINDEL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plass.html">PLASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../primerclip.html">PRIMERCLIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prosolo.html">PROSOLO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ptrimmer.html">PTRIMMER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pyfastaq.html">PYFASTAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference.html">REFERENCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../refgenie.html">REFGENIE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rubic.html">RUBIC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../salmon.html">SALMON</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sambamba.html">SAMBAMBA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../samtools.html">SAMTOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../seaborn.html">SEABORN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../seqtk.html">SEQTK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sickle.html">SICKLE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../snp-mutator.html">SNP-MUTATOR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../snpsift.html">SNPSIFT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sourmash.html">SOURMASH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sra-tools.html">SRA-TOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../star.html">STAR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../strelka.html">STRELKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tabix.html">TABIX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transdecoder.html">TRANSDECODER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../variant_distribution.html">VARIANT_DISTRIBUTION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../varscan.html">VARSCAN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vep.html">VEP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Snakemake Wrappers</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../BiGR.html">BIGR</a> &raquo;</li>
+        
+      <li>MULTIQC_RNASEQ_REPORT</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/wrappers/BiGR/multiqc_rnaseq_report.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="multiqc-rnaseq-report">
+<span id="id1"></span><h1>MULTIQC_RNASEQ_REPORT<a class="headerlink" href="#multiqc-rnaseq-report" title="Permalink to this headline">¶</a></h1>
+<p>Build a result report for RNASeq analysis</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>bioconda:multiqc=1.9</p></li>
+<li><p>conda-forge:python=3.8.2</p></li>
+</ul>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>This wrapper can be used in the following way:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">multiqc_config</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+         <span class="n">pairwise_scatterplot</span> <span class="o">=</span> <span class="s2">&quot;image.png&quot;</span><span class="p">,</span>
+         <span class="n">clustermap_sample</span> <span class="o">=</span> <span class="s2">&quot;image.png&quot;</span><span class="p">,</span>
+         <span class="n">pca_plot</span> <span class="o">=</span> <span class="s2">&quot;image.png&quot;</span><span class="p">,</span>
+         <span class="n">pca_axes_correlation</span> <span class="o">=</span> <span class="s2">&quot;image.png&quot;</span><span class="p">,</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">multiqc_config</span> <span class="o">=</span> <span class="s2">&quot;multiqc_config.yaml&quot;</span><span class="p">,</span>
+        <span class="n">plots</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;pairwise_scatterplot_mqc.png&quot;</span><span class="p">),</span>
+            <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;clustermap_sample_mqc.png&quot;</span><span class="p">),</span>
+            <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;pca_plot_mqc.png&quot;</span><span class="p">),</span>
+            <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;pca_axes_correlation_mqc.png&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/multiqc/config.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;My title&quot;</span><span class="p">,</span>
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="s2">&quot;My subtitle that catches readers&quot;</span><span class="p">,</span>
+        <span class="n">intro_text</span> <span class="o">=</span> <span class="s2">&quot;Intro text that summs up may things&quot;</span><span class="p">,</span>
+        <span class="n">report_comment</span> <span class="o">=</span> <span class="s2">&quot;A comment about this report&quot;</span><span class="p">,</span>
+        <span class="n">show_analysis_paths</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span>
+        <span class="n">show_analysis_time</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="n">custom_logo</span> <span class="o">=</span> <span class="s1">&#39;../IGR_Logo.jpeg&#39;</span><span class="p">,</span>
+        <span class="n">custom_logo_url</span> <span class="o">=</span> <span class="s1">&#39;https://gitlab.com/bioinfo_gustaveroussy/bigr&#39;</span><span class="p">,</span>
+        <span class="n">custom_logo_title</span> <span class="o">=</span> <span class="s1">&#39;BiGR, Gustave Roussy Intitute&#39;</span><span class="p">,</span>
+        <span class="n">report_header_info</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;Contact E-mail&quot;</span><span class="p">:</span> <span class="s2">&quot;my_address@gustaveroussy.fr&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Application Type&quot;</span><span class="p">:</span> <span class="s2">&quot;RNA-seq&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Project Type&quot;</span><span class="p">:</span> <span class="s2">&quot;Application&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Sequencing Platform&quot;</span><span class="p">:</span> <span class="s2">&quot;HiSeq 2500 High Output V4&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;Sequencing Setup&quot;</span><span class="p">:</span> <span class="s2">&quot;2x125&quot;</span><span class="p">}</span>
+        <span class="p">]</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/BiGR/multiqc_rnaseq_report&quot;</span>
+</pre></div>
+</div>
+<p>Note that input, output and log file paths can be chosen freely.
+When running with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
+</pre></div>
+</div>
+<p>the software dependencies will be automatically deployed into an isolated environment before execution.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Thibault Dayris</p></li>
+</ul>
+</div>
+<div class="section" id="code">
+<h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3.8</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">From the given files, produce specific MultiQC yaml files that witll ship</span>
+<span class="sd">content info MultiQC automatically</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+
+
+<span class="k">def</span> <span class="nf">link_data</span><span class="p">(</span>
+        <span class="n">section_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">section_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">abs_in</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">abs_out</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform the linking and builds the config dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;cp --force --verbose --symbolic-link {abs_in} {abs_out} {log} &quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">section_id</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;section_name&quot;</span><span class="p">:</span> <span class="n">section_name</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">description</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">link_clustermap_sample</span><span class="p">(</span><span class="n">png_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Link the provided png_path so this would be included within MultiQC</span>
+<span class="sd">    automatically</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">link_data</span><span class="p">(</span>
+        <span class="s2">&quot;clustermap_sample&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Sample clustered heatmap&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Per sample clustered heatmap. This plot has been build based on &quot;</span>
+        <span class="s2">&quot;normalized counts from DESeq2.&lt;br&gt;&lt;br&gt;Colors run from red &quot;</span>
+        <span class="s2">&quot;(identical) to blue (different). Samples are named using the &quot;</span>
+        <span class="s2">&quot;following scheme: condition - sample_id&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">png_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()),</span>
+        <span class="n">f</span><span class="s2">&quot;{output_dir}/clustermap_sample_mqc.png&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">link_pca_axes_correlation</span><span class="p">(</span>
+        <span class="n">png_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Link the provided png_path so this would be included within MultiQC</span>
+<span class="sd">    automatically</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">link_data</span><span class="p">(</span>
+        <span class="s2">&quot;pca_axes_correlation&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;PCA Axe correlations&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;This histogram shows which factor has a higher  correlation with &quot;</span>
+        <span class="s2">&quot;the first axe of the PCA. This may help to understand why a DGE &quot;</span>
+        <span class="s2">&quot;returns odd results, or which factor masks another.&lt;br&gt;&lt;br&gt;&quot;</span>
+        <span class="s2">&quot;This does not foresee anything for the upcomming differential &quot;</span>
+        <span class="s2">&quot;analysis.&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">png_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()),</span>
+        <span class="n">f</span><span class="s2">&quot;{output_dir}/pca_axes_correlation_mqc.png&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">link_pairwise_scatterplot</span><span class="p">(</span>
+        <span class="n">png_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Link the provided png_path so this would be included within MultiQC</span>
+<span class="sd">    automatically</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">link_data</span><span class="p">(</span>
+        <span class="s2">&quot;pairwise_scatterplot&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Pairwise Scatterplot&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;This is a pairwise scatterplot. It contains: (1) in diagonal: the &quot;</span>
+        <span class="s2">&quot;sample names, (2) in upper half the pearson correlation between &quot;</span>
+        <span class="s2">&quot;samples, (3) in lower half, the scatterplot of each genic feature &quot;</span>
+        <span class="s2">&quot;against each other. &lt;br&gt;&lt;br&gt;A value of 0.95 and above shows high &quot;</span>
+        <span class="s2">&quot;similarities like ones observed in cell lines. A value between &quot;</span>
+        <span class="s2">&quot;0.95 and 0.80 shows average similarities. A lesser value shows &quot;</span>
+        <span class="s2">&quot;noticable dissimilarities.&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">png_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()),</span>
+        <span class="n">f</span><span class="s2">&quot;{output_dir}/pairwise_scatterplot_mqc.png&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">link_pca_plot</span><span class="p">(</span><span class="n">png_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Link the provided png_path so this would be included within MultiQC</span>
+<span class="sd">    automatically</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">link_data</span><span class="p">(</span>
+        <span class="s2">&quot;pca_plot&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Principal Component Analysis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Principal Component Analysis (PCA) is a common method to display &quot;</span>
+        <span class="s2">&quot;samples similarities and divergences.&lt;br&gt;&lt;br&gt; Each point represents &quot;</span>
+        <span class="s2">&quot;a sample. Two points that are close from each others, are similar to &quot;</span>
+        <span class="s2">&quot;each others. Two points, that are apart from each others, are &quot;</span>
+        <span class="s2">&quot;different.&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">png_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()),</span>
+        <span class="n">f</span><span class="s2">&quot;{output_dir}/pca_plot_mqc.png&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">link_volano_plot</span><span class="p">(</span><span class="n">png_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Link the provided png_path so this would be included within MultiQC</span>
+<span class="sd">    automatically</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">link_data</span><span class="p">(</span>
+        <span class="s2">&quot;pca_plot&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;volcanoplot&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;A Volano plot shows how differentially expressed targets behave &quot;</span>
+        <span class="s2">&quot;comparatively with each others. It is a common quality control. &quot;</span>
+        <span class="s2">&quot;&lt;br&gt;&lt;br&gt;You may ask your bioinformatician if you&#39;d like to highlight &quot;</span>
+        <span class="s2">&quot;a given target, or a small set of targets.&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">png_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()),</span>
+        <span class="n">f</span><span class="s2">&quot;{output_dir}/volcanoplot_mqc.png&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">write_yaml</span><span class="p">(</span><span class="n">output_yaml</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save given dictionnary as Yaml-formatted text file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">output_yaml</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outyaml</span><span class="p">:</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">outyaml</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+
+<span class="n">mqc_config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;custom_data&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+<span class="n">mqc_config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+<span class="n">config_outpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;multiqc_config&quot;</span><span class="p">])</span>
+
+<span class="k">if</span> <span class="s2">&quot;clustermap_sample&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">mqc_config</span><span class="p">[</span><span class="s2">&quot;custom_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="n">link_clustermap_sample</span><span class="p">(</span>
+            <span class="n">Path</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;clustermap_sample&quot;</span><span class="p">]),</span>
+            <span class="n">config_outpath</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="k">if</span> <span class="s2">&quot;pairwise_scatterplot&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">mqc_config</span><span class="p">[</span><span class="s2">&quot;custom_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="n">link_pairwise_scatterplot</span><span class="p">(</span>
+            <span class="n">Path</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;pairwise_scatterplot&quot;</span><span class="p">]),</span>
+            <span class="n">config_outpath</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="k">if</span> <span class="s2">&quot;pca_plot&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">mqc_config</span><span class="p">[</span><span class="s2">&quot;custom_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="n">link_pca_plot</span><span class="p">(</span>
+            <span class="n">Path</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;pca_plot&quot;</span><span class="p">]),</span>
+            <span class="n">config_outpath</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="k">if</span> <span class="s2">&quot;pca_axes_correlation&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">mqc_config</span><span class="p">[</span><span class="s2">&quot;custom_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="n">link_pca_axes_correlation</span><span class="p">(</span>
+            <span class="n">Path</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;pca_axes_correlation&quot;</span><span class="p">]),</span>
+            <span class="n">config_outpath</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+
+<span class="k">if</span> <span class="s2">&quot;volcanoplot&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">mqc_config</span><span class="p">[</span><span class="s2">&quot;custom_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="n">link_volano_plot</span><span class="p">(</span>
+            <span class="n">Path</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;volcanoplot&quot;</span><span class="p">]),</span>
+            <span class="n">config_outpath</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="n">write_yaml</span><span class="p">(</span>
+    <span class="n">output_yaml</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;multiqc_config&quot;</span><span class="p">]),</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">mqc_config</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../arriba.html" class="btn btn-neutral float-right" title="ARRIBA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../BiGR.html" class="btn btn-neutral float-left" title="BIGR" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2016, The Snakemake team
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

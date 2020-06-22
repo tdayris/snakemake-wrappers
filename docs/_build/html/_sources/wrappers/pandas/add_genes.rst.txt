@@ -45,7 +45,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_add_genes.log"
         wrapper:
-            "0.59.2-89-g00c45215/bio/pandas/add_genes"
+            "0.60.1-107-g7e19fc2d/bio/pandas/add_genes"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -142,21 +142,24 @@ Code
         index_col=0
     )
 
+    col_interest = (
+        "Ensembl_ID"
+        if genes is True
+        else "Transcript_ID"
+    )
     merged_frame = pandas.merge(
         tsv,
         annot,
         left_index=True,
-        right_on=(
-            "Ensembl_ID"
-            if genes is True
-            else "Transcript_ID"
-        ),
+        right_on=col_interest,
         how="left"
     )
+
+    del merged_frame[col_interest]
 
     merged_frame.to_csv(
         snakemake.output["tsv"],
         sep="\t",
-        index=False,
+        index=(snakemake.params.get("write_index", False) is True),
         header=True
     )

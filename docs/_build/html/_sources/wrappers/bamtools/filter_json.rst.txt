@@ -1,0 +1,86 @@
+.. _`bamtools filter with json`:
+
+BAMTOOLS FILTER WITH JSON
+=========================
+
+Filters BAM files with JSON-script for filtering parameters and rules. For more information about bamtools see `bamtools documentation <http://stab.st-andrews.ac.uk/wiki/index.php/Bamtools>`_ and `bamtools source code <https://github.com/pezmaster31/bamtools>`_.
+
+
+
+Software dependencies
+---------------------
+
+
+* bamtools ==2.5.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bamtools_filter_json:
+        input:
+            "{sample}.bam"
+        output:
+            "filtered/{sample}.bam"
+        params:
+            json="filtering-rules.json",
+            region="" # optional parameter for defining a specific region, e.g. "chr1:500..chr3:750"
+        log:
+            "logs/bamtools/filtered/{sample}.log"
+        wrapper:
+            "0.60.1-107-g7e19fc2d/bio/bamtools/filter_json"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Antonie Vietor
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Antonie Vietor"
+    __copyright__ = "Copyright 2020, Antonie Vietor"
+    __email__ = "antonie.v@gmx.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    region = snakemake.params.get("region")
+    region_param = ""
+
+    if region and region is not None:
+        region_param = ' -region "' + region + '"'
+
+    shell(
+        "(bamtools filter"
+        " -in {snakemake.input[0]}"
+        " -out {snakemake.output[0]}"
+        + region_param
+        + " -script {snakemake.params.json}) {log}"
+    )

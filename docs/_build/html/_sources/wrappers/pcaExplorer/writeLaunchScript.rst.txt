@@ -1,0 +1,125 @@
+.. _`pcaExplorer launching script`:
+
+PCAEXPLORER LAUNCHING SCRIPT
+============================
+
+Write the Rscript used to start pcaExplorer
+
+
+
+Software dependencies
+---------------------
+
+
+* conda-forge:python=3.8.2
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_pcaexplorer_writelaunchscript:
+        input:
+            dds = "dds.RDS",
+            dst = "dst.RDS",
+            coldata = "colData.tsv",
+            pca2go = "pca2go.RDS",
+            annotation = "annot.RDS"
+        output:
+            script = "pcaExplorer.R"
+        wrapper:
+            "0.60.1-107-g7e19fc2d/bio/pcaExplorer/writeLaunchScript"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Do not forget to load required environment before using the produced script
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3.8
+    # conding: utf-8
+
+    """
+    Set up a pcaExplorer launcher script
+    """
+
+    script = f"""#!/usr/bin/R
+
+    # This script is produced automatically, please check-it before any execution
+
+    base::library(
+        package = "DESeq2",
+        quietly = TRUE
+    );
+
+    base::library(
+        package = "pcaExplorer",
+        quietly = TRUE
+    );
+    base::message(
+        'Libraries loaded. Now loading input datasets.'
+    );
+
+    dds <- base::readRDS(
+        file = '{snakemake.input["dds"]}'
+    );
+    dst <- base::readRDS(
+        file = '{snakemake.input["dst"]}'
+    );
+    coldata <- utils::read.table(
+        file = '{snakemake.input["coldata"]}'
+    );
+    annotation <- base::readRDS(
+        file = '{snakemake.input["annotation"]}'
+    );
+    pca2go <- base::readRDS(
+        file = '{snakemake.input["pca2go"]}'
+    );
+    base::message(
+        'Input files loaded. Now launching pcaExplorer.'
+    );
+
+    pcaExplorer::pcaExplorer(
+        dds = dds,
+        dst = dst,
+        coldata = coldata,
+        pca2go = pca2go,
+        annotation = annotation
+    );
+    """
+
+
+    with open(snakemake.output["script"], "w") as out_script:
+        out_script.write(script)

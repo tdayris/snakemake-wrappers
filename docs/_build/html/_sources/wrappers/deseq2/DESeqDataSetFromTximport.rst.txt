@@ -118,6 +118,13 @@ Code
     );
     rownames(coldata) <- coldata$Sample_id;
 
+    count_filter <- 0;
+    if ("count_filter" %in% names(snakemake@params)) {
+      count_filter <- base::as.numeric(
+        x = snakemake@params[["count_filter"]]
+      );
+    }
+
     # Cast formula as formula instead of string
     formula <- stats::as.formula(
       object = snakemake@params[["design"]]
@@ -132,6 +139,11 @@ Code
       design = formula
     );
     base::write("DESeqDataSet built.", stderr());
+
+
+    keep <- rowSums(counts(dds)) > count_filter;
+    dds <- dds[keep, ];
+    base::write("Low counts in DESeqDataSet were filtered.", stderr());
 
     # Save as RDS
     output_path <- base::as.character(x = snakemake@output[["dds"]]);
