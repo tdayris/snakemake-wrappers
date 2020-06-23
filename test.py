@@ -2371,3 +2371,10 @@ def test_deeptools_computeMatrix():
         "bio/deeptools/computeMatrix",
         ["snakemake", "--cores", "1", "matrix.tsv", "--use-conda", "-F"]
     )
+
+
+def test_deeptools_plotheatmap():
+    run(
+        "bio/deeptools/plotHeatmap",
+        ["snakemake", "--cores", "1", "heatmap.png", "--use-conda", "-F"]
+    )
