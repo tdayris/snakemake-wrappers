@@ -18,12 +18,15 @@ tsv_out = snakemake.output["tsv"]
 with open(gtf_in, "r") as gtf, open(tsv_out, "w") as tsv:
     # Write header on user request
     if snakemake.params.get("header", False) is True:
-        cols = (
-            ["Gene_ID", "Transcript_ID", "Gene_Name",
-             "Chromosome", "Start", "Stop", "Strand"]
-            if snakemake.params.get("positions", False) is True else
-            ["Gene_ID", "Transcript_ID", "Gene_Name"]
-        )
+        cols = ["Gene_ID", "Transcript_ID", "Gene_Name"]
+        if snakemake.params.get("positions", False) is True:
+            cols = [
+                "Gene_ID", "Transcript_ID", "Gene_Name",
+                "Chromosome", "Start", "Stop", "Strand"
+            ]
+        elif snakemake.params.get("sleuth_compatibility", False) is True:
+            cols = ["ens_gene", "target_id", "ext_gene"]
+
         tsv.write('\t'.join(cols))
         tsv.write("\n")
 
