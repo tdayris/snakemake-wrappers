@@ -2359,3 +2359,9 @@ def test_deeptools_bamcoverage():
         "bio/deeptools/bamcoverage",
         ["snakemake", "--cores", "1", "a.bedgraph", "a.xx:0:20.bw", "--use-conda", "-F"]
     )
+
+def test_bedtools_complement():
+    run(
+        "bio/bedtools/complement",
+        ["snakemake", "--cores", "1", "complement.bed", "--use-conda", "-F"]
+    )
