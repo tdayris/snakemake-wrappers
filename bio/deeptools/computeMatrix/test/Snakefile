@@ -1,0 +1,23 @@
+rule test_deeptools_computeMatrix:
+    input:
+        scores = "a.bw",
+        regions = "genome.bed"
+    output:
+        gzip = "archive.gz",
+        matrix = "matrix.tsv",
+        regions = "regions.bed"
+    message:
+        "Testing deeptools bamcoverage"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 20, 200)
+        )
+    log:
+        "logs/test_deeptools_bamcoverage.log"
+    wrapper:
+        "master/bio/deeptools/computeMatrix"

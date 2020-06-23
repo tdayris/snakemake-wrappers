@@ -2365,3 +2365,9 @@ def test_bedtools_complement():
         "bio/bedtools/complement",
         ["snakemake", "--cores", "1", "complement.bed", "--use-conda", "-F"]
     )
+
+def test_deeptools_computeMatrix():
+    run(
+        "bio/deeptools/computeMatrix",
+        ["snakemake", "--cores", "1", "matrix.tsv", "--use-conda", "-F"]
+    )
