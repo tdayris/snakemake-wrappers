@@ -14,17 +14,17 @@ log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 extra = snakemake.params.get("extra", "")
 if "regions" in snakemake.wildcards.keys():
-    extra += "--region {}".format(snakemake.wildcards["region"])
+    extra += " --region {} ".format(snakemake.wildcards["regions"])
 
 
 if "blacklist" in snakemake.input.keys():
-    extra += "--blackListFileName {}".format(snakemake.input["blacklist"])
+    extra += " --blackListFileName {} ".format(snakemake.input["blacklist"])
 
 output = snakemake.output["coverage"]
 if output.endswith(".bw"):
-    extra += "--outFileFormat bigwig"
+    extra += " --outFileFormat bigwig "
 else:
-    extra += "--outFileFormat bedgraph"
+    extra += " --outFileFormat bedgraph "
 
 print(extra)
 shell(

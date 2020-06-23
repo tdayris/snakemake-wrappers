@@ -2357,5 +2357,5 @@ def test_pandas_variant_density():
 def test_deeptools_bamcoverage():
     run(
         "bio/deeptools/bamcoverage",
-        ["snakemake", "--cores", "1", "a.bedgraph", "--use-conda", "-F"]
+        ["snakemake", "--cores", "1", "a.bedgraph", "a.xx:0:20.bw", "--use-conda", "-F"]
     )
