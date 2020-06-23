@@ -1,0 +1,20 @@
+rule test_deeptools_bamcoverage:
+    input:
+        bam = "a.bam"
+    output:
+        coverage = "a.bedgraph"
+    message:
+        "Testing deeptools bamcoverage"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 20, 200)
+        )
+    log:
+        "logs/test_deeptools_bamcoverage.log"
+    wrapper:
+        "master/bio/deeptools/bamcoverage"

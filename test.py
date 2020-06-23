@@ -2352,3 +2352,10 @@ def test_pandas_variant_density():
         "bio/pandas/variant_density",
         ["snakemake", "--cores", "1", "filtered.vcf", "--use-conda", "-F"]
     )
+
+
+def test_deeptools_bamcoverage():
+    run(
+        "bio/deeptools/bamcoverage",
+        ["snakemake", "--cores", "1", "a.bedgraph", "--use-conda", "-F"]
+    )
