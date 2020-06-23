@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""This is the Snakemake Wrapper for deeptools bamcoverage"""
+"""This is the Snakemake Wrapper for deeptools computeMatrix"""
 
 __author__ = "Thibault Dayris"
 __copyright__ = "Copyright 2020, Thibault Dayris"
