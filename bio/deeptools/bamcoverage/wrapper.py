@@ -26,7 +26,6 @@ if output.endswith(".bw"):
 else:
     extra += " --outFileFormat bedgraph "
 
-print(extra)
 shell(
     "bamCoverage "
     " --numberOfProcessors {snakemake.threads} "
