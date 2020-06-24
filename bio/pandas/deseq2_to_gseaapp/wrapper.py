@@ -59,32 +59,17 @@ data = pandas.read_csv(
 
 print(data.head())
 
-if (tx2gene := snakemake.input.get("tx2gene", None)) is not None:
-    txtable = pandas.read_csv(
-        tx2gene,
+if (gene2gene := snakemake.input.get("gene2gene", None)) is not None:
+    genetable = pandas.read_csv(
+        gene2gene,
         sep="\t",
         header=0,
-        index_col=None,
-        dtype={
-            1: str,
-            2: str,
-            3: str,
-            4: int,
-            5: int,
-            6: str,
-            7: str
-        }
+        index_col=None
     )
-
-    txtable = txtable[[
-        "Gene_ID", "Gene_Name", "Chromosome", "Start", "Stop", "Strand"
-    ]].drop_duplicates()
-    print(txtable.head())
-
 
     data = pandas.merge(
         data.copy(),
-        txtable,
+        genetable,
         left_index=True,
         right_on="Gene_ID",
         how="left"
