@@ -21,7 +21,7 @@ if "regions" in snakemake.output.keys():
 
 shell(
     "plotHeatmap "
-    " --matrixFile {snakemake.input.matrix} "
+    " --matrixFile {snakemake.input.archive} "
     " --outFileName {snakemake.output.plot} "
     " {extra} "
     " {log} "
