@@ -22,6 +22,6 @@ shell(
     " --force"
     " -o {output_dir}"
     " -n {output_name}"
-    " {input_dirs}"
+    " {snakemake.input}"
     " {log}"
 )
