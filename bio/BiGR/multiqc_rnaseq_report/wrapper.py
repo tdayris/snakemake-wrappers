@@ -118,8 +118,8 @@ def link_volano_plot(png_path: Path, output_dir: Path) -> Dict[str, Any]:
     automatically
     """
     return link_data(
-        "pca_plot",
         "volcanoplot",
+        "Volcano Plot",
         "A Volano plot shows how differentially expressed targets behave "
         "comparatively with each others. It is a common quality control. "
         "<br><br>You may ask your bioinformatician if you'd like to highlight "
