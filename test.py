@@ -1936,6 +1936,13 @@ def test_pandas_add_genes():
     )
 
 
+def test_pandas_add_transcripts():
+    run(
+        "bio/pandas/add_transcripts",
+        ["snakemake", "--cores", "1", "result.tsv", "--use-conda", "-F"],
+    )
+
+
 def test_seaborn_clustermap():
     run(
         "bio/seaborn/clustermap",

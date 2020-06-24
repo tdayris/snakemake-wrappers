@@ -1,0 +1,21 @@
+rule test_add_genes:
+    input:
+        tx2gene = "tx2gene.tsv",
+        tsv = "table.tsv"
+    output:
+        tsv = "result.tsv"
+    message:
+        "Testing add genes wrapper"
+    threads:
+        1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 512, 1024)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 10, 20)
+        )
+    log:
+        "logs/test_add_genes.log"
+    wrapper:
+        "master/bio/pandas/add_transcripts"
