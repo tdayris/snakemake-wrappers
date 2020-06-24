@@ -32,7 +32,7 @@ def get_alpha_cluster(value: numpy.float,
     This function returns a class for a given adjusted pval
     """
     if value < threshold:
-        return "Differentially Expressed"
+        return "Differentially_Expressed"
     return "Non-Significative"
 
 logging.basicConfig(
