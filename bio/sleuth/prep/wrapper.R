@@ -40,6 +40,7 @@ meta <- utils::read.table(
 command <- base::paste(
   command,
   "sample_to_covariates = meta",
+  "num_cores = threads",
   sep = ", "
 );
 

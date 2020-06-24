@@ -1,0 +1,62 @@
+#!/bin/R
+
+# Snakemake wrapper for sleuth results
+# __author__ = "Thibault Dayris"
+# __copyright__ = "Copyright 2020, Thibault Dayris"
+# __email__ = "thibault.dayris@gustaveroussy.fr"
+# __license__ = "MIT"
+
+base::library(package = "sleuth", quietly = TRUE);
+
+so <- base::readRDS(
+    file = snakemake@input[["rds"]]
+);
+
+extra <- "";
+if ("extra" %in% names(snakemake@params)) {
+  extra <- base::as.character(
+    x = snakemake@params[["extra"]]
+  );
+}
+
+
+# For each beta, run sleuth_wt
+for (beta in colnames(so$design_matrix)) {
+
+  # Update extra parameters
+  extra_beta <- base::paste0(
+    extra,
+    ", test = ",
+    beta
+  );
+
+  # Build command line
+  command <- base::paste(
+    "sleuth::sleuth_wt(",
+    "obj = so",
+    extra_beta,
+    ")",
+    sep = ", "
+  );
+
+  # Extract results
+  so_results <- base::eval(
+    base::parse(
+      text = command
+    )
+  );
+
+  output_path <- base::file.path(
+    snakemake@output[["result_dir"]],
+    base::paste0("Sleuth_Results_", beta, ".tsv")
+  );
+
+  # Save table
+  utils::write.table(
+    so_results,
+    file = output_path,
+    quote = FALSE,
+    row.names = FALSE,
+    sep = "\t"
+  );
+}
