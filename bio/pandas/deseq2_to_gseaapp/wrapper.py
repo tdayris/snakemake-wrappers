@@ -20,10 +20,10 @@ def get_fc_cluster(value: numpy.float,
     This functon returns a class for a given log2(Fold Change)
     """
     if abs(value) < threshold:
-        return "Non-Significative"
+        return "Non_Significative"
     if value > 0:
-        return "Up-regulated"
-    return "Down-regulated"
+        return "Up_Regulated"
+    return "Down_Regulated"
 
 
 def get_alpha_cluster(value: numpy.float,
@@ -33,7 +33,7 @@ def get_alpha_cluster(value: numpy.float,
     """
     if value < threshold:
         return "Differentially_Expressed"
-    return "Non-Significative"
+    return "Non_Significative"
 
 logging.basicConfig(
     filename=snakemake.log[0],
@@ -103,7 +103,7 @@ data["Cluster_Sig"] = [
 
 if "fc_sig" in snakemake.output.keys():
     logging.debug("Prining the log2(FC) / Significance table")
-    tmp = data[data["Cluster_Sig"] != "Non-Significative"]
+    tmp = data[data["Cluster_Sig"] != "Non_Significative"]
     tmp.rename(
         columns={
             "index": "GeneIdentifier",
@@ -120,8 +120,8 @@ if "fc_sig" in snakemake.output.keys():
 
 if "fc_fc" in snakemake.output.keys():
     logging.debug("Prining the log2(FC) / FC cluster table")
-    tmp = data[data["Cluster_Sig"] != "Non-Significative"]
-    tmp = tmp[tmp["Cluster_FC"] != "Non-Significative"]
+    tmp = data[data["Cluster_Sig"] != "Non_Significative"]
+    tmp = tmp[tmp["Cluster_FC"] != "Non_Significative"]
     tmp.rename(
         columns={
             "log2FoldChange": "stat_change",
@@ -137,7 +137,7 @@ if "fc_fc" in snakemake.output.keys():
 
 if "padj_sig" in snakemake.output.keys():
     logging.debug("Prining the adjusted P-Value / Significance table")
-    tmp = data[data["Cluster_Sig"] != "Non-Significative"]
+    tmp = data[data["Cluster_Sig"] != "Non_Significative"]
     tmp.rename(
         columns={
             "padj": "stat_change",
@@ -154,7 +154,7 @@ if "padj_sig" in snakemake.output.keys():
 
 if "padj_fc" in snakemake.output.keys():
     logging.debug("Prining the adjusted P-Value / FoldChange table")
-    tmp = data[data["Cluster_FC"] != "Non-Significative"]
+    tmp = data[data["Cluster_FC"] != "Non_Significative"]
     tmp.rename(
         columns={
             "padj": "stat_change",
