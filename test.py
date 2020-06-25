@@ -2129,6 +2129,13 @@ def test_deseq2_plotma():
     )
 
 
+def test_deseq2_deseq():
+    run(
+        "bio/deseq2/DESeq",
+        ["snakemake", "--cores", "1", "wald.RDS", "--use-conda", "-F"]
+    )
+
+
 def test_cp():
     run(
         "bio/cp",
