@@ -80,8 +80,8 @@ for (resultname in names) {
     object = wald,
     name = resultname,
     independentFiltering = TRUE,
-    alpha = alpha_threshold,
-    lfcThreshold = fc_threshold,
+    # alpha = alpha_threshold,
+    # lfcThreshold = fc_threshold,
     pAdjustMethod = "BH",
     cooksCutoff = TRUE
   );
