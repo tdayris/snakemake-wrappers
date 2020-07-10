@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -180,7 +181,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -277,9 +277,9 @@
         <span class="n">release</span><span class="o">=</span><span class="s2">&quot;98&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/get_genome.log&quot;</span>
-    <span class="n">cache</span><span class="p">:</span> <span class="bp">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/reference/ensembl-sequence&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/reference/ensembl-sequence&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -302,7 +302,7 @@ When running with</p>
 <span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;johannes.koester@uni-due.de&quot;</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
-<span class="kn">import</span> <span class="nn">subprocess</span> <span class="kn">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">subprocess</span> <span class="k">as</span> <span class="nn">sp</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
@@ -316,9 +316,9 @@ When running with</p>
     <span class="c1"># use the special grch37 branch for new releases</span>
     <span class="n">branch</span> <span class="o">=</span> <span class="s2">&quot;grch37/&quot;</span>
 
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="n">spec</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;{build}&quot;</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">release</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">75</span> <span class="k">else</span> <span class="s2">&quot;{build}.{release}&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="n">spec</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">{build}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">release</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">75</span> <span class="k">else</span> <span class="s2">&quot;</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
     <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="n">release</span>
 <span class="p">)</span>
 
@@ -337,9 +337,9 @@ When running with</p>
 <span class="k">else</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid datatype, must be one of dna, cdna, cds, ncrna, pep&quot;</span><span class="p">)</span>
 
-<span class="n">success</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="k">for</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="n">suffixes</span><span class="p">:</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;ftp://ftp.ensembl.org/pub/{branch}release-{release}/fasta/{species}/{datatype}/{species_cap}.{spec}.{suffix}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;ftp://ftp.ensembl.org/pub/</span><span class="si">{branch}</span><span class="s2">release-</span><span class="si">{release}</span><span class="s2">/fasta/</span><span class="si">{species}</span><span class="s2">/</span><span class="si">{datatype}</span><span class="s2">/</span><span class="si">{species_cap}</span><span class="s2">.</span><span class="si">{spec}</span><span class="s2">.</span><span class="si">{suffix}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">release</span><span class="o">=</span><span class="n">release</span><span class="p">,</span>
         <span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">,</span>
         <span class="n">datatype</span><span class="o">=</span><span class="n">datatype</span><span class="p">,</span>
@@ -350,21 +350,21 @@ When running with</p>
     <span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;curl -sSf {url} &gt; /dev/null 2&gt; /dev/null&quot;</span><span class="p">)</span>
+        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;curl -sSf </span><span class="si">{url}</span><span class="s2"> &gt; /dev/null 2&gt; /dev/null&quot;</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">sp</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">:</span>
         <span class="k">continue</span>
 
-    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;(curl -L {url} | gzip -d &gt; {snakemake.output[0]}) {log}&quot;</span><span class="p">)</span>
-    <span class="n">success</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;(curl -L </span><span class="si">{url}</span><span class="s2"> | gzip -d &gt; </span><span class="si">{snakemake.output[0]}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">break</span>
 
 <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span>
+    <span class="nb">print</span><span class="p">(</span>
         <span class="s2">&quot;Unable to download requested sequence data from Ensembl. &quot;</span>
         <span class="s2">&quot;Did you check that this combination of species, build, and release is actually provided?&quot;</span><span class="p">,</span>
-        <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+        <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

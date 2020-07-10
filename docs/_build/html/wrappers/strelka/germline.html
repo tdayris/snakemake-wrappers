@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -179,7 +180,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -269,22 +269,22 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">strelka_germline</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="c1"># the required bam file</span>
-        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/{sample}.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
         <span class="c1"># path to reference genome fasta and index</span>
         <span class="n">fasta</span><span class="o">=</span><span class="s2">&quot;genome.fasta&quot;</span><span class="p">,</span>
         <span class="n">fasta_index</span><span class="o">=</span><span class="s2">&quot;genome.fasta.fai&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="c1"># Strelka results - either use directory or complete file path</span>
-        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;strelka/{sample}&quot;</span><span class="p">)</span>
+        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;strelka/</span><span class="si">{sample}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/strelka/germline/{sample}.log&quot;</span>
+        <span class="s2">&quot;logs/strelka/germline/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="c1"># optional parameters</span>
         <span class="n">config_extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">run_extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">8</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/strelka/germline&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/strelka/germline&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -314,10 +314,10 @@ When running with</p>
 
 <span class="n">config_extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">run_extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;run_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">bam</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bam&quot;</span><span class="p">)</span>  <span class="c1"># input bam file, required</span>
-<span class="k">assert</span> <span class="n">bam</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="s2">&quot;input-&gt; bam is a required input parameter&quot;</span>
+<span class="k">assert</span> <span class="n">bam</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;input-&gt; bam is a required input parameter&quot;</span>
 
 <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.vcf.gz&quot;</span><span class="p">):</span>
     <span class="n">run_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
@@ -326,15 +326,15 @@ When running with</p>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;configureStrelkaGermlineWorkflow.py &quot;</span>  <span class="c1"># configure the strelka run</span>
-    <span class="s2">&quot;--bam {bam} &quot;</span>  <span class="c1"># input bam</span>
-    <span class="s2">&quot;--referenceFasta {snakemake.input.fasta} &quot;</span>  <span class="c1"># reference genome</span>
-    <span class="s2">&quot;--runDir {run_dir} &quot;</span>  <span class="c1"># output directory</span>
-    <span class="s2">&quot;{config_extra} &quot;</span>  <span class="c1"># additional parameters for the configuration</span>
-    <span class="s2">&quot;&amp;&amp; {run_dir}/runWorkflow.py &quot;</span>  <span class="c1"># run the strelka workflow</span>
+    <span class="s2">&quot;--bam </span><span class="si">{bam}</span><span class="s2"> &quot;</span>  <span class="c1"># input bam</span>
+    <span class="s2">&quot;--referenceFasta </span><span class="si">{snakemake.input.fasta}</span><span class="s2"> &quot;</span>  <span class="c1"># reference genome</span>
+    <span class="s2">&quot;--runDir </span><span class="si">{run_dir}</span><span class="s2"> &quot;</span>  <span class="c1"># output directory</span>
+    <span class="s2">&quot;</span><span class="si">{config_extra}</span><span class="s2"> &quot;</span>  <span class="c1"># additional parameters for the configuration</span>
+    <span class="s2">&quot;&amp;&amp; </span><span class="si">{run_dir}</span><span class="s2">/runWorkflow.py &quot;</span>  <span class="c1"># run the strelka workflow</span>
     <span class="s2">&quot;-m local &quot;</span>  <span class="c1"># run in local mode</span>
-    <span class="s2">&quot;-j {snakemake.threads} &quot;</span>  <span class="c1"># number of threads</span>
-    <span class="s2">&quot;{run_extra} &quot;</span>  <span class="c1"># additional parameters for the run</span>
-    <span class="s2">&quot;{log}&quot;</span>
+    <span class="s2">&quot;-j </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>  <span class="c1"># number of threads</span>
+    <span class="s2">&quot;</span><span class="si">{run_extra}</span><span class="s2"> &quot;</span>  <span class="c1"># additional parameters for the run</span>
+    <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>  <span class="c1"># logging</span>
 </pre></div>
 </div>

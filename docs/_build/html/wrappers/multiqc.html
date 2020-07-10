@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deseq2.html">DESEQ2</a></li>
@@ -175,7 +176,6 @@
 <li class="toctree-l1"><a class="reference internal" href="trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="umis.html">UMIS</a></li>
@@ -254,7 +254,7 @@
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>multiqc ==1.8</p></li>
+<li><p>multiqc ==1.9</p></li>
 </ul>
 </div>
 <div class="section" id="example">
@@ -262,7 +262,7 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">multiqc</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;samtools_stats/{sample}.txt&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">])</span>
+        <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;samtools_stats/</span><span class="si">{sample}</span><span class="s2">.txt&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">])</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="s2">&quot;qc/multiqc.html&quot;</span>
     <span class="n">params</span><span class="p">:</span>
@@ -270,7 +270,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/multiqc.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/multiqc&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/multiqc&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -304,16 +304,16 @@ When running with</p>
 <span class="n">input_dirs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span> <span class="k">for</span> <span class="n">fp</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">)</span>
 <span class="n">output_dir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">output_name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;multiqc&quot;</span>
-    <span class="s2">&quot; {snakemake.params}&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.params}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; --force&quot;</span>
-    <span class="s2">&quot; -o {output_dir}&quot;</span>
-    <span class="s2">&quot; -n {output_name}&quot;</span>
-    <span class="s2">&quot; {input_dirs}&quot;</span>
-    <span class="s2">&quot; {log}&quot;</span>
+    <span class="s2">&quot; -o </span><span class="si">{output_dir}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; -n </span><span class="si">{output_name}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.input}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

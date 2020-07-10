@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -119,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -185,7 +186,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -276,32 +276,32 @@
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">bismark_methylation_extractor</span><span class="p">:</span>
-    <span class="nb">input</span><span class="p">:</span> <span class="s2">&quot;bams/{sample}.bam&quot;</span>
+    <span class="nb">input</span><span class="p">:</span> <span class="s2">&quot;bams/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">mbias_r1</span><span class="o">=</span><span class="s2">&quot;qc/meth/{sample}.M-bias_R1.png&quot;</span><span class="p">,</span>
+        <span class="n">mbias_r1</span><span class="o">=</span><span class="s2">&quot;qc/meth/</span><span class="si">{sample}</span><span class="s2">.M-bias_R1.png&quot;</span><span class="p">,</span>
         <span class="c1"># Only for PE BAMS:</span>
         <span class="c1"># mbias_r2=&quot;qc/meth/{sample}.M-bias_R2.png&quot;,</span>
 
-        <span class="n">mbias_report</span><span class="o">=</span><span class="s2">&quot;meth/{sample}.M-bias.txt&quot;</span><span class="p">,</span>
-        <span class="n">splitting_report</span><span class="o">=</span><span class="s2">&quot;meth/{sample}_splitting_report.txt&quot;</span><span class="p">,</span>
+        <span class="n">mbias_report</span><span class="o">=</span><span class="s2">&quot;meth/</span><span class="si">{sample}</span><span class="s2">.M-bias.txt&quot;</span><span class="p">,</span>
+        <span class="n">splitting_report</span><span class="o">=</span><span class="s2">&quot;meth/</span><span class="si">{sample}</span><span class="s2">_splitting_report.txt&quot;</span><span class="p">,</span>
 
         <span class="c1"># 1-based start, 1-based end (&#39;inclusive&#39;) methylation info: % and counts</span>
-        <span class="n">methylome_CpG_cov</span><span class="o">=</span><span class="s2">&quot;meth_cpg/{sample}.bismark.cov.gz&quot;</span><span class="p">,</span>
+        <span class="n">methylome_CpG_cov</span><span class="o">=</span><span class="s2">&quot;meth_cpg/</span><span class="si">{sample}</span><span class="s2">.bismark.cov.gz&quot;</span><span class="p">,</span>
         <span class="c1"># BedGraph with methylation percentage: 0-based start, end exclusive</span>
-        <span class="n">methylome_CpG_mlevel_bedGraph</span><span class="o">=</span><span class="s2">&quot;meth_cpg/{sample}.bedGraph.gz&quot;</span><span class="p">,</span>
+        <span class="n">methylome_CpG_mlevel_bedGraph</span><span class="o">=</span><span class="s2">&quot;meth_cpg/</span><span class="si">{sample}</span><span class="s2">.bedGraph.gz&quot;</span><span class="p">,</span>
 
         <span class="c1"># Primary output files: methylation status at each read cytosine position: (extremely large)</span>
-        <span class="n">read_base_meth_state_cpg</span><span class="o">=</span><span class="s2">&quot;meth/CpG_context_{sample}.txt.gz&quot;</span><span class="p">,</span>
+        <span class="n">read_base_meth_state_cpg</span><span class="o">=</span><span class="s2">&quot;meth/CpG_context_</span><span class="si">{sample}</span><span class="s2">.txt.gz&quot;</span><span class="p">,</span>
         <span class="c1"># * You could merge CHG, CHH using: --merge_non_CpG</span>
-        <span class="n">read_base_meth_state_chg</span><span class="o">=</span><span class="s2">&quot;meth/CHG_context_{sample}.txt.gz&quot;</span><span class="p">,</span>
-        <span class="n">read_base_meth_state_chh</span><span class="o">=</span><span class="s2">&quot;meth/CHH_context_{sample}.txt.gz&quot;</span>
+        <span class="n">read_base_meth_state_chg</span><span class="o">=</span><span class="s2">&quot;meth/CHG_context_</span><span class="si">{sample}</span><span class="s2">.txt.gz&quot;</span><span class="p">,</span>
+        <span class="n">read_base_meth_state_chh</span><span class="o">=</span><span class="s2">&quot;meth/CHH_context_</span><span class="si">{sample}</span><span class="s2">.txt.gz&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/meth/{sample}.log&quot;</span>
+        <span class="s2">&quot;logs/meth/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;meth&quot;</span><span class="p">,</span>  <span class="c1"># optional output dir</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--gzip --comprehensive --bedGraph&quot;</span>  <span class="c1"># optional params string</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/bismark/bismark_methylation_extractor&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/bismark/bismark_methylation_extractor&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -332,7 +332,7 @@ When running with</p>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
 <span class="n">params_extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="n">cmdline_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bismark_methylation_extractor {params_extra}&quot;</span><span class="p">]</span>
+<span class="n">cmdline_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bismark_methylation_extractor </span><span class="si">{params_extra}</span><span class="s2">&quot;</span><span class="p">]</span>
 
 <span class="c1"># output dir</span>
 <span class="n">output_dir</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_dir&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -347,16 +347,16 @@ When running with</p>
     <span class="s2">&quot;ignore_3prime_r2&quot;</span><span class="p">,</span>  <span class="c1"># meth_bias_r2_3end</span>
 <span class="p">]</span>
 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">trimming_options</span><span class="p">:</span>
-    <span class="n">value</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
-        <span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--{} {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+        <span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
 
 <span class="c1"># Input</span>
-<span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;{snakemake.input}&quot;</span><span class="p">)</span>
+<span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{snakemake.input}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># log</span>
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;{log}&quot;</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># run</span>
 <span class="n">shell</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmdline_args</span><span class="p">))</span>
@@ -373,14 +373,14 @@ When running with</p>
     <span class="p">(</span><span class="s2">&quot;read_base_meth_state_chh&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;CHH_context_&quot;</span><span class="p">,</span> <span class="s2">&quot;.txt.gz&quot;</span><span class="p">)),</span>
 <span class="p">]</span>
 
-<span class="n">log_append</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log_append</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">suffix</span><span class="p">))</span> <span class="ow">in</span> <span class="n">key2prefix_suffix</span><span class="p">:</span>
-    <span class="n">exp_path</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="n">exp_path</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">exp_path</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;bismark/bismark_methylation_extractor: Error: only one BAM file is&quot;</span>
-                <span class="s2">&quot; expected in input, but was &lt;{}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">)</span>
+                <span class="s2">&quot; expected in input, but was &lt;</span><span class="si">{}</span><span class="s2">&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="n">bam_file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">bam_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">bam_file</span><span class="p">)</span>
@@ -388,7 +388,7 @@ When running with</p>
 
         <span class="n">actual_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">bam_wo_ext</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">exp_path</span> <span class="o">!=</span> <span class="n">actual_path</span><span class="p">:</span>
-            <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv {actual_path:q} {exp_path:q} {log_append}&quot;</span><span class="p">)</span>
+            <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv {actual_path:q} {exp_path:q} </span><span class="si">{log_append}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

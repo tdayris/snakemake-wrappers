@@ -1,0 +1,138 @@
+.. _`bamCoverage`:
+
+BAMCOVERAGE
+===========
+
+Generate a coverage track from alignment of reads or fragments
+
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconda:deeptools=3.4.3
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_deeptools_bamcoverage:
+        input:
+            bam = "a.bam"
+        output:
+            coverage = "a.bedgraph"
+        message:
+            "Testing deeptools bamcoverage"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 10240)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 20, 200)
+            )
+        log:
+            "logs/test_deeptools_bamcoverage.log"
+        wrapper:
+            "0.60.1-133-gf773a3b9/bio/deeptools/bamcoverage"
+
+
+    rule test_deeptools_bamcoverage_regions:
+        input:
+            bam = "a.bam"
+        output:
+            coverage = "a.{regions}.bw"
+        message:
+            "Testing deeptools bamcoverage ({wildcards.regions})"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 10240)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 20, 200)
+            )
+        log:
+            "logs/test_deeptools_bamcoverage_{regions}.log"
+        wrapper:
+            "0.60.1-133-gf773a3b9/bio/deeptools/bamcoverage"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+You can specify regions in the file name. See example
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3
+    # -*- coding: utf-8 -*-
+
+    """This is the Snakemake Wrapper for deeptools bamcoverage"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+    if "regions" in snakemake.wildcards.keys():
+        extra += " --region {} ".format(snakemake.wildcards["regions"])
+
+
+    if "blacklist" in snakemake.input.keys():
+        extra += " --blackListFileName {} ".format(snakemake.input["blacklist"])
+
+    output = snakemake.output["coverage"]
+    if output.endswith(".bw"):
+        extra += " --outFileFormat bigwig "
+    else:
+        extra += " --outFileFormat bedgraph "
+
+    shell(
+        "bamCoverage "
+        " --numberOfProcessors {snakemake.threads} "
+        " {extra} "
+        " --bam {snakemake.input.bam} "
+        " --outFileName {output}"
+        " {log} "
+    )

@@ -59,7 +59,7 @@ This wrapper can be used in the following way:
                 {"Sequencing Setup": "2x125"}
             ]
         wrapper:
-            "0.60.1-107-g7e19fc2d/bio/BiGR/multiqc_rnaseq_report"
+            "0.60.1-133-gf773a3b9/bio/BiGR/multiqc_rnaseq_report"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -207,14 +207,51 @@ Code
         automatically
         """
         return link_data(
-            "pca_plot",
             "volcanoplot",
-            "A Volano plot shows how differentially expressed targets behave "
-            "comparatively with each others. It is a common quality control. "
-            "<br><br>You may ask your bioinformatician if you'd like to highlight "
-            "a given target, or a small set of targets.",
+            "Volcano Plot",
+            "The volcanoplot shows the repartition of genes across two "
+            "dimensions: their log2(Fold Change) and the -log10(Adjusted PValue)"
+            "<br><br>Each point is a gene. The higher the point, the greater "
+            "is the confidence we have in the fact that it is differentially "
+            "expressed according to our factor of interest. The more apart a "
+            "point is from the center of the graph, the more differentially "
+            "expressed it is.",
             str(png_path.absolute()),
             f"{output_dir}/volcanoplot_mqc.png"
+        )
+
+
+    def link_distro_expr(png_path: Path, output_dir: Path) -> Dict[str, Any]:
+        """
+        Link the provided png_path so this would be included within MultiQC
+        automatically
+        """
+        return link_data(
+            "distro_expr",
+            "Expression Distribution",
+            "The distribution of the expression of the genes is a common quality "
+            "control performed over a differential gene analysis. <br><br> We "
+            "expect all samples to have similar distribution, otherwise, it would"
+            " sign a possible error before the end of the normalization process.",
+            str(png_path.absolute()),
+            f"{output_dir}/distro_expr_mqc.png"
+        )
+
+
+    def link_ma_plot(png_path: Path, output_dir: Path) -> Dict[str, Any]:
+        """
+        Link the provided png_path so this would be included within MultiQC
+        automatically
+        """
+        return link_data(
+            "ma_plot",
+            "MA-plot",
+            "The MAplot compares M (log(ratio)) to A (mean average).<br><br> "
+            "This helps to highlight possible normalisation issues. We expect no"
+            " direct link between these two values; the graph should remain "
+            "centered around zero",
+            str(png_path.absolute()),
+            f"{output_dir}/ma_plot_mqc.png"
         )
 
 
@@ -267,6 +304,23 @@ Code
         mqc_config["custom_data"].update(
             link_volano_plot(
                 Path(snakemake.input["volcanoplot"]),
+                config_outpath.absolute().parent
+            )
+        )
+
+    if "distro_expr" in snakemake.input.keys():
+        mqc_config["custom_data"].update(
+            link_distro_expr(
+                Path(snakemake.input["distro_expr"]),
+                config_outpath.absolute().parent
+            )
+        )
+
+
+    if "ma_plot" in snakemake.input.keys():
+        mqc_config["custom_data"].update(
+            link_ma_plot(
+                Path(snakemake.input["ma_plot"]),
                 config_outpath.absolute().parent
             )
         )

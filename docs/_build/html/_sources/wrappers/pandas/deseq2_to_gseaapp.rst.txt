@@ -29,7 +29,8 @@ This wrapper can be used in the following way:
 
     rule test_deseq2_to_gseapp:
         input:
-            tsv = "result_example.csv"
+            tsv = "result_example.csv",
+            gene2gene = "gene2gene.tsv"
         output:
             fc_sig = "results/fc_sig.tsv",
             fc_fc = "results/fc_fc.tsv",
@@ -50,7 +51,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_deseq2_to_gseapp.log"
         wrapper:
-            "0.60.1-107-g7e19fc2d/bio/pandas/deseq2_to_gseaapp"
+            "0.60.1-133-gf773a3b9/bio/pandas/deseq2_to_gseaapp"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -113,10 +114,10 @@ Code
         This functon returns a class for a given log2(Fold Change)
         """
         if abs(value) < threshold:
-            return "Non-Significative"
+            return "Non_Significative"
         if value > 0:
-            return "Up-regulated"
-        return "Down-regulated"
+            return "Up_Regulated"
+        return "Down_Regulated"
 
 
     def get_alpha_cluster(value: numpy.float,
@@ -125,8 +126,8 @@ Code
         This function returns a class for a given adjusted pval
         """
         if value < threshold:
-            return "Differentially Expressed"
-        return "Non-Significative"
+            return "Differentially_Expressed"
+        return "Non_Significative"
 
     logging.basicConfig(
         filename=snakemake.log[0],
@@ -152,32 +153,17 @@ Code
 
     print(data.head())
 
-    if (tx2gene := snakemake.input.get("tx2gene", None)) is not None:
-        txtable = pandas.read_csv(
-            tx2gene,
+    if (gene2gene := snakemake.input.get("gene2gene", None)) is not None:
+        genetable = pandas.read_csv(
+            gene2gene,
             sep="\t",
             header=0,
-            index_col=None,
-            dtype={
-                1: str,
-                2: str,
-                3: str,
-                4: int,
-                5: int,
-                6: str,
-                7: str
-            }
+            index_col=None
         )
-
-        txtable = txtable[[
-            "Gene_ID", "Gene_Name", "Chromosome", "Start", "Stop", "Strand"
-        ]].drop_duplicates()
-        print(txtable.head())
-
 
         data = pandas.merge(
             data.copy(),
-            txtable,
+            genetable,
             left_index=True,
             right_on="Gene_ID",
             how="left"
@@ -211,7 +197,7 @@ Code
 
     if "fc_sig" in snakemake.output.keys():
         logging.debug("Prining the log2(FC) / Significance table")
-        tmp = data[data["Cluster_Sig"] != "Non-Significative"]
+        tmp = data[data["Cluster_Sig"] != "Non_Significative"]
         tmp.rename(
             columns={
                 "index": "GeneIdentifier",
@@ -228,8 +214,8 @@ Code
 
     if "fc_fc" in snakemake.output.keys():
         logging.debug("Prining the log2(FC) / FC cluster table")
-        tmp = data[data["Cluster_Sig"] != "Non-Significative"]
-        tmp = tmp[tmp["Cluster_FC"] != "Non-Significative"]
+        tmp = data[data["Cluster_Sig"] != "Non_Significative"]
+        tmp = tmp[tmp["Cluster_FC"] != "Non_Significative"]
         tmp.rename(
             columns={
                 "log2FoldChange": "stat_change",
@@ -245,7 +231,7 @@ Code
 
     if "padj_sig" in snakemake.output.keys():
         logging.debug("Prining the adjusted P-Value / Significance table")
-        tmp = data[data["Cluster_Sig"] != "Non-Significative"]
+        tmp = data[data["Cluster_Sig"] != "Non_Significative"]
         tmp.rename(
             columns={
                 "padj": "stat_change",
@@ -262,7 +248,7 @@ Code
 
     if "padj_fc" in snakemake.output.keys():
         logging.debug("Prining the adjusted P-Value / FoldChange table")
-        tmp = data[data["Cluster_FC"] != "Non-Significative"]
+        tmp = data[data["Cluster_FC"] != "Non_Significative"]
         tmp.rename(
             columns={
                 "padj": "stat_change",

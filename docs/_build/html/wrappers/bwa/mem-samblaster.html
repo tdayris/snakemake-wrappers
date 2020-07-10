@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -117,6 +117,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -183,7 +184,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -274,19 +274,19 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">bwa_mem</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">reads</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;reads/{sample}.1.fastq&quot;</span><span class="p">,</span> <span class="s2">&quot;reads/{sample}.2.fastq&quot;</span><span class="p">]</span>
+        <span class="n">reads</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.1.fastq&quot;</span><span class="p">,</span> <span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.2.fastq&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/{sample}.bam&quot;</span><span class="p">,</span>
-        <span class="n">index</span><span class="o">=</span><span class="s2">&quot;mapped/{sample}.bam.bai&quot;</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">index</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/bwa_mem_sambamba/{sample}.log&quot;</span>
+        <span class="s2">&quot;logs/bwa_mem_sambamba/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">index</span><span class="o">=</span><span class="s2">&quot;genome&quot;</span><span class="p">,</span>
-        <span class="n">extra</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;-R &#39;@RG\tID:{sample}\tSM:{sample}&#39;&quot;</span><span class="p">,</span>
+        <span class="n">extra</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;-R &#39;@RG\tID:</span><span class="si">{sample}</span><span class="s2">\tSM:</span><span class="si">{sample}</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
         <span class="n">sort_extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span> <span class="c1"># Extra args for sambamba.</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">8</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/bwa/mem-samblaster&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/bwa/mem-samblaster&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -320,7 +320,7 @@ When running with</p>
 <span class="n">sort_extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sort_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">samblaster_extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;samblaster_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Check inputs/arguments.</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">reads</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">reads</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span>
@@ -331,19 +331,19 @@ When running with</p>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;(bwa mem&quot;</span>
-    <span class="s2">&quot; -t {snakemake.threads}&quot;</span>
-    <span class="s2">&quot; {extra}&quot;</span>
-    <span class="s2">&quot; {snakemake.params.index}&quot;</span>
-    <span class="s2">&quot; {snakemake.input.reads}&quot;</span>
+    <span class="s2">&quot; -t </span><span class="si">{snakemake.threads}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.params.index}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.input.reads}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; | samblaster&quot;</span>
-    <span class="s2">&quot; {samblaster_extra}&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{samblaster_extra}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; | sambamba view -S -f bam /dev/stdin&quot;</span>
-    <span class="s2">&quot; -t {snakemake.threads}&quot;</span>
+    <span class="s2">&quot; -t </span><span class="si">{snakemake.threads}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; | sambamba sort /dev/stdin&quot;</span>
-    <span class="s2">&quot; -t {snakemake.threads}&quot;</span>
-    <span class="s2">&quot; -o {snakemake.output.bam}&quot;</span>
-    <span class="s2">&quot; {sort_extra}&quot;</span>
-    <span class="s2">&quot;) {log}&quot;</span>
+    <span class="s2">&quot; -t </span><span class="si">{snakemake.threads}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; -o </span><span class="si">{snakemake.output.bam}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{sort_extra}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;) </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

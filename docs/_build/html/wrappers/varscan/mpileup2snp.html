@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -169,7 +170,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -270,9 +270,9 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">mpileup_to_vcf</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;mpileup/{sample}.mpileup.gz&quot;</span>
+        <span class="s2">&quot;mpileup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;vcf/{sample}.vcf&quot;</span>
+        <span class="s2">&quot;vcf/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Calling SNP with Varscan2&quot;</span>
     <span class="n">threads</span><span class="p">:</span>  <span class="c1"># Varscan does not take any threading information</span>
@@ -280,9 +280,9 @@
               <span class="c1"># Keep threading value to one for unzipped mpileup input</span>
               <span class="c1"># Set it to two for zipped mipileup files</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/varscan_{sample}.log&quot;</span>
+        <span class="s2">&quot;logs/varscan_</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/varscan/mpileup2snp&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/varscan/mpileup2snp&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -317,12 +317,12 @@ files given as input, might be gzipped.</p>
 <span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;thibault.dayris@gustaveroussy.fr&quot;</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os.path</span> <span class="kn">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 <span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">makedirs</span>
 
 <span class="c1"># Gathering extra parameters and logging behaviour</span>
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
 <span class="c1"># In case input files are gzipped mpileup files,</span>
@@ -331,9 +331,9 @@ files given as input, might be gzipped.</p>
 <span class="c1"># - One for unzipping with zcat</span>
 <span class="c1"># - One for running varscan</span>
 <span class="n">pileup</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot; cat {} &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="s2">&quot; cat </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;gz&quot;</span><span class="p">)</span>
-    <span class="k">else</span> <span class="s2">&quot; zcat {} &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span> <span class="s2">&quot; zcat </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="p">)</span>
 
 <span class="c1"># Building output directories</span>
@@ -341,10 +341,10 @@ files given as input, might be gzipped.</p>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;varscan mpileup2snp &quot;</span>  <span class="c1"># Tool and its subprocess</span>
-    <span class="s2">&quot;&lt;( {pileup} ) &quot;</span> <span class="c1"># Pileup command</span>
-    <span class="s2">&quot;{extra} &quot;</span>  <span class="c1"># Extra parameters</span>
-    <span class="s2">&quot;&gt; {snakemake.output[0]} &quot;</span>  <span class="c1"># Path to vcf file</span>
-    <span class="s2">&quot;{log}&quot;</span>  <span class="c1"># Logging behaviour</span>
+    <span class="s2">&quot;&lt;( </span><span class="si">{pileup}</span><span class="s2"> ) &quot;</span> <span class="c1"># Pileup command</span>
+    <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> &quot;</span>  <span class="c1"># Extra parameters</span>
+    <span class="s2">&quot;&gt; </span><span class="si">{snakemake.output[0]}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to vcf file</span>
+    <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span>  <span class="c1"># Logging behaviour</span>
 <span class="p">)</span>
 </pre></div>
 </div>

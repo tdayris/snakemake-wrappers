@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -109,6 +109,7 @@
 <li class="toctree-l1"><a class="reference internal" href="clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deseq2.html">DESEQ2</a></li>
@@ -175,7 +176,6 @@
 <li class="toctree-l1"><a class="reference internal" href="trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="umis.html">UMIS</a></li>
@@ -263,18 +263,18 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">arriba</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="c1"># STAR bam containing chimeric alignments</span>
-        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;{sample}.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
         <span class="c1"># path to reference genome</span>
         <span class="n">genome</span><span class="o">=</span><span class="s2">&quot;genome.fasta&quot;</span><span class="p">,</span>
         <span class="c1"># path to annotation gtf</span>
         <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;annotation.gtf&quot;</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="c1"># approved gene fusions</span>
-        <span class="n">fusions</span><span class="o">=</span><span class="s2">&quot;fusions/{sample}.tsv&quot;</span><span class="p">,</span>
+        <span class="n">fusions</span><span class="o">=</span><span class="s2">&quot;fusions/</span><span class="si">{sample}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
         <span class="c1"># discarded gene fusions</span>
-        <span class="n">discarded</span><span class="o">=</span><span class="s2">&quot;fusions/{sample}.discarded.tsv&quot;</span> <span class="c1"># optional</span>
+        <span class="n">discarded</span><span class="o">=</span><span class="s2">&quot;fusions/</span><span class="si">{sample}</span><span class="s2">.discarded.tsv&quot;</span> <span class="c1"># optional</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/arriba/{sample}.log&quot;</span>
+        <span class="s2">&quot;logs/arriba/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="c1"># arriba blacklist file</span>
         <span class="n">blacklist</span><span class="o">=</span><span class="s2">&quot;blacklist.tsv&quot;</span><span class="p">,</span> <span class="c1"># strongly recommended, see https://arriba.readthedocs.io/en/latest/input-files/#blacklist</span>
@@ -286,7 +286,7 @@
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;-T -P -i 1,2&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/arriba&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/arriba&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -314,7 +314,7 @@ When running with</p>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">discarded_fusions</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;discarded&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">discarded_fusions</span><span class="p">:</span>
@@ -342,16 +342,16 @@ When running with</p>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;arriba &quot;</span>
-    <span class="s2">&quot;-x {snakemake.input.bam} &quot;</span>
-    <span class="s2">&quot;-a {snakemake.input.genome} &quot;</span>
-    <span class="s2">&quot;-g {snakemake.input.annotation} &quot;</span>
-    <span class="s2">&quot;{blacklist_cmd} &quot;</span>
-    <span class="s2">&quot;{known_cmd} &quot;</span>
-    <span class="s2">&quot;{sv_cmd} &quot;</span>
-    <span class="s2">&quot;-o {snakemake.output.fusions} &quot;</span>
-    <span class="s2">&quot;{discarded_cmd} &quot;</span>
-    <span class="s2">&quot;{extra} &quot;</span>
-    <span class="s2">&quot;{log}&quot;</span>
+    <span class="s2">&quot;-x </span><span class="si">{snakemake.input.bam}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;-a </span><span class="si">{snakemake.input.genome}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;-g </span><span class="si">{snakemake.input.annotation}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{blacklist_cmd}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{known_cmd}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{sv_cmd}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;-o </span><span class="si">{snakemake.output.fusions}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{discarded_cmd}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

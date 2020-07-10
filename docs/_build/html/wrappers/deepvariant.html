@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="DELLY" href="delly.html" />
-    <link rel="prev" title="CUTADAPT-SE" href="cutadapt/se.html" /> 
+    <link rel="prev" title="PLOTHEATMAP" href="deeptools/plotHeatmap.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">DEEPVARIANT</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
@@ -176,7 +177,6 @@
 <li class="toctree-l1"><a class="reference internal" href="trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="umis.html">UMIS</a></li>
@@ -264,18 +264,18 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">deepvariant</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/{sample}.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
         <span class="n">ref</span><span class="o">=</span><span class="s2">&quot;genome/genome.fasta&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;calls/{sample}.vcf.gz&quot;</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">model</span><span class="o">=</span><span class="s2">&quot;wgs&quot;</span><span class="p">,</span>   <span class="c1"># {wgs, wes}</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/deepvariant/{sample}/stdout.log&quot;</span>
+        <span class="s2">&quot;logs/deepvariant/</span><span class="si">{sample}</span><span class="s2">/stdout.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/deepvariant&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/deepvariant&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -309,7 +309,7 @@ When running with</p>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
 <span class="n">log_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -322,23 +322,23 @@ When running with</p>
 <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
     <span class="n">shell</span><span class="p">(</span>
         <span class="s2">&quot;(dv_make_examples.py &quot;</span>
-        <span class="s2">&quot;--cores {snakemake.threads} &quot;</span>
-        <span class="s2">&quot;--ref {snakemake.input.ref} &quot;</span>
-        <span class="s2">&quot;--reads {snakemake.input.bam} &quot;</span>
-        <span class="s2">&quot;--sample {basename} &quot;</span>
-        <span class="s2">&quot;--examples {tmp_dir} &quot;</span>
-        <span class="s2">&quot;--logdir {log_dir} &quot;</span>
-        <span class="s2">&quot;{extra} </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;--cores </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;--ref </span><span class="si">{snakemake.input.ref}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;--reads </span><span class="si">{snakemake.input.bam}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;--sample </span><span class="si">{basename}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;--examples </span><span class="si">{tmp_dir}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;--logdir </span><span class="si">{log_dir}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;dv_call_variants.py &quot;</span>
-        <span class="s2">&quot;--cores {snakemake.threads} &quot;</span>
-        <span class="s2">&quot;--outfile {tmp_dir}/{basename}.tmp &quot;</span>
-        <span class="s2">&quot;--sample {basename} &quot;</span>
-        <span class="s2">&quot;--examples {tmp_dir} &quot;</span>
-        <span class="s2">&quot;--model {snakemake.params.model} </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;--cores </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;--outfile </span><span class="si">{tmp_dir}</span><span class="s2">/</span><span class="si">{basename}</span><span class="s2">.tmp &quot;</span>
+        <span class="s2">&quot;--sample </span><span class="si">{basename}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;--examples </span><span class="si">{tmp_dir}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;--model </span><span class="si">{snakemake.params.model}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;dv_postprocess_variants.py &quot;</span>
-        <span class="s2">&quot;--ref {snakemake.input.ref} &quot;</span>
-        <span class="s2">&quot;--infile {tmp_dir}/{basename}.tmp &quot;</span>
-        <span class="s2">&quot;--outfile {snakemake.output.vcf} ) {log}&quot;</span>
+        <span class="s2">&quot;--ref </span><span class="si">{snakemake.input.ref}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;--infile </span><span class="si">{tmp_dir}</span><span class="s2">/</span><span class="si">{basename}</span><span class="s2">.tmp &quot;</span>
+        <span class="s2">&quot;--outfile </span><span class="si">{snakemake.output.vcf}</span><span class="s2"> ) </span><span class="si">{log}</span><span class="s2">&quot;</span>
     <span class="p">)</span>
 </pre></div>
 </div>
@@ -356,7 +356,7 @@ When running with</p>
         <a href="delly.html" class="btn btn-neutral float-right" title="DELLY" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="cutadapt/se.html" class="btn btn-neutral float-left" title="CUTADAPT-SE" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="deeptools/plotHeatmap.html" class="btn btn-neutral float-left" title="PLOTHEATMAP" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

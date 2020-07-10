@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -179,7 +180,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -268,9 +268,9 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">prosolo_fdr_control</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-         <span class="s2">&quot;variant_calling/{sc}.{bulk}.prosolo.bcf&quot;</span>
+         <span class="s2">&quot;variant_calling/</span><span class="si">{sc}</span><span class="s2">.</span><span class="si">{bulk}</span><span class="s2">.prosolo.bcf&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-         <span class="s2">&quot;fdr_control/{sc}.{bulk}.prosolo.fdr.bcf&quot;</span>
+         <span class="s2">&quot;fdr_control/</span><span class="si">{sc}</span><span class="s2">.</span><span class="si">{bulk}</span><span class="s2">.prosolo.fdr.bcf&quot;</span>
     <span class="n">threads</span><span class="p">:</span>
         <span class="mi">1</span>
     <span class="n">params</span><span class="p">:</span>
@@ -280,9 +280,9 @@
         <span class="c1"># false discovery rate to control for</span>
         <span class="n">fdr</span> <span class="o">=</span> <span class="mf">0.05</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/prosolo_{sc}_{bulk}.fdr.log&quot;</span>
+        <span class="s2">&quot;logs/prosolo_</span><span class="si">{sc}</span><span class="s2">_</span><span class="si">{bulk}</span><span class="s2">.fdr.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/prosolo/control-fdr&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/prosolo/control-fdr&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -309,16 +309,16 @@ When running with</p>
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;( prosolo control-fdr&quot;</span>
-    <span class="s2">&quot; {snakemake.input}&quot;</span>
-    <span class="s2">&quot; --events {snakemake.params.events}&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.input}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; --events </span><span class="si">{snakemake.params.events}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; --var SNV&quot;</span>
-    <span class="s2">&quot; --fdr {snakemake.params.fdr}&quot;</span>
-    <span class="s2">&quot; --output {snakemake.output} )&quot;</span>
-    <span class="s2">&quot;{log} &quot;</span>
+    <span class="s2">&quot; --fdr </span><span class="si">{snakemake.params.fdr}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; --output </span><span class="si">{snakemake.output}</span><span class="s2"> )&quot;</span>
+    <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2"> &quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

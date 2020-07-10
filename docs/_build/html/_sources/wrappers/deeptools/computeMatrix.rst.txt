@@ -1,0 +1,127 @@
+.. _`computeMatrix`:
+
+COMPUTEMATRIX
+=============
+
+Calculate scores per genome regions and prepare intermediate
+files for DeepTools
+
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconda:deeptools=3.4.3
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_deeptools_computeMatrix:
+        input:
+            scores = "a.bw",
+            regions = "genome.bed"
+        output:
+            gzip = "archive.gz",
+            matrix = "matrix.tsv",
+            regions = "regions.bed"
+        message:
+            "Testing deeptools bamcoverage"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 10240)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 20, 200)
+            )
+        log:
+            "logs/test_deeptools_bamcoverage.log"
+        wrapper:
+            "0.60.1-133-gf773a3b9/bio/deeptools/computeMatrix"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Output files are optional, use gzip, matrix, and/or regions keywords in
+output section to (dis)enable each of them.
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3
+    # -*- coding: utf-8 -*-
+
+    """This is the Snakemake Wrapper for deeptools computeMatrix"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    subcommand = snakemake.params.get("subcommand", "scale-regions")
+
+    extra = snakemake.params.get("extra", "")
+    if "blacklist" in snakemake.input.keys():
+        extra += "--blackListFileName {snakemake.input.blacklist}"
+
+    output = ""
+    if "gzip" in snakemake.output.keys():
+        output += " --outFileName {} ".format(snakemake.output.gzip)
+    if "matrix" in snakemake.output.keys():
+        output += " --outFileNameMatrix {} ".format(snakemake.output.matrix)
+    if "regions" in snakemake.output.keys():
+        output += " --outFileSortedRegions {} ".format(snakemake.output.regions)
+    if len(output) == 0:
+        raise KeyError(
+            "Output section should include: gzip, matrix, and/or regions"
+        )
+
+    shell(
+        "computeMatrix "
+        " {subcommand} "
+        " --regionsFileName {snakemake.input.regions} "
+        " --scoreFileName {snakemake.input.scores} "
+        " --numberOfProcessors {snakemake.threads} "
+        " {output} "
+        " {extra} "
+        " {log} "
+    )

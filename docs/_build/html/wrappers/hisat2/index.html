@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -179,7 +180,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -269,16 +269,16 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">hisat2_index</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">fasta</span> <span class="o">=</span> <span class="s2">&quot;{genome}.fasta&quot;</span>
+        <span class="n">fasta</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fasta&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;index_{genome}&quot;</span><span class="p">)</span>
+        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;index_</span><span class="si">{genome}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;index_{genome}/&quot;</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;index_</span><span class="si">{genome}</span><span class="s2">/&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/hisat2_index_{genome}.log&quot;</span>
+        <span class="s2">&quot;logs/hisat2_index_</span><span class="si">{genome}</span><span class="s2">.log&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/hisat2/index&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/hisat2/index&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -307,14 +307,14 @@ When running with</p>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
 <span class="c1"># Creating log</span>
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Placeholder for optional parameters</span>
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
 <span class="c1"># Allowing for multiple FASTA files</span>
 <span class="n">fasta</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fasta&quot;</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">fasta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="s2">&quot;input-&gt; a FASTA-file or a sequence is required&quot;</span>
+<span class="k">assert</span> <span class="n">fasta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;input-&gt; a FASTA-file or a sequence is required&quot;</span>
 <span class="n">input_seq</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">fasta</span><span class="p">:</span>
     <span class="n">input_seq</span> <span class="o">+=</span> <span class="s2">&quot;-c &quot;</span>
@@ -325,11 +325,11 @@ When running with</p>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">hisat_dir</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
-    <span class="s2">&quot;hisat2-build {extra} &quot;</span>
-    <span class="s2">&quot;-p {snakemake.threads} &quot;</span>
-    <span class="s2">&quot;{input_seq} &quot;</span>
-    <span class="s2">&quot;{snakemake.params.prefix} &quot;</span>
-    <span class="s2">&quot;{log}&quot;</span>
+    <span class="s2">&quot;hisat2-build </span><span class="si">{extra}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;-p </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{input_seq}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{snakemake.params.prefix}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

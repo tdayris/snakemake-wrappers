@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="ESTIMATE DISPERSIONS" href="estimateDispersions.html" />
-    <link rel="prev" title="DESEQ2" href="../deseq2.html" /> 
+    <link rel="prev" title="DESEQ" href="DESeq.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -103,9 +103,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../deseq2.html">DESEQ2</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="DESeq.html">DESEQ</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">DESEQ DATASET FROM TXIMPORT</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
@@ -185,7 +187,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -337,13 +338,13 @@ optional columns</p>
 <span class="n">base</span><span class="o">::</span><span class="nf">write</span><span class="p">(</span><span class="s">&quot;Libraries loaded.&quot;</span><span class="p">,</span> <span class="nf">stderr</span><span class="p">());</span>
 
 <span class="c1"># Load txi object</span>
-<span class="n">txi_rds_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input[[</span><span class="s">&quot;tximport&quot;</span><span class="n">]]</span><span class="p">);</span>
+<span class="n">txi_rds_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;tximport&quot;</span><span class="p">]]);</span>
 <span class="n">txi</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">readRDS</span><span class="p">(</span>
   <span class="n">file</span> <span class="o">=</span> <span class="n">txi_rds_path</span>
 <span class="p">);</span>
 
 <span class="c1"># Load experimental design</span>
-<span class="n">coldata_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input[[</span><span class="s">&quot;coldata&quot;</span><span class="n">]]</span><span class="p">);</span>
+<span class="n">coldata_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;coldata&quot;</span><span class="p">]]);</span>
 <span class="n">coldata</span> <span class="o">&lt;-</span> <span class="n">utils</span><span class="o">::</span><span class="nf">read.table</span><span class="p">(</span>
   <span class="n">file</span> <span class="o">=</span> <span class="n">coldata_path</span><span class="p">,</span>
   <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;\t&quot;</span><span class="p">,</span>
@@ -354,13 +355,13 @@ optional columns</p>
 <span class="n">count_filter</span> <span class="o">&lt;-</span> <span class="m">0</span><span class="p">;</span>
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;count_filter&quot;</span> <span class="o">%in%</span> <span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
   <span class="n">count_filter</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.numeric</span><span class="p">(</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params[[</span><span class="s">&quot;count_filter&quot;</span><span class="n">]]</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;count_filter&quot;</span><span class="p">]]</span>
   <span class="p">);</span>
 <span class="p">}</span>
 
 <span class="c1"># Cast formula as formula instead of string</span>
 <span class="n">formula</span> <span class="o">&lt;-</span> <span class="n">stats</span><span class="o">::</span><span class="nf">as.formula</span><span class="p">(</span>
-  <span class="n">object</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params[[</span><span class="s">&quot;design&quot;</span><span class="n">]]</span>
+  <span class="n">object</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;design&quot;</span><span class="p">]]</span>
 <span class="p">);</span>
 
 <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Input dataset and options recovered.&quot;</span><span class="p">);</span>
@@ -375,11 +376,11 @@ optional columns</p>
 
 
 <span class="n">keep</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="nf">counts</span><span class="p">(</span><span class="n">dds</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">count_filter</span><span class="p">;</span>
-<span class="n">dds</span> <span class="o">&lt;-</span> <span class="n">dds[keep</span><span class="p">,</span> <span class="n">]</span><span class="p">;</span>
+<span class="n">dds</span> <span class="o">&lt;-</span> <span class="n">dds</span><span class="p">[</span><span class="n">keep</span><span class="p">,</span> <span class="p">];</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">write</span><span class="p">(</span><span class="s">&quot;Low counts in DESeqDataSet were filtered.&quot;</span><span class="p">,</span> <span class="nf">stderr</span><span class="p">());</span>
 
 <span class="c1"># Save as RDS</span>
-<span class="n">output_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output[[</span><span class="s">&quot;dds&quot;</span><span class="n">]]</span><span class="p">);</span>
+<span class="n">output_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;dds&quot;</span><span class="p">]]);</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">saveRDS</span><span class="p">(</span>
   <span class="n">obj</span> <span class="o">=</span> <span class="n">dds</span><span class="p">,</span>
   <span class="n">file</span> <span class="o">=</span> <span class="n">output_path</span>
@@ -402,7 +403,7 @@ optional columns</p>
         <a href="estimateDispersions.html" class="btn btn-neutral float-right" title="ESTIMATE DISPERSIONS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../deseq2.html" class="btn btn-neutral float-left" title="DESEQ2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="DESeq.html" class="btn btn-neutral float-left" title="DESEQ" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

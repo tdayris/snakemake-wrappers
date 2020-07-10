@@ -26,17 +26,17 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="DEEPVARIANT" href="../deepvariant.html" />
+    <link rel="next" title="DEEPTOOLS" href="../deeptools.html" />
     <link rel="prev" title="CUTADAPT-PE" href="pe.html" /> 
 </head>
 
@@ -113,6 +113,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -179,7 +180,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -269,17 +269,17 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">cutadapt</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;reads/{sample}.fastq&quot;</span>
+        <span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.fastq&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">fastq</span><span class="o">=</span><span class="s2">&quot;trimmed/{sample}.fastq&quot;</span><span class="p">,</span>
-        <span class="n">qc</span><span class="o">=</span><span class="s2">&quot;trimmed/{sample}.qc.txt&quot;</span>
+        <span class="n">fastq</span><span class="o">=</span><span class="s2">&quot;trimmed/</span><span class="si">{sample}</span><span class="s2">.fastq&quot;</span><span class="p">,</span>
+        <span class="n">qc</span><span class="o">=</span><span class="s2">&quot;trimmed/</span><span class="si">{sample}</span><span class="s2">.qc.txt&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="s2">&quot;-a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -q 20&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/cutadapt/{sample}.log&quot;</span>
+        <span class="s2">&quot;logs/cutadapt/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span> <span class="c1"># set desired number of threads here</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/cutadapt/se&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/cutadapt/se&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -308,15 +308,15 @@ When running with</p>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
 
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;cutadapt&quot;</span>
-    <span class="s2">&quot; {snakemake.params}&quot;</span>
-    <span class="s2">&quot; -j {snakemake.threads}&quot;</span>
-    <span class="s2">&quot; -o {snakemake.output.fastq}&quot;</span>
-    <span class="s2">&quot; {snakemake.input[0]}&quot;</span>
-    <span class="s2">&quot; &gt; {snakemake.output.qc} {log}&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.params}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; -j </span><span class="si">{snakemake.threads}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; -o </span><span class="si">{snakemake.output.fastq}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.input[0]}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; &gt; </span><span class="si">{snakemake.output.qc}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -331,7 +331,7 @@ When running with</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../deepvariant.html" class="btn btn-neutral float-right" title="DEEPVARIANT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../deeptools.html" class="btn btn-neutral float-right" title="DEEPTOOLS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="pe.html" class="btn btn-neutral float-left" title="CUTADAPT-PE" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

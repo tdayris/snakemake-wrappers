@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -113,6 +113,7 @@
 <li class="toctree-l2"><a class="reference internal" href="se.html">CUTADAPT-SE</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -179,7 +180,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -269,21 +269,21 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">cutadapt</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="p">[</span><span class="s2">&quot;reads/{sample}.1.fastq&quot;</span><span class="p">,</span> <span class="s2">&quot;reads/{sample}.2.fastq&quot;</span><span class="p">]</span>
+        <span class="p">[</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.1.fastq&quot;</span><span class="p">,</span> <span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.2.fastq&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">fastq1</span><span class="o">=</span><span class="s2">&quot;trimmed/{sample}.1.fastq&quot;</span><span class="p">,</span>
-        <span class="n">fastq2</span><span class="o">=</span><span class="s2">&quot;trimmed/{sample}.2.fastq&quot;</span><span class="p">,</span>
-        <span class="n">qc</span><span class="o">=</span><span class="s2">&quot;trimmed/{sample}.qc.txt&quot;</span>
+        <span class="n">fastq1</span><span class="o">=</span><span class="s2">&quot;trimmed/</span><span class="si">{sample}</span><span class="s2">.1.fastq&quot;</span><span class="p">,</span>
+        <span class="n">fastq2</span><span class="o">=</span><span class="s2">&quot;trimmed/</span><span class="si">{sample}</span><span class="s2">.2.fastq&quot;</span><span class="p">,</span>
+        <span class="n">qc</span><span class="o">=</span><span class="s2">&quot;trimmed/</span><span class="si">{sample}</span><span class="s2">.qc.txt&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="c1"># https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types</span>
         <span class="n">adapters</span> <span class="o">=</span> <span class="s2">&quot;-a AGAGCACACGTCTGAACTCCAGTCAC -g AGATCGGAAGAGCACACGT -A AGAGCACACGTCTGAACTCCAGTCAC -G AGATCGGAAGAGCACACGT&quot;</span><span class="p">,</span>
         <span class="c1"># https://cutadapt.readthedocs.io/en/stable/guide.html#</span>
         <span class="n">others</span> <span class="o">=</span> <span class="s2">&quot;--minimum-length 1 -q 20&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/cutadapt/{sample}.log&quot;</span>
+        <span class="s2">&quot;logs/cutadapt/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span> <span class="c1"># set desired number of threads here</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/cutadapt/pe&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/cutadapt/pe&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -316,17 +316,17 @@ When running with</p>
 <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">)</span>
 <span class="k">assert</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Input must contain 2 (paired-end) elements.&quot;</span>
 
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;cutadapt&quot;</span>
-    <span class="s2">&quot; {snakemake.params.adapters}&quot;</span>
-    <span class="s2">&quot; {snakemake.params.others}&quot;</span>
-    <span class="s2">&quot; -o {snakemake.output.fastq1}&quot;</span>
-    <span class="s2">&quot; -p {snakemake.output.fastq2}&quot;</span>
-    <span class="s2">&quot; -j {snakemake.threads}&quot;</span>
-    <span class="s2">&quot; {snakemake.input}&quot;</span>
-    <span class="s2">&quot; &gt; {snakemake.output.qc} {log}&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.params.adapters}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.params.others}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; -o </span><span class="si">{snakemake.output.fastq1}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; -p </span><span class="si">{snakemake.output.fastq2}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; -j </span><span class="si">{snakemake.threads}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.input}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; &gt; </span><span class="si">{snakemake.output.qc}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -179,7 +180,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -277,7 +277,7 @@
         <span class="c1"># bam configuration file, see http://gmt.genome.wustl.edu/packages/pindel/quick-start.html</span>
         <span class="n">config</span><span class="o">=</span><span class="s2">&quot;pindel_config.txt&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;pindel/all_{type}&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">pindel_types</span><span class="p">)</span>
+        <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;pindel/all_</span><span class="si">{type}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">pindel_types</span><span class="p">)</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="c1"># prefix must be consistent with output files</span>
         <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;pindel/all&quot;</span><span class="p">,</span>
@@ -286,7 +286,7 @@
         <span class="s2">&quot;logs/pindel.log&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/pindel/call&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/pindel/call&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -313,11 +313,11 @@ When running with</p>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
-    <span class="s2">&quot;pindel -T {snakemake.threads} {snakemake.params.extra} -i {snakemake.input.config} &quot;</span>
-    <span class="s2">&quot;-f {snakemake.input.ref} -o {snakemake.params.prefix} {log}&quot;</span>
+    <span class="s2">&quot;pindel -T </span><span class="si">{snakemake.threads}</span><span class="s2"> </span><span class="si">{snakemake.params.extra}</span><span class="s2"> -i </span><span class="si">{snakemake.input.config}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;-f </span><span class="si">{snakemake.input.ref}</span><span class="s2"> -o </span><span class="si">{snakemake.params.prefix}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

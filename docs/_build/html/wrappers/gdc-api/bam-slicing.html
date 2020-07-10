@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -179,7 +180,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -268,9 +268,9 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">gdc_api_bam_slice_download</span><span class="p">:</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;raw/{sample}.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;raw/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/gdc-api/bam-slicing/{sample}.log&quot;</span>
+        <span class="s2">&quot;logs/gdc-api/bam-slicing/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="c1"># to use this rule flexibly, make uuid a function that maps your</span>
         <span class="c1"># sample names of choice to the UUIDs they correspond to (they are</span>
@@ -285,7 +285,7 @@
         <span class="c1"># extra command line arguments passed to curl</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/gdc-api/bam-slicing&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/gdc-api/bam-slicing&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -319,7 +319,7 @@ When running with</p>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">uuid</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">uuid</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
@@ -333,7 +333,7 @@ When running with</p>
 <span class="n">token</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">token_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">tf</span><span class="p">:</span>
     <span class="n">token</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CURL_HEADER_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&#39;X-Auth-Token: {}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CURL_HEADER_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&#39;X-Auth-Token: </span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 
 <span class="n">slices</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;slices&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">slices</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
@@ -346,15 +346,15 @@ When running with</p>
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;curl --silent&quot;</span>
     <span class="s2">&quot; --header $CURL_HEADER_TOKEN&quot;</span>
-    <span class="s2">&quot; &#39;https://api.gdc.cancer.gov/slicing/view/{uuid}?{slices}&#39;&quot;</span>
-    <span class="s2">&quot; {extra}&quot;</span>
-    <span class="s2">&quot; --output {snakemake.output.bam} {log}&quot;</span>
+    <span class="s2">&quot; &#39;https://api.gdc.cancer.gov/slicing/view/</span><span class="si">{uuid}</span><span class="s2">?</span><span class="si">{slices}</span><span class="s2">&#39;&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; --output </span><span class="si">{snakemake.output.bam}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 
 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">bam</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">100000</span><span class="p">:</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">bam</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">if</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">():</span>
-            <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;cat {snakemake.output.bam} {log}&quot;</span><span class="p">)</span>
+            <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;cat </span><span class="si">{snakemake.output.bam}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Your GDC API request returned an error, check your log file for the error message.&quot;</span>
             <span class="p">)</span>

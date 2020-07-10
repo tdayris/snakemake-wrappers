@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -184,7 +185,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -300,7 +300,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_seaborn_pca.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/seaborn/pca&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/seaborn/pca&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -379,7 +379,7 @@ When running with</p>
 <span class="n">skvar</span> <span class="o">=</span> <span class="n">skpca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="n">sktransform</span><span class="p">,</span>
-    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">f</span><span class="s2">&quot;PC{i}&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nbc</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nbc</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span>
     <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 <span class="p">)</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
@@ -399,11 +399,11 @@ When running with</p>
         <span class="n">height</span><span class="o">=</span><span class="mi">13</span>
     <span class="p">)</span>
 
-    <span class="n">name_ax1</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;PC{ax1}&quot;</span>
+    <span class="n">name_ax1</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{</span><span class="n">ax1</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">skvar_ax1</span> <span class="o">=</span> <span class="n">skvar</span><span class="p">[</span><span class="n">ax1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
-    <span class="n">name_ax2</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;PC{ax2}&quot;</span>
+    <span class="n">name_ax2</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{</span><span class="n">ax2</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">skvar_ax2</span> <span class="o">=</span> <span class="n">skvar</span><span class="p">[</span><span class="n">ax2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Building plot: {output_prefix}_{name_ax1}_{name_ax2}.png&quot;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Building plot: </span><span class="si">{</span><span class="n">output_prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name_ax1</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name_ax2</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
 
     <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
         <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">,</span>
@@ -413,10 +413,10 @@ When running with</p>
     <span class="p">)</span>
 
     <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
-        <span class="n">f</span><span class="s2">&quot;{name_ax1} ({skvar_ax1:.2f}) and {name_ax2} (skvar_ax2:.2f)&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name_ax1</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">skvar_ax1</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">) and </span><span class="si">{</span><span class="n">name_ax2</span><span class="si">}</span><span class="s2"> (skvar_ax2:.2f)&quot;</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;samples_names&quot;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;samples_names&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">points_coordinates</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
             <span class="n">results</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
             <span class="n">results</span><span class="p">[</span><span class="n">name_ax1</span><span class="p">],</span>
@@ -434,12 +434,12 @@ When running with</p>
             <span class="p">)</span>
 
     <span class="n">frame</span> <span class="o">=</span> <span class="p">(</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span>
-                       <span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">legend_position</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                       <span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">legend_position</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                        <span class="o">.</span><span class="n">get_frame</span><span class="p">())</span>
     <span class="n">frame</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
 
     <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
-        <span class="n">f</span><span class="s2">&quot;{output_prefix}_{name_ax1}_{name_ax2}.png&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name_ax1</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name_ax2</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
         <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
     <span class="p">)</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Process over&quot;</span><span class="p">)</span>

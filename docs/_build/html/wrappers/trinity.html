@@ -26,17 +26,17 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="TX_TO_GENE" href="tx_to_gene.html" />
+    <link rel="next" title="TXIMPORT" href="tximport.html" />
     <link rel="prev" title="TRIMMOMATIC SE" href="trimmomatic/se.html" /> 
 </head>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deseq2.html">DESEQ2</a></li>
@@ -175,7 +176,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#code">Code</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="umis.html">UMIS</a></li>
@@ -272,7 +272,7 @@
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/trinity&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/trinity&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -305,7 +305,7 @@ When running with</p>
 
 <span class="c1"># allow multiple input files for single assembly</span>
 <span class="n">left</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">left</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="s2">&quot;input-&gt; left is a required input parameter&quot;</span>
+<span class="k">assert</span> <span class="n">left</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;input-&gt; left is a required input parameter&quot;</span>
 <span class="n">left</span> <span class="o">=</span> <span class="p">(</span>
     <span class="p">[</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">left</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -338,19 +338,19 @@ When running with</p>
         <span class="n">seqtype</span> <span class="o">=</span> <span class="s2">&quot;fa&quot;</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># assertion is redundant - warning or error instead?</span>
         <span class="k">assert</span> <span class="p">(</span>
-            <span class="n">seqtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+            <span class="n">seqtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="p">),</span> <span class="s2">&quot;cannot infer &#39;fq&#39; or &#39;fa&#39; seqtype from input files. Please specify &#39;fq&#39; or &#39;fa&#39; in &#39;seqtype&#39; parameter&quot;</span>
 
 <span class="n">outdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="k">assert</span> <span class="s2">&quot;trinity&quot;</span> <span class="ow">in</span> <span class="n">outdir</span><span class="p">,</span> <span class="s2">&quot;output directory name must contain &#39;trinity&#39;&quot;</span>
 
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
-    <span class="s2">&quot;Trinity {input_cmd} --CPU {snakemake.threads} &quot;</span>
-    <span class="s2">&quot; --max_memory {max_memory} --seqType {seqtype} &quot;</span>
-    <span class="s2">&quot; --output {outdir} {snakemake.params.extra} &quot;</span>
-    <span class="s2">&quot; {log}&quot;</span>
+    <span class="s2">&quot;Trinity </span><span class="si">{input_cmd}</span><span class="s2"> --CPU </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; --max_memory </span><span class="si">{max_memory}</span><span class="s2"> --seqType </span><span class="si">{seqtype}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; --output </span><span class="si">{outdir}</span><span class="s2"> </span><span class="si">{snakemake.params.extra}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -365,7 +365,7 @@ When running with</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tx_to_gene.html" class="btn btn-neutral float-right" title="TX_TO_GENE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tximport.html" class="btn btn-neutral float-right" title="TXIMPORT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="trimmomatic/se.html" class="btn btn-neutral float-left" title="TRIMMOMATIC SE" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

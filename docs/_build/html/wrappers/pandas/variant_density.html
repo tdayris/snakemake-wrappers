@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -140,6 +141,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../pandas.html">PANDAS</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="add_genes.html">ADD GENES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="add_transcripts.html">ADD_TRANSCRIPTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deseq2_to_gseaapp.html">DESEQ2 TO GSEAAPP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="filter_design.html">FILTER DESIGN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="salmon.html">PANDAS MERGE</a></li>
@@ -183,7 +185,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -287,11 +288,11 @@
             <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">filter_vcf</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">filter_vcf</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_variant_density.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/pandas/variant_density&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/pandas/variant_density&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -332,16 +333,16 @@ When running with</p>
 
 <span class="k">def</span> <span class="nf">save_lines</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
                <span class="n">density</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-               <span class="n">out_buffer</span><span class="p">:</span> <span class="n">TextIO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">]:</span>
+               <span class="n">out_buffer</span><span class="p">:</span> <span class="n">TextIO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function edits VCF lines</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
         <span class="n">chomp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">chomp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>
-            <span class="n">chomp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;;VD={density}&quot;</span>
+            <span class="n">chomp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;;VD=</span><span class="si">{</span><span class="n">density</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">chomp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;VD={density}&quot;</span>
+            <span class="n">chomp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;VD=</span><span class="si">{</span><span class="n">density</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">out_buffer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chomp</span><span class="p">))</span>
 
 
@@ -351,20 +352,20 @@ When running with</p>
 
 <span class="c1"># The window size</span>
 <span class="n">ws</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;window_size&quot;</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
-<span class="n">filter_out</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filter_vcf&quot;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+<span class="n">filter_out</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filter_vcf&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># VCF modifications</span>
-<span class="n">update_header</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;update_header&quot;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
-<span class="n">update_info</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;update_info&quot;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
-<span class="n">header</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;&quot;&quot;##Filtered by VariantDensity.py: ws={ws}</span>
-<span class="s2">##INFO=&lt;ID=VD,Number=1,Type=Float,Description=&quot;Variant density in {ws}bp&quot;&gt;</span><span class="se">\n</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="n">update_header</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;update_header&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">update_info</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;update_info&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">header</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;##Filtered by VariantDensity.py: ws=</span><span class="si">{</span><span class="n">ws</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">##INFO=&lt;ID=VD,Number=1,Type=Float,Description=&quot;Variant density in </span><span class="si">{</span><span class="n">ws</span><span class="si">}</span><span class="s2">bp&quot;&gt;</span><span class="se">\n</span><span class="s2">&quot;&quot;&quot;</span>
 
 
 <span class="c1"># Main process</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">vcf_in_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">vcfin</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">vcf_out_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">vcfout</span><span class="p">:</span>
 
     <span class="c1"># Initialize shared variables</span>
-    <span class="n">last_chr</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c1"># The chromosome that is currently being parsed</span>
+    <span class="n">last_chr</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># The chromosome that is currently being parsed</span>
     <span class="n">window_init</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># The begining of the scanned window</span>
     <span class="n">density</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># The number of variant within the scanned window</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
@@ -372,7 +373,7 @@ When running with</p>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">vcfin</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
             <span class="c1"># Then we are reading a header and we shall print it</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;##&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">update_header</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;##&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">update_header</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="c1"># Then it is the last line of the header</span>
                 <span class="n">vcfout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
             <span class="n">vcfout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>

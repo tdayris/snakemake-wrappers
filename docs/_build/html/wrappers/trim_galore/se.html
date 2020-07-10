@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -180,7 +181,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -269,16 +269,16 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">trim_galore_se</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;reads/{sample}.fastq.gz&quot;</span>
+        <span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.fastq.gz&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;trimmed/{sample}_trimmed.fq.gz&quot;</span><span class="p">,</span>
-         <span class="s2">&quot;trimmed/{sample}.fastq.gz_trimming_report.txt&quot;</span>
+        <span class="s2">&quot;trimmed/</span><span class="si">{sample}</span><span class="s2">_trimmed.fq.gz&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;trimmed/</span><span class="si">{sample}</span><span class="s2">.fastq.gz_trimming_report.txt&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--illumina -q 20&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/trim_galore/{sample}.log&quot;</span>
+        <span class="s2">&quot;logs/trim_galore/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/trim_galore/se&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/trim_galore/se&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -342,10 +342,10 @@ of the <cite>–fastqc</cite> option.</p></li>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;(trim_galore&quot;</span>
-    <span class="s2">&quot; {snakemake.params.extra}&quot;</span>
-    <span class="s2">&quot; -o {out_dir}&quot;</span>
-    <span class="s2">&quot; {snakemake.input})&quot;</span>
-    <span class="s2">&quot; {log}&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.params.extra}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; -o </span><span class="si">{out_dir}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.input}</span><span class="s2">)&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

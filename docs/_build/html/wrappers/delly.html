@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">DELLY</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
@@ -175,7 +176,6 @@
 <li class="toctree-l1"><a class="reference internal" href="trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="umis.html">UMIS</a></li>
@@ -274,7 +274,7 @@
         <span class="s2">&quot;logs/delly.log&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>  <span class="c1"># It is best to use as many threads as samples</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/delly&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/delly&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -302,16 +302,16 @@ When running with</p>
 
 
 <span class="n">exclude</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;-x {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">exlude</span><span class="p">)</span> <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;exlude&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="s2">&quot;-x </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">exlude</span><span class="p">)</span> <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;exlude&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
 <span class="p">)</span>
 
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
-    <span class="s2">&quot;OMP_NUM_THREADS={snakemake.threads} delly call {extra} &quot;</span>
-    <span class="s2">&quot;{exclude} -g {snakemake.input.ref} &quot;</span>
-    <span class="s2">&quot;-o {snakemake.output[0]} {snakemake.input.samples} {log}&quot;</span>
+    <span class="s2">&quot;OMP_NUM_THREADS=</span><span class="si">{snakemake.threads}</span><span class="s2"> delly call </span><span class="si">{extra}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{exclude}</span><span class="s2"> -g </span><span class="si">{snakemake.input.ref}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;-o </span><span class="si">{snakemake.output[0]}</span><span class="s2"> </span><span class="si">{snakemake.input.samples}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

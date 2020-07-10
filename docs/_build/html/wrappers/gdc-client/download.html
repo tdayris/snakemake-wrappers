@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -178,7 +179,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -269,9 +269,9 @@
     <span class="n">output</span><span class="p">:</span>
         <span class="c1"># the file extension (up to two components, here .maf.gz), has</span>
         <span class="c1"># to uniquely map to one of the files downloaded for that UUID</span>
-        <span class="s2">&quot;raw/{sample}.maf.gz&quot;</span>
+        <span class="s2">&quot;raw/</span><span class="si">{sample}</span><span class="s2">.maf.gz&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/gdc-client/download/{sample}.log&quot;</span>
+        <span class="s2">&quot;logs/gdc-client/download/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="c1"># to use this rule flexibly, make uuid a function that maps your</span>
         <span class="c1"># sample names of choice to the UUIDs they correspond to (they are</span>
@@ -286,19 +286,19 @@
         <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/gdc-client/download&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/gdc-client/download&quot;</span>
 
 <span class="n">rule</span> <span class="n">gdc_download_bam</span><span class="p">:</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="c1"># specify all the downloaded files you want to keep, as all other</span>
         <span class="c1"># downloaded files will be removed automatically e.g. for</span>
         <span class="c1"># BAM data this could be</span>
-        <span class="s2">&quot;raw/{sample}.bam&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;raw/{sample}.bam.bai&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;raw/{sample}.annotations.txt&quot;</span><span class="p">,</span>
-        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;raw/{sample}/logs&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;raw/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;raw/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;raw/</span><span class="si">{sample}</span><span class="s2">.annotations.txt&quot;</span><span class="p">,</span>
+        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;raw/</span><span class="si">{sample}</span><span class="s2">/logs&quot;</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/gdc-client/download/{sample}.log&quot;</span>
+        <span class="s2">&quot;logs/gdc-client/download/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="c1"># to use this rule flexibly, make uuid a function that maps your</span>
         <span class="c1"># sample names of choice to the UUIDs they correspond to (they are</span>
@@ -313,7 +313,7 @@
         <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/gdc-client/download&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/gdc-client/download&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -337,7 +337,7 @@ When running with</p>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
-<span class="kn">import</span> <span class="nn">os.path</span> <span class="kn">as</span> <span class="nn">path</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">path</span>
 <span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 
@@ -348,17 +348,17 @@ When running with</p>
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">token</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gdc_token&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">token</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-    <span class="n">token</span> <span class="o">=</span> <span class="s2">&quot;--token-file {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="s2">&quot;--token-file </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 
 <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tempdir</span><span class="p">:</span>
     <span class="n">shell</span><span class="p">(</span>
         <span class="s2">&quot;gdc-client download&quot;</span>
-        <span class="s2">&quot; {token}&quot;</span>
-        <span class="s2">&quot; {extra}&quot;</span>
-        <span class="s2">&quot; -n {snakemake.threads} &quot;</span>
-        <span class="s2">&quot; --log-file {snakemake.log} &quot;</span>
-        <span class="s2">&quot; --dir {tempdir}&quot;</span>
-        <span class="s2">&quot; {uuid}&quot;</span>
+        <span class="s2">&quot; </span><span class="si">{token}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; -n </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot; --log-file </span><span class="si">{snakemake.log}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot; --dir </span><span class="si">{tempdir}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; </span><span class="si">{uuid}</span><span class="s2">&quot;</span>
     <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">out_path</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">:</span>
@@ -371,21 +371,21 @@ When running with</p>
                 <span class="n">paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempdir</span><span class="p">,</span> <span class="n">uuid</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span> <span class="o">+</span> <span class="n">ext2</span> <span class="o">+</span> <span class="n">ext1</span><span class="p">))</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;{} file extension {} does not match any downloaded file.</span><span class="se">\n</span><span class="s2">&quot;</span>
-                    <span class="s2">&quot;Are you sure that UUID {} provides a file of such format?</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> file extension </span><span class="si">{}</span><span class="s2"> does not match any downloaded file.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;Are you sure that UUID </span><span class="si">{}</span><span class="s2"> provides a file of such format?</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                         <span class="n">out_path</span><span class="p">,</span> <span class="n">ext1</span><span class="p">,</span> <span class="n">uuid</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Found more than one downloaded file with extension &#39;{}&#39;:</span><span class="se">\n</span><span class="s2">&quot;</span>
-                    <span class="s2">&quot;{}</span><span class="se">\n</span><span class="s2">&quot;</span>
-                    <span class="s2">&quot;Cannot match requested output file {} unambiguously.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">&quot;Found more than one downloaded file with extension &#39;</span><span class="si">{}</span><span class="s2">&#39;:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;Cannot match requested output file </span><span class="si">{}</span><span class="s2"> unambiguously.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                         <span class="n">ext2</span> <span class="o">+</span> <span class="n">ext1</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">out_path</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
             <span class="n">tmp_path</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv {tmp_path} {out_path}&quot;</span><span class="p">)</span>
+        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv </span><span class="si">{tmp_path}</span><span class="s2"> </span><span class="si">{out_path}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deseq2.html">DESEQ2</a></li>
@@ -175,7 +176,6 @@
 <li class="toctree-l1"><a class="reference internal" href="trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="umis.html">UMIS</a></li>
@@ -262,16 +262,16 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">fastqc</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;reads/{sample}.fastq&quot;</span>
+        <span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.fastq&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">html</span><span class="o">=</span><span class="s2">&quot;qc/fastqc/{sample}.html&quot;</span><span class="p">,</span>
-        <span class="nb">zip</span><span class="o">=</span><span class="s2">&quot;qc/fastqc/{sample}_fastqc.zip&quot;</span> <span class="c1"># the suffix _fastqc.zip is necessary for multiqc to find the file. If not using multiqc, you are free to choose an arbitrary filename</span>
+        <span class="n">html</span><span class="o">=</span><span class="s2">&quot;qc/fastqc/</span><span class="si">{sample}</span><span class="s2">.html&quot;</span><span class="p">,</span>
+        <span class="nb">zip</span><span class="o">=</span><span class="s2">&quot;qc/fastqc/</span><span class="si">{sample}</span><span class="s2">_fastqc.zip&quot;</span> <span class="c1"># the suffix _fastqc.zip is necessary for multiqc to find the file. If not using multiqc, you are free to choose an arbitrary filename</span>
     <span class="n">params</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/fastqc/{sample}.log&quot;</span>
+        <span class="s2">&quot;logs/fastqc/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/fastqc&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/fastqc&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -302,7 +302,7 @@ When running with</p>
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">basename_without_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
@@ -320,9 +320,9 @@ When running with</p>
 <span class="c1"># use the same fastqc dir, we create a temp dir.</span>
 <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tempdir</span><span class="p">:</span>
     <span class="n">shell</span><span class="p">(</span>
-        <span class="s2">&quot;fastqc {snakemake.params} --quiet -t {snakemake.threads} &quot;</span>
-        <span class="s2">&quot;--outdir {tempdir} {snakemake.input[0]}&quot;</span>
-        <span class="s2">&quot; {log}&quot;</span>
+        <span class="s2">&quot;fastqc </span><span class="si">{snakemake.params}</span><span class="s2"> --quiet -t </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;--outdir </span><span class="si">{tempdir}</span><span class="s2"> </span><span class="si">{snakemake.input[0]}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2">&quot;</span>
     <span class="p">)</span>
 
     <span class="c1"># Move outputs into proper position.</span>
@@ -331,10 +331,10 @@ When running with</p>
     <span class="n">zip_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempdir</span><span class="p">,</span> <span class="n">output_base</span> <span class="o">+</span> <span class="s2">&quot;_fastqc.zip&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">html</span> <span class="o">!=</span> <span class="n">html_path</span><span class="p">:</span>
-        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv {html_path} {snakemake.output.html}&quot;</span><span class="p">)</span>
+        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv </span><span class="si">{html_path}</span><span class="s2"> </span><span class="si">{snakemake.output.html}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">zip</span> <span class="o">!=</span> <span class="n">zip_path</span><span class="p">:</span>
-        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv {zip_path} {snakemake.output.zip}&quot;</span><span class="p">)</span>
+        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv </span><span class="si">{zip_path}</span><span class="s2"> </span><span class="si">{snakemake.output.zip}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

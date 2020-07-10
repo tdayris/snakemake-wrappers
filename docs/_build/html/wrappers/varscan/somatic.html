@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -169,7 +170,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -272,18 +272,18 @@
         <span class="c1"># A pair of pileup files can be used *instead* of the mpileup</span>
         <span class="c1"># normal_pileup = &quot;&quot;</span>
         <span class="c1"># tumor_pileup = &quot;&quot;</span>
-        <span class="n">mpileup</span> <span class="o">=</span> <span class="s2">&quot;mpileup/{sample}.mpileup.gz&quot;</span>
+        <span class="n">mpileup</span> <span class="o">=</span> <span class="s2">&quot;mpileup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">snp</span> <span class="o">=</span> <span class="s2">&quot;vcf/{sample}.snp.vcf&quot;</span><span class="p">,</span>
-        <span class="n">indel</span> <span class="o">=</span> <span class="s2">&quot;vcf/{sample}.indel.vcf&quot;</span>
+        <span class="n">snp</span> <span class="o">=</span> <span class="s2">&quot;vcf/</span><span class="si">{sample}</span><span class="s2">.snp.vcf&quot;</span><span class="p">,</span>
+        <span class="n">indel</span> <span class="o">=</span> <span class="s2">&quot;vcf/</span><span class="si">{sample}</span><span class="s2">.indel.vcf&quot;</span>
     <span class="n">message</span><span class="p">:</span>
-        <span class="s2">&quot;Calling somatic variants {wildcards.sample}&quot;</span>
+        <span class="s2">&quot;Calling somatic variants </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
     <span class="n">threads</span><span class="p">:</span>
         <span class="mi">1</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/varscan/somatic&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/varscan/somatic&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -309,13 +309,13 @@ When running with</p>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
 
-<span class="kn">import</span> <span class="nn">os.path</span> <span class="kn">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 <span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">makedirs</span>
 
 <span class="c1"># Defining logging and gathering extra parameters</span>
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
 <span class="c1"># Building output dirs</span>
@@ -336,18 +336,18 @@ When running with</p>
     <span class="n">mpileup</span> <span class="o">=</span> <span class="s2">&quot;--mpileup 1&quot;</span>
 <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="n">pileup</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">for</span> <span class="n">pileup</span> <span class="ow">in</span> <span class="n">pileup_pair</span><span class="p">):</span>
     <span class="c1"># Case there are two separate pileup files</span>
-    <span class="n">in_pileup</span> <span class="o">=</span> <span class="s2">&quot; {snakemake.input.normal_pileup}&quot;</span> <span class="s2">&quot; {snakemakeinput.tumor_pileup} &quot;</span>
+    <span class="n">in_pileup</span> <span class="o">=</span> <span class="s2">&quot; </span><span class="si">{snakemake.input.normal_pileup}</span><span class="s2">&quot;</span> <span class="s2">&quot; </span><span class="si">{snakemakeinput.tumor_pileup}</span><span class="s2"> &quot;</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Could not find either a mpileup, or a pair of pileup files&quot;</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;varscan somatic&quot;</span>  <span class="c1"># Tool and its subcommand</span>
-    <span class="s2">&quot; {in_pileup}&quot;</span>  <span class="c1"># Path to input file(s)</span>
-    <span class="s2">&quot; {prefix}&quot;</span>  <span class="c1"># Path to output</span>
-    <span class="s2">&quot; {extra}&quot;</span>  <span class="c1"># Extra parameters</span>
-    <span class="s2">&quot; {mpileup}&quot;</span>
-    <span class="s2">&quot; --output-snp {snakemake.output.snp}&quot;</span>  <span class="c1"># Path to snp output file</span>
-    <span class="s2">&quot; --output-indel {snakemake.output.indel}&quot;</span>  <span class="c1"># Path to indel output file</span>
+    <span class="s2">&quot; </span><span class="si">{in_pileup}</span><span class="s2">&quot;</span>  <span class="c1"># Path to input file(s)</span>
+    <span class="s2">&quot; </span><span class="si">{prefix}</span><span class="s2">&quot;</span>  <span class="c1"># Path to output</span>
+    <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2">&quot;</span>  <span class="c1"># Extra parameters</span>
+    <span class="s2">&quot; </span><span class="si">{mpileup}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; --output-snp </span><span class="si">{snakemake.output.snp}</span><span class="s2">&quot;</span>  <span class="c1"># Path to snp output file</span>
+    <span class="s2">&quot; --output-indel </span><span class="si">{snakemake.output.indel}</span><span class="s2">&quot;</span>  <span class="c1"># Path to indel output file</span>
 <span class="p">)</span>
 </pre></div>
 </div>

@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="UCSC" href="ucsc.html" />
-    <link rel="prev" title="GTF" href="tx_to_gene/gtf.html" /> 
+    <link rel="prev" title="TRINITY" href="trinity.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deseq2.html">DESEQ2</a></li>
@@ -169,7 +170,6 @@
 <li class="toctree-l1"><a class="reference internal" href="trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">TXIMPORT</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
@@ -274,7 +274,7 @@ and gene-level analysis.</p>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;type=&#39;salmon&#39;, txOut=TRUE&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/tximport&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/tximport&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -306,7 +306,7 @@ R wrapper. Supplementary options will cause unknown parameters error.</p>
 
 <span class="c1"># Cast input paths as character to avoid errors</span>
 <span class="n">samples_paths</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span>               <span class="c1"># Sequentially apply</span>
-  <span class="n">snakemake</span><span class="o">@</span><span class="n">input[[</span><span class="s">&quot;quant&quot;</span><span class="n">]]</span><span class="p">,</span>          <span class="c1"># ... to all quantification paths</span>
+  <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;quant&quot;</span><span class="p">]],</span>          <span class="c1"># ... to all quantification paths</span>
   <span class="nf">function</span><span class="p">(</span><span class="n">quant</span><span class="p">)</span> <span class="nf">as.character</span><span class="p">(</span><span class="n">quant</span><span class="p">)</span>  <span class="c1"># ... a cast as character</span>
 <span class="p">);</span>
 
@@ -318,7 +318,7 @@ R wrapper. Supplementary options will cause unknown parameters error.</p>
 
 <span class="c1"># Check if user provided optional transcript to gene table</span>
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;tx_to_gene&quot;</span> <span class="o">%in%</span> <span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">))</span> <span class="p">{</span>
-  <span class="n">tx2gene</span> <span class="o">&lt;-</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input[[</span><span class="s">&quot;tx_to_gene&quot;</span><span class="n">]]</span><span class="p">);</span>
+  <span class="n">tx2gene</span> <span class="o">&lt;-</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;tx_to_gene&quot;</span><span class="p">]]);</span>
   <span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span>
     <span class="n">extra</span><span class="p">,</span>                 <span class="c1"># Foreward existing arguments</span>
     <span class="s">&quot;, tx2gene = &quot;</span><span class="p">,</span>        <span class="c1"># Argument name</span>
@@ -328,10 +328,10 @@ R wrapper. Supplementary options will cause unknown parameters error.</p>
 
 <span class="c1"># Add user defined arguments</span>
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;extra&quot;</span> <span class="o">%in%</span> <span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
-  <span class="nf">if </span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params[[</span><span class="s">&quot;extra&quot;</span><span class="n">]]</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">if </span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;extra&quot;</span><span class="p">]]</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span>
       <span class="n">extra</span><span class="p">,</span>                       <span class="c1"># Foreward existing parameters</span>
-      <span class="n">snakemake</span><span class="o">@</span><span class="n">params[[</span><span class="s">&quot;extra&quot;</span><span class="n">]]</span><span class="p">,</span> <span class="c1"># Add user parameters</span>
+      <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;extra&quot;</span><span class="p">]],</span> <span class="c1"># Add user parameters</span>
       <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;, &quot;</span>                   <span class="c1"># Field separator</span>
     <span class="p">);</span>
   <span class="p">}</span>
@@ -351,7 +351,7 @@ R wrapper. Supplementary options will cause unknown parameters error.</p>
 <span class="c1"># Save results</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">saveRDS</span><span class="p">(</span>                       <span class="c1"># Save R object</span>
   <span class="n">object</span> <span class="o">=</span> <span class="n">txi</span><span class="p">,</span>                      <span class="c1"># The txi object</span>
-  <span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output[[</span><span class="s">&quot;txi&quot;</span><span class="n">]]</span>   <span class="c1"># Output path is provided by Snakemake</span>
+  <span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;txi&quot;</span><span class="p">]]</span>   <span class="c1"># Output path is provided by Snakemake</span>
 <span class="p">);</span>
 </pre></div>
 </div>
@@ -369,7 +369,7 @@ R wrapper. Supplementary options will cause unknown parameters error.</p>
         <a href="ucsc.html" class="btn btn-neutral float-right" title="UCSC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="tx_to_gene/gtf.html" class="btn btn-neutral float-left" title="GTF" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="trinity.html" class="btn btn-neutral float-left" title="TRINITY" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

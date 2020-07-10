@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -119,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -185,7 +186,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -301,12 +301,12 @@
             <span class="s2">&quot;bams/b_genome.deduplicated_splitting_report.txt&quot;</span>
         <span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">html</span><span class="o">=</span><span class="s2">&quot;qc/{experiment}.bismark2summary.html&quot;</span><span class="p">,</span>
-        <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;qc/{experiment}.bismark2summary.txt&quot;</span>
+        <span class="n">html</span><span class="o">=</span><span class="s2">&quot;qc/</span><span class="si">{experiment}</span><span class="s2">.bismark2summary.html&quot;</span><span class="p">,</span>
+        <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;qc/</span><span class="si">{experiment}</span><span class="s2">.bismark2summary.txt&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/qc/{experiment}.bismark2summary.log&quot;</span>
+        <span class="s2">&quot;logs/qc/</span><span class="si">{experiment}</span><span class="s2">.bismark2summary.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/bismark/bismark2summary&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/bismark/bismark2summary&quot;</span>
 
 <span class="n">rule</span> <span class="n">bismark2summary_prepare_symlinks</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
@@ -317,15 +317,15 @@
         <span class="s2">&quot;qc/bismark2summary_prepare_symlinks.symlinks.log&quot;</span>
     <span class="n">run</span><span class="p">:</span>
         <span class="n">wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
-        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;echo &#39;Making symlinks&#39; &gt; {log}&quot;</span><span class="p">)</span>
+        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;echo &#39;Making symlinks&#39; &gt; </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
            <span class="n">target_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
            <span class="n">target_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
            <span class="n">log_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
            <span class="n">abs_src_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-           <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;cd {target_dir} &amp;&amp; ln -f -s {abs_src_path} {target_name} &gt;&gt; {log_path} 2&gt;&amp;1&quot;</span><span class="p">)</span>
+           <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;cd </span><span class="si">{target_dir}</span><span class="s2"> &amp;&amp; ln -f -s </span><span class="si">{abs_src_path}</span><span class="s2"> </span><span class="si">{target_name}</span><span class="s2"> &gt;&gt; </span><span class="si">{log_path}</span><span class="s2"> 2&gt;&amp;1&quot;</span><span class="p">)</span>
 
-        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;echo &#39;Done&#39; &gt;&gt; {log}&quot;</span><span class="p">)</span>
+        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;echo &#39;Done&#39; &gt;&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -355,18 +355,18 @@ When running with</p>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="n">cmds</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bismark2summary {extra}&quot;</span><span class="p">]</span>
+<span class="n">cmds</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bismark2summary </span><span class="si">{extra}</span><span class="s2">&quot;</span><span class="p">]</span>
 
 <span class="c1"># basename</span>
-<span class="n">bam</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bam&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<span class="n">bam</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bam&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">bam</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
         <span class="s2">&quot;bismark/bismark2summary: Please specify aligned BAM file path&quot;</span>
         <span class="s2">&quot; (one or several) using &#39;bam=..&#39;&quot;</span>
     <span class="p">)</span>
 
-<span class="n">html</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;html&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-<span class="n">txt</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<span class="n">html</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;html&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">txt</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">html</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">txt</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
         <span class="s2">&quot;bismark/bismark2summary: Please specify both &#39;html=..&#39; and&quot;</span>
@@ -377,28 +377,28 @@ When running with</p>
 <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;.html&quot;</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
         <span class="s2">&quot;bismark/bismark2summary: HTML report file should end&quot;</span>
-        <span class="s2">&quot; with suffix &#39;.html&#39; but was {} ({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">html</span><span class="p">)</span>
+        <span class="s2">&quot; with suffix &#39;.html&#39; but was </span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">html</span><span class="p">)</span>
     <span class="p">)</span>
 
 <span class="n">suggested_txt</span> <span class="o">=</span> <span class="n">basename</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span>
 <span class="k">if</span> <span class="n">suggested_txt</span> <span class="o">!=</span> <span class="n">txt</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-        <span class="s2">&quot;bismark/bismark2summary: Expected &#39;{}&#39; TXT report, &quot;</span>
-        <span class="s2">&quot;but was: &#39;{}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">suggested_txt</span><span class="p">,</span> <span class="n">txt</span><span class="p">)</span>
+        <span class="s2">&quot;bismark/bismark2summary: Expected &#39;</span><span class="si">{}</span><span class="s2">&#39; TXT report, &quot;</span>
+        <span class="s2">&quot;but was: &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">suggested_txt</span><span class="p">,</span> <span class="n">txt</span><span class="p">)</span>
     <span class="p">)</span>
 
 <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--basename {basename:q}&quot;</span><span class="p">)</span>
 
 <span class="c1"># title</span>
-<span class="n">title</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<span class="n">title</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
     <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--title {title:q}&quot;</span><span class="p">)</span>
 
-<span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;{bam}&quot;</span><span class="p">)</span>
+<span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{bam}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># log</span>
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;{log}&quot;</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># run shell command:</span>
 <span class="n">shell</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmds</span><span class="p">))</span>

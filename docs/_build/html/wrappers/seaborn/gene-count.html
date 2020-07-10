@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -184,7 +185,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -304,7 +304,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_box_count.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/seaborn/gene-count&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/seaborn/gene-count&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -359,9 +359,9 @@ When running with</p>
 <span class="p">)</span>
 
 <span class="c1"># Build output directory if necessary</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">outdir</span> <span class="p">:</span><span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;dir&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">outdir</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;dir&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
     <span class="n">makedirs</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Directory: &#39;{outdir}&#39; created.&quot;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Directory: &#39;</span><span class="si">{</span><span class="n">outdir</span><span class="si">}</span><span class="s2">&#39; created.&quot;</span><span class="p">)</span>
 
 <span class="c1"># Load normalized counts</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
@@ -376,7 +376,7 @@ When running with</p>
 
 <span class="c1"># Stack values in order to plot counts</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">stack</span><span class="p">())</span>
-<span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Target_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Sample&quot;</span><span class="p">,</span> <span class="s2">&quot;Normalized_Counts&quot;</span><span class="p">]</span>
 
 <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Condition&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
@@ -389,10 +389,10 @@ When running with</p>
 
 
 <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;targets&quot;</span><span class="p">]:</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Working on &#39;{target}&#39;&quot;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Working on &#39;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
 
     <span class="c1"># Define output path</span>
-    <span class="n">output_path</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;{target}.png&quot;</span><span class="p">)</span>
+    <span class="n">output_path</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
 
     <span class="c1"># Subset to searched targets</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Target_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">target</span><span class="p">]</span>
@@ -400,7 +400,7 @@ When running with</p>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;No target named &#39;{target}&#39; in dataset&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;No target named &#39;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&#39; in dataset&quot;</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
@@ -419,7 +419,7 @@ When running with</p>
 
     <span class="n">seaborn</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-        <span class="n">trim</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">trim</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span>
 
     <span class="c1"># Save figure</span>

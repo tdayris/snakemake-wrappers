@@ -26,10 +26,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
@@ -180,7 +181,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tx_to_gene.html">TX_TO_GENE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -278,9 +278,9 @@
         <span class="n">flavor</span><span class="o">=</span><span class="s2">&quot;&quot;</span> <span class="c1"># optional, e.g. chr_patch_hapl_scaff, see Ensembl FTP.</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/get_annotation.log&quot;</span>
-    <span class="n">cache</span><span class="p">:</span> <span class="bp">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-107-g7e19fc2d/bio/reference/ensembl-annotation&quot;</span>
+        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/reference/ensembl-annotation&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -321,7 +321,7 @@ When running with</p>
 <span class="k">if</span> <span class="n">flavor</span><span class="p">:</span>
     <span class="n">flavor</span> <span class="o">+=</span> <span class="s2">&quot;.&quot;</span>
 
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 <span class="k">if</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s2">&quot;gtf&quot;</span><span class="p">:</span>
@@ -329,7 +329,7 @@ When running with</p>
 <span class="k">elif</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s2">&quot;gff3&quot;</span><span class="p">:</span>
     <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;gff3.gz&quot;</span>
 
-<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;ftp://ftp.ensembl.org/pub/{branch}release-{release}/{fmt}/{species}/{species_cap}.{build}.{release}.{flavor}{suffix}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;ftp://ftp.ensembl.org/pub/</span><span class="si">{branch}</span><span class="s2">release-</span><span class="si">{release}</span><span class="s2">/</span><span class="si">{fmt}</span><span class="s2">/</span><span class="si">{species}</span><span class="s2">/</span><span class="si">{species_cap}</span><span class="s2">.</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{flavor}{suffix}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
     <span class="n">release</span><span class="o">=</span><span class="n">release</span><span class="p">,</span>
     <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">,</span>
     <span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">,</span>
@@ -341,16 +341,16 @@ When running with</p>
 <span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;(curl -L {url} | gzip -d &gt; {snakemake.output[0]}) {log}&quot;</span><span class="p">)</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;(curl -L </span><span class="si">{url}</span><span class="s2"> | gzip -d &gt; </span><span class="si">{snakemake.output[0]}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">:</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span>
+    <span class="nb">print</span><span class="p">(</span>
         <span class="s2">&quot;Unable to download annotation data from Ensembl. &quot;</span>
         <span class="s2">&quot;Did you check that this combination of species, build, and release is actually provided?&quot;</span><span class="p">,</span>
-        <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+        <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
