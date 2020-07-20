@@ -43,6 +43,6 @@ with open(vcf_path, "r") as vcf, open(tsv_path, "w") as tsv:
 
         for gene in genes_id:
             tsv.write(
-                "\t".join([chomp[0], gene, chomp[1], chomp[2], chomp[3]])
+                "\t".join([chomp[0], gene, chomp[1], chomp[3], chomp[4]])
             )
             tsv.write("\n")
