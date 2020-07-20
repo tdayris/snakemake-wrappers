@@ -19,7 +19,7 @@ with open(gtf_in, "r") as gtf, open(tsv_out, "w") as tsv:
     # Write header on user request
     if snakemake.params.get("header", False) is True:
         cols = (
-            ["Gene_ID", "Gene_Name", "Length", "Chromosome",
+            ["GeneID", "GeneName", "Length", "Chromosome",
              "Start", "Stop", "Strand"]
             if snakemake.params.get("positions", False) is True else
             ["Gene_ID", "Gene_Name", "Length"]
