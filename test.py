@@ -2392,3 +2392,15 @@ def test_deeptools_plotheatmap():
         "bio/deeptools/plotHeatmap",
         ["snakemake", "--cores", "1", "heatmap.png", "--use-conda", "-F"]
     )
+
+def test_rsamtools_fafile():
+    run(
+        "bio/Rsamtools/FaFile",
+        ["snakemake", "--cores", "1", "sequence.rds", "--use-conda", "-F"]
+    )
+
+def test_pandas_hist():
+    run(
+        "bio/pandas/hist",
+        ["snakemake", "--cores", "1", "hist.png", "--use-conda", "-F"]
+    )
