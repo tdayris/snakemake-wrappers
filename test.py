@@ -2404,3 +2404,34 @@ def test_pandas_hist():
         "bio/pandas/hist",
         ["snakemake", "--cores", "1", "hist.png", "--use-conda", "-F"]
     )
+
+def test_VariantAnnotation_readVcfAsVRange():
+    run(
+        "bio/VariantAnnotation/readVcfAsVRanges",
+        ["snakemake", "--cores", "1", "calls.rds", "--use-conda", "-F"]
+    )
+
+def test_VariantAnnotation_isSNV():
+    run(
+        "bio/VariantAnnotation/isSNV",
+        ["snakemake", "--cores", "1", "snv.rds", "--use-conda", "-F"]
+    )
+
+
+def test_SomaticSignatures_motifMatrix():
+    run(
+        "bio/SomaticSignatures/motifMatrix",
+        ["snakemake", "--cores", "1", "motifs.rds", "--use-conda", "-F"]
+    )
+
+def test_SomaticSignatures_mutationContext():
+    run(
+        "bio/SomaticSignatures/mutationContext",
+        ["snakemake", "--cores", "1", "context.rds", "--use-conda", "-F"]
+    )
+
+def test_SomaticSignatures_plotMutationSpectrum():
+    run(
+        "bio/SomaticSignatures/plotMutationSpectrum",
+        ["snakemake", "--cores", "1", "plot.png", "--use-conda", "-F"]
+    )
