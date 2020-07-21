@@ -4,18 +4,15 @@
 library(package = "Rsamtools", quietly = TRUE);
 library(package = "VariantAnnotation", quietly = TRUE);
 library(package = "SomaticSignatures", quietly = TRUE);
-print("loaded!")
 
 # Load input datasets
 fasta <- base::readRDS(
   file = base::as.character(x = snakemake@input[["sequence"]])
 );
-print(fasta)
 
 calling <- base::readRDS(
   file = base::as.character(x = snakemake@input[["call"]])
 );
-print(calling)
 
 extra <- "vr = calling, ref = fasta";
 if ("extra" %in% names(snakemake@params)) {
