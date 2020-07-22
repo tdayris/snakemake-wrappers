@@ -1,0 +1,113 @@
+.. _`sleuth_fit`:
+
+SLEUTH_FIT
+==========
+
+Fit a provided model to sleuth object
+
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconda:r-sleuth
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_sleuth_fit:
+        input:
+            rds = "prep.rds"
+        output:
+            rds = "fit.rds"
+        wrapper:
+            "0.60.1-148-g809106c5/bio/sleuth/fit"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+You can call this wrapper multiple times on the same sleuth object in order
+to fit multiple models (eg. full, reduced, ...), and then run sleuth_lrt.
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/bin/R
+
+    # Snakemake wrapper for sleuth fit
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    base::library(package = "sleuth", quietly = TRUE);
+
+    threads <- snakemake@threads;
+    mc.cores <- threads;
+    options(mc.cores = threads);
+
+    so <- base::readRDS(
+        file = snakemake@input[["rds"]]
+    );
+
+    extra <- "";
+    if ("extra" %in% names(snakemake@params)) {
+      extra <- base::as.character(
+        x = snakemake@params[["extra"]]
+      );
+    }
+
+    command <- base::paste(
+      "sleuth::sleuth_fit(",
+      "obj = so",
+      extra,
+      ")",
+      sep = ", "
+    );
+
+    ## Finally run sleuth prep
+    so_fit <- base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+
+    base::saveRDS(
+      object = so_fit,
+      file = snakemake@output[["rds"]]
+    );
