@@ -1,0 +1,95 @@
+.. _`pandas_histogram`:
+
+PANDAS_HISTOGRAM
+================
+
+Plot a pandas histogram
+
+
+
+Software dependencies
+---------------------
+
+
+* conda-forge:pandas=1.0.5
+
+* conda-forge:python=3.8.3
+
+* conda-forge:matplotlib=3.2.2
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_pandas_hist:
+        input:
+            tsv = "table.csv"
+        output:
+            png = "hist.png"
+        params:
+            extra = {
+                "column": "plot"
+            }
+        wrapper:
+            "0.60.1-146-g7a5461a4/bio/pandas/hist"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Parameters:
+
+* extra: dict of parameters to pass to pandas.DataFrame.hist()
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3.8
+    # conding: utf-8
+
+    """
+    Plot a histogram based on a tsv table
+    """
+
+    import pandas
+    import matplotlib.pyplot as plt
+
+    data = pandas.read_csv(
+        snakemake.input["tsv"],
+        sep="\t",
+        header=0,
+        index_col=None
+    )
+
+    data.hist(**snakemake.params["extra"])
+    plt.savefig(snakemake.output["png"])

@@ -1,7 +1,8 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
   
@@ -11,18 +12,12 @@
   
 
   
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-
-  
   
   
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -34,6 +29,10 @@
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="PCAEXPLORER" href="../pcaExplorer.html" />
@@ -51,7 +50,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Snakemake Wrappers
+            <a href="../../index.html" class="icon icon-home"> Snakemake Wrappers
           
 
           
@@ -78,7 +77,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -89,6 +87,9 @@
               <p class="caption"><span class="caption-text">Wrappers</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../BiGR.html">BIGR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Rsamtools.html">RSAMTOOLS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SomaticSignatures.html">SOMATICSIGNATURES</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../VariantAnnotation.html">VARIANTANNOTATION</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../arriba.html">ARRIBA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../art.html">ART</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bamtools.html">BAMTOOLS</a></li>
@@ -144,6 +145,7 @@
 <li class="toctree-l2"><a class="reference internal" href="add_transcripts.html">ADD_TRANSCRIPTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deseq2_to_gseaapp.html">DESEQ2 TO GSEAAPP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="filter_design.html">FILTER DESIGN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hist.html">PANDAS_HISTOGRAM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="salmon.html">PANDAS MERGE</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">VARIANT DENSITY</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
@@ -173,6 +175,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../seaborn.html">SEABORN</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../seqtk.html">SEQTK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sickle.html">SICKLE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sleuth.html">SLEUTH</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../snp-mutator.html">SNP-MUTATOR</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../snpsift.html">SNPSIFT</a></li>
@@ -197,7 +200,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -236,7 +238,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
         
           <li><a href="../pandas.html">PANDAS</a> &raquo;</li>
         
@@ -288,11 +290,11 @@
             <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">filter_vcf</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">filter_vcf</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_variant_density.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-133-gf773a3b9/bio/pandas/variant_density&quot;</span>
+        <span class="s2">&quot;0.60.1-146-g7a5461a4/bio/pandas/variant_density&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -307,7 +309,7 @@ When running with</p>
 <p>The VCF is assumed to be sorted.</p>
 <p>Parameters:</p>
 <ul class="simple">
-<li><p>window_size (int): The genomic range used to compute variant density.</p></li>
+<li><p>window_size (int): The genomic range used to compute variant density. <em>Default: 150</em></p></li>
 <li><p>update_header (bool): Add the filtering information in the header. <em>Default: true.</em></p></li>
 <li><p>update_info (bool): Add density information in the info column. <em>Default: true.</em></p></li>
 <li><p>filter_vcf (bool): Remove the variants in a region which density is below the provided threshold. <em>Default: false.</em></p></li>
@@ -333,16 +335,24 @@ When running with</p>
 
 <span class="k">def</span> <span class="nf">save_lines</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
                <span class="n">density</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+               <span class="n">cluster_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+               <span class="n">window</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                <span class="n">out_buffer</span><span class="p">:</span> <span class="n">TextIO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function edits VCF lines</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
         <span class="n">chomp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">chomp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>
-            <span class="n">chomp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;;VD=</span><span class="si">{</span><span class="n">density</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">chomp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>
+            <span class="n">chomp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">chomp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;VD=</span><span class="si">{</span><span class="n">density</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">chomp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;;&quot;</span>
+
+        <span class="n">chomp</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;VD=</span><span class="si">{</span><span class="n">density</span><span class="si">}</span><span class="s2">;&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;ClusterID=</span><span class="si">{</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2">;&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;ClusterPosition=</span><span class="si">{</span><span class="n">window</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
         <span class="n">out_buffer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chomp</span><span class="p">))</span>
 
 
@@ -351,23 +361,28 @@ When running with</p>
 <span class="n">vcf_out_path</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;vcf&quot;</span><span class="p">]</span>
 
 <span class="c1"># The window size</span>
-<span class="n">ws</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;window_size&quot;</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+<span class="n">window_size</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;window_size&quot;</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
 <span class="n">filter_out</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filter_vcf&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># VCF modifications</span>
 <span class="n">update_header</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;update_header&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 <span class="n">update_info</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;update_info&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-<span class="n">header</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;##Filtered by VariantDensity.py: ws=</span><span class="si">{</span><span class="n">ws</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">##INFO=&lt;ID=VD,Number=1,Type=Float,Description=&quot;Variant density in </span><span class="si">{</span><span class="n">ws</span><span class="si">}</span><span class="s2">bp&quot;&gt;</span><span class="se">\n</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="n">header</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;##Filtered by VariantDensity.py: ws=</span><span class="si">{</span><span class="n">window_size</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">##INFO=&lt;ID=VD,Number=1,Type=Float,Description=&quot;Variant density in </span><span class="si">{</span><span class="n">window_size</span><span class="si">}</span><span class="s2">bp&quot;&gt;</span>
+<span class="s2">##INFO=&lt;ID=ClusterID,Number=1,Type=Float,Description=&quot;The name of the variant density cluster&quot;&gt;</span>
+<span class="s2">##INFO=&lt;ID=ClusterPosition,Number=1,Type=String,Description=&quot;The cluster position as chr:start-stop&quot;&gt;</span><span class="se">\n</span><span class="s2">&quot;&quot;&quot;</span>
 
 
 <span class="c1"># Main process</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">vcf_in_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">vcfin</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">vcf_out_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">vcfout</span><span class="p">:</span>
-
-    <span class="c1"># Initialize shared variables</span>
-    <span class="n">last_chr</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># The chromosome that is currently being parsed</span>
-    <span class="n">window_init</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># The begining of the scanned window</span>
-    <span class="n">density</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># The number of variant within the scanned window</span>
+    <span class="c1">#vcf_iter = iter(vcfin, None)</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;chrom&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;stop&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="p">}</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">vcfin</span><span class="p">:</span>
@@ -379,26 +394,42 @@ When running with</p>
             <span class="n">vcfout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
             <span class="k">continue</span>
 
-        <span class="n">current_chr</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
 
-        <span class="n">window_size</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">window_init</span> <span class="o">&lt;=</span> <span class="n">ws</span>
-        <span class="n">same_chr</span> <span class="o">=</span> <span class="n">last_chr</span> <span class="o">==</span> <span class="n">current_chr</span>
-
-        <span class="k">if</span> <span class="n">same_chr</span> <span class="ow">and</span> <span class="n">window_size</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">chrom</span> <span class="o">==</span> <span class="n">window</span><span class="p">[</span><span class="s2">&quot;chrom&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">window</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">window_size</span><span class="p">:</span>
+            <span class="n">window</span><span class="p">[</span><span class="s2">&quot;stop&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">window</span><span class="p">[</span><span class="s1">&#39;density&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="n">window</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-            <span class="n">density</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">continue</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">filter_out</span> <span class="ow">and</span> <span class="n">density</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">filter_out</span><span class="p">:</span>
-            <span class="n">save_lines</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">vcfout</span><span class="p">)</span>
-        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">]</span>
-        <span class="n">last_chr</span> <span class="o">=</span> <span class="n">current_chr</span>
-        <span class="n">density</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="n">window_init</span> <span class="o">=</span> <span class="n">pos</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">filter_out</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">save_lines</span><span class="p">(</span>
+                    <span class="n">lines</span><span class="o">=</span><span class="n">lines</span><span class="p">,</span>
+                    <span class="n">density</span><span class="o">=</span><span class="mi">1</span> <span class="k">if</span> <span class="n">window</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span>  <span class="n">window</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">],</span>
+                    <span class="n">cluster_id</span><span class="o">=</span><span class="n">window</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                    <span class="n">window</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">window</span><span class="p">[</span><span class="s1">&#39;chrom&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">window</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">window</span><span class="p">[</span><span class="s1">&#39;stop&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">out_buffer</span><span class="o">=</span><span class="n">vcfout</span>
+                <span class="p">)</span>
+            <span class="n">window</span><span class="p">[</span><span class="s2">&quot;chrom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">chrom</span>
+            <span class="n">window</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
+            <span class="n">window</span><span class="p">[</span><span class="s2">&quot;stop&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
+            <span class="n">window</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">window</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">filter_out</span> <span class="ow">and</span> <span class="n">density</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">filter_out</span><span class="p">:</span>
-        <span class="n">save_lines</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">vcfout</span><span class="p">)</span>
+    <span class="c1"># Do not forget the last line!</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">filter_out</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="n">save_lines</span><span class="p">(</span>
+            <span class="n">lines</span><span class="o">=</span><span class="n">lines</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="mi">1</span> <span class="k">if</span> <span class="n">window</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span>  <span class="n">window</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">],</span>
+            <span class="n">cluster_id</span><span class="o">=</span><span class="n">window</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+            <span class="n">window</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">window</span><span class="p">[</span><span class="s1">&#39;chrom&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">window</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">window</span><span class="p">[</span><span class="s1">&#39;stop&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">out_buffer</span><span class="o">=</span><span class="n">vcfout</span>
+        <span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -424,19 +455,11 @@ When running with</p>
 
   <div role="contentinfo">
     <p>
-        
         &copy; Copyright 2016, The Snakemake team
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -447,6 +470,7 @@ When running with</p>
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {

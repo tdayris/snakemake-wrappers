@@ -1,0 +1,106 @@
+.. _`somatic_signatures`:
+
+SOMATIC_SIGNATURES
+==================
+
+Load VCF file as VRange object
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconda:bioconductor-variantannotation=1.34.0
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_VariantAnnotation_readVcfAsVRange:
+        input:
+            calls = "calls.vcf.gz",
+            tbi = "calls.vcf.gz.tbi"
+        output:
+            rds = "calls.rds"
+        wrapper:
+            "0.60.1-146-g7a5461a4/bio/VariantAnnotation/readVcfAsVRanges"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Requires both vcf and tabix file to work.
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # Load VCF file and save a Range object RDS-formatted.
+    base::library(package="VariantAnnotation", quietly=TRUE);
+
+    calling <- VariantAnnotation::VcfFile(
+      file = base::as.character(x = snakemake@input[["calls"]]),
+      index = base::as.character(x = snakemake@input[["tbi"]])
+    );
+
+    extra <- "x = calling";
+    if ("extra" %in% names(snakemake@params)) {
+      extra <- base::paste(
+        extra,
+        base::as.character(x = snakemake@params["extra"]),
+        sep=", "
+      );
+    }
+
+    command <- base::paste0(
+      "VariantAnnotation::readVcfAsVRanges(",
+      extra,
+      ");"
+    );
+    print(command)
+
+    # Load vcf file as Range object
+    vrange <- base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+
+    # Save as RDS
+    base::saveRDS(
+      object = vrange,
+      file = base::as.character(snakemake@output[["rds"]])
+    );
