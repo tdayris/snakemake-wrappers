@@ -76,7 +76,7 @@ if (gene2gene := snakemake.input.get("gene2gene", None)) is not None:
     )
 
     data = data[[
-        "log2FoldChange", "padj", "Gene_ID", "Gene_Name",
+        "Gene_ID", "Gene_Name", "log2FoldChange", "padj",
         "Chromosome", "Start", "Stop", "Strand"
     ]]
     data.rename(columns={"Gene_ID": "index"}, inplace=True)
