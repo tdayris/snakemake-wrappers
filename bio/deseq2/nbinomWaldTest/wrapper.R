@@ -19,7 +19,7 @@ dds <- base::readRDS(file = dds_path);
 
 # Build extra parameters for DESeq2 nbinomWaldTest
 extra <- "";
-if ("extra" %in% snakemake@params) {
+if ("extra" %in% names(snakemake@params)) {
   extra <- base::paste0(
     ", ",
     base::as.character(x = snakemake@params[["extra"]])
