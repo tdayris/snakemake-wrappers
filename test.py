@@ -2136,6 +2136,13 @@ def test_deseq2_deseq():
     )
 
 
+def test_pheatmap_deseq2():
+    run(
+        "bio/pheatmap/deseq2",
+        ["snakemake", "--cores", "1", "plot.png", "--use-conda", "-F"]
+    )
+
+
 def test_cp():
     run(
         "bio/cp",
@@ -2434,4 +2441,10 @@ def test_SomaticSignatures_plotMutationSpectrum():
     run(
         "bio/SomaticSignatures/plotMutationSpectrum",
         ["snakemake", "--cores", "1", "plot.png", "--use-conda", "-F"]
+    )
+
+def test_iRODS_yaml():
+    run(
+        "bio/iRODS/yaml",
+        ["snakemake", "--cores", "1", "iRODS.yaml", "--use-conda", "-F"]
     )
