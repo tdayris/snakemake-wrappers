@@ -4,9 +4,9 @@
 """Snakemake wrapper for bash copy"""
 
 __author__ = "Thibault Dayris"
-__copyright__ = "Fish_n_CHIP 2019"
+__copyright__ = "Copyright 2019, Thibault Dayris"
 __email__ = "thibault.dayris@gustaveroussy.fr"
-__license__ = "GPLV3"
+__license__ = "MIT"
 
 import os.path as op
 import yaml
