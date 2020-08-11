@@ -2448,3 +2448,16 @@ def test_iRODS_yaml():
         "bio/iRODS/yaml",
         ["snakemake", "--cores", "1", "iRODS.yaml", "--use-conda", "-F"]
     )
+
+
+def test_iRODS_extract_collections():
+    run(
+        "bio/iRODS/extract_collections",
+        ["snakemake", "--cores", "3", "collections.txt", "--use-conda", "-F"]
+    )
+
+def test_iRODS_extract_metadata():
+    run(
+        "bio/iRODS/extract_metadata",
+        ["snakemake", "--cores", "1", "extraction.tsv", "--use-conda", "-F"]
+    )
