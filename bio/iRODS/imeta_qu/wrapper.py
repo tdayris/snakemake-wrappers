@@ -1,7 +1,7 @@
 #!/usr/bin/python3.7
 # -*- coding: utf-8 -*-
 
-"""Snakemake wrapper for bash copy"""
+"""Snakemake wrapper for iRODS imeta qu"""
 
 __author__ = "Thibault Dayris"
 __copyright__ = "Copyright 2020, Thibault Dayris"
