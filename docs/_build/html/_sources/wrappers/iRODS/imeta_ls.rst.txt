@@ -3,7 +3,7 @@
 IMETA_LS
 ========
 
-Perform iRODS ils command
+Perform iRODS `imeta ls` command
 
 
 
@@ -26,12 +26,16 @@ This wrapper can be used in the following way:
 .. code-block:: python
 
     rule test_iRODS_imeta_ls:
+        input:
+            # Optional input file
+            collection = "collection_list.txt"
         output:
             "metadata.txt"
         params:
-            name = "/path/to/iRODS/archive"
+            # Optional collection name list
+            name = ["/path/to/iRODS/archive/collection.txt"]
         wrapper:
-            "0.60.1-163-g34160919/bio/iRODS/imate_ls"
+            "0.60.1-166-g8fbba268/bio/iRODS/imate_ls"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -48,13 +52,13 @@ the software dependencies will be automatically deployed into an isolated enviro
 Notes
 -----
 
-Use iRODS/imeta to get a list of collections
-Use iRODS/yaml to parse the output file
+Use iRODS/imeta qu and iRODS/extract_collections to get a list of collections
+Use iRODS/yaml to parse the output file easily
 
 Parameters:
 
-* extra (str): Extra parameters for `ils`
-* collections (str): Path to a file containing the list of collections
+* extra (str): Extra parameters for `imeta ls`
+* name (str): A list of collections to look for
 
 
 
@@ -90,23 +94,25 @@ Code
     extra = snakemake.params.get("extra", "")
     attribute = snakemake.params.get("attribute", "")
 
-    if isinstance(snakemake.params["name"], str):
-        shell(
-            "imeta ls "  # iRODS command
-            " {extra} "  # Extra parameters
-            " {snakemake.params['name']} "  # Name of the collection
-            " {attribute} "  # Name of the attribute to search for
-            " > {snakemake.output[0]} "  # Path to output file
-            " {log} "  # Logging behavior
-        )
-    else:
-        for idx, name in enumerate(snakemake.params['name']):
-            overwrite = ">" if idx == 0 else ">>"
+    if "collection" in snakemake.input.keys():
+        with open(snakemake.input["collection"], "r") as collection_list:
+            for line in collection_list:
+                shell(
+                    "imeta ls "  # iRODS command
+                    " {extra} "  # Extra parameters
+                    " {line[:-1]} "  # Name of the collection
+                    " {attribute} "  # Name of the attribute to search for
+                    " >> {snakemake.output[0]} "  # Path to output file
+                    " {log} "  # Logging behavior
+                )
+
+    if "name" in snakemake.params.keys():
+        for collection_name in snakemake.params["name"]:
             shell(
                 "imeta ls "  # iRODS command
                 " {extra} "  # Extra parameters
-                " {name} "  # Name of the collection
+                " {collection_name} "  # Name of the collection
                 " {attribute} "  # Name of the attribute to search for
-                " {overwrite} {snakemake.output[0]} "  # Path to output file
+                " >> {snakemake.output[0]} "  # Path to output file
                 " {log} "  # Logging behavior
             )

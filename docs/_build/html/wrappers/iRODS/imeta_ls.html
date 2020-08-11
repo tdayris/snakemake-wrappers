@@ -264,7 +264,7 @@
             
   <div class="section" id="imeta-ls">
 <span id="id1"></span><h1>IMETA_LS<a class="headerlink" href="#imeta-ls" title="Permalink to this headline">¶</a></h1>
-<p>Perform iRODS ils command</p>
+<p>Perform iRODS <cite>imeta ls</cite> command</p>
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -276,12 +276,16 @@
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_iRODS_imeta_ls</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="c1"># Optional input file</span>
+        <span class="n">collection</span> <span class="o">=</span> <span class="s2">&quot;collection_list.txt&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="s2">&quot;metadata.txt&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;/path/to/iRODS/archive&quot;</span>
+        <span class="c1"># Optional collection name list</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;/path/to/iRODS/archive/collection.txt&quot;</span><span class="p">]</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.60.1-163-g34160919/bio/iRODS/imate_ls&quot;</span>
+        <span class="s2">&quot;0.60.1-166-g8fbba268/bio/iRODS/imate_ls&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -293,12 +297,12 @@ When running with</p>
 </div>
 <div class="section" id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<p>Use iRODS/imeta to get a list of collections
-Use iRODS/yaml to parse the output file</p>
+<p>Use iRODS/imeta qu and iRODS/extract_collections to get a list of collections
+Use iRODS/yaml to parse the output file easily</p>
 <p>Parameters:</p>
 <ul class="simple">
-<li><p>extra (str): Extra parameters for <cite>ils</cite></p></li>
-<li><p>collections (str): Path to a file containing the list of collections</p></li>
+<li><p>extra (str): Extra parameters for <cite>imeta ls</cite></p></li>
+<li><p>name (str): A list of collections to look for</p></li>
 </ul>
 </div>
 <div class="section" id="authors">
@@ -327,24 +331,26 @@ Use iRODS/yaml to parse the output file</p>
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">attribute</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;attribute&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">shell</span><span class="p">(</span>
-        <span class="s2">&quot;imeta ls &quot;</span>  <span class="c1"># iRODS command</span>
-        <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2"> &quot;</span>  <span class="c1"># Extra parameters</span>
-        <span class="s2">&quot; </span><span class="si">{snakemake.params[&#39;name&#39;]}</span><span class="s2"> &quot;</span>  <span class="c1"># Name of the collection</span>
-        <span class="s2">&quot; </span><span class="si">{attribute}</span><span class="s2"> &quot;</span>  <span class="c1"># Name of the attribute to search for</span>
-        <span class="s2">&quot; &gt; </span><span class="si">{snakemake.output[0]}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to output file</span>
-        <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2"> &quot;</span>  <span class="c1"># Logging behavior</span>
-    <span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]):</span>
-        <span class="n">overwrite</span> <span class="o">=</span> <span class="s2">&quot;&gt;&quot;</span> <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&gt;&gt;&quot;</span>
+<span class="k">if</span> <span class="s2">&quot;collection&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;collection&quot;</span><span class="p">],</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">collection_list</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">collection_list</span><span class="p">:</span>
+            <span class="n">shell</span><span class="p">(</span>
+                <span class="s2">&quot;imeta ls &quot;</span>  <span class="c1"># iRODS command</span>
+                <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2"> &quot;</span>  <span class="c1"># Extra parameters</span>
+                <span class="s2">&quot; </span><span class="si">{line[:-1]}</span><span class="s2"> &quot;</span>  <span class="c1"># Name of the collection</span>
+                <span class="s2">&quot; </span><span class="si">{attribute}</span><span class="s2"> &quot;</span>  <span class="c1"># Name of the attribute to search for</span>
+                <span class="s2">&quot; &gt;&gt; </span><span class="si">{snakemake.output[0]}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to output file</span>
+                <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2"> &quot;</span>  <span class="c1"># Logging behavior</span>
+            <span class="p">)</span>
+
+<span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">collection_name</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]:</span>
         <span class="n">shell</span><span class="p">(</span>
             <span class="s2">&quot;imeta ls &quot;</span>  <span class="c1"># iRODS command</span>
             <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2"> &quot;</span>  <span class="c1"># Extra parameters</span>
-            <span class="s2">&quot; </span><span class="si">{name}</span><span class="s2"> &quot;</span>  <span class="c1"># Name of the collection</span>
+            <span class="s2">&quot; </span><span class="si">{collection_name}</span><span class="s2"> &quot;</span>  <span class="c1"># Name of the collection</span>
             <span class="s2">&quot; </span><span class="si">{attribute}</span><span class="s2"> &quot;</span>  <span class="c1"># Name of the attribute to search for</span>
-            <span class="s2">&quot; </span><span class="si">{overwrite}</span><span class="s2"> </span><span class="si">{snakemake.output[0]}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to output file</span>
+            <span class="s2">&quot; &gt;&gt; </span><span class="si">{snakemake.output[0]}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to output file</span>
             <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2"> &quot;</span>  <span class="c1"># Logging behavior</span>
         <span class="p">)</span>
 </pre></div>
