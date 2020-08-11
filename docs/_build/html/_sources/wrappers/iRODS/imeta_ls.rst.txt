@@ -1,0 +1,112 @@
+.. _`imeta_ls`:
+
+IMETA_LS
+========
+
+Perform iRODS ils command
+
+
+
+Software dependencies
+---------------------
+
+
+* conda-forge:bash=5.0.011
+
+* conda-forge:python-irodsclient=0.8.2
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_iRODS_imeta_ls:
+        output:
+            "metadata.txt"
+        params:
+            name = "/path/to/iRODS/archive"
+        wrapper:
+            "0.60.1-163-g34160919/bio/iRODS/imate_ls"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Use iRODS/imeta to get a list of collections
+Use iRODS/yaml to parse the output file
+
+Parameters:
+
+* extra (str): Extra parameters for `ils`
+* collections (str): Path to a file containing the list of collections
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3.7
+    # -*- coding: utf-8 -*-
+
+    """Snakemake wrapper for iRODS imeta ls"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    # Prepare logging
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True, append=True)
+    extra = snakemake.params.get("extra", "")
+    attribute = snakemake.params.get("attribute", "")
+
+    if isinstance(snakemake.params["name"], str):
+        shell(
+            "imeta ls "  # iRODS command
+            " {extra} "  # Extra parameters
+            " {snakemake.params['name']} "  # Name of the collection
+            " {attribute} "  # Name of the attribute to search for
+            " > {snakemake.output[0]} "  # Path to output file
+            " {log} "  # Logging behavior
+        )
+    else:
+        for idx, name in enumerate(snakemake.params['name']):
+            overwrite = ">" if idx == 0 else ">>"
+            shell(
+                "imeta ls "  # iRODS command
+                " {extra} "  # Extra parameters
+                " {name} "  # Name of the collection
+                " {attribute} "  # Name of the attribute to search for
+                " {overwrite} {snakemake.output[0]} "  # Path to output file
+                " {log} "  # Logging behavior
+            )
