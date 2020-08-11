@@ -16,7 +16,7 @@ log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 extra = snakemake.params.get("extra", "")
 
 kwords_list = [
-    f'"{k}" {"like" if "%" in v} "{v}"'
+    f'"{k}" {"like" if "%" in v else "="} "{v}"'
     for k, v in snakemake.params["kwords"].items()
 ]
 kwords_command = " and ".join(kwords_list)
