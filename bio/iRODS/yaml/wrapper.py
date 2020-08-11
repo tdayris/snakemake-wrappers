@@ -29,7 +29,7 @@ def get_key_val(line: str) -> Dict[str, str]:
 with open(snakemake.input[0], "r") as text:
     for line in text:
         if line.startswith("AVUs"):
-            file_path = line[:-2].split(" ")[-1]
+            file_path = line[:-1].split(" ")[-1]
         elif line.startswith(("----", "\n")):
             continue
         elif line.startswith("attribute:"):
