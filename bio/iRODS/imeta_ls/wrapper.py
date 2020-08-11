@@ -16,23 +16,25 @@ log = snakemake.log_fmt_shell(stdout=False, stderr=True, append=True)
 extra = snakemake.params.get("extra", "")
 attribute = snakemake.params.get("attribute", "")
 
-if isinstance(snakemake.params["name"], str):
-    shell(
-        "imeta ls "  # iRODS command
-        " {extra} "  # Extra parameters
-        " {snakemake.params['name']} "  # Name of the collection
-        " {attribute} "  # Name of the attribute to search for
-        " > {snakemake.output[0]} "  # Path to output file
-        " {log} "  # Logging behavior
-    )
-else:
-    for idx, name in enumerate(snakemake.params['name']):
-        overwrite = ">" if idx == 0 else ">>"
+if "collection" in snakemake.input.keys():
+    with open(snakemake.input["collection"], "r") as collection_list:
+        for line in collection_list:
+            shell(
+                "imeta ls "  # iRODS command
+                " {extra} "  # Extra parameters
+                " {line[:-1]} "  # Name of the collection
+                " {attribute} "  # Name of the attribute to search for
+                " >> {snakemake.output[0]} "  # Path to output file
+                " {log} "  # Logging behavior
+            )
+
+if "name" in snakemake.params.keys():
+    for collection_name in snakemake.params["name"]:
         shell(
             "imeta ls "  # iRODS command
             " {extra} "  # Extra parameters
-            " {name} "  # Name of the collection
+            " {collection_name} "  # Name of the collection
             " {attribute} "  # Name of the attribute to search for
-            " {overwrite} {snakemake.output[0]} "  # Path to output file
+            " >> {snakemake.output[0]} "  # Path to output file
             " {log} "  # Logging behavior
         )

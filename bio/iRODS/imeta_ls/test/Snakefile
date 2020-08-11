@@ -1,7 +1,11 @@
 rule test_iRODS_imeta_ls:
+    input:
+        # Optional input file
+        collection = "collection_list.txt"
     output:
         "metadata.txt"
     params:
-        name = "/path/to/iRODS/archive"
+        # Optional collection name list
+        name = ["/path/to/iRODS/archive/collection.txt"]
     wrapper:
         "master/bio/iRODS/imate_ls"
