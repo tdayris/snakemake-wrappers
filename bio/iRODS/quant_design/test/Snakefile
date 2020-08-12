@@ -1,0 +1,17 @@
+rule test_quant_design:
+    input:
+        "collections.tsv"
+    output:
+        "collections_merged.tsv"
+    params:
+        common = [
+            "species", "protocol", "sampleType",
+            "technicalPlatform", "sampleId",
+            "datasetId"
+        ],
+        rename = {
+            "Path": "Upstream_file,Downstream_file",
+            "datafileName": "Upstream_realname,Downstream_realname"
+        }
+    wrapper:
+        "master/bio/iRODS/quant_design"

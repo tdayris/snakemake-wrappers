@@ -2461,3 +2461,10 @@ def test_iRODS_extract_metadata():
         "bio/iRODS/extract_metadata",
         ["snakemake", "--cores", "1", "extraction.tsv", "--use-conda", "-F"]
     )
+
+
+def test_iRODS_quant_design():
+    run(
+        "bio/iRODS/quant_design",
+        ["snakemake", "--cores", "1", "collections_merged.tsv", "--use-conda", "-F"]
+    )
