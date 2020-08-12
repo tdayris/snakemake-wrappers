@@ -19,10 +19,11 @@ attribute = snakemake.params.get("attribute", "")
 if "collection" in snakemake.input.keys():
     with open(snakemake.input["collection"], "r") as collection_list:
         for line in collection_list:
+            collection = line[:-1]
             shell(
                 "imeta ls "  # iRODS command
                 " {extra} "  # Extra parameters
-                " {line[:-1]} "  # Name of the collection
+                " {collection} "  # Name of the collection
                 " {attribute} "  # Name of the attribute to search for
                 " >> {snakemake.output[0]} "  # Path to output file
                 " {log} "  # Logging behavior
