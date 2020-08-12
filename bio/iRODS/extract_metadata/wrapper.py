@@ -51,5 +51,5 @@ pandas.DataFrame(content).to_csv(
     snakemake.output[0],
     sep="\t",
     header=True,
-    index=True
+    index=False
 )
