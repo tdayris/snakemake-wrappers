@@ -1,0 +1,12 @@
+rule test_pheatmap_deseq2:
+    input:
+        dds = "wald.RDS",
+        norm = "vst.RDS"
+    output:
+        png = "plot.png"
+    params:
+        condition_array = ["Cond"],
+        padj_threshold = 0.000001,
+        extra = "cluster_rows=TRUE, show_rownames=FALSE, cluster_cols=FALSE"
+    wrapper:
+        "master/bio/pheatmap/deseq2"
