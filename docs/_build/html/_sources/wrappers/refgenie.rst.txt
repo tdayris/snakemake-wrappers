@@ -11,9 +11,9 @@ Software dependencies
 ---------------------
 
 
-* refgenie =0.8.2
+* refgenie =0.9.2
 
-* refgenconf =0.6.1
+* refgenconf =0.9.0
 
 
 
@@ -35,7 +35,7 @@ This wrapper can be used in the following way:
             asset="fasta",
             tag="default"
         wrapper:
-            "0.60.1-166-g8fbba268/bio/refgenie"
+            "0.64.0-176-g1bc8b0a3/bio/refgenie"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -80,8 +80,8 @@ Code
     rgc = refgenconf.RefGenConf(conf_path, writable=True)
 
     # pull asset if necessary
-    gat, archive_data, server_url = rgc.pull_asset(genome, asset, tag, force=False)
+    gat, archive_data, server_url = rgc.pull(genome, asset, tag, force=False)
 
     for seek_key, out in snakemake.output.items():
-        path = rgc.get_asset(genome, asset, tag, seek_key=seek_key)
+        path = rgc.seek(genome, asset, tag_name=tag, seek_key=seek_key, strict_exists=True)
         os.symlink(path, out)

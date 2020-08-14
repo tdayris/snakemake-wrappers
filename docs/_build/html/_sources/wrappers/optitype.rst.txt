@@ -1,0 +1,101 @@
+.. _`Optitype`:
+
+OPTITYPE
+========
+
+Precision 4-digit HLA-I-typing from NGS data based on integer linear programming. Use razers3 beforehand to generate input fastq files only mapping to HLA-regions. Please see https://github.com/FRED-2/OptiType
+
+
+
+Software dependencies
+---------------------
+
+
+* optitype ==1.3.4
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule optitype:
+        input:
+            # list of input reads
+            reads=["reads/{sample}_1.fished.fastq", "reads/{sample}_2.fished.fastq"]
+        output:
+            multiext("optitype/{sample}", "_coverage_plot.pdf", "_result.tsv")
+        log:
+            "logs/optitype/{sample}.log"
+        params:
+            # Type of sequencing data. Can be 'dna' or 'rna'. Default is 'dna'.
+            sequencing_type="dna",
+            # optiype config file, optional
+            config="",
+            # additional parameters
+            extra=""
+        wrapper:
+            "0.64.0-176-g1bc8b0a3/bio/optitype"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Jan Forster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2020, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+
+    import os
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    outdir = os.path.dirname(snakemake.output[0])
+
+    # get sequencing type
+    seq_type = snakemake.params.get("sequencing_type", "dna")
+    seq_type = "--{}".format(seq_type)
+
+    # check if non-default config.ini is used
+    config = snakemake.params.get("config", "")
+    if any(config):
+        config = "--config {}".format(config)
+
+    shell(
+        "(OptiTypePipeline.py"
+        " --input {snakemake.input.reads}"
+        " --outdir {outdir}"
+        " --prefix {snakemake.wildcards.sample}"
+        " {seq_type}"
+        " {config}"
+        " {extra})"
+        " {log}"
+    )

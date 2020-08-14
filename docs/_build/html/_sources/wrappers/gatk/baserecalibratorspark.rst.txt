@@ -1,0 +1,118 @@
+.. _`gatk BaseRecalibratorSpark`:
+
+GATK BASERECALIBRATORSPARK
+==========================
+
+Run gatk BaseRecalibratorSpark.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* gatk4 ==4.1.4.1
+
+* openjdk =8
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule gatk_baserecalibratorspark:
+        input:
+            bam="mapped/{sample}.bam",
+            ref="genome.fasta",
+            dict="genome.dict",
+            known="dbsnp.vcf.gz"  # optional known sites
+        output:
+            recal_table="recal/{sample}.grp"
+        log:
+            "logs/gatk/baserecalibrator/{sample}.log"
+        params:
+            extra="",  # optional
+            java_opts="", # optional
+            #spark_runner="",  # optional, local by default
+            #spark_0.64.0-176-g1bc8b0a3="",  # optional
+            #spark_extra="", # optional
+        threads: 8
+        wrapper:
+            "0.64.0-176-g1bc8b0a3/bio/gatk/baserecalibratorspark"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+* The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
+* The `extra` param allows for additional program arguments for baserecalibratorspark.
+* The `spark_runner` param = "LOCAL"|"SPARK"|"GCS" allows to set the spark_runner. Set the parameter to "LOCAL" or don't set it at all to run on local machine.
+* The `spark_master` param allows to set the URL of the Spark Master to submit the job. Set to "local[number_of_cores]" for local execution. Don't set it at all for local execution with number of cores determined by snakemake.
+* The 'spark_extra' param allows for additional spark arguments.
+* For more information see, https://gatk.broadinstitute.org/hc/en-us/articles/360036897372-BaseRecalibratorSpark-BETA-
+
+
+
+
+Authors
+-------
+
+
+* Christopher Schröder
+
+* Johannes Köster
+
+* Jake VanCampen
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Christopher Schröder"
+    __copyright__ = "Copyright 2020, Christopher Schröder"
+    __email__ = "christopher.schroeder@tu-dortmund.de"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    spark_runner = snakemake.params.get("spark_runner", "LOCAL")
+    spark_master = snakemake.params.get(
+        "spark_master", "local[{}]".format(snakemake.threads)
+    )
+    spark_extra = snakemake.params.get("spark_extra", "")
+    java_opts = snakemake.params.get("java_opts", "")
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    known = snakemake.input.get("known", "")
+    if known:
+        known = "--known-sites {}".format(known)
+
+    shell(
+        "gatk --java-options '{java_opts}' BaseRecalibratorSpark {extra} "
+        "-R {snakemake.input.ref} -I {snakemake.input.bam} "
+        "-O {snakemake.output.recal_table} {known} "
+        "-- --spark-runner {spark_runner} --spark-master {spark_master} {spark_extra} "
+        "{log}"
+    )

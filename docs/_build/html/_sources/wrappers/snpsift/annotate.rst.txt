@@ -11,7 +11,11 @@ Software dependencies
 ---------------------
 
 
-* bioconda:snpsift=4.3.1t
+* snpsift ==4.3.1t
+
+* bcftools ==1.10.2
+
+* pbgzip ==2016.08.04
 
 
 
@@ -25,16 +29,14 @@ This wrapper can be used in the following way:
 
     rule test_snpsift_annotate:
         input:
-            incall = "in.vcf",
-            database = "annotation.vcf"
+            call="in.vcf",
+            database="annotation.vcf"
         output:
-            vcf = "annotated/out.vcf"
-        message:
-            "Testing SnpSift Annotate"
+            call="annotated/out.vcf"
         log:
             "annotate.log"
         wrapper:
-            "0.60.1-166-g8fbba268/bio/snpsift/annotate"
+            "0.64.0-176-g1bc8b0a3/bio/snpsift/annotate"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -69,25 +71,42 @@ Code
     __email__ = "thibault.dayris@gustaveroussy.fr"
     __license__ = "MIT"
 
-    from os.path import dirname
     from snakemake.shell import shell
-    from snakemake.utils import makedirs
 
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
     extra = snakemake.params.get("extra", "")
+    min_threads = 1
 
-    incall = snakemake.input.incall
-    if incall.endswith(".bcf"):
+    incall = snakemake.input["call"]
+    if snakemake.input["call"].endswith("bcf"):
+        min_threads += 1
         incall = "< <(bcftools view {})".format(incall)
-    elif incall.endswith(".vcf.gz"):
+    elif snakemake.input["call"].endswith("gz"):
+        min_threads += 1
         incall = "< <(gunzip -c {})".format(incall)
+
+    outcall = snakemake.output["call"]
+    if snakemake.output["call"].endswith("gz"):
+        min_threads += 1
+        outcall = "| gzip -c > {}".format(outcall)
+    elif snakemake.output["call"].endswith("bcf"):
+        min_threads += 1
+        outcall = "| bcftools view > {}".format(outcall)
+    else:
+        outcall = "> {}".format(outcall)
+
+    if snakemake.threads < min_threads:
+        raise ValueError(
+            "At least {} threads required, {} provided".format(
+                min_threads, snakemake.threads
+            )
+        )
 
     shell(
         "SnpSift annotate"  # Tool and its subcommand
         " {extra}"  # Extra parameters
         " {snakemake.input.database}"  # Path to annotation vcf file
-        " {incall}"  # Path to input vcf file
-        " > {snakemake.output.vcf}"  # Path to output vcf file
+        " {incall} "  # Path to input vcf file
+        " {outcall} "  # Path to output vcf file
         " {log}"  # Logging behaviour
     )

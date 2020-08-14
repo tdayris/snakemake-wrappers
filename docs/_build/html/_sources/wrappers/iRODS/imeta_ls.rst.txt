@@ -35,7 +35,7 @@ This wrapper can be used in the following way:
             # Optional collection name list
             name = ["/path/to/iRODS/archive/collection.txt"]
         wrapper:
-            "0.60.1-166-g8fbba268/bio/iRODS/imate_ls"
+            "0.64.0-176-g1bc8b0a3/bio/iRODS/imate_ls"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -97,10 +97,11 @@ Code
     if "collection" in snakemake.input.keys():
         with open(snakemake.input["collection"], "r") as collection_list:
             for line in collection_list:
+                collection = line[:-1]
                 shell(
                     "imeta ls "  # iRODS command
                     " {extra} "  # Extra parameters
-                    " {line[:-1]} "  # Name of the collection
+                    " {collection} "  # Name of the collection
                     " {attribute} "  # Name of the attribute to search for
                     " >> {snakemake.output[0]} "  # Path to output file
                     " {log} "  # Logging behavior

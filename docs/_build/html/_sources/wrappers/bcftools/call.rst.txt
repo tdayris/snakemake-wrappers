@@ -3,15 +3,13 @@
 BCFTOOLS CALL
 =============
 
-Call variants with bcftools.
+Call variants with `bcftools call <https://samtools.github.io/bcftools/bcftools.html#call>`_.
 
 
 
 Software dependencies
 ---------------------
 
-
-* samtools ==1.10
 
 * bcftools ==1.10
 
@@ -27,23 +25,16 @@ This wrapper can be used in the following way:
 
     rule bcftools_call:
         input:
-            ref="genome.fasta",
-            samples=expand("mapped/{sample}.sorted.bam", sample=config["samples"]),
-            indexes=expand("mapped/{sample}.sorted.bam.bai", sample=config["samples"])
+            pileup="{sample}.pileup.bcf",
         output:
-            # Here, we optionally use a region as wildcard and constrain it to the
-            # format accepted by samtools mpileup.
-            "called/{region,.+(:[0-9]+-[0-9]+)?}.bcf"
+            calls="{sample}.calls.bcf",
         params:
-            # Optional parameters for samtools mpileup (except -g, -f).
-            # In this example, we forward the region wildcard from the output file to mpileup.
-            mpileup="--region {region}",
-            # Optional parameters for bcftools call (except -v, -o, -m).
-            call=""
+            caller="-m", # valid options include -c/--consensus-caller or -m/--multiallelic-caller
+            options="--ploidy 1 --prior 0.001",
         log:
-            "logs/bcftools_call/{region}.log"
+            "logs/bcftools_call/{sample}.log",
         wrapper:
-            "0.60.1-166-g8fbba268/bio/bcftools/call"
+            "0.64.0-176-g1bc8b0a3/bio/bcftools/call"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -64,6 +55,8 @@ Authors
 
 * Johannes Köster
 
+* Michael Hall
+
 
 
 Code
@@ -80,8 +73,22 @@ Code
     from snakemake.shell import shell
 
 
+    class CallerOptionError(Exception):
+        pass
+
+
+    valid_caller_opts = {"-c", "--consensus-caller", "-m", "--multiallelic-caller"}
+
+    caller_opt = snakemake.params.get("caller", "")
+    if caller_opt.strip() not in valid_caller_opts:
+        raise CallerOptionError(
+            "bcftools call expects either -m/--multiallelic-caller or "
+            "-c/--consensus-caller as caller option."
+        )
+
+    options = snakemake.params.get("options", "")
+
     shell(
-        "(samtools mpileup {snakemake.params.mpileup} {snakemake.input.samples} "
-        "--fasta-ref {snakemake.input.ref} --BCF --uncompressed | "
-        "bcftools call -m {snakemake.params.call} -o {snakemake.output[0]} -v -) 2> {snakemake.log}"
+        "bcftools call {options} {caller_opt} --threads {snakemake.threads} "
+        "-o {snakemake.output.calls} {snakemake.input.pileup} 2> {snakemake.log}"
     )

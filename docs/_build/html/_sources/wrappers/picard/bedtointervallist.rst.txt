@@ -1,0 +1,87 @@
+.. _`picard BedToIntervalList`:
+
+PICARD BEDTOINTERVALLIST
+========================
+
+`picard BedToIntervalList <https://broadinstitute.github.io/picard/command-line-overview.html#BedToIntervalList>`_ converts a BED file to Picard Interval List format.
+
+
+
+
+Software dependencies
+---------------------
+
+
+* picard ==2.22.1
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bed_to_interval_list:
+        input:
+            bed="resources/a.bed",
+            dict="resources/genome.dict"
+        output:
+            "a.interval_list"
+        log:
+            "logs/picard/bedtointervallist/a.log"
+        params:
+            # optional parameters
+            "SORT=true " # sort output interval list before writing
+        wrapper:
+            "0.64.0-176-g1bc8b0a3/bio/picard/bedtointervallist"
+
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Fabian Kilpert
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Fabian Kilpert"
+    __copyright__ = "Copyright 2020, Fabian Kilpert"
+    __email__ = "fkilpert@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    log = snakemake.log_fmt_shell()
+
+
+    shell(
+        "picard BedToIntervalList "
+        "{snakemake.params} "
+        "INPUT={snakemake.input.bed} "
+        "SEQUENCE_DICTIONARY={snakemake.input.dict} "
+        "OUTPUT={snakemake.output} "
+        "{log} "
+    )

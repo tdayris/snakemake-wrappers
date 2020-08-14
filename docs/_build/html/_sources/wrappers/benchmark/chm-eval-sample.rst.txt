@@ -1,0 +1,103 @@
+.. _`chm-eval-sample`:
+
+CHM-EVAL-SAMPLE
+===============
+
+Download CHM-eval sample (https://github.com/lh3/CHM-eval) for benchmarking variant calling.
+
+
+
+Software dependencies
+---------------------
+
+
+* samtools =1.10
+
+* curl
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule chm_eval_sample:
+        output:
+            bam="resources/chm-eval-sample.bam",
+            bai="resources/chm-eval-sample.bam.bai"
+        params:
+            # Optionally only grab the first 100 records.
+            # This is for testing, remove next line to grab all records.
+            first_n=100
+        log:
+            "logs/chm-eval-sample.log"
+        wrapper:
+            "0.64.0-176-g1bc8b0a3/bio/benchmark/chm-eval-sample"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Johannes Köster
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2020, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    url = "ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR134/ERR1341796/CHM1_CHM13_2.bam"
+
+    pipefail = ""
+    fmt = "-b"
+    prefix = snakemake.params.get("first_n", "")
+    if prefix:
+        prefix = "| head -n {} | samtools view -h -b".format(prefix)
+        fmt = "-h"
+        pipefail = "set +o pipefail"
+
+        shell(
+            """
+            {pipefail}
+            {{
+                samtools view {fmt} {url} {prefix} > {snakemake.output.bam}
+                samtools index {snakemake.output.bam}
+            }} {log}
+            """
+        )
+    else:
+        shell(
+            """
+            {{
+                curl -L {url} > {snakemake.output.bam}
+                samtools index {snakemake.output.bam}
+            }} {log}
+            """
+        )

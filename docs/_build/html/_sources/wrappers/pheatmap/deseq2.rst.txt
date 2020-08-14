@@ -33,10 +33,10 @@ This wrapper can be used in the following way:
             png = "plot.png"
         params:
             condition_array = ["Cond"],
-            padj_threshold = 1,
+            padj_threshold = 0.000001,
             extra = "cluster_rows=TRUE, show_rownames=FALSE, cluster_cols=FALSE"
         wrapper:
-            "0.60.1-166-g8fbba268/bio/pheatmap/deseq2"
+            "0.64.0-176-g1bc8b0a3/bio/pheatmap/deseq2"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -103,16 +103,9 @@ Code
       padj_threshold <- snakemake@params[["padj_threshold"]];
     }
 
-    # Filter results
-    select_padj <- results(dds)$padj <= padj_threshold;
-    print(head(dds$padj))
     annotation <- base::as.data.frame(
       x = colData(dds)[, condition_array]
     );
-
-    normalized_counts <- assay(norm)[select_padj,];
-    print("normalized_counts:")
-    print(head(normalized_counts))
 
     # Buildcommand line
     extra <- 'normalized_counts, annotation_col = annotation';
@@ -131,19 +124,46 @@ Code
     );
     print(command);
 
-    # Build plot and save it
-    png(
-      filename = snakemake@output[["png"]],
-      width = 1024,
-      height = 768,
-      units = "px",
-      type = "cairo"
-    );
 
-    base::eval(
-      base::parse(
-        text = command
-      )
-    );
+    # For each result in this deseq2 object, print pheatmap
+    names <- DESeq2::resultsNames(object = dds);
 
-    dev.off();
+    for (resultname in names) {
+      base::message(base::paste("Building heatmap for", resultname));
+      results_frame <- DESeq2::results(
+        object = dds,
+        name = resultname,
+        independentFiltering = TRUE,
+        # alpha = padj_threshold,
+        pAdjustMethod = "BH",
+        cooksCutoff = TRUE
+      );
+
+      not_na <- complete.cases(results_frame);
+      significant <- results_frame$padj <= padj_threshold;
+      select_ids <- row.names(results_frame[not_na & significant, ]);
+
+      normalized_counts <- assay(norm)[select_ids, ];
+      print(head(assay(norm)))
+      print(dim(assay(norm)))
+      print(head(select_ids))
+      print(head(normalized_counts))
+      print(dim(normalized_counts))
+
+      # Build plot and save it
+      png(
+        filename = snakemake@output[["png"]],
+        width = 1024,
+        height = 768,
+        units = "px",
+        type = "cairo"
+      );
+
+      base::eval(
+        base::parse(
+          text = command
+        )
+      );
+
+      dev.off();
+    }

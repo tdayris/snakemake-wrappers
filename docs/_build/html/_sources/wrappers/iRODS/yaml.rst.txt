@@ -31,7 +31,7 @@ This wrapper can be used in the following way:
         output:
             "iRODS.yaml"
         wrapper:
-            "0.60.1-166-g8fbba268/bio/iRODS/yaml"
+            "0.64.0-176-g1bc8b0a3/bio/iRODS/yaml"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -80,6 +80,7 @@ Code
 
     current_attribute = None
 
+
     def get_key_val(line: str) -> Dict[str, str]:
         """
         Split key:value string
@@ -87,24 +88,29 @@ Code
         key, *val = line.split(":")
         return {key.strip(" "): ":".join(val).strip(" ")}
 
+
     with open(snakemake.input[0], "r") as text:
         for line in text:
             if line.startswith("AVUs"):
-                file_path = line[:-1].split(" ")[-1]
+                file_path = line[:-1].split(" ")[-1].strip(":")
             elif line.startswith(("----", "\n")):
                 continue
             elif line.startswith("attribute:"):
                 current_attribute = get_key_val(line=line[:-1])["attribute"]
                 if file_path in attributes.keys():
-                    attributes[file_path][current_attribute] = {}
+                    if current_attribute not in attributes[file_path].keys():
+                        attributes[file_path][current_attribute] = {}
                 else:
                     attributes[file_path] = {current_attribute: {}}
             elif line.startswith(("value:", "units:")):
-                parsed = get_key_val(line[:-1])
-                try:
-                    attributes[file_path][current_attribute].update(parsed)
-                except KeyError:
-                    attributes[file_path][current_attribute] = parsed
+                key, val = list(get_key_val(line[:-1]).items())[0]
+                if current_attribute in attributes[file_path].keys():
+                    if key in attributes[file_path][current_attribute].keys():
+                        attributes[file_path][current_attribute][key] += f";{val}"
+                    else:
+                        attributes[file_path][current_attribute][key] = val
+                else:
+                    attributes[file_path][current_attribute][key] = val
             else:
                 raise ValueError(f"Unknown line format: {line}")
 
