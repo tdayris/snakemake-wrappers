@@ -17,7 +17,10 @@ switch_list <- base::as.character(
   x = snakemake@input[["switch_list"]]
 );
 
-extra <- "switchAnalyzeRlist = switch_list";
+extra <- base::paste0(
+  "switchAnalyzeRlist = switch_list, pathToPFAMresultFile = ",
+  snakemake@input[["pfam"]]
+);
 if ("extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
     extra,
