@@ -1,0 +1,80 @@
+.. _`make_hexamer_table`:
+
+MAKE_HEXAMER_TABLE
+==================
+
+Build a hexamer table for CPAT
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconda:cpat=2.0.0
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_cpat_make_hexamer_table:
+        input:
+            coding =
+            noncoding =
+        output:
+            "hexamer_table"
+        wrapper:
+            "0.64.0-183-g8531afc3/bio/cpat/make_hexamer_table"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3
+    # -*- coding: utf-8 -*-
+
+    """This is the Snakemake Wrapper for CPAT make_hexamer_table.py"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        " make_hexamer_tab.py "
+        " --cod {snakemake.input['coding']} "
+        " --noncod {snakemake.input['noncoding']} "
+        " {log} "
+    )
