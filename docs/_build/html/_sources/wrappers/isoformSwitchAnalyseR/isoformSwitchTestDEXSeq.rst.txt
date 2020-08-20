@@ -1,0 +1,117 @@
+.. _`isoformSwitchTestDEXSeq`:
+
+ISOFORMSWITCHTESTDEXSEQ
+=======================
+
+Testing for Isoform Switches via DEXSeq
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconda:bioconductor-isoformswitchanalyzer=1.8.0
+
+* bioconda:bioconductor-dexseq=1.34.0
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_isoformSwitchAnalyseR_dexseq:
+        input:
+            switch_list = "switch_list.RDS"
+        output:
+            rds = "tested.RDS"
+        wrapper:
+            "0.64.0-188-g0db15379/bio/isoformSwitchAnalyzeR/isoformSwitchTestDEXSeq"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Parameters:
+  * extra: Optional parameters passed to importIsoformExpression, besides "switchAnalyzeRlist"
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script takes a IsoformSwitchAnalyseR object
+    # and tests exons with differential expression
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # The main package
+    base::library(package = "isoformSwitchAnalyzeR", quietly = TRUE);
+    base::library(package = "DEXSeq", quietly = TRUE);
+
+    # Gathering input dataset and parameters
+    switch_list <- base::as.character(
+      x = snakemake@input[["switch_list"]]
+    );
+
+    extra <- "switchAnalyzeRlist = switch_list";
+    if ("extra" %in% base::anems(snakemake@params)) {
+      extra <- base::paste(
+          extra,
+          snakemake@params[["extra"]],
+          sep = ", "
+      );
+    }
+
+    command <- base::paste0(
+      "InsoformSwitchAnalyseR::isoformSwitchTestDEXSeq(",
+      extra,
+      ")"
+    );
+    base::message("Libraries and input data loaded");
+    base::message(command);
+
+    # Running command
+    base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+    # Saving results
+    base::saveRDS(
+      obj = edgn,
+      file = snakemake@output[["rds"]]
+    );
