@@ -25,11 +25,12 @@ This wrapper can be used in the following way:
 
     rule test_analyze_cpat:
         input:
-            switch_list = "switch_list.RDS"
+            switch_list = "switch_list.RDS",
+            pfam = "pfam_results.txt"
         output:
             rds = "switch_list_with_pfam.RDS"
         wrapper:
-            "0.64.0-191-gca9d2861/bio/isoformSwitchAnalyzeR/analyzePFAM"
+            "0.64.0-196-g5677d3e8/bio/isoformSwitchAnalyzeR/analyzePFAM"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -84,7 +85,10 @@ Code
       x = snakemake@input[["switch_list"]]
     );
 
-    extra <- "switchAnalyzeRlist = switch_list";
+    extra <- base::paste0(
+      "switchAnalyzeRlist = switch_list, pathToPFAMresultFile = ",
+      snakemake@input[["pfam"]]
+    );
     if ("extra" %in% base::names(snakemake@params)) {
       extra <- base::paste(
         extra,
