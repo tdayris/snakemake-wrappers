@@ -10,16 +10,24 @@
 
 
 # The main package
-base::library(package = "isoformSwitchAnalyzeR", quietly = TRUE);
+base::library(package = "IsoformSwitchAnalyzeR", quietly = TRUE);
 
-# Gathering parameters
+# Gathering input files
 quant_files <- sapply(
   snakemake@input[["quant"]],
   function(quant) base::as.character(x = quant)
 );
 
+# Guessing the argument type in importIsoformExpression
+import_type <- ifelse(
+  all(file_test("-f", quant_files)),
+  "sampleVector",
+  "parentDir"
+);
 
-extra <- "parentDir = quant_files";
+
+# Building command line arguments
+extra <- base::paste0(import_type, " = quant_files");
 if ("extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
     extra,
@@ -30,7 +38,7 @@ if ("extra" %in% base::names(snakemake@params)) {
 
 # Buiding command line itself
 command <- base::paste0(
-  "InsoformSwitchAnalyseR::importIsoformExpression(",
+  "IsoformSwitchAnalyzeR::importIsoformExpression(",
   extra,
   ")"
 );
@@ -38,7 +46,7 @@ base::message("Libraries and input data loaded");
 base::message(command);
 
 # Running command
-base::eval(
+isar <- base::eval(
   base::parse(
     text = command
   )
@@ -46,6 +54,6 @@ base::eval(
 
 # Saving results
 base::saveRDS(
-  obj = edgn,
+  obj = isar,
   file = snakemake@output[["rds"]]
 );
