@@ -84,7 +84,7 @@ def test_vembrane():
         ["snakemake", "--cores", "1", "--use-conda", "filtered/out.vcf"],
     )
 
-    
+
 def test_shovill():
     run(
         "bio/shovill",
@@ -2628,6 +2628,13 @@ def test_isoformSwitchAnalyseR_importIsoformExpression():
     )
 
 
+def test_isoformSwitchAnalyseR_preFilter():
+    run(
+        "bio/isoformSwitchAnalyseR/preFilter",
+        ["snakemake", "--cores", "1", "filtered.RDS", "--use-conda", "-F"]
+    )
+
+
 def test_bigr_multiqc():
     run(
         "bio/BiGR/multiqc_rnaseq_report",
@@ -2781,4 +2788,11 @@ def test_snpsift_annotate():
     run(
         "bio/snpsift/annotate",
         ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"]
+    )
+
+
+def test_seaborn_categorical_swarmplot():
+    run(
+        "bio/seaborn/categorical_swarmplot",
+        ["snakemake", "--cores", "1", "plot.png", "--use-conda", "-F"]
     )

@@ -1,0 +1,14 @@
+rule test_seaborn_categorical_histogram:
+    input:
+        "table.tsv",
+        "table2.tsv"
+    output:
+        png = "plot.png",
+        tsv = "freq.tsv"
+    params:
+        column = "Value",
+        index = "Idx"
+    log:
+        "logging.txt"
+    wrapper:
+        "master/bio/seaborn/categorical_swarmplot"
