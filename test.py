@@ -2797,3 +2797,10 @@ def test_concatenate_fastq():
         "bio/concatenate_fastq",
         ["snakemake", "--cores", "2", "concat.fq.gz", "--use-conda", "-F"]
     )
+
+
+def test_check_md5():
+    run(
+        "bio/check_md5",
+        ["snakemake", "--cores", "2", "test.md5", "--use-conda", "-F"]
+    )
