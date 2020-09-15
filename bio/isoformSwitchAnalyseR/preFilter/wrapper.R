@@ -10,7 +10,7 @@
 
 
 # The main package
-base::library(package = "isoformSwitchAnalyzeR", quietly = TRUE);
+base::library(package = "IsoformSwitchAnalyzeR", quietly = TRUE);
 
 # Gathering input dataset and parameters
 switch_list <- base::as.character(
@@ -28,7 +28,7 @@ if ("extra" %in% base::names(snakemake@params)) {
 
 # Buiding command line itself
 command <- base::paste0(
-  "InsoformSwitchAnalyseR::preFilter(",
+  "IsoformSwitchAnalyzeR::preFilter(",
   extra,
   ")"
 );
