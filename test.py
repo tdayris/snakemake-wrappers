@@ -2784,15 +2784,16 @@ def test_chm_eval_eval():
         ["snakemake", "--cores", "1", "--use-conda", "chm-eval/calls.summary"],
     )
 
-def test_snpsift_annotate():
-    run(
-        "bio/snpsift/annotate",
-        ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"]
-    )
-
 
 def test_seaborn_categorical_swarmplot():
     run(
         "bio/seaborn/categorical_swarmplot",
         ["snakemake", "--cores", "1", "plot.png", "--use-conda", "-F"]
+    )
+
+
+def test_concatenate_fastq():
+    run(
+        "bio/concatenate_fastq",
+        ["snakemake", "--cores", "2", "concat.fq.gz", "--use-conda", "-F"]
     )
