@@ -4,6 +4,7 @@ import tempfile
 import shutil
 import pytest
 import sys
+import yaml
 
 DIFF_ONLY = os.environ.get("DIFF_ONLY", "false") == "true"
 
@@ -19,25 +20,39 @@ if DIFF_ONLY:
 def run(wrapper, cmd, check_log=None):
     origdir = os.getcwd()
     with tempfile.TemporaryDirectory() as d:
-        dst = os.path.join(d, "master", wrapper)
+        dst = os.path.join(d, "master")
         os.makedirs(dst, exist_ok=True)
-        copy = lambda src: shutil.copy(os.path.join(wrapper, src), dst)
-        success = False
-        for ext in ("py", "R", "Rmd"):
-            script = "wrapper." + ext
-            if os.path.exists(os.path.join(wrapper, script)):
-                copy(script)
-                success = True
-                break
-        assert success, "No wrapper.{py,R,Rmd} found"
+        copy = lambda pth, src: shutil.copy(os.path.join(pth, src), os.path.join(dst, pth))
 
-        if DIFF_ONLY and not any(f.startswith(wrapper) for f in DIFF_FILES):
+        used_wrappers = []
+        wrapper_file = "used_wrappers.yaml"
+        if os.path.exists(os.path.join(wrapper, wrapper_file)):
+            # is meta wrapper
+            with open(os.path.join(wrapper, wrapper_file), "r") as wf:
+                wf = yaml.load(wf)
+                used_wrappers = wf["wrappers"]
+        else:
+            used_wrappers.append(wrapper)
+
+
+        for w in used_wrappers:
+            success = False
+            for ext in ("py", "R", "Rmd"):
+                script = "wrapper." + ext
+                if os.path.exists(os.path.join(w, script)):
+                    os.makedirs(os.path.join(dst, w), exist_ok=True)
+                    copy(w, script)
+                    success=True
+                    break
+            assert success, "No wrapper script found for {}".format(w)
+            copy(w, "environment.yaml")
+
+        if DIFF_ONLY and not any(any(f.startswith(w) for f in DIFF_FILES) for w in used_wrappers):
             print(
                 "Skipping wrapper {} (not modified).".format(wrapper), file=sys.stderr
             )
             return
 
-        copy("environment.yaml")
         testdir = os.path.join(wrapper, "test")
         # switch to test directory
         os.chdir(testdir)
@@ -76,6 +91,108 @@ def run(wrapper, cmd, check_log=None):
             )
             # go back to original directory
             os.chdir(origdir)
+
+
+def test_bwa_mapping_meta():
+    run(
+        "meta/bio/bwa_mapping",
+        ["snakemake", "--cores", "1", "--use-conda", "mapped/a.bam.bai"],
+    )
+
+
+def test_gridss_call():
+    run(
+        "bio/gridss/call",
+        ["snakemake", "--show-failed-logs", "--cores", "1", "--use-conda", "vcf/group.vcf"],
+    )
+
+
+def test_gridss_assemble():
+    run(
+        "bio/gridss/assemble",
+        ["snakemake", "--show-failed-logs", "--cores", "1", "--use-conda", "assembly/group.bam"],
+    )
+
+
+def test_gridss_preprocess():
+    run(
+        "bio/gridss/preprocess",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "--show-failed-logs",
+            "working_dir/A.bam.gridss.working/A.bam.cigar_metrics",
+            "working_dir/A.bam.gridss.working/A.bam.coverage.blacklist.bed",
+            "working_dir/A.bam.gridss.working/A.bam.idsv_metrics",
+            "working_dir/A.bam.gridss.working/A.bam.insert_size_histogram.pdf",
+            "working_dir/A.bam.gridss.working/A.bam.insert_size_metrics",
+            "working_dir/A.bam.gridss.working/A.bam.mapq_metrics",
+            "working_dir/A.bam.gridss.working/A.bam.sv.bam",
+            "working_dir/A.bam.gridss.working/A.bam.sv.bam.bai",
+            "working_dir/A.bam.gridss.working/A.bam.sv_metrics",
+            "working_dir/A.bam.gridss.working/A.bam.tag_metrics",
+        ],
+    )
+
+
+def test_gridss_setupreference():
+    run(
+        "bio/gridss/setupreference",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "--show-failed-logs",
+            "reference/genome.fasta.gridsscache",
+            "reference/genome.fasta.img",
+        ],
+    )
+
+
+def test_strling_call():
+    run(
+        "bio/strling/call",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "call/A-bounds.txt",
+            "call/A-genotype.txt",
+            "call/A-unplaced.txt",
+        ],
+    )
+
+
+def test_strling_merge():
+    run(
+        "bio/strling/merge",
+        ["snakemake", "--cores", "1", "--use-conda", "merged/group-bounds.txt"],
+    )
+
+
+def test_strling_extract():
+    run(
+        "bio/strling/extract",
+        ["snakemake", "--cores", "1", "--use-conda", "extract/A.bin"],
+    )
+
+
+def test_strling_index():
+    run(
+        "bio/strling/index",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "reference/genome.fasta.str",
+            "reference/genome.fasta.fai",
+        ],
+    )
 
 
 def test_vembrane():
@@ -151,6 +268,7 @@ def test_art_profiler_illumina():
         ],
     )
 
+
 def test_bcftools_call():
     run(
         "bio/bcftools/call",
@@ -177,6 +295,7 @@ def test_bcftools_merge():
         "bio/bcftools/merge",
         ["snakemake", "--cores", "1", "all.bcf", "--use-conda", "-F"],
     )
+
 
 def test_bcftools_mpileup():
     run(
@@ -830,6 +949,27 @@ def test_lofreq_call():
     run(
         "bio/lofreq/call",
         ["snakemake", "--cores", "1", "calls/a.vcf", "--use-conda", "-F"],
+    )
+
+
+def test_macs2_callpeak():
+    run(
+        "bio/macs2/callpeak",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "callpeak/basename_peaks.xls",
+            "callpeak/basename_peaks.narrowPeak",
+            "callpeak/basename_summits.bed",
+            "callpeak_options/basename_peaks.xls",
+            "callpeak_options/basename_peaks.broadPeak",
+            "callpeak_options/basename_peaks.gappedPeak",
+            "callpeak_options/basename_treat_pileup.bdg",
+            "callpeak_options/basename_control_lambda.bdg",
+            "--use-conda",
+            "-F",
+        ],
     )
 
 
@@ -2765,6 +2905,14 @@ def test_iRODS_quant_design():
     )
 
 
+def test_genomepy():
+    # download dm3 genome (relatively small, +/- 250 mb)
+    run(
+        "bio/genomepy",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "dm3/dm3.fa"],
+    )
+
+
 def test_chm_eval_sample():
     run(
         "bio/benchmark/chm-eval-sample",
@@ -2782,6 +2930,13 @@ def test_chm_eval_eval():
     run(
         "bio/benchmark/chm-eval",
         ["snakemake", "--cores", "1", "--use-conda", "chm-eval/calls.summary"],
+    )
+
+
+def test_snpsift_annotate():
+    run(
+        "bio/snpsift/annotate",
+        ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"],
     )
 
 
