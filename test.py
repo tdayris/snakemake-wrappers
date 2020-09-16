@@ -2959,3 +2959,10 @@ def test_check_md5():
         "bio/check_md5",
         ["snakemake", "--cores", "2", "test.md5", "--use-conda", "-F"]
     )
+
+
+def test_unicycler():
+    run(
+        "bio/unicycler",
+        ["snakemake", "--cores", "1", "result/assembly.fasta", "--use-conda", "-F"]
+    )
