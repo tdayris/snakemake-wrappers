@@ -8,19 +8,12 @@ Build a MinHash signature for a transcriptome, genome, or reads
 
 
 
-Software dependencies
----------------------
-
-
-* sourmash==2.0.0a7
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -38,7 +31,7 @@ This wrapper can be used in the following way:
             scaled = "1000",
             extra = ""
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/sourmash/compute"
+            "0.65.0-211-g6a5c5194/bio/sourmash/compute"
 
 
     rule sourmash_transcriptome:
@@ -55,7 +48,7 @@ This wrapper can be used in the following way:
             scaled = "1000",
             extra = ""
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/sourmash/compute"
+            "0.65.0-211-g6a5c5194/bio/sourmash/compute"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -81,24 +74,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    """Snakemake wrapper for sourmash compute."""
-
-    __author__ = "Lisa K. Johnson"
-    __copyright__ = "Copyright 2018, Lisa K. Johnson"
-    __email__ = "ljcohen@ucdavis.edu"
-    __license__ = "MIT"
-
-    from snakemake.shell import shell
-
-    extra = snakemake.params.get("extra", "")
-    scaled = snakemake.params.get("scaled", "1000")
-    k = snakemake.params.get("k", "31")
-
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    shell(
-        "sourmash compute --scaled {scaled} -k {k} {snakemake.input} -o {snakemake.output}"
-        " {extra} {log}"
-    )

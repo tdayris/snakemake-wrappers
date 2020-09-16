@@ -8,19 +8,12 @@ ProSolo can control the false discovery rate of any combination of its defined s
 
 
 
-Software dependencies
----------------------
-
-
-* prosolo ==0.6.1
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -40,7 +33,7 @@ This wrapper can be used in the following way:
         log:
             "logs/prosolo_{sc}_{bulk}.fdr.log"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/prosolo/control-fdr"
+            "0.65.0-211-g6a5c5194/bio/prosolo/control-fdr"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -66,25 +59,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    """Snakemake wrapper for ProSolo FDR control"""
-
-    __author__ = "David Lähnemann"
-    __copyright__ = "Copyright 2020, David Lähnemann"
-    __email__ = "david.laehnemann@uni-due.de"
-    __license__ = "MIT"
-
-    from snakemake.shell import shell
-
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    shell(
-        "( prosolo control-fdr"
-        " {snakemake.input}"
-        " --events {snakemake.params.events}"
-        " --var SNV"
-        " --fdr {snakemake.params.fdr}"
-        " --output {snakemake.output} )"
-        "{log} "
-    )

@@ -8,19 +8,12 @@ PRESEQ LC_EXTRAP
 
 
 
-Software dependencies
----------------------
-
-
-* preseq ==2.0.3
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -34,7 +27,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_bam/{sample}.log"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/preseq/lc_extrap"
+            "0.65.0-211-g6a5c5194/bio/preseq/lc_extrap"
 
     rule preseq_lc_extrap_bed:
         input:
@@ -46,7 +39,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_bed/{sample}.log"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/preseq/lc_extrap"
+            "0.65.0-211-g6a5c5194/bio/preseq/lc_extrap"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -72,23 +65,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    __author__ = "Antonie Vietor"
-    __copyright__ = "Copyright 2020, Antonie Vietor"
-    __email__ = "antonie.v@gmx.de"
-    __license__ = "MIT"
-
-    import os
-    from snakemake.shell import shell
-
-    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
-    params = ""
-    if (os.path.splitext(snakemake.input[0])[-1]) == ".bam":
-        if "-bam" not in (snakemake.input[0]):
-            params = "-bam "
-
-    shell(
-        "(preseq lc_extrap {params} {snakemake.params} {snakemake.input[0]} -output {snakemake.output[0]}) {log}"
-    )

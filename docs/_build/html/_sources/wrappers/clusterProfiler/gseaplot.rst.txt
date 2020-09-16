@@ -7,23 +7,12 @@ Perform GSEA-like plot
 
 
 
-Software dependencies
----------------------
-
-
-* bioconda:bioconductor-enrichplot=1.6.0
-
-* bioconda:bioconductor-clusterprofiler=3.14.0
-
-* conda-forge:r-cairo=1.5_12
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -33,7 +22,7 @@ This wrapper can be used in the following way:
         output:
             png = "gsea.png"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/clusterProfiler/gseaplot"
+            "0.65.0-211-g6a5c5194/bio/clusterProfiler/gseaplot"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -69,64 +58,4 @@ Authors
 Code
 ----
 
-.. code-block:: R
 
-    #!/usr/bin/R
-
-    # This script takes an gsea object from clusterProfiler
-    # and builds a GSEA-like plot
-
-    # __author__ = "Thibault Dayris"
-    # __copyright__ = "Copyright 2020, Thibault Dayris"
-    # __email__ = "thibault.dayris@gustaveroussy.fr"
-    # __license__ = "MIT"
-
-    # Handle enrichment
-    base::library(package = "clusterProfiler", quietly = TRUE);
-    # Handle graphics
-    base::library(package = "Cairo", quietly = TRUE);
-    base::library(package = "enrichplot", quietly = TRUE);
-
-    gsea <- base::readRDS(
-      file = base::as.character(x = snakemake@input[["rds"]])
-    );
-
-    extra <- "x = gsea";
-    if ("extra" %in% base::names(snakemake@params)) {
-      extra <- base::paste(
-        extra,
-        snakemake@params[["extra"]],
-        sep = ", "
-      );
-    } else {
-      extra <- base::paste(
-        extra,
-        "geneSetID = 1",
-        sep = ", "
-      )
-    }
-    base::message("Libraries and input data loaded");
-
-    command <- base::paste0(
-      "enrichplot::gseaplot2(",
-      extra,
-      ")"
-    );
-    base::message(command);
-
-    # Build plot
-    png(
-      filename = snakemake@output[["png"]],
-      width = 1024,
-      height = 768,
-      units = "px",
-      type = "cairo"
-    );
-
-    base::eval(
-      base::parse(
-        text = command
-      )
-    );
-
-    dev.off()

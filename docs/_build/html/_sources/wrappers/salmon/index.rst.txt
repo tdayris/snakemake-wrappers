@@ -8,19 +8,12 @@ Index a transcriptome assembly with salmon
 
 
 
-Software dependencies
----------------------
-
-
-* salmon ==0.14.1
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -36,7 +29,7 @@ This wrapper can be used in the following way:
             # optional parameters
             extra=""
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/salmon/index"
+            "0.65.0-211-g6a5c5194/bio/salmon/index"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -62,21 +55,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    """Snakemake wrapper for Salmon Index."""
-
-    __author__ = "Tessa Pierce"
-    __copyright__ = "Copyright 2018, Tessa Pierce"
-    __email__ = "ntpierce@gmail.com"
-    __license__ = "MIT"
-
-    from snakemake.shell import shell
-
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-    extra = snakemake.params.get("extra", "")
-
-    shell(
-        "salmon index -t {snakemake.input} -i {snakemake.output} "
-        " --threads {snakemake.threads} {extra} {log}"
-    )

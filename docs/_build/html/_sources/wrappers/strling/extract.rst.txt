@@ -1,0 +1,59 @@
+.. _`strling extract`:
+
+STRLING EXTRACT
+===============
+
+STRling (pronounced “sterling”) is a method to detect large short tandem repeat (STR) expansions from short-read sequencing data. ``extract`` retrieves informative read pairs to a binary format for a single sample (same as above, you can use the same bin files). Documentation at: https://strling.readthedocs.io/en/latest/run.html
+
+
+
+
+
+
+Example
+-------
+
+This meta-wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule strling_extract:
+        input:
+            bam="mapped/{sample}.bam",
+            bai="mapped/{sample}.bam.bai",
+            reference="reference/genome.fasta",
+            fai="reference/genome.fasta.fai",
+            index="reference/genome.fasta.str" # optional
+        output:
+            "extract/{sample}.bin"
+        log:
+            "log/strling/extract/{sample}.log"
+        params:
+           extra="" # optionally add further command line arguments
+        wrapper:
+            "0.65.0-211-g6a5c5194/bio/strling/extract"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Christopher Schröder
+
+
+
+Code
+----
+
+

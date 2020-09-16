@@ -8,19 +8,12 @@ PICARD BEDTOINTERVALLIST
 
 
 
-Software dependencies
----------------------
-
-
-* picard ==2.22.1
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -36,7 +29,7 @@ This wrapper can be used in the following way:
             # optional parameters
             "SORT=true " # sort output interval list before writing
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/picard/bedtointervallist"
+            "0.65.0-211-g6a5c5194/bio/picard/bedtointervallist"
 
 
 
@@ -63,25 +56,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    __author__ = "Fabian Kilpert"
-    __copyright__ = "Copyright 2020, Fabian Kilpert"
-    __email__ = "fkilpert@gmail.com"
-    __license__ = "MIT"
-
-
-    from snakemake.shell import shell
-
-
-    log = snakemake.log_fmt_shell()
-
-
-    shell(
-        "picard BedToIntervalList "
-        "{snakemake.params} "
-        "INPUT={snakemake.input.bed} "
-        "SEQUENCE_DICTIONARY={snakemake.input.dict} "
-        "OUTPUT={snakemake.output} "
-        "{log} "
-    )

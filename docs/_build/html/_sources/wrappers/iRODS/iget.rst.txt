@@ -12,7 +12,7 @@ This wrapper performs iRODS copy from a file url
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -22,7 +22,7 @@ This wrapper can be used in the following way:
         params:
             input = "/irods/path/archive/my_file.txt"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/iRODS/iget"
+            "0.65.0-211-g6a5c5194/bio/iRODS/iget"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -58,45 +58,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    #!/usr/bin/python3.8
-    # conding: utf-8
-
-    """
-    A script that handles iRODS copy.
-
-    WARNING: Input file has to be defined in params, as it does not exists outside
-    iRODS environment. Therefore, snakemake would raise a FileNotFoundError
-    (false positive in best cases).
-
-    snakemake.RemoteProvider.iRODS is not used since authentication cannot be
-    securely transmitted within the wrapper.
-    """
-
-    __author__ = "Thibault Dayris"
-    __copyright__ = "Copyright 2020, Thibault Dayris"
-    __email__ = "thibault.dayris@gustaveroussy.fr"
-    __license__ = "MIT"
-
-
-    from snakemake.shell import shell
-
-    # Prepare logging
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-    extra = snakemake.params.get("extra", "-VK")
-
-    if not isinstance(snakemake.params['input'], str):
-        raise TypeError(
-            "A single file is expected in this wrapper. Multiple copies should be "
-            "performed in multiple call of this pipeline."
-        )
-
-    shell(
-        " iget "  # Copy command from iRODS
-        " {extra} "  # Extra parameters
-        " -N {snakemake.threads} "  # Maximum number of threads
-        " {snakemake.params['input']} "  # Input collection
-        " {snakemake.output[0]} "  # Output path
-        " {log} "  # Logging behavior
-    )

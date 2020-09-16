@@ -7,19 +7,12 @@ Sort bam file with sambamba
 
 
 
-Software dependencies
----------------------
-
-
-* sambamba ==0.6.6
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -32,7 +25,7 @@ This wrapper can be used in the following way:
             ""  # optional parameters
         threads: 8
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/sambamba/sort"
+            "0.65.0-211-g6a5c5194/bio/sambamba/sort"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -58,18 +51,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    __author__ = "Johannes Köster"
-    __copyright__ = "Copyright 2016, Johannes Köster"
-    __email__ = "koester@jimmy.harvard.edu"
-    __license__ = "MIT"
-
-
-    import os
-    from snakemake.shell import shell
-
-    shell(
-        "sambamba sort {snakemake.params} -t {snakemake.threads} "
-        "-o {snakemake.output[0]} {snakemake.input[0]}"
-    )

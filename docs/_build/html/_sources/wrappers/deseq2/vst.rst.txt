@@ -7,19 +7,12 @@ Apply a variance stabilizing transformation
 
 
 
-Software dependencies
----------------------
-
-
-* bioconductor-deseq2==1.26.0
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -43,7 +36,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_vst.log"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/deseq2/vst"
+            "0.65.0-211-g6a5c5194/bio/deseq2/vst"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -69,58 +62,4 @@ Authors
 Code
 ----
 
-.. code-block:: R
 
-    #!/usr/bin/R
-
-    # __author__ = "Thibault Dayris"
-    # __copyright__ = "Copyright 2020, Thibault Dayris"
-    # __email__ = "thibault.dayris@gustaveroussy.fr"
-    # __license__ = "MIT"
-
-    # This script takes a deseq2 dataset object and performs
-    # a variance stabilizing transformations transformation on it
-
-    # Differential Gene expression
-    base::library(package = "DESeq2", quietly = TRUE);
-    # Handle large datasets
-    base::library(package = "SummarizedExperiment", quietly = TRUE);
-
-    # Cast input path as character
-    dds_path <- base::as.character(x = snakemake@input[["dds"]]);
-    dds <- base::readRDS(file = dds_path);
-
-    # Recover extra parameters
-    extra <- "";
-    if ("extra" %in% names(snakemake@params)) {
-      extra <- base::paste0(
-        ", ",
-        base::as.character(x = snakemake@params[["extra"]])
-      );
-    }
-
-    # Create object
-    vst <- base::eval(
-      base::parse(
-        text = base::paste0(
-          "DESeq2::vst(object = dds ", extra, ");"
-        )
-      )
-    );
-
-    # Save results
-    output_rds <- base::as.character(snakemake@output[["rds"]]);
-    base::saveRDS(
-      obj = vst,
-      file = output_rds
-    );
-
-
-    output_table <- base::as.character(snakemake@output[["tsv"]]);
-    tsv <- SummarizedExperiment::assay(vst);
-    utils::write.table(
-      x = tsv,
-      file = output_table,
-      sep = "\t",
-      quote = FALSE
-    );

@@ -7,19 +7,12 @@ Index a transcriptome using kallisto.
 
 
 
-Software dependencies
----------------------
-
-
-* kallisto ==0.45.0
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -34,7 +27,7 @@ This wrapper can be used in the following way:
             "logs/kallisto_index_{transcriptome}.log"
         threads: 1
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/kallisto/index"
+            "0.65.0-211-g6a5c5194/bio/kallisto/index"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -60,32 +53,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    """Snakemake wrapper for Kallisto index"""
-
-    __author__ = "Joël Simoneau"
-    __copyright__ = "Copyright 2019, Joël Simoneau"
-    __email__ = "simoneaujoel@gmail.com"
-    __license__ = "MIT"
-
-    from snakemake.shell import shell
-
-    # Creating log
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    # Placeholder for optional parameters
-    extra = snakemake.params.get("extra", "")
-
-    # Allowing for multiple FASTA files
-    fasta = snakemake.input.get("fasta")
-    assert fasta is not None, "input-> a FASTA-file is required"
-    fasta = " ".join(fasta) if isinstance(fasta, list) else fasta
-
-    shell(
-        "kallisto index "  # Tool
-        "{extra} "  # Optional parameters
-        "--index={snakemake.output.index} "  # Output file
-        "{fasta} "  # Input FASTA files
-        "{log}"  # Logging
-    )

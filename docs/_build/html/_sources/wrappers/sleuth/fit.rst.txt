@@ -8,19 +8,12 @@ Fit a provided model to sleuth object
 
 
 
-Software dependencies
----------------------
-
-
-* bioconda:r-sleuth
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -30,7 +23,7 @@ This wrapper can be used in the following way:
         output:
             rds = "fit.rds"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/sleuth/fit"
+            "0.65.0-211-g6a5c5194/bio/sleuth/fit"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -64,50 +57,4 @@ Authors
 Code
 ----
 
-.. code-block:: R
 
-    #!/bin/R
-
-    # Snakemake wrapper for sleuth fit
-    # __author__ = "Thibault Dayris"
-    # __copyright__ = "Copyright 2020, Thibault Dayris"
-    # __email__ = "thibault.dayris@gustaveroussy.fr"
-    # __license__ = "MIT"
-
-    base::library(package = "sleuth", quietly = TRUE);
-
-    threads <- snakemake@threads;
-    mc.cores <- threads;
-    options(mc.cores = threads);
-
-    so <- base::readRDS(
-        file = snakemake@input[["rds"]]
-    );
-
-    extra <- "";
-    if ("extra" %in% names(snakemake@params)) {
-      extra <- base::as.character(
-        x = snakemake@params[["extra"]]
-      );
-    }
-
-    command <- base::paste(
-      "sleuth::sleuth_fit(",
-      "obj = so",
-      extra,
-      ")",
-      sep = ", "
-    );
-
-    ## Finally run sleuth prep
-    so_fit <- base::eval(
-      base::parse(
-        text = command
-      )
-    );
-
-
-    base::saveRDS(
-      object = so_fit,
-      file = snakemake@output[["rds"]]
-    );

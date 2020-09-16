@@ -1,0 +1,99 @@
+.. _`gridss assemble`:
+
+GRIDSS ASSEMBLE
+===============
+
+GRIDSS is a module software suite containing tools useful for the detection of genomic rearrangements. It includes a genome-wide break-end assembler, as well as a structural variation caller for Illumina sequencing data. ``assemble`` performs GRIDSS breakend assembly. Documentation at: https://github.com/PapenfussLab/gridss
+
+
+
+
+
+
+Example
+-------
+
+This meta-wrapper can be used in the following way:
+
+.. code-block:: python
+
+    WORKING_DIR = "working_dir"
+    samples = ["A", "B"]
+
+    preprocess_endings = (
+        ".cigar_metrics",
+        ".coverage.blacklist.bed",
+        ".idsv_metrics",
+        ".insert_size_histogram.pdf",
+        ".insert_size_metrics",
+        ".mapq_metrics",
+        ".sv.bam",
+        ".sv.bam.bai",
+        ".sv_metrics",
+        ".tag_metrics",
+        )
+
+    assembly_endings = (
+        ".cigar_metrics",
+        ".coverage.blacklist.bed",
+        ".downsampled_0.bed",
+        ".excluded_0.bed",
+        ".idsv_metrics",
+        ".mapq_metrics",
+        ".quality_distribution.pdf",
+        ".quality_distribution_metrics",
+        ".subsetCalled_0.bed",
+        ".sv.bam",
+        ".sv.bam.bai",
+        ".tag_metrics",
+        )
+
+    reference_index_endings = (".amb",".ann", ".bwt", ".pac", ".sa", ".gridsscache", ".img")
+
+    rule gridss_assemble:
+        input:
+            bams=expand("mapped/{sample}.bam", sample=samples),
+            bais=expand("mapped/{sample}.bam.bai", sample=samples),
+            reference="reference/genome.fasta",
+            dictionary="reference/genome.dict",
+            indices=multiext("reference/genome.fasta", *reference_index_endings),
+            preprocess=expand("{working_dir}/{sample}.bam.gridss.working/{sample}.bam{ending}", working_dir=[WORKING_DIR], sample=samples, ending=preprocess_endings)
+        output:
+            assembly="assembly/group.bam",
+            assembly_others=expand("{working_dir}/group.bam.gridss.working/group.bam{ending}", working_dir=[WORKING_DIR], ending=assembly_endings)
+        params:
+            extra="--jvmheap 1g",
+            workingdir=WORKING_DIR
+        log:
+            "log/gridss/assemble/group.log"
+        threads:
+            100
+        wrapper:
+            "0.65.0-211-g6a5c5194/bio/gridss/assemble"
+
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Christopher Schröder
+
+
+
+Code
+----
+
+

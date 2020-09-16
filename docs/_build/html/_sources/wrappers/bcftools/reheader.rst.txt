@@ -7,19 +7,12 @@ Change header or sample names of vcf/bcf file.
 
 
 
-Software dependencies
----------------------
-
-
-* bcftools ==1.10
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -36,7 +29,7 @@ This wrapper can be used in the following way:
             extra="",  # optional parameters for bcftools reheader
             view_extra="-O b"  # add output format for internal bcftools view call
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/bcftools/reheader"
+            "0.65.0-211-g6a5c5194/bio/bcftools/reheader"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -62,39 +55,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    __author__ = "Jan Forster"
-    __copyright__ = "Copyright 2020, Jan Forster"
-    __email__ = "j.forster@dkfz.de"
-    __license__ = "MIT"
-
-
-    from snakemake.shell import shell
-
-    ## Extract arguments
-    header = snakemake.input.get("header", "")
-    if header:
-        header_cmd = "-h " + header
-    else:
-        header_cmd = ""
-
-    samples = snakemake.input.get("samples", "")
-    if samples:
-        samples_cmd = "-s " + samples
-    else:
-        samples_cmd = ""
-
-    extra = snakemake.params.get("extra", "")
-    view_extra = snakemake.params.get("view_extra", "")
-
-    shell(
-        "bcftools reheader "
-        "{extra} "
-        "{header_cmd} "
-        "{samples_cmd} "
-        "{snakemake.input.vcf} "
-        "| bcftools view "
-        "{view_extra} "
-        "> {snakemake.output}"
-    )

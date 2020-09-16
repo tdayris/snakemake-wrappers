@@ -7,19 +7,12 @@ Filter a VRange file and keep only SNVs
 
 
 
-Software dependencies
----------------------
-
-
-* bioconda:bioconductor-variantannotation=1.34.0
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -29,7 +22,7 @@ This wrapper can be used in the following way:
         output:
             rds = "snv.rds"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/VariantAnnotation/isSNV"
+            "0.65.0-211-g6a5c5194/bio/VariantAnnotation/isSNV"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -62,27 +55,4 @@ Authors
 Code
 ----
 
-.. code-block:: R
 
-    #!/usr/bin/R
-
-    # Filter VCF based on the SNP status
-    library(package = "VariantAnnotation", quietly = TRUE);
-    library(package = "Biostrings", quietly = TRUE);
-
-    # Load dataset
-    vcf <- base::readRDS(
-      base::as.character(x = snakemake@input[["calls"]])
-    );
-
-    # Filter dataset on SNVs
-    keep_snv <- VariantAnnotation::isSNV(vcf, singleAltOnly=TRUE);
-    keep_ref <- VariantAnnotation::ref(vcf) %in% Biostrings::DNA_BASES;
-    keep_alt <- VariantAnnotation::alt(vcf) %in% Biostrings::DNA_BASES;
-    vcf <- vcf[keep_alt & keep_ref & keep_snv, ];
-
-    # Save results
-    base::saveRDS(
-      object = vcf,
-      file = base::as.character(x = snakemake@output[["rds"]])
-    );

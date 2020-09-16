@@ -28,19 +28,12 @@ In addition to required output, an optional output file of read counts can be ge
 
 
 
-Software dependencies
----------------------
-
-
-* deeptools ==3.4.3
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -61,7 +54,7 @@ This wrapper can be used in the following way:
             # optional parameters
             "--numberOfSamples 200 "
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/deeptools/plotfingerprint"
+            "0.65.0-211-g6a5c5194/bio/deeptools/plotfingerprint"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -87,28 +80,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    __author__ = "Antonie Vietor"
-    __copyright__ = "Copyright 2020, Antonie Vietor"
-    __email__ = "antonie.v@gmx.de"
-    __license__ = "MIT"
-
-    from snakemake.shell import shell
-
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    out_counts = snakemake.output.get("counts")
-
-    optional_output = ""
-
-    if out_counts:
-        optional_output += " --outRawCounts {out_counts} ".format(out_counts=out_counts)
-
-    shell(
-        "(plotFingerprint "
-        "-b {snakemake.input.bam_files} "
-        "-o {snakemake.output.fingerprint} "
-        "{optional_output} "
-        "{snakemake.params}) {log}"
-    )

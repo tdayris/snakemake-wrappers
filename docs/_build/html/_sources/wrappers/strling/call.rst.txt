@@ -1,0 +1,63 @@
+.. _`strling call`:
+
+STRLING CALL
+============
+
+STRling (pronounced like “sterling”) is a method to detect large short tandem repeat (STR) expansions from short-read sequencing data. ``call`` calls genotypes/estimate allele sizes for all loci in each sample. Documentation at: https://strling.readthedocs.io/en/latest/run.html
+
+
+
+
+
+
+Example
+-------
+
+This meta-wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule strling_call:
+        input:
+            bam="mapped/{sample}.bam",
+            bai="mapped/{sample}.bam.bai",
+            bin="extract/{sample}.bin",
+            reference="reference/genome.fasta",
+            fai="reference/genome.fasta.fai",
+            bounds="merged/group-bounds.txt" # optional, produced by strling merge
+        output:
+            "call/{sample}-bounds.txt", # must end with -bounds.txt
+            "call/{sample}-genotype.txt", # must end with -genotype.txt
+            "call/{sample}-unplaced.txt" # must end with -unplaced.txt
+        params:
+            extra="" # optional extra command line arguments
+        log:
+            "log/strling/call/{sample}.log"
+        wrapper:
+            "0.65.0-211-g6a5c5194/bio/strling/call" 
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Christopher Schröder
+
+
+
+Code
+----
+
+

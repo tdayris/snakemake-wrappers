@@ -7,19 +7,12 @@ Mapping (short) reads against a reference sequence. Can have multiple output for
 
 
 
-Software dependencies
----------------------
-
-
-* razers3 ==3.5.8
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -39,7 +32,7 @@ This wrapper can be used in the following way:
             extra=""
         threads: 8
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/razers3"
+            "0.65.0-211-g6a5c5194/bio/razers3"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -65,27 +58,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    __author__ = "Jan Forster"
-    __copyright__ = "Copyright 2020, Jan Forster"
-    __email__ = "j.forster@dkfz.de"
-    __license__ = "MIT"
-
-
-    import os
-    from snakemake.shell import shell
-
-    extra = snakemake.params.get("extra", "")
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-
-    shell(
-        "(razers3"
-        " -tc {snakemake.threads}"
-        " {extra}"
-        " -o {snakemake.output[0]}"
-        " {snakemake.params.genome}"
-        " {snakemake.input.reads})"
-        " {log}"
-    )

@@ -8,19 +8,12 @@ Mark PCR and optical duplicates with picard tools.
 
 
 
-Software dependencies
----------------------
-
-
-* picard ==2.22.1
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -35,7 +28,7 @@ This wrapper can be used in the following way:
         params:
             "REMOVE_DUPLICATES=true"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/picard/markduplicates"
+            "0.65.0-211-g6a5c5194/bio/picard/markduplicates"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -61,20 +54,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    __author__ = "Johannes Köster"
-    __copyright__ = "Copyright 2016, Johannes Köster"
-    __email__ = "koester@jimmy.harvard.edu"
-    __license__ = "MIT"
-
-
-    from snakemake.shell import shell
-
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    shell(
-        "picard MarkDuplicates {snakemake.params} INPUT={snakemake.input} "
-        "OUTPUT={snakemake.output.bam} METRICS_FILE={snakemake.output.metrics} "
-        "{log}"
-    )

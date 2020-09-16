@@ -7,21 +7,12 @@ Align nucleotide reads to a protein fasta file (that has been indexed with palad
 
 
 
-Software dependencies
----------------------
-
-
-* paladin=1.4.4
-
-* samtools=1.5
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -35,7 +26,7 @@ This wrapper can be used in the following way:
             "logs/paladin/{sample}.log"
         threads: 4
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/paladin/align"
+            "0.65.0-211-g6a5c5194/bio/paladin/align"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -61,39 +52,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    """Snakemake wrapper for PALADIN alignment"""
-
-    __author__ = "N. Tessa Pierce"
-    __copyright__ = "Copyright 2019, N. Tessa Pierce"
-    __email__ = "ntpierce@gmail.com"
-    __license__ = "MIT"
-
-    from os import path
-    from snakemake.shell import shell
-
-    extra = snakemake.params.get("extra", "")
-    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
-    r = snakemake.input.get("reads")
-    assert (
-        r is not None
-    ), "reads are required as input. If you have paired end reads, please merge them first (e.g. with PEAR)"
-    index = snakemake.input.get("index")
-    assert (
-        index is not None
-    ), "please index your assembly and provide the basename (with'.bwt' extension) via the 'index' input param"
-
-    index_base = str(index).rsplit(".bwt")[0]
-
-    outfile = snakemake.output
-
-    # if bam output, pipe to bam!
-    output_cmd = "  | samtools view -Sb - > " if str(outfile).endswith(".bam") else " -o "
-
-    min_orf_len = snakemake.params.get("f", "250")
-
-    shell(
-        "paladin align -f {min_orf_len} -t {snakemake.threads} {extra} {index_base} {r} {output_cmd} {outfile}"
-    )

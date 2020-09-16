@@ -8,19 +8,12 @@ Merge vcf files using picard tools.
 
 
 
-Software dependencies
----------------------
-
-
-* picard ==2.22.1
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -34,7 +27,7 @@ This wrapper can be used in the following way:
         params:
             extra=""
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/picard/mergevcfs"
+            "0.65.0-211-g6a5c5194/bio/picard/mergevcfs"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -60,28 +53,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    """Snakemake wrapper for picard MergeSamFiles."""
-
-    __author__ = "Johannes Köster"
-    __copyright__ = "Copyright 2018, Johannes Köster"
-    __email__ = "johannes.koester@protonmail.com"
-    __license__ = "MIT"
-
-
-    from snakemake.shell import shell
-
-
-    inputs = " ".join("INPUT={}".format(f) for f in snakemake.input.vcfs)
-    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-    extra = snakemake.params.get("extra", "")
-
-    shell(
-        "picard"
-        " MergeVcfs"
-        " {extra}"
-        " {inputs}"
-        " OUTPUT={snakemake.output[0]}"
-        " {log}"
-    )

@@ -7,21 +7,12 @@ Draw a heatmap from enriched terms and GSEA
 
 
 
-Software dependencies
----------------------
-
-
-* bioconda:bioconductor-enrichplot=1.4.0
-
-* bioconda:bioconductor-clusterprofiler=3.12.0
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -33,7 +24,7 @@ This wrapper can be used in the following way:
         params:
             upsetplot_extra = "n = 5"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/clusterProfiler/upsetplot"
+            "0.65.0-211-g6a5c5194/bio/clusterProfiler/upsetplot"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -69,70 +60,4 @@ Authors
 Code
 ----
 
-.. code-block:: R
 
-    #!/usr/bin/R
-
-    # This script takes an enriched terms object from clusterProfiler
-    # and builds a upsetplot of most enriched terms or provided list of
-    # pathways
-
-    # __author__ = "Thibault Dayris"
-    # __copyright__ = "Copyright 2020, Thibault Dayris"
-    # __email__ = "thibault.dayris@gustaveroussy.fr"
-    # __license__ = "MIT"
-
-    # Handle enrichment
-    base::library(package = "clusterProfiler", quietly = TRUE);
-    # Handle graphics
-    # base::library(package = "Cairo", quietly = TRUE);
-    base::library(package = "enrichplot", quietly = TRUE);
-
-    enriched <- base::readRDS(
-      file = base::as.character(x = snakemake@input[["rds"]])
-    );
-
-    fc <- NULL;
-    if ("gene_list" %in% base::names(snakemake@input)) {
-      fc <- readRDS(
-        file = base::as.character(snakemake@input[["gene_list"]])
-      );
-    }
-
-    upsetplot_extra <- "x = enriched";
-    if ("upsetplot_extra" %in% base::names(snakemake@params)) {
-      upsetplot_extra <- base::paste(
-        upsetplot_extra,
-        snakemake@params[["upsetplot_extra"]],
-        sep = ", "
-      );
-    }
-    base::message("Libraries and input data loaded");
-
-    # Build command line
-    command <- base::paste0(
-      "enrichplot::upsetplot(",
-      upsetplot_extra,
-      ")"
-    );
-    base::message(command);
-
-    print(head(enriched))
-
-    # Build plot
-    png(
-      filename = snakemake@output[["png"]],
-      width = 1024,
-      height = 768,
-      units = "px",
-      # type = "cairo"
-    );
-
-
-    base::eval(
-      base::parse(
-        text = command
-      )
-    );
-
-    dev.off()

@@ -7,19 +7,12 @@ Multiple alignment of nucleic acid and protein sequences.
 
 
 
-Software dependencies
----------------------
-
-
-* clustalo ==1.2.4
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -34,7 +27,7 @@ This wrapper can be used in the following way:
             "logs/clustalo/test/{sample}.log"
         threads: 8
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/clustalo"
+            "0.65.0-211-g6a5c5194/bio/clustalo"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -60,28 +53,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    """Snakemake wrapper for clustal omega."""
-
-    __author__ = "Michael Hall"
-    __copyright__ = "Copyright 2019, Michael Hall"
-    __email__ = "mbhall88@gmail.com"
-    __license__ = "MIT"
-
-
-    from snakemake.shell import shell
-
-    # Placeholder for optional parameters
-    extra = snakemake.params.get("extra", "")
-    # Formats the log redrection string
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    # Executed shell command
-    shell(
-        "clustalo {extra}"
-        " --threads={snakemake.threads}"
-        " --in {snakemake.input[0]}"
-        " --out {snakemake.output[0]} "
-        " {log}"
-    )

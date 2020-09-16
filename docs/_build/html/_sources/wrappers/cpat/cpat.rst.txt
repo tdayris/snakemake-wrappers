@@ -7,19 +7,12 @@ Assess coding potential
 
 
 
-Software dependencies
----------------------
-
-
-* bioconda:cpat=2.0.0
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -31,7 +24,7 @@ This wrapper can be used in the following way:
         output:
             "cpat_results.tsv"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/cpat/cpat"
+            "0.65.0-211-g6a5c5194/bio/cpat/cpat"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -57,36 +50,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    #!/usr/bin/python3
-    # -*- coding: utf-8 -*-
-
-    """This is the Snakemake Wrapper for CPAT"""
-
-    __author__ = "Thibault Dayris"
-    __copyright__ = "Copyright 2020, Thibault Dayris"
-    __email__ = "thibault.dayris@gustaveroussy.fr"
-    __license__ = "MIT"
-
-
-    from snakemake.shell import shell
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    # A reference sequence in FASTA format is needed only if
-    # transcript file was in BED format.
-    reference = ""
-    if "reference" in snakemake.input.keys():
-        reference = "--ref {}".format(snakemake.input["reference"])
-
-    extra = snakemake.params.get("extra", "")
-
-    shell(
-        " cpat.py "
-        " --gene {snakemake.input['trnascripts']} "
-        " {reference} "
-        " --hex {snakemake.input['hexamer_table']} "
-        " --logitModel {snakemake.input['logitModel']}"
-        " {extra} "
-        " {log} "
-    )

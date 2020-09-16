@@ -7,19 +7,12 @@ A versatile pairwise aligner for genomic and spliced nucleotide sequences https:
 
 
 
-Software dependencies
----------------------
-
-
-* minimap2 ==2.17
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -35,7 +28,7 @@ This wrapper can be used in the following way:
             extra="-x map-pb"  # optional
         threads: 3
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/minimap2/aligner"
+            "0.65.0-211-g6a5c5194/bio/minimap2/aligner"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -63,21 +56,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    __author__ = "Tom Poorten"
-    __copyright__ = "Copyright 2017, Tom Poorten"
-    __email__ = "tom.poorten@gmail.com"
-    __license__ = "MIT"
-
-    from snakemake.shell import shell
-
-    extra = snakemake.params.get("extra", "")
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    inputQuery = " ".join(snakemake.input.query)
-
-    shell(
-        "(minimap2 -t {snakemake.threads} {extra} -o {snakemake.output[0]} "
-        "{snakemake.input.target} {inputQuery}) {log}"
-    )

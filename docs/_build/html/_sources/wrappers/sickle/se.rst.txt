@@ -7,19 +7,12 @@ Trim single-end reads with sickle.
 
 
 
-Software dependencies
----------------------
-
-
-* sickle-trim ==1.33
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -35,7 +28,7 @@ This wrapper can be used in the following way:
       log:
         "logs/sickle/job.log"
       wrapper:
-        "0.64.0-196-g5677d3e8/bio/sickle/pe"
+        "0.65.0-211-g6a5c5194/bio/sickle/pe"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -61,20 +54,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    __author__ = "Wibowo Arindrarto"
-    __copyright__ = "Copyright 2016, Wibowo Arindrarto"
-    __email__ = "bow@bow.web.id"
-    __license__ = "BSD"
-
-    from snakemake.shell import shell
-
-    # Placeholder for optional parameters
-    extra = snakemake.params.get("extra", "")
-    log = snakemake.log_fmt_shell()
-
-    shell(
-        "(sickle se -f {snakemake.input[0]} -o {snakemake.output[0]} "
-        "-t {snakemake.params.qual_type} {extra}) {log}"
-    )

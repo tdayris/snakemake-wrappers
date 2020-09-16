@@ -7,19 +7,12 @@ Starting from a CM database <cmfile> in standard Infernal-1.1 format, construct 
 
 
 
-Software dependencies
----------------------
-
-
-* infernal=1.1.2
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -36,7 +29,7 @@ This wrapper can be used in the following way:
         params:
             extra="",
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/infernal/cmpress"
+            "0.65.0-211-g6a5c5194/bio/infernal/cmpress"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -62,21 +55,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    """Snakemake wrapper for Infernal CMpress"""
-
-    __author__ = "N. Tessa Pierce"
-    __copyright__ = "Copyright 2019, N. Tessa Pierce"
-    __email__ = "ntpierce@gmail.com"
-    __license__ = "MIT"
-
-    from os import path
-    from snakemake.shell import shell
-
-    extra = snakemake.params.get("extra", "")
-
-    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
-    # -F enables overwrite of old (otherwise cmpress will fail if old versions exist)
-    shell("cmpress -F {snakemake.input} {log}")

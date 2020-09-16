@@ -7,19 +7,12 @@ Pseudoalign reads and quantify transcripts using kallisto.
 
 
 
-Software dependencies
----------------------
-
-
-* kallisto ==0.45.0
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -35,7 +28,7 @@ This wrapper can be used in the following way:
             "logs/kallisto_quant_{exp}.log"
         threads: 1
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/kallisto/quant"
+            "0.65.0-211-g6a5c5194/bio/kallisto/quant"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -61,34 +54,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    """Snakemake wrapper for Kallisto quant"""
-
-    __author__ = "Joël Simoneau"
-    __copyright__ = "Copyright 2019, Joël Simoneau"
-    __email__ = "simoneaujoel@gmail.com"
-    __license__ = "MIT"
-
-    from snakemake.shell import shell
-
-    # Creating log
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    # Placeholder for optional parameters
-    extra = snakemake.params.get("extra", "")
-
-    # Allowing for multiple FASTQ files
-    fastq = snakemake.input.get("fastq")
-    assert fastq is not None, "input-> a FASTQ-file is required"
-    fastq = " ".join(fastq) if isinstance(fastq, list) else fastq
-
-    shell(
-        "kallisto quant "  # Tool
-        "{extra} "  # Optional parameters
-        "--threads={snakemake.threads} "  # Number of threads
-        "--index={snakemake.input.index} "  # Input file
-        "--output-dir={snakemake.output} "  # Output directory
-        "{fastq} "  # Input FASTQ files
-        "{log}"  # Logging
-    )

@@ -7,23 +7,12 @@ Perform GSE analysis on Network of Cancer Genes
 
 
 
-Software dependencies
----------------------
-
-
-* bioconda:bioconductor-clusterprofiler=3.14.0
-
-* bioconda:bioconductor-org.hs.eg.db=3.10.0
-
-* bioconda:bioconductor-dose=3.12.0
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -36,7 +25,7 @@ This wrapper can be used in the following way:
         params:
             gseNCG_extra = "pvalueCutoff  = 1, pAdjustMethod = 'BH', by = 'DOSE'"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/clusterProfiler/gseNCG"
+            "0.65.0-211-g6a5c5194/bio/clusterProfiler/gseNCG"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -75,68 +64,4 @@ Authors
 Code
 ----
 
-.. code-block:: R
 
-    #!/usr/bin/R
-
-    # This script takes a geneList object and performs
-    # an GSEA based on NCG
-
-    # __author__ = "Thibault Dayris"
-    # __copyright__ = "Copyright 2020, Thibault Dayris"
-    # __email__ = "thibault.dayris@gustaveroussy.fr"
-    # __license__ = "MIT"
-
-    # Perform gene enrichment
-    base::library(package = "DOSE", quietly = TRUE);
-    base::library(package = "clusterProfiler", quietly = TRUE);
-    # Loading databases
-    base::library(package = "org.Hs.eg.db", quietly = TRUE);
-
-
-    # Loading input dataset
-    geneList <- base::readRDS(
-      file = snakemake@input[["rds"]]
-    );
-
-    extra <- "geneList, verbose = TRUE";
-    if ("gseNCG_extra" %in% base::names(snakemake@params)) {
-      extra <- base::paste(
-        extra,
-        snakemake@params[["gseNCG_extra"]],
-        sep = ", "
-      )
-    }
-
-    command <- base::paste0(
-      "DOSE::gseNCG(",
-      extra,
-      ")"
-    );
-    base::message("Libraries and datasets loaded");
-    base::message(command);
-
-    # Performing DOSE enrichment
-    gse_ncg <- base::eval(
-      base::parse(
-        text = command
-      )
-    );
-    base::message("GSEA done");
-
-    gse_ncg <- DOSE::setReadable(
-        x = gse_ncg,
-        OrgDb = org.Hs.eg.db,
-        keyType = "ENTREZID"
-    );
-
-    # Saving results
-    base::saveRDS(
-      obj = gse_ncg,
-      file = snakemake@output[["rds"]]
-    );
-
-    utils::write.table(
-      x = gse_ncg,
-      file = snakemake@output[["tsv"]]
-    );

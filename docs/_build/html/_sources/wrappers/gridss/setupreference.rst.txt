@@ -1,0 +1,57 @@
+.. _`gridss setupreference`:
+
+GRIDSS SETUPREFERENCE
+=====================
+
+GRIDSS is a module software suite containing tools useful for the detection of genomic rearrangements. It includes a genome-wide break-end assembler, as well as a structural variation caller for Illumina sequencing data. ``setupreference`` is a once-off setup generating additional files in the same directory as the reference. WARNING multiple instances of GRIDSS attempting to perform setupreference at the same time will result in file corruption. Make sure these files are generated before running parallel GRIDSS jobs. Documentation at: https://github.com/PapenfussLab/gridss
+
+
+
+
+
+
+Example
+-------
+
+This meta-wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule gridss_setupreference:
+        input:
+            reference="reference/genome.fasta",
+            dictionary="reference/genome.dict",
+            indices=multiext("reference/genome.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa")
+        output:
+            multiext("reference/genome.fasta", ".gridsscache", ".img")
+        params:
+            extra="--jvmheap 1g"
+        log:
+            "log/gridss/setupreference.log"
+        wrapper:
+            "0.65.0-211-g6a5c5194/bio/gridss/setupreference"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Christopher Schröder
+
+
+
+Code
+----
+
+

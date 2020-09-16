@@ -8,19 +8,12 @@ Find ChIP- or ATAC-Seq peaks with the HOMER suite. For more information, please 
 
 
 
-Software dependencies
----------------------
-
-
-* homer ==4.11
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -39,7 +32,7 @@ This wrapper can be used in the following way:
         log:
             "logs/findPeaks/{sample}.log"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/homer/findPeaks"
+            "0.65.0-211-g6a5c5194/bio/homer/findPeaks"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -65,32 +58,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    __author__ = "Jan Forster"
-    __copyright__ = "Copyright 2020, Jan Forster"
-    __email__ = "j.forster@dkfz.de"
-    __license__ = "MIT"
-
-    from snakemake.shell import shell
-    import os.path as path
-    import sys
-
-    extra = snakemake.params.get("extra", "")
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    control = snakemake.input.get("control", "")
-    if control == "":
-        control_command = ""
-    else:
-        control_command = "-i " + control
-
-    shell(
-        "(findPeaks"
-        " {snakemake.input.tag}"
-        " -style {snakemake.params.style}"
-        " {extra}"
-        " {control_command}"
-        " -o {snakemake.output})"
-        " {log}"
-    )

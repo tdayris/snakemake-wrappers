@@ -7,19 +7,12 @@ Read fasta files and return it as a RDS object
 
 
 
-Software dependencies
----------------------
-
-
-* bioconda:bioconductor-rsamtools=2.4.0
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -30,7 +23,7 @@ This wrapper can be used in the following way:
         output:
             rds="sequence.rds"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/Rsamtools/FaFile"
+            "0.65.0-211-g6a5c5194/bio/Rsamtools/FaFile"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -56,21 +49,4 @@ Authors
 Code
 ----
 
-.. code-block:: R
 
-    #!/usr/bin/R
-
-    # Load a fasta file and return a RDS object
-    library(package="Rsamtools", quietly=TRUE);
-
-    # Load dataset
-    fasta <- Rsamtools::FaFile(
-      file = base::as.character(x = snakemake@input[["fasta"]]),
-      index = base::as.character(x = snakemake@input[["fai"]])
-    );
-
-    # Save as RDS object
-    base::saveRDS(
-      object = fasta,
-      file = base::as.character(x = snakemake@output[["rds"]])
-    );

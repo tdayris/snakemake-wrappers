@@ -1,0 +1,57 @@
+.. _`genomepy`:
+
+GENOMEPY
+========
+
+Download genomes the easy way:
+https://github.com/vanheeringen-lab/genomepy
+
+
+
+
+
+
+Example
+-------
+
+This meta-wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule genomepy:
+        output:
+            multiext("{assembly}/{assembly}", ".fa", ".fa.fai", ".fa.sizes", ".gaps.bed", 
+                     ".annotation.gtf.gz", ".blacklist.bed")
+        log:
+            "logs/genomepy_{assembly}.log"
+        params:
+            provider="UCSC"  # optional, defaults to ucsc. Choose from ucsc, ensembl, and ncbi
+        cache: True  # mark as eligible for between workflow caching
+        wrapper:
+            "0.65.0-211-g6a5c5194/bio/genomepy"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+
+Authors
+-------
+
+
+* Maarten van der Sande
+
+
+
+Code
+----
+
+

@@ -1,0 +1,60 @@
+.. _`check MD5`:
+
+CHECK MD5
+=========
+
+Verify MD5 validity bewteen a provided file and a provided hash
+
+
+
+
+
+Example
+-------
+
+This meta-wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_check_md5_with_expected_hash_as_file:
+        input:
+            file = "test.txt",
+            hash = "expected.md5"
+        output:
+            "test.md5"
+        wrapper:
+            "0.65.0-211-g6a5c5194/bio/check_md5"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+If no expected-hash file is provided, then the hash value should be passed as
+a parameter: hash_value
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+

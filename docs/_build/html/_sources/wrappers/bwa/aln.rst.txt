@@ -7,19 +7,12 @@ Map reads with bwa aln.
 
 
 
-Software dependencies
----------------------
-
-
-* bwa ==0.7.17
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -35,7 +28,7 @@ This wrapper can be used in the following way:
             "logs/bwa_aln/{sample}.{pair}.log"
         threads: 8
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/bwa/aln"
+            "0.65.0-211-g6a5c5194/bio/bwa/aln"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -61,27 +54,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    """Snakemake wrapper for bwa aln."""
-
-    __author__ = "Julian de Ruiter"
-    __copyright__ = "Copyright 2017, Julian de Ruiter"
-    __email__ = "julianderuiter@gmail.com"
-    __license__ = "MIT"
-
-
-    from snakemake.shell import shell
-
-
-    extra = snakemake.params.get("extra", "")
-    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
-    shell(
-        "bwa aln"
-        " {extra}"
-        " -t {snakemake.threads}"
-        " {snakemake.params.index}"
-        " {snakemake.input[0]}"
-        " > {snakemake.output[0]} {log}"
-    )

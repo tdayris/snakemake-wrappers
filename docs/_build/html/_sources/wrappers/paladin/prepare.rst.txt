@@ -7,21 +7,12 @@ Download and prepare uniprot refs for paladin mapping. PALADIN is a protein sequ
 
 
 
-Software dependencies
----------------------
-
-
-* paladin=1.4.4
-
-* samtools=1.5
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -34,7 +25,7 @@ This wrapper can be used in the following way:
         params:
             reference_type=1, # 1=swiss-prot, 2=uniref90 
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/paladin/prepare"
+            "0.65.0-211-g6a5c5194/bio/paladin/prepare"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -60,24 +51,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    """Snakemake wrapper for Paladin Prepare"""
-
-    __author__ = "N. Tessa Pierce"
-    __copyright__ = "Copyright 2019, N. Tessa Pierce"
-    __email__ = "ntpierce@gmail.com"
-    __license__ = "MIT"
-
-    from snakemake.shell import shell
-
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-    extra = snakemake.params.get("extra", "")
-
-    reference_type = snakemake.params.get(
-        "reference_type", "1"
-    )  # download swissprot as default
-    assert int(reference_type) in [1, 2]
-    ref_type_cmd = "-r" + str(reference_type)
-
-    shell("paladin prepare {ref_type_cmd} {extra} {log}")

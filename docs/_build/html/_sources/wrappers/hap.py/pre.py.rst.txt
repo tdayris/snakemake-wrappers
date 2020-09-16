@@ -7,19 +7,12 @@ Preprocessing/normalisation of vcf/bcf files. Part of the hap.py suite by Illumi
 
 
 
-Software dependencies
----------------------
-
-
-* hap.py =0.3.10
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -36,7 +29,7 @@ This wrapper can be used in the following way:
             extra="-L"
         threads: 2
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/hap.py/pre.py"
+            "0.65.0-211-g6a5c5194/bio/hap.py/pre.py"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -62,28 +55,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    __author__ = "Jan Forster"
-    __copyright__ = "Copyright 2019, Jan Forster"
-    __email__ = "j.forster@dkfz.de"
-    __license__ = "MIT"
-
-    from os import path
-
-    from snakemake.shell import shell
-
-    ## Extract arguments
-    extra = snakemake.params.get("extra", "")
-
-    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
-    shell(
-        "(pre.py"
-        " --threads {snakemake.threads}"
-        " -r {snakemake.params.genome}"
-        " {extra}"
-        " {snakemake.input.variants}"
-        " {snakemake.output})"
-        " {log}"
-    )

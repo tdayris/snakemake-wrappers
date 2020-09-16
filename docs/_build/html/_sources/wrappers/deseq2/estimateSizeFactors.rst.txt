@@ -7,19 +7,12 @@ ESTIMATE SIZE FACTORS
 
 
 
-Software dependencies
----------------------
-
-
-* bioconductor-deseq2==1.26.0
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -42,7 +35,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_estimateSizeFactor.log"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/deseq2/estimateSizeFactors"
+            "0.65.0-211-g6a5c5194/bio/deseq2/estimateSizeFactors"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -75,48 +68,4 @@ Authors
 Code
 ----
 
-.. code-block:: R
 
-    #!/usr/bin/R
-
-    # This script takes a deseq2 dataset object and estimates
-    # size factors for further normalization
-
-    # __author__ = "Thibault Dayris"
-    # __copyright__ = "Copyright 2020, Thibault Dayris"
-    # __email__ = "thibault.dayris@gustaveroussy.fr"
-    # __license__ = "MIT"
-
-    # Differential Gene expression
-    base::library(package = "DESeq2", quietly = TRUE);
-
-    # Cast input path as character
-    dds_path <- base::as.character(x = snakemake@input[["dds"]]);
-    dds <- base::readRDS(dds_path);
-
-
-    # Check if user provided optional parameters
-    extra <- "";
-    if ("extra" %in% names(snakemake@params)) {
-      extra <- base::paste0(
-        ", ",
-        base::as.character(x = snakemake@params[["extra"]])
-      );
-    }
-
-
-    # Create object
-    dds <- base::eval(
-      base::parse(
-        text = base::paste0(
-          "DESeq2::estimateSizeFactors(dds", extra, ");"
-        )
-      )
-    );
-
-    # Save as RDS
-    output_path <- base::as.character(snakemake@output[["dds"]]);
-    base::saveRDS(
-      obj = dds,
-      file = output_path
-    );

@@ -7,19 +7,12 @@ Convert SVG files with cairosvg.
 
 
 
-Software dependencies
----------------------
-
-
-* cairosvg =2.4.2
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -29,7 +22,7 @@ This wrapper can be used in the following way:
         output:
             "{prefix}.{fmt,(pdf|png)}"
         wrapper:
-            "0.64.0-196-g5677d3e8/utils/cairosvg"
+            "0.65.0-211-g6a5c5194/utils/cairosvg"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -55,23 +48,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    __author__ = "Johannes Köster"
-    __copyright__ = "Copyright 2017, Johannes Köster"
-    __email__ = "johannes.koester@protonmail.com"
-    __license__ = "MIT"
-
-    import os
-    from snakemake.shell import shell
-
-    extra = snakemake.params.get("extra", "")
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    _, ext = os.path.splitext(snakemake.output[0])
-
-    if ext not in (".png", ".pdf", ".ps", ".svg"):
-        raise ValueError("invalid file extension: '{}'".format(ext))
-    fmt = ext[1:]
-
-    shell("cairosvg -f {fmt} {snakemake.input[0]} -o {snakemake.output[0]}")

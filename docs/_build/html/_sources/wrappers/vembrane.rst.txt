@@ -7,19 +7,12 @@ Vembrane allows to simultaneously filter variants based on any INFO field, CHROM
 
 
 
-Software dependencies
----------------------
-
-
-* vembrane =0.4.1
-
-
 
 
 Example
 -------
 
-This wrapper can be used in the following way:
+This meta-wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -34,7 +27,7 @@ This wrapper can be used in the following way:
         log:
             "logs/vembrane.log"
         wrapper:
-            "0.64.0-196-g5677d3e8/bio/vembrane"
+            "0.65.0-211-g6a5c5194/bio/vembrane"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -60,26 +53,4 @@ Authors
 Code
 ----
 
-.. code-block:: python
 
-    """Snakemake wrapper for vembrane"""
-
-    __author__ = "Christopher Schröder"
-    __copyright__ = "Copyright 2020, Christopher Schröder"
-    __email__ = "christopher.schroeder@tu-dortmund.de"
-    __license__ = "MIT"
-
-    from snakemake.shell import shell
-
-    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
-    extra = snakemake.params.get("extra", "")
-
-    shell(
-        "vembrane"  # Tool and its subcommand
-        " {extra}"  # Extra parameters
-        ' "{snakemake.params.expression}"'
-        " {snakemake.input.vcf}"  # Path to input vcf file
-        " > {snakemake.output.vcf}"  # Path to output vcf file
-        " {log}"  # Logging behaviour
-    )
