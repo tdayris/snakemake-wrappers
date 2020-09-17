@@ -1,0 +1,106 @@
+fasta_datatype = ["dna", "cdna", "ncrna"]
+build_release_organism = [
+    "GRCh38.99.homo_sapiens",
+    "GRCm38.99.mus_musculus"
+]
+
+rule all:
+    input:
+        fasta = expand(
+            "refs/{build_release_organism}.{datatype}.fasta",
+            build_release_organism=build_release_organism,
+            datatype=fasta_datatype
+        ),
+        fasta_index = expand(
+            "refs/{build_release_organism}.{datatype}.fasta.fai",
+            build_release_organism=build_release_organism,
+            datatype=fasta_datatype
+        ),
+        fasta_dict = expand(
+            "refs/{build_release_organism}.{datatype}.dict",
+            build_release_organism=build_release_organism,
+            datatype=fasta_datatype
+        ),
+        gtf = expand(
+            "refs/{build_release_organism}.gtf",
+            build_release_organism=build_release_organism
+        ),
+        vcf = expand(
+            "refs/{build_release_organism}.all.vcf.gz",
+            build_release_organism=build_release_organism
+        )
+
+
+rule get_genome:
+    output:
+        "refs/{build}.{release}.{organism}.{datatype}.fasta"
+    params:
+        species="{organism}",
+        datatype="{datatype}",
+        build="{build}",
+        release="{release}"
+    log:
+        "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
+    cache: True  # save space and time with between workflow caching (see docs)
+    wrapper:
+        "master/bio/reference/ensembl-sequence"
+
+
+rule get_annotation:
+    output:
+        "refs/{build}.{release}.{organism}.gtf"
+    params:
+        species="{organism}",
+        release="{release}",
+        build="{build}",
+        fmt="gtf",
+        flavor="" # optional, e.g. chr_patch_hapl_scaff, see Ensembl FTP.
+    log:
+        "logs/get_annotation/{build}.{release}.{organism}.log"
+    cache: True  # save space and time with between workflow caching (see docs)
+    wrapper:
+        "master/bio/reference/ensembl-annotation"
+
+
+rule samtools_faidx_reference:
+    input:
+        "refs/{build}.{release}.{organism}.{datatype}.fasta"
+    output:
+        "refs/{build}.{release}.{organism}.{datatype}.fasta.fai"
+    params:
+        "" # optional params string
+    cache: True
+    group: "index_fasta"
+    wrapper:
+        "master/bio/samtools/faidx"
+
+
+rule create_dict:
+    input:
+        "refs/{build}.{release}.{organism}.{datatype}.fasta"
+    output:
+        "refs/{build}.{release}.{organism}.{datatype}.dict"
+    log:
+        "logs/picard/create_dict/{build}.{release}.{organism}.{datatype}.log"
+    params:
+        extra=""  # optional: extra arguments for picard.
+    cache: True
+    group: "index_fasta"
+    wrapper:
+        "master/bio/picard/createsequencedictionary"
+
+
+rule get_variation_with_contig_lengths:
+    input:
+        fai="refs/{build}.{release}.{organism}.dna.fasta.fai"
+    output:
+        vcf="refs/{build}.{release}.{organism}.all.vcf.gz"
+    params:
+        species="{organism}",
+        release="{release}",
+        build="{build}",
+        type="all" # one of "all", "somatic", "structural_variation"
+    log:
+        "logs/get_variation/{build}.{release}.{organism}.log"
+    wrapper:
+        "master/bio/reference/ensembl-variation"

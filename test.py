@@ -100,6 +100,13 @@ def test_bwa_mapping_meta():
     )
 
 
+def test_download_reference_meta():
+    run(
+        "meta/bio/download_references",
+        ["snakemake", "--cores", "1", "--use-conda",]
+    )
+
+
 def test_gridss_call():
     run(
         "bio/gridss/call",
