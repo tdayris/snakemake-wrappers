@@ -76,8 +76,8 @@ command <- base::paste0(
   extra,
   ")"
 );
-print("Libraries and input data loaded");
-print(command);
+base::message("Libraries and input data loaded");
+base::message(command);
 
 # Running command
 quantification <- base::eval(
@@ -111,6 +111,9 @@ if ("extra_rdata" %in% names(snakemake@params)) {
 } else {
   command = base::paste0(command, ")");
 }
+
+base::message("Import R data:");
+base::message(command);
 
 # Running command
 switch_list <- base::eval(
