@@ -62,10 +62,10 @@ import_type <- ifelse(
 
 # Building command line arguments
 extra <- base::paste0(import_type, " = quant_files");
-if ("extra" %in% base::names(snakemake@params)) {
+if ("extra_isoform_expression" %in% base::names(snakemake@params)) {
   extra <- base::paste(
     extra,
-    snakemake@params[["extra"]],
+    snakemake@params[["extra_isoform_expr"]],
     sep = ", "
   );
 }
@@ -96,18 +96,37 @@ new_names <- sapply(
 );
 colnames(quantification$counts) <- new_names;
 colnames(quantification$abundance) <- new_names;
-print(head(quantification$counts))
-print(head(quantification$abundance))
-print(design)
 
-switch_list <- IsoformSwitchAnalyzeR::importRdata(
-  isoformCountMatrix = quantification$counts,
-  isoformRepExpression = quantification$abundance,
-  designMatrix = design,
-  isoformExonAnnoation = gtf_path,
-  isoformNtFasta = fasta_path,
-  showProgress = TRUE
+command = base::paste0(
+  "IsoformSwitchAnalyzeR::importRdata("
+  "isoformCountMatrix = quantification$counts, "
+  "isoformRepExpression = quantification$abundance, ",
+  "designMatrix = design, ",
+  "isoformExonAnnoation = gtf_path, ",
+  "isoformNtFasta = fasta_path, ",
 );
+command = "IsoformSwitchAnalyzeR::importRdata("
+if ("extra_rdata" %in% names(snakemake@params)) {
+  cmd = base::paste0(cmd, snakemake@params[["extra_rdata"]], ")");
+} else {
+  cmd = base::paste0(cmd, ")");
+}
+
+# Running command
+switch_list <- base::eval(
+  base::parse(
+    text = command
+  )
+);
+
+# switch_list <- IsoformSwitchAnalyzeR::importRdata(
+#   isoformCountMatrix = quantification$counts,
+#   isoformRepExpression = quantification$abundance,
+#   designMatrix = design,
+#   isoformExonAnnoation = gtf_path,
+#   isoformNtFasta = fasta_path,
+#   showProgress = TRUE
+# );
 
 print("Switchlist built")
 
