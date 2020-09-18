@@ -62,7 +62,7 @@ import_type <- ifelse(
 
 # Building command line arguments
 extra <- base::paste0(import_type, " = quant_files");
-if ("extra_isoform_expression" %in% base::names(snakemake@params)) {
+if ("extra_isoform_expr" %in% base::names(snakemake@params)) {
   extra <- base::paste(
     extra,
     snakemake@params[["extra_isoform_expr"]],
