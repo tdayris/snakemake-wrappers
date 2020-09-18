@@ -107,9 +107,9 @@ command = base::paste0(
 );
 command = "IsoformSwitchAnalyzeR::importRdata("
 if ("extra_rdata" %in% names(snakemake@params)) {
-  cmd = base::paste0(cmd, ", ", snakemake@params[["extra_rdata"]], ")");
+  command = base::paste0(command, ", ", snakemake@params[["extra_rdata"]], ")");
 } else {
-  cmd = base::paste0(cmd, ")");
+  command = base::paste0(command, ")");
 }
 
 # Running command
