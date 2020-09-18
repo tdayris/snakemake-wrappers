@@ -97,7 +97,7 @@ new_names <- sapply(
 colnames(quantification$counts) <- new_names;
 colnames(quantification$abundance) <- new_names;
 
-command = base::paste0(
+command <- base::paste0(
   "IsoformSwitchAnalyzeR::importRdata(",
   "isoformCountMatrix = quantification$counts, ",
   "isoformRepExpression = quantification$abundance, ",
@@ -105,7 +105,6 @@ command = base::paste0(
   "isoformExonAnnoation = gtf_path, ",
   "isoformNtFasta = fasta_path "
 );
-command = "IsoformSwitchAnalyzeR::importRdata("
 if ("extra_rdata" %in% names(snakemake@params)) {
   command = base::paste0(command, ", ", snakemake@params[["extra_rdata"]], ")");
 } else {
