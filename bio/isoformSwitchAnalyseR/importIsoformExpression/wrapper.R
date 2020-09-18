@@ -98,8 +98,8 @@ colnames(quantification$counts) <- new_names;
 colnames(quantification$abundance) <- new_names;
 
 command = base::paste0(
-  "IsoformSwitchAnalyzeR::importRdata("
-  "isoformCountMatrix = quantification$counts, "
+  "IsoformSwitchAnalyzeR::importRdata(",
+  "isoformCountMatrix = quantification$counts, ",
   "isoformRepExpression = quantification$abundance, ",
   "designMatrix = design, ",
   "isoformExonAnnoation = gtf_path, ",
