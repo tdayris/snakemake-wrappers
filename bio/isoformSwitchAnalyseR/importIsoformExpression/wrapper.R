@@ -103,7 +103,7 @@ command = base::paste0(
   "isoformRepExpression = quantification$abundance, ",
   "designMatrix = design, ",
   "isoformExonAnnoation = gtf_path, ",
-  "isoformNtFasta = fasta_path ",
+  "isoformNtFasta = fasta_path "
 );
 command = "IsoformSwitchAnalyzeR::importRdata("
 if ("extra_rdata" %in% names(snakemake@params)) {
