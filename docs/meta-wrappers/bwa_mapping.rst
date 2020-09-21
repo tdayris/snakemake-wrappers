@@ -40,7 +40,7 @@ This meta-wrapper can be used in the following way:
             sort_extra=""            # Extra args for samtools/picard.
         threads: 8
         wrapper:
-            "0.65.0-212-g458009d7/bio/bwa/mem"
+            "0.66.0-222-gcebb77a4/bio/bwa/mem"
 
     rule samtools_index:
         input:
@@ -50,7 +50,7 @@ This meta-wrapper can be used in the following way:
         params:
             "" # optional params string
         wrapper:
-            "0.65.0-212-g458009d7/bio/samtools/index"
+            "0.66.0-222-gcebb77a4/bio/samtools/index"
 
 
 Note that input, output and log file paths can be chosen freely.

@@ -14,6 +14,10 @@ log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 extra = snakemake.params.get("extra", "")
 makedirs(dirname(snakemake.output.vcf))
 
+
+if "mem_mb" in snakemake.resources.keys():
+    extra += "-Xmx{}M".format(snakemake.resources["mem_mb"])
+
 shell(
     "SnpSift geneSets"  # Tool and its subcommand
     " {extra}"  # Extra parameters

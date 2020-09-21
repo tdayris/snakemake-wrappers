@@ -40,6 +40,10 @@ if snakemake.threads < min_threads:
     )
 
 
+if "mem_mb" in snakemake.resources.keys():
+    extra += "-Xmx{}M".format(snakemake.resources["mem_mb"])
+
+
 shell(
     "SnpSift geneSets"  # Tool and its subcommand
     " {extra}"  # Extra parameters
