@@ -92,8 +92,12 @@ output_r1, output_r1_unp, output_r2, output_r2_unp = [
     for filename in output_files
 ]
 
+memory = ""
+if "mem_mb" in snakemake.resources.keys():
+    memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
+
 shell(
-    "trimmomatic PE -threads {trimmomatic_threads} {extra} "
+    "trimmomatic {memory} PE -threads {trimmomatic_threads} {extra} "
     "{input_r1} {input_r2} "
     "{output_r1} {output_r1_unp} "
     "{output_r2} {output_r2_unp} "

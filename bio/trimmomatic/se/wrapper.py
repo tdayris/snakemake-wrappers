@@ -79,6 +79,10 @@ trimmomatic_threads, input_threads, output_threads = distribute_threads(
 input = compose_input_gz(snakemake.input[0], input_threads)
 output = compose_output_gz(snakemake.output[0], output_threads, compression_level)
 
+memory = ""
+if "mem_mb" in snakemake.resources.keys():
+    memory = "-Xmx{}M".format(snakem.resources["mem_mb"])
+
 shell(
-    "trimmomatic SE -threads {trimmomatic_threads} {extra} {input} {output} {trimmer} {log}"
+    "trimmomatic {memory} SE -threads {trimmomatic_threads} {extra} {input} {output} {trimmer} {log}"
 )
