@@ -1,0 +1,19 @@
+build_release_organism = [
+    "GRCh38.99.homo_sapiens",
+    "GRCm38.99.mus_musculus"
+]
+
+
+rule get_genome:
+    output:
+        "refs/{build}.{release}.{organism}.dna.fasta"
+    params:
+        species="{organism}",
+        datatype="{datatype}",
+        build="{build}",
+        release="{release}"
+    log:
+        "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
+    cache: True  # save space and time with between workflow caching (see docs)
+    wrapper:
+        "master/bio/reference/ensembl-sequence"
