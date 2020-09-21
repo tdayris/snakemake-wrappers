@@ -5,9 +5,18 @@ __license__ = "MIT"
 
 
 from snakemake.shell import shell
+log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+memory = ""
+if "mem_mb" is snakemake.resources.keys():
+    memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
 
 
 shell(
-    "picard AddOrReplaceReadGroups {snakemake.params} I={snakemake.input} "
-    "O={snakemake.output} &> {snakemake.log}"
+    " picard AddOrReplaceReadGroups "
+    " {memory} "
+    " {snakemake.params} "
+    " I={snakemake.input} "
+    " O={snakemake.output} "
+    " {log}"
 )
