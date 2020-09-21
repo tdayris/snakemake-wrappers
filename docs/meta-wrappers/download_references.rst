@@ -41,18 +41,18 @@ This meta-wrapper can be used in the following way:
         input:
             fasta = expand(
                 "refs/{build_release_organism}.{datatype}.fasta",
-                build_release_organism=build_release_organism
-                datatype=datatype
+                build_release_organism=build_release_organism,
+                datatype=fasta_datatype
             ),
             fasta_index = expand(
                 "refs/{build_release_organism}.{datatype}.fasta.fai",
-                build_release_organism=build_release_organism
-                datatype=datatype
+                build_release_organism=build_release_organism,
+                datatype=fasta_datatype
             ),
             fasta_dict = expand(
-                "refs/{build_releasfasta.fae_organism}.{datatype}.dict",
-                build_release_organism=build_release_organism
-                datatype=datatype
+                "refs/{build_release_organism}.{datatype}.dict",
+                build_release_organism=build_release_organism,
+                datatype=fasta_datatype
             ),
             gtf = expand(
                 "refs/{build_release_organism}.gtf",
@@ -76,7 +76,7 @@ This meta-wrapper can be used in the following way:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.65.0-212-g458009d7/bio/reference/ensembl-sequence"
+            "0.66.0-225-gb77af9ed/bio/reference/ensembl-sequence"
 
 
     rule get_annotation:
@@ -92,7 +92,7 @@ This meta-wrapper can be used in the following way:
             "logs/get_annotation/{build}.{release}.{organism}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.65.0-212-g458009d7/bio/reference/ensembl-annotation"
+            "0.66.0-225-gb77af9ed/bio/reference/ensembl-annotation"
 
 
     rule samtools_faidx_reference:
@@ -105,7 +105,7 @@ This meta-wrapper can be used in the following way:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.65.0-212-g458009d7/bio/samtools/faidx"
+            "0.66.0-225-gb77af9ed/bio/samtools/faidx"
 
 
     rule create_dict:
@@ -120,7 +120,7 @@ This meta-wrapper can be used in the following way:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.65.0-212-g458009d7/bio/picard/createsequencedictionary"
+            "0.66.0-225-gb77af9ed/bio/picard/createsequencedictionary"
 
 
     rule get_variation_with_contig_lengths:
@@ -136,7 +136,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/get_variation/{build}.{release}.{organism}.log"
         wrapper:
-            "0.65.0-212-g458009d7/bio/reference/ensembl-variation"
+            "0.66.0-225-gb77af9ed/bio/reference/ensembl-variation"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -439,9 +439,15 @@ Code
     extra = snakemake.params.get("extra", "")
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
+
+    memory = ""
+    if "mem_mb" in snakemake.resources.keys():
+        memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
+
     shell(
         "picard "
         "CreateSequenceDictionary "
+        "{memory} "
         "{extra} "
         "R={snakemake.input[0]} "
         "O={snakemake.output[0]} "

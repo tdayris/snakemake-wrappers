@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
 
   
   
@@ -30,12 +32,15 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="FASTQ_SCREEN_INDEXER" href="fastq_screen_indexer.html" />
     <link rel="prev" title="BWA_MAPPING" href="bwa_mapping.html" /> 
 </head>
 
@@ -211,6 +216,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#code">Code</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="fastq_screen_indexer.html">FASTQ_SCREEN_INDEXER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="star_arriba.html">STAR-ARRIBA</a></li>
 </ul>
 
             
@@ -302,18 +309,18 @@
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">fasta</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;refs/</span><span class="si">{build_release_organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta&quot;</span><span class="p">,</span>
-            <span class="n">build_release_organism</span><span class="o">=</span><span class="n">build_release_organism</span>
-            <span class="n">datatype</span><span class="o">=</span><span class="n">datatype</span>
+            <span class="n">build_release_organism</span><span class="o">=</span><span class="n">build_release_organism</span><span class="p">,</span>
+            <span class="n">datatype</span><span class="o">=</span><span class="n">fasta_datatype</span>
         <span class="p">),</span>
         <span class="n">fasta_index</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;refs/</span><span class="si">{build_release_organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta.fai&quot;</span><span class="p">,</span>
-            <span class="n">build_release_organism</span><span class="o">=</span><span class="n">build_release_organism</span>
-            <span class="n">datatype</span><span class="o">=</span><span class="n">datatype</span>
+            <span class="n">build_release_organism</span><span class="o">=</span><span class="n">build_release_organism</span><span class="p">,</span>
+            <span class="n">datatype</span><span class="o">=</span><span class="n">fasta_datatype</span>
         <span class="p">),</span>
         <span class="n">fasta_dict</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;refs/</span><span class="si">{build_releasfasta.fae_organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.dict&quot;</span><span class="p">,</span>
-            <span class="n">build_release_organism</span><span class="o">=</span><span class="n">build_release_organism</span>
-            <span class="n">datatype</span><span class="o">=</span><span class="n">datatype</span>
+            <span class="s2">&quot;refs/</span><span class="si">{build_release_organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.dict&quot;</span><span class="p">,</span>
+            <span class="n">build_release_organism</span><span class="o">=</span><span class="n">build_release_organism</span><span class="p">,</span>
+            <span class="n">datatype</span><span class="o">=</span><span class="n">fasta_datatype</span>
         <span class="p">),</span>
         <span class="n">gtf</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;refs/</span><span class="si">{build_release_organism}</span><span class="s2">.gtf&quot;</span><span class="p">,</span>
@@ -337,7 +344,7 @@
         <span class="s2">&quot;logs/get_genome/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.log&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.65.0-212-g458009d7/bio/reference/ensembl-sequence&quot;</span>
+        <span class="s2">&quot;0.66.0-225-gb77af9ed/bio/reference/ensembl-sequence&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">get_annotation</span><span class="p">:</span>
@@ -353,7 +360,7 @@
         <span class="s2">&quot;logs/get_annotation/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.log&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.65.0-212-g458009d7/bio/reference/ensembl-annotation&quot;</span>
+        <span class="s2">&quot;0.66.0-225-gb77af9ed/bio/reference/ensembl-annotation&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">samtools_faidx_reference</span><span class="p">:</span>
@@ -366,7 +373,7 @@
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">group</span><span class="p">:</span> <span class="s2">&quot;index_fasta&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.65.0-212-g458009d7/bio/samtools/faidx&quot;</span>
+        <span class="s2">&quot;0.66.0-225-gb77af9ed/bio/samtools/faidx&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">create_dict</span><span class="p">:</span>
@@ -381,7 +388,7 @@
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">group</span><span class="p">:</span> <span class="s2">&quot;index_fasta&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.65.0-212-g458009d7/bio/picard/createsequencedictionary&quot;</span>
+        <span class="s2">&quot;0.66.0-225-gb77af9ed/bio/picard/createsequencedictionary&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">get_variation_with_contig_lengths</span><span class="p">:</span>
@@ -397,7 +404,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/get_variation/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.65.0-212-g458009d7/bio/reference/ensembl-variation&quot;</span>
+        <span class="s2">&quot;0.66.0-225-gb77af9ed/bio/reference/ensembl-variation&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -674,9 +681,15 @@ When running with</p>
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+
+<span class="n">memory</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="s2">&quot;mem_mb&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">memory</span> <span class="o">=</span> <span class="s2">&quot;-Xmx</span><span class="si">{}</span><span class="s2">M&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;mem_mb&quot;</span><span class="p">])</span>
+
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;picard &quot;</span>
     <span class="s2">&quot;CreateSequenceDictionary &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{memory}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;R=</span><span class="si">{snakemake.input[0]}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;O=</span><span class="si">{snakemake.output[0]}</span><span class="s2"> &quot;</span>
@@ -694,6 +707,8 @@ When running with</p>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="fastq_screen_indexer.html" class="btn btn-neutral float-right" title="FASTQ_SCREEN_INDEXER" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="bwa_mapping.html" class="btn btn-neutral float-left" title="BWA_MAPPING" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
