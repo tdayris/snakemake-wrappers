@@ -106,9 +106,9 @@ command <- base::paste0(
   "isoformNtFasta = fasta_path "
 );
 if ("extra_rdata" %in% names(snakemake@params)) {
-  command = base::paste0(command, ", ", snakemake@params[["extra_rdata"]], ")");
+  command <- base::paste0(command, ", ", snakemake@params[["extra_rdata"]], ")");
 } else {
-  command = base::paste0(command, ")");
+  command <- base::paste0(command, ")");
 }
 
 base::message("Import R data:");
