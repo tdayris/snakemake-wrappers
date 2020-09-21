@@ -15,6 +15,7 @@ log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 shell(
     "picard"
     " SortSam"
+    " {memory}"
     " {extra}"
     " INPUT={snakemake.input[0]}"
     " OUTPUT={snakemake.output[0]}"

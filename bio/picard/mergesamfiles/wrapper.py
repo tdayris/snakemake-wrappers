@@ -12,9 +12,15 @@ from snakemake.shell import shell
 inputs = " ".join("INPUT={}".format(in_) for in_ in snakemake.input)
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
+
+memory = ""
+if "mem_mb" is snakemake.resources.keys():
+    memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
+
 shell(
     "picard"
     " MergeSamFiles"
+    " {memory} "
     " {snakemake.params}"
     " {inputs}"
     " OUTPUT={snakemake.output[0]}"

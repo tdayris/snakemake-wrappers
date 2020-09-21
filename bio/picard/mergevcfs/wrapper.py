@@ -13,9 +13,15 @@ inputs = " ".join("INPUT={}".format(f) for f in snakemake.input.vcfs)
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 extra = snakemake.params.get("extra", "")
 
+
+memory = ""
+if "mem_mb" is snakemake.resources.keys():
+    memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
+
 shell(
     "picard"
     " MergeVcfs"
+    " {memory} "
     " {extra}"
     " {inputs}"
     " OUTPUT={snakemake.output[0]}"

@@ -12,6 +12,11 @@ from snakemake.shell import shell
 extra = snakemake.params.get("extra", "")
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
+
+memory = ""
+if "mem_mb" is snakemake.resources.keys():
+    memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
+
 fastq1 = snakemake.output.fastq1
 fastq2 = snakemake.output.get("fastq2", None)
 fastq_unpaired = snakemake.output.get("unpaired_fastq", None)
@@ -31,5 +36,7 @@ if isinstance(fastq_unpaired, str):
         output += " UNPAIRED_FASTQ=" + fastq_unpaired
 
 shell(
-    "picard" " SamToFastq" " {extra}" " INPUT={snakemake.input[0]}" " {output}" " {log}"
+    "picard SamToFastq {memory} " 
+    " {extra} INPUT={snakemake.input[0]}"
+    " {output} {log}"
 )

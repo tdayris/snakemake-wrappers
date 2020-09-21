@@ -7,6 +7,8 @@ __license__ = "MIT"
 
 
 from snakemake.shell import shell
+from os.path import splitext
+
 extra = snakemake.params.get("extra", "")
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
@@ -20,12 +22,17 @@ else:
         "Input sequence could not be found."
     )
 
-prefix =
+prefix = ""
+if "prefix" in snakemake.params.keys():
+    prefix = snakemake.params["prefix"]
+else:
+    prefix = splitext(snakemake.output[0])[0]
 
 shell(
     " bowtie2-build "
-    " {input} "
     " {snakemake.params['prefix']} "
     " --threads {snakemake.threads} "
     " {extra} "
+    " {input} "
+    " {prefix} "
 )

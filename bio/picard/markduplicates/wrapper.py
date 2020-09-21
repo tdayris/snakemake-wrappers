@@ -8,8 +8,14 @@ from snakemake.shell import shell
 
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
+
+memory = ""
+if "mem_mb" is snakemake.resources.keys():
+    memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
+
 shell(
-    "picard MarkDuplicates {snakemake.params} INPUT={snakemake.input} "
+    "picard MarkDuplicates "
+    "{memory} {snakemake.params} INPUT={snakemake.input} "
     "OUTPUT={snakemake.output.bam} METRICS_FILE={snakemake.output.metrics} "
     "{log}"
 )

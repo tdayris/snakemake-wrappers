@@ -11,8 +11,14 @@ log = snakemake.log_fmt_shell()
 
 extra = snakemake.params.get("extra", "")
 
+
+memory = ""
+if "mem_mb" is snakemake.resources.keys():
+    memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
+
 shell(
     "picard CollectTargetedPcrMetrics "
+    "{memory} "
     "{extra} "
     "INPUT={snakemake.input.bam} "
     "OUTPUT={snakemake.output[0]} "
