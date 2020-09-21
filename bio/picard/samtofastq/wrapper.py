@@ -14,7 +14,7 @@ log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 
 memory = ""
-if "mem_mb" is snakemake.resources.keys():
+if "mem_mb" in snakemake.resources.keys():
     memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
 
 fastq1 = snakemake.output.fastq1
@@ -36,7 +36,7 @@ if isinstance(fastq_unpaired, str):
         output += " UNPAIRED_FASTQ=" + fastq_unpaired
 
 shell(
-    "picard SamToFastq {memory} " 
+    "picard SamToFastq {memory} "
     " {extra} INPUT={snakemake.input[0]}"
     " {output} {log}"
 )

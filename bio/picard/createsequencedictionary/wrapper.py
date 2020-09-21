@@ -12,7 +12,7 @@ log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 
 memory = ""
-if "mem_mb" is snakemake.resources.keys():
+if "mem_mb" in snakemake.resources.keys():
     memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
 
 shell(
