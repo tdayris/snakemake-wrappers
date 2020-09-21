@@ -1,4 +1,4 @@
-"""Snakemake wrapper for SnpSift dbNSFP"""
+"""Snakemake wrapper for SnpSift gwasCat"""
 
 __author__ = "Thibault Dayris"
 __copyright__ = "Copyright 2020, Dayris Thibault"
@@ -10,14 +10,9 @@ from snakemake.shell import shell
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 extra = snakemake.params.get("extra", "")
 
-# Using user-defined file if requested
-db = snakemake.input.get("dbNSFP", "")
-if db != "":
-    db = "-db {}".format(db)
-
 min_threads = 1
 
-# Uncompression shall be done on user request
+# Uncompression shall be done based on user input
 incall = snakemake.input["call"]
 if incall.endswith("bcf"):
     min_threads += 1
@@ -26,18 +21,20 @@ elif incall.endswith("gz"):
     min_threads += 1
     incall = "< <(gunzip -c {})".format(incall)
 
-# Compression shall be done according to user-defined output
+
+# Compression shall be done based on user-defined output
 outcall = snakemake.output["call"]
-if outcall.endswith("gz"):
+if outcall.endswith("bcf"):
+    min_threads += 1
+    outcall = "| bcftools view {}".format(outcall)
+elif outcall.endswith("gz"):
     min_threads += 1
     outcall = "| gzip -c > {}".format(outcall)
-elif outcall.endswith("bcf"):
-    min_threads += 1
-    outcall = "| bcftools view > {}".format(outcall)
 else:
     outcall = "> {}".format(outcall)
 
-# Each (un)compression raises the thread number
+
+# Each additional (un)compression step requires more threads
 if snakemake.threads < min_threads:
     raise ValueError(
         "At least {} threads required, {} provided".format(
@@ -45,12 +42,11 @@ if snakemake.threads < min_threads:
         )
     )
 
-
 shell(
-    "SnpSift dbnsfp"  # Tool and its subcommand
-    " {extra}"  # Extra parameters
-    " {db}"  # Path to annotation vcf file
-    " {incall}"  # Path to input vcf file
-    " {outcall}"  # Path to output vcf file
-    " {log}"  # Logging behaviour
+    "SnpSift gwasCat "  # Tool and its subcommand
+    " {extra} "  # Extra parameters
+    " -db {snakemake.input.gwascat} "  # Path to gwasCat file
+    " {incall} "  # Path to input vcf file
+    " {outcall} "  # Path to output vcf file
+    " {log} "  # Logging behaviour
 )

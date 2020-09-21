@@ -22,7 +22,9 @@ def run(wrapper, cmd, check_log=None):
     with tempfile.TemporaryDirectory() as d:
         dst = os.path.join(d, "master")
         os.makedirs(dst, exist_ok=True)
-        copy = lambda pth, src: shutil.copy(os.path.join(pth, src), os.path.join(dst, pth))
+        copy = lambda pth, src: shutil.copy(
+            os.path.join(pth, src), os.path.join(dst, pth)
+        )
 
         used_wrappers = []
         wrapper_file = "used_wrappers.yaml"
@@ -34,7 +36,6 @@ def run(wrapper, cmd, check_log=None):
         else:
             used_wrappers.append(wrapper)
 
-
         for w in used_wrappers:
             success = False
             for ext in ("py", "R", "Rmd"):
@@ -42,12 +43,14 @@ def run(wrapper, cmd, check_log=None):
                 if os.path.exists(os.path.join(w, script)):
                     os.makedirs(os.path.join(dst, w), exist_ok=True)
                     copy(w, script)
-                    success=True
+                    success = True
                     break
             assert success, "No wrapper script found for {}".format(w)
             copy(w, "environment.yaml")
 
-        if DIFF_ONLY and not any(any(f.startswith(w) for f in DIFF_FILES) for w in used_wrappers):
+        if DIFF_ONLY and not any(
+            any(f.startswith(w) for f in DIFF_FILES) for w in used_wrappers
+        ):
             print(
                 "Skipping wrapper {} (not modified).".format(wrapper), file=sys.stderr
             )
@@ -93,10 +96,24 @@ def run(wrapper, cmd, check_log=None):
             os.chdir(origdir)
 
 
+def test_arriba_star_meta():
+    run(
+        "meta/bio/star_arriba",
+        ["snakemake", "--cores", "1", "--use-conda", "results/arriba/a.fusions.tsv"],
+    )
+
+
+
 def test_bwa_mapping_meta():
     run(
         "meta/bio/bwa_mapping",
-        ["snakemake", "--cores", "1", "--use-conda", "mapped/a.bam.bai"],
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "mapped/a.bam.bai",
+        ],
     )
 
 
@@ -110,14 +127,28 @@ def test_download_reference_meta():
 def test_gridss_call():
     run(
         "bio/gridss/call",
-        ["snakemake", "--show-failed-logs", "--cores", "1", "--use-conda", "vcf/group.vcf"],
+        [
+            "snakemake",
+            "--show-failed-logs",
+            "--cores",
+            "1",
+            "--use-conda",
+            "vcf/group.vcf",
+        ],
     )
 
 
 def test_gridss_assemble():
     run(
         "bio/gridss/assemble",
-        ["snakemake", "--show-failed-logs", "--cores", "1", "--use-conda", "assembly/group.bam"],
+        [
+            "snakemake",
+            "--show-failed-logs",
+            "--cores",
+            "1",
+            "--use-conda",
+            "assembly/group.bam",
+        ],
     )
 
 
@@ -656,6 +687,7 @@ def test_deeptools_plotfingerprint():
             "1",
             "plot_fingerprint/plot_fingerprint.png",
             "plot_fingerprint/raw_counts.tab",
+            "plot_fingerprint/qc_metrics.txt",
             "--use-conda",
             "-F",
         ],
@@ -2300,9 +2332,23 @@ def test_bwa_mem2_samblaster():
     )
 
 
+def test_snpsift_genesets():
+    run(
+        "bio/snpsift/genesets",
+        ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"],
+    )
+
+
 def test_snpsift_vartype():
     run(
         "bio/snpsift/varType",
+        ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"],
+    )
+
+
+def test_snpsift_gwascat():
+    run(
+        "bio/snpsift/gwascat",
         ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"],
     )
 
@@ -2937,6 +2983,13 @@ def test_chm_eval_eval():
     run(
         "bio/benchmark/chm-eval",
         ["snakemake", "--cores", "1", "--use-conda", "chm-eval/calls.summary"],
+    )
+
+
+def test_snpsift_dbnsfp():
+    run(
+        "bio/snpsift/dbnsfp",
+        ["snakemake", "--cores", "1", "out.vcf", "--use-conda", "-F"],
     )
 
 
