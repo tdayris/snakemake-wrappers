@@ -3033,3 +3033,10 @@ def test_unicycler():
         "bio/unicycler",
         ["snakemake", "--cores", "1", "result/assembly.fasta", "--use-conda", "-F"]
     )
+
+
+def test_cpat_make_hexamer_table():
+    run(
+        "bio/cpat/make_hexamer_table",
+        ["snakemake", "--cores", "1", "hexamer_table", "--use-conda", "-F"]
+    )

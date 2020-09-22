@@ -10,11 +10,12 @@ __license__ = "MIT"
 
 
 from snakemake.shell import shell
-log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 shell(
     " make_hexamer_tab.py "
-    " --cod {snakemake.input['coding']} "
-    " --noncod {snakemake.input['noncoding']} "
+    " --cod {snakemake.input.coding} "
+    " --noncod {snakemake.input.noncoding} "
+    " > {snakemake.output[0]} "
     " {log} "
 )
