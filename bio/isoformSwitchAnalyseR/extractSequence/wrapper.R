@@ -20,9 +20,9 @@ prefix <- "isoformSwitchAnalyzeR_isoform";
 if ("prefix" %in% base::names(snakemake@params)) {
   prefix <- base::as.character(snakemake@params[["prefix"]]);
 } else if ("fasta" %in% base::names(snakemake@output)) {
-  prefix <- base::gsub("_nt.fasta", snakemake@output[["fasta"]])
+  prefix <- base::gsub("_nt.fasta", "", snakemake@output[["fasta"]])
 } else if ("aa_sequence" %in% base::names(snakemake@output)) {
-  prefix <- base::gsub("_AA.fasta", snakemake@output[["aa_sequence"]])
+  prefix <- base::gsub("_AA.fasta", "", snakemake@output[["aa_sequence"]])
 }
 
 extra <- "switchAnalyzeRlist = switch_list, outputPrefix = prefix";
