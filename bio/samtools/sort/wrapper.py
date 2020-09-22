@@ -18,7 +18,7 @@ threads = "" if snakemake.threads <= 1 else " -@ {} ".format(snakemake.threads -
 # Memory per thread
 extra = snakemake.params[0]
 if "mem_mb" in snakemake.resources.keys() and "-m" not in extra:
-    extra += " -m {}".format(in(snakemake.resources["mem_mb"] / threads))
+    extra += " -m {}M".format(in(snakemake.resources["mem_mb"] / threads))
 
 shell(
     "samtools sort {snakemake.params} {threads} -o {snakemake.output[0]} "
