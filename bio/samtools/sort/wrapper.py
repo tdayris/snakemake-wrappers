@@ -15,6 +15,11 @@ prefix = os.path.splitext(snakemake.output[0])[0]
 # Other threads are *additional* threads passed to the argument -@
 threads = "" if snakemake.threads <= 1 else " -@ {} ".format(snakemake.threads - 1)
 
+# Memory per thread
+extra = snakemake.params[0]
+if "mem_mb" in snakemake.resources.keys() and "-m" not in extra:
+    extra += " -m {}".format(in(snakemake.resources["mem_mb"] / threads))
+
 shell(
     "samtools sort {snakemake.params} {threads} -o {snakemake.output[0]} "
     "-T {prefix} {snakemake.input[0]}"
