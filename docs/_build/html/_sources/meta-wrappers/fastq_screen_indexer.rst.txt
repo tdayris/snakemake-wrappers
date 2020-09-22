@@ -43,7 +43,7 @@ This meta-wrapper can be used in the following way:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.66.0-241-gab2c8ef4/bio/reference/ensembl-sequence"
+            "0.66.0-243-ged9d28af/bio/reference/ensembl-sequence"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -174,19 +174,18 @@ Code
             "Input sequence could not be found."
         )
 
-    prefix = ""
+    prefix = "bwt2_index"
     if "prefix" in snakemake.params.keys():
         prefix = snakemake.params["prefix"]
-    else:
-        prefix = splitext(snakemake.output[0])[0]
+
 
     shell(
         " bowtie2-build "
-        " {snakemake.params['prefix']} "
-        " --threads {snakemake.threads} "
-        " {extra} "
         " {input} "
         " {prefix} "
+        " --threads {snakemake.threads} "
+        " {extra} "
+        " {log} "
     )
 
 

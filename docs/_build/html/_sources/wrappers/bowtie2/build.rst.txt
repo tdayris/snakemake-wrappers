@@ -25,16 +25,16 @@ This wrapper can be used in the following way:
 
     rule test_bowtie2_build:
         input:
-            fasta = "genome.fa"
+            fasta = "genome.fasta"
         output:
-            directory("bwt2_index")
+            "bwt2_index/genome.1.bt2"
         params:
             # The following parameter is optional:
             # if a path to one of the files created in index is provided,
             # then the wrapper can guess the prefix itself.
             prefix = "bwt2_index/genome"
         wrapper:
-            "0.66.0-241-gab2c8ef4/bio/bowtie2/build"
+            "0.66.0-243-ged9d28af/bio/bowtie2/build"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -93,17 +93,16 @@ Code
             "Input sequence could not be found."
         )
 
-    prefix = ""
+    prefix = "bwt2_index"
     if "prefix" in snakemake.params.keys():
         prefix = snakemake.params["prefix"]
-    else:
-        prefix = splitext(snakemake.output[0])[0]
+
 
     shell(
         " bowtie2-build "
-        " {snakemake.params['prefix']} "
-        " --threads {snakemake.threads} "
-        " {extra} "
         " {input} "
         " {prefix} "
+        " --threads {snakemake.threads} "
+        " {extra} "
+        " {log} "
     )

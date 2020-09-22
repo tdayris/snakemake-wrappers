@@ -303,16 +303,16 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_bowtie2_build</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">fasta</span> <span class="o">=</span> <span class="s2">&quot;genome.fa&quot;</span>
+        <span class="n">fasta</span> <span class="o">=</span> <span class="s2">&quot;genome.fasta&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;bwt2_index&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;bwt2_index/genome.1.bt2&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="c1"># The following parameter is optional:</span>
         <span class="c1"># if a path to one of the files created in index is provided,</span>
         <span class="c1"># then the wrapper can guess the prefix itself.</span>
         <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;bwt2_index/genome&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/bowtie2/build&quot;</span>
+        <span class="s2">&quot;0.66.0-243-ged9d28af/bio/bowtie2/build&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -358,19 +358,18 @@ When running with</p>
         <span class="s2">&quot;Input sequence could not be found.&quot;</span>
     <span class="p">)</span>
 
-<span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;bwt2_index&quot;</span>
 <span class="k">if</span> <span class="s2">&quot;prefix&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
     <span class="n">prefix</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="n">prefix</span> <span class="o">=</span> <span class="n">splitext</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot; bowtie2-build &quot;</span>
-    <span class="s2">&quot; </span><span class="si">{snakemake.params[&#39;prefix&#39;]}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot; --threads </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot; </span><span class="si">{input}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot; </span><span class="si">{prefix}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; --threads </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2"> &quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
