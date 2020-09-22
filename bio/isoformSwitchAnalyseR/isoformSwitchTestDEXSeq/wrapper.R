@@ -9,7 +9,7 @@
 # __license__ = "MIT"
 
 # The main package
-base::library(package = "isoformSwitchAnalyzeR", quietly = TRUE);
+base::library(package = "IsoformSwitchAnalyzeR", quietly = TRUE);
 base::library(package = "DEXSeq", quietly = TRUE);
 
 # Gathering input dataset and parameters
