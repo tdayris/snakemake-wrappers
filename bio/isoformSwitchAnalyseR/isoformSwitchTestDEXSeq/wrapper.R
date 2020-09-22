@@ -27,7 +27,7 @@ if ("extra" %in% base::names(snakemake@params)) {
 }
 
 command <- base::paste0(
-  "InsoformSwitchAnalyseR::isoformSwitchTestDEXSeq(",
+  "IsoformSwitchAnalyzeR::isoformSwitchTestDEXSeq(",
   extra,
   ")"
 );
