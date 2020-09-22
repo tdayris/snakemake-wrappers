@@ -18,7 +18,7 @@ switch_list <- base::readRDS(
 );
 
 extra <- "switchAnalyzeRlist = switch_list";
-if ("extra" %in% base::anems(snakemake@params)) {
+if ("extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
       extra,
       snakemake@params[["extra"]],
