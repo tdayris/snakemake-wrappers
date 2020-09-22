@@ -34,7 +34,7 @@ base::message("Libraries and input data loaded");
 base::message(command);
 
 # Running command
-base::eval(
+extracted <- base::eval(
   base::parse(
     text = command
   )
@@ -42,6 +42,6 @@ base::eval(
 
 # Saving results
 base::saveRDS(
-  obj = edgn,
+  obj = extracted,
   file = snakemake@output[["rds"]]
 );

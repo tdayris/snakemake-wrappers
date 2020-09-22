@@ -39,7 +39,7 @@ base::message("Libraries and input data loaded");
 base::message(command);
 
 # Running command
-base::eval(
+pfam_scanned <- base::eval(
   base::parse(
     text = command
   )
@@ -47,6 +47,6 @@ base::eval(
 
 # Saving results
 base::saveRDS(
-  obj = edgn,
+  obj = pfam_scanned,
   file = snakemake@output[["rds"]]
 );
