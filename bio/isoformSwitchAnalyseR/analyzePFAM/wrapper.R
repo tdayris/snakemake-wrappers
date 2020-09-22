@@ -13,8 +13,8 @@
 base::library(package = "isoformSwitchAnalyzeR", quietly = TRUE);
 
 # Gathering input dataset and parameters
-switch_list <- base::as.character(
-  x = snakemake@input[["switch_list"]]
+switch_list <- base::readRDS(
+  file = base::as.character(x = snakemake@input[["switch_list"]])
 );
 
 extra <- base::paste0(
