@@ -22,10 +22,10 @@ extra = snakemake.params.get("extra", "")
 
 shell(
     " cpat.py "
-    " --gene {snakemake.input['trnascripts']} "
+    " --gene {snakemake.input.transcript} "
     " {reference} "
-    " --hex {snakemake.input['hexamer_table']} "
-    " --logitModel {snakemake.input['logitModel']}"
+    " --hex {snakemake.input.hexamer_table} "
+    " --logitModel {snakemake.input.logit_model}"
     " {extra} "
     " {log} "
 )
