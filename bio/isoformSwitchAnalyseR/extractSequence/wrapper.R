@@ -16,7 +16,16 @@ switch_list <- base::readRDS(
   file = base::as.character(x = snakemake@input[["switch_list"]])
 );
 
-extra <- "switchAnalyzeRlist = switch_list";
+prefix <- "isoformSwitchAnalyzeR_isoform";
+if ("prefix" %in% base::names(snakemake@params)) {
+  prefix <- base::as.character(snakemake@params[["prefix"]]);
+} else if ("fasta" %in% base::names(snakemake@output)) {
+  prefix <- base::gsub("_nt.fasta", snakemake@output[["fasta"]])
+} else if ("aa_sequence" %in% base::names(snakemake@output)) {
+  prefix <- base::gsub("_AA.fasta", snakemake@output[["fasta"]])
+}
+
+extra <- "switchAnalyzeRlist = switch_list, outputPrefix = prefix";
 if ("extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
       extra,
