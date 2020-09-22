@@ -22,17 +22,16 @@ else:
         "Input sequence could not be found."
     )
 
-prefix = ""
+prefix = "bwt2_index"
 if "prefix" in snakemake.params.keys():
     prefix = snakemake.params["prefix"]
-else:
-    prefix = splitext(snakemake.output[0])[0]
+
 
 shell(
     " bowtie2-build "
-    " {snakemake.params['prefix']} "
-    " --threads {snakemake.threads} "
-    " {extra} "
     " {input} "
     " {prefix} "
+    " --threads {snakemake.threads} "
+    " {extra} "
+    " {log} "
 )
