@@ -10,14 +10,17 @@ __license__ = "MIT"
 
 
 from snakemake.shell import shell
+from os.path import dirname
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 extra = snakemake.params.get("extra", "")
 
+pfam_dir = dirname(snakemake.input.pfam_hmm)
+
 shell(
     " pfam_scan.pl "
     " -fasta {snakemake.input.fasta} "
-    " -dir {snakemake.input.pfam_dir} "
+    " -dir {pfam_dir} "
     " --outfile {snakemake.output[0]} "
     " -cpu {snakemake.threads} "
     " {extra} "
