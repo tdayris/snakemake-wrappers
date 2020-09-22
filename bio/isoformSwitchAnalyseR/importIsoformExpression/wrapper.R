@@ -121,15 +121,6 @@ switch_list <- base::eval(
   )
 );
 
-# switch_list <- IsoformSwitchAnalyzeR::importRdata(
-#   isoformCountMatrix = quantification$counts,
-#   isoformRepExpression = quantification$abundance,
-#   designMatrix = design,
-#   isoformExonAnnoation = gtf_path,
-#   isoformNtFasta = fasta_path,
-#   showProgress = TRUE
-# );
-
 print("Switchlist built")
 
 # Saving results
