@@ -16,8 +16,8 @@ extra = snakemake.params.get("extra", "")
 
 shell(
     " pfam_scan.pl "
-    " -fasta {snakemake.input['fasta']} "
-    " -dir {snakemake.input['pfam_dir']} "
+    " -fasta {snakemake.input.fasta} "
+    " -dir {snakemake.input.pfam_dir} "
     " --outfile {snakemake.output[0]} "
     " -cpu {snakemake.threads} "
     " {extra} "
