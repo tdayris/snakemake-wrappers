@@ -9,7 +9,7 @@
 # __license__ = "MIT"
 
 # The main package
-base::library(package = "isoformSwitchAnalyzeR", quietly = TRUE);
+base::library(package = "IsoformSwitchAnalyzeR", quietly = TRUE);
 
 # Gathering input dataset and parameters
 switch_list <- base::readRDS(
@@ -26,7 +26,7 @@ if ("extra" %in% base::anems(snakemake@params)) {
 }
 
 command <- base::paste0(
-  "InsoformSwitchAnalyseR::extractSequence(",
+  "IsoformSwitchAnalyzeR::extractSequence(",
   extra,
   ")"
 );
