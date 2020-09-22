@@ -3047,3 +3047,10 @@ def test_cpat_make_logit_model():
         "bio/cpat/make_logit_model",
         ["snakemake", "--cores", "1", "logit_model.logit.RData", "--use-conda", "-F"]
     )
+
+
+def test_cpat_make_logit_model():
+    run(
+        "bio/cpat/cpat",
+        ["snakemake", "--cores", "1", "cpat_results.tsv", "--use-conda", "-F"]
+    )
