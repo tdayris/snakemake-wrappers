@@ -7,12 +7,19 @@ Extract collection paths from imeta queries
 
 
 
+Software dependencies
+---------------------
+
+
+* conda-forge:bash=5.0.011
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -23,7 +30,7 @@ This meta-wrapper can be used in the following way:
             "collections.txt"
         threads: 3
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/iRODS/extract_collections"
+            "0.66.0-241-gab2c8ef4/bio/iRODS/extract_collections"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -49,4 +56,33 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    #!/usr/bin/python3.7
+    # -*- coding: utf-8 -*-
+
+    """Snakemake wrapper designed to extract """
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Fish_n_CHIP 2019"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "GPLV3"
+
+    from snakemake.shell import shell
+
+    # Prepare logging
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    if snakemake.threads != 3:
+        raise ValueError(
+            "The iRODS' extract-collections wrapper requires exactly 3 threads."
+        )
+
+    shell(
+        'grep -P "^(collection|dataObj):"'  # Grep line with interesting content
+        ' {snakemake.input[0]} | '  # Path to input file
+        ' cut -f2 -d " " | '  # Remove line identifier
+        ' paste -d "/" - - '  # Paste collection and dataset names side by side
+        ' > {snakemake.output[0]} '  # Path to output file
+        ' {log} '  # Logging
+    )

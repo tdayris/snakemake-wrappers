@@ -154,6 +154,7 @@
 <li class="toctree-l1"><a class="reference internal" href="msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l1"><a class="reference internal" href="multiqc.html">MULTIQC</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">NANOSIM-H</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code">Code</a></li>
@@ -284,9 +285,15 @@
   <div class="section" id="nanosim-h">
 <span id="id1"></span><h1>NANOSIM-H<a class="headerlink" href="#nanosim-h" title="Permalink to this headline">¶</a></h1>
 <p>NanoSim-H is a simulator of Oxford Nanopore reads that captures the technology-specific features of ONT data, and allows for adjustments upon improvement of Nanopore sequencing technology.</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>nanosim-h ==1.1.0.4</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">nanosimh</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">.fa&quot;</span>
@@ -302,7 +309,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/nanosim-h/test/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/nanosim-h&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/nanosim-h&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -320,6 +327,67 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Snakemake wrapper for NanoSim-H.&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Michael Hall&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2019, Michael Hall&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;mbhall88@gmail.com&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+
+<span class="k">def</span> <span class="nf">is_header</span><span class="p">(</span><span class="n">query</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_length_of_longest_sequence</span><span class="p">(</span><span class="n">fh</span><span class="p">):</span>
+    <span class="n">current_length</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">all_lengths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fh</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_header</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="n">current_length</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">all_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_length</span><span class="p">)</span>
+            <span class="n">current_length</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">all_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_length</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">all_lengths</span><span class="p">)</span>
+
+
+<span class="c1"># Placeholder for optional parameters</span>
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">prefix</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prefix&quot;</span><span class="p">,</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">reads</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">num_reads</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_reads&quot;</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+<span class="n">profile</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="s2">&quot;ecoli_R9_2D&quot;</span><span class="p">)</span>
+<span class="n">perfect_reads</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;perfect_reads&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">min_read_len</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_read_len&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">max_read_len</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_read_len&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># need to do this as the default read length of infinity can cause nanosim-h to</span>
+<span class="c1"># hang if the reference is short</span>
+<span class="k">if</span> <span class="n">max_read_len</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+        <span class="n">max_read_len</span> <span class="o">=</span> <span class="n">get_length_of_longest_sequence</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+
+<span class="n">perfect_reads_flag</span> <span class="o">=</span> <span class="s2">&quot;--perfect &quot;</span> <span class="k">if</span> <span class="n">perfect_reads</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<span class="c1"># Formats the log redrection string</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Executed shell command</span>
+<span class="n">shell</span><span class="p">(</span>
+    <span class="s2">&quot;nanosim-h </span><span class="si">{extra}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{perfect_reads_flag}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;--max-len </span><span class="si">{max_read_len}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;--min-len </span><span class="si">{min_read_len}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;--profile </span><span class="si">{profile}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;--number </span><span class="si">{num_reads}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;--out-pref </span><span class="si">{prefix}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{snakemake.input}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

@@ -107,6 +107,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mpileup.html">BCFTOOLS MPILEUP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="norm.html">BCFTOOLS NORM</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">BCFTOOLS REHEADER</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
@@ -296,9 +297,15 @@
   <div class="section" id="bcftools-reheader">
 <span id="id1"></span><h1>BCFTOOLS REHEADER<a class="headerlink" href="#bcftools-reheader" title="Permalink to this headline">¶</a></h1>
 <p>Change header or sample names of vcf/bcf file.</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>bcftools ==1.10</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">bcftools_reheader</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;a.bcf&quot;</span><span class="p">,</span>
@@ -312,7 +319,7 @@
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># optional parameters for bcftools reheader</span>
         <span class="n">view_extra</span><span class="o">=</span><span class="s2">&quot;-O b&quot;</span>  <span class="c1"># add output format for internal bcftools view call</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/bcftools/reheader&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/bcftools/reheader&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -330,6 +337,42 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Jan Forster&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, Jan Forster&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;j.forster@dkfz.de&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+<span class="c1">## Extract arguments</span>
+<span class="n">header</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">header</span><span class="p">:</span>
+    <span class="n">header_cmd</span> <span class="o">=</span> <span class="s2">&quot;-h &quot;</span> <span class="o">+</span> <span class="n">header</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">header_cmd</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="n">samples</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">samples</span><span class="p">:</span>
+    <span class="n">samples_cmd</span> <span class="o">=</span> <span class="s2">&quot;-s &quot;</span> <span class="o">+</span> <span class="n">samples</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">samples_cmd</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">view_extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;view_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">shell</span><span class="p">(</span>
+    <span class="s2">&quot;bcftools reheader &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{header_cmd}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{samples_cmd}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{snakemake.input.vcf}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;| bcftools view &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{view_extra}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;&gt; </span><span class="si">{snakemake.output}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

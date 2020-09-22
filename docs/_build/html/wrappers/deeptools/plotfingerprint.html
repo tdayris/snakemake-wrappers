@@ -122,6 +122,7 @@
 <li class="toctree-l2"><a class="reference internal" href="computematrix.html">DEEPTOOLS COMPUTEMATRIX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plotHeatmap.html">PLOTHEATMAP</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">DEEPTOOLS PLOTFINGERPRINT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
@@ -346,9 +347,15 @@
 </tbody>
 </table>
 </div></blockquote>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>deeptools ==3.4.3</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">plot_fingerprint</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">bam_files</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;samples/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">]),</span>
@@ -370,7 +377,7 @@
     <span class="n">threads</span><span class="p">:</span>
         <span class="mi">8</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/deeptools/plotfingerprint&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/deeptools/plotfingerprint&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -388,6 +395,53 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Antonie Vietor&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, Antonie Vietor&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;antonie.v@gmx.de&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">jsd_sample</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;jsd_sample&quot;</span><span class="p">)</span>
+<span class="n">out_counts</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;counts&quot;</span><span class="p">)</span>
+<span class="n">out_metrics</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;qc_metrics&quot;</span><span class="p">)</span>
+<span class="n">optional_output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">jsd</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="k">if</span> <span class="n">jsd_sample</span><span class="p">:</span>
+    <span class="n">jsd</span> <span class="o">+=</span> <span class="s2">&quot; --JSDsample </span><span class="si">{jsd}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">jsd</span><span class="o">=</span><span class="n">jsd_sample</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">out_counts</span><span class="p">:</span>
+    <span class="n">optional_output</span> <span class="o">+=</span> <span class="s2">&quot; --outRawCounts </span><span class="si">{out_counts}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_counts</span><span class="o">=</span><span class="n">out_counts</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">out_metrics</span><span class="p">:</span>
+    <span class="n">optional_output</span> <span class="o">+=</span> <span class="s2">&quot; --outQualityMetrics </span><span class="si">{metrics}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="n">out_metrics</span><span class="p">)</span>
+
+<span class="n">shell</span><span class="p">(</span>
+    <span class="s2">&quot;(plotFingerprint &quot;</span>
+    <span class="s2">&quot;-b </span><span class="si">{snakemake.input.bam_files}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;-o </span><span class="si">{snakemake.output.fingerprint}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{optional_output}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;--numberOfProcessors </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{jsd}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{snakemake.params}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+<span class="c1"># ToDo: remove the &#39;NA&#39; string replacement when fixed in deepTools, see:</span>
+<span class="c1"># https://github.com/deeptools/deepTools/pull/999</span>
+<span class="n">regex_passes</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_metrics</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">regex_passes</span><span class="p">):</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">NA(</span><span class="se">\t</span><span class="s2">|</span><span class="se">\n</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">nan</span><span class="se">\\</span><span class="s2">1&quot;</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_metrics</span><span class="p">,</span> <span class="s2">&quot;wt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

@@ -7,12 +7,19 @@ Create self-contained igv.js HTML pages.
 
 
 
+Software dependencies
+---------------------
+
+
+* igv-reports =0.9.1
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -29,7 +36,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/igv-report.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/igv-reports"
+            "0.66.0-241-gab2c8ef4/bio/igv-reports"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -55,4 +62,27 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    """Snakemake wrapper for igv-reports."""
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2019, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    tracks = snakemake.input.get("tracks", [])
+    if tracks:
+        if isinstance(tracks, str):
+            tracks = [tracks]
+        tracks = "--tracks {}".format(" ".join(tracks))
+
+    shell(
+        "create_report {extra} --standalone --output {snakemake.output[0]} {snakemake.input.vcf} {snakemake.input.fasta} {tracks} {log}"
+    )

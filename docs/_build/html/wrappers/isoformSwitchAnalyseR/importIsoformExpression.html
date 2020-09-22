@@ -152,6 +152,7 @@
 <li class="toctree-l2"><a class="reference internal" href="analyzeSwitchConsequences.html">ANALYZESWITCHCONSEQUENCES</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extractSequence.html">EXTRACTSEQUENCE</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">IMPORTISOFORMEXPRESSION</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
@@ -298,9 +299,15 @@
   <div class="section" id="importisoformexpression">
 <span id="id1"></span><h1>IMPORTISOFORMEXPRESSION<a class="headerlink" href="#importisoformexpression" title="Permalink to this headline">¶</a></h1>
 <p>Import Salmon/Kallisto/RSEM/… in InsoformSwitchAnalyseR</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>bioconda:bioconductor-isoformswitchanalyzer=1.10.0</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_isoformSwitchAnalyseR_importIsoformExpression</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">quant</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
@@ -320,7 +327,7 @@
             <span class="s2">&quot; ignoreAfterSpace = TRUE&quot;</span>
         <span class="p">)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/isoformSwitchAnalyseR/importIsoformExpression&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/isoformSwitchAnalyseR/importIsoformExpression&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -347,6 +354,138 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="c1">#!/usr/bin/R</span>
+
+<span class="c1"># This script takes an list of Salmon directories</span>
+<span class="c1"># and builds a IsoformSwitchAnalyseR object</span>
+
+<span class="c1"># __author__ = &quot;Thibault Dayris&quot;</span>
+<span class="c1"># __copyright__ = &quot;Copyright 2020, Thibault Dayris&quot;</span>
+<span class="c1"># __email__ = &quot;thibault.dayris@gustaveroussy.fr&quot;</span>
+<span class="c1"># __license__ = &quot;MIT&quot;</span>
+
+
+<span class="c1"># The main package</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;IsoformSwitchAnalyzeR&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
+
+<span class="c1"># Gathering input files</span>
+<span class="n">quant_files</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span>
+  <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;quant&quot;</span><span class="p">]],</span>
+  <span class="nf">function</span><span class="p">(</span><span class="n">quant</span><span class="p">)</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">quant</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="n">design_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span>
+  <span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;design&quot;</span><span class="p">]]</span>
+<span class="p">);</span>
+
+<span class="n">separator</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">ifelse</span><span class="p">(</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">endsWith</span><span class="p">(</span><span class="n">design_path</span><span class="p">,</span> <span class="s">&quot;.csv&quot;</span><span class="p">),</span>
+  <span class="s">&quot;,&quot;</span><span class="p">,</span>
+  <span class="s">&quot;\t&quot;</span>
+<span class="p">);</span>
+
+<span class="n">design_table</span> <span class="o">&lt;-</span> <span class="n">utils</span><span class="o">::</span><span class="nf">read.table</span><span class="p">(</span>
+  <span class="n">file</span><span class="o">=</span><span class="n">design_path</span><span class="p">,</span>
+  <span class="n">sep</span><span class="o">=</span><span class="n">separator</span><span class="p">,</span>
+  <span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span>
+<span class="p">);</span>
+
+<span class="n">sample_id_col</span> <span class="o">&lt;-</span> <span class="s">&quot;Sample_id&quot;</span><span class="p">;</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;sample_id_col&quot;</span> <span class="o">%in%</span> <span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">sample_id_col</span> <span class="o">&lt;-</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;sample_id_col&quot;</span><span class="p">]];</span>
+<span class="p">}</span>
+
+<span class="n">condition_col</span> <span class="o">&lt;-</span> <span class="s">&quot;condition&quot;</span><span class="p">;</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;condition&quot;</span> <span class="o">%in%</span> <span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">condition_col</span> <span class="o">&lt;-</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;condition_col&quot;</span><span class="p">]];</span>
+<span class="p">}</span>
+
+<span class="n">design</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span>
+  <span class="n">sampleID</span> <span class="o">=</span> <span class="n">design_table</span><span class="p">[,</span> <span class="n">sample_id_col</span><span class="p">],</span>
+  <span class="n">condition</span> <span class="o">=</span> <span class="n">design_table</span><span class="p">[,</span> <span class="n">condition_col</span><span class="p">]</span>
+<span class="p">);</span>
+
+<span class="n">gtf_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;gtf&quot;</span><span class="p">]]);</span>
+<span class="n">fasta_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;fasta&quot;</span><span class="p">]]);</span>
+
+<span class="c1"># Guessing the argument type in importIsoformExpression</span>
+<span class="n">import_type</span> <span class="o">&lt;-</span> <span class="nf">ifelse</span><span class="p">(</span>
+  <span class="nf">all</span><span class="p">(</span><span class="nf">file_test</span><span class="p">(</span><span class="s">&quot;-f&quot;</span><span class="p">,</span> <span class="n">quant_files</span><span class="p">)),</span>
+  <span class="s">&quot;sampleVector&quot;</span><span class="p">,</span>
+  <span class="s">&quot;parentDir&quot;</span>
+<span class="p">);</span>
+
+
+<span class="c1"># Building command line arguments</span>
+<span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span><span class="n">import_type</span><span class="p">,</span> <span class="s">&quot; = quant_files&quot;</span><span class="p">);</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;extra_isoform_expr&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span>
+    <span class="n">extra</span><span class="p">,</span>
+    <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;extra_isoform_expr&quot;</span><span class="p">]],</span>
+    <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;, &quot;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1"># Buiding command line itself</span>
+<span class="n">command</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span>
+  <span class="s">&quot;IsoformSwitchAnalyzeR::importIsoformExpression(&quot;</span><span class="p">,</span>
+  <span class="n">extra</span><span class="p">,</span>
+  <span class="s">&quot;)&quot;</span>
+<span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Libraries and input data loaded&quot;</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+
+<span class="c1"># Running command</span>
+<span class="n">quantification</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">eval</span><span class="p">(</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">parse</span><span class="p">(</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">command</span>
+  <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="n">new_names</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span>
+  <span class="nf">colnames</span><span class="p">(</span><span class="n">quantification</span><span class="o">$</span><span class="n">counts</span><span class="p">),</span>
+  <span class="nf">function</span><span class="p">(</span><span class="n">sampleid</span><span class="p">)</span> <span class="n">base</span><span class="o">::</span><span class="nf">ifelse</span><span class="p">(</span>
+      <span class="n">sampleid</span> <span class="o">==</span> <span class="s">&quot;isoform_id&quot;</span><span class="p">,</span>
+      <span class="s">&quot;isoform_id&quot;</span><span class="p">,</span>
+      <span class="n">base</span><span class="o">::</span><span class="nf">basename</span><span class="p">(</span><span class="n">base</span><span class="o">::</span><span class="nf">dirname</span><span class="p">(</span><span class="n">sampleid</span><span class="p">))</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+<span class="nf">colnames</span><span class="p">(</span><span class="n">quantification</span><span class="o">$</span><span class="n">counts</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">new_names</span><span class="p">;</span>
+<span class="nf">colnames</span><span class="p">(</span><span class="n">quantification</span><span class="o">$</span><span class="n">abundance</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">new_names</span><span class="p">;</span>
+
+<span class="n">command</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span>
+  <span class="s">&quot;IsoformSwitchAnalyzeR::importRdata(&quot;</span><span class="p">,</span>
+  <span class="s">&quot;isoformCountMatrix = quantification$counts, &quot;</span><span class="p">,</span>
+  <span class="s">&quot;isoformRepExpression = quantification$abundance, &quot;</span><span class="p">,</span>
+  <span class="s">&quot;designMatrix = design, &quot;</span><span class="p">,</span>
+  <span class="s">&quot;isoformExonAnnoation = gtf_path, &quot;</span><span class="p">,</span>
+  <span class="s">&quot;isoformNtFasta = fasta_path &quot;</span>
+<span class="p">);</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;extra_rdata&quot;</span> <span class="o">%in%</span> <span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">command</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="s">&quot;, &quot;</span><span class="p">,</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;extra_rdata&quot;</span><span class="p">]],</span> <span class="s">&quot;)&quot;</span><span class="p">);</span>
+<span class="p">}</span> <span class="n">else</span> <span class="p">{</span>
+  <span class="n">command</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="s">&quot;)&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Import R data:&quot;</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+
+<span class="c1"># Running command</span>
+<span class="n">switch_list</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">eval</span><span class="p">(</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">parse</span><span class="p">(</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">command</span>
+  <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="s">&quot;Switchlist built&quot;</span><span class="p">)</span>
+
+<span class="c1"># Saving results</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">saveRDS</span><span class="p">(</span>
+  <span class="n">switch_list</span><span class="p">,</span>
+  <span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;rds&quot;</span><span class="p">]]</span>
+<span class="p">);</span>
+</pre></div>
+</div>
 </div>
 </div>
 

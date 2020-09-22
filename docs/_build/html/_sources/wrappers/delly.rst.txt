@@ -7,12 +7,19 @@ Call variants with delly.
 
 
 
+Software dependencies
+---------------------
+
+
+* delly ==0.8.1
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -30,7 +37,7 @@ This meta-wrapper can be used in the following way:
             "logs/delly.log"
         threads: 2  # It is best to use as many threads as samples
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/delly"
+            "0.66.0-241-gab2c8ef4/bio/delly"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -56,4 +63,26 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "koester@jimmy.harvard.edu"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    exclude = (
+        "-x {}".format(snakemake.input.exlude) if snakemake.input.get("exlude", "") else ""
+    )
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "OMP_NUM_THREADS={snakemake.threads} delly call {extra} "
+        "{exclude} -g {snakemake.input.ref} "
+        "-o {snakemake.output[0]} {snakemake.input.samples} {log}"
+    )

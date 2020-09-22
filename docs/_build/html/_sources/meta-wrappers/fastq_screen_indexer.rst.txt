@@ -43,7 +43,7 @@ This meta-wrapper can be used in the following way:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/reference/ensembl-sequence"
+            "0.66.0-241-gab2c8ef4/bio/reference/ensembl-sequence"
 
 
 Note that input, output and log file paths can be chosen freely.

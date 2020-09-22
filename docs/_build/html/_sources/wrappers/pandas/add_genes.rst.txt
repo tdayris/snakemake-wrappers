@@ -7,12 +7,21 @@ Add a gene/transcript column to a given tsv
 
 
 
+Software dependencies
+---------------------
+
+
+* conda-forge:python=3.8.2
+
+* conda-forge:pandas=1.0.1
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -36,7 +45,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/test_add_genes.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/pandas/add_genes"
+            "0.66.0-241-gab2c8ef4/bio/pandas/add_genes"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -72,4 +81,73 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    #!/usr/bin/python3.8
+    # conding: utf-8
+
+    """
+    Join multiple two tsv files on a given column. One of
+    these tsv file if formatted as follows:
+
+    1: gene_id
+    2: transcript_id
+    3: gene_name
+
+    Optional columns can be:
+
+    4: chr
+    5: start
+    6: end
+    """
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    import logging
+    import pandas
+
+    from os.path import basename, dirname
+    from snakemake.utils import makedirs
+
+    if (outdir := dirname(snakemake.output["tsv"])) != "":
+        makedirs(outdir)
+
+    genes = snakemake.params.get("genes", False)
+
+    annot = pandas.read_csv(
+        snakemake.input["gene2gene"],
+        sep="\t",
+        header=(
+            0
+            if snakemake.params.get("header", None) is not None
+            else None
+        ),
+        index_col=0,
+        dtype=str
+    )
+
+    tsv = pandas.read_csv(
+        snakemake.input["tsv"],
+        sep="\t",
+        header=0,
+        index_col=0
+    )
+
+    merged_frame = pandas.merge(
+        tsv,
+        annot,
+        left_index=True,
+        right_index=True,
+        how="left"
+    )
+
+    merged_frame.to_csv(
+        snakemake.output["tsv"],
+        sep="\t",
+        index=(snakemake.params.get("write_index", True) is True),
+        header=True
+    )

@@ -173,6 +173,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../razers3.html">RAZERS3</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../reference.html">REFERENCE</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">ENSEMBL-ANNOTATION</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
@@ -291,9 +292,15 @@
   <div class="section" id="ensembl-annotation">
 <span id="id1"></span><h1>ENSEMBL-ANNOTATION<a class="headerlink" href="#ensembl-annotation" title="Permalink to this headline">¶</a></h1>
 <p>Download annotation of genomic sites (e.g. transcripts) from ENSEMBL FTP servers, and store them in a single .gtf or .gff3 file.</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>curl</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">get_annotation</span><span class="p">:</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="s2">&quot;refs/annotation.gtf&quot;</span>
@@ -307,7 +314,7 @@
         <span class="s2">&quot;logs/get_annotation.log&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/reference/ensembl-annotation&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/reference/ensembl-annotation&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -325,6 +332,61 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Johannes Köster&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2019, Johannes Köster&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;johannes.koester@uni-due.de&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+<span class="n">species</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="n">release</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">release</span><span class="p">)</span>
+<span class="n">fmt</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">fmt</span>
+<span class="n">build</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">build</span>
+<span class="n">flavor</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;flavor&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">branch</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="n">release</span> <span class="o">&gt;=</span> <span class="mi">81</span> <span class="ow">and</span> <span class="n">build</span> <span class="o">==</span> <span class="s2">&quot;GRCh37&quot;</span><span class="p">:</span>
+    <span class="c1"># use the special grch37 branch for new releases</span>
+    <span class="n">branch</span> <span class="o">=</span> <span class="s2">&quot;grch37/&quot;</span>
+
+<span class="k">if</span> <span class="n">flavor</span><span class="p">:</span>
+    <span class="n">flavor</span> <span class="o">+=</span> <span class="s2">&quot;.&quot;</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s2">&quot;gtf&quot;</span><span class="p">:</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;gtf.gz&quot;</span>
+<span class="k">elif</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s2">&quot;gff3&quot;</span><span class="p">:</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;gff3.gz&quot;</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;ftp://ftp.ensembl.org/pub/</span><span class="si">{branch}</span><span class="s2">release-</span><span class="si">{release}</span><span class="s2">/</span><span class="si">{fmt}</span><span class="s2">/</span><span class="si">{species}</span><span class="s2">/</span><span class="si">{species_cap}</span><span class="s2">.</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{flavor}{suffix}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">release</span><span class="o">=</span><span class="n">release</span><span class="p">,</span>
+    <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">,</span>
+    <span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">,</span>
+    <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span>
+    <span class="n">species_cap</span><span class="o">=</span><span class="n">species</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span>
+    <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
+    <span class="n">flavor</span><span class="o">=</span><span class="n">flavor</span><span class="p">,</span>
+    <span class="n">branch</span><span class="o">=</span><span class="n">branch</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;(curl -L </span><span class="si">{url}</span><span class="s2"> | gzip -d &gt; </span><span class="si">{snakemake.output[0]}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;Unable to download annotation data from Ensembl. &quot;</span>
+        <span class="s2">&quot;Did you check that this combination of species, build, and release is actually provided?&quot;</span><span class="p">,</span>
+        <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

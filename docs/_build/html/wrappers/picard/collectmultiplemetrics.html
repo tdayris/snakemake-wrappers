@@ -169,6 +169,7 @@
 <li class="toctree-l2"><a class="reference internal" href="collecthsmetrics.html">PICARD COLLECTHSMETRICS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="collectinsertsizemetrics.html">PICARD COLLECTINSERTSIZEMETRICS</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">PICARD COLLECTMULTIPLEMETRICS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
@@ -361,9 +362,15 @@
 </tbody>
 </table>
 </div></blockquote>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>picard ==2.23.0</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">collect_multiple_metrics</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
          <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
@@ -407,7 +414,7 @@
         <span class="s2">&quot;METRIC_ACCUMULATION_LEVEL=SAMPLE &quot;</span>
         <span class="s2">&quot;REF_FLAT=ref_flat.txt &quot;</span>   <span class="c1"># is required if RnaSeqMetrics are used</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/picard/collectmultiplemetrics&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/picard/collectmultiplemetrics&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -426,6 +433,72 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;David Laehnemann, Antonie Vietor&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, David Laehnemann, Antonie Vietor&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;antonie.v@gmx.de&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mem_gb&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">res</span> <span class="ow">or</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">exts_to_prog</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;.alignment_summary_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectAlignmentSummaryMetrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.insert_size_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectInsertSizeMetrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.insert_size_histogram.pdf&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectInsertSizeMetrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.quality_distribution_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;QualityScoreDistribution&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.quality_distribution.pdf&quot;</span><span class="p">:</span> <span class="s2">&quot;QualityScoreDistribution&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.quality_by_cycle_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;MeanQualityByCycle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.quality_by_cycle.pdf&quot;</span><span class="p">:</span> <span class="s2">&quot;MeanQualityByCycle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.base_distribution_by_cycle_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectBaseDistributionByCycle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.base_distribution_by_cycle.pdf&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectBaseDistributionByCycle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.gc_bias.detail_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectGcBiasMetrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.gc_bias.summary_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectGcBiasMetrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.gc_bias.pdf&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectGcBiasMetrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.rna_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;RnaSeqMetrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.bait_bias_detail_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectSequencingArtifactMetrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.bait_bias_summary_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectSequencingArtifactMetrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.error_summary_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectSequencingArtifactMetrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.pre_adapter_detail_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectSequencingArtifactMetrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.pre_adapter_summary_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectSequencingArtifactMetrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.quality_yield_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectQualityYieldMetrics&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">progs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">:</span>
+    <span class="n">matched</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">exts_to_prog</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+            <span class="n">progs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">exts_to_prog</span><span class="p">[</span><span class="n">ext</span><span class="p">])</span>
+            <span class="n">matched</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">matched</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span>
+            <span class="s2">&quot;Unknown type of metrics file requested, for possible metrics files, see https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/picard/collectmultiplemetrics.html&quot;</span>
+        <span class="p">)</span>
+
+<span class="n">programs</span> <span class="o">=</span> <span class="s2">&quot; PROGRAM=&quot;</span> <span class="o">+</span> <span class="s2">&quot; PROGRAM=&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">progs</span><span class="p">)</span>
+
+<span class="n">out</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="p">)</span>  <span class="c1"># as default</span>
+<span class="n">output_file</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">exts_to_prog</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">output_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">output_file</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">ext</span><span class="p">)]</span>
+        <span class="k">break</span>
+
+<span class="n">shell</span><span class="p">(</span>
+    <span class="s2">&quot;(picard -Xmx</span><span class="si">{res}</span><span class="s2">g CollectMultipleMetrics &quot;</span>
+    <span class="s2">&quot;I=</span><span class="si">{snakemake.input.bam}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;O=</span><span class="si">{out}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;R=</span><span class="si">{snakemake.input.ref}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{snakemake.params}{programs}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

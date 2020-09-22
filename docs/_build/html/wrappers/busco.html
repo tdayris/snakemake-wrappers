@@ -106,6 +106,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bismark.html">BISMARK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bowtie2.html">BOWTIE2</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">BUSCO</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code">Code</a></li>
@@ -284,9 +285,16 @@
   <div class="section" id="busco">
 <span id="id1"></span><h1>BUSCO<a class="headerlink" href="#busco" title="Permalink to this headline">¶</a></h1>
 <p>Assess assembly and annotation completeness with BUSCO</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>python ==3.6</p></li>
+<li><p>busco</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">run_busco</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="s2">&quot;sample_data/target.fa&quot;</span>
@@ -301,7 +309,7 @@
         <span class="c1"># optional parameters</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/busco&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/busco&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -319,6 +327,45 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Snakemake wrapper for BUSCO assessment&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Tessa Pierce&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2018, Tessa Pierce&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;ntpierce@gmail.com&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">mode</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mode&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;please input a run mode: genome, transcriptome or proteins&quot;</span>
+<span class="n">lineage</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lineage_path&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">lineage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;please input the path to a lineage for busco assessment&quot;</span>
+
+<span class="c1"># busco does not allow you to direct output location: handle this by moving output</span>
+<span class="n">outdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">outdir</span><span class="p">:</span>
+    <span class="n">out_name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">out_name</span> <span class="o">=</span> <span class="n">outdir</span>
+
+<span class="c1"># note: --force allows snakemake to handle rewriting files as necessary</span>
+<span class="c1"># without needing to specify *all* busco outputs as snakemake outputs</span>
+<span class="n">shell</span><span class="p">(</span>
+    <span class="s2">&quot;run_busco --in </span><span class="si">{snakemake.input}</span><span class="s2"> --out </span><span class="si">{out_name}</span><span class="s2"> --force &quot;</span>
+    <span class="s2">&quot; --cpu </span><span class="si">{snakemake.threads}</span><span class="s2"> --mode </span><span class="si">{mode}</span><span class="s2"> --lineage </span><span class="si">{lineage}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+
+<span class="n">busco_outname</span> <span class="o">=</span> <span class="s2">&quot;run_&quot;</span> <span class="o">+</span> <span class="n">out_name</span>
+
+<span class="c1"># move to intended location</span>
+<span class="n">shell</span><span class="p">(</span><span class="s2">&quot;cp -r </span><span class="si">{busco_outname}</span><span class="s2">/* </span><span class="si">{outdir}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">shell</span><span class="p">(</span><span class="s2">&quot;rm -rf </span><span class="si">{busco_outname}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

@@ -298,14 +298,14 @@
 <p>This wrapper performs iRODS copy from a file url</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_iRODS_iget</span><span class="p">:</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="s2">&quot;my_file.txt&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="nb">input</span> <span class="o">=</span> <span class="s2">&quot;/irods/path/archive/my_file.txt&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/iRODS/iget&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/iRODS/iget&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -331,6 +331,48 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3.8</span>
+<span class="c1"># conding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A script that handles iRODS copy.</span>
+
+<span class="sd">WARNING: Input file has to be defined in params, as it does not exists outside</span>
+<span class="sd">iRODS environment. Therefore, snakemake would raise a FileNotFoundError</span>
+<span class="sd">(false positive in best cases).</span>
+
+<span class="sd">snakemake.RemoteProvider.iRODS is not used since authentication cannot be</span>
+<span class="sd">securely transmitted within the wrapper.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Thibault Dayris&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, Thibault Dayris&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;thibault.dayris@gustaveroussy.fr&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+<span class="c1"># Prepare logging</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;-VK&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+        <span class="s2">&quot;A single file is expected in this wrapper. Multiple copies should be &quot;</span>
+        <span class="s2">&quot;performed in multiple call of this pipeline.&quot;</span>
+    <span class="p">)</span>
+
+<span class="n">shell</span><span class="p">(</span>
+    <span class="s2">&quot; iget &quot;</span>  <span class="c1"># Copy command from iRODS</span>
+    <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2"> &quot;</span>  <span class="c1"># Extra parameters</span>
+    <span class="s2">&quot; -N </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>  <span class="c1"># Maximum number of threads</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.params[&#39;input&#39;]}</span><span class="s2"> &quot;</span>  <span class="c1"># Input collection</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.output[0]}</span><span class="s2"> &quot;</span>  <span class="c1"># Output path</span>
+    <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2"> &quot;</span>  <span class="c1"># Logging behavior</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

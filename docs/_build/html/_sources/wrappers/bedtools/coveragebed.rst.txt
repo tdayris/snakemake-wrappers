@@ -7,12 +7,19 @@ Returns the depth and breadth of coverage of features from B on the intervals in
 
 
 
+Software dependencies
+---------------------
+
+
+* bedtools ==2.29.0
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -28,7 +35,7 @@ This meta-wrapper can be used in the following way:
             extra=""  # optional parameters
         threads: 8
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/bedtools/coveragebed"
+            "0.66.0-241-gab2c8ef4/bio/bedtools/coveragebed"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -54,4 +61,35 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "Patrik Smeds"
+    __copyright__ = "Copyright 2019, Patrik Smeds"
+    __email__ = "patrik.smeds@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    shell.executable("bash")
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    extra_params = snakemake.params.get("extra", "")
+
+    input_a = snakemake.input.a
+    input_b = snakemake.input.b
+
+    output_file = snakemake.output[0]
+
+    if not isinstance(output_file, str) and len(snakemake.output) != 1:
+        raise ValueError("Output should be one file: " + str(output_file) + "!")
+
+    shell(
+        "coverageBed"
+        " -a {input_a}"
+        " -b {input_b}"
+        " {extra_params}"
+        " > {output_file}"
+        " {log}"
+    )

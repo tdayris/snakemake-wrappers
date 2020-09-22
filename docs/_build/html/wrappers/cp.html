@@ -114,6 +114,7 @@
 <li class="toctree-l1"><a class="reference internal" href="clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l1"><a class="reference internal" href="concatenate_fastq.html">CONCATENATE FASTQ</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">CP (BASH)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authors">Authors</a></li>
@@ -285,9 +286,15 @@
   <div class="section" id="cp-bash">
 <span id="id1"></span><h1>CP (BASH)<a class="headerlink" href="#cp-bash" title="Permalink to this headline">¶</a></h1>
 <p>Simple cp from bash.</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>bash ==4.4.18</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">cp_target</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="s2">&quot;source/</span><span class="si">{input}</span><span class="s2">&quot;</span>
@@ -307,7 +314,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/cp/</span><span class="si">{input}</span><span class="s2">.logs&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/cp/&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/cp/&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -330,6 +337,67 @@ symbolic linking automatic choices</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3.7</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;Snakemake wrapper for bash copy&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Thibault Dayris&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2019, Thibault Dayris&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;thibault.dayris@gustaveroussy.fr&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+<span class="c1"># No node can access a cold storage</span>
+<span class="c1"># these files must be copied. However,</span>
+<span class="c1"># any file else where should be symlinked!</span>
+<span class="n">cold_storage</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">cold_storage</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="n">cold_storage</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">cold_storage</span>
+<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">cold_storage</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">cold_storage</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">cold_storage</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cold_list</span><span class="p">:</span>
+            <span class="n">cold_storage</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cold_list</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cold_storage</span> <span class="o">=</span> <span class="p">[</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">cold_storage</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">cold_storage</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">cold_storage</span><span class="p">)]</span>
+
+<span class="c1"># Prepare logging</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">extra_cp</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;-v&quot;</span><span class="p">)</span>
+<span class="n">extra_iget</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra_irods&quot;</span><span class="p">,</span> <span class="s2">&quot;-vK&quot;</span><span class="p">)</span>
+
+<span class="n">output_directory</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="n">shell_cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;mkdir --parents </span><span class="si">{</span><span class="n">output_directory</span><span class="si">}</span><span class="s2"> &amp;&amp; &quot;</span>
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/odin/kdi/dataset&quot;</span><span class="p">):</span>
+        <span class="n">shell_cmd</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="s2">&quot;iget &quot;</span>                                      <span class="c1"># iRODS copy</span>
+            <span class="s2">&quot; </span><span class="si">{extra_iget}</span><span class="s2"> &quot;</span>                             <span class="c1"># Extra parameters</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>                         <span class="c1"># Path to input file</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2"> &quot;</span>       <span class="c1"># Path to output file</span>
+            <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">; &quot;</span>                                    <span class="c1"># Logging</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">symlink</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">cs</span><span class="p">)</span> <span class="k">for</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">cold_storage</span><span class="p">)</span>
+        <span class="n">shell_cmd</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="s2">&quot;cp &quot;</span>                                        <span class="c1"># Tool</span>
+            <span class="s2">&quot;</span><span class="si">{extra_cp}</span><span class="s2"> &quot;</span>                                <span class="c1"># Optionnal parameters</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">symlink</span> <span class="k">else</span> <span class="s1">&#39;--symbolic-link&#39;</span><span class="si">}</span><span class="s2"> &quot;</span>   <span class="c1"># Symlink if needed</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>                         <span class="c1"># Path to input file</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2"> &quot;</span>       <span class="c1"># Path to output file</span>
+            <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">; &quot;</span>                                    <span class="c1"># Logging</span>
+        <span class="p">)</span>
+
+<span class="n">shell</span><span class="p">(</span><span class="n">shell_cmd</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

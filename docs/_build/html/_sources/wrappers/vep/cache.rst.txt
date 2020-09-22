@@ -7,12 +7,19 @@ Download VEP cache for given species, build and release.
 
 
 
+Software dependencies
+---------------------
+
+
+* ensembl-vep
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -27,7 +34,7 @@ This meta-wrapper can be used in the following way:
             "logs/vep/cache.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/vep/cache"
+            "0.66.0-241-gab2c8ef4/bio/vep/cache"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -53,4 +60,26 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2020, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    from pathlib import Path
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "vep_install --AUTO cf "
+        "--SPECIES {snakemake.params.species} "
+        "--ASSEMBLY {snakemake.params.build} "
+        "--CACHE_VERSION {snakemake.params.release} "
+        "--CACHEDIR {snakemake.output} "
+        "--CONVERT "
+        "--NO_UPDATE "
+        "{extra} {log}"
+    )

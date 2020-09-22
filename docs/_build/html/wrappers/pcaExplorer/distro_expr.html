@@ -163,6 +163,7 @@
 <li class="toctree-l2"><a class="reference internal" href="PCAScree.html">PCAEXPLORER PCA SCREE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="annotation.html">PCAEXPLORER ANNOTATION</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">PCAEXPLORER DISTRO_EXPR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
@@ -297,9 +298,23 @@
   <div class="section" id="pcaexplorer-distro-expr">
 <span id="id1"></span><h1>PCAEXPLORER DISTRO_EXPR<a class="headerlink" href="#pcaexplorer-distro-expr" title="Permalink to this headline">¶</a></h1>
 <p>Plot the distribution of the sample expression values</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>bioconda:bioconductor-deseq2=1.26.0</p></li>
+<li><p>bioconda:bioconductor-pcaexplorer=2.12.0</p></li>
+<li><p>bioconda:bioconductor-delayedarray=0.12.0</p></li>
+<li><p>conda-forge:r-readr=1.3.1</p></li>
+<li><p>conda-forge:r-jsonlite=1.6.1</p></li>
+<li><p>bioconda:bioconductor-summarizedexperiment=1.16.0</p></li>
+<li><p>bioconda:bioconductor-iranges=2.20.0</p></li>
+<li><p>conda-forge:cairo=1.16.0</p></li>
+<li><p>conda-forge:r-cairo=1.5_11</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_pcaexplorer_distro_expr</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">dst</span> <span class="o">=</span> <span class="s2">&quot;vst.RDS&quot;</span>
@@ -321,7 +336,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_pcaexplorer_distro_expr.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/pcaExplorer/distro_expr&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/pcaExplorer/distro_expr&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -346,6 +361,68 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="c1">#!/usr/bin/R</span>
+
+<span class="c1"># __author__ = &quot;Thibault Dayris&quot;</span>
+<span class="c1"># __copyright__ = &quot;Copyright 2020, Thibault Dayris&quot;</span>
+<span class="c1"># __email__ = &quot;thibault.dayris@gustaveroussy.fr&quot;</span>
+<span class="c1"># __license__ = &quot;MIT&quot;</span>
+
+<span class="c1"># This script takes a deseq2 transform object and performs</span>
+<span class="c1"># plot over expression distribution</span>
+
+
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;DESeq2&quot;</span><span class="p">);</span>        <span class="c1"># Differential analysis</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;pcaExplorer&quot;</span><span class="p">);</span>   <span class="c1"># Handles PCAs</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;Cairo&quot;</span><span class="p">);</span>         <span class="c1"># Graphic library</span>
+
+<span class="c1"># Overload output defaults in order to avoid</span>
+<span class="c1"># X11 foreward errors on cluster nodes</span>
+<span class="nf">options</span><span class="p">(</span><span class="n">bitmapType</span><span class="o">=</span><span class="s">&quot;cairo&quot;</span><span class="p">);</span>
+
+<span class="c1"># Load specified input files</span>
+<span class="n">dst_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span>
+  <span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;dst&quot;</span><span class="p">]]</span>
+<span class="p">);</span>
+<span class="n">dst</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">readRDS</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="n">dst_path</span><span class="p">);</span>
+
+
+<span class="c1"># Load extra parameters</span>
+<span class="n">extra</span> <span class="o">&lt;-</span> <span class="s">&quot;dst&quot;</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;extra&quot;</span> <span class="o">%in%</span> <span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span>
+      <span class="n">extra</span><span class="p">,</span>
+      <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;extra&quot;</span><span class="p">]],</span>
+      <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;, &quot;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1"># Build plot</span>
+<span class="nf">png</span><span class="p">(</span>
+  <span class="n">filename</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;png&quot;</span><span class="p">]],</span>
+  <span class="n">width</span> <span class="o">=</span> <span class="m">1024</span><span class="p">,</span>
+  <span class="n">height</span> <span class="o">=</span> <span class="m">768</span><span class="p">,</span>
+  <span class="n">units</span> <span class="o">=</span> <span class="s">&quot;px&quot;</span><span class="p">,</span>
+  <span class="n">type</span> <span class="o">=</span> <span class="s">&quot;cairo&quot;</span>
+<span class="p">);</span>
+
+<span class="n">command</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span>
+  <span class="s">&quot;pcaExplorer::distro_expr(&quot;</span><span class="p">,</span>
+  <span class="n">extra</span><span class="p">,</span>
+  <span class="s">&quot;);&quot;</span>
+<span class="p">);</span>
+
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+
+<span class="n">base</span><span class="o">::</span><span class="nf">eval</span><span class="p">(</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">parse</span><span class="p">(</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">command</span>
+  <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="nf">dev.off</span><span class="p">()</span>
+</pre></div>
+</div>
 </div>
 </div>
 

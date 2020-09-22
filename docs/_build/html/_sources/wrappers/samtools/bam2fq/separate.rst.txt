@@ -7,12 +7,19 @@ Convert a bam file with paired end reads back to unaligned reads in a two separa
 
 
 
+Software dependencies
+---------------------
+
+
+* samtools ==1.10
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -29,7 +36,7 @@ This meta-wrapper can be used in the following way:
             3     # At least 2 threads have to be requested on cluster sumbission.
                   # Thus, this value - 2 will be sent to samtools sort -@ argument.
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/samtools/bam2fq/separate"
+            "0.66.0-241-gab2c8ef4/bio/samtools/bam2fq/separate"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -64,4 +71,38 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "David Laehnemann, Victoria Sack"
+    __copyright__ = "Copyright 2018, David Laehnemann, Victoria Sack"
+    __email__ = "david.laehnemann@hhu.de"
+    __license__ = "MIT"
+
+
+    import os
+    from snakemake.shell import shell
+
+    prefix = os.path.splitext(snakemake.output[0])[0]
+
+    # Samtools takes additional threads through its option -@
+    # One thread is used bu Samtools sort
+    # One thread is used by Samtools bam2fq
+    # So snakemake.threads has to take them into account
+    # before allowing additional threads through samtools sort -@
+    threads = "" if snakemake.threads <= 2 else " -@ {} ".format(snakemake.threads - 2)
+
+    shell(
+        "samtools sort -n "
+        " {threads} "
+        " -T {prefix} "
+        " {snakemake.params.sort} "
+        " {snakemake.input[0]} | "
+        "samtools bam2fq "
+        " {snakemake.params.bam2fq} "
+        " -1 {snakemake.output[0]} "
+        " -2 {snakemake.output[1]} "
+        " -0 /dev/null "
+        " -s /dev/null "
+        " -F 0x900 "
+        " - "
+    )

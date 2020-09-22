@@ -165,6 +165,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../picard.html">PICARD</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="addorreplacereadgroups.html">PICARD ADDORREPLACEREADGROUPS</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">PICARD BEDTOINTERVALLIST</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
@@ -302,9 +303,15 @@
   <div class="section" id="picard-bedtointervallist">
 <span id="id1"></span><h1>PICARD BEDTOINTERVALLIST<a class="headerlink" href="#picard-bedtointervallist" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference external" href="https://broadinstitute.github.io/picard/command-line-overview.html#BedToIntervalList">picard BedToIntervalList</a> converts a BED file to Picard Interval List format.</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>picard ==2.23.4</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">bed_to_interval_list</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">bed</span><span class="o">=</span><span class="s2">&quot;resources/a.bed&quot;</span><span class="p">,</span>
@@ -317,7 +324,7 @@
         <span class="c1"># optional parameters</span>
         <span class="s2">&quot;SORT=true &quot;</span> <span class="c1"># sort output interval list before writing</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/picard/bedtointervallist&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/picard/bedtointervallist&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -335,6 +342,34 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Fabian Kilpert&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, Fabian Kilpert&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;fkilpert@gmail.com&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="n">memory</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="s2">&quot;mem_mb&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">memory</span> <span class="o">=</span> <span class="s2">&quot;-Xmx</span><span class="si">{}</span><span class="s2">M&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;mem_mb&quot;</span><span class="p">])</span>
+
+
+<span class="n">shell</span><span class="p">(</span>
+    <span class="s2">&quot;picard BedToIntervalList &quot;</span>
+    <span class="s2">&quot; </span><span class="si">{memory}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.params}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; INPUT=</span><span class="si">{snakemake.input.bed}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; SEQUENCE_DICTIONARY=</span><span class="si">{snakemake.input.dict}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; OUTPUT=</span><span class="si">{snakemake.output}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2"> &quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

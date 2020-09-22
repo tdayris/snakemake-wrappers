@@ -110,6 +110,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bwa-mem2.html">BWA-MEM2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cairosvg.html">CAIROSVG</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">CHECK MD5</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authors">Authors</a></li>
@@ -285,9 +286,15 @@
   <div class="section" id="check-md5">
 <span id="id1"></span><h1>CHECK MD5<a class="headerlink" href="#check-md5" title="Permalink to this headline">¶</a></h1>
 <p>Verify MD5 validity bewteen a provided file and a provided hash</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>conda-forge:bash=5.0.011</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_check_md5_with_expected_hash_as_file</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;test.txt&quot;</span><span class="p">,</span>
@@ -295,7 +302,7 @@
     <span class="n">output</span><span class="p">:</span>
         <span class="s2">&quot;test.md5&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/check_md5&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/check_md5&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -318,6 +325,51 @@ a parameter: hash_value</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3.7</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;Snakemake wrapper md5sum checking&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Thibault Dayris&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2019, Thibault Dayris&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;thibault.dayris@gustaveroussy.fr&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">read_md5</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read a MD5sum output file and return the hash value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">hashfile</span><span class="p">:</span>
+        <span class="n">hash_value</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">hashfile</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">hash_value</span>
+
+
+<span class="n">expected</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hash_value&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;hash_value&quot;</span><span class="p">]</span>
+<span class="k">elif</span> <span class="s2">&quot;hash&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="n">read_md5</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;hash&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="s2">&quot;Could not determine expected hash value for MD5 comparison&quot;</span>
+    <span class="p">)</span>
+
+<span class="n">shell</span><span class="p">(</span><span class="s2">&quot;md5sum </span><span class="si">{snakemake.input.file}</span><span class="s2"> &gt; </span><span class="si">{snakemake.output}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">obtained</span> <span class="o">=</span> <span class="n">read_md5</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">expected</span> <span class="o">==</span> <span class="n">obtained</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="s2">&quot;MD5 hash was not the expected one: &quot;</span>
+        <span class="s2">&quot;got </span><span class="si">{}</span><span class="s2">, expected </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obtained</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

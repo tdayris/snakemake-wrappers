@@ -158,6 +158,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../paladin.html">PALADIN</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">PALADIN ALIGN</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
@@ -291,9 +292,16 @@
   <div class="section" id="paladin-align">
 <span id="id1"></span><h1>PALADIN ALIGN<a class="headerlink" href="#paladin-align" title="Permalink to this headline">¶</a></h1>
 <p>Align nucleotide reads to a protein fasta file (that has been indexed with paladin index). PALADIN is a protein sequence alignment tool designed for the accurate functional characterization of metagenomes.</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>paladin=1.4.4</p></li>
+<li><p>samtools=1.5</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">paladin_align</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">reads</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;reads/reads.left.fq.gz&quot;</span><span class="p">],</span>
@@ -304,7 +312,7 @@
         <span class="s2">&quot;logs/paladin/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/paladin/align&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/paladin/align&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -325,6 +333,42 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Snakemake wrapper for PALADIN alignment&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;N. Tessa Pierce&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2019, N. Tessa Pierce&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;ntpierce@gmail.com&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reads&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<span class="p">),</span> <span class="s2">&quot;reads are required as input. If you have paired end reads, please merge them first (e.g. with PEAR)&quot;</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<span class="p">),</span> <span class="s2">&quot;please index your assembly and provide the basename (with&#39;.bwt&#39; extension) via the &#39;index&#39; input param&quot;</span>
+
+<span class="n">index_base</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;.bwt&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">outfile</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span>
+
+<span class="c1"># if bam output, pipe to bam!</span>
+<span class="n">output_cmd</span> <span class="o">=</span> <span class="s2">&quot;  | samtools view -Sb - &gt; &quot;</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.bam&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot; -o &quot;</span>
+
+<span class="n">min_orf_len</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;250&quot;</span><span class="p">)</span>
+
+<span class="n">shell</span><span class="p">(</span>
+    <span class="s2">&quot;paladin align -f </span><span class="si">{min_orf_len}</span><span class="s2"> -t </span><span class="si">{snakemake.threads}</span><span class="s2"> </span><span class="si">{extra}</span><span class="s2"> </span><span class="si">{index_base}</span><span class="s2"> </span><span class="si">{r}</span><span class="s2"> </span><span class="si">{output_cmd}</span><span class="s2"> </span><span class="si">{outfile}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

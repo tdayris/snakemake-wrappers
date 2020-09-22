@@ -7,12 +7,19 @@ Generate VCF or BCF containing genotype likelihoods for one or multiple alignmen
 
 
 
+Software dependencies
+---------------------
+
+
+* bcftools ==1.10
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -28,7 +35,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/bcftools_mpileup/{sample}.log",
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/bcftools/mpileup"
+            "0.66.0-241-gab2c8ef4/bio/bcftools/mpileup"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -54,4 +61,35 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "Michael Hall"
+    __copyright__ = "Copyright 2020, Michael Hall"
+    __email__ = "michael@mbh.sh"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    class MissingReferenceError(Exception):
+        pass
+
+
+    options = snakemake.params.get("options", "")
+
+    # determine if a fasta reference is provided or not and add to options
+    if "--no-reference" not in options:
+        ref = snakemake.input.get("ref", "")
+        if not ref:
+            raise MissingReferenceError(
+                "The --no-reference option was not given, but no fasta reference was "
+                "provided."
+            )
+        options += " --fasta-ref {}".format(ref)
+
+    shell(
+        "bcftools mpileup {options} --threads {snakemake.threads} "
+        "--output {snakemake.output.pileup} "
+        "{snakemake.input.alignments} 2> {snakemake.log}"
+    )

@@ -7,12 +7,19 @@ Left-align and normalize indels, check if REF alleles match the reference, split
 
 
 
+Software dependencies
+---------------------
+
+
+* bcftools ==1.10
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -24,7 +31,7 @@ This meta-wrapper can be used in the following way:
         params:
             ""  # optional parameters for bcftools norm (except -o)
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/bcftools/norm"
+            "0.66.0-241-gab2c8ef4/bio/bcftools/norm"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -50,4 +57,17 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "Dayne Filer"
+    __copyright__ = "Copyright 2019, Dayne Filer"
+    __email__ = "dayne.filer@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    shell(
+        "bcftools norm {snakemake.params} {snakemake.input[0]} " "-o {snakemake.output[0]}"
+    )

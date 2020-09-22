@@ -140,6 +140,7 @@
 <li class="toctree-l2"><a class="reference internal" href="gene2gene.html">GENE2GENE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gene_length.html">GENELENGTH</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">GTF</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
@@ -292,9 +293,15 @@
   <div class="section" id="gtf">
 <span id="id1"></span><h1>GTF<a class="headerlink" href="#gtf" title="Permalink to this headline">¶</a></h1>
 <p>Build a transcript / gene correspondancy table from a GTF</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>conda-forge:python=3.8.2</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">tx_to_gene</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">gtf</span> <span class="o">=</span> <span class="s2">&quot;file.gtf&quot;</span>
@@ -314,7 +321,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/tx_to_gene.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/gtf/tx2gene&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/gtf/tx2gene&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -370,6 +377,85 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3.8</span>
+<span class="c1"># conding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This script extracts a tsv from a GTF. This tsv contains gene_id,</span>
+<span class="sd">transcript_id, gene_name. Optionaly, headers and positions can</span>
+<span class="sd">also be given.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Thibault Dayris&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, Thibault Dayris&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;thibault.dayris@gustaveroussy.fr&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="n">gtf_in</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;gtf&quot;</span><span class="p">]</span>
+<span class="n">tsv_out</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;tsv&quot;</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">gtf_in</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtf</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">tsv_out</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tsv</span><span class="p">:</span>
+    <span class="c1"># Write header on user request</span>
+    <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Gene_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Transcript_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Gene_Name&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;positions&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;Gene_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Transcript_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Gene_Name&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Chromosome&quot;</span><span class="p">,</span> <span class="s2">&quot;Start&quot;</span><span class="p">,</span> <span class="s2">&quot;Stop&quot;</span><span class="p">,</span> <span class="s2">&quot;Strand&quot;</span>
+            <span class="p">]</span>
+        <span class="k">elif</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sleuth_compatibility&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ens_gene&quot;</span><span class="p">,</span> <span class="s2">&quot;target_id&quot;</span><span class="p">,</span> <span class="s2">&quot;ext_gene&quot;</span><span class="p">]</span>
+
+        <span class="n">tsv</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
+        <span class="n">tsv</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">gtf</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+            <span class="c1"># Then is it a comment</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># If the line is not a transcript, then it will no contain</span>
+        <span class="c1"># the required information</span>
+        <span class="n">chomp</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">chomp</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;transcript&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">chomp</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="n">chomp</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">chrom</span> <span class="o">=</span> <span class="n">chomp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">strand</span> <span class="o">=</span> <span class="n">chomp</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+
+        <span class="c1"># We are interested in the last column</span>
+        <span class="n">chomp</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">attr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="n">attr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">chomp</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">attr</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="s1">&#39;&quot;&#39;</span> <span class="ow">in</span> <span class="n">attr</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gencode&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">chomp</span><span class="p">[</span><span class="s2">&quot;gene_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">chomp</span><span class="p">[</span><span class="s2">&quot;gene_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">chomp</span><span class="p">[</span><span class="s2">&quot;transcript_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">chomp</span><span class="p">[</span><span class="s2">&quot;transcript_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Some genes have an ID but no name ...</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">chomp</span><span class="p">[</span><span class="s2">&quot;gene_id&quot;</span><span class="p">],</span>
+                <span class="n">chomp</span><span class="p">[</span><span class="s2">&quot;transcript_id&quot;</span><span class="p">],</span>
+                <span class="n">chomp</span><span class="p">[</span><span class="s2">&quot;gene_name&quot;</span><span class="p">]</span>
+            <span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">chomp</span><span class="p">[</span><span class="s2">&quot;gene_id&quot;</span><span class="p">],</span>
+                <span class="n">chomp</span><span class="p">[</span><span class="s2">&quot;transcript_id&quot;</span><span class="p">],</span>
+                <span class="n">chomp</span><span class="p">[</span><span class="s2">&quot;gene_id&quot;</span><span class="p">]</span>
+            <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;positions&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">tsv</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span> <span class="o">+</span> <span class="p">[</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">strand</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tsv</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

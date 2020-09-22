@@ -135,6 +135,7 @@
 <li class="toctree-l2"><a class="reference internal" href="baserecalibratorspark.html">GATK BASERECALIBRATORSPARK</a></li>
 <li class="toctree-l2"><a class="reference internal" href="combinegvcfs.html">GATK COMBINEGVCFS</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">GATK GENOTYPEGVCFS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
@@ -300,9 +301,15 @@
   <div class="section" id="gatk-genotypegvcfs">
 <span id="id1"></span><h1>GATK GENOTYPEGVCFS<a class="headerlink" href="#gatk-genotypegvcfs" title="Permalink to this headline">¶</a></h1>
 <p>Run gatk GenotypeGVCFs.</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>gatk4 ==4.1.4.1</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">genotype_gvcfs</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">gvcf</span><span class="o">=</span><span class="s2">&quot;calls/all.g.vcf&quot;</span><span class="p">,</span>  <span class="c1"># combined gvcf over multiple samples</span>
@@ -315,7 +322,7 @@
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># optional</span>
         <span class="n">java_opts</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="c1"># optional</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/gatk/genotypegvcfs&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/gatk/genotypegvcfs&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -342,6 +349,29 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Johannes Köster&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2018, Johannes Köster&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;johannes.koester@protonmail.com&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">java_opts</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;java_opts&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">shell</span><span class="p">(</span>
+    <span class="s2">&quot;gatk --java-options &#39;</span><span class="si">{java_opts}</span><span class="s2">&#39; GenotypeGVCFs </span><span class="si">{extra}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;-V </span><span class="si">{snakemake.input.gvcf}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;-R </span><span class="si">{snakemake.input.ref}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;-O </span><span class="si">{snakemake.output.vcf}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

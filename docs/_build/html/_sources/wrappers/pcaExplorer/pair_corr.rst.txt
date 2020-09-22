@@ -7,12 +7,35 @@ Plot the sample pairwise correlation
 
 
 
+Software dependencies
+---------------------
+
+
+* bioconda:bioconductor-deseq2=1.26.0
+
+* bioconda:bioconductor-pcaexplorer=2.12.0
+
+* bioconda:bioconductor-delayedarray=0.12.0
+
+* conda-forge:r-readr=1.3.1
+
+* conda-forge:r-jsonlite=1.6.1
+
+* bioconda:bioconductor-summarizedexperiment=1.16.0
+
+* bioconda:bioconductor-iranges=2.20.0
+
+* conda-forge:cairo=1.16.0
+
+* conda-forge:r-cairo=1.5_11
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -35,7 +58,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/test_pcaexplorer_distro_expr.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/pcaExplorer/pair_corr"
+            "0.66.0-241-gab2c8ef4/bio/pcaExplorer/pair_corr"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -70,4 +93,75 @@ Authors
 Code
 ----
 
+.. code-block:: R
 
+    #!/usr/bin/R
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # This script takes a deseq2 transform object and performs
+    # a plot over sample pairwise correlation
+
+
+    base::library(package = "DESeq2");        # Differential analysis
+    base::library(package = "pcaExplorer");   # Handles PCAs
+    base::library(package = "Cairo");         # Graphic library
+
+    # Overload output defaults in order to avoid
+    # X11 foreward errors on cluster nodes
+    options(bitmapType="cairo");
+
+    # Load specified input files
+    dst_path <- base::as.character(
+      x = snakemake@input[["dst"]]
+    );
+    dst <- base::readRDS(file = dst_path);
+
+    gene_number <- 100;
+    if ("gene_number" %in% names(snakemake@params)) {
+      gene_number <- base::as.numeric(
+        snakemake@params[["gene_number"]]
+      );
+    }
+
+
+    # Load extra parameters
+    extra <- "counts(dst)[1:gene_number, ]"
+    if ("extra" %in% names(snakemake@params)) {
+      if (snakemake@params[["extra"]] != "") {
+        extra <- base::paste(
+            extra,
+            snakemake@params[["extra"]],
+            sep = ", "
+        );
+      }
+    }
+    message(gene_number)
+
+    # Build plot
+    png(
+      filename = snakemake@output[["png"]],
+      width = 1024,
+      height = 768,
+      units = "px",
+      type = "cairo"
+    );
+
+    command <- base::paste0(
+      "pcaExplorer::pair_corr(",
+      extra,
+      ");"
+    );
+
+    base::message(command);
+
+    base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+    dev.off()

@@ -9,12 +9,33 @@ detects recurrent copy number alterations using copy number breaks.
 
 
 
+Software dependencies
+---------------------
+
+
+* r-base =3.4.1
+
+* r-rubic =1.0.3
+
+* r-data.table =1.10.4
+
+* r-pracma =2.0.4
+
+* r-ggplot2 =2.2.1
+
+* r-gtable =0.2.0
+
+* r-codetools =0.2_15
+
+* r-digest =0.6.12
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -30,7 +51,7 @@ This meta-wrapper can be used in the following way:
             fdr="",
             genefile=""
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/rubic"
+            "0.66.0-241-gab2c8ef4/bio/rubic"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -56,4 +77,19 @@ Authors
 Code
 ----
 
+.. code-block:: R
 
+    # __author__ = "Beatrice F. Tan"
+    # __copyright__ = "Copyright 2018, Beatrice F. Tan"
+    # __email__ = "beatrice.ftan@gmail.com"
+    # __license__ = "LUMC"
+
+    library(RUBIC)
+
+    all_genes <- if (snakemake@params[["genefile"]] == "") system.file("extdata", "genes.tsv", package="RUBIC") else snakemake@params[["genefile"]]
+    fdr <- if (snakemake@params[["fdr"]] == "") 0.25 else snakemake@params[["fdr"]]
+
+    rbc <- rubic(fdr, snakemake@input[["seg"]], snakemake@input[["markers"]], genes=all_genes)
+    rbc$save.focal.gains(snakemake@output[["out_gains"]])
+    rbc$save.focal.losses(snakemake@output[["out_losses"]])
+    rbc$save.plots(snakemake@output[["out_plots"]])

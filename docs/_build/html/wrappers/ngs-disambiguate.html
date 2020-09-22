@@ -155,6 +155,7 @@
 <li class="toctree-l1"><a class="reference internal" href="multiqc.html">MULTIQC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nanosim-h.html">NANOSIM-H</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">NGS-DISAMBIGUATE</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code">Code</a></li>
@@ -285,9 +286,16 @@
 <span id="id1"></span><h1>NGS-DISAMBIGUATE<a class="headerlink" href="#ngs-disambiguate" title="Permalink to this headline">¶</a></h1>
 <p>Disambiguation algorithm for reads aligned to two species (e.g. human
 and mouse genomes) from Tophat, Hisat2, STAR or BWA mem.</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>ngs-disambiguate ==2016.11.10</p></li>
+<li><p>bamtools ==2.4.0</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">disambiguate</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">a</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.a.bam&quot;</span><span class="p">,</span>
@@ -307,7 +315,7 @@ and mouse genomes) from Tophat, Hisat2, STAR or BWA mem.</p>
         <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/ngs-disambiguate&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/ngs-disambiguate&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -325,6 +333,60 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Snakemake wrapper for ngs-disambiguate (from Astrazeneca).&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Julian de Ruiter&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2017, Julian de Ruiter&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;julianderuiter@gmail.com&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span>
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+
+<span class="c1"># Extract arguments.</span>
+<span class="n">prefix</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prefix&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">output_dir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">a_ambiguous</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># If prefix is not given, we use the summary path to derive the most</span>
+<span class="c1"># probable sample name (as the summary path is least likely to contain)</span>
+<span class="c1"># additional suffixes. This is better than using a random id as prefix,</span>
+<span class="c1"># the prefix is also used as the sample name in the summary file.</span>
+<span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">summary</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Run command.</span>
+<span class="n">shell</span><span class="p">(</span>
+    <span class="s2">&quot;ngs_disambiguate&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; -o </span><span class="si">{output_dir}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; -s </span><span class="si">{prefix}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; -a </span><span class="si">{snakemake.params.algorithm}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.input.a}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{snakemake.input.b}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Move outputs into expected positions.</span>
+<span class="n">output_base</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span>
+
+<span class="n">output_map</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">output_base</span> <span class="o">+</span> <span class="s2">&quot;.ambiguousSpeciesA.bam&quot;</span><span class="p">:</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">a_ambiguous</span><span class="p">,</span>
+    <span class="n">output_base</span> <span class="o">+</span> <span class="s2">&quot;.ambiguousSpeciesB.bam&quot;</span><span class="p">:</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">b_ambiguous</span><span class="p">,</span>
+    <span class="n">output_base</span> <span class="o">+</span> <span class="s2">&quot;.disambiguatedSpeciesA.bam&quot;</span><span class="p">:</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">a_disambiguated</span><span class="p">,</span>
+    <span class="n">output_base</span> <span class="o">+</span> <span class="s2">&quot;.disambiguatedSpeciesB.bam&quot;</span><span class="p">:</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">b_disambiguated</span><span class="p">,</span>
+    <span class="n">output_base</span> <span class="o">+</span> <span class="s2">&quot;_summary.txt&quot;</span><span class="p">:</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">summary</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">for</span> <span class="n">src</span><span class="p">,</span> <span class="n">dest</span> <span class="ow">in</span> <span class="n">output_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">src</span> <span class="o">!=</span> <span class="n">dest</span><span class="p">:</span>
+        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv </span><span class="si">{src}</span><span class="s2"> </span><span class="si">{dest}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

@@ -7,12 +7,31 @@ Perform pairwise scatterplot on sample counts
 
 
 
+Software dependencies
+---------------------
+
+
+* conda-forge:python=3.8.2
+
+* conda-forge:pandas=1.0.1
+
+* conda-forge:numpy=1.18.1
+
+* conda-forge:seaborn=0.10.0
+
+* conda-forge:matplotlib=3.1.3
+
+* conda-forge:pillow=7.0.0
+
+* conda-forge:pyqt=5.12.3
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -35,7 +54,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/test_pariwise_scatterplot.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/seaborn/pairwise-scatterplot"
+            "0.66.0-241-gab2c8ef4/bio/seaborn/pairwise-scatterplot"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -61,4 +80,65 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    #!/usr/bin/python3.8
+    # conding: utf-8
+
+    """
+    Plot a pairwise scatterplot with KDE on the diagonal
+    """
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    import logging
+    import matplotlib
+    import matplotlib.pyplot
+    import numpy
+    import pandas
+    import seaborn
+
+    from os.path import basename, dirname
+    from snakemake.utils import makedirs
+
+    logging.basicConfig(
+        filename=snakemake.log[0],
+        filemode="w",
+        level=logging.DEBUG
+    )
+
+    # Build output directory if necessary
+    if (outdir := basename(dirname(snakemake.output["png"]))) != "":
+        makedirs(outdir)
+        logging.debug(f"Directory: '{outdir}' created.")
+
+    data = pandas.read_csv(
+        snakemake.input["counts"],
+        sep="\t",
+        index_col=0,
+        header=0
+    )
+
+    logging.debug("Loaded dataset:")
+    logging.debug(data.head())
+
+    seaborn.set(
+        style="ticks",
+        color_codes=True
+    )
+
+    g = seaborn.pairplot(
+        data,
+        kind="scatter",
+        dropna=True,
+        diag_kind="kde"
+    )
+
+    matplotlib.pyplot.savefig(
+        snakemake.output["png"],
+        bbox_inches="tight"
+    )
+    logging.info("Process over")

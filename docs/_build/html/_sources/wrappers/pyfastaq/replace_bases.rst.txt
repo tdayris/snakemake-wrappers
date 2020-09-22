@@ -7,12 +7,19 @@ Replaces all occurrences of one letter with another.
 
 
 
+Software dependencies
+---------------------
+
+
+* pyfastaq ==3.17.0
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -27,7 +34,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/fastaq/replace_bases/test/{sample}.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/pyfastaq/replace_bases"
+            "0.66.0-241-gab2c8ef4/bio/pyfastaq/replace_bases"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -53,4 +60,24 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "Michael Hall"
+    __copyright__ = "Copyright 2019, Michael Hall"
+    __email__ = "michael@mbh.sh"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell(
+        "fastaq replace_bases"
+        " {snakemake.input[0]}"
+        " {snakemake.output[0]}"
+        " {snakemake.params.old_base}"
+        " {snakemake.params.new_base}"
+        " {log}"
+    )

@@ -7,12 +7,23 @@ Extract a given metadata from a list of yaml files
 
 
 
+Software dependencies
+---------------------
+
+
+* conda-forge:python=3.8.5
+
+* conda-forge:pandas=1.1.0
+
+* confa-forge:pyyaml=5.3.1
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -24,7 +35,7 @@ This meta-wrapper can be used in the following way:
         params:
             attributes = ["SampleID", "Condition", "Strand"]
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/iRODS/extract_metadata"
+            "0.66.0-241-gab2c8ef4/bio/iRODS/extract_metadata"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -59,4 +70,60 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    #!/usr/bin/python3.7
+    # -*- coding: utf-8 -*-
+
+    """Snakemake wrapper for iRODS metadata extraction"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    import pandas
+    import yaml
+
+    from typing import Any, Dict, List, Union
+
+    # Load complete metadata file
+    with open(snakemake.input[0], "r") as yamlin:
+        metadatas = yaml.load(yamlin, Loader=yaml.SafeLoader)
+
+
+    # Extract user defined metadatas
+    def getitem(item: Union[str, List[str]],
+                indict: Dict[str, Any]) -> Any:
+        """
+        Return a list of keys from a dictionnary, providing None as default
+        missing value
+        """
+        if isinstance(item, str):
+            try:
+                return {item: indict[item]['value']}
+            except KeyError:
+                return None
+
+        results = {}
+        for i in item:
+            try:
+                results[i] = indict[i]["value"]
+            except KeyError:
+                results[i] = None
+
+        return results
+
+
+    content = [
+        {"Path": k, **getitem(snakemake.params["attributes"], v)}
+        for k, v in metadatas.items()
+    ]
+
+    # Formatting output as TSV, then saving it.
+    pandas.DataFrame(content).to_csv(
+        snakemake.output[0],
+        sep="\t",
+        header=True,
+        index=False
+    )

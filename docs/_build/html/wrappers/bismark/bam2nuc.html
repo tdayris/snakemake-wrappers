@@ -105,6 +105,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../benchmark.html">BENCHMARK</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../bismark.html">BISMARK</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">BAM2NUC</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
@@ -297,9 +298,17 @@
 <span id="id1"></span><h1>BAM2NUC<a class="headerlink" href="#bam2nuc" title="Permalink to this headline">¶</a></h1>
 <p>Calculate mono- and di-nucleotide coverage of the reads and compares them with average genomic sequence
 composition (see <a class="reference external" href="https://github.com/FelixKrueger/Bismark/blob/master/bam2nuc">https://github.com/FelixKrueger/Bismark/blob/master/bam2nuc</a>).</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>bowtie2 == 2.3.4.3</p></li>
+<li><p>bismark == 0.22.1</p></li>
+<li><p>samtools == 1.9</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Nucleotide stats for genome is required for further stats for BAM file</span>
 <span class="n">rule</span> <span class="n">bam2nuc_for_genome</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
@@ -309,7 +318,7 @@ composition (see <a class="reference external" href="https://github.com/FelixKru
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/indexes/</span><span class="si">{genome}</span><span class="s2">/genomic_nucleotide_frequencies.txt.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/bismark/bam2nuc&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/bismark/bam2nuc&quot;</span>
 
 <span class="c1"># Nucleotide stats for BAM file</span>
 <span class="n">rule</span> <span class="n">bam2nuc_for_bam</span><span class="p">:</span>
@@ -321,7 +330,7 @@ composition (see <a class="reference external" href="https://github.com/FelixKru
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{genome}</span><span class="s2">.nucleotide_stats.txt.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/bismark/bam2nuc&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/bismark/bam2nuc&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -339,6 +348,87 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Snakemake wrapper for bam2nuc tool that calculates mono- and di-nucleotide coverage of the reads and compares them with average genomic sequence</span>
+<span class="sd">composition.&quot;&quot;&quot;</span>
+<span class="c1"># https://github.com/FelixKrueger/Bismark/blob/master/bam2nuc</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Roman Chernyatchik&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright (c) 2019 JetBrains&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;roman.chernyatchik@jetbrains.com&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">cmdline_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bam2nuc </span><span class="si">{extra}</span><span class="s2">&quot;</span><span class="p">]</span>
+
+<span class="n">genome_fa</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;genome_fa&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">genome_fa</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;bismark/bam2nuc: Error &#39;genome_fa&#39; input not specified.&quot;</span><span class="p">)</span>
+<span class="n">genome_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">genome_fa</span><span class="p">)</span>
+<span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--genome_folder {genome_folder:q}&quot;</span><span class="p">)</span>
+
+
+<span class="n">bam</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bam&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">bam</span><span class="p">:</span>
+    <span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{bam}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">bams</span> <span class="o">=</span> <span class="n">bam</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bam</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">bam</span><span class="p">]</span>
+
+    <span class="n">report</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;report&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">report</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;bismark/bam2nuc: Error &#39;report&#39; output isn&#39;t specified.&quot;</span><span class="p">)</span>
+
+    <span class="n">reports</span> <span class="o">=</span> <span class="n">report</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">report</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reports</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bams</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;bismark/bam2nuc: Error number of paths in output:report (</span><span class="si">{}</span><span class="s2"> files)&quot;</span>
+            <span class="s2">&quot; should be same as in input:bam (</span><span class="si">{}</span><span class="s2"> files).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">reports</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">bams</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reports</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">output_dir</span> <span class="o">!=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">reports</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;bismark/bam2nuc: Error all reports should be in same directory:&quot;</span>
+            <span class="s2">&quot; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+        <span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--dir {output_dir:q}&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--genomic_composition_only&quot;</span><span class="p">)</span>
+
+<span class="c1"># log</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># run</span>
+<span class="n">shell</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmdline_args</span><span class="p">))</span>
+
+
+<span class="c1"># Move outputs into proper position.</span>
+<span class="k">if</span> <span class="n">bam</span><span class="p">:</span>
+    <span class="n">log_append</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">expected_2_actual_paths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">bam_path</span><span class="p">,</span> <span class="n">report_path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bams</span><span class="p">,</span> <span class="n">reports</span><span class="p">):</span>
+        <span class="n">bam_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">bam_path</span><span class="p">)</span>
+        <span class="n">bam_basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">bam_name</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">expected_2_actual_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">report_path</span><span class="p">,</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.nucleotide_stats.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bam_basename</span><span class="p">)</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">exp_path</span><span class="p">,</span> <span class="n">actual_path</span><span class="p">)</span> <span class="ow">in</span> <span class="n">expected_2_actual_paths</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">exp_path</span> <span class="ow">and</span> <span class="p">(</span><span class="n">exp_path</span> <span class="o">!=</span> <span class="n">actual_path</span><span class="p">):</span>
+            <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv {actual_path:q} {exp_path:q} </span><span class="si">{log_append}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

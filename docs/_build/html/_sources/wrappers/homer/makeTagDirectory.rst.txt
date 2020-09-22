@@ -8,12 +8,21 @@ Create a tag directory with the HOMER suite. For more information, please see th
 
 
 
+Software dependencies
+---------------------
+
+
+* homer ==4.11
+
+* samtools ==1.10
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -28,7 +37,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/makeTagDir/{sample}.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/homer/makeTagDirectory"
+            "0.66.0-241-gab2c8ef4/bio/homer/makeTagDirectory"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -54,4 +63,20 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2020, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    import os.path as path
+    import sys
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "(makeTagDirectory" " {snakemake.output}" " {extra}" " {snakemake.input})" " {log}"
+    )

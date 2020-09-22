@@ -123,6 +123,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../ensembl.html">ENSEMBL</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">REMOVE PATCH VERSION</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
@@ -290,9 +291,16 @@
   <div class="section" id="remove-patch-version">
 <span id="id1"></span><h1>REMOVE PATCH VERSION<a class="headerlink" href="#remove-patch-version" title="Permalink to this headline">¶</a></h1>
 <p>Remove the patch version from Ensembl cdna fasta file</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>conda-forge:bash=5.0.011</p></li>
+<li><p>conda-forge:python=3.8.2</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_ensembl_remove_patch_cdna</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">fasta</span> <span class="o">=</span> <span class="s2">&quot;test.fasta&quot;</span>
@@ -312,7 +320,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_gencode_corrections.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/ensembl/remove_patch_cdna&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/ensembl/remove_patch_cdna&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -366,6 +374,42 @@ If the output is gzipped, then add one thread to the final one for decompression
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/python3.8</span>
+<span class="c1"># conding: utf-8</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Thibault Dayris&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, Thibault Dayris&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;thibault.dayris@gustaveroussy.fr&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Corrects transcripts names from the CDNA fasta file from ensembl</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">input_stream</span> <span class="o">=</span>  <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span>
+<span class="n">output_stream</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&gt; </span><span class="si">{</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;fasta&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="n">min_threads</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;gz&quot;</span><span class="p">):</span>
+    <span class="n">input_stream</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;(gunzip -c </span><span class="si">{</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s1">&#39;fasta&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="n">min_threads</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;gz&quot;</span><span class="p">):</span>
+    <span class="n">output_stream</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;| gzip -c &gt; </span><span class="si">{</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;fasta&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="n">min_threads</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">threads</span> <span class="o">&lt;</span> <span class="n">min_threads</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;At least </span><span class="si">{</span><span class="n">min_threads</span><span class="si">}</span><span class="s2"> are required for patch removal due to compression&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="n">shell</span><span class="p">(</span><span class="s2">&quot;sed &#39;s/\.*//g&#39; </span><span class="si">{input_stream}</span><span class="s2"> </span><span class="si">{output_stream}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

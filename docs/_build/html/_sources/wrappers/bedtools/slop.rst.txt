@@ -7,12 +7,19 @@ Increase the size of each feature in a BED/BAM/VCF by a specified factor.
 
 
 
+Software dependencies
+---------------------
+
+
+* bedtools =2.29.0
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -29,7 +36,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/slop/A.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/bedtools/slop"
+            "0.66.0-241-gab2c8ef4/bio/bedtools/slop"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -55,4 +62,25 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2019, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    ## Extract arguments
+    extra = snakemake.params.get("extra", "")
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "(bedtools slop"
+        " {extra}"
+        " -i {snakemake.input[0]}"
+        " -g {snakemake.params.genome}"
+        " > {snakemake.output})"
+        " {log}"
+    )

@@ -122,6 +122,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../deseq2.html">DESEQ2</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="DESeq.html">DESEQ</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">DESEQ DATASET FROM TXIMPORT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
@@ -297,9 +298,18 @@
   <div class="section" id="deseq-dataset-from-tximport">
 <span id="id1"></span><h1>DESEQ DATASET FROM TXIMPORT<a class="headerlink" href="#deseq-dataset-from-tximport" title="Permalink to this headline">¶</a></h1>
 <p>Import counts from Tximport into DESeq2</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>bioconductor-tximport==1.14.0</p></li>
+<li><p>r-readr==1.3.1</p></li>
+<li><p>r-jsonlite==1.6</p></li>
+<li><p>bioconductor-deseq2==1.26.0</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_DESeqDataSetFromTximport</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">tximport</span> <span class="o">=</span> <span class="s2">&quot;txi.RDS&quot;</span><span class="p">,</span>
@@ -340,6 +350,79 @@ optional columns</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="c1">#!/usr/bin/R</span>
+
+<span class="c1"># __author__ = &quot;Thibault Dayris&quot;</span>
+<span class="c1"># __copyright__ = &quot;Copyright 2020, Thibault Dayris&quot;</span>
+<span class="c1"># __email__ = &quot;thibault.dayris@gustaveroussy.fr&quot;</span>
+<span class="c1"># __license__ = &quot;MIT&quot;</span>
+
+<span class="c1"># This script takes a tximport object and builds a deseq2 dataset</span>
+<span class="c1"># for each formula given to snakemake.</span>
+
+<span class="c1"># Perform actual count importation in R</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;tximport&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
+<span class="c1"># Read faster!</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;readr&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
+<span class="c1"># Importing inferential replicates</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;jsonlite&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
+<span class="c1"># Differential Gene expression</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;DESeq2&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
+
+<span class="n">base</span><span class="o">::</span><span class="nf">write</span><span class="p">(</span><span class="s">&quot;Libraries loaded.&quot;</span><span class="p">,</span> <span class="nf">stderr</span><span class="p">());</span>
+
+<span class="c1"># Load txi object</span>
+<span class="n">txi_rds_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;tximport&quot;</span><span class="p">]]);</span>
+<span class="n">txi</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">readRDS</span><span class="p">(</span>
+  <span class="n">file</span> <span class="o">=</span> <span class="n">txi_rds_path</span>
+<span class="p">);</span>
+
+<span class="c1"># Load experimental design</span>
+<span class="n">coldata_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;coldata&quot;</span><span class="p">]]);</span>
+<span class="n">coldata</span> <span class="o">&lt;-</span> <span class="n">utils</span><span class="o">::</span><span class="nf">read.table</span><span class="p">(</span>
+  <span class="n">file</span> <span class="o">=</span> <span class="n">coldata_path</span><span class="p">,</span>
+  <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;\t&quot;</span><span class="p">,</span>
+  <span class="n">header</span> <span class="o">=</span> <span class="kc">TRUE</span>
+<span class="p">);</span>
+<span class="nf">rownames</span><span class="p">(</span><span class="n">coldata</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">coldata</span><span class="o">$</span><span class="n">Sample_id</span><span class="p">;</span>
+
+<span class="n">count_filter</span> <span class="o">&lt;-</span> <span class="m">0</span><span class="p">;</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;count_filter&quot;</span> <span class="o">%in%</span> <span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">count_filter</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.numeric</span><span class="p">(</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;count_filter&quot;</span><span class="p">]]</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1"># Cast formula as formula instead of string</span>
+<span class="n">formula</span> <span class="o">&lt;-</span> <span class="n">stats</span><span class="o">::</span><span class="nf">as.formula</span><span class="p">(</span>
+  <span class="n">object</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;design&quot;</span><span class="p">]]</span>
+<span class="p">);</span>
+
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Input dataset and options recovered.&quot;</span><span class="p">);</span>
+
+<span class="c1"># Create dds object</span>
+<span class="n">dds</span> <span class="o">&lt;-</span> <span class="n">DESeq2</span><span class="o">::</span><span class="nf">DESeqDataSetFromTximport</span><span class="p">(</span>
+  <span class="n">txi</span> <span class="o">=</span> <span class="n">txi</span><span class="p">,</span>
+  <span class="n">colData</span> <span class="o">=</span> <span class="n">coldata</span><span class="p">,</span>
+  <span class="n">design</span> <span class="o">=</span> <span class="n">formula</span>
+<span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">write</span><span class="p">(</span><span class="s">&quot;DESeqDataSet built.&quot;</span><span class="p">,</span> <span class="nf">stderr</span><span class="p">());</span>
+
+
+<span class="n">keep</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="nf">counts</span><span class="p">(</span><span class="n">dds</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">count_filter</span><span class="p">;</span>
+<span class="n">dds</span> <span class="o">&lt;-</span> <span class="n">dds</span><span class="p">[</span><span class="n">keep</span><span class="p">,</span> <span class="p">];</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">write</span><span class="p">(</span><span class="s">&quot;Low counts in DESeqDataSet were filtered.&quot;</span><span class="p">,</span> <span class="nf">stderr</span><span class="p">());</span>
+
+<span class="c1"># Save as RDS</span>
+<span class="n">output_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;dds&quot;</span><span class="p">]]);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">saveRDS</span><span class="p">(</span>
+  <span class="n">obj</span> <span class="o">=</span> <span class="n">dds</span><span class="p">,</span>
+  <span class="n">file</span> <span class="o">=</span> <span class="n">output_path</span>
+<span class="p">);</span>
+
+<span class="n">base</span><span class="o">::</span><span class="nf">write</span><span class="p">(</span><span class="s">&quot;Process over.&quot;</span><span class="p">,</span> <span class="nf">stderr</span><span class="p">());</span>
+</pre></div>
+</div>
 </div>
 </div>
 

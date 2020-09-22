@@ -125,6 +125,7 @@
 <li class="toctree-l1"><a class="reference internal" href="epic.html">EPIC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fastp.html">FASTP</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">FASTQ_SCREEN</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authors">Authors</a></li>
@@ -319,9 +320,17 @@ reads.  These can be overridden using <code class="docutils literal notranslate"
 respectively. Furthermore, <cite>params.extra</cite> can be used to pass additional
 arguments verbatim to <code class="docutils literal notranslate"><span class="pre">fastq_screen</span></code>, for example <code class="docutils literal notranslate"><span class="pre">extra=&quot;--illumina1_3&quot;</span></code> or
 <code class="docutils literal notranslate"><span class="pre">extra=&quot;--bowtie2</span> <span class="pre">'--trim5=8'&quot;</span></code>.</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>fastq-screen ==0.5.2</p></li>
+<li><p>bowtie2 ==2.2.6</p></li>
+<li><p>bowtie ==1.1.2</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">fastq_screen</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="s2">&quot;samples/</span><span class="si">{sample}</span><span class="s2">.fastq&quot;</span>
@@ -334,7 +343,7 @@ arguments verbatim to <code class="docutils literal notranslate"><span class="pr
         <span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;bowtie2&#39;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">8</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/fastq_screen&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/fastq_screen&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -372,6 +381,68 @@ wrapper.</p></li>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Ryan Dale&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2016, Ryan Dale&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;dalerr@niddk.nih.gov&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="n">_config</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;fastq_screen_config&quot;</span><span class="p">]</span>
+
+<span class="n">subset</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;subset&quot;</span><span class="p">,</span> <span class="mi">100000</span><span class="p">)</span>
+<span class="n">aligner</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;aligner&quot;</span><span class="p">,</span> <span class="s2">&quot;bowtie2&quot;</span><span class="p">)</span>
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">()</span>
+
+<span class="c1"># snakemake.params.fastq_screen_config can be either a dict or a string. If</span>
+<span class="c1"># string, interpret as a filename pointing to the fastq_screen config file.</span>
+<span class="c1"># Otherwise, create a new tempfile out of the contents of the dict:</span>
+<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">indexes</span> <span class="ow">in</span> <span class="n">_config</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">aligner</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indexes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;DATABASE&quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">aligner</span><span class="o">.</span><span class="n">upper</span><span class="p">()])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="k">for</span> <span class="n">aligner</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">_config</span><span class="p">[</span><span class="s2">&quot;aligner_paths&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">aligner</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">path</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">config_file</span> <span class="o">=</span> <span class="n">tmp</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">config_file</span> <span class="o">=</span> <span class="n">_config</span>
+
+<span class="c1"># fastq_screen hard-codes filenames according to this prefix. We will send</span>
+<span class="c1"># hard-coded output to a temp dir, and then move them later.</span>
+<span class="n">prefix</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.fastq|.fq|.txt|.seq&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">tempdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+
+<span class="n">shell</span><span class="p">(</span>
+    <span class="s2">&quot;fastq_screen --outdir </span><span class="si">{tempdir}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;--force &quot;</span>
+    <span class="s2">&quot;--aligner </span><span class="si">{aligner}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;--conf </span><span class="si">{config_file}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;--subset </span><span class="si">{subset}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;--threads </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{snakemake.input[0]}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Move output to the filenames specified by the rule</span>
+<span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv </span><span class="si">{tempdir}</span><span class="s2">/</span><span class="si">{prefix}</span><span class="s2">_screen.txt </span><span class="si">{snakemake.output.txt}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv </span><span class="si">{tempdir}</span><span class="s2">/</span><span class="si">{prefix}</span><span class="s2">_screen.png </span><span class="si">{snakemake.output.png}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Clean up temp</span>
+<span class="n">shell</span><span class="p">(</span><span class="s2">&quot;rm -r </span><span class="si">{tempdir}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;rm </span><span class="si">{tmp}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

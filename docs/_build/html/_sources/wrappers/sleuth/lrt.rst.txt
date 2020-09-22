@@ -8,12 +8,19 @@ Perform a likelyhood ration test
 
 
 
+Software dependencies
+---------------------
+
+
+* bioconda:r-sleuth
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -23,7 +30,7 @@ This meta-wrapper can be used in the following way:
         output:
             rds = "lrt.rds"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/sleuth/lrt"
+            "0.66.0-241-gab2c8ef4/bio/sleuth/lrt"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -49,4 +56,50 @@ Authors
 Code
 ----
 
+.. code-block:: R
 
+    #!/bin/R
+
+    # Snakemake wrapper for sleuth lrt
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    base::library(package = "sleuth", quietly = TRUE);
+
+    threads <- snakemake@threads;
+    mc.cores <- threads;
+    options(mc.cores = threads);
+
+    so <- base::readRDS(
+        file = snakemake@input[["rds"]]
+    );
+
+    extra <- "";
+    if ("extra" %in% names(snakemake@params)) {
+      extra <- base::as.character(
+        x = snakemake@params[["extra"]]
+      );
+    }
+
+    command <- base::paste(
+      "sleuth::sleuth_lrt(",
+      "obj = so",
+      extra,
+      ")",
+      sep = ", "
+    );
+
+    ## Finally run sleuth prep
+    so_lrt <- base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+
+    base::saveRDS(
+      object = so_lrt,
+      file = snakemake@output[["rds"]]
+    );

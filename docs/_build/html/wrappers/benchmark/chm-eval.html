@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../bedtools.html">BEDTOOLS</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../benchmark.html">BENCHMARK</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">CHM-EVAL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
@@ -291,9 +292,15 @@
   <div class="section" id="chm-eval">
 <span id="id1"></span><h1>CHM-EVAL<a class="headerlink" href="#chm-eval" title="Permalink to this headline">¶</a></h1>
 <p>Evaluate given VCF file with chm-eval (<a class="reference external" href="https://github.com/lh3/CHM-eval">https://github.com/lh3/CHM-eval</a>) for benchmarking variant calling.</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>perl =5.26</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">chm_eval</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">kit</span><span class="o">=</span><span class="s2">&quot;resources/chm-eval-kit&quot;</span><span class="p">,</span>
@@ -307,7 +314,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/chm-eval/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/benchmark/chm-eval&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/benchmark/chm-eval&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -325,6 +332,27 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Johannes Köster&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, Johannes Köster&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;johannes.koester@uni-due.de&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">kit</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">kit</span>
+<span class="n">vcf</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">vcf</span>
+<span class="n">build</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">build</span>
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.summary&quot;</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Output file must end with .summary&quot;</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">8</span><span class="p">]</span>
+
+<span class="n">shell</span><span class="p">(</span><span class="s2">&quot;(</span><span class="si">{kit}</span><span class="s2">/run-eval -g </span><span class="si">{build}</span><span class="s2"> -o </span><span class="si">{out}</span><span class="s2"> </span><span class="si">{extra}</span><span class="s2"> </span><span class="si">{vcf}</span><span class="s2"> | sh) </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

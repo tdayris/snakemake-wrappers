@@ -149,6 +149,7 @@
 <li class="toctree-l2"><a class="reference internal" href="analyzeCPAT.html">ANALYZECPAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="analyzeORF.html">ANALYZEORF</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">ANALYZEPFAM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
@@ -298,9 +299,15 @@
   <div class="section" id="analyzepfam">
 <span id="id1"></span><h1>ANALYZEPFAM<a class="headerlink" href="#analyzepfam" title="Permalink to this headline">¶</a></h1>
 <p>Add PFAM analysis to switch list</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>bioconda:bioconductor-isoformswitchanalyzer=1.8.0</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_analyze_cpat</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">switch_list</span> <span class="o">=</span> <span class="s2">&quot;switch_list.RDS&quot;</span><span class="p">,</span>
@@ -308,7 +315,7 @@
     <span class="n">output</span><span class="p">:</span>
         <span class="n">rds</span> <span class="o">=</span> <span class="s2">&quot;switch_list_with_pfam.RDS&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/isoformSwitchAnalyzeR/analyzePFAM&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/isoformSwitchAnalyzeR/analyzePFAM&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -335,6 +342,60 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="c1">#!/usr/bin/R</span>
+
+<span class="c1"># This script takes a IsoformSwitchAnalyseR object</span>
+<span class="c1"># and add CPAT results</span>
+
+<span class="c1"># __author__ = &quot;Thibault Dayris&quot;</span>
+<span class="c1"># __copyright__ = &quot;Copyright 2020, Thibault Dayris&quot;</span>
+<span class="c1"># __email__ = &quot;thibault.dayris@gustaveroussy.fr&quot;</span>
+<span class="c1"># __license__ = &quot;MIT&quot;</span>
+
+
+<span class="c1"># The main package</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;IsoformSwitchAnalyzeR&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
+
+<span class="c1"># Gathering input dataset and parameters</span>
+<span class="n">switch_list</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">readRDS</span><span class="p">(</span>
+  <span class="n">file</span> <span class="o">=</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;switch_list&quot;</span><span class="p">]])</span>
+<span class="p">);</span>
+
+<span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span>
+  <span class="s">&quot;switchAnalyzeRlist = switch_list, pathToPFAMresultFile = &quot;</span><span class="p">,</span>
+  <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;pfam&quot;</span><span class="p">]]</span>
+<span class="p">);</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;extra&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span>
+    <span class="n">extra</span><span class="p">,</span>
+    <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;extra&quot;</span><span class="p">]],</span>
+    <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;, &quot;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1"># Buiding command line itself</span>
+<span class="n">command</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span>
+  <span class="s">&quot;IsoformSwitchAnalyzeR::analyzeCPAT(&quot;</span><span class="p">,</span>
+  <span class="n">extra</span><span class="p">,</span>
+  <span class="s">&quot;)&quot;</span>
+<span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Libraries and input data loaded&quot;</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+
+<span class="c1"># Running command</span>
+<span class="n">pfam_scanned</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">eval</span><span class="p">(</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">parse</span><span class="p">(</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">command</span>
+  <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1"># Saving results</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">saveRDS</span><span class="p">(</span>
+  <span class="n">obj</span> <span class="o">=</span> <span class="n">pfam_scanned</span><span class="p">,</span>
+  <span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;rds&quot;</span><span class="p">]]</span>
+<span class="p">);</span>
+</pre></div>
+</div>
 </div>
 </div>
 

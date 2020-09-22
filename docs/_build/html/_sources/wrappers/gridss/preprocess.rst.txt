@@ -8,12 +8,19 @@ GRIDSS is a module software suite containing tools useful for the detection of g
 
 
 
+Software dependencies
+---------------------
+
+
+* gridss ==2.9.4
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -36,7 +43,7 @@ This meta-wrapper can be used in the following way:
         threads:
             8
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/gridss/preprocess"
+            "0.66.0-241-gab2c8ef4/bio/gridss/preprocess"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -61,4 +68,54 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    """Snakemake wrapper for gridss preprocess"""
+
+    __author__ = "Christopher Schröder"
+    __copyright__ = "Copyright 2020, Christopher Schröder"
+    __email__ = "christopher.schroede@tu-dortmund.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    from os import path
+
+    # Creating log
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    # Placeholder for optional parameters
+    extra = snakemake.params.get("extra", "")
+
+    # Check inputs/arguments.
+    reference = snakemake.input.get("reference")
+    dictionary = snakemake.input.get("dictionary")
+    if not snakemake.params.workingdir:
+        raise ValueError("Please set params.workingdir to provide a working directory.")
+
+    if not snakemake.input.reference:
+        raise ValueError("Please set input.reference to provide reference genome.")
+
+    for ending in (".amb", ".ann", ".bwt", ".pac", ".sa"):
+        if not path.exists("{}{}".format(reference, ending)):
+            raise ValueError(
+                "{reference}{ending} missing. Please make sure the reference was properly indexed by bwa.".format(
+                    reference=reference, ending=ending
+                )
+            )
+
+    dictionary = path.splitext(reference)[0] + ".dict"
+    if not path.exists(dictionary):
+        raise ValueError(
+            "{dictionary}.dict missing. Please make sure the reference dictionary was properly created. This can be accomplished for example by CreateSequenceDictionary.jar from Picard".format(
+                dictionary=dictionary
+            )
+        )
+
+    shell(
+        "(gridss -s preprocess "  # Tool
+        "--reference {reference} "  # Reference
+        "--threads {snakemake.threads} "
+        "--workingdir {snakemake.params.workingdir} "
+        "{snakemake.input.bam} "
+        "{extra}) {log}"
+    )

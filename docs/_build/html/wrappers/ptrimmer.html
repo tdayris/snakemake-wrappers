@@ -169,6 +169,7 @@
 <li class="toctree-l1"><a class="reference internal" href="primerclip.html">PRIMERCLIP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prosolo.html">PROSOLO</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">PTRIMMER</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code">Code</a></li>
@@ -284,9 +285,15 @@
   <div class="section" id="ptrimmer">
 <span id="id1"></span><h1>PTRIMMER<a class="headerlink" href="#ptrimmer" title="Permalink to this headline">¶</a></h1>
 <p>Tool to trim off the primer sequence from mutiplex amplicon sequencing</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>ptrimmer ==1.3.3</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">ptrimmer_pe</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">r1</span><span class="o">=</span><span class="s2">&quot;resources/a.lane1_R1.fastq.gz&quot;</span><span class="p">,</span>
@@ -298,7 +305,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/ptrimmer/a.lane.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/ptrimmer&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/ptrimmer&quot;</span>
 
 <span class="n">rule</span> <span class="n">ptrimmer_se</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
@@ -309,7 +316,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/ptrimmer/a.lane1.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/ptrimmer&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/ptrimmer&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -327,6 +334,49 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Felix Mölder&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, Felix Mölder&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;felix.moelder@uni-due.de&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">ntpath</span>
+
+<span class="n">input_reads</span> <span class="o">=</span> <span class="s2">&quot;-f </span><span class="si">{r1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r1</span><span class="o">=</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">r1</span><span class="p">)</span>
+
+<span class="n">out_r1</span> <span class="o">=</span> <span class="n">ntpath</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">r1</span><span class="p">)</span>
+<span class="n">output_reads</span> <span class="o">=</span> <span class="s2">&quot;-d </span><span class="si">{o1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o1</span><span class="o">=</span><span class="n">out_r1</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="n">seqmode</span> <span class="o">=</span> <span class="s2">&quot;pair&quot;</span>
+    <span class="n">input_reads</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{reads}</span><span class="s2"> -r </span><span class="si">{r2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">reads</span><span class="o">=</span><span class="n">input_reads</span><span class="p">,</span> <span class="n">r2</span><span class="o">=</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">r2</span><span class="p">)</span>
+    <span class="n">out_r2</span> <span class="o">=</span> <span class="n">ntpath</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">r2</span><span class="p">)</span>
+    <span class="n">output_reads</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{reads}</span><span class="s2"> -e </span><span class="si">{o2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">reads</span><span class="o">=</span><span class="n">output_reads</span><span class="p">,</span> <span class="n">o2</span><span class="o">=</span><span class="n">out_r2</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">seqmode</span> <span class="o">=</span> <span class="s2">&quot;single&quot;</span>
+
+<span class="n">primers</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">primers</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">ptrimmer_params</span> <span class="o">=</span> <span class="s2">&quot;-t </span><span class="si">{mode}</span><span class="s2"> </span><span class="si">{in_reads}</span><span class="s2"> -a </span><span class="si">{primers}</span><span class="s2"> </span><span class="si">{out_reads}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">mode</span><span class="o">=</span><span class="n">seqmode</span><span class="p">,</span> <span class="n">in_reads</span><span class="o">=</span><span class="n">input_reads</span><span class="p">,</span> <span class="n">primers</span><span class="o">=</span><span class="n">primers</span><span class="p">,</span> <span class="n">out_reads</span><span class="o">=</span><span class="n">output_reads</span>
+<span class="p">)</span>
+
+<span class="n">process_r1</span> <span class="o">=</span> <span class="s2">&quot;mv </span><span class="si">{out_read}</span><span class="s2"> </span><span class="si">{final_output_path}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">out_read</span><span class="o">=</span><span class="n">out_r1</span><span class="p">,</span> <span class="n">final_output_path</span><span class="o">=</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">r1</span>
+<span class="p">)</span>
+
+<span class="n">process_r2</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="n">process_r2</span> <span class="o">=</span> <span class="s2">&quot;&amp;&amp; mv </span><span class="si">{out_read}</span><span class="s2"> </span><span class="si">{final_output_path}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">out_read</span><span class="o">=</span><span class="n">out_r2</span><span class="p">,</span> <span class="n">final_output_path</span><span class="o">=</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">r2</span>
+    <span class="p">)</span>
+
+<span class="n">shell</span><span class="p">(</span><span class="s2">&quot;(ptrimmer </span><span class="si">{ptrimmer_params}</span><span class="s2"> &amp;&amp; </span><span class="si">{process_r1}</span><span class="s2"> </span><span class="si">{process_r2}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

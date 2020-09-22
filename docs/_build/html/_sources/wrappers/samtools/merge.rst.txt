@@ -7,12 +7,19 @@ Merge two bam files with samtools.
 
 
 
+Software dependencies
+---------------------
+
+
+* samtools ==1.10
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -26,7 +33,7 @@ This meta-wrapper can be used in the following way:
         threads:  # Samtools takes additional threads through its option -@
             8     # This value - 1 will be sent to -@
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/samtools/merge"
+            "0.66.0-241-gab2c8ef4/bio/samtools/merge"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -59,4 +66,22 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "koester@jimmy.harvard.edu"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    # Samtools takes additional threads through its option -@
+    # One thread for samtools merge
+    # Other threads are *additional* threads passed to the '-@' argument
+    threads = "" if snakemake.threads <= 1 else " -@ {} ".format(snakemake.threads - 1)
+
+    shell(
+        "samtools merge {threads} {snakemake.params} "
+        "{snakemake.output[0]} {snakemake.input}"
+    )

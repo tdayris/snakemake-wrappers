@@ -7,12 +7,21 @@ Annotate predicted effect of nucleotide changes with SnpEff
 
 
 
+Software dependencies
+---------------------
+
+
+* snpeff ==4.3.1t
+
+* bcftools =1.10
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -29,7 +38,7 @@ This meta-wrapper can be used in the following way:
         params:
             extra="-Xmx4g"           # optional parameters (e.g., max memory 4g)
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/snpeff/annotate"
+            "0.66.0-241-gab2c8ef4/bio/snpeff/annotate"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -55,4 +64,47 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "Bradford Powell"
+    __copyright__ = "Copyright 2018, Bradford Powell"
+    __email__ = "bpow@unc.edu"
+    __license__ = "BSD"
+
+
+    from snakemake.shell import shell
+    from os import path
+    import shutil
+    import tempfile
+    from pathlib import Path
+
+    outcalls = snakemake.output.calls
+    if outcalls.endswith(".vcf.gz"):
+        outprefix = "| bcftools view -Oz"
+    elif outcalls.endswith(".bcf"):
+        outprefix = "| bcftools view -Ob"
+    else:
+        outprefix = ""
+
+    incalls = snakemake.input[0]
+    if incalls.endswith(".bcf"):
+        incalls = "< <(bcftools view {})".format(incalls)
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+
+    data_dir = Path(snakemake.input.db).parent.resolve()
+
+    stats = snakemake.output.get("stats", "")
+    csvstats = snakemake.output.get("csvstats", "")
+    csvstats_opt = "" if not csvstats else "-csvStats {}".format(csvstats)
+    stats_opt = "-noStats" if not stats else "-stats {}".format(stats)
+
+    reference = path.basename(snakemake.input.db)
+
+    shell(
+        "snpEff -dataDir {data_dir} {stats_opt} {csvstats_opt} {extra} "
+        "{reference} {incalls} "
+        "{outprefix} > {outcalls} {log}"
+    )

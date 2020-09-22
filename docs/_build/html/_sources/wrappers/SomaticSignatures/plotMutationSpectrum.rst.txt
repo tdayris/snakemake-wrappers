@@ -7,12 +7,21 @@ Plot Mutational spectrum
 
 
 
+Software dependencies
+---------------------
+
+
+* bioconda:bioconductor-somaticsignatures=2.24.0
+
+* conda-forge:r-nmf=0.21.0
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -24,7 +33,7 @@ This meta-wrapper can be used in the following way:
         params:
             extra = "group = 'sampleNames'"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/SomaticSignatures/plotMutationSpectrum"
+            "0.66.0-241-gab2c8ef4/bio/SomaticSignatures/plotMutationSpectrum"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -58,4 +67,49 @@ Authors
 Code
 ----
 
+.. code-block:: R
 
+    #!/usr/bin/R
+
+    # Plot mutational spectrum
+    library(package = "SomaticSignatures", quietly=TRUE);
+
+
+    contexts <- base::readRDS(
+      file = base::as.character(
+        x = snakemake@input[['context']]
+      )
+    );
+
+    extra <- "contexts";
+    if ("extra" %in% names(snakemake@params)) {
+      extra <- base::paste(
+        extra,
+        base::as.character(x = snakemake@params[["extra"]]),
+        sep = ", "
+      );
+    }
+
+    command <- paste0(
+      "SomaticSignatures::plotMutationSpectrum(",
+      extra,
+      ")"
+    );
+    print(command);
+
+
+    png(
+      filename = snakemake@output[["png"]],
+      width = 1024,
+      height = 768,
+      units = "px",
+      type = "cairo"
+    );
+
+    base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+    dev.off();

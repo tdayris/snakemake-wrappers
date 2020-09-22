@@ -8,12 +8,19 @@ STRling (pronounced like “sterling”) is a method to detect large short tande
 
 
 
+Software dependencies
+---------------------
+
+
+* strling ==0.3
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -28,7 +35,7 @@ This meta-wrapper can be used in the following way:
         log:
             "log/strling/index.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/strling/index"
+            "0.66.0-241-gab2c8ef4/bio/strling/index"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -53,4 +60,30 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    """Snakemake wrapper for strling index"""
+
+    __author__ = "Christopher Schröder"
+    __copyright__ = "Copyright 2020, Christopher Schröder"
+    __email__ = "christopher.schroede@tu-dortmund.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    from os import path
+
+    # Creating log
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    # Placeholder for optional parameters
+    extra = snakemake.params.get("extra", "")
+
+    # Check inputs/arguments.
+    if len(snakemake.input) != 1:
+        raise ValueError("Please provide exactly one reference genome.")
+
+    shell(
+        "(strling index {snakemake.input[0]} "
+        "-g {snakemake.output.index} "
+        "{extra}) {log}"
+    )

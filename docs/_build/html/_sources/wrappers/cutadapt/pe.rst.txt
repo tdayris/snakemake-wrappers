@@ -8,12 +8,19 @@ Trim paired-end reads using cutadapt.
 
 
 
+Software dependencies
+---------------------
+
+
+* cutadapt ==2.10
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -33,7 +40,7 @@ This meta-wrapper can be used in the following way:
             "logs/cutadapt/{sample}.log"
         threads: 4 # set desired number of threads here
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/cutadapt/pe"
+            "0.66.0-241-gab2c8ef4/bio/cutadapt/pe"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -61,4 +68,31 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    """Snakemake wrapper for trimming paired-end reads using cutadapt."""
+
+    __author__ = "Julian de Ruiter"
+    __copyright__ = "Copyright 2017, Julian de Ruiter"
+    __email__ = "julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    n = len(snakemake.input)
+    assert n == 2, "Input must contain 2 (paired-end) elements."
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell(
+        "cutadapt"
+        " {snakemake.params.adapters}"
+        " {snakemake.params.others}"
+        " -o {snakemake.output.fastq1}"
+        " -p {snakemake.output.fastq2}"
+        " -j {snakemake.threads}"
+        " {snakemake.input}"
+        " > {snakemake.output.qc} {log}"
+    )

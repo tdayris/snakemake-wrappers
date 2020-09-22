@@ -8,12 +8,19 @@ Generate qc report using multiqc.
 
 
 
+Software dependencies
+---------------------
+
+
+* multiqc ==1.9
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -27,7 +34,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/multiqc.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/multiqc"
+            "0.66.0-241-gab2c8ef4/bio/multiqc"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -53,4 +60,32 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    """Snakemake wrapper for trimming paired-end reads using cutadapt."""
+
+    __author__ = "Julian de Ruiter"
+    __copyright__ = "Copyright 2017, Julian de Ruiter"
+    __email__ = "julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from os import path
+
+    from snakemake.shell import shell
+
+
+    input_dirs = set(path.dirname(fp) for fp in snakemake.input)
+    output_dir = path.dirname(snakemake.output[0])
+    output_name = path.basename(snakemake.output[0])
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "multiqc"
+        " {snakemake.params}"
+        " --force"
+        " -o {output_dir}"
+        " -n {output_name}"
+        " {snakemake.input}"
+        " {log}"
+    )

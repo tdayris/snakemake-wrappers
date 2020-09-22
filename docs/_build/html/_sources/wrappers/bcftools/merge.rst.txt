@@ -7,12 +7,19 @@ Merge vcf/bcf files with bcftools.
 
 
 
+Software dependencies
+---------------------
+
+
+* bcftools ==1.10
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -24,7 +31,7 @@ This meta-wrapper can be used in the following way:
         params:
             ""  # optional parameters for bcftools concat (except -o)
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/bcftools/merge"
+            "0.66.0-241-gab2c8ef4/bio/bcftools/merge"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -50,4 +57,17 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "Patrik Smeds"
+    __copyright__ = "Copyright 2018, Patrik Smeds"
+    __email__ = "patrik.smeds@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    shell(
+        "bcftools merge {snakemake.params} -o {snakemake.output[0]} "
+        "{snakemake.input.calls}"
+    )

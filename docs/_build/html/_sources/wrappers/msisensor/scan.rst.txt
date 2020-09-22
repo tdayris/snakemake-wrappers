@@ -7,12 +7,19 @@ Scan homopolymers and microsatelites with MSIsensor
 
 
 
+Software dependencies
+---------------------
+
+
+* msisensor ==0.5
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -30,7 +37,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/msisensor_scan.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/msisensor/scan"
+            "0.66.0-241-gab2c8ef4/bio/msisensor/scan"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -54,4 +61,26 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    """Snakemake script for MSISensor Scan"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Dayris Thibault"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    # Extra parameters default value is an empty string
+    extra = snakemake.params.get("extra", "")
+
+    shell(
+        "msisensor scan "  # Tool and its sub-command
+        "-d {snakemake.input} "  # Path to fasta file
+        "-o {snakemake.output} "  # Path to output file
+        "{extra} "  # Optional extra parameters
+        "{log}"  # Logging behavior
+    )

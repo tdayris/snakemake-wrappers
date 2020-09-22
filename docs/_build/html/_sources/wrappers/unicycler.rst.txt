@@ -7,12 +7,33 @@ Assemble bacterial genomes with Unicycler
 
 
 
+Software dependencies
+---------------------
+
+
+* bowtie2 ==2.4.1
+
+* bcftools ==1.10.2
+
+* spades ==3.14.1
+
+* samtools ==1.10
+
+* pilon ==1.23
+
+* racon ==1.4.13
+
+* blast ==2.10.1
+
+* unicycler ==0.4.8
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -23,7 +44,7 @@ This meta-wrapper can be used in the following way:
         output:
             "result/assembly.fasta"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/unicycler"
+            "0.66.0-241-gab2c8ef4/bio/unicycler"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -49,4 +70,37 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    """Snakemake wrapper for Unicycler"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Dayris Thibault"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    from os.path import dirname
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    input_reads = ""
+    if "short1" in snakemake.input.keys() and "short2" in snakemake.input.keys():
+        input_reads += " --short1 {} ".format(snakemake.input["short1"])
+        input_reads += " --short2 {} ".format(snakemake.input["short2"])
+    if "unpaired" in snakemake.input.keys():
+        input_reads += " --unpaired {} ".format(snakemake.input["unpaired"])
+    if "long" in snakemake.input.keys():
+        input_reads += " --long {} ".format(snakemake.input["long"])
+
+    output_dir = " --out {} ".format(dirname(snakemake.output[0]))
+
+    shell(
+        " unicycler "
+        " {input_reads} "
+        " --threads {snakemake.threads} "
+        " {output_dir} "
+        " {extra} "
+        " {log} "
+    )

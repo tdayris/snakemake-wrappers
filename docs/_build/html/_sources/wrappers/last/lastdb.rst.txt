@@ -7,12 +7,19 @@ LAST finds similar regions between sequences, and aligns them. It is designed fo
 
 
 
+Software dependencies
+---------------------
+
+
+* last=874
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -27,7 +34,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/lastdb/test-transcript.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/last/lastdb"
+            "0.66.0-241-gab2c8ef4/bio/last/lastdb"
 
     rule lastdb_protein:
         input:
@@ -40,7 +47,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/lastdb/test-protein.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/last/lastdb"
+            "0.66.0-241-gab2c8ef4/bio/last/lastdb"
 
 
 
@@ -67,4 +74,24 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    __author__ = "N. Tessa Pierce"
+    __copyright__ = "Copyright 2019, N. Tessa Pierce"
+    __email__ = "ntpierce@gmail.com"
+    __license__ = "MIT"
+
+    from os import path
+
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    protein_cmd = ""
+    protein = snakemake.params.get("protein_input", False)
+
+    if protein:
+        protein_cmd = " -p "
+
+    shell("lastdb {extra} {protein_cmd} -P {snakemake.threads} {snakemake.input} {log}")

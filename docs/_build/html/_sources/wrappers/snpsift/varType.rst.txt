@@ -7,12 +7,19 @@ Add an INFO field denoting variant type.
 
 
 
+Software dependencies
+---------------------
+
+
+* snpsift =4.3.1t
+
+
 
 
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This wrapper can be used in the following way:
 
 .. code-block:: python
 
@@ -26,7 +33,7 @@ This meta-wrapper can be used in the following way:
         log:
             "varType.log"
         wrapper:
-            "0.66.0-240-gd9cffe8c/bio/snpsift/varType"
+            "0.66.0-241-gab2c8ef4/bio/snpsift/varType"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -52,4 +59,29 @@ Authors
 Code
 ----
 
+.. code-block:: python
 
+    """Snakemake wrapper for SnpSift varType"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Dayris Thibault"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+
+
+    if "mem_mb" in snakemake.resources.keys():
+        extra += "-Xmx{}M".format(snakemake.resources["mem_mb"])
+
+    shell(
+        "SnpSift varType"  # Tool and its subcommand
+        " {extra}"  # Extra parameters
+        " {snakemake.input.vcf}"  # Path to input vcf file
+        " > {snakemake.output.vcf}"  # Path to output vcf file
+        " {log}"  # Logging behaviour
+    )

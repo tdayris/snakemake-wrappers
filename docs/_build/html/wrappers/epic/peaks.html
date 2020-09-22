@@ -124,6 +124,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../epic.html">EPIC</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">EPIC</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
@@ -290,9 +291,16 @@
   <div class="section" id="epic">
 <span id="id1"></span><h1>EPIC<a class="headerlink" href="#epic" title="Permalink to this headline">¶</a></h1>
 <p>Find broad enriched domains in ChIP-Seq data with epic</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>epic =0.2.7</p></li>
+<li><p>pandas =0.22.0</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>This meta-wrapper can be used in the following way:</p>
+<p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">epic</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
       <span class="n">treatment</span> <span class="o">=</span> <span class="s2">&quot;bed/test.bed&quot;</span><span class="p">,</span>
@@ -308,7 +316,7 @@
       <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;-g 3 -w 200&quot;</span> <span class="c1"># &quot;--bigwig epic/bigwigs&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span> <span class="c1"># optional, defaults to 1</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-240-gd9cffe8c/bio/epic/peaks&quot;</span>
+        <span class="s2">&quot;0.66.0-241-gab2c8ef4/bio/epic/peaks&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -332,6 +340,46 @@ When running with</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Endre Bakken Stovner&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2017, Endre Bakken Stovner&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;endrebak85@gmail.com&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+<span class="c1"># Placeholder for optional parameters</span>
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">threads</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">threads</span> <span class="ow">or</span> <span class="mi">1</span>
+
+<span class="n">treatment</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;treatment&quot;</span><span class="p">)</span>
+<span class="n">background</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;background&quot;</span><span class="p">)</span>
+
+<span class="c1"># Executed shell command</span>
+<span class="n">enriched_regions</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enriched_regions&quot;</span><span class="p">)</span>
+
+<span class="n">bed</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bed&quot;</span><span class="p">)</span>
+<span class="n">matrix</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;matrix&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">genome</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;genome&quot;</span><span class="p">)</span>
+
+<span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;epic -cpu </span><span class="si">{threads}</span><span class="s2"> -t </span><span class="si">{treatment}</span><span class="s2"> -c </span><span class="si">{background}</span><span class="s2"> -o </span><span class="si">{enriched_regions}</span><span class="s2"> -gn </span><span class="si">{genome}</span><span class="s2">&quot;</span>
+
+<span class="k">if</span> <span class="n">bed</span><span class="p">:</span>
+    <span class="n">cmd</span> <span class="o">+=</span> <span class="s2">&quot; -b </span><span class="si">{bed}</span><span class="s2">&quot;</span>
+<span class="k">if</span> <span class="n">matrix</span><span class="p">:</span>
+    <span class="n">cmd</span> <span class="o">+=</span> <span class="s2">&quot; -sm </span><span class="si">{matrix}</span><span class="s2">&quot;</span>
+<span class="k">if</span> <span class="n">log</span><span class="p">:</span>
+    <span class="n">cmd</span> <span class="o">+=</span> <span class="s2">&quot; -l </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
+<span class="n">cmd</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2">&quot;</span>
+
+<span class="n">shell</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 
