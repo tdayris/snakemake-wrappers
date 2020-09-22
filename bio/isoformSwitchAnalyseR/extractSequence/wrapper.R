@@ -22,7 +22,7 @@ if ("prefix" %in% base::names(snakemake@params)) {
 } else if ("fasta" %in% base::names(snakemake@output)) {
   prefix <- base::gsub("_nt.fasta", snakemake@output[["fasta"]])
 } else if ("aa_sequence" %in% base::names(snakemake@output)) {
-  prefix <- base::gsub("_AA.fasta", snakemake@output[["fasta"]])
+  prefix <- base::gsub("_AA.fasta", snakemake@output[["aa_sequence"]])
 }
 
 extra <- "switchAnalyzeRlist = switch_list, outputPrefix = prefix";
