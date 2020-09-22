@@ -3040,3 +3040,10 @@ def test_cpat_make_hexamer_table():
         "bio/cpat/make_hexamer_table",
         ["snakemake", "--cores", "1", "hexamer_table", "--use-conda", "-F"]
     )
+
+
+def test_cpat_make_logit_model():
+    run(
+        "bio/cpat/make_logit_model",
+        ["snakemake", "--cores", "1", "logit_model.logit.RData", "--use-conda", "-F"]
+    )

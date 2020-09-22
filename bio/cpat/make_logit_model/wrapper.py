@@ -13,17 +13,17 @@ from snakemake.shell import shell
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 extra = snakemake.params.get("extra", "")
-prefix = snakemake.output[0]
+prefix = snakemake.output["rdata"][:-len(".logit.RData")]
 
 reference = ""
 if "reference" in snakemake.input.keys():
-    reference = "--ref {snakemake.input['reference']}"
+    reference = "--ref {snakemake.input.reference}"
 
 shell(
     " make_logitModel.py "
-    " --cgene {snakemake.input['coding']} "
-    " --ngene {snakemake.input['noncoding']} "
-    " --hex {snakemake.input['hexamer_table']} "
+    " --cgene {snakemake.input.coding} "
+    " --ngene {snakemake.input.noncoding} "
+    " --hex {snakemake.input.hexamer_table} "
     " --outfile {prefix} "
     " {reference} "
     " {extra} "
