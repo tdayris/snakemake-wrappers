@@ -48,9 +48,3 @@ extracted <- base::eval(
     text = command
   )
 );
-
-# Saving results
-base::saveRDS(
-  obj = extracted,
-  file = snakemake@output[["rds"]]
-);
