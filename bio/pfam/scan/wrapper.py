@@ -15,7 +15,7 @@ log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 extra = snakemake.params.get("extra", "")
 
-pfam_dir = snakemake.input.pfam_dir
+pfam_dir = dirname(snakemake.input.pfam_hmm)
 
 shell(
     " pfam_scan.pl "
