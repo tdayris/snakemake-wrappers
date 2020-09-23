@@ -32,7 +32,7 @@ if ("extra" %in% base::names(snakemake@params)) {
 
 # Buiding command line itself
 command <- base::paste0(
-  "IsoformSwitchAnalyzeR::analyzeCPAT(",
+  "IsoformSwitchAnalyzeR::analyzePFAM(",
   extra,
   ")"
 );
