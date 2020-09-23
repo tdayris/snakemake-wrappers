@@ -18,8 +18,9 @@ switch_list <- base::readRDS(
 );
 
 extra <- base::paste0(
-  "switchAnalyzeRlist = switch_list, pathToPFAMresultFile = ",
-  snakemake@input[["pfam"]]
+  "switchAnalyzeRlist = switch_list, pathToPFAMresultFile = '",
+  snakemake@input[["pfam"]],
+  "'"
 );
 if ("extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
