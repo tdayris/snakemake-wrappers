@@ -15,7 +15,7 @@ log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 extra = snakemake.params.get("extra", "")
 
-pfam_dir = dirname(snakemake.input.pfam_hmm)
+pfam_dir = dirname(snakemake.input.pfam_hmm[0])
 
 exts = ["hmm", "hmm.dat", "hmm.h3f", "hmm.h3i", "hmm.h3m", "hmm.h3p"]
 
