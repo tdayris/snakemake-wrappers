@@ -17,6 +17,8 @@ extra = snakemake.params.get("extra", "")
 
 pfam_dir = dirname(snakemake.input.pfam_hmm)
 
+exts = ["hmm", "hmm.dat", "hmm.h3f", "hmm.h3i", "hmm.h3m", "hmm.h3p"]
+
 shell(
     " pfam_scan.pl "
     " -fasta {snakemake.input.fasta} "
