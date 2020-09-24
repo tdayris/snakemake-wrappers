@@ -21,6 +21,6 @@ if "mem_mb" in snakemake.resources.keys() and "-m" not in extra:
     extra += " -m {}M".format(int(snakemake.resources["mem_mb"] / snakemake.threads))
 
 shell(
-    "samtools sort {snakemake.params} {threads} -o {snakemake.output[0]} "
+    "samtools sort {extra} {threads} -o {snakemake.output[0]} "
     "-T {prefix} {snakemake.input[0]}"
 )
