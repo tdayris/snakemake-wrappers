@@ -56,7 +56,7 @@ if ("tsv" %in% base::names(snakemake@output)) {
   );
 
   utils::write.table(
-    x = tested,
+    x = tested_table,
     file = base::as.character(snakemake@output[["tsv"]]),
     sep = "\t",
     row.names = TRUE,
