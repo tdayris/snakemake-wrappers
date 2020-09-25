@@ -42,7 +42,24 @@ tested <- base::eval(
 );
 
 # Saving results
-base::saveRDS(
-  obj = tested,
-  file = snakemake@output[["rds"]]
-);
+if ("rds" %in% base::names(snakemake@output)) {
+  base::saveRDS(
+    obj = tested,
+    file = snakemake@output[["rds"]]
+  );
+}
+
+if ("tsv" %in% base::names(snakemake@output)) {
+  tested_table <- base::as.data.frame(
+    x = tested,
+    stringsAsFactors = FALSE
+  );
+
+  utils::write.table(
+    x = tested,
+    file = base::as.character(snakemake@output[["tsv"]]),
+    sep = "\t",
+    row.names = TRUE,
+    col.names = TRUE
+  );
+}
