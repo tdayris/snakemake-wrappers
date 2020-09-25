@@ -51,12 +51,12 @@ if ("rds" %in% base::names(snakemake@output)) {
 
 if ("tsv" %in% base::names(snakemake@output)) {
   tested_table <- base::as.data.frame(
-    x = tested,
+    x = tested$isoformSwitchAnalysis,
     stringsAsFactors = FALSE
   );
 
   utils::write.table(
-    x = tested$isoformSwitchAnalysis,
+    x = tested,
     file = base::as.character(snakemake@output[["tsv"]]),
     sep = "\t",
     row.names = TRUE,
