@@ -59,7 +59,7 @@ if ("tsv" %in% base::names(snakemake@output)) {
     x = tested_table,
     file = base::as.character(snakemake@output[["tsv"]]),
     sep = "\t",
-    row.names = TRUE,
+    row.names = FALSE,
     col.names = TRUE,
     quote = FALSE
   );
