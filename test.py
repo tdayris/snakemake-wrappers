@@ -2494,6 +2494,13 @@ def test_filter_design():
     )
 
 
+def test_filter_table():
+    run(
+        "bio/pandas/filter_table",
+        ["snakemake", "--use-conda", "--core", "1", "-F", "filtered.tsv"],
+    )
+
+
 def test_deseq2_to_gseaapp():
     run(
         "bio/pandas/deseq2_to_gseaapp",

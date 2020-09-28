@@ -1,0 +1,12 @@
+rule test_filter_table:
+    input:
+        table = "table.tsv"
+    output:
+        table = "filtered.tsv"
+    params:
+        keep_column = ["a", "b"],
+        filter = [["a", ">=", 2.3]]
+    log:
+        "filter.log"
+    wrapper:
+        "master/bio/pandas/filter_table"
