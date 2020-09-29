@@ -5,8 +5,32 @@ __license__ = "MIT"
 
 
 from snakemake.shell import shell
+log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+extra = snakemake.params[0]
+output_file = snakemake.output[0]
+if output_file.endswith(".bcf"):
+    extra += " --output-type b "
+elif output_file.endswith(".vcf.gz"):
+    extra += " --output-type z "
+elif output_file.endswith(".vcf"):
+    extra += " --output-type v "
+else:
+    raise ValueError(
+        "Output file extension should be one of: vcf, bcf, vcf.gz"
+    )
+
+region_file = ""
+if "regions" in snakemake.input.keys():
+    region_file = " --regions-file {}".format(snakemake.input["regions"])
+
 
 shell(
-    "bcftools merge {snakemake.params} -o {snakemake.output[0]} "
-    "{snakemake.input.calls}"
+    " bcftools merge "
+    " {extra} "
+    " {region_file} "
+    " --threads {snakemake.threads} "
+    " --output {output_file} "
+    " {snakemake.input.calls} "
+    " {log} "
 )
