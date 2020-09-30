@@ -41,7 +41,7 @@ annot = pandas.read_csv(
         if snakemake.params.get("header", None) is not None
         else None
     ),
-    index_col=0,
+    index_col=snakemake.params.get("annot_col", 0),
     dtype=str
 )
 
