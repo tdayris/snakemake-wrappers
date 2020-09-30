@@ -69,5 +69,6 @@ logging.debug(f"Head of the final DataFrame:\n{data.head()}")
 
 data.to_csv(
     snakemake.output["table"],
-    sep=sep
+    sep=sep,
+    index=False
 )
