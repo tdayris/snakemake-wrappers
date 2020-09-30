@@ -67,7 +67,7 @@ if (nb_mouse_genes != nb_human_genes) {
       "%"
     )
   );
-  base::message(setdiff(mouse_genes, genes$HGNC.symbol))
+  base::print(setdiff(mouse_genes, genes$HGNC.symbol))
 
 } else {
   base::message("All genes were translated");
