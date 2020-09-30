@@ -3061,3 +3061,10 @@ def test_cpat_make_logit_model():
         "bio/cpat/cpat",
         ["snakemake", "--cores", "1", "cpat_results.tsv", "--use-conda", "-F"]
     )
+
+
+def test_biomart_mouse_to_human():
+    run(
+        "bio/biomaRt/mouse_to_human",
+        ["snakemake", "--cores", "1", "translated_table.tsv", "--use-conda", "-F"]
+    )
