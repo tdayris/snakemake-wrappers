@@ -25,13 +25,13 @@ This wrapper can be used in the following way:
 
     rule test_cpat:
         input:
-            hexamer_table =
-            logit_model =
-            transcripts =
+            hexamer_table = "hexamer_table",
+            logit_model = "logit_model.logit.RData",
+            transcripts = "transcripts.fasta"
         output:
             "cpat_results.tsv"
         wrapper:
-            "0.66.0-243-ged9d28af/bio/cpat/cpat"
+            "0.66.0-280-g9f0281de/bio/cpat/cpat"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -83,10 +83,11 @@ Code
 
     shell(
         " cpat.py "
-        " --gene {snakemake.input['trnascripts']} "
+        " --gene {snakemake.input.transcripts} "
         " {reference} "
-        " --hex {snakemake.input['hexamer_table']} "
-        " --logitModel {snakemake.input['logitModel']}"
+        " --hex {snakemake.input.hexamer_table} "
+        " --logitModel {snakemake.input.logit_model}"
+        " --outfile {snakemake.output[0]}"
         " {extra} "
         " {log} "
     )

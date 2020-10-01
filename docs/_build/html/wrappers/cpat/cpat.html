@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../bcl2fastq.html">BCF2FASTQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bedtools.html">BEDTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../benchmark.html">BENCHMARK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomaRt.html">BIOMART</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bismark.html">BISMARK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bowtie2.html">BOWTIE2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../busco.html">BUSCO</a></li>
@@ -303,13 +304,13 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_cpat</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">hexamer_table</span> <span class="o">=</span>
-        <span class="n">logit_model</span> <span class="o">=</span>
-        <span class="n">transcripts</span> <span class="o">=</span>
+        <span class="n">hexamer_table</span> <span class="o">=</span> <span class="s2">&quot;hexamer_table&quot;</span><span class="p">,</span>
+        <span class="n">logit_model</span> <span class="o">=</span> <span class="s2">&quot;logit_model.logit.RData&quot;</span><span class="p">,</span>
+        <span class="n">transcripts</span> <span class="o">=</span> <span class="s2">&quot;transcripts.fasta&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="s2">&quot;cpat_results.tsv&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-243-ged9d28af/bio/cpat/cpat&quot;</span>
+        <span class="s2">&quot;0.66.0-280-g9f0281de/bio/cpat/cpat&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -351,10 +352,11 @@ When running with</p>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot; cpat.py &quot;</span>
-    <span class="s2">&quot; --gene </span><span class="si">{snakemake.input[&#39;trnascripts&#39;]}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; --gene </span><span class="si">{snakemake.input.transcripts}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot; </span><span class="si">{reference}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot; --hex </span><span class="si">{snakemake.input[&#39;hexamer_table&#39;]}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot; --logitModel </span><span class="si">{snakemake.input[&#39;logitModel&#39;]}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; --hex </span><span class="si">{snakemake.input.hexamer_table}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; --logitModel </span><span class="si">{snakemake.input.logit_model}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; --outfile </span><span class="si">{snakemake.output[0]}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2"> &quot;</span>
 <span class="p">)</span>

@@ -25,14 +25,15 @@ This wrapper can be used in the following way:
 
     rule test_cpat_make_logit_model:
         input:
-            coding =
-            noncoding =
-            hexamer_table =
-            reference =
+            coding = "code.fasta",
+            noncoding = "nocode.fasta",
+            hexamer_table = "hexamer_table"
         output:
-            "logit_model"
+            excel = "logit_model.feature.xls",
+            rdata = "logit_model.logit.RData",
+            rscript = "logit_model.make_logitModel.r"
         wrapper:
-            "0.66.0-243-ged9d28af/bio/cpat/make_logit_model"
+            "0.66.0-280-g9f0281de/bio/cpat/make_logit_model"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -75,17 +76,17 @@ Code
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
     extra = snakemake.params.get("extra", "")
-    prefix = snakemake.output[0]
+    prefix = snakemake.output["rdata"][:-len(".logit.RData")]
 
     reference = ""
     if "reference" in snakemake.input.keys():
-        reference = "--ref {snakemake.input['reference']}"
+        reference = "--ref {snakemake.input.reference}"
 
     shell(
         " make_logitModel.py "
-        " --cgene {snakemake.input['coding']} "
-        " --ngene {snakemake.input['noncoding']} "
-        " --hex {snakemake.input['hexamer_table']} "
+        " --cgene {snakemake.input.coding} "
+        " --ngene {snakemake.input.noncoding} "
+        " --hex {snakemake.input.hexamer_table} "
         " --outfile {prefix} "
         " {reference} "
         " {extra} "

@@ -25,12 +25,12 @@ This wrapper can be used in the following way:
 
     rule test_cpat_make_hexamer_table:
         input:
-            coding =
-            noncoding =
+            coding = "code.fasta",
+            noncoding = "nocode.fasta"
         output:
             "hexamer_table"
         wrapper:
-            "0.66.0-243-ged9d28af/bio/cpat/make_hexamer_table"
+            "0.66.0-280-g9f0281de/bio/cpat/make_hexamer_table"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -70,11 +70,12 @@ Code
 
 
     from snakemake.shell import shell
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
     shell(
         " make_hexamer_tab.py "
-        " --cod {snakemake.input['coding']} "
-        " --noncod {snakemake.input['noncoding']} "
+        " --cod {snakemake.input.coding} "
+        " --noncod {snakemake.input.noncoding} "
+        " > {snakemake.output[0]} "
         " {log} "
     )

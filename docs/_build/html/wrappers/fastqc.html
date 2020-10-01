@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bcl2fastq.html">BCF2FASTQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bedtools.html">BEDTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmark.html">BENCHMARK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="biomaRt.html">BIOMART</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bismark.html">BISMARK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bowtie2.html">BOWTIE2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="busco.html">BUSCO</a></li>
@@ -305,7 +306,7 @@
         <span class="s2">&quot;logs/fastqc/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-243-ged9d28af/bio/fastqc&quot;</span>
+        <span class="s2">&quot;0.66.0-280-g9f0281de/bio/fastqc&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -355,8 +356,8 @@ When running with</p>
 <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tempdir</span><span class="p">:</span>
     <span class="n">shell</span><span class="p">(</span>
         <span class="s2">&quot;fastqc </span><span class="si">{snakemake.params}</span><span class="s2"> --quiet -t </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
-        <span class="s2">&quot;--outdir {tempdir:q} {snakemake.input[0]:q}&quot;</span>
-        <span class="s2">&quot; {log:q}&quot;</span>
+        <span class="s2">&quot;--outdir </span><span class="si">{tempdir}</span><span class="s2"> </span><span class="si">{snakemake.input[0]}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2">&quot;</span>
     <span class="p">)</span>
 
     <span class="c1"># Move outputs into proper position.</span>
@@ -365,10 +366,10 @@ When running with</p>
     <span class="n">zip_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempdir</span><span class="p">,</span> <span class="n">output_base</span> <span class="o">+</span> <span class="s2">&quot;_fastqc.zip&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">html</span> <span class="o">!=</span> <span class="n">html_path</span><span class="p">:</span>
-        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv {html_path:q} {snakemake.output.html:q}&quot;</span><span class="p">)</span>
+        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv </span><span class="si">{html_path}</span><span class="s2"> </span><span class="si">{snakemake.output.html}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">zip</span> <span class="o">!=</span> <span class="n">zip_path</span><span class="p">:</span>
-        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv {zip_path:q} {snakemake.output.zip:q}&quot;</span><span class="p">)</span>
+        <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;mv </span><span class="si">{zip_path}</span><span class="s2"> </span><span class="si">{snakemake.output.zip}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

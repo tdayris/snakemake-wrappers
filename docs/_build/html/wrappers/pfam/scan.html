@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../bcl2fastq.html">BCF2FASTQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bedtools.html">BEDTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../benchmark.html">BENCHMARK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomaRt.html">BIOMART</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bismark.html">BISMARK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bowtie2.html">BOWTIE2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../busco.html">BUSCO</a></li>
@@ -302,11 +303,11 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_pfam_scan</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">fasta</span> <span class="o">=</span>
-        <span class="n">pfam_dir</span> <span class="o">=</span>
+        <span class="n">pfam_hmm</span> <span class="o">=</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="s2">&quot;pfam_scanned&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-243-ged9d28af/bio/pfam/scan&quot;</span>
+        <span class="s2">&quot;0.66.0-280-g9f0281de/bio/pfam/scan&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -336,14 +337,19 @@ When running with</p>
 
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">dirname</span>
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
+<span class="n">pfam_dir</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">pfam_hmm</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">exts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;hmm&quot;</span><span class="p">,</span> <span class="s2">&quot;hmm.dat&quot;</span><span class="p">,</span> <span class="s2">&quot;hmm.h3f&quot;</span><span class="p">,</span> <span class="s2">&quot;hmm.h3i&quot;</span><span class="p">,</span> <span class="s2">&quot;hmm.h3m&quot;</span><span class="p">,</span> <span class="s2">&quot;hmm.h3p&quot;</span><span class="p">]</span>
+
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot; pfam_scan.pl &quot;</span>
-    <span class="s2">&quot; -fasta </span><span class="si">{snakemake.input[&#39;fasta&#39;]}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot; -dir </span><span class="si">{snakemake.input[&#39;pfam_dir&#39;]}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; -fasta </span><span class="si">{snakemake.input.fasta}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot; -dir </span><span class="si">{pfam_dir}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot; --outfile </span><span class="si">{snakemake.output[0]}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot; -cpu </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2"> &quot;</span>
