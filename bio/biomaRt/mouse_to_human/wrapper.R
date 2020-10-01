@@ -9,6 +9,7 @@
 
 # Loading libraries
 base::library(package = "biomaRt", quietly = TRUE);
+base::library(package = "dplyr", quietly = TRUE);
 base::message("Library loaded");
 
 # Loading gene list
@@ -82,6 +83,16 @@ results <- base::merge(
   all.y = FALSE,
   sort = FALSE
 );
+
+results[, mgi_id] <- NULL;
+
+results %>% dplyr::group_by(
+  HGNC.symbol
+) %>% dplyr::summarise_if(
+  base::is.numeric,
+  base::sum,
+  na.rm=TRUE
+) -> results
 
 utils::write.table(
   x=results,
