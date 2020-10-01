@@ -92,7 +92,9 @@ results %>% dplyr::group_by(
   base::is.numeric,
   base::sum,
   na.rm=TRUE
-) -> results
+) %>% dplyr::filter(
+  !is.na(HGNC.symbol)
+) -> results;
 
 utils::write.table(
   x=results,
