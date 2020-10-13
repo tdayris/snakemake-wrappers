@@ -28,7 +28,7 @@ if "input_dir" in snakemake.input.keys():
 
 # path to runfolder directory
 run_dir = ""
-if "run_dir" in snakemake.input.keys():
+if "run_dir" in snakemake.params.keys():
     run_dir = "--runfolder-dir {}".format(snakemake.input["run_dir"])
 
 # path to intensities directory, requires an input dir (see above)
