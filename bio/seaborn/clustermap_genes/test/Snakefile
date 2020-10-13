@@ -1,0 +1,12 @@
+rule test_seaborn_clustermap_genes:
+    input:
+        counts = "table.tsv"
+    output:
+        png = "clustermap.png"
+    log:
+        "clustermap.log"
+    params:
+        conditions = {"a": "CondA", "b": "CondB"},
+        factor = "Condition_Test"
+    wrapper:
+        "master/bio/seaborn/clustermap_genes"
