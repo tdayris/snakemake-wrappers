@@ -2395,6 +2395,13 @@ def test_vep_annotate():
     )
 
 
+def test_pandas_left_minus_join():
+    run(
+        "bio/pandas/left_minus_join",
+        ["snakemake", "--cores", "1", "left_minus_join.tsv", "--use-conda", "-F"]
+    )
+
+
 def test_pandas_merge_salmon():
     run(
         "bio/pandas/salmon",
@@ -2434,6 +2441,13 @@ def test_pandas_add_transcripts():
 def test_seaborn_clustermap():
     run(
         "bio/seaborn/clustermap",
+        ["snakemake", "--cores", "1", "clustermap.png", "--use-conda", "-F"],
+    )
+
+
+def test_seaborn_clustermap_genes():
+    run(
+        "bio/seaborn/clustermap_genes",
         ["snakemake", "--cores", "1", "clustermap.png", "--use-conda", "-F"],
     )
 
@@ -3067,4 +3081,25 @@ def test_biomart_mouse_to_human():
     run(
         "bio/biomaRt/mouse_to_human",
         ["snakemake", "--cores", "1", "translated_table.tsv", "--use-conda", "-F"]
+    )
+
+
+def test_eacon_install():
+    run(
+        "bio/eacon/install",
+        ["snakemake", "--cores", "1", "sources", "--use-conda", "-F"]
+    )
+
+
+def test_eacon_databases():
+    run(
+        "bio/eacon/databases",
+        ["snakemake", "--cores", "1", "grd.pl", "--use-conda", "-F"]
+    )
+
+
+def test_eacon_oncoscan_process():
+    run(
+        "bio/eacon/oncoscan_process",
+        ["snakemake", "--cores", "1", "REF.RDS", "--use-conda", "-F"]
     )
