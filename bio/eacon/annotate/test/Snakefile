@@ -1,9 +1,19 @@
 rule test_eacon_annotate:
     input:
-        rds = "file.RDS",
+        rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS",
         grd = "grd.pl",
-        database = "database/"
+        database = "database"
     output:
-        "report.html"
+        multiext(
+            "{sample}/ASCAT/L2R/{sample}",
+            ".BAF.png",
+            ".Cut.acbs",
+            ".Instab.txt",
+            ".INT.png",
+            ".L2R.G.png",
+            ".L2R.K.png",
+            ".TargetGenes.txt",
+            ".TruncatedGenes.txt"
+        )
     wrapper:
         "master/bio/eacon/annotate"

@@ -4,6 +4,13 @@ rule test_eacon_oncoscan_process:
         ATChannelCel = "{sample}_A.CEL",
         GCChannelCel = "{sample}_C.CEL"
     output:
-        rds = "{sample}.RDS"
+        qc = multiext(
+            "{sample}/{sample}_2.4.0_nar33.r2",
+            ".qc.txt",
+            ".log",
+            ".paircheck.txt"
+        ),
+        txt = "{sample}/{sample}_nar33.r2_hg19_rawplot.png",
+        rds = "{sample}/{sample}_OncoScan_CNV_hg19_processed.RDS"
     wrapper:
         "master/bio/eacon/oncoscan_process"

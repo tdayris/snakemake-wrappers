@@ -1,7 +1,15 @@
 rule test_eacon_segment:
     input:
-        rds = "process.RDS"
+        rds = "{sample}/{sample}_OncoScan_CNV_hg19_processed.RDS"
     output:
-        "file.RDS"
+        files = multiext(
+            "{sample}/ASCAT/L2R/{sample}",
+            "Cut.cbs",
+            "NoCut.cbs",
+            "Rorschach.png",
+            "SegmentedBAF.txt"
+        ),
+        rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS",
+        png = "{sample}/ASCAT/L2R/{sample}.SEG.png"
     wrapper:
         "master/bio/eacon/segment"

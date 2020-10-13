@@ -1,7 +1,11 @@
 rule test_eacon_ascn:
     input:
-        rds = "file.RDS"
+        rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS"
     output:
-        "result.RDS"
+        gamma_eval = multiext(
+            "{sample}/ASCAT/ASCN/{sample}.gemmeEval",
+            ".png",
+            ".txt"
+        )
     wrapper:
         "master/bio/eacon/ascn"

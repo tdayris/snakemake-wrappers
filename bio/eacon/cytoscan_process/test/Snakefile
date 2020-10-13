@@ -2,4 +2,10 @@ rule test_eacon_cytoscan_process:
     input:
         cel = "{sample}.CEL"
     output:
-        rds = ".RDS"
+        qc = multiext(
+            "{sample}/{sample}_2.4.0_nar33.r4",
+            ".qc.txt",
+            ".log"
+        ),
+        txt = "{sample}/{sample}_CELfile.txt",
+        rds = "{sample}/{sample}_CytoScanHD_Array_hg19_processed.RDS"
