@@ -1,0 +1,159 @@
+.. _`EaCoN_OncoScan_process`:
+
+EACON_ONCOSCAN_PROCESS
+======================
+
+Perform EaCoN OncoScan processing
+
+
+
+Software dependencies
+---------------------
+
+
+* conda-forge:r-devtools=2.3.2
+
+* conda-forge:r-dbi=1.1.0
+
+* conda-forge:r-rsqlite=2.2.1
+
+* bioconda:r-eacon=0.3.4_1
+
+* bioconda:bioconductor-bsgenome=1.54.0
+
+* bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg19=1.4.0
+
+* bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg38=1.4.1
+
+* bioconda:bioconductor-bsgenome.hsapiens.1000genomes.hs37d5=0.99.1
+
+* bioconda:bioconductor-affxparser=1.58.0
+
+* bioconda:bioconductor-biostrings=2.54.0
+
+* bioconda:bioconductor-aroma.light=3.16.0
+
+* bioconda:bioconductor-copynumber=1.26.0
+
+* bioconda:bioconductor-genomicranges=1.38.0
+
+* bioconda:bioconductor-rhdf5=2.30.0
+
+* bioconda:bioconductor-limma=3.42.0
+
+* bioconda:r-sequenza=3.0.0
+
+* bioconda:r-facets=0.5.14
+
+* bioconda:cnv_facets=0.16.0
+
+* bioconda:ascat=2.5.2
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_eacon_oncoscan_process:
+        input:
+            install = "sources",
+            ATChannelCel = "{sample}_A.CEL",
+            GCChannelCel = "{sample}_C.CEL"
+        output:
+            qc = multiext(
+                "{sample}/{sample}_2.4.0_nar33.r2",
+                ".qc.txt",
+                ".log",
+                ".paircheck.txt"
+            ),
+            txt = "{sample}/{sample}_nar33.r2_hg19_rawplot.png",
+            rds = "{sample}/{sample}_OncoScan_CNV_hg19_processed.RDS"
+        wrapper:
+            "0.66.0-289-g07b60db0/bio/eacon/oncoscan_process"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Use extra parameter to pass arguments to OS.Process. Default extra parameter
+is: `force=TRUE`
+
+The wildcard `sample` is required to identify sample name.
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/bin/R
+
+    # This is the snakemake wrapper for EaCoN OS.Process
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+
+    library(package = "EaCoN", quietly = TRUE);
+
+    atchc <- base::as.character(x = snakemake@input[["ATChannelCel"]]);
+    gcchc <- base::as.character(x = snakemake@input[["GCChannelCel"]]);
+
+    # Gather extra parameters
+    extra <- ", force=TRUE";
+    if ("extra" %in% base::names(snakemake@params)) {
+      extra <- base::paste(
+        ", ",
+        base::as.character(x = snakemake@params[["extra"]])
+      );
+    }
+
+    # Get sample name from wildcards
+    sample_name <- base::as.character(
+      x = snakemake@wildcards["sample"]
+    );
+
+    # Build command line
+    command <- base::paste0(
+      "EaCoN::OS.Process(",
+      "ATChannelCel = atchc, ",
+      "GCChannelCel = gcchc, ",
+      "samplename = sample_name",
+      extra,
+      ")"
+    );
+    base::message(command);
+
+    base::eval(
+      base::parse(
+        text = command
+      )
+    );

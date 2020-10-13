@@ -121,6 +121,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eacon.html">EACON</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../epic.html">EPIC</a></li>
@@ -320,6 +321,17 @@
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_seaborn_clustermap_genes</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="s2">&quot;table.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">png</span> <span class="o">=</span> <span class="s2">&quot;clustermap.png&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;clustermap.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">conditions</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="s2">&quot;CondA&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="s2">&quot;CondB&quot;</span><span class="p">},</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="s2">&quot;Condition_Test&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.66.0-289-g07b60db0/bio/seaborn/clustermap_genes&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -388,6 +400,8 @@ When running with</p>
 <span class="p">)</span>
 <span class="n">cond_id</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;factor&quot;</span><span class="p">,</span> <span class="s2">&quot;Condition&quot;</span><span class="p">)</span>
 <span class="n">conditions</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">cond_id</span><span class="p">]</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Head of the conditions dataframe:&quot;</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">conditions</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 
 <span class="c1"># Load normalized counts</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
@@ -396,6 +410,8 @@ When running with</p>
     <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span>
 <span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Head of the loaded data:&quot;</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">conditions</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 
 <span class="c1"># Remove possible text annotations and validate</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">number</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span>

@@ -1,0 +1,135 @@
+.. _`EaCoN_segment`:
+
+EACON_SEGMENT
+=============
+
+Segment profile with EaCoN
+
+
+
+Software dependencies
+---------------------
+
+
+* conda-forge:r-devtools=2.3.2
+
+* conda-forge:r-dbi=1.1.0
+
+* conda-forge:r-rsqlite=2.2.1
+
+* bioconda:r-eacon=0.3.4_1
+
+* bioconda:bioconductor-bsgenome=1.54.0
+
+* bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg19=1.4.0
+
+* bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg38=1.4.1
+
+* bioconda:bioconductor-bsgenome.hsapiens.1000genomes.hs37d5=0.99.1
+
+* bioconda:bioconductor-affxparser=1.58.0
+
+* bioconda:bioconductor-biostrings=2.54.0
+
+* bioconda:bioconductor-aroma.light=3.16.0
+
+* bioconda:bioconductor-copynumber=1.26.0
+
+* bioconda:bioconductor-genomicranges=1.38.0
+
+* bioconda:bioconductor-rhdf5=2.30.0
+
+* bioconda:bioconductor-limma=3.42.0
+
+* bioconda:r-sequenza=3.0.0
+
+* bioconda:r-facets=0.5.14
+
+* bioconda:cnv_facets=0.16.0
+
+* bioconda:ascat=2.5.2
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_eacon_segment:
+        input:
+            rds = "{sample}/{sample}_OncoScan_CNV_hg19_processed.RDS"
+        output:
+            files = multiext(
+                "{sample}/ASCAT/L2R/{sample}",
+                "Cut.cbs",
+                "NoCut.cbs",
+                "Rorschach.png",
+                "SegmentedBAF.txt"
+            ),
+            rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS",
+            png = "{sample}/ASCAT/L2R/{sample}.SEG.png"
+        wrapper:
+            "0.66.0-289-g07b60db0/bio/eacon/segment"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+Use extra parameters to pass options to segment.ff
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/bin/R
+
+    base::library(package = "EaCoN", quietly = TRUE);
+
+    input_rds <- base::as.character(
+      x = snakemake@input[["rds"]]
+    );
+
+    extra <- "force=TRUE";
+    if ("extra" %in% base::names(snakemake@params)) {
+      extra <- base::as.character(x = snakemake@params[["extra"]]);
+    }
+
+    command <- base::paste0(
+      "EaCoN::Segment.ff(RDS.file = input_rds, ",
+      extra,
+      ")"
+    );
+    base::message(command);
+
+    base::eval(
+      base::parse(
+        text=command
+      )
+    );

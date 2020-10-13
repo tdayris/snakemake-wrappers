@@ -46,6 +46,17 @@ This wrapper can be used in the following way:
 .. code-block:: python
 
     rule test_seaborn_clustermap_genes:
+        input:
+            counts = "table.tsv"
+        output:
+            png = "clustermap.png"
+        log:
+            "clustermap.log"
+        params:
+            conditions = {"a": "CondA", "b": "CondB"},
+            factor = "Condition_Test"
+        wrapper:
+            "0.66.0-289-g07b60db0/bio/seaborn/clustermap_genes"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -126,6 +137,8 @@ Code
     )
     cond_id = snakemake.params.get("factor", "Condition")
     conditions.columns = [cond_id]
+    logging.debug("Head of the conditions dataframe:")
+    logging.debug(conditions.head())
 
     # Load normalized counts
     data = pandas.read_csv(
@@ -134,6 +147,8 @@ Code
         header=0,
         index_col=0
     )
+    logging.debug("Head of the loaded data:")
+    logging.debug(conditions.head())
 
     # Remove possible text annotations and validate
     data = data[list(data.select_dtypes(include=[numpy.number]).columns.values)]
