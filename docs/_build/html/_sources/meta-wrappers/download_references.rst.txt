@@ -76,7 +76,7 @@ This meta-wrapper can be used in the following way:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.66.0-289-g07b60db0/bio/reference/ensembl-sequence"
+            "0.66.0-299-g3a2efc89/bio/reference/ensembl-sequence"
 
 
     rule get_annotation:
@@ -92,7 +92,7 @@ This meta-wrapper can be used in the following way:
             "logs/get_annotation/{build}.{release}.{organism}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.66.0-289-g07b60db0/bio/reference/ensembl-annotation"
+            "0.66.0-299-g3a2efc89/bio/reference/ensembl-annotation"
 
 
     rule samtools_faidx_reference:
@@ -105,7 +105,7 @@ This meta-wrapper can be used in the following way:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.66.0-289-g07b60db0/bio/samtools/faidx"
+            "0.66.0-299-g3a2efc89/bio/samtools/faidx"
 
 
     rule create_dict:
@@ -120,7 +120,7 @@ This meta-wrapper can be used in the following way:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.66.0-289-g07b60db0/bio/picard/createsequencedictionary"
+            "0.66.0-299-g3a2efc89/bio/picard/createsequencedictionary"
 
 
     rule get_variation_with_contig_lengths:
@@ -136,7 +136,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/get_variation/{build}.{release}.{organism}.log"
         wrapper:
-            "0.66.0-289-g07b60db0/bio/reference/ensembl-variation"
+            "0.66.0-299-g3a2efc89/bio/reference/ensembl-variation"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -203,8 +203,12 @@ Code
 
     suffixes = ""
     datatype = snakemake.params.get("datatype", "")
+    chromosome = snakemake.params.get("chromosome", "")
     if datatype == "dna":
-        suffixes = ["dna.primary_assembly.fa.gz", "dna.toplevel.fa.gz"]
+        if chromosome:
+            suffixes = ["dna.chromosome.{}.fa.gz".format(chromosome)]
+        else:
+            suffixes = ["dna.primary_assembly.fa.gz", "dna.toplevel.fa.gz"]
     elif datatype == "cdna":
         suffixes = ["cdna.all.fa.gz"]
     elif datatype == "cds":
@@ -215,6 +219,12 @@ Code
         suffixes = ["pep.all.fa.gz"]
     else:
         raise ValueError("invalid datatype, must be one of dna, cdna, cds, ncrna, pep")
+
+    if chromosome:
+        if not datatype == "dna":
+            raise ValueError(
+                "invalid datatype, to select a single chromosome the datatype must be dna"
+            )
 
     success = False
     for suffix in suffixes:

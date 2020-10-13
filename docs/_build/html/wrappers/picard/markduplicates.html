@@ -325,7 +325,7 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="s2">&quot;REMOVE_DUPLICATES=true&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-289-g07b60db0/bio/picard/markduplicates&quot;</span>
+        <span class="s2">&quot;0.66.0-299-g3a2efc89/bio/picard/markduplicates&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -353,16 +353,18 @@ When running with</p>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-
 <span class="n">memory</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 <span class="k">if</span> <span class="s2">&quot;mem_mb&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-    <span class="n">memory</span> <span class="o">=</span> <span class="s2">&quot;-Xmx</span><span class="si">{}</span><span class="s2">M&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;mem_mb&quot;</span><span class="p">])</span>
+    <span class="n">memory</span> <span class="o">=</span> <span class="s2">&quot;-Xmx</span><span class="si">{}</span><span class="s2">M&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;mem_mb&quot;</span><span class="p">]))</span>
 
 <span class="n">shell</span><span class="p">(</span>
-    <span class="s2">&quot;picard MarkDuplicates &quot;</span>
-    <span class="s2">&quot;</span><span class="si">{memory}</span><span class="s2"> </span><span class="si">{snakemake.params}</span><span class="s2"> INPUT=</span><span class="si">{snakemake.input}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot;OUTPUT=</span><span class="si">{snakemake.output.bam}</span><span class="s2"> METRICS_FILE=</span><span class="si">{snakemake.output.metrics}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;picard MarkDuplicates &quot;</span>  <span class="c1"># Tool and its subcommand</span>
+    <span class="s2">&quot;</span><span class="si">{memory}</span><span class="s2"> &quot;</span>  <span class="c1"># Automatic Xmx java option</span>
+    <span class="s2">&quot;</span><span class="si">{snakemake.params}</span><span class="s2"> &quot;</span>  <span class="c1"># User defined parmeters</span>
+    <span class="s2">&quot;INPUT=</span><span class="si">{snakemake.input}</span><span class="s2"> &quot;</span>  <span class="c1"># Input file</span>
+    <span class="s2">&quot;OUTPUT=</span><span class="si">{snakemake.output.bam}</span><span class="s2"> &quot;</span>  <span class="c1"># Output bam</span>
+    <span class="s2">&quot;METRICS_FILE=</span><span class="si">{snakemake.output.metrics}</span><span class="s2"> &quot;</span>  <span class="c1"># Output metrics</span>
+    <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span>  <span class="c1"># Logging</span>
 <span class="p">)</span>
 </pre></div>
 </div>

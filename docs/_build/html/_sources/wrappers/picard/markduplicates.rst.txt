@@ -35,7 +35,7 @@ This wrapper can be used in the following way:
         params:
             "REMOVE_DUPLICATES=true"
         wrapper:
-            "0.66.0-289-g07b60db0/bio/picard/markduplicates"
+            "0.66.0-299-g3a2efc89/bio/picard/markduplicates"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -73,14 +73,16 @@ Code
 
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
-
     memory = ""
     if "mem_mb" in snakemake.resources.keys():
-        memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
+        memory = "-Xmx{}M".format(str(snakemake.resources["mem_mb"]))
 
     shell(
-        "picard MarkDuplicates "
-        "{memory} {snakemake.params} INPUT={snakemake.input} "
-        "OUTPUT={snakemake.output.bam} METRICS_FILE={snakemake.output.metrics} "
-        "{log}"
+        "picard MarkDuplicates "  # Tool and its subcommand
+        "{memory} "  # Automatic Xmx java option
+        "{snakemake.params} "  # User defined parmeters
+        "INPUT={snakemake.input} "  # Input file
+        "OUTPUT={snakemake.output.bam} "  # Output bam
+        "METRICS_FILE={snakemake.output.metrics} "  # Output metrics
+        "{log}"  # Logging
     )
