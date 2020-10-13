@@ -14,6 +14,13 @@ rule test_eacon_annotate:
             ".L2R.K.png",
             ".TargetGenes.txt",
             ".TruncatedGenes.txt"
-        )
+        ),
+        expand(
+            "{sample}/ASCAT/L2R/chromosomes/{chromosome}",
+            chromosome = [f"chr{i}.png" for i in list(map(str, range(1, 23))) + ["X", "Y"]],
+            allow_missing=True
+        ),
+        "{sample}/ASCAT/L2R/{sample}.REPORT.html",
+        directory("{sample}/ASCAT/L2R/{sample}_solo.hg19")
     wrapper:
         "master/bio/eacon/annotate"
