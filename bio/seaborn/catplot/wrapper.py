@@ -7,7 +7,7 @@ __email__ = "thibault.dayris@gustaveroussy.fr"
 __license__ = "MIT"
 
 """
-Plot a box plot of each sample counts
+Plot distribution as categories
 """
 
 import logging
