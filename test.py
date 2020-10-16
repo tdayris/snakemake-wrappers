@@ -2478,6 +2478,13 @@ def test_seaborn_clustermap():
     )
 
 
+def test_seaborn_catplot():
+    run(
+        "bio/seaborn/catplot",
+        ["snakemake", "--cores", "1", "catplot.png", "--use-conda", "-F"]
+    )
+
+
 def test_seaborn_clustermap_genes():
     run(
         "bio/seaborn/clustermap_genes",

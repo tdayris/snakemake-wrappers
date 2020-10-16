@@ -1,0 +1,15 @@
+rule test_seaborn_catplot:
+    input:
+        tsv = "table.tsv"
+    output:
+        png = "catplot.png"
+    params:
+        extra = {
+            "x": "score",
+            "y": "chr",
+            "hue": "Sample_id"
+        }
+    log:
+        "catplot.log"
+    wrapper:
+        "master/bio/seaborn/catplot"
