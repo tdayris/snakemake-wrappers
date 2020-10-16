@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bamtools.html">BAMTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bcftools.html">BCFTOOLS</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">BCF2FASTQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code">Code</a></li>
@@ -286,6 +287,12 @@
   <div class="section" id="bcf2fastq">
 <span id="id1"></span><h1>BCF2FASTQ<a class="headerlink" href="#bcf2fastq" title="Permalink to this headline">¶</a></h1>
 <p>Run demultiplexing of base call (BCL) files into Fastq files</p>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>dranew:bcl2fastq=2.19.0</p></li>
+</ul>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -299,7 +306,7 @@
         <span class="n">reports_dir</span> <span class="o">=</span> <span class="n">directory</span><span class="p">()</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">3</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-299-g3a2efc89/bio/bcl2fastq&quot;</span>
+        <span class="s2">&quot;0.66.0-304-gaabdcb22/bio/bcl2fastq&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -333,6 +340,69 @@ When running with</p>
 
 <span class="c1"># extra parameters</span>
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">extra_parameters_presets</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># This preset of options comes from 10X genomics documentation</span>
+    <span class="s2">&quot;10x single-cell&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot; --use-bases-mask=Y26,I8,Y98&quot;</span>
+        <span class="s2">&quot; --create-fastq-for-index-reads&quot;</span>
+        <span class="s2">&quot; --minimum-trimmed-read-length=8&quot;</span>
+        <span class="s2">&quot; --mask-short-adapter-reads=8&quot;</span>
+        <span class="s2">&quot; --ignore-missing-positions&quot;</span>
+        <span class="s2">&quot; --ignore-missing-controls&quot;</span>
+        <span class="s2">&quot; --ignore-missing-filter&quot;</span>
+        <span class="s2">&quot; --ignore-missing-bcls &quot;</span>
+    <span class="p">),</span>
+    <span class="c1"># This preset of options comes from 10X genomics documentation</span>
+    <span class="s2">&quot;single-cell VDJ single indexing&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot; --use-bases-mask=Y26,I8,Y91&quot;</span>
+        <span class="s2">&quot; --create-fastq-for-index-reads&quot;</span>
+        <span class="s2">&quot; --minimum-trimmed-read-length=8&quot;</span>
+        <span class="s2">&quot; --mask-short-adapter-reads=8&quot;</span>
+        <span class="s2">&quot; --ignore-missing-positions&quot;</span>
+        <span class="s2">&quot; --ignore-missing-controls&quot;</span>
+        <span class="s2">&quot; --ignore-missing-filter&quot;</span>
+        <span class="s2">&quot; --ignore-missing-bcls&quot;</span>
+    <span class="p">),</span>
+    <span class="c1"># This preset of options comes from 10X genomics documentation</span>
+    <span class="s2">&quot;single-cell VDJ dual indexing&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot; --use-bases-mask=Y26,I8,I8,Y91&quot;</span>
+        <span class="s2">&quot; --create-fastq-for-index-reads&quot;</span>
+        <span class="s2">&quot; --minimum-trimmed-read-length=8&quot;</span>
+        <span class="s2">&quot; --mask-short-adapter-reads=8&quot;</span>
+        <span class="s2">&quot; --ignore-missing-positions&quot;</span>
+        <span class="s2">&quot; --ignore-missing-controls&quot;</span>
+        <span class="s2">&quot; --ignore-missing-filter&quot;</span>
+        <span class="s2">&quot; --ignore-missing-bcls&quot;</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;NEBNext Direct GS Libraries&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot; --use-bases-mask Y12,I8,I8,Y75&quot;</span>
+        <span class="s2">&quot; --mask-short-adapter-reads 10&quot;</span>
+        <span class="s2">&quot; --barcode-mismatches 0&quot;</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;10x Genomic Single Cell 3&#39; v1 kit Paired-end&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot; --use-bases-mask Y98,Y14,I8,Y10&quot;</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;10x Genomic Single Cell ATAC kit Paired-end&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot; --use-bases-mask Y50,I8n*,Y16,Y49&quot;</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;Single Indexing&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot; --use-bases-mask Y\*,I6N,Y\*&quot;</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;WGS S4 flowcell&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot; --use-bases-mask=Y151,I12,Y151&quot;</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;Ovation SoLo RNA-Seq Single-end&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot; --use-base-mask=Y*,I8Y*,Y*&quot;</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;Ovation SoLo RNA-Seq Paired-end&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot; --use-base-mask=Y*,I8Y*,N*,Y*&quot;</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;ChIP-Seq&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot; --use-bases-mask=Y51,I6,Y51&quot;</span>
+    <span class="p">)</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="s2">&quot;extra_preset&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">extra</span> <span class="o">+=</span> <span class="n">extra_parameters_presets</span><span class="p">[</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;extra_preset&quot;</span><span class="p">]]</span>
 
 <span class="c1">## Input parameters</span>
 <span class="c1"># path to the sample sheet</span>
@@ -409,7 +479,7 @@ When running with</p>
 <span class="n">reserved_threads</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">max_threads</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">reserved_threads</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
-    <span class="s2">&quot;bcl_to_fastq &quot;</span>
+    <span class="s2">&quot;bcl2fastq &quot;</span>
     <span class="s2">&quot; </span><span class="si">{input_dir}</span><span class="s2"> &quot;</span>  <span class="c1"># path to input directory</span>
     <span class="s2">&quot; </span><span class="si">{intensities}</span><span class="s2"> &quot;</span>  <span class="c1"># path to intensities directory</span>
     <span class="s2">&quot; </span><span class="si">{run_dir}</span><span class="s2"> &quot;</span>  <span class="c1"># path to runfolder directory</span>
