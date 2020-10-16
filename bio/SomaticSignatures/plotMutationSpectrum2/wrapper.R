@@ -129,7 +129,7 @@ motifMatrix <- function(vr, group = "sampleNames", normalize = TRUE) {
 
     return(y)
 }
-contexts <- base::readRDS(file = base::as.character(x = snakemake@input[['calls']]))
+contexts <- base::readRDS(file = base::as.character(x = snakemake@input[['context']]))
 # contexts$alteration <- paste0(ref(contexts), alt(contexts))
 print(contexts)
 
@@ -152,8 +152,8 @@ print(command);
 
 png(
   filename = snakemake@output[["png"]],
-  width = 1024,
-  height = 768,
+  width = 2048,
+  height = 1536,
   units = "px",
   type = "cairo"
 );
