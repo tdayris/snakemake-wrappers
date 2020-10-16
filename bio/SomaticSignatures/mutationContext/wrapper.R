@@ -38,7 +38,23 @@ context <- base::eval(
   )
 );
 
-base::saveRDS(
-  object = context,
-  file = base::as.character(x = snakemake@output[["rds"]])
-);
+# Filtering empty genotypes
+context <- context[context$GT != "./.", ];
+
+# Saving results on user's demand
+if ("rds" %in% base::names(snakemake@output)) {
+  base::saveRDS(
+    object = context,
+    file = base::as.character(x = snakemake@output[["rds"]])
+  );
+}
+
+if ("tsv" %in% base::names(snakemake@output)) {
+  utils::write.table(
+    x = base::as.data.frame(context),
+    file = base::as.character(x = snakemake@output[["tsv"]]),
+    quote = FALSE,
+    sep = "\t",
+    row.names = FALSE
+  );
+}
