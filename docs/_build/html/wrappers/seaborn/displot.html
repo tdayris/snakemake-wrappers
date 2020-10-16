@@ -331,7 +331,7 @@
             <span class="s2">&quot;multiple&quot;</span><span class="p">:</span> <span class="s2">&quot;dodge&quot;</span>
         <span class="p">}</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-307-g1ea269e8/bio/seaborn/displot&quot;</span>
+        <span class="s2">&quot;0.66.0-310-g359ef626/bio/seaborn/displot&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -386,6 +386,7 @@ When running with</p>
     <span class="n">makedirs</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Directory: &#39;</span><span class="si">{</span><span class="n">outdir</span><span class="si">}</span><span class="s2">&#39; created.&quot;</span><span class="p">)</span>
 
+<span class="c1"># Load datasets</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
     <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;tsv&quot;</span><span class="p">],</span>
     <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -395,12 +396,14 @@ When running with</p>
 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 
 
+<span class="c1"># Build plot</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">displot</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
     <span class="o">**</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="p">{})</span>
 <span class="p">)</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Plot created&quot;</span><span class="p">)</span>
 
+<span class="c1"># Save figure</span>
 <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
     <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;png&quot;</span><span class="p">],</span>
     <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
