@@ -1,0 +1,15 @@
+rule test_seaborn_displot:
+    input:
+        tsv = "table.tsv"
+    output:
+        png = "displot.png"
+    log:
+        "displot.log"
+    params:
+        extra = {
+            "x": "score",
+            "hue": "Sample_id",
+            "multiple": "dodge"
+        }
+    wrapper:
+        "master/bio/seaborn/displot"
