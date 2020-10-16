@@ -31,6 +31,7 @@ if (outdir := basename(dirname(snakemake.output["png"]))) != "":
     makedirs(outdir)
     logging.debug(f"Directory: '{outdir}' created.")
 
+# Load datasets
 data = pandas.read_csv(
     snakemake.input["tsv"],
     sep="\t",
@@ -40,12 +41,14 @@ logging.debug("Dataframe:")
 logging.debug(data.head())
 
 
+# Build plot
 seaborn.displot(
     data=data,
     **snakemake.params.get("extra", {})
 )
 logging.debug("Plot created")
 
+# Save figure
 matplotlib.pyplot.savefig(
     snakemake.output["png"],
     bbox_inches="tight"
