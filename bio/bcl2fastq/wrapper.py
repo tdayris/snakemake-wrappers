@@ -14,6 +14,69 @@ log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 # extra parameters
 extra = snakemake.params.get("extra", "")
+extra_parameters_presets = {
+    # This preset of options comes from 10X genomics documentation
+    "10x single-cell": (
+        " --use-bases-mask=Y26,I8,Y98"
+        " --create-fastq-for-index-reads"
+        " --minimum-trimmed-read-length=8"
+        " --mask-short-adapter-reads=8"
+        " --ignore-missing-positions"
+        " --ignore-missing-controls"
+        " --ignore-missing-filter"
+        " --ignore-missing-bcls "
+    ),
+    # This preset of options comes from 10X genomics documentation
+    "single-cell VDJ single indexing": (
+        " --use-bases-mask=Y26,I8,Y91"
+        " --create-fastq-for-index-reads"
+        " --minimum-trimmed-read-length=8"
+        " --mask-short-adapter-reads=8"
+        " --ignore-missing-positions"
+        " --ignore-missing-controls"
+        " --ignore-missing-filter"
+        " --ignore-missing-bcls"
+    ),
+    # This preset of options comes from 10X genomics documentation
+    "single-cell VDJ dual indexing": (
+        " --use-bases-mask=Y26,I8,I8,Y91"
+        " --create-fastq-for-index-reads"
+        " --minimum-trimmed-read-length=8"
+        " --mask-short-adapter-reads=8"
+        " --ignore-missing-positions"
+        " --ignore-missing-controls"
+        " --ignore-missing-filter"
+        " --ignore-missing-bcls"
+    ),
+    "NEBNext Direct GS Libraries": (
+        " --use-bases-mask Y12,I8,I8,Y75"
+        " --mask-short-adapter-reads 10"
+        " --barcode-mismatches 0"
+    ),
+    "10x Genomic Single Cell 3' v1 kit Paired-end": (
+        " --use-bases-mask Y98,Y14,I8,Y10"
+    ),
+    "10x Genomic Single Cell ATAC kit Paired-end": (
+        " --use-bases-mask Y50,I8n*,Y16,Y49"
+    ),
+    "Single Indexing": (
+        " --use-bases-mask Y\*,I6N,Y\*"
+    ),
+    "WGS S4 flowcell": (
+        " --use-bases-mask=Y151,I12,Y151"
+    ),
+    "Ovation SoLo RNA-Seq Single-end": (
+        " --use-base-mask=Y*,I8Y*,Y*"
+    ),
+    "Ovation SoLo RNA-Seq Paired-end": (
+        " --use-base-mask=Y*,I8Y*,N*,Y*"
+    ),
+    "ChIP-Seq": (
+        " --use-bases-mask=Y51,I6,Y51"
+    )
+}
+if "extra_preset" in snakemake.params.keys():
+    extra += extra_parameters_presets[snakemake.params["extra_preset"]]
 
 ## Input parameters
 # path to the sample sheet
@@ -90,7 +153,7 @@ else:
 reserved_threads[1] += max_threads - sum(reserved_threads)
 
 shell(
-    "bcl_to_fastq "
+    "bcl2fastq "
     " {input_dir} "  # path to input directory
     " {intensities} "  # path to intensities directory
     " {run_dir} "  # path to runfolder directory
