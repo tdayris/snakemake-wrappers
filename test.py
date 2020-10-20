@@ -3150,3 +3150,10 @@ def test_eacon_oncoscan_process():
         "bio/eacon/oncoscan_process",
         ["snakemake", "--cores", "1", "REF.RDS", "--use-conda", "-F"]
     )
+
+
+def test_bioinfokit_volcanoplot():
+    run(
+        "bio/bioinfokit/volcanoplot",
+        ["snakemake", "--cores", "1", "figures/testvolcano.png", "--use-conda", "-F"]
+    )

@@ -1,0 +1,20 @@
+rule test_bioinfokit_volcanoplot:
+    input:
+        "testvolcano.csv"
+    output:
+        "figures/testvolcano.png"
+    params:
+        volcano = {
+            "lfc": 'log2FC',
+            "pv": 'p-value',
+            "geneid": "GeneNames",
+            "genenames": (
+                {"LOC_Os09g01000.1":"EP", "LOC_Os01g50030.1":"CPuORF25",
+                 "LOC_Os06g40940.3":"GDH", "LOC_Os03g03720.1":"G3PD"}
+            ),
+            "gstyle": 2,
+            "sign_line": True
+        }
+
+    wrapper:
+        "master/bio/bioinfokit/volcanoplot"
