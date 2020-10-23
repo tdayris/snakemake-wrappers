@@ -3157,3 +3157,10 @@ def test_bioinfokit_volcanoplot():
         "bio/bioinfokit/volcanoplot",
         ["snakemake", "--cores", "1", "figures/testvolcano.png", "--use-conda", "-F"]
     )
+
+
+def test_bioinfokit_maplot():
+    run(
+        "bio/bioinfokit/maplot",
+        ["snakemake", "--cores", "1", "figures/maplot.png", "--use-conda", "-F"]
+    )

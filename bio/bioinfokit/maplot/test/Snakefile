@@ -1,0 +1,16 @@
+rule test_bioinfokit_volcanoplot:
+    input:
+        "maplot_dataset.csv"
+    output:
+        "figures/maplot.png"
+    params:
+        volcano = {
+            'lfc': 'log2FC',
+            'ct_count': 'value1',
+            'st_count': 'value2',
+            'plotlegend': True,
+            'legendpos': 'lower right',
+            'legendlabels': ['Upregulated', 'Normal', 'Downregulated']
+        }
+    wrapper:
+        "master/bio/bioinfokit/maplot"
