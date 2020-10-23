@@ -32,5 +32,5 @@ visuz.gene_exp.ma(
     show=False,
     figtype=figtype,
     figname=figname,
-    **snakemake.params.get("volcano", {})
+    **snakemake.params.get("maplot", {})
 )
