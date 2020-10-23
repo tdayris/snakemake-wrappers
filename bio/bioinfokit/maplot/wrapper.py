@@ -1,4 +1,4 @@
-"""Snakemake wrapper for bioinfokit Volcanoplot"""
+"""Snakemake wrapper for bioinfokit MA-plot"""
 
 __author__ = "Thibault Dayris"
 __copyright__ = "Copyright 2020"
