@@ -3164,3 +3164,10 @@ def test_bioinfokit_maplot():
         "bio/bioinfokit/maplot",
         ["snakemake", "--cores", "1", "figures/maplot.png", "--use-conda", "-F"]
     )
+
+
+def test_bioinfokit_heatmap():
+    run(
+        "bio/bioinfokit/heatmap",
+        ["snakemake", "--cores", "1", "figures/heatmap.png", "--use-conda", "-F"]
+    )
