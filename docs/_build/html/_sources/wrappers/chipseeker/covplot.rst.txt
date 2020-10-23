@@ -1,0 +1,132 @@
+.. _`Coverage plot`:
+
+COVERAGE PLOT
+=============
+
+Build a coverage plot over the genome with ChipSeeker
+
+
+
+Software dependencies
+---------------------
+
+
+* bioconda:bioconductor-txdb.hsapiens.ucsc.hg19.knowngene=3.2.2
+
+* bioconda:bioconductor-txdb.hsapiens.ucsc.hg38.knowngene=3.10.0
+
+* bioconda:bioconductor-txdb.mmusculus.ucsc.mm10.knowngene=3.10.0
+
+* bioconda:bioconductor-txdb.mmusculus.ucsc.mm9.knowngene=3.2.2
+
+* bioconda:bioconductor-chipseeker=1.24.0
+
+* bioconda:bioconductor-clusterprofiler=3.16.0
+
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_chipseeker_covplot:
+        input:
+            rds = "bampe.narrowPeak.RDS"
+        output:
+            png = "covplot.png"
+        params:
+            extra = "weightCol='V5'"
+        wrapper:
+            "0.66.0-319-gadd5ddc7/bio/chipseeker/covplot"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Notes
+-----
+
+notes
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script loads peaks into R with ChipSeeker
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+
+    # Load libraries
+    base::library(package = "ChIPseeker", quietly = TRUE);
+
+    # Read peaks
+    tagMatrixList <- base::readRDS(
+      file = base::as.character(x = snakemake@input[["rds"]])
+    );
+    base::message("Dataset loaded");
+
+    extra <- "peak = tagMatrixList";
+    if ("extra" %in% base::names(snakemake@params)) {
+      extra <- base::paste(
+        extra,
+        snakemake@params[["extra"]],
+        sep = ", "
+      );
+    }
+
+    # Create R command line
+    command <- base::eval(
+      base::parse(
+        text = base::paste0(
+          "ChIPseeker::covplot(", extra, ")"
+        )
+      )
+    );
+
+
+    # Build plot
+    png(
+      filename = snakemake@output[["png"]],
+      width = 1024,
+      height = 768,
+      units = "px",
+      type = "cairo"
+    );
+
+    base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+    dev.off();
