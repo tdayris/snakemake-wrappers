@@ -3178,3 +3178,10 @@ def test_bioinfokit_manhattan():
         "bio/bioinfokit/manhattanplot",
         ["snakemake", "--cores", "1", "figures/manhattan.png", "--use-conda", "-F"]
     )
+
+
+def test_chipseeker_getTagMatrix():
+    run(
+        "bio/chipseeker/tagMatrixList",
+        ["snakemake", "--cores", "1", "bampe.narrowPeak.RDS", "--use-conda", "-F"]
+    )
