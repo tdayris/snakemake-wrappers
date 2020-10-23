@@ -1,0 +1,10 @@
+rule test_bioinfokit_manhattan:
+    input:
+        "gwas_res_sim.csv"
+    output:
+        "figures/manhattan.png"
+    params:
+        manhattan = {"chr": "chr", "pv": "pvalue", "gwas_sign_line": True,
+                     "gwasp": 5E-06, "markernames": True, "markeridcol": 'SNP'}
+    wrapper:
+        "master/bio/bioinfokit/manhattanplot"
