@@ -3185,3 +3185,10 @@ def test_chipseeker_getTagMatrix():
         "bio/chipseeker/tagMatrixList",
         ["snakemake", "--cores", "1", "bampe.narrowPeak.RDS", "--use-conda", "-F"]
     )
+
+
+def test_chipseeker_covplot():
+    run(
+        "bio/chipseeker/covplot",
+        ["snakemake", "--cores", "1", "covplot.png", "--use-conda", "-F"]
+    )
