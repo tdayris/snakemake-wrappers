@@ -6,18 +6,6 @@ FASTQ_SCREEN_INDEXER
 Build indexes and congif file for FastQ Screen
 
 
-
-Used wrappers
----------------------
-
-
-* bio/reference/ensembl-sequence
-
-* bio/bowtie2/build
-
-
-
-
 Example
 -------
 
@@ -43,7 +31,7 @@ This meta-wrapper can be used in the following way:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.66.0-321-g890d65f7/bio/reference/ensembl-sequence"
+            "0.67.0-335-ga139be0c/bio/reference/ensembl-sequence"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -54,6 +42,19 @@ When running with
     snakemake --use-conda
 
 the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Used wrappers
+---------------------
+
+
+* ``bio/reference/ensembl-sequence``
+
+* ``bio/bowtie2/build``
+
+
+
 
 
 
@@ -70,7 +71,7 @@ Code
 ----
 
 
-* bio/reference/ensembl-sequence
+* ``bio/reference/ensembl-sequence``
 
 .. code-block:: python
 
@@ -156,46 +157,24 @@ Code
 
 
 
-* bio/bowtie2/build
+* ``bio/bowtie2/build``
 
 .. code-block:: python
 
-    """Snakemake wrapper for bowtie2 build"""
-
-    __author__ = "Thibault Dayris"
-    __copyright__ = "Copyright 2020"
-    __email__ = "koester@jimmy.harvard.edu"
+    __author__ = "Daniel Standage"
+    __copyright__ = "Copyright 2020, Daniel Standage"
+    __email__ = "daniel.standage@nbacc.dhs.gov"
     __license__ = "MIT"
 
 
     from snakemake.shell import shell
-    from os.path import splitext
 
     extra = snakemake.params.get("extra", "")
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    input = ""
-    if "fasta" in snakemake.input.keys():
-        input = "-f {}".format(snakemake.input["fasta"])
-    elif "fasta" in snakemake.params.keys():
-        input = "-c {}".format(snakemake.params["fasta"])
-    else:
-        raise ValueError(
-            "Input sequence could not be found."
-        )
-
-    prefix = "bwt2_index"
-    if "prefix" in snakemake.params.keys():
-        prefix = snakemake.params["prefix"]
-
-
+    indexbase = snakemake.output[0].replace(".1.bt2", "")
     shell(
-        " bowtie2-build "
-        " {input} "
-        " {prefix} "
-        " --threads {snakemake.threads} "
-        " {extra} "
-        " {log} "
+        "bowtie2-build --threads {snakemake.threads} {snakemake.params.extra} "
+        "{snakemake.input.reference} {indexbase}"
     )
 
 

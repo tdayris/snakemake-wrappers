@@ -7,20 +7,6 @@ Generate summary graphical HTML report from several Bismark text report files re
 
 
 
-
-Software dependencies
----------------------
-
-
-* bowtie2 == 2.3.4.3
-
-* bismark == 0.22.1
-
-* samtools == 1.9
-
-
-
-
 Example
 -------
 
@@ -60,7 +46,7 @@ This wrapper can be used in the following way:
         log:
             "logs/qc/{experiment}.bismark2summary.log"
         wrapper:
-            "0.66.0-321-g890d65f7/bio/bismark/bismark2summary"
+            "0.67.0-335-ga139be0c/bio/bismark/bismark2summary"
 
     rule bismark2summary_prepare_symlinks:
         input:
@@ -91,15 +77,31 @@ When running with
 
 the software dependencies will be automatically deployed into an isolated environment before execution.
 
+Software dependencies
+---------------------
+
+* ``bowtie2==2.3.4.3``
+* ``bismark==0.22.1``
+* ``samtools==1.9``
+
+Input/Output
+------------
+**Input:**
+
+* ``bam``: One or several (space separated) BAM file paths (aligned bam files with bismark reports in same folder). Also, it is recommended to add dependencies for all required reports using rules order or specifing them in input section using any other keys. E.g. deduplicaton report could be missing if rule only depends on aligned bam file. If you add dependency on deduplicated bam file bismark2report will fail because it expects input files to be initial aligned files with aligning report in same directory.
+
+**Output:**
+
+* ``html``: Output HTML report path (e.g. 'bismark_summary_report.html').
+* ``txt``: Output txt table path (e.g. 'bismark_summary_report.txt'). Should have same as 'html' report but with suffix '.txt'.
+
 
 
 
 Authors
 -------
 
-
 * Roman Cherniatchik
-
 
 
 Code

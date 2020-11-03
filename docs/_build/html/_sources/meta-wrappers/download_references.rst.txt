@@ -6,24 +6,6 @@ DOWNLOAD REFERENCE
 Download sequence and annotations from Ensembl
 
 
-
-Used wrappers
----------------------
-
-
-* bio/reference/ensembl-sequence
-
-* bio/reference/ensembl-annotation
-
-* bio/reference/ensembl-variation
-
-* bio/samtools/faidx
-
-* bio/picard/createsequencedictionary
-
-
-
-
 Example
 -------
 
@@ -76,7 +58,7 @@ This meta-wrapper can be used in the following way:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.66.0-321-g890d65f7/bio/reference/ensembl-sequence"
+            "0.67.0-335-ga139be0c/bio/reference/ensembl-sequence"
 
 
     rule get_annotation:
@@ -92,7 +74,7 @@ This meta-wrapper can be used in the following way:
             "logs/get_annotation/{build}.{release}.{organism}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.66.0-321-g890d65f7/bio/reference/ensembl-annotation"
+            "0.67.0-335-ga139be0c/bio/reference/ensembl-annotation"
 
 
     rule samtools_faidx_reference:
@@ -105,7 +87,7 @@ This meta-wrapper can be used in the following way:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.66.0-321-g890d65f7/bio/samtools/faidx"
+            "0.67.0-335-ga139be0c/bio/samtools/faidx"
 
 
     rule create_dict:
@@ -120,7 +102,7 @@ This meta-wrapper can be used in the following way:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.66.0-321-g890d65f7/bio/picard/createsequencedictionary"
+            "0.67.0-335-ga139be0c/bio/picard/createsequencedictionary"
 
 
     rule get_variation_with_contig_lengths:
@@ -136,7 +118,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/get_variation/{build}.{release}.{organism}.log"
         wrapper:
-            "0.66.0-321-g890d65f7/bio/reference/ensembl-variation"
+            "0.67.0-335-ga139be0c/bio/reference/ensembl-variation"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -147,6 +129,25 @@ When running with
     snakemake --use-conda
 
 the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Used wrappers
+---------------------
+
+
+* ``bio/reference/ensembl-sequence``
+
+* ``bio/reference/ensembl-annotation``
+
+* ``bio/reference/ensembl-variation``
+
+* ``bio/samtools/faidx``
+
+* ``bio/picard/createsequencedictionary``
+
+
+
 
 
 
@@ -172,7 +173,7 @@ Code
 ----
 
 
-* bio/reference/ensembl-sequence
+* ``bio/reference/ensembl-sequence``
 
 .. code-block:: python
 
@@ -258,7 +259,7 @@ Code
 
 
 
-* bio/reference/ensembl-annotation
+* ``bio/reference/ensembl-annotation``
 
 .. code-block:: python
 
@@ -319,7 +320,7 @@ Code
 
 
 
-* bio/reference/ensembl-variation
+* ``bio/reference/ensembl-variation``
 
 .. code-block:: python
 
@@ -415,7 +416,7 @@ Code
 
 
 
-* bio/samtools/faidx
+* ``bio/samtools/faidx``
 
 .. code-block:: python
 
@@ -433,7 +434,7 @@ Code
 
 
 
-* bio/picard/createsequencedictionary
+* ``bio/picard/createsequencedictionary``
 
 .. code-block:: python
 

@@ -1,0 +1,158 @@
+.. _`dada2_dereplicate_fastq`:
+
+DADA2_DEREPLICATE_FASTQ
+=======================
+
+`DADA2 <https://benjjneb.github.io/dada2/index.html>`_
+Dereplication of FASTQ files using dada2 derepFastq function. Optional parameters are documented in the `manual <https://www.bioconductor.org/packages/release/bioc/manuals/dada2/man/dada2.pdf>`_.
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule dada2_dereplicate_fastq:
+        input:
+        # Quality filtered FASTQ file
+            "filtered/{fastq}.fastq"
+        output:
+        # Dereplicated sequences stored as `derep-class` object in a RDS file 
+            "uniques/{fastq}.RDS"
+        log:
+            "logs/dada2/dereplicate-fastq/{fastq}.log"
+        wrapper:
+            "0.67.0-335-ga139be0c/bio/dada2/dereplicate-fastq"
+
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconductor-dada2==1.16``
+
+Input/Output
+------------
+**Input:**
+
+* a
+*  
+* F
+* A
+* S
+* T
+* Q
+*  
+* f
+* i
+* l
+* e
+
+**Output:**
+
+* R
+* D
+* S
+*  
+* f
+* i
+* l
+* e
+*  
+* c
+* o
+* n
+* t
+* a
+* i
+* n
+* i
+* n
+* g
+*  
+* a
+*  
+* `
+* d
+* e
+* r
+* e
+* p
+* -
+* c
+* l
+* a
+* s
+* s
+* `
+*  
+* o
+* b
+* j
+* e
+* c
+* t
+
+
+
+
+Authors
+-------
+
+* Charlie Pauvert
+
+
+Code
+----
+
+.. code-block:: R
+
+    # __author__ = "Charlie Pauvert"
+    # __copyright__ = "Copyright 2020, Charlie Pauvert"
+    # __email__ = "cpauvert@protonmail.com"
+    # __license__ = "MIT"
+
+    # Snakemake wrapper for dereplicating FASTQ files using dada2 derepFastq function.
+
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt")
+    sink(log.file)
+    sink(log.file,type="message")
+
+    library(dada2)
+
+    # Prepare arguments (no matter the order)
+    args<-list( fls = unlist(snakemake@input))
+    # Check if extra params are passed
+    if(length(snakemake@params) > 0 ){
+           # Keeping only the named elements of the list for do.call()
+           extra<-snakemake@params[ names(snakemake@params) != "" ]
+           # Add them to the list of arguments
+           args<-c(args, extra)
+    } else{
+        message("No optional parameters. Using default parameters from dada2::derepFastq()")
+    }
+    # Dereplicate
+    uniques<-do.call(derepFastq, args)
+
+    # Store as RDS file
+    saveRDS(uniques,snakemake@output[[1]])
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    sink(type="message")
+    sink()
+

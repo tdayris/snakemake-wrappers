@@ -1,19 +1,9 @@
-.. _`Bowtie2 build`:
+.. _`bowtie2_build`:
 
-BOWTIE2 BUILD
+BOWTIE2_BUILD
 =============
 
-Index genomes with Bowtie2-build
-
-
-
-Software dependencies
----------------------
-
-
-* bowtie2=2.4.1
-
-
+Map reads with bowtie2.
 
 
 Example
@@ -23,18 +13,21 @@ This wrapper can be used in the following way:
 
 .. code-block:: python
 
-    rule test_bowtie2_build:
+    rule bowtie2_build:
         input:
-            fasta = "genome.fasta"
+            reference="genome.fasta"
         output:
-            "bwt2_index/genome.1.bt2"
+            multiext(
+                "genome",
+                ".1.bt2", ".2.bt2", ".3.bt2", ".4.bt2", ".rev.1.bt2", ".rev.2.bt2",
+            ),
+        log:
+            "logs/bowtie2_build/build.log"
         params:
-            # The following parameter is optional:
-            # if a path to one of the files created in index is provided,
-            # then the wrapper can guess the prefix itself.
-            prefix = "bwt2_index/genome"
+            extra=""  # optional parameters
+        threads: 8
         wrapper:
-            "0.66.0-321-g890d65f7/bio/bowtie2/build"
+            "0.67.0-335-ga139be0c/bio/bowtie2/build"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -46,12 +39,11 @@ When running with
 
 the software dependencies will be automatically deployed into an isolated environment before execution.
 
+Software dependencies
+---------------------
 
-
-Notes
------
-
-If sequence are not provided as a fasta-formatted file, then they shall be given as parameters.
+* ``bowtie2==2.4.1``
+* ``samtools==1.10``
 
 
 
@@ -59,9 +51,7 @@ If sequence are not provided as a fasta-formatted file, then they shall be given
 Authors
 -------
 
-
-* Thibault Dayris
-
+* Daniel Standage
 
 
 Code
@@ -69,40 +59,18 @@ Code
 
 .. code-block:: python
 
-    """Snakemake wrapper for bowtie2 build"""
-
-    __author__ = "Thibault Dayris"
-    __copyright__ = "Copyright 2020"
-    __email__ = "koester@jimmy.harvard.edu"
+    __author__ = "Daniel Standage"
+    __copyright__ = "Copyright 2020, Daniel Standage"
+    __email__ = "daniel.standage@nbacc.dhs.gov"
     __license__ = "MIT"
 
 
     from snakemake.shell import shell
-    from os.path import splitext
 
     extra = snakemake.params.get("extra", "")
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-
-    input = ""
-    if "fasta" in snakemake.input.keys():
-        input = "-f {}".format(snakemake.input["fasta"])
-    elif "fasta" in snakemake.params.keys():
-        input = "-c {}".format(snakemake.params["fasta"])
-    else:
-        raise ValueError(
-            "Input sequence could not be found."
-        )
-
-    prefix = "bwt2_index"
-    if "prefix" in snakemake.params.keys():
-        prefix = snakemake.params["prefix"]
-
-
+    indexbase = snakemake.output[0].replace(".1.bt2", "")
     shell(
-        " bowtie2-build "
-        " {input} "
-        " {prefix} "
-        " --threads {snakemake.threads} "
-        " {extra} "
-        " {log} "
+        "bowtie2-build --threads {snakemake.threads} {snakemake.params.extra} "
+        "{snakemake.input.reference} {indexbase}"
     )

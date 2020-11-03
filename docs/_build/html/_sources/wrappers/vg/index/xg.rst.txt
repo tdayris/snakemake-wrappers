@@ -1,0 +1,70 @@
+.. _`vg index xg`:
+
+VG INDEX XG
+===========
+
+Create an xg index on variation graphs.
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule xg:
+        input:
+            vgs="x.vg"
+        output:
+            xg="index/x.xg"
+        log:
+            "logs/vg/index/xg/x.log"
+        threads:
+            4
+        wrapper:
+            "0.67.0-335-ga139be0c/bio/vg/index/xg"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``vg==1.27.0``
+
+
+
+
+Authors
+-------
+
+* Ali Ghaffaari
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Ali Ghaffaari"
+    __copyright__ = "Copyright 2017, Ali Ghaffaari"
+    __email__ = "ghaffari@mpi-inf.mpg.de"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell()
+
+    shell(
+        "(vg index --xg-name {snakemake.output.xg} --threads {snakemake.threads}"
+        " {snakemake.params} {snakemake.input.vgs}) {log}"
+    )

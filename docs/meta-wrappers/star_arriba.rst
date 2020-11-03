@@ -7,20 +7,6 @@ A subworkflow for fusion detection from RNA-seq data with ``arriba``. The fusion
 
 
 
-
-Used wrappers
----------------------
-
-
-* bio/star/index
-
-* bio/star/align
-
-* bio/arriba
-
-
-
-
 Example
 -------
 
@@ -41,7 +27,7 @@ This meta-wrapper can be used in the following way:
             "logs/star_index_genome.log"
         cache: True
         wrapper:
-            "0.66.0-321-g890d65f7/bio/star/index"
+            "0.67.0-335-ga139be0c/bio/star/index"
 
     rule star_align:
         input:
@@ -66,7 +52,7 @@ This meta-wrapper can be used in the following way:
                 " --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"
         threads: 12
         wrapper:
-            "0.66.0-321-g890d65f7/bio/star/align"
+            "0.67.0-335-ga139be0c/bio/star/align"
 
     rule arriba:
         input:
@@ -84,7 +70,7 @@ This meta-wrapper can be used in the following way:
             "logs/arriba/{sample}.log"
         threads: 1
         wrapper:
-            "0.66.0-321-g890d65f7/bio/arriba"
+            "0.67.0-335-ga139be0c/bio/arriba"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -95,6 +81,21 @@ When running with
     snakemake --use-conda
 
 the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Used wrappers
+---------------------
+
+
+* ``bio/star/index``
+
+* ``bio/star/align``
+
+* ``bio/arriba``
+
+
+
 
 
 
@@ -111,7 +112,7 @@ Code
 ----
 
 
-* bio/star/index
+* ``bio/star/index``
 
 .. code-block:: python
 
@@ -154,7 +155,7 @@ Code
 
 
 
-* bio/star/align
+* ``bio/star/align``
 
 .. code-block:: python
 
@@ -213,7 +214,7 @@ Code
 
 
 
-* bio/arriba
+* ``bio/arriba``
 
 .. code-block:: python
 

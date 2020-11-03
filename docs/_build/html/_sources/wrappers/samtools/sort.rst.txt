@@ -3,17 +3,7 @@
 SAMTOOLS SORT
 =============
 
-Sort bam file with samtools.
-
-
-
-Software dependencies
----------------------
-
-
-* samtools ==1.10
-
-
+Sort bam file with samtools. For more information see `SAMtools documentation <http://www.htslib.org/doc/samtools-sort.html>`_.
 
 
 Example
@@ -29,11 +19,12 @@ This wrapper can be used in the following way:
         output:
             "mapped/{sample}.sorted.bam"
         params:
-            "-m 4G"
+            extra = "-m 4G",
+            tmp_dir = "/tmp/"
         threads:  # Samtools takes additional threads through its option -@
             8     # This value - 1 will be sent to -@.
         wrapper:
-            "0.66.0-321-g890d65f7/bio/samtools/sort"
+            "0.67.0-335-ga139be0c/bio/samtools/sort"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -45,6 +36,11 @@ When running with
 
 the software dependencies will be automatically deployed into an isolated environment before execution.
 
+Software dependencies
+---------------------
+
+* ``samtools==1.10``
+
 
 
 Notes
@@ -54,13 +50,10 @@ Notes
 
 
 
-
 Authors
 -------
 
-
 * Johannes Köster
-
 
 
 Code
@@ -78,7 +71,13 @@ Code
     from snakemake.shell import shell
 
 
-    prefix = os.path.splitext(snakemake.output[0])[0]
+    out_name, out_ext = os.path.splitext(snakemake.output[0])
+
+    tmp_dir = snakemake.params.get("tmp_dir", "")
+    if tmp_dir:
+        prefix = os.path.join(tmp_dir, os.path.basename(out_name))
+    else:
+        prefix = out_name
 
     # Samtools takes additional threads through its option -@
     # One thread for samtools
@@ -91,6 +90,6 @@ Code
         extra += " -m {}M".format(int(snakemake.resources["mem_mb"] / snakemake.threads))
 
     shell(
-        "samtools sort {extra} {threads} -o {snakemake.output[0]} "
+        "samtools sort {snakemake.params.extra} {threads} -o {snakemake.output[0]} "
         "-T {prefix} {snakemake.input[0]}"
     )

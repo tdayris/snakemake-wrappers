@@ -6,18 +6,6 @@ BWA_MAPPING
 Map reads with bwa-mem and index with samtools index - this is just a test for subworkflows
 
 
-
-Used wrappers
----------------------
-
-
-* bio/bwa/mem
-
-* bio/samtools/index
-
-
-
-
 Example
 -------
 
@@ -40,7 +28,7 @@ This meta-wrapper can be used in the following way:
             sort_extra=""            # Extra args for samtools/picard.
         threads: 8
         wrapper:
-            "0.66.0-321-g890d65f7/bio/bwa/mem"
+            "0.67.0-335-ga139be0c/bio/bwa/mem"
 
     rule samtools_index:
         input:
@@ -50,7 +38,7 @@ This meta-wrapper can be used in the following way:
         params:
             "" # optional params string
         wrapper:
-            "0.66.0-321-g890d65f7/bio/samtools/index"
+            "0.67.0-335-ga139be0c/bio/samtools/index"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -61,6 +49,19 @@ When running with
     snakemake --use-conda
 
 the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Used wrappers
+---------------------
+
+
+* ``bio/bwa/mem``
+
+* ``bio/samtools/index``
+
+
+
 
 
 
@@ -77,7 +78,7 @@ Code
 ----
 
 
-* bio/bwa/mem
+* ``bio/bwa/mem``
 
 .. code-block:: python
 
@@ -152,7 +153,7 @@ Code
 
 
 
-* bio/samtools/index
+* ``bio/samtools/index``
 
 .. code-block:: python
 

@@ -111,8 +111,9 @@
 <li class="toctree-l2"><a class="reference internal" href="bismark2bedGraph.html">BISMARK2BEDGRAPH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bismark2report.html">BISMARK2REPORT</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">BISMARK2SUMMARY</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
 </ul>
@@ -135,6 +136,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cpat.html">CPAT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dada2.html">DADA2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
@@ -170,6 +172,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../last.html">LAST</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lofreq.html">LOFREQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../macs2.html">MACS2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mapdamage2.html">MAPDAMAGE2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
@@ -224,6 +227,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../vembrane.html">VEMBRANE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../vep.html">VEP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vg.html">VG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wgsim.html">WGSIM</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Meta-Wrappers</span></p>
 <ul>
@@ -301,14 +306,6 @@
   <div class="section" id="bismark2summary">
 <span id="id1"></span><h1>BISMARK2SUMMARY<a class="headerlink" href="#bismark2summary" title="Permalink to this headline">¶</a></h1>
 <p>Generate summary graphical HTML report from several Bismark text report files reports (see <a class="reference external" href="https://github.com/FelixKrueger/Bismark/blob/master/bismark2summary">https://github.com/FelixKrueger/Bismark/blob/master/bismark2summary</a>).</p>
-<div class="section" id="software-dependencies">
-<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>bowtie2 == 2.3.4.3</p></li>
-<li><p>bismark == 0.22.1</p></li>
-<li><p>samtools == 1.9</p></li>
-</ul>
-</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -344,7 +341,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/qc/</span><span class="si">{experiment}</span><span class="s2">.bismark2summary.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-321-g890d65f7/bio/bismark/bismark2summary&quot;</span>
+        <span class="s2">&quot;0.67.0-335-ga139be0c/bio/bismark/bismark2summary&quot;</span>
 
 <span class="n">rule</span> <span class="n">bismark2summary_prepare_symlinks</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
@@ -372,6 +369,26 @@ When running with</p>
 </pre></div>
 </div>
 <p>the software dependencies will be automatically deployed into an isolated environment before execution.</p>
+</div>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">bowtie2==2.3.4.3</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bismark==0.22.1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">samtools==1.9</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">bam</span></code>: One or several (space separated) BAM file paths (aligned bam files with bismark reports in same folder). Also, it is recommended to add dependencies for all required reports using rules order or specifing them in input section using any other keys. E.g. deduplicaton report could be missing if rule only depends on aligned bam file. If you add dependency on deduplicated bam file bismark2report will fail because it expects input files to be initial aligned files with aligning report in same directory.</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">html</span></code>: Output HTML report path (e.g. ‘bismark_summary_report.html’).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">txt</span></code>: Output txt table path (e.g. ‘bismark_summary_report.txt’). Should have same as ‘html’ report but with suffix ‘.txt’.</p></li>
+</ul>
 </div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>

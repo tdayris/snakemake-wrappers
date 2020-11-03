@@ -1,0 +1,118 @@
+.. _`dada2_assign_taxonomy`:
+
+DADA2_ASSIGN_TAXONOMY
+=====================
+
+`DADA2 <https://benjjneb.github.io/dada2/index.html>`_
+Classifying sequences against a reference database using dada2 assignTaxonomy function. Optional parameters are documented in the `manual <https://www.bioconductor.org/packages/release/bioc/manuals/dada2/man/dada2.pdf>`_.
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule dada2_assign_taxonomy:
+        input:
+            seqs="results/dada2/seqTab.nochim.RDS", # Chimera-free sequence table
+            refFasta="resources/example_train_set.fa.gz" # Reference FASTA for taxonomy
+        # Even though this is an R wrapper, use named arguments in Python syntax
+        # here, to specify extra parameters. Python booleans (`arg1=True`, `arg2=False`)
+        # and lists (`list_arg=[]`) are automatically converted to R.
+        # For a named list as an extra named argument, use a python dict
+        #   (`named_list={name1=arg1}`).
+        params:
+            verbose=True
+        output:
+            "results/dada2/taxa.RDS" # Taxonomic assignments
+        log:
+            "logs/dada2/assign-taxonomy/assign-taxonomy.log"
+        threads: 1 # set desired number of threads here
+        wrapper:
+            "0.67.0-335-ga139be0c/bio/dada2/assign-taxonomy"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconductor-dada2==1.16``
+
+Input/Output
+------------
+**Input:**
+
+* ``seqs``: RDS file with the chimera-free sequence table
+* ``refFasta``: A string with the path to the FASTA reference database
+
+**Output:**
+
+* RDS file containing the taxonomic assignments
+
+
+
+
+Authors
+-------
+
+* Charlie Pauvert
+
+
+Code
+----
+
+.. code-block:: R
+
+    # __author__ = "Charlie Pauvert"
+    # __copyright__ = "Copyright 2020, Charlie Pauvert"
+    # __email__ = "cpauvert@protonmail.com"
+    # __license__ = "MIT"
+
+    # Snakemake wrapper for classifying sequences against 
+    # a reference database using dada2 assignTaxonomy function.
+
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt")
+    sink(log.file)
+    sink(log.file,type="message")
+
+    library(dada2)
+
+    # Prepare arguments (no matter the order)
+    args<-list(
+               seqs = readRDS(snakemake@input[["seqs"]]),
+               refFasta = snakemake@input[["refFasta"]],
+               multithread=snakemake@threads
+               )
+    # Check if extra params are passed
+    if(length(snakemake@params) > 0 ){
+           # Keeping only the named elements of the list for do.call()
+           extra<-snakemake@params[ names(snakemake@params) != "" ]
+           # Add them to the list of arguments
+           args<-c(args, extra)
+    } else{
+        message("No optional parameters. Using default parameters from dada2::assignTaxonomy()")
+    }
+
+    # Learn errors rates for both read types
+    taxa<-do.call(assignTaxonomy, args)
+
+    # Store the taxonomic assignments as a RDS file
+    saveRDS(taxa, snakemake@output[[1]],compress = T)
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    sink(type="message")
+    sink()

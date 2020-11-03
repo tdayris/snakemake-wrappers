@@ -119,10 +119,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cpat.html">CPAT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dada2.html">DADA2</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">BAMCOVERAGE</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
@@ -170,6 +172,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../last.html">LAST</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lofreq.html">LOFREQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../macs2.html">MACS2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mapdamage2.html">MAPDAMAGE2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
@@ -224,6 +227,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../vembrane.html">VEMBRANE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../vep.html">VEP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vg.html">VG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wgsim.html">WGSIM</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Meta-Wrappers</span></p>
 <ul>
@@ -301,12 +306,6 @@
   <div class="section" id="bamcoverage">
 <span id="id1"></span><h1>BAMCOVERAGE<a class="headerlink" href="#bamcoverage" title="Permalink to this headline">¶</a></h1>
 <p>Generate a coverage track from alignment of reads or fragments</p>
-<div class="section" id="software-dependencies">
-<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>bioconda:deeptools=3.4.3</p></li>
-</ul>
-</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -329,7 +328,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_deeptools_bamcoverage.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-321-g890d65f7/bio/deeptools/bamcoverage&quot;</span>
+        <span class="s2">&quot;0.67.0-335-ga139be0c/bio/deeptools/bamcoverage&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">test_deeptools_bamcoverage_regions</span><span class="p">:</span>
@@ -351,7 +350,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_deeptools_bamcoverage_</span><span class="si">{regions}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-321-g890d65f7/bio/deeptools/bamcoverage&quot;</span>
+        <span class="s2">&quot;0.67.0-335-ga139be0c/bio/deeptools/bamcoverage&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -360,6 +359,24 @@ When running with</p>
 </pre></div>
 </div>
 <p>the software dependencies will be automatically deployed into an isolated environment before execution.</p>
+</div>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:deeptools=3.4.3</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>BAM formatted alignment file</p></li>
+<li><p>Optional black list file</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>Coverage track (bigWig or bedGraph)</p></li>
+</ul>
 </div>
 <div class="section" id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>

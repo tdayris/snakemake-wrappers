@@ -6,16 +6,6 @@ FASTP
 trim and QC fastq reads with fastp
 
 
-
-Software dependencies
----------------------
-
-
-* fastp ==0.20.0
-
-
-
-
 Example
 -------
 
@@ -33,10 +23,11 @@ This wrapper can be used in the following way:
         log:
             "logs/fastp/se/{sample}.log"
         params:
+            adapters="--adapter_sequence ACGGCTAGCTA",
             extra=""
         threads: 1
         wrapper:
-            "0.66.0-321-g890d65f7/bio/fastp"
+            "0.67.0-335-ga139be0c/bio/fastp"
 
 
     rule fastp_pe:
@@ -49,10 +40,11 @@ This wrapper can be used in the following way:
         log:
             "logs/fastp/pe/{sample}.log"
         params:
+            adapters="--adapter_sequence ACGGCTAGCTA --adapter_sequence_r2 AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC",
             extra=""
         threads: 2
         wrapper:
-            "0.66.0-321-g890d65f7/bio/fastp"
+            "0.67.0-335-ga139be0c/bio/fastp"
 
     rule fastp_pe_wo_trimming:
         input:
@@ -66,7 +58,7 @@ This wrapper can be used in the following way:
             extra=""
         threads: 2
         wrapper:
-            "0.66.0-321-g890d65f7/bio/fastp"
+            "0.67.0-335-ga139be0c/bio/fastp"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -78,15 +70,18 @@ When running with
 
 the software dependencies will be automatically deployed into an isolated environment before execution.
 
+Software dependencies
+---------------------
+
+* ``fastp==0.20.0``
+
 
 
 
 Authors
 -------
 
-
 * Sebastian Kurscheid (sebastian.kurscheid@anu.edu.au)
-
 
 
 Code
@@ -102,6 +97,7 @@ Code
     from snakemake.shell import shell
 
     extra = snakemake.params.get("extra", "")
+    adapters = snakemake.params.get("adapters", "")
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
     n = len(snakemake.input.sample)
@@ -127,7 +123,9 @@ Code
     json = "--json {}".format(snakemake.output.json)
 
     shell(
-        "(fastp --thread {snakemake.threads} {snakemake.params.extra} "
+        "(fastp --thread {snakemake.threads} "
+        "{extra} "
+        "{adapters} "
         "{reads} "
         "{trimmed} "
         "{json} "

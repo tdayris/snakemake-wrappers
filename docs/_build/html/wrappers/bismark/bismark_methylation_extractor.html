@@ -113,8 +113,9 @@
 <li class="toctree-l2"><a class="reference internal" href="bismark2summary.html">BISMARK2SUMMARY</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bismark_genome_preparation.html">BISMARK_GENOME_PREPARATION</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">BISMARK_METHYLATION_EXTRACTOR</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
 </ul>
@@ -135,6 +136,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cpat.html">CPAT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dada2.html">DADA2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../delly.html">DELLY</a></li>
@@ -170,6 +172,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../last.html">LAST</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lofreq.html">LOFREQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../macs2.html">MACS2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mapdamage2.html">MAPDAMAGE2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
@@ -224,6 +227,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../vembrane.html">VEMBRANE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../vep.html">VEP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vg.html">VG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wgsim.html">WGSIM</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Meta-Wrappers</span></p>
 <ul>
@@ -301,15 +306,6 @@
   <div class="section" id="bismark-methylation-extractor">
 <span id="id1"></span><h1>BISMARK_METHYLATION_EXTRACTOR<a class="headerlink" href="#bismark-methylation-extractor" title="Permalink to this headline">¶</a></h1>
 <p>Call methylation counts from Bismark alignment results (see <a class="reference external" href="https://github.com/FelixKrueger/Bismark/blob/master/bismark_methylation_extractor">https://github.com/FelixKrueger/Bismark/blob/master/bismark_methylation_extractor</a>).</p>
-<div class="section" id="software-dependencies">
-<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>bowtie2 == 2.3.4.3</p></li>
-<li><p>bismark == 0.22.1</p></li>
-<li><p>samtools == 1.9</p></li>
-<li><p>perl-gdgraph == 1.54</p></li>
-</ul>
-</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -339,7 +335,7 @@
         <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;meth&quot;</span><span class="p">,</span>  <span class="c1"># optional output dir</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--gzip --comprehensive --bedGraph&quot;</span>  <span class="c1"># optional params string</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-321-g890d65f7/bio/bismark/bismark_methylation_extractor&quot;</span>
+        <span class="s2">&quot;0.67.0-335-ga139be0c/bio/bismark/bismark_methylation_extractor&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -348,6 +344,35 @@ When running with</p>
 </pre></div>
 </div>
 <p>the software dependencies will be automatically deployed into an isolated environment before execution.</p>
+</div>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">bowtie2==2.3.4.3</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bismark==0.22.1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">samtools==1.9</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">perl-gdgraph==1.54</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>Input BAM file aligned by Bismark</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>Depends on bismark options passed to <cite>params.extra</cite>, optional for this wrapper</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mbias_report</span></code>: M-bias report, *.M-bias.txt (if key is provided, the out file will be renamed to this name)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mbias_r1</span></code>: M-Bias plot for R1, *.M-bias_R1.png (if key is provided, the out file will be renamed to this name)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mbias_r2</span></code>: M-Bias plot for R2, *.M-bias_R2.png (if key is provided, the out file will be renamed to this name)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">splitting_report</span></code>: Splitting report, *_splitting_report.txt (if key is provided, the out file will be renamed to this name)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">methylome_CpG_cov</span></code>: Bismark coverage file for CpG context, *.bismark.cov.gz (if key is provided, the out file will be renamed to this name)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">methylome_CpG_mlevel_bedGraph</span></code>: Bismark methylation level track, *.bedGraph.gz</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">read_base_meth_state_cpg</span></code>: Per read CpG base methylation info, <a href="#id2"><span class="problematic" id="id3">CpG_context_</span></a>*.txt.gz  (if key is provided, the out file will be renamed to this name)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">read_base_meth_state_chg</span></code>: Per read CpG base methylation info, <a href="#id4"><span class="problematic" id="id5">CHG_context_</span></a>*.txt.gz  (if key is provided, the out file will be renamed to this name)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">read_base_meth_state_chh</span></code>: Per read CpG base methylation info, <a href="#id6"><span class="problematic" id="id7">CHH_context_</span></a>*.txt.gz  (if key is provided, the out file will be renamed to this name)</p></li>
+</ul>
 </div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>

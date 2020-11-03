@@ -40,7 +40,7 @@
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="SAMTOOLS DEPTH" href="../depth.html" />
+    <link rel="next" title="SAMTOOLS CALMD" href="../calmd.html" />
     <link rel="prev" title="SAMTOOLS BAM2FQ INTERLEAVED" href="interleaved.html" /> 
 </head>
 
@@ -119,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../cp.html">CP (BASH)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../cpat.html">CPAT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dada2.html">DADA2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../deeptools.html">DEEPTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../delly.html">DELLY</a></li>
@@ -154,6 +155,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../last.html">LAST</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../lofreq.html">LOFREQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../macs2.html">MACS2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mapdamage2.html">MAPDAMAGE2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../multiqc.html">MULTIQC</a></li>
@@ -183,13 +185,14 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../samtools.html">SAMTOOLS</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="interleaved.html">SAMTOOLS BAM2FQ INTERLEAVED</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">SAMTOOLS BAM2FQ SEPARATE</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../calmd.html">SAMTOOLS CALMD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../depth.html">SAMTOOLS DEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../faidx.html">SAMTOOLS FAIDX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fixmate.html">SAMTOOLS FIXMATE</a></li>
@@ -230,6 +233,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../vcftools.html">VCFTOOLS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../vembrane.html">VEMBRANE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../vep.html">VEP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../vg.html">VG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../wgsim.html">WGSIM</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Meta-Wrappers</span></p>
 <ul>
@@ -307,12 +312,6 @@
   <div class="section" id="samtools-bam2fq-separate">
 <span id="id1"></span><h1>SAMTOOLS BAM2FQ SEPARATE<a class="headerlink" href="#samtools-bam2fq-separate" title="Permalink to this headline">¶</a></h1>
 <p>Convert a bam file with paired end reads back to unaligned reads in a two separate fastq files with samtools. Reads that are not properly paired are discarded (READ_OTHER and singleton reads in samtools bam2fq documentation), as are secondary (0x100) and supplementary reads (0x800).</p>
-<div class="section" id="software-dependencies">
-<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>samtools ==1.10</p></li>
-</ul>
-</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -329,7 +328,7 @@
         <span class="mi">3</span>     <span class="c1"># At least 2 threads have to be requested on cluster sumbission.</span>
               <span class="c1"># Thus, this value - 2 will be sent to samtools sort -@ argument.</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.66.0-321-g890d65f7/bio/samtools/bam2fq/separate&quot;</span>
+        <span class="s2">&quot;0.67.0-335-ga139be0c/bio/samtools/bam2fq/separate&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -338,6 +337,12 @@ When running with</p>
 </pre></div>
 </div>
 <p>the software dependencies will be automatically deployed into an isolated environment before execution.</p>
+</div>
+<div class="section" id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">samtools==1.10</span></code></p></li>
+</ul>
 </div>
 <div class="section" id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
@@ -400,7 +405,7 @@ When running with</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../depth.html" class="btn btn-neutral float-right" title="SAMTOOLS DEPTH" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../calmd.html" class="btn btn-neutral float-right" title="SAMTOOLS CALMD" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="interleaved.html" class="btn btn-neutral float-left" title="SAMTOOLS BAM2FQ INTERLEAVED" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
