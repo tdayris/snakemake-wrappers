@@ -1,12 +1,15 @@
-rule test_bowtie2_build:
+rule bowtie2_build:
     input:
-        fasta = "genome.fasta"
+        reference="genome.fasta"
     output:
-        "bwt2_index/genome.1.bt2"
+        multiext(
+            "genome",
+            ".1.bt2", ".2.bt2", ".3.bt2", ".4.bt2", ".rev.1.bt2", ".rev.2.bt2",
+        ),
+    log:
+        "logs/bowtie2_build/build.log"
     params:
-        # The following parameter is optional:
-        # if a path to one of the files created in index is provided,
-        # then the wrapper can guess the prefix itself.
-        prefix = "bwt2_index/genome"
+        extra=""  # optional parameters
+    threads: 8
     wrapper:
         "master/bio/bowtie2/build"

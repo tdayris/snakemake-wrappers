@@ -95,13 +95,100 @@ def run(wrapper, cmd, check_log=None):
             # go back to original directory
             os.chdir(origdir)
 
+def test_dada2_sample_inference():
+    run(
+        "bio/dada2/sample-inference",
+        ["snakemake", "--cores", "1", "--use-conda", "denoised/a.1.RDS"],
+    )
+
+def test_dada2_merge_pairs():
+    run(
+        "bio/dada2/merge-pairs",
+        ["snakemake", "--cores", "1", "--use-conda", "merged/a.RDS", "-F"],
+    )
+
+
+def test_mapdamage2():
+    run(
+        "bio/mapdamage2",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "results/a/Runtime_log.txt",
+        ],
+    )
+
+def test_dada2_add_species():
+    run(
+        "bio/dada2/add-species",
+        ["snakemake", "--cores", "1", "--use-conda", "results/dada2/taxa-sp.RDS"],
+    )
+
+def test_dada2_remove_chimeras():
+    run(
+        "bio/dada2/remove-chimeras",
+        ["snakemake", "--cores", "1", "--use-conda", "results/dada2/seqTab.nochim.RDS"],
+    )
+
+def test_dada2_assign_taxonomy():
+    run(
+        "bio/dada2/assign-taxonomy",
+        ["snakemake", "--cores", "1", "--use-conda", "results/dada2/taxa.RDS"],
+    )
+
+def test_dada2_make_table_se():
+    run(
+        "bio/dada2/make-table",
+        ["snakemake", "--cores", "1", "--use-conda", "results/dada2/seqTab-se.RDS"],
+    )
+
+def test_dada2_make_table_pe():
+    run(
+        "bio/dada2/make-table",
+        ["snakemake", "--cores", "1", "--use-conda", "results/dada2/seqTab-pe.RDS"],
+    )
+
+def test_dada2_dereplicate_fastq():
+    run(
+        "bio/dada2/dereplicate-fastq",
+        ["snakemake", "--cores", "1", "--use-conda", "uniques/a.1.RDS"],
+    )
+
+def test_dada2_learn_errors():
+    run(
+        "bio/dada2/learn-errors",
+        ["snakemake", "--cores", "1", "--use-conda", "results/dada2/model_1.RDS"],
+    )
+
+def test_dada2_filter_trim_se():
+    run(
+        "bio/dada2/filter-trim",
+        ["snakemake", "--cores", "1", "filtered-se/a.1.fastq.gz", "--use-conda", "-F"]
+    )
+
+def test_dada2_filter_trim_pe():
+    run(
+        "bio/dada2/filter-trim",
+        ["snakemake", "--cores", "1", "filtered-pe/a.1.fastq.gz", "--use-conda", "-F"],
+    )
+
+def test_dada2_quality_profile_pe():
+    run("bio/dada2/quality-profile",
+        ["snakemake", "--cores", "1", "reports/dada2/quality-profile/a.1-quality-profile.png", "--use-conda", "-F"],
+    )
+
+def test_dada2_quality_profile_se():
+    run("bio/dada2/quality-profile",
+        ["snakemake", "--cores", "1", "reports/dada2/quality-profile/a-quality-profile.png", "--use-conda", "-F"],
+    )
 
 def test_arriba_star_meta():
     run(
         "meta/bio/star_arriba",
         ["snakemake", "--cores", "1", "--use-conda", "results/arriba/a.fusions.tsv"],
     )
-
 
 
 def test_bwa_mapping_meta():
@@ -307,6 +394,13 @@ def test_art_profiler_illumina():
     )
 
 
+def test_bcftools_sort():
+    run(
+        "bio/bcftools/sort",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "a.sorted.bcf"],
+    )
+
+
 def test_bcftools_call():
     run(
         "bio/bcftools/call",
@@ -420,7 +514,7 @@ def test_bowtie2_align():
 def test_bowtie2_build():
     run(
         "bio/bowtie2/build",
-        ["snakemake", "--cores", "1", "bwt2_index/genome.1.bt2", "--use-conda", "-F"]
+        ["snakemake", "--cores", "1", "genome.1.bt2", "--use-conda", "-F"],
     )
 
 
@@ -492,6 +586,162 @@ def test_bwa_index():
             "genome.sa",
             "--use-conda",
             "-F",
+        ],
+    )
+
+
+def test_bwa_samxe_sam_se():
+    run(
+        "bio/bwa/samxe",
+        ["snakemake", "--cores", "1", "mapped/a.se.sam", "--use-conda", "-F"],
+    )
+
+
+def test_bwa_samxe_sam_pe():
+    run(
+        "bio/bwa/samxe",
+        ["snakemake", "--cores", "1", "mapped/a.pe.sam", "--use-conda", "-F"],
+    )
+
+
+def test_bwa_samxe_bam_se():
+    run(
+        "bio/bwa/samxe",
+        ["snakemake", "--cores", "1", "mapped/a.se.bam", "--use-conda", "-F"],
+    )
+
+
+def test_bwa_samxe_bam_pe():
+    run(
+        "bio/bwa/samxe",
+        ["snakemake", "--cores", "1", "mapped/a.pe.bam", "--use-conda", "-F"],
+    )
+
+
+def test_bwa_samxe_sam_se_sort_samtools():
+    run(
+        "bio/bwa/samxe",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "mapped/a.se.samtools_sort.sam",
+            "--use-conda",
+            "-F",
+            "-s",
+            "Snakefile_samtools",
+        ],
+    )
+
+
+def test_bwa_samxe_sam_pe_sort_samtools():
+    run(
+        "bio/bwa/samxe",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "mapped/a.pe.samtools_sort.sam",
+            "--use-conda",
+            "-F",
+            "-s",
+            "Snakefile_samtools",
+        ],
+    )
+
+
+def test_bwa_samxe_bam_se_sort_samtools():
+    run(
+        "bio/bwa/samxe",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "mapped/a.se.samtools_sort.bam",
+            "--use-conda",
+            "-F",
+            "-s",
+            "Snakefile_samtools",
+        ],
+    )
+
+
+def test_bwa_samxe_bam_pe_sort_samtools():
+    run(
+        "bio/bwa/samxe",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "mapped/a.pe.samtools_sort.bam",
+            "--use-conda",
+            "-F",
+            "-s",
+            "Snakefile_samtools",
+        ],
+    )
+
+
+def test_bwa_samxe_sam_se_sort_picard():
+    run(
+        "bio/bwa/samxe",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "mapped/a.se.picard_sort.sam",
+            "--use-conda",
+            "-F",
+            "-s",
+            "Snakefile_picard",
+        ],
+    )
+
+
+def test_bwa_samxe_sam_pe_sort_picard():
+    run(
+        "bio/bwa/samxe",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "mapped/a.pe.picard_sort.sam",
+            "--use-conda",
+            "-F",
+            "-s",
+            "Snakefile_picard",
+        ],
+    )
+
+
+def test_bwa_samxe_bam_se_sort_picard():
+    run(
+        "bio/bwa/samxe",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "mapped/a.se.picard_sort.bam",
+            "--use-conda",
+            "-F",
+            "-s",
+            "Snakefile_picard",
+        ],
+    )
+
+
+def test_bwa_samxe_bam_pe_sort_picard():
+    run(
+        "bio/bwa/samxe",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "mapped/a.pe.picard_sort.bam",
+            "--use-conda",
+            "-F",
+            "-s",
+            "Snakefile_picard",
         ],
     )
 
@@ -1099,6 +1349,20 @@ def test_optitype():
     )
 
 
+def test_picard_markduplicates():
+    run(
+        "bio/picard/markduplicates",
+        ["snakemake", "--cores", "1", "dedup/a.bam", "--use-conda", "-F"],
+    )
+
+
+def test_picard_markduplicateswithmatecigar():
+    run(
+        "bio/picard/markduplicateswithmatecigar",
+        ["snakemake", "--cores", "1", "dedup/a.bam", "--use-conda", "-F"],
+    )
+
+
 def test_picard_collectalignmentsummarymetrics():
     run(
         "bio/picard/collectalignmentsummarymetrics",
@@ -1270,6 +1534,13 @@ def test_razers3():
     run(
         "bio/razers3",
         ["snakemake", "--cores", "1", "--use-conda", "-F", "mapped/a.bam"],
+    )
+
+
+def test_samtools_calmd():
+    run(
+        "bio/samtools/calmd",
+        ["snakemake", "--cores", "1", "a.calmd.bam", "--use-conda", "-F"],
     )
 
 
@@ -3096,13 +3367,6 @@ def test_check_md5():
     )
 
 
-def test_unicycler():
-    run(
-        "bio/unicycler",
-        ["snakemake", "--cores", "1", "result/assembly.fasta", "--use-conda", "-F"]
-    )
-
-
 def test_cpat_make_hexamer_table():
     run(
         "bio/cpat/make_hexamer_table",
@@ -3192,3 +3456,55 @@ def test_chipseeker_covplot():
         "bio/chipseeker/covplot",
         ["snakemake", "--cores", "1", "covplot.png", "--use-conda", "-F"]
     )
+
+def test_unicycler():
+    run(
+        "bio/unicycler",
+        ["snakemake", "--cores", "1", "result/reads/assembly.fasta", "--use-conda", "-F"],
+    )
+
+
+def test_vg_construct():
+    run("bio/vg/construct",
+        ["snakemake", "--cores", "1", "graph/c.vg", "--use-conda", "-F"])
+
+
+def test_vg_merge():
+    run("bio/vg/merge",
+        ["snakemake", "--cores", "1", "graph/wg.vg", "--use-conda", "-F"])
+
+
+def test_vg_ids():
+    run("bio/vg/ids",
+        ["snakemake", "--cores", "1", "graph/c_mod.vg", "--use-conda", "-F"])
+
+
+def test_vg_index_gcsa():
+    run("bio/vg/index/gcsa",
+        ["snakemake", "--cores", "1", "index/wg.gcsa", "--use-conda", "-F"])
+
+
+def test_vg_index_xg():
+    run("bio/vg/index/xg",
+        ["snakemake", "--cores", "1", "index/x.xg", "--use-conda", "-F"])
+
+
+def test_vg_kmers():
+    run("bio/vg/kmers",
+        ["snakemake", "--cores", "1", "kmers/c.kmers", "--use-conda", "-F"])
+
+
+def test_vg_prune():
+    run("bio/vg/prune",
+        ["snakemake", "--cores", "1", "graph/c.pruned.vg", "--use-conda", "-F"])
+
+
+def test_vg_sim():
+    run("bio/vg/sim",
+        ["snakemake", "--cores", "1", "reads/x.seq", "--use-conda", "-F"])
+
+
+def test_wgsim():
+    run("bio/wgsim",
+        ["snakemake", "--cores", "1", "reads/1.fq", "reads/2.fq",
+         "--use-conda", "-F"])

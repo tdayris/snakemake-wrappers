@@ -8,7 +8,13 @@ import os
 from snakemake.shell import shell
 
 
-prefix = os.path.splitext(snakemake.output[0])[0]
+out_name, out_ext = os.path.splitext(snakemake.output[0])
+
+tmp_dir = snakemake.params.get("tmp_dir", "")
+if tmp_dir:
+    prefix = os.path.join(tmp_dir, os.path.basename(out_name))
+else:
+    prefix = out_name
 
 # Samtools takes additional threads through its option -@
 # One thread for samtools
@@ -21,6 +27,6 @@ if "mem_mb" in snakemake.resources.keys() and "-m" not in extra:
     extra += " -m {}M".format(int(snakemake.resources["mem_mb"] / snakemake.threads))
 
 shell(
-    "samtools sort {extra} {threads} -o {snakemake.output[0]} "
+    "samtools sort {snakemake.params.extra} {threads} -o {snakemake.output[0]} "
     "-T {prefix} {snakemake.input[0]}"
 )
