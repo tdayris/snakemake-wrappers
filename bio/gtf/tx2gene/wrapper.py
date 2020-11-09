@@ -61,6 +61,18 @@ logging.info("GTF parsed")
 
 
 # Save results and their subsets on demand
+if "tx2gene_small" in snakemake.output.keys():
+    tmp = gtf.copy()
+    tmp = tmp[["transcript_id", "gene_id"]]
+    tmp.drop_duplicates(inplace=True)
+    tmp.to_csv(
+        snakemake.output["tx2gene_small"],
+        sep = "\t",
+        index = False,
+        header = False
+    )
+    logging.info("Tx2Gene table saved without gene names")
+
 if "tx2gene" in snakemake.output.keys():
     tmp = gtf.copy()
     tmp = tmp[["gene_id", "transcript_id", "gene_name"]]
