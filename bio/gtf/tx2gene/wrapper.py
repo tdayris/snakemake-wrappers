@@ -64,6 +64,7 @@ logging.info("GTF parsed")
 if "tx2gene" in snakemake.output.keys():
     tmp = gtf.copy()
     tmp = tmp[["gene_id", "transcript_id", "gene_name"]]
+    tmp.drop_duplicates(inplace=True)
     tmp.to_csv(
         snakemake.output["tx2gene"],
         sep = "\t",
@@ -75,6 +76,7 @@ if "tx2gene" in snakemake.output.keys():
 if "tx2gene_large" in snakemake.output.keys():
     tmp = gtf.copy()
     tmp = tmp[["gene_id", "transcript_id", "gene_name", "start", "stop"]]
+    tmp.drop_duplicates(inplace=True)
     tmp.to_csv(
         snakemake.output["tx2gene_large"],
         sep = "\t",
