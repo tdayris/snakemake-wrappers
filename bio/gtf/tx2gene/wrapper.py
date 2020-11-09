@@ -12,66 +12,98 @@ __copyright__ = "Copyright 2020, Thibault Dayris"
 __email__ = "thibault.dayris@gustaveroussy.fr"
 __license__ = "MIT"
 
-gtf_in = snakemake.input["gtf"]
-tsv_out = snakemake.output["tsv"]
+import logging
+import numpy
+import pandas
 
-with open(gtf_in, "r") as gtf, open(tsv_out, "w") as tsv:
-    # Write header on user request
-    if snakemake.params.get("header", False) is True:
-        cols = ["Gene_ID", "Transcript_ID", "Gene_Name"]
-        if snakemake.params.get("positions", False) is True:
-            cols = [
-                "Gene_ID", "Transcript_ID", "Gene_Name",
-                "Chromosome", "Start", "Stop", "Strand"
-            ]
-        elif snakemake.params.get("sleuth_compatibility", False) is True:
-            cols = ["ens_gene", "target_id", "ext_gene"]
 
-        tsv.write('\t'.join(cols))
-        tsv.write("\n")
+logging.basicConfig(
+    filename=snakemake.log[0],
+    filemode="w",
+    level=logging.DEBUG
+)
 
-    for line in gtf:
-        if line.startswith("#"):
-            # Then is it a comment
-            continue
 
-        # If the line is not a transcript, then it will no contain
-        # the required information
-        chomp = line[:-1].split("\t")
-        if chomp[2] != "transcript":
-            continue
+# Read GTF file
+gtf = pandas.read_csv(
+    snakemake.input["gtf"],
+    sep="\t",
+    header = None,
+    comment = "#"
+)
+gtf.columns = [
+    "chromosome", "source", "feature", "start", "stop",
+    "confidence", "strand", "frame", "annotation"
+]
+gtf.set_index(
+    ["chromosome", "source", "strand", "feature"],
+    inplace = True
+)
+logging.debug("Head of the GTF file:")
+logging.debug(gtf.head())
+logging.info("GTF loaded")
 
-        start = chomp[3]
-        stop = chomp[4]
-        chrom = chomp[0]
-        strand = chomp[6]
 
-        # We are interested in the last column
-        chomp = {
-            attr.split('"')[0].strip(): attr.split('"')[1].strip()
-            for attr in chomp[8].split(";")
-            if attr != '' and '"' in attr
-        }
+# Extract transcripts identifiers, gene identifiers and gene names
+gtf["gene_id"] = gtf["annotation"].str.extract(r"gene_id \"(\w+)\"")
+gtf["transcript_id"] = gtf["annotation"].str.extract(r"transcript_id \"(\w+)\"")
+gtf["gene_name"] = gtf["annotation"].str.extract(r"gene_name \"(\w+)\"")
+del gtf["annotation"]
 
-        if snakemake.params.get("gencode", False) is True:
-            chomp["gene_id"] = chomp["gene_id"].split(".")[0]
-            chomp["transcript_id"] = chomp["transcript_id"].split(".")[0]
 
-        # Some genes have an ID but no name ...
-        try:
-            result = [
-                chomp["gene_id"],
-                chomp["transcript_id"],
-                chomp["gene_name"]
-            ]
-        except KeyError:
-            result = [
-                chomp["gene_id"],
-                chomp["transcript_id"],
-                chomp["gene_id"]
-            ]
+# Filter on transcripts to reduce the amound of data
+gtf[gtf.index.get_level_values("feature") == "transcript"]
+gtf.index = gtf.index.droplevel("feature")
 
-        if snakemake.params.get("positions", False) is True:
-            tsv.write("\t".join(result + [chrom, start, stop, strand]) + "\n")
-        else:
-            tsv.write("\t".join(result) + "\n")
+logging.debug("Head of the GTF file:")
+logging.debug(gtf.head())
+logging.info("GTF parsed")
+
+
+# Save results and their subsets on demand
+if "tx2gene" in snakemake.output.keys():
+    tmp = gtf.copy()
+    tmp = tmp[["gene_id", "transcript_id", "gene_name"]]
+    tmp.to_csv(
+        snakemake.output["tx2gene"],
+        sep = "\t",
+        index = False,
+        header = False
+    )
+    logging.info("Tx2Gene table saved")
+
+if "tx2gene_large" in snakemake.output.keys():
+    tmp = gtf.copy()
+    tmp = tmp[["gene_id", "transcript_id", "gene_name", "start", "stop"]]
+    tmp.to_csv(
+        snakemake.output["tx2gene_large"],
+        sep = "\t",
+        index = True,
+        header = True
+    )
+    logging.info("Tx2Gene table saved with positions and source info")
+
+if "gene2gene" in snakemake.output.keys():
+    tmp = gtf.copy()
+    tmp = tmp[["gene_id", "gene_name"]]
+    tmp.drop_duplicates(inplace=True)
+    tmp.to_csv(
+        snakemake.output["gene2gene"],
+        sep = "\t",
+        index = False,
+        header = False
+    )
+    logging.info("Gene2Gene table saved")
+
+
+if "gene2gene_large" in snakemake.output.keys():
+    tmp = gtf.copy()
+    tmp = tmp[["gene_id", "gene_name"]]
+    tmp.drop_duplicates(inplace=True)
+    tmp.to_csv(
+        snakemake.output["gene2gene_large"],
+        sep = "\t",
+        index = True,
+        header = True
+    )
+    logging.info("Gene2Gene table saved with chromosome and source info")
