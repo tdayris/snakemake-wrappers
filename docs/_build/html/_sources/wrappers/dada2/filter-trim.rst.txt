@@ -4,7 +4,7 @@ DADA2_FILTER_TRIM
 =================
 
 `DADA2 <https://benjjneb.github.io/dada2/index.html>`_
-Quality filtering of single or paired-end reads using dada2 filterAndTrim function. Optional parameters are documented in the `manual <https://www.bioconductor.org/packages/release/bioc/manuals/dada2/man/dada2.pdf>`_.
+Quality filtering of single or paired-end reads using dada2 ``filterAndTrim`` function. Optional parameters are documented in the `manual <https://www.bioconductor.org/packages/release/bioc/manuals/dada2/man/dada2.pdf#filterAndTrim>`_ and the function is introduced in the dedicated tutorial `section <https://benjjneb.github.io/dada2/tutorial.html#filter-and-trim>`_.
 
 
 
@@ -22,23 +22,23 @@ This wrapper can be used in the following way:
         output:
             filt="filtered-se/{sample}.1.fastq.gz",
             stats="reports/dada2/filter-trim-se/{sample}.tsv"
-        log:
-            "logs/dada2/filter-trim-se/{sample}.log"
         # Even though this is an R wrapper, use named arguments in Python syntax
         # here, to specify extra parameters. Python booleans (`arg1=True`, `arg2=False`)
         # and lists (`list_arg=[]`) are automatically converted to R.
         # For a named list as an extra named argument, use a python dict
         #   (`named_list={name1=arg1}`).
         params:
-    	# Set the maximum expected errors tolerated in filtered reads
+            # Set the maximum expected errors tolerated in filtered reads
             maxEE=1,
             # Set the number of kept bases to 7 for the toy example
             truncLen=7,
             # Set minLen to 1 for the toy example but default is 20
             minLen=1
+        log:
+            "logs/dada2/filter-trim-se/{sample}.log"
         threads: 1 # set desired number of threads here
         wrapper:
-            "0.67.0-335-ga139be0c/bio/dada2/filter-trim"
+            "0.67.0-343-g892df8bb/bio/dada2/filter-trim"
 
     rule dada2_filter_trim_pe:
         input:
@@ -49,24 +49,24 @@ This wrapper can be used in the following way:
             filt="filtered-pe/{sample}.1.fastq.gz",
             filt_rev="filtered-pe/{sample}.2.fastq.gz",
             stats="reports/dada2/filter-trim-pe/{sample}.tsv"
-        log:
-            "logs/dada2/filter-trim-pe/{sample}.log"
         # Even though this is an R wrapper, use named arguments in Python syntax
         # here, to specify extra parameters. Python booleans (`arg1=True`, `arg2=False`)
         # and lists (`list_arg=[]`) are automatically converted to R.
         # For a named list as an extra named argument, use a python dict
         #   (`named_list={name1=arg1}`).
         params:
-    	# Set the maximum expected errors tolerated in filtered reads
+            # Set the maximum expected errors tolerated in filtered reads
             maxEE=1,
             # Set the number of kept bases in forward and reverse reads
-    	# respectively to 7 for the toy example
+            # respectively to 7 for the toy example
             truncLen=[7,6],
             # Set minLen to 1 for the toy example but default is 20
             minLen=1
+        log:
+            "logs/dada2/filter-trim-pe/{sample}.log"
         threads: 1 # set desired number of threads here
         wrapper:
-            "0.67.0-335-ga139be0c/bio/dada2/filter-trim"
+            "0.67.0-343-g892df8bb/bio/dada2/filter-trim"
 
 
 Note that input, output and log file paths can be chosen freely.

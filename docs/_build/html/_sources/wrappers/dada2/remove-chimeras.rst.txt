@@ -4,7 +4,7 @@ DADA2_REMOVE_CHIMERAS
 =====================
 
 `DADA2 <https://benjjneb.github.io/dada2/index.html>`_
-Remove chimera sequences from the sequence table data using dada2 removeBimeraDenovo function. Optional parameters are documented in the `manual <https://www.bioconductor.org/packages/release/bioc/manuals/dada2/man/dada2.pdf>`_.
+Remove chimera sequences from the sequence table data using dada2 ``removeBimeraDenovo`` function. Optional parameters are documented in the `manual <https://www.bioconductor.org/packages/release/bioc/manuals/dada2/man/dada2.pdf#removeBimeraDenovo>`_  and the function is introduced in the dedicated tutorial `section <https://benjjneb.github.io/dada2/tutorial.html#remove-chimeras>`_.
 
 
 
@@ -18,20 +18,20 @@ This wrapper can be used in the following way:
     rule dada2_remove_chimeras:
         input:
             "results/dada2/seqTab.RDS" # Sequence table
+        output:
+            "results/dada2/seqTab.nochim.RDS" # Chimera-free sequence table
         # Even though this is an R wrapper, use named arguments in Python syntax
         # here, to specify extra parameters. Python booleans (`arg1=True`, `arg2=False`)
         # and lists (`list_arg=[]`) are automatically converted to R.
         # For a named list as an extra named argument, use a python dict
         #   (`named_list={name1=arg1}`).
-        params:
-            verbose=True
-        output:
-            "results/dada2/seqTab.nochim.RDS" # Chimera-free sequence table
+        #params:
+        #    verbose=True
         log:
             "logs/dada2/remove-chimeras/remove-chimeras.log"
         threads: 1 # set desired number of threads here
         wrapper:
-            "0.67.0-335-ga139be0c/bio/dada2/remove-chimeras"
+            "0.67.0-343-g892df8bb/bio/dada2/remove-chimeras"
 
 
 Note that input, output and log file paths can be chosen freely.
