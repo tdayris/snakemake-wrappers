@@ -9,16 +9,15 @@
 # __license__ = "MIT"
 
 # Differential Gene expression
+base::library(package = "SummarizedExperiment", quietly = TRUE);
 base::library(package = "DESeq2", quietly = TRUE);
 
 # Load DESeq2 dataset
-dds_path <- base::as.character(
-  x = snakemake@input[["dds"]]
-);
+dds_path <- base::as.character(x = snakemake@input[["dds"]]);
 dds <- base::readRDS(file = dds_path);
 
-# Build extra parameters for DESeq2 nbinomWaldTest
-extra <- "";
+# Build extra parameters for DESeq2
+extra_deseq2 <- "object = dds";
 if ("extra" %in% snakemake@params) {
   extra <- base::paste0(
     ", ",
@@ -27,70 +26,52 @@ if ("extra" %in% snakemake@params) {
 }
 base::message("Libraries and dataset loaded");
 
+deseq2_cmd <- base::paste0(
+  "DESeq2::DESeq(", extra_deseq2, ");"
+);
+base::message("DESeq2 command line:");
+base::message(deseq2_cmd);
+
 # Create object
-wald <- base::eval(
-  base::parse(
-    text = base::paste0(
-      "DESeq2::DESeq(object = dds", extra, ");"
-    )
-  )
-);
+wald <- base::eval(base::parse(text = deseq2_cmd));
 
-# Save results
-output_rds <- base::as.character(
-  x = snakemake@output[["rds"]]
-);
-
-base::saveRDS(
-  obj = wald,
-  file = output_rds
-);
+# Save results as RDS
+output_rds <- base::as.character(x = snakemake@output[["rds"]]);
+base::saveRDS(obj = wald, file = output_rds);
 base::message("Wald test over, RDS saved");
 
+# Saving results as TSV
+names <- DESeq2::resultsNames(object = wald);
 
-names <- DESeq2::resultsNames(
-  object = wald
-);
-
-output_prefix <- snakemake@output[["tsv"]];
+# Recovreing extra parameters for TSV tables
+output_prefix <- snakemake@output[["deseq2_results"]];
 if (! base::file.exists(output_prefix)) {
-  base::dir.create(
-    path = output_prefix,
-    recursive = TRUE
+  base::dir.create(path = output_prefix,recursive = TRUE);
+}
+
+extra_results <- "object = wald, name = resultname";
+if ("extra_results" %in% base::names(snakemake@params)) {
+  extra_results <- base::paste(
+    ", ",
+    base::as.character(x = snakemake@params[["extra_results"]])
   );
 }
 
-alpha_threshold <- 0.5;
-if ("alpha_threshold" %in% names(snakemake@params)) {
-  alpha_threshold <- base::as.numeric(
-    x = snakemake@params[["alpha_threshold"]]
-  );
-}
-
-fc_threshold <- 0.001;
-if ("fc_threshold" %in% names(snakemake@params)) {
-  fc_threshold <- base::as.numeric(
-    x = snakemake@params[["fc_threshold"]]
-  );
-}
+results_cmd <- base::paste0("DESeq2::results(", extra_results, ")");
+base::message("Command line used for TSV results creation:");
+base::message(results_cmd);
 
 for (resultname in names) {
+  # Building table
   base::message(base::paste("Saving results for", resultname))
-  results_frame <- DESeq2::results(
-    object = wald,
-    name = resultname,
-    independentFiltering = TRUE,
-    alpha = alpha_threshold,
-    lfcThreshold = fc_threshold,
-    pAdjustMethod = "BH",
-    cooksCutoff = TRUE
-  );
+  results_frame <- base::eval(base::parse(text = results_cmd));
 
   results_path <- base::file.path(
     output_prefix,
     base::paste0("Deseq2_", resultname, ".tsv")
   );
 
+  # Saving table
   utils::write.table(
     x = results_frame,
     file = results_path,
@@ -98,4 +79,12 @@ for (resultname in names) {
     sep = "\t",
     row.names = TRUE
   );
+}
+
+# Saving normalized counts on demand
+if ("normalized_counts" %in% base::names(snakemake@output)) {
+  output_table <- base::as.character(snakemake@output[["normalized_counts"]]);
+  tsv <- SummarizedExperiment::assay(wald);
+  utils::write.table(x = tsv, file = output_table, sep = "\t", quote = FALSE);
+  base::message("Normalized counts saved");
 }
