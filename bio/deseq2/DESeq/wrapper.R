@@ -82,9 +82,19 @@ for (resultname in names) {
 }
 
 # Saving normalized counts on demand
+table <- SummarizedExperiment::assay(wald);
 if ("normalized_counts" %in% base::names(snakemake@output)) {
-  output_table <- base::as.character(snakemake@output[["normalized_counts"]]);
-  tsv <- SummarizedExperiment::assay(wald);
-  utils::write.table(x = tsv, file = output_table, sep = "\t", quote = FALSE);
-  base::message("Normalized counts saved");
+  output_table <- base::as.character(x=snakemake@output[["normalized_counts"]]);
+  utils::write.table(x = table, file = output_table, sep = "\t", quote = FALSE);
+  base::message("Normalized counts saved as TSV");
+}
+
+if ("dst" %in% base::names(snakemake@output)) {
+  output_rds <- base::as.character(
+    x=snakemake@output[["dst"]]
+  );
+  base::saveRDS(
+    obj = table,
+    file = output_rds
+  );
 }
