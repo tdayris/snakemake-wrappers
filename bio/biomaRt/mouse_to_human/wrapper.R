@@ -104,3 +104,14 @@ utils::write.table(
   col.names=TRUE,
   row.names=FALSE
 );
+
+if ("gene_table" %in% base::names(snakemake@output)) {
+  write.table(
+    x=genes,
+    file=snakemake@output[["gene_table"]],
+    sep="\t",
+    quote=FALSE,
+    col.names=TRUE,
+    row.names=TRUE
+  );
+}
