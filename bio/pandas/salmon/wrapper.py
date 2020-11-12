@@ -43,7 +43,10 @@ def read_tx2gene(path: str,
         if len(t2g.columns.tolist()) == 3:
             t2g.columns = ["Ensembl_Gene_ID", "Ensembl_Transcript_ID", "Hugo_ID"]
         else:
-            t2g.columns = ["Ensembl_Gene_ID", "Ensembl_Transcript_ID", "Hugo_ID", "Chromosome", "Start", "End", "Strand"]
+            t2g.columns = [
+                "Chromosome", "Source", "Strand", "Ensembl_Gene_ID",
+                "Ensembl_Transcript_ID", "Hugo_ID", "Start", "End"
+            ]
 
         if genes is True:
             logging.debug("Keeping only genes from tx2gene DataFrame")

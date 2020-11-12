@@ -2841,22 +2841,7 @@ def test_pandas_left_minus_join():
 def test_pandas_merge_salmon():
     run(
         "bio/pandas/salmon",
-        ["snakemake", "--cores", "1", "table_tr.tsv", "--use-conda", "-F"],
-    )
-
-    run(
-        "bio/pandas/salmon",
         ["snakemake", "--cores", "1", "table_tr_pos.tsv", "--use-conda", "-F"]
-    )
-
-    run(
-        "bio/pandas/salmon",
-        ["snakemake", "--cores", "1", "table_genes.tsv", "--use-conda", "-F"]
-    )
-
-    run(
-        "bio/pandas/salmon",
-        ["snakemake", "--cores", "1", "table_genes_pos.tsv", "--use-conda", "-F"]
     )
 
 
