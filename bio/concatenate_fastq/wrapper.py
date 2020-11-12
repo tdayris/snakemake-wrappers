@@ -10,17 +10,18 @@ __license__ = "MIT"
 
 from snakemake.shell import shell
 
-if snakemake.threads != 2:
+input_list = list(snakemake.input)
+if len(input_list) > 1 and snakemake.threads != 2:
     raise ValueError(
-        "Exactly two threads are required for this wrapper. "
-        "Only {} were given.".format(str(snakemake.threads))
+        "Exactly two threads are required for this wrapper, "
+        "and {} was/were given.".format(str(snakemake.threads))
     )
 
 if len(snakemake.input) > 1:
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
     shell(
         " zcat "  # Concatenate gzipped files
-        " {snakemake.input} "  # List of input files
+        " {input_list} "  # List of input files
         " | "
         " gzip -c "  # Gzip output file
         " > {snakemake.output} "  # Path to output file
@@ -30,7 +31,7 @@ else:
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
     shell(
         " cp -v "  # Copy if not merge needed
-        " {input} "  # Path to input file
+        " {input_list} "  # Path to input file
         " {output} "  # Path to output file
         " {log} "  # Logging
     )
