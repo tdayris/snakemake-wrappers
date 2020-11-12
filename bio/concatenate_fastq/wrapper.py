@@ -32,6 +32,6 @@ else:
     shell(
         " cp -v "  # Copy if not merge needed
         " {input_list} "  # Path to input file
-        " {output} "  # Path to output file
+        " {snakemake.output} "  # Path to output file
         " {log} "  # Logging
     )
