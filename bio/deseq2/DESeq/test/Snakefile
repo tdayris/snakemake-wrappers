@@ -3,7 +3,8 @@ rule test_deseq:
         dds = "dds.RDS"
     output:
         rds = "wald.RDS",
-        deseq2_results = directory("tsv"),
+        #deseq2_result_dir = directory("tsv"),
+        deseq2_tsv = "DESeq2/Condition.tsv",
         normalized_counts = "counts.tsv",
         dst = "counts.RDS"
     message:
@@ -17,6 +18,10 @@ rule test_deseq:
         time_min = (
             lambda wildcards, attempt: min(attempt * 10, 20)
         )
+    params:
+        factor = "Cond",
+        numerator = "B",
+        denominator = "A"
     log:
         "logs/test_nbinomWaldTest.log"
     wrapper:

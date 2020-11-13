@@ -43,38 +43,76 @@ base::message("Wald test over, RDS saved");
 # Saving results as TSV
 names <- DESeq2::resultsNames(object = wald);
 
-# Recovreing extra parameters for TSV tables
-output_prefix <- snakemake@output[["deseq2_results"]];
-if (! base::file.exists(output_prefix)) {
-  base::dir.create(path = output_prefix,recursive = TRUE);
+if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
+  # Recovreing extra parameters for TSV tables
+  extra_results <- "object = wald, name = resultname";
+  if ("extra_results" %in% base::names(snakemake@params)) {
+    extra_results <- base::paste(
+      ", ",
+      base::as.character(x = snakemake@params[["extra_results"]])
+    );
+  }
+
+  # DESeq2 result dir will contain all results available in the Wald object
+  output_prefix <- snakemake@output[["deseq2_result_dir"]];
+  if (! base::file.exists(output_prefix)) {
+    base::dir.create(path = output_prefix,recursive = TRUE);
+  }
+
+  results_cmd <- base::paste0("DESeq2::results(", extra_results, ")");
+  base::message("Command line used for TSV results creation:");
+  base::message(results_cmd);
+
+  for (resultname in names) {
+    # Building table
+    base::message(base::paste("Saving results for", resultname))
+    results_frame <- base::eval(base::parse(text = results_cmd));
+
+    results_path <- base::file.path(
+      output_prefix,
+      base::paste0("Deseq2_", resultname, ".tsv")
+    );
+
+    # Saving table
+    utils::write.table(
+      x = results_frame,
+      file = results_path,
+      quote = FALSE,
+      sep = "\t",
+      row.names = TRUE
+    );
+  }
 }
 
-extra_results <- "object = wald, name = resultname";
-if ("extra_results" %in% base::names(snakemake@params)) {
+if ("deseq2_tsv" %in% base::names(snakemake@output)) {
+  base::message("Saving results as TSV");
+  # This will save results based on their contrast identifier
+  # For more information, see deseq2 vignette or type ?results
+  constrast <- c(
+    base::as.character(x = snakemake@params[["factor"]]),
+    base::as.character(x = snakemake@params[["numerator"]]),
+    base::as.character(x = snakemake@params[["denominator"]])
+  );
   extra_results <- base::paste(
-    ", ",
-    base::as.character(x = snakemake@params[["extra_results"]])
+    "object=wald",
+    "contrast=constrast",
+    sep=", "
   );
-}
-
-results_cmd <- base::paste0("DESeq2::results(", extra_results, ")");
-base::message("Command line used for TSV results creation:");
-base::message(results_cmd);
-
-for (resultname in names) {
-  # Building table
-  base::message(base::paste("Saving results for", resultname))
+  if ("extra_results" %in% base::names(snakemake@params)) {
+    extra_results <- base::paste(
+      extra_results,
+      base::as.character(x = snakemake@params[["extra_results"]]),
+      sep=", "
+    );
+  }
+  results_cmd <- base::paste0("DESeq2::results(", extra_results, ")");
+  base::message("Result extraction command:");
   results_frame <- base::eval(base::parse(text = results_cmd));
-
-  results_path <- base::file.path(
-    output_prefix,
-    base::paste0("Deseq2_", resultname, ".tsv")
-  );
 
   # Saving table
   utils::write.table(
     x = results_frame,
-    file = results_path,
+    file = base::as.character(x = snakemake@output[["deseq2_tsv"]]),
     quote = FALSE,
     sep = "\t",
     row.names = TRUE
