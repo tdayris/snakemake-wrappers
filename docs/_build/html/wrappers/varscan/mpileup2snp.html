@@ -301,7 +301,7 @@
             
   <div class="section" id="varscan-mpileup2snp">
 <span id="id1"></span><h1>VARSCAN MPILEUP2SNP<a class="headerlink" href="#varscan-mpileup2snp" title="Permalink to this headline">¶</a></h1>
-<p>Detect variants in NGS data from Samtools mpileup</p>
+<p>Detect variants in NGS data from Samtools mpileup with <a class="reference external" href="http://varscan.sourceforge.net/germline-calling.html">VarScan</a></p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -316,10 +316,16 @@
         <span class="mi">1</span>     <span class="c1"># However, mpileup might have to be unzipped.</span>
               <span class="c1"># Keep threading value to one for unzipped mpileup input</span>
               <span class="c1"># Set it to two for zipped mipileup files</span>
+    <span class="c1"># optional specification of memory usage of the JVM that snakemake will respect with global</span>
+    <span class="c1"># resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)</span>
+    <span class="c1"># and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:</span>
+    <span class="c1"># https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">1024</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/varscan_</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.67.0-345-g15e007be/bio/varscan/mpileup2snp&quot;</span>
+        <span class="s2">&quot;0.67.0-359-g027844ee/bio/varscan/mpileup2snp&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -333,6 +339,7 @@ When running with</p>
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">varscan==2.4.3</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">snakemake-wrapper-utils==0.1.3</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="input-output">
@@ -374,10 +381,12 @@ files given as input, might be gzipped.</p>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 <span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">makedirs</span>
+<span class="kn">from</span> <span class="nn">snakemake_wrapper_utils.java</span> <span class="kn">import</span> <span class="n">get_java_opts</span>
 
 <span class="c1"># Gathering extra parameters and logging behaviour</span>
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">java_opts</span> <span class="o">=</span> <span class="n">get_java_opts</span><span class="p">(</span><span class="n">snakemake</span><span class="p">)</span>
 
 <span class="c1"># In case input files are gzipped mpileup files,</span>
 <span class="c1"># they are being unzipped and piped</span>
@@ -395,8 +404,8 @@ files given as input, might be gzipped.</p>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;varscan mpileup2snp &quot;</span>  <span class="c1"># Tool and its subprocess</span>
-    <span class="s2">&quot;&lt;( </span><span class="si">{pileup}</span><span class="s2"> ) &quot;</span> <span class="c1"># Pileup command</span>
-    <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> &quot;</span>  <span class="c1"># Extra parameters</span>
+    <span class="s2">&quot;&lt;( </span><span class="si">{pileup}</span><span class="s2"> ) &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{java_opts}</span><span class="s2"> </span><span class="si">{extra}</span><span class="s2"> &quot;</span>  <span class="c1"># Extra parameters</span>
     <span class="s2">&quot;&gt; </span><span class="si">{snakemake.output[0]}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to vcf file</span>
     <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span>  <span class="c1"># Logging behaviour</span>
 <span class="p">)</span>

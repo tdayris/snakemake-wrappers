@@ -3,7 +3,7 @@
 SNPSIFT GENES SETS
 ==================
 
-Annotate using GMT genes sets.
+Annotate using GMT genes sets with `SnpSift <https://pcingola.github.io/SnpEff/ss_genesets/>`_
 
 
 Example
@@ -19,8 +19,14 @@ This wrapper can be used in the following way:
             gmt = "fake_set.gmt"
         output:
             call = "annotated/out.vcf"
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
         wrapper:
-            "0.67.0-345-g15e007be/bio/snpsift/genesets"
+            "0.67.0-359-g027844ee/bio/snpsift/genesets"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -37,6 +43,7 @@ Software dependencies
 
 * ``snpsift==4.3.1t``
 * ``bcftools==1.10.2``
+* ``snakemake-wrapper-utils==0.1.3``
 
 Input/Output
 ------------
@@ -71,6 +78,9 @@ Code
     __license__ = "MIT"
 
     from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    java_opts = get_java_opts(snakemake)
 
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
     extra = snakemake.params.get("extra", "")
@@ -111,7 +121,7 @@ Code
 
     shell(
         "SnpSift geneSets"  # Tool and its subcommand
-        " {extra}"  # Extra parameters
+        " {java_opts} {extra}"  # Extra parameters
         " {snakemake.input.gmt}"  # Path to annotation vcf file
         " {incall}"  # Path to input vcf file
         " {outcall}"  # Path to output vcf file

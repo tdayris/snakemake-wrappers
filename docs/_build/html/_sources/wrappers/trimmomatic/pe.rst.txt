@@ -3,7 +3,7 @@
 TRIMMOMATIC PE
 ==============
 
-Trim paired-end reads with trimmomatic. (De)compress with pigz.
+Trim paired-end reads with `trimmomatic <http://www.usadellab.org/cms/?page=trimmomatic>`_ . (De)compress with pigz.
 
 
 Example
@@ -33,8 +33,14 @@ This wrapper can be used in the following way:
             compression_level="-9"
         threads:
             32
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
         wrapper:
-            "0.67.0-345-g15e007be/bio/trimmomatic/pe"
+            "0.67.0-359-g027844ee/bio/trimmomatic/pe"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -51,6 +57,7 @@ Software dependencies
 
 * ``trimmomatic==0.39``
 * ``pigz==2.3.4``
+* ``snakemake-wrapper-utils==0.1.3``
 
 
 
@@ -85,7 +92,7 @@ Code
 
 
     from snakemake.shell import shell
-
+    from snakemake_wrapper_utils.java import get_java_opts
 
     # Distribute available threads between trimmomatic itself and any potential pigz instances
     def distribute_threads(input_files, output_files, available_threads):
@@ -135,6 +142,7 @@ Code
 
 
     extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
     compression_level = snakemake.params.get("compression_level", "-5")
     trimmer = " ".join(snakemake.params.trimmer)
@@ -161,12 +169,8 @@ Code
         for filename in output_files
     ]
 
-    memory = ""
-    if "mem_mb" in snakemake.resources.keys():
-        memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
-
     shell(
-        "trimmomatic {memory} PE -threads {trimmomatic_threads} {extra} "
+        "trimmomatic PE -threads {trimmomatic_threads} {java_opts} {extra} "
         "{input_r1} {input_r2} "
         "{output_r1} {output_r1_unp} "
         "{output_r2} {output_r2_unp} "

@@ -27,8 +27,14 @@ This wrapper can be used in the following way:
         params:
             extra="",  # optional
             java_opts="", # optional
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
         wrapper:
-            "0.67.0-345-g15e007be/bio/gatk/applybqsr"
+            "0.67.0-359-g027844ee/bio/gatk/applybqsr"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -45,6 +51,7 @@ Software dependencies
 
 * ``gatk4==4.1.4.1``
 * ``openjdk=8``
+* ``snakemake-wrapper-utils==0.1.3``
 
 
 
@@ -77,13 +84,15 @@ Code
 
 
     from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
 
     extra = snakemake.params.get("extra", "")
-    java_opts = snakemake.params.get("java_opts", "")
+    java_opts = get_java_opts(snakemake)
 
     log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
     shell(
-        "gatk --java-options '{java_opts}' ApplyBQSR {extra} -R {snakemake.input.ref} -I {snakemake.input.bam} "
+        "gatk --java-options '{java_opts}' ApplyBQSR {extra} "
+        "-R {snakemake.input.ref} -I {snakemake.input.bam} "
         "--bqsr-recal-file {snakemake.input.recal_table} "
         "-O {snakemake.output.bam} {log}"
     )

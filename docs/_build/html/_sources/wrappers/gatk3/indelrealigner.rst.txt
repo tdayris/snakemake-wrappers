@@ -25,9 +25,12 @@ This wrapper can be used in the following way:
         log:
             "logs/gatk3/indelrealigner/{sample}.log"
         params:
-            extra="",  # optional
-            java_opts="", # optional
+            extra=""  # optional
+        resources:
+            mem_mb = 1024
         threads: 16
+        resources:
+            mem_mb = 1024
         wrapper:
             "bio/gatk/indelrealigner"
 
@@ -45,6 +48,7 @@ Software dependencies
 ---------------------
 
 * ``gatk==3.8``
+* ``snakemake-wrapper-utils==0.1.3``
 
 Input/Output
 ------------
@@ -90,9 +94,10 @@ Code
     import os
 
     from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
 
     extra = snakemake.params.get("extra", "")
-    java_opts = snakemake.params.get("java_opts", "")
+    java_opts = get_java_opts(snakemake)
 
     input_bam = snakemake.input.bam
     input_known = snakemake.input.known

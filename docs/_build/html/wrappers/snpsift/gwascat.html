@@ -192,7 +192,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../snpsift.html">SNPSIFT</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="annotate.html">SNPSIFT ANNOTATE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dbnsfp.html">SNPSIFT DNNSFP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbnsfp.html">SNPSIFT DBNSFP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="geneSets.html">SNPSIFT GENES SETS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="genesets.html">SNPSIFT GENES SETS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gwasCat.html">SNPSIFT GWAS CATALOG</a></li>
@@ -304,7 +304,7 @@
             
   <div class="section" id="snpsift-gwas-catalog">
 <span id="id1"></span><h1>SNPSIFT GWAS CATALOG<a class="headerlink" href="#snpsift-gwas-catalog" title="Permalink to this headline">¶</a></h1>
-<p>Annotate using GWAS catalog.</p>
+<p>Annotate using GWAS catalog with <a class="reference external" href="https://pcingola.github.io/SnpEff/ss_gwascatalog/">SnpSift</a></p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -314,8 +314,14 @@
         <span class="n">gwascat</span> <span class="o">=</span> <span class="s2">&quot;gwascatalog.txt&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">call</span> <span class="o">=</span> <span class="s2">&quot;annotated/out.vcf&quot;</span>
+    <span class="c1"># optional specification of memory usage of the JVM that snakemake will respect with global</span>
+    <span class="c1"># resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)</span>
+    <span class="c1"># and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:</span>
+    <span class="c1"># https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">1024</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.67.0-345-g15e007be/bio/snpsift/gwascat&quot;</span>
+        <span class="s2">&quot;0.67.0-359-g027844ee/bio/snpsift/gwascat&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -330,6 +336,7 @@ When running with</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">snpsift==4.3.1t</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">bcftools==1.10.2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">snakemake-wrapper-utils==0.1.3</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="input-output">
@@ -360,10 +367,12 @@ When running with</p>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+<span class="kn">from</span> <span class="nn">snakemake_wrapper_utils.java</span> <span class="kn">import</span> <span class="n">get_java_opts</span>
+
+<span class="n">java_opts</span> <span class="o">=</span> <span class="n">get_java_opts</span><span class="p">(</span><span class="n">snakemake</span><span class="p">)</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-
 <span class="n">min_threads</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="c1"># Uncompression shall be done based on user input</span>
@@ -402,7 +411,7 @@ When running with</p>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;SnpSift gwasCat &quot;</span>  <span class="c1"># Tool and its subcommand</span>
-    <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2"> &quot;</span>  <span class="c1"># Extra parameters</span>
+    <span class="s2">&quot; </span><span class="si">{java_opts}</span><span class="s2"> </span><span class="si">{extra}</span><span class="s2"> &quot;</span>  <span class="c1"># Extra parameters</span>
     <span class="s2">&quot; -db </span><span class="si">{snakemake.input.gwascat}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to gwasCat file</span>
     <span class="s2">&quot; </span><span class="si">{incall}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to input vcf file</span>
     <span class="s2">&quot; </span><span class="si">{outcall}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to output vcf file</span>

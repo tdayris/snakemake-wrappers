@@ -3,7 +3,7 @@
 TRIMMOMATIC SE
 ==============
 
-Trim single-end reads with trimmomatic. (De)compress with pigz.
+Trim single-end reads with `trimmomatic <http://www.usadellab.org/cms/?page=trimmomatic>`_. (De)compress with pigz.
 
 
 Example
@@ -29,8 +29,14 @@ This wrapper can be used in the following way:
             compression_level="-9"
         threads:
             32
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
         wrapper:
-            "0.67.0-345-g15e007be/bio/trimmomatic/se"
+            "0.67.0-359-g027844ee/bio/trimmomatic/se"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -47,6 +53,7 @@ Software dependencies
 
 * ``trimmomatic==0.39``
 * ``pigz==2.3.4``
+* ``snakemake-wrapper-utils==0.1.3``
 
 
 
@@ -81,7 +88,7 @@ Code
 
 
     from snakemake.shell import shell
-
+    from snakemake_wrapper_utils.java import get_java_opts
 
     # Distribute available threads between trimmomatic itself and any potential pigz instances
     def distribute_threads(input_file, output_file, available_threads):
@@ -131,6 +138,7 @@ Code
 
 
     extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
     compression_level = snakemake.params.get("compression_level", "-5")
     trimmer = " ".join(snakemake.params.trimmer)
@@ -144,10 +152,7 @@ Code
     input = compose_input_gz(snakemake.input[0], input_threads)
     output = compose_output_gz(snakemake.output[0], output_threads, compression_level)
 
-    memory = ""
-    if "mem_mb" in snakemake.resources.keys():
-        memory = "-Xmx{}M".format(snakem.resources["mem_mb"])
-
     shell(
-        "trimmomatic {memory} SE -threads {trimmomatic_threads} {extra} {input} {output} {trimmer} {log}"
+        "trimmomatic SE -threads {trimmomatic_threads} "
+        "{java_opts} {extra} {input} {output} {trimmer} {log}"
     )

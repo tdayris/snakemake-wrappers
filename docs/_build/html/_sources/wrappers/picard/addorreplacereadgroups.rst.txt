@@ -22,8 +22,14 @@ This wrapper can be used in the following way:
             "logs/picard/replace_rg/{sample}.log"
         params:
             "RGLB=lib1 RGPL=illumina RGPU={sample} RGSM={sample}"
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
         wrapper:
-            "0.67.0-345-g15e007be/bio/picard/addorreplacereadgroups"
+            "0.67.0-359-g027844ee/bio/picard/addorreplacereadgroups"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -38,7 +44,8 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``picard==2.23.4``
+* ``picard==2.22.1``
+* ``snakemake-wrapper-utils==0.1.3``
 
 Input/Output
 ------------
@@ -71,18 +78,12 @@ Code
 
 
     from snakemake.shell import shell
-    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    from snakemake_wrapper_utils.java import get_java_opts
 
-    memory = ""
-    if "mem_mb" in snakemake.resources.keys():
-        memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
-
+    extra = snakemake.params
+    java_opts = get_java_opts(snakemake)
 
     shell(
-        " picard AddOrReplaceReadGroups "
-        " {memory} "
-        " {snakemake.params} "
-        " I={snakemake.input} "
-        " O={snakemake.output} "
-        " {log}"
+        "picard AddOrReplaceReadGroups {java_opts} {extra} "
+        "I={snakemake.input} O={snakemake.output} &> {snakemake.log}"
     )

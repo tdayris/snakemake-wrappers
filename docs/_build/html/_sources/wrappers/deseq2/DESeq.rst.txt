@@ -21,7 +21,8 @@ This wrapper can be used in the following way:
         output:
             rds = "wald.RDS",
             deseq2_results = directory("tsv"),
-            normalized_counts = "counts.tsv"
+            normalized_counts = "counts.tsv",
+            dst = "counts.RDS"
         message:
             "Testing DESeq2 nbinomWaldTest"
         threads:
@@ -36,7 +37,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_nbinomWaldTest.log"
         wrapper:
-            "0.67.0-345-g15e007be/bio/deseq2/DESeq"
+            "0.67.0-359-g027844ee/bio/deseq2/DESeq"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -173,9 +174,19 @@ Code
     }
 
     # Saving normalized counts on demand
+    table <- SummarizedExperiment::assay(wald);
     if ("normalized_counts" %in% base::names(snakemake@output)) {
-      output_table <- base::as.character(snakemake@output[["normalized_counts"]]);
-      tsv <- SummarizedExperiment::assay(wald);
-      utils::write.table(x = tsv, file = output_table, sep = "\t", quote = FALSE);
-      base::message("Normalized counts saved");
+      output_table <- base::as.character(x=snakemake@output[["normalized_counts"]]);
+      utils::write.table(x = table, file = output_table, sep = "\t", quote = FALSE);
+      base::message("Normalized counts saved as TSV");
+    }
+
+    if ("dst" %in% base::names(snakemake@output)) {
+      output_rds <- base::as.character(
+        x=snakemake@output[["dst"]]
+      );
+      base::saveRDS(
+        obj = table,
+        file = output_rds
+      );
     }

@@ -21,7 +21,7 @@ This wrapper can be used in the following way:
             "concat.fq.gz"
         threads: 2
         wrapper:
-            "0.67.0-345-g15e007be/bio/concatenate_fastq"
+            "0.67.0-359-g027844ee/bio/concatenate_fastq"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -81,17 +81,18 @@ Code
 
     from snakemake.shell import shell
 
-    if snakemake.threads != 2:
+    input_list = list(snakemake.input)
+    if len(input_list) > 1 and snakemake.threads != 2:
         raise ValueError(
-            "Exactly two threads are required for this wrapper. "
-            "Only {} were given.".format(str(snakemake.threads))
+            "Exactly two threads are required for this wrapper, "
+            "and {} was/were given.".format(str(snakemake.threads))
         )
 
     if len(snakemake.input) > 1:
         log = snakemake.log_fmt_shell(stdout=False, stderr=True)
         shell(
             " zcat "  # Concatenate gzipped files
-            " {snakemake.input} "  # List of input files
+            " {input_list} "  # List of input files
             " | "
             " gzip -c "  # Gzip output file
             " > {snakemake.output} "  # Path to output file
@@ -101,7 +102,7 @@ Code
         log = snakemake.log_fmt_shell(stdout=True, stderr=True)
         shell(
             " cp -v "  # Copy if not merge needed
-            " {input} "  # Path to input file
-            " {output} "  # Path to output file
+            " {input_list} "  # Path to input file
+            " {snakemake.output} "  # Path to output file
             " {log} "  # Logging
         )

@@ -317,7 +317,8 @@ and negative binomial GLM fitting and Wald test.</p>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">rds</span> <span class="o">=</span> <span class="s2">&quot;wald.RDS&quot;</span><span class="p">,</span>
         <span class="n">deseq2_results</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;tsv&quot;</span><span class="p">),</span>
-        <span class="n">normalized_counts</span> <span class="o">=</span> <span class="s2">&quot;counts.tsv&quot;</span>
+        <span class="n">normalized_counts</span> <span class="o">=</span> <span class="s2">&quot;counts.tsv&quot;</span><span class="p">,</span>
+        <span class="n">dst</span> <span class="o">=</span> <span class="s2">&quot;counts.RDS&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Testing DESeq2 nbinomWaldTest&quot;</span>
     <span class="n">threads</span><span class="p">:</span>
@@ -332,7 +333,7 @@ and negative binomial GLM fitting and Wald test.</p>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_nbinomWaldTest.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.67.0-345-g15e007be/bio/deseq2/DESeq&quot;</span>
+        <span class="s2">&quot;0.67.0-359-g027844ee/bio/deseq2/DESeq&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -461,11 +462,21 @@ When running with</p>
 <span class="p">}</span>
 
 <span class="c1"># Saving normalized counts on demand</span>
+<span class="n">table</span> <span class="o">&lt;-</span> <span class="n">SummarizedExperiment</span><span class="o">::</span><span class="nf">assay</span><span class="p">(</span><span class="n">wald</span><span class="p">);</span>
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;normalized_counts&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">))</span> <span class="p">{</span>
-  <span class="n">output_table</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;normalized_counts&quot;</span><span class="p">]]);</span>
-  <span class="n">tsv</span> <span class="o">&lt;-</span> <span class="n">SummarizedExperiment</span><span class="o">::</span><span class="nf">assay</span><span class="p">(</span><span class="n">wald</span><span class="p">);</span>
-  <span class="n">utils</span><span class="o">::</span><span class="nf">write.table</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">tsv</span><span class="p">,</span> <span class="n">file</span> <span class="o">=</span> <span class="n">output_table</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;\t&quot;</span><span class="p">,</span> <span class="n">quote</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">);</span>
-  <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Normalized counts saved&quot;</span><span class="p">);</span>
+  <span class="n">output_table</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;normalized_counts&quot;</span><span class="p">]]);</span>
+  <span class="n">utils</span><span class="o">::</span><span class="nf">write.table</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">table</span><span class="p">,</span> <span class="n">file</span> <span class="o">=</span> <span class="n">output_table</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;\t&quot;</span><span class="p">,</span> <span class="n">quote</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">);</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Normalized counts saved as TSV&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;dst&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">output_rds</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;dst&quot;</span><span class="p">]]</span>
+  <span class="p">);</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">saveRDS</span><span class="p">(</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">table</span><span class="p">,</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">output_rds</span>
+  <span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>

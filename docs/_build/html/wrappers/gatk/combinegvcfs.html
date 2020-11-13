@@ -324,8 +324,14 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># optional</span>
         <span class="n">java_opts</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># optional</span>
+    <span class="c1"># optional specification of memory usage of the JVM that snakemake will respect with global</span>
+    <span class="c1"># resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)</span>
+    <span class="c1"># and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:</span>
+    <span class="c1"># https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">1024</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.67.0-345-g15e007be/bio/gatk/combinegvcfs&quot;</span>
+        <span class="s2">&quot;0.67.0-359-g027844ee/bio/gatk/combinegvcfs&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -339,6 +345,7 @@ When running with</p>
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">gatk4==4.1.4.1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">snakemake-wrapper-utils==0.1.3</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="input-output">
@@ -378,10 +385,12 @@ When running with</p>
 <span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+<span class="kn">from</span> <span class="nn">snakemake_wrapper_utils.java</span> <span class="kn">import</span> <span class="n">get_java_opts</span>
 
 
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="n">java_opts</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;java_opts&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">java_opts</span> <span class="o">=</span> <span class="n">get_java_opts</span><span class="p">(</span><span class="n">snakemake</span><span class="p">)</span>
+
 <span class="n">gvcfs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="s2">&quot;-V </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">gvcfs</span><span class="p">))</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

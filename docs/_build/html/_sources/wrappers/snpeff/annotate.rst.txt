@@ -3,7 +3,7 @@
 SNPEFF
 ======
 
-Annotate predicted effect of nucleotide changes with SnpEff
+Annotate predicted effect of nucleotide changes with `SnpEff <https://pcingola.github.io/SnpEff/se_introduction/>`_
 
 
 Example
@@ -23,10 +23,14 @@ This wrapper can be used in the following way:
             csvstats="snpeff/{sample}.csv" # summary statistics in CSV, optional
         log:
             "logs/snpeff/{sample}.log"
-        params:
-            extra="-Xmx4g"           # optional parameters (e.g., max memory 4g)
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=4096
         wrapper:
-            "0.67.0-345-g15e007be/bio/snpeff/annotate"
+            "0.67.0-359-g027844ee/bio/snpeff/annotate"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -43,6 +47,7 @@ Software dependencies
 
 * ``snpeff==4.3.1t``
 * ``bcftools=1.10``
+* ``snakemake-wrapper-utils==0.1.3``
 
 
 
@@ -69,6 +74,11 @@ Code
     import shutil
     import tempfile
     from pathlib import Path
+    from snakemake_wrapper_utils.java import get_java_opts
+
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
 
     outcalls = snakemake.output.calls
     if outcalls.endswith(".vcf.gz"):
@@ -84,8 +94,6 @@ Code
 
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
-    extra = snakemake.params.get("extra", "")
-
     data_dir = Path(snakemake.input.db).parent.resolve()
 
     stats = snakemake.output.get("stats", "")
@@ -96,7 +104,8 @@ Code
     reference = path.basename(snakemake.input.db)
 
     shell(
-        "snpEff -dataDir {data_dir} {stats_opt} {csvstats_opt} {extra} "
+        "snpEff {java_opts} -dataDir {data_dir} "
+        "{stats_opt} {csvstats_opt} {extra} "
         "{reference} {incalls} "
         "{outprefix} > {outcalls} {log}"
     )

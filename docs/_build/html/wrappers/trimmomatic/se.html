@@ -298,7 +298,7 @@
             
   <div class="section" id="trimmomatic-se">
 <span id="id1"></span><h1>TRIMMOMATIC SE<a class="headerlink" href="#trimmomatic-se" title="Permalink to this headline">¶</a></h1>
-<p>Trim single-end reads with trimmomatic. (De)compress with pigz.</p>
+<p>Trim single-end reads with <a class="reference external" href="http://www.usadellab.org/cms/?page=trimmomatic">trimmomatic</a>. (De)compress with pigz.</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -318,8 +318,14 @@
         <span class="n">compression_level</span><span class="o">=</span><span class="s2">&quot;-9&quot;</span>
     <span class="n">threads</span><span class="p">:</span>
         <span class="mi">32</span>
+    <span class="c1"># optional specification of memory usage of the JVM that snakemake will respect with global</span>
+    <span class="c1"># resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)</span>
+    <span class="c1"># and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:</span>
+    <span class="c1"># https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">1024</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.67.0-345-g15e007be/bio/trimmomatic/se&quot;</span>
+        <span class="s2">&quot;0.67.0-359-g027844ee/bio/trimmomatic/se&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -334,6 +340,7 @@ When running with</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">trimmomatic==0.39</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pigz==2.3.4</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">snakemake-wrapper-utils==0.1.3</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="authors">
@@ -363,7 +370,7 @@ When running with</p>
 
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
-
+<span class="kn">from</span> <span class="nn">snakemake_wrapper_utils.java</span> <span class="kn">import</span> <span class="n">get_java_opts</span>
 
 <span class="c1"># Distribute available threads between trimmomatic itself and any potential pigz instances</span>
 <span class="k">def</span> <span class="nf">distribute_threads</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">available_threads</span><span class="p">):</span>
@@ -413,6 +420,7 @@ When running with</p>
 
 
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">java_opts</span> <span class="o">=</span> <span class="n">get_java_opts</span><span class="p">(</span><span class="n">snakemake</span><span class="p">)</span>
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">compression_level</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compression_level&quot;</span><span class="p">,</span> <span class="s2">&quot;-5&quot;</span><span class="p">)</span>
 <span class="n">trimmer</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">trimmer</span><span class="p">)</span>
@@ -426,12 +434,9 @@ When running with</p>
 <span class="nb">input</span> <span class="o">=</span> <span class="n">compose_input_gz</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">input_threads</span><span class="p">)</span>
 <span class="n">output</span> <span class="o">=</span> <span class="n">compose_output_gz</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">output_threads</span><span class="p">,</span> <span class="n">compression_level</span><span class="p">)</span>
 
-<span class="n">memory</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<span class="k">if</span> <span class="s2">&quot;mem_mb&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-    <span class="n">memory</span> <span class="o">=</span> <span class="s2">&quot;-Xmx</span><span class="si">{}</span><span class="s2">M&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakem</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;mem_mb&quot;</span><span class="p">])</span>
-
 <span class="n">shell</span><span class="p">(</span>
-    <span class="s2">&quot;trimmomatic </span><span class="si">{memory}</span><span class="s2"> SE -threads </span><span class="si">{trimmomatic_threads}</span><span class="s2"> </span><span class="si">{extra}</span><span class="s2"> </span><span class="si">{input}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2"> </span><span class="si">{trimmer}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;trimmomatic SE -threads </span><span class="si">{trimmomatic_threads}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{java_opts}</span><span class="s2"> </span><span class="si">{extra}</span><span class="s2"> </span><span class="si">{input}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2"> </span><span class="si">{trimmer}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

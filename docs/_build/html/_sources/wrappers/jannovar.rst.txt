@@ -3,7 +3,7 @@
 JANNOVAR
 ========
 
-Annotate predicted effect of nucleotide changes with Jannovar
+Annotate predicted effect of nucleotide changes with `Jannovar<https://doc-openbio.readthedocs.io/projects/jannovar/en/master/>`_
 
 
 Example
@@ -21,11 +21,17 @@ This wrapper can be used in the following way:
             "jannovar/{sample}.vcf.gz"
         log:
             "logs/jannovar/{sample}.log"
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mg}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_gb = 1
         params:
             database="hg19_small.ser", # path to jannovar reference dataset
             extra="--show-all"         # optional parameters
         wrapper:
-            "0.67.0-345-g15e007be/bio/jannovar"
+            "0.67.0-359-g027844ee/bio/jannovar"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -41,6 +47,7 @@ Software dependencies
 ---------------------
 
 * ``jannovar-cli==0.31``
+* ``snakemake-wrapper-utils==0.1.3``
 
 
 
@@ -63,12 +70,14 @@ Code
 
 
     from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
 
     shell.executable("bash")
 
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
     extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
 
     pedigree = snakemake.input.get("pedigree", "")
     if pedigree:
@@ -77,5 +86,5 @@ Code
     shell(
         "jannovar annotate-vcf --database {snakemake.params.database}"
         " --input-vcf {snakemake.input.vcf} --output-vcf {snakemake.output}"
-        " {pedigree} {extra} {log}"
+        " {pedigree} {extra} {java_opts} {log}"
     )

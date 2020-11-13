@@ -18,7 +18,7 @@ This wrapper can be used in the following way:
     rule trinity:
         input:
             left=["reads/reads.left.fq.gz", "reads/reads2.left.fq.gz"],
-            right=["reads/reads.right.fq.gz", "reads/reads2.right.fq.gz"] 
+            right=["reads/reads.right.fq.gz", "reads/reads2.right.fq.gz"]
         output:
             "trinity_out_dir/Trinity.fasta"
         log:
@@ -26,8 +26,14 @@ This wrapper can be used in the following way:
         params:
             extra=""
         threads: 4
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_gb=10
         wrapper:
-            "0.67.0-345-g15e007be/bio/trinity"
+            "0.67.0-359-g027844ee/bio/trinity"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -79,9 +85,22 @@ Code
     from snakemake.shell import shell
 
     extra = snakemake.params.get("extra", "")
-    max_memory = snakemake.params.get("max_memory", "10G")
+    # Previous wrapper reserved 10 Gigabytes by default. This behaviour is
+    # preserved below:
+    max_memory = "10G"
+
+    # Getting memory in megabytes, if java opts is not filled with -Xmx parameter
+    # By doing so, backward compatibility is preserved
     if "mem_mb" in snakemake.resources.keys():
-        max_memory = snakemake.resources["mem_mb"]
+        # max_memory from trinity expects a value in gigabytes.
+        rounded_mb_to_gb = int(snakemake.resources["mem_mb"] / 1024)
+        max_memory = "{}G".format(rounded_mb_to_gb)
+
+    # Getting memory in gigabytes, for user convenience. Please prefer the use
+    # of mem_mb over mem_gb as advised in documentation.
+    elif "mem_gb" in snakemake.resources.keys():
+        max_memory = "{}G".format(snakemake.resources["mem_gb"])
+
 
     # allow multiple input files for single assembly
     left = snakemake.input.get("left")

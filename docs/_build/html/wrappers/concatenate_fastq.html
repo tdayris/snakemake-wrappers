@@ -306,7 +306,7 @@
         <span class="s2">&quot;concat.fq.gz&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.67.0-345-g15e007be/bio/concatenate_fastq&quot;</span>
+        <span class="s2">&quot;0.67.0-359-g027844ee/bio/concatenate_fastq&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -358,17 +358,18 @@ When running with</p>
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
-<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">threads</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+<span class="n">input_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">threads</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-        <span class="s2">&quot;Exactly two threads are required for this wrapper. &quot;</span>
-        <span class="s2">&quot;Only </span><span class="si">{}</span><span class="s2"> were given.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">threads</span><span class="p">))</span>
+        <span class="s2">&quot;Exactly two threads are required for this wrapper, &quot;</span>
+        <span class="s2">&quot;and </span><span class="si">{}</span><span class="s2"> was/were given.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">threads</span><span class="p">))</span>
     <span class="p">)</span>
 
 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
     <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">shell</span><span class="p">(</span>
         <span class="s2">&quot; zcat &quot;</span>  <span class="c1"># Concatenate gzipped files</span>
-        <span class="s2">&quot; </span><span class="si">{snakemake.input}</span><span class="s2"> &quot;</span>  <span class="c1"># List of input files</span>
+        <span class="s2">&quot; </span><span class="si">{input_list}</span><span class="s2"> &quot;</span>  <span class="c1"># List of input files</span>
         <span class="s2">&quot; | &quot;</span>
         <span class="s2">&quot; gzip -c &quot;</span>  <span class="c1"># Gzip output file</span>
         <span class="s2">&quot; &gt; </span><span class="si">{snakemake.output}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to output file</span>
@@ -378,8 +379,8 @@ When running with</p>
     <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">shell</span><span class="p">(</span>
         <span class="s2">&quot; cp -v &quot;</span>  <span class="c1"># Copy if not merge needed</span>
-        <span class="s2">&quot; </span><span class="si">{input}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to input file</span>
-        <span class="s2">&quot; </span><span class="si">{output}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to output file</span>
+        <span class="s2">&quot; </span><span class="si">{input_list}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to input file</span>
+        <span class="s2">&quot; </span><span class="si">{snakemake.output}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to output file</span>
         <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2"> &quot;</span>  <span class="c1"># Logging</span>
     <span class="p">)</span>
 </pre></div>

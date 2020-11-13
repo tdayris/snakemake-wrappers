@@ -296,25 +296,91 @@
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This meta-wrapper can be used in the following way:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">build_release_organism</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;GRCh38.99.homo_sapiens&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;GRCm38.99.mus_musculus&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">snakemake.remote.HTTP</span> <span class="kn">import</span> <span class="n">RemoteProvider</span> <span class="k">as</span> <span class="n">HTTPRemoteProvider</span>
+<span class="n">HTTP</span> <span class="o">=</span> <span class="n">HTTPRemoteProvider</span><span class="p">()</span>
+
+<span class="n">ensembl_build_release_organism</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;GRCh38&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;homo_sapiens&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;GRCm38&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;mus_musculus&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;BDGP6.28&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;drosophila_melanogaster&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;WBcel235&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;caenorhabditis_elegans&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;ICSASG_v2&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;salmo_salar&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;R64-1-1&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;saccharomyces_cerevisiae&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Rnor_6.0&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;rattus_norvegicus&quot;</span><span class="p">]</span>
 <span class="p">]</span>
 
+<span class="n">wildcard_constraints</span><span class="p">:</span>
+    <span class="n">release</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ensembl_build_release_organism</span><span class="p">]),</span>
+    <span class="n">organism</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ensembl_build_release_organism</span><span class="p">]),</span>
+    <span class="n">build</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ensembl_build_release_organism</span><span class="p">])</span>
 
-<span class="n">rule</span> <span class="n">get_genome</span><span class="p">:</span>
+
+<span class="n">rule</span> <span class="n">target</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;index/ensembl/</span><span class="si">{fasta}</span><span class="s2">.dna.1.bt2&quot;</span><span class="p">,</span>
+            <span class="n">fasta</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ensembl_build_release_organism</span><span class="p">]</span>
+        <span class="p">)</span>
+
+
+<span class="n">rule</span> <span class="n">get_genome_from_ensembl</span><span class="p">:</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;refs/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.dna.fasta&quot;</span>
+        <span class="s2">&quot;refs/ensembl/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">species</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{organism}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">datatype</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{datatype}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">build</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{build}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">release</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{release}</span><span class="s2">&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/get_genome/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.log&quot;</span>
+        <span class="s2">&quot;logs/ensembl/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.log&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.67.0-345-g15e007be/bio/reference/ensembl-sequence&quot;</span>
+        <span class="s2">&quot;bio/reference/ensembl-sequence&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">download_tair10</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">HTTP</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span>
+            <span class="s2">&quot;https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_chromosome_files/TAIR10_chr_all.fas&quot;</span><span class="p">,</span>
+            <span class="n">keep_local</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;refs/TAIR/TAIR.10.arabidopsis_thaliana.dna.fasta&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/tair/TAIR.10.arabidopsis_thaliana.chr_all.log&quot;</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;mv </span><span class="si">{input}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">download_phix_nbci</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">HTTP</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span>
+            <span class="s2">&quot;https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/enterobacteria_phage_phix174_sensu_lato_uid14015/NC_001422.fna&quot;</span><span class="p">,</span>
+            <span class="n">keep_local</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;refs/ncbi/NC_001422.174.enterobacteria_phage_phix.dna.fasta&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/ncbi/NC_001422.174.enterobacteria_phage_phix.dna.log&quot;</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;mv </span><span class="si">{input}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">bowtie2_build</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;refs/</span><span class="si">{source}</span><span class="s2">/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.dna.fasta&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">multiext</span><span class="p">(</span>
+            <span class="s2">&quot;index/</span><span class="si">{source}</span><span class="s2">/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.dna&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;.1.bt2&quot;</span><span class="p">,</span> <span class="s2">&quot;.2.bt2&quot;</span><span class="p">,</span> <span class="s2">&quot;.3.bt2&quot;</span><span class="p">,</span> <span class="s2">&quot;.4.bt2&quot;</span><span class="p">,</span> <span class="s2">&quot;.rev.1.bt2&quot;</span><span class="p">,</span> <span class="s2">&quot;.rev.2.bt2&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bwt2_build/</span><span class="si">{source}</span><span class="s2">.</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.log&quot;</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/bowtie2/build&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.

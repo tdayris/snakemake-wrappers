@@ -3,7 +3,7 @@
 VARSCAN MPILEUP2SNP
 ===================
 
-Detect variants in NGS data from Samtools mpileup
+Detect variants in NGS data from Samtools mpileup with `VarScan <http://varscan.sourceforge.net/germline-calling.html>`_
 
 
 Example
@@ -24,10 +24,16 @@ This wrapper can be used in the following way:
             1     # However, mpileup might have to be unzipped.
                   # Keep threading value to one for unzipped mpileup input
                   # Set it to two for zipped mipileup files
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
         log:
             "logs/varscan_{sample}.log"
         wrapper:
-            "0.67.0-345-g15e007be/bio/varscan/mpileup2snp"
+            "0.67.0-359-g027844ee/bio/varscan/mpileup2snp"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -43,6 +49,7 @@ Software dependencies
 ---------------------
 
 * ``varscan==2.4.3``
+* ``snakemake-wrapper-utils==0.1.3``
 
 Input/Output
 ------------
@@ -90,10 +97,12 @@ Code
     import os.path as op
     from snakemake.shell import shell
     from snakemake.utils import makedirs
+    from snakemake_wrapper_utils.java import get_java_opts
 
     # Gathering extra parameters and logging behaviour
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
     extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
 
     # In case input files are gzipped mpileup files,
     # they are being unzipped and piped
@@ -111,8 +120,8 @@ Code
 
     shell(
         "varscan mpileup2snp "  # Tool and its subprocess
-        "<( {pileup} ) " # Pileup command
-        "{extra} "  # Extra parameters
+        "<( {pileup} ) "
+        "{java_opts} {extra} "  # Extra parameters
         "> {snakemake.output[0]} "  # Path to vcf file
         "{log}"  # Logging behaviour
     )

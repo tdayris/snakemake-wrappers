@@ -58,7 +58,7 @@ This meta-wrapper can be used in the following way:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.67.0-345-g15e007be/bio/reference/ensembl-sequence"
+            "0.67.0-359-g027844ee/bio/reference/ensembl-sequence"
 
 
     rule get_annotation:
@@ -74,7 +74,7 @@ This meta-wrapper can be used in the following way:
             "logs/get_annotation/{build}.{release}.{organism}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.67.0-345-g15e007be/bio/reference/ensembl-annotation"
+            "0.67.0-359-g027844ee/bio/reference/ensembl-annotation"
 
 
     rule samtools_faidx_reference:
@@ -87,7 +87,7 @@ This meta-wrapper can be used in the following way:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.67.0-345-g15e007be/bio/samtools/faidx"
+            "0.67.0-359-g027844ee/bio/samtools/faidx"
 
 
     rule create_dict:
@@ -102,7 +102,7 @@ This meta-wrapper can be used in the following way:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.67.0-345-g15e007be/bio/picard/createsequencedictionary"
+            "0.67.0-359-g027844ee/bio/picard/createsequencedictionary"
 
 
     rule get_variation_with_contig_lengths:
@@ -118,7 +118,7 @@ This meta-wrapper can be used in the following way:
         log:
             "logs/get_variation/{build}.{release}.{organism}.log"
         wrapper:
-            "0.67.0-345-g15e007be/bio/reference/ensembl-variation"
+            "0.67.0-359-g027844ee/bio/reference/ensembl-variation"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -445,21 +445,17 @@ Code
 
 
     from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
 
 
     extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
-
-    memory = ""
-    if "mem_mb" in snakemake.resources.keys():
-        memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
 
     shell(
         "picard "
         "CreateSequenceDictionary "
-        "{memory} "
-        "{extra} "
+        "{java_opts} {extra} "
         "R={snakemake.input[0]} "
         "O={snakemake.output[0]} "
         "{log}"

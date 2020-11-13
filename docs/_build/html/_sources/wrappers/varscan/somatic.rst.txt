@@ -3,7 +3,8 @@
 VARSCAN SOMATIC
 ===============
 
-Varscan Somatic calls variants and identifies their somatic status (Germline/LOH/Somatic) using pileup files from a matched tumor-normal pair.
+`Varscan Somatic <http://varscan.sourceforge.net/somatic-calling.html>`_ calls variants and identifies their somatic status (Germline/LOH/Somatic) using pileup files from a matched tumor-normal pair.
+
 
 
 Example
@@ -26,10 +27,16 @@ This wrapper can be used in the following way:
             "Calling somatic variants {wildcards.sample}"
         threads:
             1
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
         params:
             extra = ""
         wrapper:
-            "0.67.0-345-g15e007be/bio/varscan/somatic"
+            "0.67.0-359-g027844ee/bio/varscan/somatic"
 
 
 Note that input, output and log file paths can be chosen freely.
@@ -45,6 +52,7 @@ Software dependencies
 ---------------------
 
 * ``varscan==2.4.3``
+* ``snakemake-wrapper-utils==0.1.3``
 
 Input/Output
 ------------
@@ -82,10 +90,12 @@ Code
 
     from snakemake.shell import shell
     from snakemake.utils import makedirs
+    from snakemake_wrapper_utils.java import get_java_opts
 
     # Defining logging and gathering extra parameters
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
     extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
 
     # Building output dirs
     makedirs(op.dirname(snakemake.output.snp))
@@ -113,7 +123,7 @@ Code
         "varscan somatic"  # Tool and its subcommand
         " {in_pileup}"  # Path to input file(s)
         " {prefix}"  # Path to output
-        " {extra}"  # Extra parameters
+        " {java_opts} {extra}"  # Extra parameters
         " {mpileup}"
         " --output-snp {snakemake.output.snp}"  # Path to snp output file
         " --output-indel {snakemake.output.indel}"  # Path to indel output file

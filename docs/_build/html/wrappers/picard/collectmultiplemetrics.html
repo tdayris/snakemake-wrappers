@@ -418,7 +418,7 @@
         <span class="s2">&quot;METRIC_ACCUMULATION_LEVEL=SAMPLE &quot;</span>
         <span class="s2">&quot;REF_FLAT=ref_flat.txt &quot;</span>   <span class="c1"># is required if RnaSeqMetrics are used</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.67.0-345-g15e007be/bio/picard/collectmultiplemetrics&quot;</span>
+        <span class="s2">&quot;0.67.0-359-g027844ee/bio/picard/collectmultiplemetrics&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -432,6 +432,7 @@ When running with</p>
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">picard==2.23.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">snakemake-wrapper-utils==0.1.3</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="input-output">
@@ -464,12 +465,12 @@ When running with</p>
 
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+<span class="kn">from</span> <span class="nn">snakemake_wrapper_utils.java</span> <span class="kn">import</span> <span class="n">get_java_opts</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="n">res</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mem_gb&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">)</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">res</span> <span class="ow">or</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span>
+<span class="n">java_opts</span> <span class="o">=</span> <span class="n">get_java_opts</span><span class="p">(</span><span class="n">snakemake</span><span class="p">)</span>
 
 <span class="n">exts_to_prog</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;.alignment_summary_metrics&quot;</span><span class="p">:</span> <span class="s2">&quot;CollectAlignmentSummaryMetrics&quot;</span><span class="p">,</span>
@@ -515,11 +516,11 @@ When running with</p>
         <span class="k">break</span>
 
 <span class="n">shell</span><span class="p">(</span>
-    <span class="s2">&quot;(picard -Xmx</span><span class="si">{res}</span><span class="s2">g CollectMultipleMetrics &quot;</span>
+    <span class="s2">&quot;(picard CollectMultipleMetrics &quot;</span>
     <span class="s2">&quot;I=</span><span class="si">{snakemake.input.bam}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;O=</span><span class="si">{out}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;R=</span><span class="si">{snakemake.input.ref}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot;</span><span class="si">{snakemake.params}{programs}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> </span><span class="si">{programs}</span><span class="s2"> </span><span class="si">{java_opts}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
