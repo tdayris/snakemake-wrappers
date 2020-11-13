@@ -16,7 +16,7 @@ __license__ = "MIT"
 
 
 from snakemake.shell import shell
-
+from snakemake_wrapper_utils.java import get_java_opts
 
 # Distribute available threads between trimmomatic itself and any potential pigz instances
 def distribute_threads(input_files, output_files, available_threads):
@@ -66,6 +66,7 @@ def compose_output_gz(filename, threads, compression_level):
 
 
 extra = snakemake.params.get("extra", "")
+java_opts = get_java_opts(snakemake)
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 compression_level = snakemake.params.get("compression_level", "-5")
 trimmer = " ".join(snakemake.params.trimmer)
@@ -92,12 +93,8 @@ output_r1, output_r1_unp, output_r2, output_r2_unp = [
     for filename in output_files
 ]
 
-memory = ""
-if "mem_mb" in snakemake.resources.keys():
-    memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
-
 shell(
-    "trimmomatic {memory} PE -threads {trimmomatic_threads} {extra} "
+    "trimmomatic PE -threads {trimmomatic_threads} {java_opts} {extra} "
     "{input_r1} {input_r2} "
     "{output_r1} {output_r1_unp} "
     "{output_r2} {output_r2_unp} "

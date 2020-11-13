@@ -7,21 +7,17 @@ __license__ = "MIT"
 
 
 from snakemake.shell import shell
+from snakemake_wrapper_utils.java import get_java_opts
 
 
 inputs = " ".join("INPUT={}".format(in_) for in_ in snakemake.input)
 extra = snakemake.params.get("extra", "")
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
-
-memory = ""
-if "mem_mb" in snakemake.resources.keys():
-    memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
+java_opts = get_java_opts(snakemake)
 
 shell(
     "picard CollectHsMetrics"
-    " {memory} "
-    " {extra}"
+    " {java_opts} {extra}"
     " INPUT={snakemake.input.bam}"
     " OUTPUT={snakemake.output[0]}"
     " REFERENCE_SEQUENCE={snakemake.input.reference}"

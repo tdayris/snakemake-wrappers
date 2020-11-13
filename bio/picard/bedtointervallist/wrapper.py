@@ -5,22 +5,19 @@ __license__ = "MIT"
 
 
 from snakemake.shell import shell
-
+from snakemake_wrapper_utils.java import get_java_opts
 
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 
-memory = ""
-if "mem_mb" in snakemake.resources.keys():
-    memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
-
+extra = snakemake.params
+java_opts = get_java_opts(snakemake)
 
 shell(
     "picard BedToIntervalList "
-    " {memory} "
-    " {snakemake.params} "
-    " INPUT={snakemake.input.bed} "
-    " SEQUENCE_DICTIONARY={snakemake.input.dict} "
-    " OUTPUT={snakemake.output} "
-    " {log} "
+    "{java_opts} {extra} "
+    "INPUT={snakemake.input.bed} "
+    "SEQUENCE_DICTIONARY={snakemake.input.dict} "
+    "OUTPUT={snakemake.output} "
+    "{log} "
 )

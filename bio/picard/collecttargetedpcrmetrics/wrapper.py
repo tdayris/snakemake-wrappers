@@ -5,21 +5,18 @@ __license__ = "MIT"
 
 
 from snakemake.shell import shell
+from snakemake_wrapper_utils.java import get_java_opts
 
 
 log = snakemake.log_fmt_shell()
 
 extra = snakemake.params.get("extra", "")
+java_opts = get_java_opts(snakemake)
 
-
-memory = ""
-if "mem_mb" in snakemake.resources.keys():
-    memory = "-Xmx{}M".format(snakemake.resources["mem_mb"])
 
 shell(
     "picard CollectTargetedPcrMetrics "
-    "{memory} "
-    "{extra} "
+    "{java_opts} {extra} "
     "INPUT={snakemake.input.bam} "
     "OUTPUT={snakemake.output[0]} "
     "AMPLICON_INTERVALS={snakemake.input.amplicon_intervals} "
