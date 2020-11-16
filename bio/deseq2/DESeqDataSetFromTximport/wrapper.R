@@ -59,7 +59,7 @@ base::write("DESeqDataSet built.", stderr());
 if ("levels" %in% base::names(snakemake@params)) {
   # Levels should come with reference as first item
   levels <- sapply(
-    snakemake@arams[["levels"]],
+    snakemake@params[["levels"]],
     function(level) base::as.character(level)
   );
 
