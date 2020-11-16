@@ -321,7 +321,8 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deseq2/DESeqDataSetFromTximport.logs&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">design</span> <span class="o">=</span> <span class="s2">&quot;~Cond&quot;</span>
+        <span class="n">design</span> <span class="o">=</span> <span class="s2">&quot;~Cond&quot;</span><span class="p">,</span>
+        <span class="n">levels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;https://raw.githubusercontent.com/tdayris-perso/snakemake-wrappers/deseq2_dataset/bio/deseq2/DESeqDataSetFromTximport/&quot;</span>
 </pre></div>
@@ -361,6 +362,7 @@ optional columns</p>
 <p>Parameters:</p>
 <ul class="simple">
 <li><p>design: the R formulae used to performs differential expression</p></li>
+<li><p>levels: a list of condition to study. The first one is the reference level</p></li>
 </ul>
 </div>
 <div class="section" id="authors">
@@ -428,6 +430,18 @@ optional columns</p>
   <span class="n">design</span> <span class="o">=</span> <span class="n">formula</span>
 <span class="p">);</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">write</span><span class="p">(</span><span class="s">&quot;DESeqDataSet built.&quot;</span><span class="p">,</span> <span class="nf">stderr</span><span class="p">());</span>
+
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;levels&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="c1"># Levels should come with reference as first item</span>
+  <span class="n">levels</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span>
+    <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;levels&quot;</span><span class="p">]],</span>
+    <span class="nf">function</span><span class="p">(</span><span class="n">level</span><span class="p">)</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+  <span class="p">);</span>
+
+  <span class="n">dds</span><span class="o">$</span><span class="n">condition</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">factor</span><span class="p">(</span><span class="n">dds</span><span class="o">$</span><span class="n">condition</span><span class="p">,</span> <span class="n">levels</span> <span class="o">=</span> <span class="n">levels</span><span class="p">);</span>
+  <span class="n">dds</span><span class="o">$</span><span class="n">condition</span> <span class="o">&lt;-</span> <span class="n">stat</span><span class="o">::</span><span class="nf">relevel</span><span class="p">(</span><span class="n">dds</span><span class="o">$</span><span class="n">condition</span><span class="p">,</span> <span class="n">ref</span> <span class="o">=</span> <span class="n">levels</span><span class="p">[[</span><span class="m">1</span><span class="p">]]);</span>
+  <span class="n">dds</span><span class="o">$</span><span class="n">condition</span> <span class="o">&lt;-</span> <span class="nf">droplevels</span><span class="p">(</span><span class="n">dds</span><span class="o">$</span><span class="n">condition</span><span class="p">);</span>
+<span class="p">}</span>
 
 
 <span class="n">keep</span> <span class="o">&lt;-</span> <span class="nf">rowSums</span><span class="p">(</span><span class="nf">counts</span><span class="p">(</span><span class="n">dds</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">count_filter</span><span class="p">;</span>
