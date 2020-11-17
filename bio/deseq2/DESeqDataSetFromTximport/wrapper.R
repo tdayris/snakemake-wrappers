@@ -55,6 +55,23 @@ dds <- DESeq2::DESeqDataSetFromTximport(
   design = formula
 );
 base::write("DESeqDataSet built.", stderr());
+saveRDS(dds, "my_dds.RDS")
+
+levels <- ("levels" %in% base::names(snakemake@params));
+factor <- ("factor" %in% base::names(snakemake@params));
+if (levels & factor) {
+  # Levels should come with reference as first item
+  levels <- sapply(
+    snakemake@params[["levels"]],
+    function(level) base::as.character(x = level)
+  );
+  factor <- base::as.character(x = snakemake@params[["factor"]]);
+
+  dds[[factor]] <- base::factor(dds[[factor]], levels = levels);
+  dds[[factor]] <- stats::relevel(dds[[factor]], ref = levels[[1]]);
+  dds[[factor]] <- droplevels(dds[[factor]]);
+  base::write("Factors have been releveled", stderr());
+}
 
 
 keep <- rowSums(counts(dds)) > count_filter;
