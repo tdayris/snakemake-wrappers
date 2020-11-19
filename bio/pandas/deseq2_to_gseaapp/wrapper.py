@@ -66,6 +66,7 @@ if (gene2gene := snakemake.input.get("gene2gene", None)) is not None:
         header=0,
         index_col=None
     )
+    print(genetable.head())
 
     data = pandas.merge(
         data.copy(),
@@ -76,8 +77,9 @@ if (gene2gene := snakemake.input.get("gene2gene", None)) is not None:
     )
 
     data = data[[
-        "Gene_ID", "Gene_Name", "log2FoldChange", "padj",
-        "Chromosome", "Start", "Stop", "Strand"
+        "Gene_ID", "Gene_Name",
+        "log2FoldChange", "padj",
+        "Chromosome", "Strand"
     ]]
     data.rename(columns={"Gene_ID": "index"}, inplace=True)
 else:

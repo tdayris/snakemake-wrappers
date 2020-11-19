@@ -2,8 +2,8 @@
 # conding: utf-8
 
 """
-This script extracts a tsv from a GTF. This tsv contains gene_id,
-transcript_id, gene_name. Optionaly, headers and positions can
+This script extracts a tsv from a GTF. This tsv contains Gene_ID,
+transcript_id, Gene_Name. Optionaly, headers and positions can
 also be given.
 """
 
@@ -24,6 +24,19 @@ logging.basicConfig(
 )
 
 
+def fill_empty(frame: pandas.DataFrame,
+               fill_col: str,
+               ref_col: str) -> pandas.DataFrame:
+    """
+    Fill NA and empty values in a frame
+    """
+    frame[fill_col] = [
+        ref if ((fill is None) or (fill == numpy.NaN)) else fill
+        for fill, ref in zip(frame[fill_col], frame[ref_col])
+    ]
+    return frame
+
+
 # Read GTF file
 gtf = pandas.read_csv(
     snakemake.input["gtf"],
@@ -32,11 +45,11 @@ gtf = pandas.read_csv(
     comment = "#"
 )
 gtf.columns = [
-    "chromosome", "source", "feature", "start", "stop",
-    "confidence", "strand", "frame", "annotation"
+    "Chromosome", "source", "feature", "Start", "Stop",
+    "confidence", "Strand", "frame", "annotation"
 ]
 gtf.set_index(
-    ["chromosome", "source", "strand", "feature"],
+    ["Chromosome", "source", "Strand", "feature"],
     inplace = True
 )
 logging.debug("Head of the GTF file:")
@@ -45,9 +58,9 @@ logging.info("GTF loaded")
 
 
 # Extract transcripts identifiers, gene identifiers and gene names
-gtf["gene_id"] = gtf["annotation"].str.extract(r"gene_id \"(\w+)\"")
+gtf["Gene_ID"] = gtf["annotation"].str.extract(r"gene_id \"(\w+)\"")
 gtf["transcript_id"] = gtf["annotation"].str.extract(r"transcript_id \"(\w+)\"")
-gtf["gene_name"] = gtf["annotation"].str.extract(r"gene_name \"(\w+)\"")
+gtf["Gene_Name"] = gtf["annotation"].str.extract(r"gene_name \"(\w+)\"")
 del gtf["annotation"]
 
 
@@ -63,7 +76,8 @@ logging.info("GTF parsed")
 # Save results and their subsets on demand
 if "tx2gene_small" in snakemake.output.keys():
     tmp = gtf.copy()
-    tmp = tmp[["transcript_id", "gene_id"]]
+    tmp = tmp[["transcript_id", "Gene_ID"]]
+    tmp = fill_empty(tmp.copy(), "Gene_ID", "transcript_id")
     tmp.drop_duplicates(inplace=True)
     tmp.to_csv(
         snakemake.output["tx2gene_small"],
@@ -75,8 +89,10 @@ if "tx2gene_small" in snakemake.output.keys():
 
 if "tx2gene" in snakemake.output.keys():
     tmp = gtf.copy()
-    tmp = tmp[["gene_id", "transcript_id", "gene_name"]]
+    tmp = tmp[["Gene_ID", "transcript_id", "Gene_Name"]]
     tmp.drop_duplicates(inplace=True)
+    tmp = fill_empty(tmp.copy(), "Gene_ID", "transcript_id")
+    tmp = fill_empty(tmp.copy(), "Gene_Name", "Gene_ID")
     tmp.to_csv(
         snakemake.output["tx2gene"],
         sep = "\t",
@@ -87,7 +103,9 @@ if "tx2gene" in snakemake.output.keys():
 
 if "tx2gene_large" in snakemake.output.keys():
     tmp = gtf.copy()
-    tmp = tmp[["gene_id", "transcript_id", "gene_name", "start", "stop"]]
+    tmp = tmp[["Gene_ID", "transcript_id", "Gene_Name", "Start", "Stop"]]
+    tmp = fill_empty(tmp.copy(), "Gene_ID", "transcript_id")
+    tmp = fill_empty(tmp.copy(), "Gene_Name", "Gene_ID")
     tmp.drop_duplicates(inplace=True)
     tmp.to_csv(
         snakemake.output["tx2gene_large"],
@@ -99,7 +117,8 @@ if "tx2gene_large" in snakemake.output.keys():
 
 if "gene2gene" in snakemake.output.keys():
     tmp = gtf.copy()
-    tmp = tmp[["gene_id", "gene_name"]]
+    tmp = tmp[["Gene_ID", "Gene_Name"]]
+    tmp = fill_empty(tmp.copy(), "Gene_Name", "Gene_ID")
     tmp.drop_duplicates(inplace=True)
     tmp.to_csv(
         snakemake.output["gene2gene"],
@@ -112,7 +131,8 @@ if "gene2gene" in snakemake.output.keys():
 
 if "gene2gene_large" in snakemake.output.keys():
     tmp = gtf.copy()
-    tmp = tmp[["gene_id", "gene_name"]]
+    tmp = tmp[["Gene_ID", "Gene_Name"]]
+    tmp = fill_empty(tmp.copy(), "Gene_Name", "Gene_ID")
     tmp.drop_duplicates(inplace=True)
     tmp.to_csv(
         snakemake.output["gene2gene_large"],
@@ -120,4 +140,4 @@ if "gene2gene_large" in snakemake.output.keys():
         index = True,
         header = True
     )
-    logging.info("Gene2Gene table saved with chromosome and source info")
+    logging.info("Gene2Gene table saved with Chromosome and source info")
