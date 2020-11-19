@@ -1,21 +1,27 @@
-rule test_bedtools_complement:
+rule bedtools_complement_bed:
     input:
-        intervals = "intervals.bed",
-        genome = "small.genome"
+        in_file="a.bed",
+        genome="dummy.genome"
     output:
-        "complement.bed"
-    message:
-        "Testing bedtools complement"
-    threads:
-        1
-    resources:
-        mem_mb = (
-            lambda wildcards, attempt: min(attempt * 1024, 10240)
-        ),
-        time_min = (
-            lambda wildcards, attempt: min(attempt * 20, 200)
-        )
+        "results/bed-complement/a.complement.bed"
+    params:
+        ## Add optional parameters
+        extra="-L"
     log:
-        "logs/test_bedtools_complement.log"
+        "logs/a.complement.bed.log"
+    wrapper:
+        "master/bio/bedtools/complement"
+
+rule bedtools_complement_vcf:
+    input:
+        in_file="a.vcf",
+        genome="dummy.genome"
+    output:
+        "results/vcf-complement/a.complement.vcf"
+    params:
+        ## Add optional parameters
+        extra="-L"
+    log:
+        "logs/a.complement.vcf.log"
     wrapper:
         "master/bio/bedtools/complement"
