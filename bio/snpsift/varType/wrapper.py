@@ -12,10 +12,6 @@ java_opts = get_java_opts(snakemake)
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 extra = snakemake.params.get("extra", "")
 
-
-if "mem_mb" in snakemake.resources.keys():
-    extra += "-Xmx{}M".format(snakemake.resources["mem_mb"])
-
 shell(
     "SnpSift varType"  # Tool and its subcommand
     " {java_opts} {extra}"  # Extra parameters

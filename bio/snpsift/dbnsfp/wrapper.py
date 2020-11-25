@@ -48,10 +48,6 @@ if snakemake.threads < min_threads:
     )
 
 
-if "mem_mb" in snakemake.resources.keys():
-    extra += " -Xmx{}M ".format(snakemake.resources["mem_mb"])
-
-
 shell(
     "SnpSift dbnsfp"  # Tool and its subcommand
     " {java_opts} {extra}"  # Extra parameters
