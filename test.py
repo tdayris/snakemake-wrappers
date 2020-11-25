@@ -3953,3 +3953,11 @@ def test_wgsim():
         "bio/wgsim",
         ["snakemake", "--cores", "1", "reads/1.fq", "reads/2.fq", "--use-conda", "-F"],
     )
+
+
+@skip_if_not_modified
+def test_bcl2fastq():
+    run(
+        "bio/bcl2fastq",
+        ["snakemake", "--cores", "3", "test/output", "--use-conda", "-F"]
+    )

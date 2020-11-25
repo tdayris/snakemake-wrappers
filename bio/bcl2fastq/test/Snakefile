@@ -1,11 +1,10 @@
 rule test_bcfl2fastq:
     input:
-        run_dir = directory()
+        run_dir = "cellranger-tiny-bcl-1.2.0",
+        sample_sheet = "cellranger-tiny-bcl-samplesheet-1.2.0.csv",
+        #input_dir = "cellranger-tiny-bcl-1.2.0/Data/Intensities/BaseCalls/"
     output:
-        out_dir = directory()
-        interop_dir = directory()
-        stats_dir = directory()
-        reports_dir = directory()
+        out_dir = directory("test/output")
     threads: 3
     wrapper:
         "master/bio/bcl2fastq"
