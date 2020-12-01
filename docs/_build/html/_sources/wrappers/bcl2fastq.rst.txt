@@ -16,13 +16,20 @@ This wrapper can be used in the following way:
     rule test_bcfl2fastq:
         input:
             run_dir = "cellranger-tiny-bcl-1.2.0",
-            sample_sheet = "cellranger-tiny-bcl-samplesheet-1.2.0.csv",
-            #input_dir = "cellranger-tiny-bcl-1.2.0/Data/Intensities/BaseCalls/"
+            sample_sheet = "cellranger-tiny-bcl-simple-1.2.0.csv",
+            intensities = "cellranger-tiny-bcl-1.2.0/Data/Intensities"
         output:
             out_dir = directory("test/output")
         threads: 3
+        params:
+            extra = (
+                " --ignore-missing-controls"
+                " --ignore-missing-positions"
+                " --ignore-missing-filter"
+                " --ignore-missing-bcls"
+            )
         wrapper:
-            "0.68.0-353-g70fc74bae/bio/bcl2fastq"
+            "0.68.0-356-g38db5d6d3/bio/bcl2fastq"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -100,7 +107,7 @@ Code
 
 
     # path to runfolder directory
-    if "run_dir" in snakemake.params.keys():
+    if "run_dir" in snakemake.input.keys():
         io_parameters += " --runfolder-dir {} ".format(snakemake.input["run_dir"])
 
 

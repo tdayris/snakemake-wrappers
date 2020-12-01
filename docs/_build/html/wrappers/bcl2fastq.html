@@ -303,13 +303,20 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_bcfl2fastq</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">run_dir</span> <span class="o">=</span> <span class="s2">&quot;cellranger-tiny-bcl-1.2.0&quot;</span><span class="p">,</span>
-        <span class="n">sample_sheet</span> <span class="o">=</span> <span class="s2">&quot;cellranger-tiny-bcl-samplesheet-1.2.0.csv&quot;</span><span class="p">,</span>
-        <span class="c1">#input_dir = &quot;cellranger-tiny-bcl-1.2.0/Data/Intensities/BaseCalls/&quot;</span>
+        <span class="n">sample_sheet</span> <span class="o">=</span> <span class="s2">&quot;cellranger-tiny-bcl-simple-1.2.0.csv&quot;</span><span class="p">,</span>
+        <span class="n">intensities</span> <span class="o">=</span> <span class="s2">&quot;cellranger-tiny-bcl-1.2.0/Data/Intensities&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">out_dir</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;test/output&quot;</span><span class="p">)</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">3</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot; --ignore-missing-controls&quot;</span>
+            <span class="s2">&quot; --ignore-missing-positions&quot;</span>
+            <span class="s2">&quot; --ignore-missing-filter&quot;</span>
+            <span class="s2">&quot; --ignore-missing-bcls&quot;</span>
+        <span class="p">)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.68.0-353-g70fc74bae/bio/bcl2fastq&quot;</span>
+        <span class="s2">&quot;0.68.0-356-g38db5d6d3/bio/bcl2fastq&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -382,7 +389,7 @@ When running with</p>
 
 
 <span class="c1"># path to runfolder directory</span>
-<span class="k">if</span> <span class="s2">&quot;run_dir&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+<span class="k">if</span> <span class="s2">&quot;run_dir&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
     <span class="n">io_parameters</span> <span class="o">+=</span> <span class="s2">&quot; --runfolder-dir </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;run_dir&quot;</span><span class="p">])</span>
 
 
