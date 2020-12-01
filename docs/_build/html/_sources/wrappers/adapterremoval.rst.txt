@@ -1,0 +1,217 @@
+.. _`bio/adapterremoval`:
+
+ADAPTERREMOVAL
+==============
+
+rapid adapter trimming, identification, and read merging. For more information see `AdapterRemoval documentation <https://adapterremoval.readthedocs.io/en/latest/>`_.
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+
+    rule adapterremoval_se:
+        input:
+            sample=["reads/se/{sample}.fastq"]
+        output:
+            fq="trimmed/se/{sample}.fastq.gz",
+            discarded="trimmed/se/{sample}.discarded.fastq.gz",
+            settings="stats/se/{sample}.settings"
+        log:
+            "logs/adapterremoval/se/{sample}.log"
+        params:
+            adapters="--adapter1 ACGGCTAGCTA",
+            extra="",
+            merge_singletons=True,  # Irrelevant for SE; just for testing purposes
+        threads: 1
+        wrapper:
+            "0.68.0-353-g70fc74bae/bio/adapterremoval"
+
+
+    rule adapterremoval_pe:
+        input:
+            sample=["reads/pe/{sample}.1.fastq", "reads/pe/{sample}.2.fastq"]
+        output:
+            fq1="trimmed/pe/{sample}_R1.fastq.gz",
+            fq2="trimmed/pe/{sample}_R2.fastq.gz",
+            collapsed="trimmed/pe/{sample}.collapsed.fastq.gz",
+            collapsed_trunc="trimmed/pe/{sample}.collapsed_trunc.fastq.gz",
+            singleton="trimmed/pe/{sample}.singleton.fastq.gz",
+            discarded="trimmed/pe/{sample}.discarded.fastq.gz",
+            settings="stats/pe/{sample}.settings"
+        log:
+            "logs/adapterremoval/pe/{sample}.log"
+        params:
+            adapters="--adapter1 ACGGCTAGCTA --adapter2 AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC",
+            extra="--collapse --collapse-deterministic",
+        threads: 2
+        wrapper:
+            "0.68.0-353-g70fc74bae/bio/adapterremoval"
+
+
+    rule adapterremoval_pe_collapse_single:
+        input:
+            sample=["reads/pe/{sample}.1.fastq", "reads/pe/{sample}.2.fastq"]
+        output:
+            fq1="trimmed/pe_collapse/{sample}_R1.fastq.gz",
+            fq2="trimmed/pe_collapse/{sample}_R2.fastq.gz",
+            singleton="trimmed/pe_collapse/{sample}.fastq.gz",
+            discarded="trimmed/pe_collapse/{sample}.discarded.fastq.gz",
+            settings="stats/pe_collapse/{sample}.settings"
+        log:
+            "logs/adapterremoval/pe_collapse/{sample}.log"
+        params:
+            adapters="--adapter1 ACGGCTAGCTA --adapter2 AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC",
+            extra="--collapse --collapse-deterministic",
+            merge_singletons=True,
+        threads: 2
+        wrapper:
+            "0.68.0-353-g70fc74bae/bio/adapterremoval"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``adapterremoval==2.3.1``
+
+Input/Output
+------------
+**Input:**
+
+* raw fastq file with R1 reads
+* raw fastq file with R2 reads
+
+**Output:**
+
+* trimmed fastq file with R1 reads
+* trimmed fastq file with R2 reads
+* fastq file with singleton reads (those where mate was filtered out)
+* fastq file with collapsed reads (only for PE and if collapsing of reads is enabled)
+* fastq file with collapsed truncated reads, i.e. that were trimmed due the presence of low-quality or ambiguous nucleotides (only for PE and if collapsing of reads is enabled)
+* fastq file with discarded reads
+* settings and stats file
+
+
+
+Notes
+-----
+
+* If `merge_singletons` is set (only for PE and if collapsing of reads is enabled), then `collapsed` and `collapsed truncated` files are not created and reads are appended to the `singleton` file.
+
+
+
+Authors
+-------
+
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Filipe G. Vieira"
+    __copyright__ = "Copyright 2020, Filipe G. Vieira"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    from pathlib import Path
+    import tempfile
+
+    extra = snakemake.params.get("extra", "") + " "
+    adapters = snakemake.params.get("adapters", "")
+    collapse_pe = (
+        True if "--collapse " in extra or "--collapse-deterministic " in extra else False
+    )
+    merge_singletons = snakemake.params.get("merge_singletons", False)
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+
+    # Check input files
+    n = len(snakemake.input.sample)
+    assert (
+        n == 1 or n == 2
+    ), "input->sample must have 1 (single-end) or 2 (paired-end) elements."
+
+
+    # Input files
+    if n == 1 or "--interleaved " in extra or "--interleaved-input " in extra:
+        reads = "--file1 {}".format(snakemake.input.sample)
+    else:
+        reads = "--file1 {} --file2 {}".format(*snakemake.input.sample)
+
+
+    # Gzip or Bzip compressed output?
+    compress_out = ""
+    if all(
+        [
+            Path(value).suffix == ".gz"
+            for key, value in snakemake.output.items()
+            if key != "settings"
+        ]
+    ):
+        compress_out = "--gzip"
+    elif all(
+        [
+            Path(value).suffix == ".bz2"
+            for key, value in snakemake.output.items()
+            if key != "settings"
+        ]
+    ):
+        compress_out = "--bzip2"
+    else:
+        raise ValueError(
+            "all output files (except for 'settings') must be compressed the same way"
+        )
+
+
+    # Output files
+    if n == 1 or "--interleaved " in extra or "--interleaved-output " in extra:
+        trimmed = f"--output1 {snakemake.output.fq}"
+    else:
+        trimmed = f"--output1 {snakemake.output.fq1} --output2 {snakemake.output.fq2}"
+
+
+    # Collapsed reads output
+    if n == 2:
+        trimmed += f" --singleton {snakemake.output.singleton}"
+        if collapse_pe:
+            if merge_singletons:
+                out_collapsed = tempfile.NamedTemporaryFile()
+                out_collapsed_trunc = tempfile.NamedTemporaryFile()
+                trimmed += f" --outputcollapsed {out_collapsed.name} --outputcollapsedtruncated {out_collapsed_trunc.name}"
+            else:
+                trimmed += f" --outputcollapsed {snakemake.output.collapsed} --outputcollapsedtruncated {snakemake.output.collapsed_trunc}"
+
+
+    shell(
+        "(AdapterRemoval --threads {snakemake.threads} "
+        "{reads} "
+        "{adapters} "
+        "{extra} "
+        "{compress_out} "
+        "{trimmed} "
+        "--discarded {snakemake.output.discarded} "
+        "--settings {snakemake.output.settings}"
+        ") {log}"
+    )
+
+
+    if collapse_pe and merge_singletons:
+        shell("cat {out_collapsed.name} >> {snakemake.output.singleton}")
+        out_collapsed.close()
+        shell("cat {out_collapsed_trunc.name} >> {snakemake.output.singleton}")
+        out_collapsed_trunc.close()
