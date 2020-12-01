@@ -72,6 +72,12 @@ logging.debug("Head of the GTF file:")
 logging.debug(gtf.head())
 logging.info("GTF parsed")
 
+# Removing patches on identifiers
+drop_patches = snakemake.params.get("drop_patches", True)
+if drop_patches is True:
+    gtf["Gene_ID"] = gtf["Gene_ID"].str.split(r"\.", expand=True)[0]
+    gtf["transcript_id"] = gtf["transcript_id"].str.split(r"\.", expand=True)[0]
+
 
 # Save results and their subsets on demand
 if "tx2gene_small" in snakemake.output.keys():
