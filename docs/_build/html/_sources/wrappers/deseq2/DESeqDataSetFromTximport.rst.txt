@@ -1,4 +1,4 @@
-.. _`DESeq DataSet From Tximport`:
+.. _`bio/deseq2/DESeqDataSetFromTximport`:
 
 DESEQ DATASET FROM TXIMPORT
 ===========================
@@ -25,10 +25,10 @@ This wrapper can be used in the following way:
             "logs/deseq2/DESeqDataSetFromTximport.logs"
         params:
             design = "~Cond",
-            levels = ["A", "B"]
+            levels = ["A", "B"],
+            factor = "Cond"
         wrapper:
-            "https://raw.githubusercontent.com/tdayris-perso/snakemake-wrappers/deseq2_dataset/bio/deseq2/DESeqDataSetFromTximport/"
-
+            "0.67.0-410-g57ebbe38/bio/deseq2/DESeqDataSetFromTximport/"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -141,17 +141,22 @@ Code
       design = formula
     );
     base::write("DESeqDataSet built.", stderr());
+    saveRDS(dds, "my_dds.RDS")
 
-    if ("levels" %in% base::names(snakemake@params)) {
+    levels <- ("levels" %in% base::names(snakemake@params));
+    factor <- ("factor" %in% base::names(snakemake@params));
+    if (levels & factor) {
       # Levels should come with reference as first item
       levels <- sapply(
         snakemake@params[["levels"]],
-        function(level) base::as.character(level)
+        function(level) base::as.character(x = level)
       );
+      factor <- base::as.character(x = snakemake@params[["factor"]]);
 
-      dds$condition <- base::factor(dds$condition, levels = levels);
-      dds$condition <- stat::relevel(dds$condition, ref = levels[[1]]);
-      dds$condition <- droplevels(dds$condition);
+      dds[[factor]] <- base::factor(dds[[factor]], levels = levels);
+      dds[[factor]] <- stats::relevel(dds[[factor]], ref = levels[[1]]);
+      dds[[factor]] <- droplevels(dds[[factor]]);
+      base::write("Factors have been releveled", stderr());
     }
 
 

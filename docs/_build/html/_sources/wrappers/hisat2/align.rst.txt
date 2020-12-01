@@ -1,4 +1,4 @@
-.. _`hisat2 align`:
+.. _`bio/hisat2/align`:
 
 HISAT2 ALIGN
 ============
@@ -16,18 +16,17 @@ This wrapper can be used in the following way:
 
     rule hisat2_align:
         input:
-          idx = "index/",
           reads=["reads/{sample}_R1.fastq", "reads/{sample}_R2.fastq"]
         output:
           "mapped/{sample}.bam"
         log:
             "logs/hisat2_align_{sample}.log"
         params:
-          extra = ""
+          extra="",
+          idx="index/",
         threads: 2
         wrapper:
-          "0.67.0-365-g942457b2/bio/hisat2/align"
-
+          "0.67.0-410-g57ebbe38/bio/hisat2/align"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -112,7 +111,7 @@ Code
     shell(
         "(hisat2 {extra} "
         "--threads {snakemake.threads} "
-        " -x {snakemake.input.idx} {input_flags} "
+        " -x {snakemake.params.idx} {input_flags} "
         " | samtools view -Sbh -o {snakemake.output[0]} -) "
         " {log}"
     )

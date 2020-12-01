@@ -1,10 +1,9 @@
-.. _`complement`:
+.. _`bio/bedtools/complement`:
 
-COMPLEMENT
-==========
+BEDTOOLS COMPLEMENT
+===================
 
-Compute all genomic intervals that are not covered by at least
-one record from the input file.
+`Bedtools complement <https://bedtools.readthedocs.io/en/latest/content/tools/complement.html>`_ maps all regions of the genome which are not covered by the input.
 
 
 
@@ -15,28 +14,33 @@ This wrapper can be used in the following way:
 
 .. code-block:: python
 
-    rule test_bedtools_complement:
+    rule bedtools_complement_bed:
         input:
-            intervals = "intervals.bed",
-            genome = "small.genome"
+            in_file="a.bed",
+            genome="dummy.genome"
         output:
-            "complement.bed"
-        message:
-            "Testing bedtools complement"
-        threads:
-            1
-        resources:
-            mem_mb = (
-                lambda wildcards, attempt: min(attempt * 1024, 10240)
-            ),
-            time_min = (
-                lambda wildcards, attempt: min(attempt * 20, 200)
-            )
+            "results/bed-complement/a.complement.bed"
+        params:
+            ## Add optional parameters
+            extra="-L"
         log:
-            "logs/test_bedtools_complement.log"
+            "logs/a.complement.bed.log"
         wrapper:
-            "0.67.0-365-g942457b2/bio/bedtools/complement"
+            "0.67.0-410-g57ebbe38/bio/bedtools/complement"
 
+    rule bedtools_complement_vcf:
+        input:
+            in_file="a.vcf",
+            genome="dummy.genome"
+        output:
+            "results/vcf-complement/a.complement.vcf"
+        params:
+            ## Add optional parameters
+            extra="-L"
+        log:
+            "logs/a.complement.vcf.log"
+        wrapper:
+            "0.67.0-410-g57ebbe38/bio/bedtools/complement"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -50,35 +54,26 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``bedtools==2.29.0``
+* ``bedtools=2.29``
 
 Input/Output
 ------------
 **Input:**
 
-* BED/GFF/VCF formatted intervals
-* genome intervals
+* BED/GFF/VCF files
+* genome file (`genome file format <https://bedtools.readthedocs.io/en/latest/content/general-usage.html#genome-file-format>`_)
 
 **Output:**
 
-* BED formatted complement
+* complemented BED/GFF/VCF file
 
-
-
-Notes
------
-
-Eventhough it is not mentionned in the official documentation:
-
-* GTF seems to be accepted as well as GFF.
-* genome intervals is a two columned bed file.
 
 
 
 Authors
 -------
 
-* Thibault Dayris
+* Antonie Vietor
 
 
 Code
@@ -86,27 +81,22 @@ Code
 
 .. code-block:: python
 
-    #!/usr/bin/python3
-    # -*- coding: utf-8 -*-
-
-    """This is the Snakemake Wrapper for bedtools complement"""
-
-    __author__ = "Thibault Dayris"
-    __copyright__ = "Copyright 2020, Thibault Dayris"
-    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __author__ = "Antonie Vietor"
+    __copyright__ = "Copyright 2020, Antonie Vietor"
+    __email__ = "antonie.v@gmx.de"
     __license__ = "MIT"
 
-
     from snakemake.shell import shell
-    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
     extra = snakemake.params.get("extra", "")
 
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
     shell(
-        "bedtools complement "
-        " {extra} "
-        " -i {snakemake.input.intervals} "
-        " -g {snakemake.input.genome} "
-        " > {snakemake.output} "
-        " {log} "
+        "(bedtools complement"
+        " {extra}"
+        " -i {snakemake.input.in_file}"
+        " -g {snakemake.input.genome}"
+        " > {snakemake.output[0]})"
+        " {log}"
     )

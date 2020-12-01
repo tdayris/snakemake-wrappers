@@ -1,4 +1,4 @@
-.. _`gatk3 RealignerTargetCreator`:
+.. _`bio/gatk3/realignertargetcreator`:
 
 GATK3 REALIGNERTARGETCREATOR
 ============================
@@ -16,21 +16,21 @@ This wrapper can be used in the following way:
 
     rule realignertargetcreator:
         input:
-            bam="mapped/{sample}.bam"
+            bam="mapped/{sample}.bam",
             ref="genome.fasta",
-            known="dbsnp.vcf.gz"
+            known="dbsnp.vcf.gz",
         output:
-            "{sample}.intervals"
+            intervals="{sample}.intervals",
+            java_temp=temp(directory("gatk3_indelrealigner/{sample}")),
         log:
-            "logs/gatk/realignertargetcreator/{sample}.log"
+            "logs/gatk/realignertargetcreator/{sample}.log",
         params:
-            extra=""  # optional
+            extra="", # optional
         resources:
-            mem_mb = 1024
+            mem_mb=1024,
         threads: 16
         wrapper:
             "bio/gatk3/realignertargetcreator"
-
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -54,17 +54,19 @@ Input/Output
 * bam file
 * vcf files
 * reference genome
+* bed file (optional)
 
 **Output:**
 
 * target intervals
+* temp dir (optional)
 
 
 
 Notes
 -----
 
-* The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
+* The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-XX:ParallelGCThreads=10" (memory is automatically inferred from `resources` and temp dir from `output.java_temp`.
 * The `extra` param alllows for additional program arguments.
 * For more inforamtion see, https://software.broadinstitute.org/gatk/documentation/article?id=11050
 * Gatk3.jar is not included in the bioconda package, i.e it need to be added to the conda environment manually.
@@ -75,6 +77,7 @@ Authors
 -------
 
 * Patrik Smeds
+* Filipe G. Vieira
 
 
 Code
@@ -92,21 +95,22 @@ Code
     from snakemake.shell import shell
     from snakemake_wrapper_utils.java import get_java_opts
 
+    input_known = snakemake.input.known
     extra = snakemake.params.get("extra", "")
     java_opts = get_java_opts(snakemake)
 
-    input_bam = snakemake.input.bam
-    input_known = snakemake.input.known
-    input_ref = snakemake.input.ref
-    bed = snakemake.params.get("bed", None)
+
+    bed = snakemake.input.get("bed", None)
     if bed is not None:
         bed = "-L " + bed
     else:
         bed = ""
 
+
     input_known_string = ""
     for known in input_known:
-        input_known_string = input_known_string + " --known {}".format(known)
+        input_known_string = input_known_string + " -known {}".format(known)
+
 
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
@@ -115,10 +119,10 @@ Code
         "gatk3 {java_opts} -T RealignerTargetCreator"
         " -nt {snakemake.threads}"
         " {extra}"
-        " -I {input_bam}"
-        " -R {input_ref}"
+        " -I {snakemake.input.bam}"
+        " -R {snakemake.input.ref}"
         " {input_known_string}"
         " {bed}"
-        " -o {snakemake.output}"
+        " -o {snakemake.output.intervals}"
         " {log}"
     )

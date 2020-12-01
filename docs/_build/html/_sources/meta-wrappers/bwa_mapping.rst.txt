@@ -9,7 +9,7 @@ Map reads with bwa-mem and index with samtools index - this is just a test for s
 Example
 -------
 
-This meta-wrapper can be used in the following way:
+This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
@@ -28,7 +28,7 @@ This meta-wrapper can be used in the following way:
             sort_extra=""            # Extra args for samtools/picard.
         threads: 8
         wrapper:
-            "0.67.0-365-g942457b2/bio/bwa/mem"
+            "0.67.0-410-g57ebbe38/bio/bwa/mem"
 
     rule samtools_index:
         input:
@@ -38,10 +38,11 @@ This meta-wrapper can be used in the following way:
         params:
             "" # optional params string
         wrapper:
-            "0.67.0-365-g942457b2/bio/samtools/index"
+            "0.67.0-410-g57ebbe38/bio/samtools/index"
 
+Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
+For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
 
-Note that input, output and log file paths can be chosen freely.
 When running with
 
 .. code-block:: bash
@@ -55,10 +56,15 @@ the software dependencies will be automatically deployed into an isolated enviro
 Used wrappers
 ---------------------
 
+The following individual wrappers are used in this meta-wrapper:
 
-* ``bio/bwa/mem``
 
-* ``bio/samtools/index``
+* :ref:`bio/bwa/mem`
+
+* :ref:`bio/samtools/index`
+
+
+Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
 
 
 
@@ -71,103 +77,4 @@ Authors
 
 
 * Jan Forster
-
-
-
-Code
-----
-
-
-* ``bio/bwa/mem``
-
-.. code-block:: python
-
-    __author__ = "Johannes Köster, Julian de Ruiter"
-    __copyright__ = "Copyright 2016, Johannes Köster and Julian de Ruiter"
-    __email__ = "koester@jimmy.harvard.edu, julianderuiter@gmail.com"
-    __license__ = "MIT"
-
-
-    from os import path
-
-    from snakemake.shell import shell
-
-
-    # Extract arguments.
-    extra = snakemake.params.get("extra", "")
-
-    sort = snakemake.params.get("sort", "none")
-    sort_order = snakemake.params.get("sort_order", "coordinate")
-    sort_extra = snakemake.params.get("sort_extra", "")
-
-    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
-    # Check inputs/arguments.
-    if not isinstance(snakemake.input.reads, str) and len(snakemake.input.reads) not in {
-        1,
-        2,
-    }:
-        raise ValueError("input must have 1 (single-end) or " "2 (paired-end) elements")
-
-    if sort_order not in {"coordinate", "queryname"}:
-        raise ValueError("Unexpected value for sort_order ({})".format(sort_order))
-
-    # Determine which pipe command to use for converting to bam or sorting.
-    if sort == "none":
-
-        # Simply convert to bam using samtools view.
-        pipe_cmd = "samtools view -Sbh -o {snakemake.output[0]} -"
-
-    elif sort == "samtools":
-
-        # Sort alignments using samtools sort.
-        pipe_cmd = "samtools sort {sort_extra} -o {snakemake.output[0]} -"
-
-        # Add name flag if needed.
-        if sort_order == "queryname":
-            sort_extra += " -n"
-
-        prefix = path.splitext(snakemake.output[0])[0]
-        sort_extra += " -T " + prefix + ".tmp"
-
-    elif sort == "picard":
-
-        # Sort alignments using picard SortSam.
-        pipe_cmd = (
-            "picard SortSam {sort_extra} INPUT=/dev/stdin"
-            " OUTPUT={snakemake.output[0]} SORT_ORDER={sort_order}"
-        )
-
-    else:
-        raise ValueError("Unexpected value for params.sort ({})".format(sort))
-
-    shell(
-        "(bwa mem"
-        " -t {snakemake.threads}"
-        " {extra}"
-        " {snakemake.params.index}"
-        " {snakemake.input.reads}"
-        " | " + pipe_cmd + ") {log}"
-    )
-
-
-
-
-* ``bio/samtools/index``
-
-.. code-block:: python
-
-    __author__ = "Johannes Köster"
-    __copyright__ = "Copyright 2016, Johannes Köster"
-    __email__ = "koester@jimmy.harvard.edu"
-    __license__ = "MIT"
-
-
-    from snakemake.shell import shell
-
-
-    shell("samtools index {snakemake.params} {snakemake.input[0]} {snakemake.output[0]}")
-
-
-
 

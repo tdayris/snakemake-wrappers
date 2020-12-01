@@ -1,4 +1,4 @@
-.. _`DESeq2 to GSEAapp`:
+.. _`bio/pandas/deseq2_to_gseaapp`:
 
 DESEQ2 TO GSEAAPP
 =================
@@ -37,8 +37,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_deseq2_to_gseapp.log"
         wrapper:
-            "0.67.0-365-g942457b2/bio/pandas/deseq2_to_gseaapp"
-
+            "0.67.0-410-g57ebbe38/bio/pandas/deseq2_to_gseaapp"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -164,6 +163,7 @@ Code
             header=0,
             index_col=None
         )
+        print(genetable.head())
 
         data = pandas.merge(
             data.copy(),
@@ -174,8 +174,9 @@ Code
         )
 
         data = data[[
-            "Gene_ID", "Gene_Name", "log2FoldChange", "padj",
-            "Chromosome", "Start", "Stop", "Strand"
+            "Gene_ID", "Gene_Name",
+            "log2FoldChange", "padj",
+            "Chromosome", "Strand"
         ]]
         data.rename(columns={"Gene_ID": "index"}, inplace=True)
     else:

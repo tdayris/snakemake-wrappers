@@ -1,4 +1,4 @@
-.. _`freebayes`:
+.. _`bio/freebayes`:
 
 FREEBAYES
 =========
@@ -20,7 +20,7 @@ This wrapper can be used in the following way:
             samples="mapped/{sample}.bam",
             # the matching BAI indexes have to present for freebayes
             indexes="mapped/{sample}.bam.bai"
-            # optional BED file specifying chromosomal regions on which freebayes 
+            # optional BED file specifying chromosomal regions on which freebayes
             # should run, e.g. all regions that show coverage
             #regions="/path/to/region-file.bed"
         output:
@@ -29,11 +29,11 @@ This wrapper can be used in the following way:
             "logs/freebayes/{sample}.log"
         params:
             extra="",         # optional parameters
-            chunksize=100000  # reference genome chunk size for parallelization (default: 100000)
+            chunksize=100000, # reference genome chunk size for parallelization (default: 100000)
+            normalize=False,  # flag to use bcftools norm to normalize indels
         threads: 2
         wrapper:
-            "0.67.0-365-g942457b2/bio/freebayes"
-
+            "0.67.0-410-g57ebbe38/bio/freebayes"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -47,11 +47,11 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``freebayes==1.3.1``
-* ``bcftools==1.10``
-* ``parallel==20190522``
+* ``freebayes=1.3.1``
+* ``bcftools=1.11``
+* ``parallel=20190522``
 * ``bedtools>=2.29``
-* ``sed==4.7``
+* ``sed=4.7``
 
 
 
@@ -68,7 +68,7 @@ Code
 
 .. code-block:: python
 
-    __author__ = "Johannes Köster, Felix Mölder"
+    __author__ = "Johannes Köster, Felix Mölder, Christopher Schröder"
     __copyright__ = "Copyright 2017, Johannes Köster"
     __email__ = "johannes.koester@protonmail.com, felix.moelder@uni-due.de"
     __license__ = "MIT"
@@ -81,10 +81,17 @@ Code
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
     params = snakemake.params.get("extra", "")
+    norm = snakemake.params.get("normalize", False)
+    assert norm in [True, False]
 
     pipe = ""
     if snakemake.output[0].endswith(".bcf"):
-        pipe = "| bcftools view -Ob -"
+        if norm:
+            pipe = "| bcftools norm -Ob -"
+        else:
+            pipe = "| bcftools view -Ob -"
+    elif norm:
+        pipe = "| bcftools norm -"
 
     if snakemake.threads == 1:
         freebayes = "freebayes"
