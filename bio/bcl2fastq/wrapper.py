@@ -36,7 +36,7 @@ if "input_dir" in snakemake.input.keys():
 
 
 # path to runfolder directory
-if "run_dir" in snakemake.params.keys():
+if "run_dir" in snakemake.input.keys():
     io_parameters += " --runfolder-dir {} ".format(snakemake.input["run_dir"])
 
 
