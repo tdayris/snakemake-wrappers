@@ -4079,3 +4079,11 @@ def test_bcl2fastq():
         "bio/bcl2fastq",
         ["snakemake", "--cores", "3", "test/output", "--use-conda", "-F"]
     )
+
+
+@skip_if_not_modified
+def test_rbt_sequence_stats():
+    run(
+        "bio/rbt/sequence-stats",
+        ["snakemake", "--cores", "1", "stats.yaml", "--use-conda", "-F"]
+    )
