@@ -4087,3 +4087,11 @@ def test_rbt_sequence_stats():
         "bio/rbt/sequence-stats",
         ["snakemake", "--cores", "1", "stats.yaml", "--use-conda", "-F"]
     )
+
+
+@skip_if_not_modified
+def test_rbt_sequence_vcf_annotate_dgidb():
+    run(
+        "bio/rbt/vcf-annotate-dgidb",
+        ["snakemake", "--cores", "1", "annotated.vcf", "--use-conda", "-F"]
+    )
