@@ -4095,3 +4095,11 @@ def test_rbt_sequence_vcf_annotate_dgidb():
         "bio/rbt/vcf-annotate-dgidb",
         ["snakemake", "--cores", "1", "annotated.vcf", "--use-conda", "-F"]
     )
+
+
+@skip_if_not_modified
+def test_rbt_vcf_match():
+    run(
+        "bio/rbt/vcf-match",
+        ["snakemake", "--cores", "1", "match.vcf", "--use-conda", "-F"]
+    )
