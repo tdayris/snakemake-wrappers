@@ -4104,9 +4104,18 @@ def test_rbt_vcf_match():
         ["snakemake", "--cores", "1", "match.vcf", "--use-conda", "-F"]
     )
 
+
 @skip_if_not_modified
 def test_mixcr_mutation_parser():
     run(
         "bio/mixcr/mutation_parser",
         ["snakemake", "--cores", "1", "mutations.txt", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_mixcr_align():
+    run(
+        "bio/mixcr/align",
+        ["snakemake", "--cores", "1", "alignment.vdjca", "--use-conda", "-F"]
     )
