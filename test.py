@@ -4143,3 +4143,11 @@ def test_mixcr_export_alignments_pretty():
         "bio/mixcr/exportAlignmentsPretty",
         ["snakemake", "--cores", "1", "export.txt", "--use-conda", "-F"]
     )
+
+
+@skip_if_not_modified
+def test_mixcr_export_clones():
+    run(
+        "bio/mixcr/exportClones",
+        ["snakemake", "--cores", "1", "export.txt", "--use-conda", "-F"]
+    )
