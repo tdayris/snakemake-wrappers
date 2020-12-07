@@ -4119,3 +4119,11 @@ def test_mixcr_align():
         "bio/mixcr/align",
         ["snakemake", "--cores", "1", "alignment.vdjca", "--use-conda", "-F"]
     )
+
+
+@skip_if_not_modified
+def test_mixcr_assemble():
+    run(
+        "bio/mixcr/assemble",
+        ["snakemake", "--cores", "1", "assembly.clna", "--use-conda", "-F"]
+    )
