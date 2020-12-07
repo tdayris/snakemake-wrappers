@@ -33,7 +33,7 @@ This wrapper can be used in the following way:
             extra=""
         threads: 2
         wrapper:
-            "0.68.0-373-g44ea37646/bio/salmon/quant"
+            "0.68.0-378-g58033247a/bio/salmon/quant"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -47,7 +47,7 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``salmon==0.14.1``
+* ``salmon==1.4.0``
 
 Input/Output
 ------------
@@ -88,27 +88,39 @@ Code
         """Allow *.bz2 input into salmon. Also provide same
         decompression for *gz files, as salmon devs mention
         it may be faster in some cases."""
-        if zip_ext and reads:
-            if zip_ext == "bz2":
-                reads = " < (bunzip2 -c " + reads + ")"
-            elif zip_ext == "gz":
-                reads = " < (gunzip -c " + reads + ")"
-        return reads
+        unzip_tools = {
+            "bz2": "bunzip2",
+            "gz": "gunzip"
+        }
+        try:
+            unzip_cmd = "<({} -c {})".format(unzip_tools[zip_ext], reads)
+        except KeyError:
+            unzip_cmd = reads
+
+        return unzip_cmd
 
 
     extra = snakemake.params.get("extra", "")
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-    zip_extension = snakemake.params.get("zip_extension", "")
+    zip_ext = snakemake.params.get("zip_extension", "")
+
+    # If user enableled the inline decompression, then one threads is reserved for
+    # this purpose, and cannot be given to Snakemake.
+    salmon_threads = snakemake.threads
+    if zip_ext != "":
+        if snakemake.threads < 2:
+            raise ValueError("At lease 2 threads are required for this wrapper")
+        salmon_threads = snakemake.threads - 1
+
     libtype = snakemake.params.get("libtype", "A")
 
+
+    # Checking IO files
     r1 = snakemake.input.get("r1")
     r2 = snakemake.input.get("r2")
     r = snakemake.input.get("r")
 
-    assert (
-        r1 is not None and r2 is not None
-    ) or r is not None, "either r1 and r2 (paired), or r (unpaired) are required as input"
-    if r1:
+    if r1 is not None and r2 is not None:
         r1 = (
             [snakemake.input.r1]
             if isinstance(snakemake.input.r1, str)
@@ -119,21 +131,40 @@ Code
             if isinstance(snakemake.input.r2, str)
             else snakemake.input.r2
         )
-        assert len(r1) == len(r2), "input-> equal number of files required for r1 and r2"
-        r1_cmd = " -1 " + manual_decompression(" ".join(r1), zip_extension)
-        r2_cmd = " -2 " + manual_decompression(" ".join(r2), zip_extension)
-        read_cmd = " ".join([r1_cmd, r2_cmd])
-    if r:
-        assert (
-            r1 is None and r2 is None
-        ), "Salmon cannot quantify mixed paired/unpaired input files. Please input either r1,r2 (paired) or r (unpaired)"
-        r = [snakemake.input.r] if isinstance(snakemake.input.r, str) else snakemake.input.r
-        read_cmd = " -r " + manual_decompression(" ".join(r), zip_extension)
+        if len(r1) != len(r2):
+            raise ValueError(
+                "input-> equal number of files required for r1 and r2"
+            )
 
+        r1_cmd = " --mates1 {}".format(manual_decompression(" ".join(r1), zip_ext))
+        r2_cmd = " --mates2 {}".format(manual_decompression(" ".join(r2), zip_ext))
+        read_cmd = " ".join([r1_cmd, r2_cmd])
+    elif r is not None:
+        r = (
+            [snakemake.input.r]
+            if isinstance(snakemake.input.r, str)
+            else snakemake.input.r
+        )
+        read_cmd = " --unmatedReads " + manual_decompression(" ".join(r), zip_ext)
+    else:
+        raise ValueError(
+            "Either r1 and r2 (paired), or r (unpaired) are required as input"
+        )
+
+
+    # Building output name from results
     outdir = path.dirname(snakemake.output.get("quant"))
 
+
+    # Dealing with optional IO files
+    if "gtf" in snakemake.input.keys():
+        extra += " --geneMap {} ".format(snakemake.input["gtf"])
+
+    if "mapping" in snakemake.output.keys():
+        extra += " --writeMappings {} ".format(snakemake.output["mapping"])
+
     shell(
-        "salmon quant -i {snakemake.input.index} "
-        " -l {libtype} {read_cmd} -o {outdir} "
-        " -p {snakemake.threads} {extra} {log} "
+        "salmon quant --index {snakemake.input.index} "
+        " --libType {libtype} {read_cmd} --output {outdir} "
+        " --threads {salmon_threads} {extra} {log} "
     )

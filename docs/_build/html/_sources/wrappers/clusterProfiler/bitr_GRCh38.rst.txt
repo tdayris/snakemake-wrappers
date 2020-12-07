@@ -1,0 +1,135 @@
+.. _`bio/clusterProfiler/bitr_GRCh38`:
+
+TSV TO GENE LIST
+================
+
+Build a clusterProfiler gene list from a TSV formatted table
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_clusterprofiler_bitr:
+        input:
+            table = "table.tsv"
+        output:
+            rds = "geneList.RDS",
+            translation_table = "complete_table.tsv"
+        wrapper:
+            "0.68.0-378-g58033247a/bio/clusterProfiler/bitr_GRCh38"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconda:bioconductor-org.hs.eg.db==3.12.0``
+* ``bioconda:bioconductor-clusterprofiler==3.18.0``
+
+Input/Output
+------------
+**Input:**
+
+* A TV formatted table with ensembl genes identifiers
+
+**Output:**
+
+* A RDS-formatted gene list
+
+
+
+Notes
+-----
+
+Annotations available: GRCh38
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script builds a gene list from a tsv formatted table with
+    # clusterProfiler::bitr and org.hs.eg.db
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+
+    base::library(package="clusterProfiler", quietly=TRUE);
+    base::library(package="org.Hs.eg.db", quietly=TRUE);
+    base::message("Libraries loaded")
+
+    genes_id <- "Gene_ID";
+    if ("gene_id" %in% base::names(snakemake@params)) {
+      gene_id <- snakemake@params[["gene_id"]];
+    }
+
+    key_type <- "ENSEMBL";
+    if ("key_type" %in% base::names(snakemake@params)) {
+      key_type <- snakemake@params[["key_type"]];
+    }
+
+    to_type <- c("ENTREZID", "SYMBOL");
+    if ("to_type" %in% base::names(snakemake@params)) {
+      key_type <- snakemake@params[["to_type"]];
+    }
+
+    df <- utils::read.table(
+      file = base::as.character(x = snakemake@input[["table"]]),
+      header = TRUE,
+      sep = "\t",
+      stringsAsFactors = FALSE
+    );
+    base::message("Parameters set, input table loaded")
+
+    gene_translation <- clusterProfiler::bitr(
+      df[[genes_id]],
+      fromType=key_type,
+      toType=to_type,
+      OrgDb="org.Hs.eg.db"
+    );
+
+    gene_list <- gene_translation$ENTREZID;
+    names(gene_list) <- gene_translation[[key_type]];
+    base::message("Translation performed")
+
+
+    if ("translation_table" %in% base::names(snakemake@output)) {
+      utils::write.table(
+          x = gene_translation,
+          file = base::as.character(x = snakemake@output[["translation_table"]]),
+          sep = "\t",
+          quote = FALSE,
+          row.names = FALSE
+      );
+      base::message("Optional translation table saved")
+    }
+
+    base::saveRDS(
+      object = gene_list,
+      file = base::as.character(snakemake@output[["rds"]])
+    );
+    base::message("Gene list saved")
