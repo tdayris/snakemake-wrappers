@@ -4127,3 +4127,11 @@ def test_mixcr_assemble():
         "bio/mixcr/assemble",
         ["snakemake", "--cores", "1", "assembly.clna", "--use-conda", "-F"]
     )
+
+
+@skip_if_not_modified
+def test_mixcr_export_alignments():
+    run(
+        "bio/mixcr/exportAlignments",
+        ["snakemake", "--cores", "1", "export.txt", "--use-conda", "-F"]
+    )
