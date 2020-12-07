@@ -1,0 +1,82 @@
+.. _`bio/rbt/vcf-match`:
+
+VCF-MATCH
+=========
+
+Annotate for each variant in a VCF/BCF at STDIN whether it is contained in a given second VCF/BCF using `rust bio tools <https://github.com/rust-bio/rust-bio-tools>`_.
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_rbt_vcf_match:
+        input:
+            call = "call.vcf",
+            reference = "reference.vcf"
+        output:
+            "match.vcf"
+        wrapper:
+            "0.68.0-373-g44ea37646/bio/rbt/vcf-match"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``rust-bio-tools==0.16``
+
+Input/Output
+------------
+**Input:**
+
+* One calling file to annotate, either VCF or BCF formatted
+* One reference call used to annotate, either VCF or BCF formatted.
+
+**Output:**
+
+* An annotated VCF file
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3
+    # -*- coding: utf-8 -*-
+
+    """This is the Snakemake Wrapper for rust-bio-tools vcf-match"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+
+    shell(
+        "rbt vcf-match {snakemake.input.reference} {extra} "
+        " < {snakemake.input.call} > {snakemake.output} {log}"
+    )
