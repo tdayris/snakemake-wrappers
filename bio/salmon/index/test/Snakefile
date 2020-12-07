@@ -1,13 +1,14 @@
 rule salmon_index:
     input:
-        "assembly/transcriptome.fasta"
+        sequences = "gentrome.fasta",
+        decoys = "decoys.txt"
     output:
-        directory("salmon/transcriptome_index")
+        index = directory("salmon/transcriptome_index")
     log:
         "logs/salmon/transcriptome_index.log"
     threads: 2
     params:
         # optional parameters
-        extra=""
+        extra="-k 11"
     wrapper:
         "master/bio/salmon/index"

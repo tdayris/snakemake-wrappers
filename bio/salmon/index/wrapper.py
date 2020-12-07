@@ -10,7 +10,11 @@ from snakemake.shell import shell
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 extra = snakemake.params.get("extra", "")
 
+if "decoys" in snakemake.input.keys():
+    extra += " --decoys {} ".format(snakemake.input["decoys"])
+
 shell(
-    "salmon index -t {snakemake.input} -i {snakemake.output} "
-    " --threads {snakemake.threads} {extra} {log}"
+    "salmon index --transcripts {snakemake.input.sequences} "
+    "--index {snakemake.output.index} "
+    "--threads {snakemake.threads} {extra} {log}"
 )
