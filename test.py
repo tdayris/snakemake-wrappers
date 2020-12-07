@@ -2406,6 +2406,14 @@ def test_salmon_index():
 
 
 @skip_if_not_modified
+def test_salmon_decoy():
+    run(
+        "bio/salmon/generate_decoy",
+        ["snakemake", "--cores", "2", "decoys.txt", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
 def test_salmon_quant():
     run(
         "bio/salmon/quant",
@@ -3505,6 +3513,15 @@ def test_deseq2_to_genelist():
         "bio/clusterProfiler/DESeq2_to_geneList",
         ["snakemake", "--cores", "1", "geneLists", "--use-conda", "-F"]
     )
+
+
+@skip_if_not_modified
+def test_clusterprofiler_bitr():
+    run(
+        "bio/clusterProfiler/bitr_GRCh38",
+        ["snakemake", "--cores", "1", "geneList.RDS", "--use-conda", "-F"]
+    )
+
 
 def test_clusterprofiler_enrichDO():
     run(
