@@ -58,9 +58,9 @@ logging.info("GTF loaded")
 
 
 # Extract transcripts identifiers, gene identifiers and gene names
-gtf["Gene_ID"] = gtf["annotation"].str.extract(r"gene_id \"(\w+)\"")
-gtf["transcript_id"] = gtf["annotation"].str.extract(r"transcript_id \"(\w+)\"")
-gtf["Gene_Name"] = gtf["annotation"].str.extract(r"gene_name \"(\w+)\"")
+gtf["Gene_ID"] = gtf["annotation"].str.extract(r"gene_id \"(\w+.\w+)\"")
+gtf["transcript_id"] = gtf["annotation"].str.extract(r"transcript_id \"(\w+.\w+)\"")
+gtf["Gene_Name"] = gtf["annotation"].str.extract(r"gene_name \"(\w+.\w+)\"")
 del gtf["annotation"]
 
 
