@@ -13,6 +13,12 @@ log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 extra = snakemake.params.get("extra", "")
 
+input_call = snakemake.input["call"]
+if input_call.endswith("bcf"):
+    input_call = "(bcftools -c {})".format(input_call)
+elif input_call.endswith(".gz"):
+    input_call = "(gunzip -c {})".format(input_call)
+
 shell(
     "rbt vcf-match {snakemake.input.reference} {extra} "
     " < {snakemake.input.call} > {snakemake.output} {log}"
