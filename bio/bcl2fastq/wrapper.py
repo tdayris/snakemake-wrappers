@@ -9,6 +9,7 @@ __email__ = "thibault.dayris@gustaveroussy.fr"
 __license__ = "MIT"
 
 
+from os.path import exists
 from snakemake.shell import shell
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
@@ -16,12 +17,22 @@ log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 # extra parameters
 extra = snakemake.params.get("extra", "")
 
+# path to runfolder directory
+io_parameters = " --runfolder-dir {} ".format(snakemake.input["run_dir"])
 
-## Input parameters
-io_parameters = ""
 # path to the sample sheet
 if "sample_sheet" in snakemake.input.keys():
     io_parameters += " --sample-sheet {} ".format(snakemake.input["sample_sheet"])
+else:
+    path = "{}/SampleSheet.csv".format(
+        snakemake.input["run_dir"]
+    )
+    if exists(path):
+        io_parameters += "--sample-sheet {}/SampleSheet.csv".format(
+            snakemake.input["run_dir"]
+        )
+    else:
+        raise FileNotFoundError("Could not find SampleSheet at {}".format(path))
 
 
 # path to both input and intensities directories
@@ -33,29 +44,59 @@ if "input_dir" in snakemake.input.keys():
         io_parameters += " --intensities-dir {} ".format(
             snakemake.input["intensities"]
         )
+else:
+    path = "{}/Data/Intensities/BaseCalls/".format(snakemake.input["run_dir"])
+    if exists(path):
+        io_parameters += " --input-dir {}".format(path)
+    else:
+        raise FileNotFoundError("Could not find InputDir at {}".format(path))
 
-
-# path to runfolder directory
-if "run_dir" in snakemake.input.keys():
-    io_parameters += " --runfolder-dir {} ".format(snakemake.input["run_dir"])
+    path = "{}/Data/Intensities/".format(snakemake.input["run_dir"])
+    if exists(path):
+        io_parameters += " --intensities-dir {}".format(path)
+    else:
+        raise FileNotFoundError("Could not find Intensities at {}".format(path))
 
 
 ## Output parameters
 # path to demultiplexed output
+out_dir = None
 if "out_dir" in snakemake.output.keys():
+    out_dir = snakemake.output["out_dir"]
     io_parameters += " --output-dir {} ".format(snakemake.output["out_dir"])
+elif "out_dir" in snakemake.params.keys():
+    out_dir = snakemake.params["out_dir"]
+    io_parameters += " --output-dir {} ".format(snakemake.params["out_dir"])
 
 # path to demultiplexing statistics directory
 if "interop_dir" in snakemake.output.keys():
     io_parameters += " --interop-dir {} ".format(snakemake.output["interop_dir"])
+elif out_dir is not None:
+    io_parameters += " --interop-dir {}/InterOp/".format(out_dir)
+else:
+    io_parameters += " --interop-dir {}/InterOp/".format(
+        snakemake.input["run_dir"]
+    )
 
 # path to human-readable demultiplexing statistics directory
 if "stats_dir" in snakemake.output.keys():
-    io_parameters += "--stats-dir {}".format(snakemake.output["stats_dir"])
+    io_parameters += " --stats-dir {}".format(snakemake.output["stats_dir"])
+elif out_dir is not None:
+    io_parameters += " --stats-dir {}/Stats/".format(out_dir)
+else:
+    io_parameters += " --stats-dir {}/Stats/".format(
+        snakemake.input["run_dir"]
+    )
 
 # path to reporting directory
 if "reports_dir" in snakemake.output.keys():
-    io_parameters += "--reports-dir {}".format(snakemake.output["reports_dir"])
+    io_parameters += " --reports-dir {}".format(snakemake.output["reports_dir"])
+elif out_dir is not None:
+    io_parameters += " --reports-dir {}/Reports/".format(out_dir)
+else:
+    io_parameters += " --reports-dir {}/Stats/".format(
+        snakemake.input["run_dir"]
+    )
 
 
 # The number of threads shall be spreaded between loading, processing

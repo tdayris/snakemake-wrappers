@@ -2,9 +2,10 @@ rule test_bcfl2fastq:
     input:
         run_dir = "cellranger-tiny-bcl-1.2.0",
         sample_sheet = "cellranger-tiny-bcl-simple-1.2.0.csv",
-        intensities = "cellranger-tiny-bcl-1.2.0/Data/Intensities"
+        #intensities = "cellranger-tiny-bcl-1.2.0/Data/Intensities"
     output:
-        out_dir = directory("test/output")
+        reports_dir = directory("test/output/Reports"),
+        stats_dir = directory("test/output/Stats")
     threads: 3
     params:
         extra = (
@@ -12,6 +13,7 @@ rule test_bcfl2fastq:
             " --ignore-missing-positions"
             " --ignore-missing-filter"
             " --ignore-missing-bcls"
-        )
+        ),
+        out_dir = "test/output"
     wrapper:
         "master/bio/bcl2fastq"

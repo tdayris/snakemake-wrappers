@@ -4094,7 +4094,7 @@ def test_wgsim():
 def test_bcl2fastq():
     run(
         "bio/bcl2fastq",
-        ["snakemake", "--cores", "3", "test/output", "--use-conda", "-F"]
+        ["snakemake", "--cores", "3", "test/output/Reports", "--use-conda", "-F"]
     )
 
 
