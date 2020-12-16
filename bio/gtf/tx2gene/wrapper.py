@@ -42,7 +42,18 @@ gtf = pandas.read_csv(
     snakemake.input["gtf"],
     sep="\t",
     header = None,
-    comment = "#"
+    comment = "#",
+    dtype = {
+        0: "category",
+        1: "category",
+        2: "category",
+        3: "uintc",
+        4: "uintc",
+        5: "category",
+        6: "category",
+        7: "category"
+    },
+    na_values = "."
 )
 gtf.columns = [
     "Chromosome", "source", "feature", "Start", "Stop",
