@@ -1,0 +1,15 @@
+rule test_tximeta_makelinkedtxome:
+    input:
+        fasta="genome.fasta",
+        gtf="annotations.gtf",
+        index="transcriptome_index"
+    output:
+        json="metadata.json",
+        bioc_dir=directory("BiocFileCacheDir")
+    params:
+        source="de-novo",
+        organism="fake",
+        release="0.1",
+        genome="fake_contigs"
+    wrapper:
+        "master/bio/tximeta/makeLinkedTxome"

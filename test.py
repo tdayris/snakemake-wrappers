@@ -4168,3 +4168,11 @@ def test_mixcr_export_clones():
         "bio/mixcr/exportClones",
         ["snakemake", "--cores", "1", "export.txt", "--use-conda", "-F"]
     )
+
+
+@skip_if_not_modified
+def test_tximeta_makelinkedtxome():
+    run(
+        "bio/tximeta/makeLinkedTxome",
+        ["snakemake", "--cores", "1", "metadata.json", "--use-conda", "-F"]
+    )
