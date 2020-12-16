@@ -204,7 +204,7 @@ if "complete" in snakemake.output.keys():
             "index": "GeneIdentifier",
             "Cluster_FC": "cluster",
             "Cluster_Sig": "significance",
-            "padj": "Adjuster_PValue"
+            "padj": "Adjusted_PValue"
         },
         inplace=True
     )
