@@ -227,6 +227,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tximeta.html">TXIMETA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../umis.html">UMIS</a></li>
@@ -340,7 +341,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_deseq2_to_gseapp.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.68.0-378-g58033247a/bio/pandas/deseq2_to_gseaapp&quot;</span>
+        <span class="s2">&quot;0.68.0-386-gee3675a8c/bio/pandas/deseq2_to_gseaapp&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -500,6 +501,10 @@ When running with</p>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Prining the log2(FC) / Significance table&quot;</span><span class="p">)</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="s2">&quot;Cluster_Sig&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;Non_Significative&quot;</span><span class="p">]</span>
+    <span class="n">tmp</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span>
+        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;log2FoldChange&quot;</span><span class="p">,</span> <span class="s2">&quot;padj&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
     <span class="n">tmp</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
         <span class="n">columns</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;GeneIdentifier&quot;</span><span class="p">,</span>
@@ -520,6 +525,10 @@ When running with</p>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="s2">&quot;Cluster_Sig&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;Non_Significative&quot;</span><span class="p">]</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="s2">&quot;Cluster_FC&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;Non_Significative&quot;</span><span class="p">]</span>
+    <span class="n">tmp</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span>
+        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;log2FoldChange&quot;</span><span class="p">,</span> <span class="s2">&quot;padj&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
     <span class="n">tmp</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
         <span class="n">columns</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;GeneIdentifier&quot;</span><span class="p">,</span>
@@ -538,6 +547,10 @@ When running with</p>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Prining the adjusted P-Value / Significance table&quot;</span><span class="p">)</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="s2">&quot;Cluster_Sig&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;Non_Significative&quot;</span><span class="p">]</span>
+    <span class="n">tmp</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span>
+        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;log2FoldChange&quot;</span><span class="p">,</span> <span class="s2">&quot;padj&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
     <span class="n">tmp</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
         <span class="n">columns</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;padj&quot;</span><span class="p">:</span> <span class="s2">&quot;stat_change&quot;</span><span class="p">,</span>
@@ -557,6 +570,10 @@ When running with</p>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Prining the adjusted P-Value / FoldChange table&quot;</span><span class="p">)</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="s2">&quot;Cluster_FC&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;Non_Significative&quot;</span><span class="p">]</span>
+    <span class="n">tmp</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span>
+        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;log2FoldChange&quot;</span><span class="p">,</span> <span class="s2">&quot;padj&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
     <span class="n">tmp</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
         <span class="n">columns</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;padj&quot;</span><span class="p">:</span> <span class="s2">&quot;stat_change&quot;</span><span class="p">,</span>
@@ -581,7 +598,7 @@ When running with</p>
             <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;GeneIdentifier&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Cluster_FC&quot;</span><span class="p">:</span> <span class="s2">&quot;cluster&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Cluster_Sig&quot;</span><span class="p">:</span> <span class="s2">&quot;significance&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;padj&quot;</span><span class="p">:</span> <span class="s2">&quot;Adjuster_PValue&quot;</span>
+            <span class="s2">&quot;padj&quot;</span><span class="p">:</span> <span class="s2">&quot;Adjusted_PValue&quot;</span>
         <span class="p">},</span>
         <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>

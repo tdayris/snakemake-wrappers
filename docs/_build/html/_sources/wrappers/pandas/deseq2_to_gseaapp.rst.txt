@@ -37,7 +37,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_deseq2_to_gseapp.log"
         wrapper:
-            "0.68.0-378-g58033247a/bio/pandas/deseq2_to_gseaapp"
+            "0.68.0-386-gee3675a8c/bio/pandas/deseq2_to_gseaapp"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -204,6 +204,10 @@ Code
         logging.debug("Prining the log2(FC) / Significance table")
         tmp = data.copy()
         tmp = tmp[tmp["Cluster_Sig"] != "Non_Significative"]
+        tmp.dropna(
+            inplace=True,
+            subset=["log2FoldChange", "padj"]
+        )
         tmp.rename(
             columns={
                 "index": "GeneIdentifier",
@@ -224,6 +228,10 @@ Code
         tmp = data.copy()
         tmp = tmp[tmp["Cluster_Sig"] != "Non_Significative"]
         tmp = tmp[tmp["Cluster_FC"] != "Non_Significative"]
+        tmp.dropna(
+            inplace=True,
+            subset=["log2FoldChange", "padj"]
+        )
         tmp.rename(
             columns={
                 "index": "GeneIdentifier",
@@ -242,6 +250,10 @@ Code
         logging.debug("Prining the adjusted P-Value / Significance table")
         tmp = data.copy()
         tmp = tmp[tmp["Cluster_Sig"] != "Non_Significative"]
+        tmp.dropna(
+            inplace=True,
+            subset=["log2FoldChange", "padj"]
+        )
         tmp.rename(
             columns={
                 "padj": "stat_change",
@@ -261,6 +273,10 @@ Code
         logging.debug("Prining the adjusted P-Value / FoldChange table")
         tmp = data.copy()
         tmp = tmp[tmp["Cluster_FC"] != "Non_Significative"]
+        tmp.dropna(
+            inplace=True,
+            subset=["log2FoldChange", "padj"]
+        )
         tmp.rename(
             columns={
                 "padj": "stat_change",
@@ -285,7 +301,7 @@ Code
                 "index": "GeneIdentifier",
                 "Cluster_FC": "cluster",
                 "Cluster_Sig": "significance",
-                "padj": "Adjuster_PValue"
+                "padj": "Adjusted_PValue"
             },
             inplace=True
         )

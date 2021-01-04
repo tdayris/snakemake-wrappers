@@ -1,0 +1,223 @@
+.. _`bio/tximeta/tximeta`:
+
+TXIMETA
+=======
+
+Import quantification data with automatic metadata addition
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_tximeta:
+        input:
+            json_txome = "metadata.json",
+            coldata = "design.csv",
+            bioc_file_cache = "BiocFileCache"
+        output:
+            tx_rds = "",
+            tx_tsv = ""
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconductor-tximeta==1.8.0``
+* ``bioconductor-tximport==1.18.0``
+* ``r-jsonlite==1.7.2``
+* ``r-readr==1.4.0``
+
+Input/Output
+------------
+**Input:**
+
+* Salmon/Kallisto/RSEM quantifications
+* Optional GTF annotation and FASTA sequences
+
+**Output:**
+
+* A RDS object containing the SummerizedExperiment ready for DESeq2, EdgeR, ...
+
+
+
+Notes
+-----
+
+If GTF and Fasta are not provided, tximeta will download them. Use cache to avoid multiple downloads.
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/bin/R
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # Loading library
+    base::library(package = "tximport", quietly = TRUE);
+    base::library(package = "readr", quietly = TRUE);
+    base::library(package = "jsonlite", quietly = TRUE);
+    base::library(package = "tximeta", quietly = TRUE);
+    base::library(package = "SummarizedExperiment", quietly = TRUE);
+
+    # Loading input datasets before running tximport
+    coldata_path <- base::as.character(x = snakemake@input[["coldata"]]);
+    coldata <- utils::read.table(
+      file = coldata_path
+      header = TRUE,
+      sep = ifelse("\t", base::endsWith(coldata_path, "tsv"), ","),
+      stringsAsFactors = FALSE
+    );
+
+    # The metadata can be provided either as a json file or through BiocFileCache
+    if ("bioc_file_cache" %in% base::names(snakemake@input)) {
+      bioc_file_path <- base::as.character(
+        x = snakemake@input[["bioc_file_cache"]]
+      );
+      tximeta::setTximetaBFC(dir = bioc_file_path);
+    } else {
+      base::message("Default BiocFileCache path will be used:");
+    }
+    base::message("BiocFileCache path:");
+    base::message(tximeta::getTximetaBFC());
+
+    if ("json_txome" %in% base::names(snakemake@input)) {
+      linked_txome_path <- base::as.character(
+        x = snakemake@input[["linked_txome"]]
+      );
+      tximeta::loadLinkedTxome(jsonFile = linked_txome_path);
+    } else
+
+    # Loading quantification
+    extra <- "coldata = coldata";
+    if ("tximeta_extra" %in% base::names(snakemake@params)) {
+      extra <- base::paste(
+        extra, base::as.character(x = snakemake@params[["extra"]]), sep = ","
+      );
+    }
+    cmd_line <- base::paste0("tximeta::tximeta(", extra, ")");
+
+    base::message(cmd_line);
+    se <- base::eval(base::parse(text = cmd_line));
+
+    # The next lines handles transcripts names translation
+    if ("target_identifier" %in% base::names(snakemake@params)) {
+      target_identifier <- base::as.character(
+        x = snakemake@params[["target_identifier"]]
+      );
+      db <- tximeta::retrieveDb(se = se);
+      se <- tximeta::addIDs(
+        se = se,
+        column = target_identifier,
+        fromDb = db,
+        gene = FALSE
+      );
+    }
+
+    # Save results
+    if ("tx_rds" %in% base::names(snakemake@output)) {
+      rds_path <- base::as.character(x = snakemake@output[["tx_rds"]]);
+      base::saveRDS(object = se, file = rds_path);
+    }
+
+    if ("txi_tsv" %in% base::name(snakemake@output)) {
+      tsv_path <- base::as.character(x = snakemake@output[["tx_tsv"]]);
+      utils::write.table(
+        x = SummarizedExperiment::assay(se),
+        file = tsv_path,
+        quote = FALSE,
+        sep = "\t"
+      );
+    }
+
+    # Optionally add exons annotation if requested by user
+    exons_tsv <- "exons_tsv" %in% base::names(snakemake@output);
+    exons_rds <- "exons_rds" %in% base::names(snakemake@output);
+    se.exons <- ifelse(tximeta::addExons(se = se), (exons_rds | exons_tsv), NULL);
+    if (exons_rds) {
+      rds_path <- base::as.character(x = snakemake@output[["exons_rds"]]);
+      base::saveRDS(object = se.exons, file = rds_path);
+    }
+    if (exons_tsv) {
+      tsv_path <- base::as.character(x = snakemake@output[["exons_tsv"]]);
+      utils::write.table(
+        x = SummarizedExperiment::assay(se.exons),
+        file = tsv_path,
+        quote = FALSE,
+        sep = "\t"
+      );
+    }
+
+    # Optionally add CDS annotation if requested by user
+    cds_rds <- "cds_rds" %in% base::names(snakemake@output)
+    cds_tsv <- "cds_tsv" %in% base::names(snakemake@output)
+    se.cds <- ifelse(tximeta::addCDS(se = se), (cds_rds | cds_tsv), NULL);
+    if (cds_rds) {
+      rds_path <- base::as.character(x = snakemake@output[["cds_rds"]]);
+      base::saveRDS(object = se.cds, file = rds_path);
+    }
+    if (cds_tsv) {
+      tsv_path <- base::as.character(x = snakemake@output[["cds_tsv"]]);
+      utils::write.table(
+        x = SummarizedExperiment::assay(se.cds),
+        file = tsv_path,
+        quote = FALSE,
+        sep = "\t"
+      );
+    }
+
+
+    # Optionally aggregate counts per genes if requested by user
+    gene_tsv <- "gene_tsv" %in% base::names(snakemake@output);
+    gene_rds <- "gene_rds" %in% base::names(snakemake@output);
+    se.genes <- "";
+
+    if (gene_tsv | gene_rds) {
+      extra <- "object = se";
+      if ("tximport_extra" %in% base::names(snakemake@params)) {
+        extra <- base::paste(
+          extra, base::as.character(x = snakemake@params), sep = ","
+        );
+      }
+      cmd_line <- base::paste0("tximeta::summarizeToGene(", extra, ")");
+      base::message(cmd_line);
+      se.genes <- base::eval(base::parse(text = cmd_line));
+    }
+
+    if (gene_rds) {
+      rds_path <- base::as.character(x = snakemake@output[["gene_rds"]]);
+      base::saveRDS(object = se.genes, file = rds_path);
+    }
+    if (gene_tsv) {
+      tsv_path <- base::as.character(x = snakemake@output[["gene_tsv"]]);
+      utils::write.table(
+        x = SummarizedExperiment::assay(se.cds),
+        file = tsv_path,
+        quote = FALSE,
+        sep = "\t"
+      );
+    }

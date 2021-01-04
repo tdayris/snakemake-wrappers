@@ -20,7 +20,7 @@ This wrapper can be used in the following way:
         output:
             "match.vcf"
         wrapper:
-            "0.68.0-378-g58033247a/bio/rbt/vcf-match"
+            "0.68.0-386-gee3675a8c/bio/rbt/vcf-match"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -35,6 +35,7 @@ Software dependencies
 ---------------------
 
 * ``rust-bio-tools==0.16``
+* ``bcftools==1.11``
 
 Input/Output
 ------------
@@ -75,6 +76,12 @@ Code
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
     extra = snakemake.params.get("extra", "")
+
+    input_call = snakemake.input["call"]
+    if input_call.endswith("bcf"):
+        input_call = "(bcftools -c {})".format(input_call)
+    elif input_call.endswith(".gz"):
+        input_call = "(gunzip -c {})".format(input_call)
 
     shell(
         "rbt vcf-match {snakemake.input.reference} {extra} "

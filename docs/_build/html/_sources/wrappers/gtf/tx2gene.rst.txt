@@ -35,7 +35,7 @@ This wrapper can be used in the following way:
         log:
             "logs/tx_to_gene.log"
         wrapper:
-            "0.68.0-378-g58033247a/bio/gtf/tx2gene"
+            "0.68.0-386-gee3675a8c/bio/gtf/tx2gene"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -138,7 +138,18 @@ Code
         snakemake.input["gtf"],
         sep="\t",
         header = None,
-        comment = "#"
+        comment = "#",
+        dtype = {
+            0: "category",
+            1: "category",
+            2: "category",
+            3: "uintc",
+            4: "uintc",
+            5: "category",
+            6: "category",
+            7: "category"
+        },
+        na_values = "."
     )
     gtf.columns = [
         "Chromosome", "source", "feature", "Start", "Stop",
@@ -154,9 +165,9 @@ Code
 
 
     # Extract transcripts identifiers, gene identifiers and gene names
-    gtf["Gene_ID"] = gtf["annotation"].str.extract(r"gene_id \"(\w+)\"")
-    gtf["transcript_id"] = gtf["annotation"].str.extract(r"transcript_id \"(\w+)\"")
-    gtf["Gene_Name"] = gtf["annotation"].str.extract(r"gene_name \"(\w+)\"")
+    gtf["Gene_ID"] = gtf["annotation"].str.extract(r"gene_id \"(\w+.\w+)\"")
+    gtf["transcript_id"] = gtf["annotation"].str.extract(r"transcript_id \"(\w+.\w+)\"")
+    gtf["Gene_Name"] = gtf["annotation"].str.extract(r"gene_name \"(\w+.\w+)\"")
     del gtf["annotation"]
 
 
