@@ -58,7 +58,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.68.0-392-gc94c17c08/bio/reference/ensembl-sequence"
+            "v0.69.0-394-gd8b1658ca/bio/reference/ensembl-sequence"
 
 
     rule get_annotation:
@@ -74,7 +74,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/get_annotation/{build}.{release}.{organism}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.68.0-392-gc94c17c08/bio/reference/ensembl-annotation"
+            "v0.69.0-394-gd8b1658ca/bio/reference/ensembl-annotation"
 
 
     rule samtools_faidx_reference:
@@ -87,7 +87,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.68.0-392-gc94c17c08/bio/samtools/faidx"
+            "v0.69.0-394-gd8b1658ca/bio/samtools/faidx"
 
 
     rule create_dict:
@@ -102,7 +102,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.68.0-392-gc94c17c08/bio/picard/createsequencedictionary"
+            "v0.69.0-394-gd8b1658ca/bio/picard/createsequencedictionary"
 
 
     rule get_variation_with_contig_lengths:
@@ -118,7 +118,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/get_variation/{build}.{release}.{organism}.log"
         wrapper:
-            "0.68.0-392-gc94c17c08/bio/reference/ensembl-variation"
+            "v0.69.0-394-gd8b1658ca/bio/reference/ensembl-variation"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
