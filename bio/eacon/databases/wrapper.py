@@ -13,7 +13,6 @@ log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
 if "databases" in snakemake.output.keys():
     shell("wget -O {snakemake.output.databases}.tar.bz2 https://nextcloud.gustaveroussy.fr/s/E7P3oTKS2Lo2x87/download?path=Onco_Cyto/Annotations/EaCoN_databases.tar.bz2 {log}")
     shell("tar -xvjf {snakemake.output.databases}.tar.bz2 {log}")
-    shell("mv -v databases {snakemake.output.databases} {log}")
 
 if "grd" in snakemake.output.keys():
     shell("wget -O {snakemake.output.grd} https://raw.githubusercontent.com/tdayris/cel-cnv-eacon/master/scripts/grd {log}")
