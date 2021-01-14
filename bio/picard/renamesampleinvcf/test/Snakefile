@@ -1,0 +1,15 @@
+rule test_picard_renamesampleinvcf:
+    input:
+        vcf = "snvs.chr1.vcf"
+    output:
+        vcf = "renamed.snvs.chr1.vcf"
+    # optional specification of memory usage of the JVM that snakemake will respect with global
+    # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+    # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+    # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+    resources:
+        mem_mb = 1024
+    params:
+        new_sample_name = "NewName"
+    wrapper:
+        "master/bio/picard/renamesampleinvcf"
