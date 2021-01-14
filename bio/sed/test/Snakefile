@@ -1,0 +1,12 @@
+rule test_sed:
+    input:
+        "test.csv"
+    output:
+        "sedded.tsv"
+    params:
+        csv_to_tsv=True,
+        remove_lines=[2],
+        replace_dict={"test": "replaced"},
+        tmp="sed.tmp"
+    wrapper:
+        "master/bio/sed"

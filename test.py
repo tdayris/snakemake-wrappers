@@ -95,6 +95,7 @@ def run(wrapper, cmd, check_log=None):
         # env["CONDA_PKGS_DIRS"] = pkgdir
         try:
             subprocess.check_call(cmd)
+            subprocess.check_call("cp -rv . /home/tdayris/Documents/Developments/snakemake-wrappers/my_tests", shell=True)
         except Exception as e:
             # go back to original directory
             os.chdir(origdir)
@@ -4175,4 +4176,36 @@ def test_tximeta_makelinkedtxome():
     run(
         "bio/tximeta/makeLinkedTxome",
         ["snakemake", "--cores", "1", "metadata.json", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_picard_cleansam():
+    run(
+        "bio/picard/cleansam",
+        ["snakemake", "--cores", "1", "cleaned/a.bam", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_md5sum():
+    run(
+        "bio/md5sum",
+        ["snakemake", "--cores", "1", "hash.txt", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_picard_renamesampleinvcf():
+    run(
+        "bio/picard/renamesampleinvcf",
+        ["snakemake", "--cores", "1", "renamed.snvs.chr1.vcf", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_sed():
+    run(
+        "bio/sed",
+        ["snakemake", "--cores", "1", "sedded.tsv", "--use-conda", "-Frp"]
     )
