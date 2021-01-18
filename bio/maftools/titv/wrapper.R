@@ -1,0 +1,77 @@
+#!/usr/bin/R
+
+# __author__ = "Thibault Dayris"
+# __copyright__ = "Copyright 2020, Thibault Dayris"
+# __email__ = "thibault.dayris@gustaveroussy.fr"
+# __license__ = "MIT"
+
+# Snakemake wrapper for both maftools titv and plotTiTv
+
+# Many libraries are useless. This wrapper will be splitted in at least four
+# of them.
+base::library(package = "maftools", quietly = TRUE);
+
+# Building graphics environment command
+png_extra <- base::paste0(
+  "filename", "='", base::as.character(x = snakemake@output[["png"]]), "'"
+);
+if ("png_extra" %in% base::names(snakemake@params)) {
+  png_extra <- base::paste(
+    png_extra, snakemake@params[["png_extra"]], sep = ", "
+  );
+}
+
+png_cmd_line <- base::paste0("grDevices::png(", png_extra, ")");
+
+# Building titv computation command line
+maf_obj <- base::readRDS(
+  file = base::as.character(x = snakemake@input[["rds"]])
+);
+titv_extra <- "maf = maf_obj";
+if ("titv_extra" %in% base::names(snakemake@params)) {
+  titv_extra <- base::paste(
+    titv_extra, snakemake@params[["titv_extra"]], sep = ", "
+  );
+}
+
+titv_cmd_line <- base::paste0("maftools::titv(", titv_extra, ")");
+
+# Building titv plot command line
+# The results of titv will be stored in a variable called: maf.titv
+# don't be surprised on this poping variable name.
+plottitv_extra <- "res = maf.titv";
+if ("plottitv_extra" %in% base::names(snakemake@params)) {
+  plottitv_extra <- base::paste(
+    plottitv_extra, snakemake@params[["plottitv_extra"]], sep = ", "
+  );
+}
+plottitv_cmd_line <- base::paste0("maftools::plotTiTv(", plottitv_extra, ")");
+
+# Running command lines on user's request
+base::message(titv_cmd_line);
+maf.titv <- base::eval(base::parse(text = titv_cmd_line));
+
+if ("tsv" %in% base::names(snakemake@output)) {
+  utils::write.table(
+    x = maf.titv,
+    file = base::as.character(x = snakemake@output[["tsv"]]),
+    sep = "\t",
+    quote = FALSE
+  );
+}
+
+if ("png" %in% base::names(snakemake@output)) {
+  base::message(png_cmd_line);
+  base::eval(base::parse(text = png_cmd_line));
+
+  base::message(plottitv_cmd_line);
+  base::eval(base::parse(text = plottitv_cmd_line));
+  dev.off();
+}
+
+if ("rds" %in% base::names(snakemake@output)) {
+  base::saveRDS(
+    file = base::as.character(x = snakemake@output[["rds"]]),
+    obj = maf.titv
+  );
+}
