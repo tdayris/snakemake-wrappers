@@ -24,7 +24,7 @@ This wrapper can be used in the following way:
             replace_dict={"test": "replaced"},
             tmp="sed.tmp"
         wrapper:
-            "v0.69.0-403-ge5f55b3a7/bio/sed"
+            "v0.69.0-406-g1e9e192ca/bio/sed"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -70,6 +70,7 @@ Other sed expressions can be built manually
 * remove_list (list[str]): Remove all lines containing one of the strings provided
 * remove_lines (list[int]): Remove all lines which numbers are provided
 * replace_dict (dict[str, str]): A dictionnary in which key = replaced string, value = replacement string.
+* new_header (list[str]): Replace first line by the new-one
 
 
 
@@ -137,6 +138,12 @@ Code
     if snakemake.params.get("join_on_spaces") is not None:
         intermediar.append(
             "-E ':a ; $!N ; s/\n\s+/ / ; ta ; P ; D'"
+        )
+
+
+    if (new_header := snakemake.params.get("new_header")) is not None:
+        intermediar.append(
+            f"'1 s/^.$/{new_header}/'"
         )
 
 

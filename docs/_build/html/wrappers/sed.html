@@ -319,7 +319,7 @@
         <span class="n">replace_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;test&quot;</span><span class="p">:</span> <span class="s2">&quot;replaced&quot;</span><span class="p">},</span>
         <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;sed.tmp&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;v0.69.0-403-ge5f55b3a7/bio/sed&quot;</span>
+        <span class="s2">&quot;v0.69.0-406-g1e9e192ca/bio/sed&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -361,7 +361,8 @@ When running with</p>
 <p>Other sed expressions can be built manually
 * remove_list (list[str]): Remove all lines containing one of the strings provided
 * remove_lines (list[int]): Remove all lines which numbers are provided
-* replace_dict (dict[str, str]): A dictionnary in which key = replaced string, value = replacement string.</p>
+* replace_dict (dict[str, str]): A dictionnary in which key = replaced string, value = replacement string.
+* new_header (list[str]): Replace first line by the new-one</p>
 </div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
@@ -424,6 +425,12 @@ When running with</p>
 <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;join_on_spaces&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">intermediar</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
         <span class="s2">&quot;-E &#39;:a ; $!N ; s/</span><span class="se">\n</span><span class="s2">\s+/ / ; ta ; P ; D&#39;&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">if</span> <span class="p">(</span><span class="n">new_header</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;new_header&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">intermediar</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;&#39;1 s/^.$/</span><span class="si">{</span><span class="n">new_header</span><span class="si">}</span><span class="s2">/&#39;&quot;</span>
     <span class="p">)</span>
 
 
