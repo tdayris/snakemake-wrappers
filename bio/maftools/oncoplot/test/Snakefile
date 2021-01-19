@@ -1,0 +1,26 @@
+rule test_maftools_oncoplot:
+    input:
+        rds = "maf.RDS"
+    output:
+        png = "results/oncoplot.png"
+    params:
+        non_synonymous = [
+            "Missense_Mutation",
+            "3_prime_UTR_variant",
+            "5_prime_UTR_variant",
+            "Splice_Site",
+            "Nonsense_Mutation",
+            "Frame_Shift_Ins",
+            "In_Frame_Del"
+        ],
+        color_named_vector = [
+            "#1a9850",
+            "#91cf60",
+            "#d9ef8b",
+            "#ffffbf",
+            "#fee08b",
+            "#fc8d59",
+            "#d73027"
+        ]
+    wrapper:
+        "master/bio/maftools/oncoplot"
