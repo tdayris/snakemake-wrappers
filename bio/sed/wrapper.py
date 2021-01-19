@@ -54,6 +54,12 @@ if snakemake.params.get("join_on_spaces") is not None:
     )
 
 
+if (new_header := snakemake.params.get("new_header")) is not None:
+    intermediar.append(
+        f"'1 s/^.$/{new_header}/'"
+    )
+
+
 # Case of line removal on several criteria
 if (remove_list := snakemake.params.get("remove_list")) is not None:
     for element_to_remove in remove_list:
