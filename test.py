@@ -4224,5 +4224,59 @@ def test_picard_renamesampleinvcf():
 def test_sed():
     run(
         "bio/sed",
-        ["snakemake", "--cores", "1", "sedded.tsv", "--use-conda", "-Frp"]
+        ["snakemake", "--cores", "1", "sedded.tsv", "--use-conda", "-F"]
+    )
+
+@skip_if_not_modified
+def test_maftools_readmaf():
+    run(
+        "bio/maftools/readmaf",
+        ["snakemake", "--cores", "1", "results/maf.RDS", "--use-conda", "-F"]
+    )
+
+@skip_if_not_modified
+def test_maftools_titv():
+    run(
+        "bio/maftools/titv",
+        ["snakemake", "--cores", "1", "results/titv.RDS", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_maftools_trinucleotidematrix_mm10():
+    run(
+        "bio/maftools/trinucleotidematrix_mm10",
+        ["snakemake", "--cores", "1", "results/matrix.RDS", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_maftools_plotmafsummary():
+    run(
+        "bio/maftools/plotmafsummary",
+        ["snakemake", "--cores", "1", "results/plotmafSummary.png", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_maftools_oncoplot():
+    run(
+        "bio/maftools/oncoplot",
+        ["snakemake", "--cores", "1", "results/oncoplot.png", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_maftools_signatures():
+    run(
+        "bio/maftools/signatures",
+        ["snakemake", "--cores", "1", "results/signatures.png", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_maftools_cosine_similarity():
+    run(
+        "bio/maftools/cosine_similarity",
+        ["snakemake", "--cores", "1", "results/cosine.png", "--use-conda", "-F"]
     )
