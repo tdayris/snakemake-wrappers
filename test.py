@@ -95,7 +95,7 @@ def run(wrapper, cmd, check_log=None):
         # env["CONDA_PKGS_DIRS"] = pkgdir
         try:
             subprocess.check_call(cmd)
-            subprocess.check_call("cp -rv . /home/tdayris/Documents/Developments/snakemake-wrappers/my_tests", shell=True)
+            subprocess.check_call("cp -r . /home/tdayris/Documents/Developments/snakemake-wrappers/my_tests", shell=True)
         except Exception as e:
             # go back to original directory
             os.chdir(origdir)
@@ -3190,6 +3190,13 @@ def test_snpsift_genesets():
     run(
         "bio/snpsift/genesets",
         ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"],
+    )
+
+@skip_if_not_modified
+def test_snpsift_extractfields():
+    run(
+        "bio/snpsift/extractfields",
+        ["snakemake", "--cores", "1", "extracted/out.tsv", "--use-conda", "-F"],
     )
 
 
