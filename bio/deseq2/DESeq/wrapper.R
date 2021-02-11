@@ -46,7 +46,7 @@ wald <- tryCatch({
   error = function(e) {
     dds <- cleanColData(
       dds = dds,
-      factor = base::as.character(x = "Cancer_Type") #snakemake@params[["factor"]])
+      factor = base::as.character(x = snakemake@params[["factor"]])
     );
     base::eval(base::parse(text = deseq2_cmd))
   }
