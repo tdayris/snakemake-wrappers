@@ -27,7 +27,7 @@ extra = snakemake.params.get("extra", "-VK")
 if not isinstance(snakemake.params['input'], str):
     raise TypeError(
         "A single file is expected in this wrapper. Multiple copies should be "
-        "performed in multiple call of this pipeline."
+        "performed in multiple call of this wrapper."
     )
 
 shell(
