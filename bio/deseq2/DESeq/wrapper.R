@@ -12,6 +12,13 @@
 base::library(package = "SummarizedExperiment", quietly = TRUE);
 base::library(package = "DESeq2", quietly = TRUE);
 
+cleanColData <- function(dds, factor) {
+  NApos <- base::is.na(dds[[factor]]);
+  dds2 <- dds[, !NApos];
+  dds2[[factor]] <- dds[[factor]][!NApos];
+  return(dds2)
+}
+
 # Load DESeq2 dataset
 dds_path <- base::as.character(x = snakemake@input[["dds"]]);
 dds <- base::readRDS(file = dds_path);
@@ -33,7 +40,18 @@ base::message("DESeq2 command line:");
 base::message(deseq2_cmd);
 
 # Create object
-wald <- base::eval(base::parse(text = deseq2_cmd));
+wald <- tryCatch({
+    base::eval(base::parse(text = deseq2_cmd))
+  },
+  error = function(e) {
+    dds <- cleanColData(
+      dds = dds,
+      factor = base::as.character(x = "Cancer_Type") #snakemake@params[["factor"]])
+    );
+    base::eval(base::parse(text = deseq2_cmd))
+  }
+);
+#wald <- base::eval(base::parse(text = deseq2_cmd));
 
 # Save results as RDS
 output_rds <- base::as.character(x = snakemake@output[["rds"]]);
