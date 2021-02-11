@@ -15,8 +15,8 @@ base::library(package = "DESeq2", quietly = TRUE);
 cleanColData <- function(dds, factor) {
   NApos <- base::is.na(dds[[factor]]);
   dds2 <- dds[, !NApos];
-  for coldata in base::names(colData(dds2)) {
-    dds2[[coldata]] <- dds[[coldata]][!NApos];
+  for (coldata in base::names(colData(dds2))) {
+    dds2[[coldata]] <- dds[[coldata]][!NApos]
   }
   return(dds2)
 }
