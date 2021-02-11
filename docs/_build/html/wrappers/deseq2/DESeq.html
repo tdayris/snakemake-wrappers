@@ -352,7 +352,7 @@ and negative binomial GLM fitting and Wald test.</p>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_nbinomWaldTest.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;v0.69.0-416-gc814694dd/bio/deseq2/DESeq&quot;</span>
+        <span class="s2">&quot;v0.69.0-419-ge58eacb23/bio/deseq2/DESeq&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -417,7 +417,9 @@ When running with</p>
 <span class="n">cleanColData</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">NApos</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">is.na</span><span class="p">(</span><span class="n">dds</span><span class="p">[[</span><span class="n">factor</span><span class="p">]]);</span>
   <span class="n">dds2</span> <span class="o">&lt;-</span> <span class="n">dds</span><span class="p">[,</span> <span class="o">!</span><span class="n">NApos</span><span class="p">];</span>
-  <span class="n">dds2</span><span class="p">[[</span><span class="n">factor</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="n">dds</span><span class="p">[[</span><span class="n">factor</span><span class="p">]][</span><span class="o">!</span><span class="n">NApos</span><span class="p">];</span>
+  <span class="nf">for </span><span class="p">(</span><span class="n">coldata</span> <span class="n">in</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="nf">colData</span><span class="p">(</span><span class="n">dds2</span><span class="p">)))</span> <span class="p">{</span>
+    <span class="n">dds2</span><span class="p">[[</span><span class="n">coldata</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="n">dds</span><span class="p">[[</span><span class="n">coldata</span><span class="p">]][</span><span class="o">!</span><span class="n">NApos</span><span class="p">]</span>
+  <span class="p">}</span>
   <span class="nf">return</span><span class="p">(</span><span class="n">dds2</span><span class="p">)</span>
 <span class="p">}</span>
 

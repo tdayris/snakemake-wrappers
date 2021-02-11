@@ -28,7 +28,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             sort_extra=""            # Extra args for samtools/picard.
         threads: 8
         wrapper:
-            "v0.69.0-416-gc814694dd/bio/bwa/mem"
+            "v0.69.0-419-ge58eacb23/bio/bwa/mem"
 
     rule samtools_index:
         input:
@@ -38,7 +38,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             "" # optional params string
         wrapper:
-            "v0.69.0-416-gc814694dd/bio/samtools/index"
+            "v0.69.0-419-ge58eacb23/bio/samtools/index"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
