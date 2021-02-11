@@ -51,11 +51,14 @@ data = data[list(data.select_dtypes(include=[numpy.number]).columns.values)]
 nbs = len(data.columns.tolist())
 nbc = len(conditions.index.tolist())
 if nbs != nbc:
-    logging.warning(
+    print(
         f"Expected same number of samples and conditions, got {nbs} != {nbc}. "
         "Dropping unexpected samples"
     )
-    data = data[conditions.index.tolist()]
+    if nbs > nbc:
+        data = data[conditions.index.tolist()]
+    else:
+        conditions[conditions.index.isin(data.columns.tolist())]
 
 # Create custom colormap for heatmap values
 cmap = seaborn.diverging_palette(
