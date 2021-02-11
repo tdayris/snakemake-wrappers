@@ -343,12 +343,12 @@
             <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">conditions</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="s2">&quot;CondA&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="s2">&quot;CondB&quot;</span><span class="p">},</span>
+        <span class="n">conditions</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="s2">&quot;CondA&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="s2">&quot;CondB&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="s2">&quot;CondB&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="s2">&quot;CondA&quot;</span><span class="p">},</span>
         <span class="n">factor</span> <span class="o">=</span> <span class="s2">&quot;Condition_Test&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/seaborn_clustermap.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;v0.69.0-421-ga13d93b97/bio/seaborn/clustermap&quot;</span>
+        <span class="s2">&quot;v0.69.0-423-g916db7d8a/bio/seaborn/clustermap&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -461,11 +461,14 @@ When running with</p>
 <span class="n">nbs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 <span class="n">nbc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditions</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 <span class="k">if</span> <span class="n">nbs</span> <span class="o">!=</span> <span class="n">nbc</span><span class="p">:</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+    <span class="nb">print</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;Expected same number of samples and conditions, got </span><span class="si">{</span><span class="n">nbs</span><span class="si">}</span><span class="s2"> != </span><span class="si">{</span><span class="n">nbc</span><span class="si">}</span><span class="s2">. &quot;</span>
         <span class="s2">&quot;Dropping unexpected samples&quot;</span>
     <span class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">conditions</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+    <span class="k">if</span> <span class="n">nbs</span> <span class="o">&gt;</span> <span class="n">nbc</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">conditions</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">conditions</span><span class="p">[</span><span class="n">conditions</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())]</span>
 
 <span class="c1"># Create custom colormap for heatmap values</span>
 <span class="n">cmap</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">diverging_palette</span><span class="p">(</span>

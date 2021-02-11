@@ -30,12 +30,12 @@ This wrapper can be used in the following way:
                 lambda wildcards, attempt: min(attempt * 10, 20)
             )
         params:
-            conditions = {"A": "CondA", "B": "CondB"},
+            conditions = {"A": "CondA", "B": "CondB", "C": "CondB", "D": "CondA"},
             factor = "Condition_Test"
         log:
             "logs/seaborn_clustermap.log"
         wrapper:
-            "v0.69.0-421-ga13d93b97/bio/seaborn/clustermap"
+            "v0.69.0-423-g916db7d8a/bio/seaborn/clustermap"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -154,11 +154,14 @@ Code
     nbs = len(data.columns.tolist())
     nbc = len(conditions.index.tolist())
     if nbs != nbc:
-        logging.warning(
+        print(
             f"Expected same number of samples and conditions, got {nbs} != {nbc}. "
             "Dropping unexpected samples"
         )
-        data = data[conditions.index.tolist()]
+        if nbs > nbc:
+            data = data[conditions.index.tolist()]
+        else:
+            conditions[conditions.index.isin(data.columns.tolist())]
 
     # Create custom colormap for heatmap values
     cmap = seaborn.diverging_palette(
