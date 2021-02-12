@@ -1,0 +1,81 @@
+.. _`bio/bamtools/split`:
+
+BAMTOOLS SPLIT
+==============
+
+Split bam file into sub files, default by reference
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bamtools_split:
+        input:
+            "mapped/{sample}.bam",
+        output:
+            "mapped/{sample}.REF_xx.bam",
+        params:
+            extra="-reference",
+        log:
+            "logs/bamtoos_split/{sample}.log",
+        wrapper:
+            "0.71.1-427-gbdc7a8d34/bio/bamtools/split"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bamtools==2.5.1``
+
+Input/Output
+------------
+**Input:**
+
+* bam file
+
+**Output:**
+
+* multiple bam file
+
+
+
+
+Authors
+-------
+
+* Patrik Smeds
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Patrik Smeds"
+    __copyright__ = "Copyright 2021, Patrik Smeds"
+    __email__ = "patrik.smeds@scilifelab.uu.se"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+
+    if len(snakemake.input) != 1:
+        raise ValueError("One bam input file expected, got: " + str(len(snakemake.input)))
+
+    shell("bamtools split -in {snakemake.input} {extra} {log}")

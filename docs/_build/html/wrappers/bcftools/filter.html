@@ -109,7 +109,6 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">BCFTOOLS FILTER</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
 </ul>
@@ -147,6 +146,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../diamond.html">DIAMOND</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../eacon.html">EACON</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
@@ -187,6 +187,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../nanosim-h.html">NANOSIM-H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ngs-disambiguate.html">NGS-DISAMBIGUATE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../open-cravat.html">OPEN-CRAVAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pandas.html">PANDAS</a></li>
@@ -238,6 +239,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../umis.html">UMIS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../unicycler.html">UNICYCLER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vardict.html">VARDICT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../variant_distribution.html">VARIANT_DISTRIBUTION</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../varscan.html">VARSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
@@ -321,17 +323,64 @@
             
   <div class="section" id="bcftools-filter">
 <span id="bio-bcftools-filter"></span><h1>BCFTOOLS FILTER<a class="headerlink" href="#bcftools-filter" title="Permalink to this headline">¶</a></h1>
-<p>Filter VCF/BCF files</p>
+<p>filter vcf/bcf file.</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_bcftools_filter</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">bcf_filter_o_vcf</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;a.bcf&quot;</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.bcf&quot;</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;filtered.bcf&quot;</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.filter.vcf&quot;</span><span class="p">,</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;log/</span><span class="si">{prefix}</span><span class="s2">.filter.vcf.log&quot;</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;-i &#39;QUAL &gt; 5&#39;&quot;</span><span class="p">,</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;v0.69.0-425-gae71034f1/bio/bcftools/filter&quot;</span>
+        <span class="s2">&quot;0.71.1-427-gbdc7a8d34/bio/bcftools/filter&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">bcf_filter_o_vcf_gz</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.bcf&quot;</span><span class="p">,</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.filter.vcf.gz&quot;</span><span class="p">,</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;log/</span><span class="si">{prefix}</span><span class="s2">.filter.vcf.gz.log&quot;</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;-i &#39;QUAL &gt; 5&#39;&quot;</span><span class="p">,</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-427-gbdc7a8d34/bio/bcftools/filter&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">bcf_filter_o_bcf</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.bcf&quot;</span><span class="p">,</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.filter.bcf&quot;</span><span class="p">,</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;log/</span><span class="si">{prefix}</span><span class="s2">.filter.bcf.log&quot;</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;-i &#39;QUAL &gt; 5&#39;&quot;</span><span class="p">,</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-427-gbdc7a8d34/bio/bcftools/filter&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">bcf_filter_o_bcf_gz</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.bcf&quot;</span><span class="p">,</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.filter.bcf.gz&quot;</span><span class="p">,</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;log/</span><span class="si">{prefix}</span><span class="s2">.filter.bcf.gz.log&quot;</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;-i &#39;QUAL &gt; 5&#39;&quot;</span><span class="p">,</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-427-gbdc7a8d34/bio/bcftools/filter&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -347,57 +396,48 @@ When running with</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">bcftools==1.10</span></code></p></li>
 </ul>
 </div>
-<div class="section" id="input-output">
-<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
-<p><strong>Input:</strong></p>
-<ul class="simple">
-<li><p>A single VCF/BCF file</p></li>
-</ul>
-<p><strong>Output:</strong></p>
-<ul class="simple">
-<li><p>A single filtered VCF/BCF file</p></li>
-</ul>
-</div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Thibault Dayris</p></li>
+<li><p>Patrik Smeds</p></li>
 </ul>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Snakemake wrapper for bcftools filter&quot;&quot;&quot;</span>
-
-<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Thibault Dayris&quot;</span>
-<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, Thibault Dayris&quot;</span>
-<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;thibault.dayris@gustaveroussy.fr&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Patrik Smeds&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2021, Patrik Smeds&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;patrik.smeds@scilifelab.uu.se&quot;</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">output_file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="k">if</span> <span class="n">output_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.bcf&quot;</span><span class="p">):</span>
-    <span class="n">extra</span> <span class="o">+=</span> <span class="s2">&quot; --output-type b &quot;</span>
-<span class="k">elif</span> <span class="n">output_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.vcf.gz&quot;</span><span class="p">):</span>
-    <span class="n">extra</span> <span class="o">+=</span> <span class="s2">&quot; --output-type z &quot;</span>
-<span class="k">elif</span> <span class="n">output_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.vcf&quot;</span><span class="p">):</span>
-    <span class="n">extra</span> <span class="o">+=</span> <span class="s2">&quot; --output-type v &quot;</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-        <span class="s2">&quot;Output file extension should be one of: vcf, bcf, vcf.gz&quot;</span>
-    <span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;bcf&quot;</span><span class="p">):</span>
+    <span class="n">output_format</span> <span class="o">=</span> <span class="s2">&quot;-Ou&quot;</span>
+<span class="k">elif</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;bcf.gz&quot;</span><span class="p">):</span>
+    <span class="n">output_format</span> <span class="o">=</span> <span class="s2">&quot;-Ob&quot;</span>
+<span class="k">elif</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;vcf&quot;</span><span class="p">):</span>
+    <span class="n">output_format</span> <span class="o">=</span> <span class="s2">&quot;-Ov&quot;</span>
+<span class="k">elif</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;vcf.gz&quot;</span><span class="p">):</span>
+    <span class="n">output_format</span> <span class="o">=</span> <span class="s2">&quot;-Oz&quot;</span>
+
+
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Only one input file expected, got: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">)))</span>
+
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Only one output file expected, got: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">)))</span>
+
+<span class="nb">filter</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filter&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
-    <span class="s2">&quot; bcftools filte &quot;</span>
-    <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot; --threads </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot; --output </span><span class="si">{output_file}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot; </span><span class="si">{snakemake.input[0]}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot; </span><span class="si">{log}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;bcftools filter </span><span class="si">{filter}</span><span class="s2"> </span><span class="si">{extra}</span><span class="s2"> </span><span class="si">{snakemake.input[0]}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{output_format}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;-o </span><span class="si">{snakemake.output[0]}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

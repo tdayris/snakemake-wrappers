@@ -128,6 +128,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../diamond.html">DIAMOND</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../eacon.html">EACON</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
@@ -143,6 +144,7 @@
 <li class="toctree-l3"><a class="reference internal" href="baserecalibrator.html">GATK BASERECALIBRATOR</a></li>
 <li class="toctree-l3"><a class="reference internal" href="baserecalibratorspark.html">GATK BASERECALIBRATORSPARK</a></li>
 <li class="toctree-l3"><a class="reference internal" href="combinegvcfs.html">GATK COMBINEGVCFS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="filtermutectcalls.html">GATK FILTERMUTECTCALLS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="genotypegvcfs.html">GATK GENOTYPEGVCFS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="haplotypecaller.html">GATK HAPLOTYPECALLER</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">GATK MUTECT2</a><ul>
@@ -188,6 +190,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../nanosim-h.html">NANOSIM-H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ngs-disambiguate.html">NGS-DISAMBIGUATE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../open-cravat.html">OPEN-CRAVAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pandas.html">PANDAS</a></li>
@@ -239,6 +242,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../umis.html">UMIS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../unicycler.html">UNICYCLER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vardict.html">VARDICT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../variant_distribution.html">VARIANT_DISTRIBUTION</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../varscan.html">VARSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
@@ -345,7 +349,29 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/mutect_</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-         <span class="s2">&quot;v0.69.0-425-gae71034f1/bio/gatk/mutect&quot;</span>
+         <span class="s2">&quot;0.71.1-427-gbdc7a8d34/bio/gatk/mutect&quot;</span>
+
+<span class="n">rule</span> <span class="n">mutect2_bam</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">fasta</span> <span class="o">=</span> <span class="s2">&quot;genome/genome.fasta&quot;</span><span class="p">,</span>
+        <span class="nb">map</span> <span class="o">=</span> <span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;variant_bam/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+        <span class="n">bam</span> <span class="o">=</span> <span class="s2">&quot;variant_bam/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Testing Mutect2 with </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span>
+        <span class="mi">1</span>
+    <span class="c1"># optional specification of memory usage of the JVM that snakemake will respect with global</span>
+    <span class="c1"># resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)</span>
+    <span class="c1"># and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:</span>
+    <span class="c1"># https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">1024</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/mutect_</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+         <span class="s2">&quot;0.71.1-427-gbdc7a8d34/bio/gatk/mutect&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -395,12 +421,19 @@ When running with</p>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+<span class="n">bam_output</span> <span class="o">=</span> <span class="s2">&quot;--bam-output&quot;</span>
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bam&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">bam_output</span> <span class="o">=</span> <span class="n">bam_output</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">bam</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">bam_output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">java_opts</span> <span class="o">=</span> <span class="n">get_java_opts</span><span class="p">(</span><span class="n">snakemake</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;gatk --java-options &#39;</span><span class="si">{java_opts}</span><span class="s2">&#39; Mutect2 &quot;</span>  <span class="c1"># Tool and its subprocess</span>
     <span class="s2">&quot;--input </span><span class="si">{snakemake.input.map}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to input mapping file</span>
+    <span class="s2">&quot;</span><span class="si">{bam_output}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to output bam file, optional</span>
     <span class="s2">&quot;--output </span><span class="si">{snakemake.output.vcf}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to output vcf file</span>
     <span class="s2">&quot;--reference </span><span class="si">{snakemake.input.fasta}</span><span class="s2"> &quot;</span>  <span class="c1"># Path to reference fasta file</span>
     <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> &quot;</span>  <span class="c1"># Extra parameters</span>

@@ -1,0 +1,77 @@
+.. _`bio/diamond/makedb`:
+
+DIAMOND MAKEDB
+==============
+
+DIAMOND is a sequence aligner for protein and translated DNA searches, designed for high performance analysis of big sequence data.
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule diamond_blastx:
+        input:
+            fname = "{reference}.fasta",
+        output:
+            fname = "{reference}.dmnd"
+        log:
+            "logs/diamond_makedb/{reference}.log"
+        params:
+            extra=""
+        threads: 8
+        wrapper:
+            "0.71.1-427-gbdc7a8d34/bio/diamond/makedb"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``diamond==2.0.6``
+
+
+
+
+Authors
+-------
+
+* Kim Philipp Jablonski
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Kim Philipp Jablonski"
+    __copyright__ = "Copyright 2020, Kim Philipp Jablonski"
+    __email__ = "kim.philipp.jablonski@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+
+    shell(
+        "diamond makedb"
+        " --threads {snakemake.threads}"
+        " --in {snakemake.input.fname}"
+        " --db {snakemake.output.fname}"
+        " {extra}"
+        " {log}"
+    )

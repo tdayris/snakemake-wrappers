@@ -21,7 +21,7 @@ This wrapper can be used in the following way:
         params:
             ""  # optional parameters for bcftools concat (except -o)
         wrapper:
-            "v0.69.0-425-gae71034f1/bio/bcftools/concat"
+            "0.71.1-427-gbdc7a8d34/bio/bcftools/concat"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -59,8 +59,10 @@ Code
 
     from snakemake.shell import shell
 
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
     shell(
         "bcftools concat {snakemake.params} -o {snakemake.output[0]} "
-        "{snakemake.input.calls}"
+        "{snakemake.input.calls} "
+        "{log}"
     )

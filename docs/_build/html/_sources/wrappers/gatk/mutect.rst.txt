@@ -32,7 +32,29 @@ This wrapper can be used in the following way:
         log:
             "logs/mutect_{sample}.log"
         wrapper:
-             "v0.69.0-425-gae71034f1/bio/gatk/mutect"
+             "0.71.1-427-gbdc7a8d34/bio/gatk/mutect"
+
+    rule mutect2_bam:
+        input:
+            fasta = "genome/genome.fasta",
+            map = "mapped/{sample}.bam"
+        output:
+            vcf = "variant_bam/{sample}.vcf",
+            bam = "variant_bam/{sample}.bam"
+        message:
+            "Testing Mutect2 with {wildcards.sample}"
+        threads:
+            1
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
+        log:
+            "logs/mutect_{sample}.log"
+        wrapper:
+             "0.71.1-427-gbdc7a8d34/bio/gatk/mutect"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -87,12 +109,19 @@ Code
 
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
+    bam_output = "--bam-output"
+    if snakemake.output.get("bam", None) is not None:
+        bam_output = bam_output + " " + snakemake.output.bam
+    else:
+        bam_output = ""
+
     extra = snakemake.params.get("extra", "")
     java_opts = get_java_opts(snakemake)
 
     shell(
         "gatk --java-options '{java_opts}' Mutect2 "  # Tool and its subprocess
         "--input {snakemake.input.map} "  # Path to input mapping file
+        "{bam_output} "  # Path to output bam file, optional
         "--output {snakemake.output.vcf} "  # Path to output vcf file
         "--reference {snakemake.input.fasta} "  # Path to reference fasta file
         "{extra} "  # Extra parameters

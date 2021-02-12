@@ -1,0 +1,85 @@
+.. _`bio/open-cravat/module`:
+
+OPENCRAVAT MODULE
+=================
+
+Install OpenCRAVAT modules. Annotate variant calls with OpenCRAVAT. For more details, see https://github.com/KarchinLab/open-cravat/wiki.
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule opencravat_module:
+        output:
+            # add any other desired modules as separate directory outputs
+            directory("modules/annotators/biogrid"),
+        log:
+            "logs/open-cravat/module.log"
+        wrapper:
+            "0.71.1-427-gbdc7a8d34/bio/open-cravat/module"
+
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``open-cravat=2.1``
+
+
+
+
+Authors
+-------
+
+* Rick Kim
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Rick Kim"
+    __copyright__ = "Copyright 2020, Rick Kim"
+    __license__ = "GPLv3"
+
+    from snakemake.shell import shell
+    import cravat
+    import re
+    import pathlib
+    import os
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    onames = []
+    for o in snakemake.output:
+        onames.append(o)
+    if type(onames) == str:
+        onames = [onames]
+    elif type(onames) == list:
+        onames = onames
+    else:
+        onames = [str(onames)]
+    for oname in onames:
+        if os.path.exists(oname):
+            continue
+        [o2, module_name] = os.path.split(oname)
+        [modules_dir, module_type] = os.path.split(o2)
+        module_type = module_type[:-1]
+        modules_dir_cur = cravat.admin_util.get_modules_dir()
+        if modules_dir_cur != modules_dir:
+            cravat.admin_util.set_modules_dir(modules_dir)
+        cmd = ["oc", "module", "install", module_name, "-y"]
+        cmd = " ".join(cmd)
+        shell("{cmd} {log}")
