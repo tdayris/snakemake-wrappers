@@ -347,7 +347,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_pcaexplorer_pcacorrs.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-427-gbdc7a8d34/bio/pcaExplorer/plotCorrs&quot;</span>
+        <span class="s2">&quot;0.71.1-429-g3782a2b48/bio/pcaExplorer/plotCorrs&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -438,7 +438,17 @@ When running with</p>
 <span class="p">);</span>
 <span class="n">dds</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">readRDS</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="n">dds_path</span><span class="p">);</span>
 
-<span class="n">corrs_pca</span> <span class="o">&lt;-</span> <span class="n">pcaExplorer</span><span class="o">::</span><span class="nf">correlatePCs</span><span class="p">(</span><span class="n">pca</span><span class="p">,</span> <span class="nf">colData</span><span class="p">(</span><span class="n">dds</span><span class="p">))</span>
+<span class="n">corrs_pca</span> <span class="o">&lt;-</span> <span class="nf">tryCatch</span><span class="p">({</span>
+    <span class="n">pcaExplorer</span><span class="o">::</span><span class="nf">correlatePCs</span><span class="p">(</span><span class="n">pca</span><span class="p">,</span> <span class="nf">colData</span><span class="p">(</span><span class="n">dds</span><span class="p">))</span>
+  <span class="p">},</span>
+  <span class="n">error</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">dds</span> <span class="o">&lt;-</span> <span class="nf">cleanColData</span><span class="p">(</span>
+      <span class="n">dds</span> <span class="o">=</span> <span class="n">dds</span><span class="p">,</span>
+      <span class="n">factor</span> <span class="o">=</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;factor&quot;</span><span class="p">]])</span>
+    <span class="p">);</span>
+    <span class="n">pcaExplorer</span><span class="o">::</span><span class="nf">correlatePCs</span><span class="p">(</span><span class="n">pca</span><span class="p">,</span> <span class="nf">colData</span><span class="p">(</span><span class="n">dds</span><span class="p">))</span>
+  <span class="p">}</span>
+<span class="p">);</span>
 
 <span class="c1"># Load extra parameters</span>
 <span class="n">extra</span> <span class="o">&lt;-</span> <span class="s">&quot;corrs_pca&quot;</span>

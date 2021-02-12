@@ -33,7 +33,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_pcaexplorer_pcacorrs.log"
         wrapper:
-            "0.71.1-427-gbdc7a8d34/bio/pcaExplorer/plotCorrs"
+            "0.71.1-429-g3782a2b48/bio/pcaExplorer/plotCorrs"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -130,7 +130,17 @@ Code
     );
     dds <- base::readRDS(file = dds_path);
 
-    corrs_pca <- pcaExplorer::correlatePCs(pca, colData(dds))
+    corrs_pca <- tryCatch({
+        pcaExplorer::correlatePCs(pca, colData(dds))
+      },
+      error = function(e) {
+        dds <- cleanColData(
+          dds = dds,
+          factor = base::as.character(x = snakemake@params[["factor"]])
+        );
+        pcaExplorer::correlatePCs(pca, colData(dds))
+      }
+    );
 
     # Load extra parameters
     extra <- "corrs_pca"
