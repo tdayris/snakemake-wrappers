@@ -38,7 +38,17 @@ dds_path <- base::as.character(
 );
 dds <- base::readRDS(file = dds_path);
 
-corrs_pca <- pcaExplorer::correlatePCs(pca, colData(dds))
+corrs_pca <- tryCatch({
+    pcaExplorer::correlatePCs(pca, colData(dds))
+  },
+  error = function(e) {
+    dds <- cleanColData(
+      dds = dds,
+      factor = base::as.character(x = snakemake@params[["factor"]])
+    );
+    pcaExplorer::correlatePCs(pca, colData(dds))
+  }
+);
 
 # Load extra parameters
 extra <- "corrs_pca"
