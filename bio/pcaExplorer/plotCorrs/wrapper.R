@@ -13,6 +13,15 @@ base::library(package = "DESeq2");        # Differential analysis
 base::library(package = "pcaExplorer");   # Handles PCAs
 base::library(package = "Cairo");         # Graphic library
 
+cleanColData <- function(dds, factor) {
+  NApos <- base::is.na(dds[[factor]]);
+  dds2 <- dds[, !NApos];
+  for (coldata in base::names(colData(dds2))) {
+    dds2[[coldata]] <- dds[[coldata]][!NApos]
+  }
+  return(dds2)
+}
+
 # Overload output defaults in order to avoid
 # X11 foreward errors on cluster nodes
 options(bitmapType="cairo");
@@ -41,6 +50,14 @@ if ("extra" %in% names(snakemake@params)) {
   );
 }
 
+command <- base::paste0(
+  "pcaExplorer::plotPCcorrs(",
+  extra,
+  ");"
+);
+
+base::message(command);
+
 # Build plot
 png(
   filename = snakemake@output[["png"]],
@@ -50,18 +67,16 @@ png(
   type = "cairo"
 );
 
-command <- base::paste0(
-  "pcaExplorer::plotPCcorrs(",
-  extra,
-  ");"
-);
-
-base::message(command);
-
-base::eval(
-  base::parse(
-    text = command
-  )
+tryCatch({
+    base::eval(base::parse(text = command))
+  },
+  error = function(e) {
+    dds <- cleanColData(
+      dds = dds,
+      factor = base::as.character(x = snakemake@params[["factor"]])
+    );
+    base::eval(base::parse(text = command))
+  }
 );
 
 dev.off()
