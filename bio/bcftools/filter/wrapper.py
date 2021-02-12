@@ -1,33 +1,35 @@
-"""Snakemake wrapper for bcftools filter"""
-
-__author__ = "Thibault Dayris"
-__copyright__ = "Copyright 2020, Thibault Dayris"
-__email__ = "thibault.dayris@gustaveroussy.fr"
+__author__ = "Patrik Smeds"
+__copyright__ = "Copyright 2021, Patrik Smeds"
+__email__ = "patrik.smeds@scilifelab.uu.se"
 __license__ = "MIT"
 
 
 from snakemake.shell import shell
-log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
-extra = snakemake.params[0]
-output_file = snakemake.output[0]
-if output_file.endswith(".bcf"):
-    extra += " --output-type b "
-elif output_file.endswith(".vcf.gz"):
-    extra += " --output-type z "
-elif output_file.endswith(".vcf"):
-    extra += " --output-type v "
-else:
-    raise ValueError(
-        "Output file extension should be one of: vcf, bcf, vcf.gz"
-    )
+log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
+if snakemake.output[0].endswith("bcf"):
+    output_format = "-Ou"
+elif snakemake.output[0].endswith("bcf.gz"):
+    output_format = "-Ob"
+elif snakemake.output[0].endswith("vcf"):
+    output_format = "-Ov"
+elif snakemake.output[0].endswith("vcf.gz"):
+    output_format = "-Oz"
+
+
+if len(snakemake.input) > 1:
+    raise Exception("Only one input file expected, got: " + str(len(snakemake.input)))
+
+if len(snakemake.output) > 1:
+    raise Exception("Only one output file expected, got: " + str(len(snakemake.output)))
+
+filter = snakemake.params.get("filter", "")
+extra = snakemake.params.get("extra", "")
 
 shell(
-    " bcftools filte "
-    " {extra} "
-    " --threads {snakemake.threads} "
-    " --output {output_file} "
-    " {snakemake.input[0]} "
-    " {log} "
+    "bcftools filter {filter} {extra} {snakemake.input[0]} "
+    "{output_format} "
+    "-o {snakemake.output[0]} "
+    "{log}"
 )

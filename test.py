@@ -127,6 +127,22 @@ def run(wrapper, cmd, check_log=None):
 
 
 @skip_if_not_modified
+def test_open_cravat_run():
+    run(
+        "bio/open-cravat/run",
+        ["snakemake", "--cores", "1", "--use-conda"],
+    )
+
+
+@skip_if_not_modified
+def test_open_cravat_module():
+    run(
+        "bio/open-cravat/module",
+        ["snakemake", "--cores", "1", "--use-conda"],
+    )
+
+
+@skip_if_not_modified
 def test_dada2_se_meta():
     run(
         "meta/bio/dada2_se",
@@ -611,6 +627,30 @@ def test_art_profiler_illumina():
             "-F",
         ],
     )
+
+
+@skip_if_not_modified
+def test_bcftools_filter_vcf():
+    run("bio/bcftools/filter",
+        ["snakemake", "--cores", "1", "a.filter.vcf", "--use-conda", "-F"])
+
+
+@skip_if_not_modified
+def test_bcftools_filter_vcf_gz():
+    run("bio/bcftools/filter",
+        ["snakemake", "--cores", "1", "a.filter.vcf.gz", "--use-conda", "-F"])
+
+
+@skip_if_not_modified
+def test_bcftools_filter_bcf():
+    run("bio/bcftools/filter",
+        ["snakemake", "--cores", "1", "a.filter.bcf", "--use-conda", "-F"])
+
+
+@skip_if_not_modified
+def test_bcftools_filter_bcf_gz():
+    run("bio/bcftools/filter",
+        ["snakemake", "--cores", "1", "a.filter.bcf.gz", "--use-conda", "-F"])
 
 
 @skip_if_not_modified
@@ -2067,6 +2107,14 @@ def test_bamtools_filter_json():
 
 
 @skip_if_not_modified
+def test_bamtools_split():
+    run(
+        "bio/bamtools/split",
+        ["snakemake", "--cores", "1", "mapped/a.REF_xx.bam", "--use-conda", "-F"],
+    )
+
+
+@skip_if_not_modified
 def test_bamtools_stats():
     run(
         "bio/bamtools/stats",
@@ -2584,6 +2632,14 @@ def test_gatk_variantrecalibrator():
 
 
 @skip_if_not_modified
+def test_gatk_filtermutectcalls():
+    run(
+        "bio/gatk/filtermutectcalls",
+        ["snakemake", "--cores", "1", "calls/snvs.mutect.filtered.vcf", "--use-conda", "-F"],
+    )
+
+
+@skip_if_not_modified
 def test_gatk_selectvariants():
     run(
         "bio/gatk/selectvariants",
@@ -2663,6 +2719,30 @@ def test_gatk_mutect():
     run(
         "bio/gatk/mutect",
         ["snakemake", "--cores", "1", "variant/a.vcf", "--use-conda", "-F"],
+    )
+
+
+@skip_if_not_modified
+def test_gatk_mutect_bam():
+    run(
+        "bio/gatk/mutect",
+        ["snakemake", "--cores", "1", "variant_bam/a.vcf", "variant_bam/a.bam", "--use-conda", "-F"],
+    )
+
+
+@skip_if_not_modified
+def test_vardict_single_mode():
+    run(
+        "bio/vardict",
+        ["snakemake", "--cores", "1", "vcf/a.s.vcf", "--use-conda", "-F"],
+    )
+
+
+@skip_if_not_modified
+def test_vardict_paired_mode():
+    run(
+        "bio/vardict",
+        ["snakemake", "--cores", "1", "vcf/a.tn.vcf", "--use-conda", "-F"],
     )
 
 
@@ -4286,4 +4366,20 @@ def test_maftools_cosine_similarity():
     run(
         "bio/maftools/cosine_similarity",
         ["snakemake", "--cores", "1", "results/cosine.png", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_diamond_blastx():
+    run(
+        "bio/diamond/makedb",
+        ["snakemake", "--cores", "1", "foo.dmnd", "--use-conda", "-F"],
+    )
+
+
+@skip_if_not_modified
+def test_diamond_blastx():
+    run(
+        "bio/diamond/blastx",
+        ["snakemake", "--cores", "1", "foo.tsv.gz", "--use-conda", "-F"],
     )
