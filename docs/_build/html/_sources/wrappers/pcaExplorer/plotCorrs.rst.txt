@@ -33,7 +33,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_pcaexplorer_pcacorrs.log"
         wrapper:
-            "v0.69.0-423-g916db7d8a/bio/pcaExplorer/plotCorrs"
+            "v0.69.0-425-gae71034f1/bio/pcaExplorer/plotCorrs"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -105,6 +105,15 @@ Code
     base::library(package = "pcaExplorer");   # Handles PCAs
     base::library(package = "Cairo");         # Graphic library
 
+    cleanColData <- function(dds, factor) {
+      NApos <- base::is.na(dds[[factor]]);
+      dds2 <- dds[, !NApos];
+      for (coldata in base::names(colData(dds2))) {
+        dds2[[coldata]] <- dds[[coldata]][!NApos]
+      }
+      return(dds2)
+    }
+
     # Overload output defaults in order to avoid
     # X11 foreward errors on cluster nodes
     options(bitmapType="cairo");
@@ -133,6 +142,14 @@ Code
       );
     }
 
+    command <- base::paste0(
+      "pcaExplorer::plotPCcorrs(",
+      extra,
+      ");"
+    );
+
+    base::message(command);
+
     # Build plot
     png(
       filename = snakemake@output[["png"]],
@@ -142,18 +159,16 @@ Code
       type = "cairo"
     );
 
-    command <- base::paste0(
-      "pcaExplorer::plotPCcorrs(",
-      extra,
-      ");"
-    );
-
-    base::message(command);
-
-    base::eval(
-      base::parse(
-        text = command
-      )
+    tryCatch({
+        base::eval(base::parse(text = command))
+      },
+      error = function(e) {
+        dds <- cleanColData(
+          dds = dds,
+          factor = base::as.character(x = snakemake@params[["factor"]])
+        );
+        base::eval(base::parse(text = command))
+      }
     );
 
     dev.off()
