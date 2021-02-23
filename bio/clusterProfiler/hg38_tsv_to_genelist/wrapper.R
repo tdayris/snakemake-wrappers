@@ -1,0 +1,60 @@
+#!/usr/bin/R
+
+# This script takes a tsv-formatted dge result and build
+# a clusterProfiler compatible geneList object
+
+# __author__ = "Thibault Dayris"
+# __copyright__ = "Copyright 2020, Thibault Dayris"
+# __email__ = "thibault.dayris@gustaveroussy.fr"
+# __license__ = "MIT"
+
+
+# Handling annotations for dataframes object
+base::library(package = "AnnotationDbi", quietly = TRUE);
+# Loading database
+base::library(package = "org.Hs.eg.db", quietly = TRUE);
+
+get_parameter <- function(param_name, default_value) {
+  # Return the provided parameter or a default value otherwise
+  res <- default_value;
+  if (param_name %in% base::names(snakemake@params)) {
+    res <- base::as.character(x = snakemake@params[[param_name]]);
+  }
+  return(res)
+}
+
+# Loading input file
+tsv <- utils::read.table(
+  file = base::as.character(x = snakemake@input[["tsv"]]),
+  header = TRUE,
+  sep = "\t",
+  stringsAsFactors = FALSE
+);
+
+gene_id_type <- get_parameter("gene_id_type", "ENSEMBL");
+gene_id_col <- get_parameter("gene_id_col",  "ensembl_id");
+fc_col <- get_parameter("fc_col", "stat_change");
+padj_col <- get_parameter("padj_col", "padj");
+base::message("Dataset and libraries loaded");
+
+# Gathering results contained within the object and adding annotations
+res <- tsv[, c(gene_id_col, fc_col, padj_col)];
+res$entrez <- mapIds(
+  org.Hs.eg.db,
+  keys=res[, gene_id_col],
+  column="ENTREZID",
+  keytype=gene_id_type,
+  multiVals="first"
+);
+base::message(utils::head(x = res));
+
+# Building genelist object from dataframe
+geneList <- res[[fc_col]];
+base::names(geneList) <- res$entrez;
+geneList <- sort(x = geneList, decreasing = TRUE, na.last = NA);
+base::message(utils::head(x = geneList));
+base::saveRDS(
+  object = geneList,
+  file = base::as.character(x=snakemake@output[["rds"]])
+);
+base::message("Process over");
