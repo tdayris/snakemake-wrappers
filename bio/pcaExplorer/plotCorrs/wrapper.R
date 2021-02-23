@@ -18,6 +18,7 @@ cleanColData <- function(dds, factor) {
   dds2 <- dds[, !NApos];
   for (coldata in base::names(colData(dds2))) {
     dds2[[coldata]] <- dds[[coldata]][!NApos]
+    if (length(levels(dds2[[coldata]])) == 1) {dds2[[coldata]] <- NULL}
   }
   return(dds2)
 }
