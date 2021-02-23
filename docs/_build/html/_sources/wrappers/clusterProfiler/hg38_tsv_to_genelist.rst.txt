@@ -1,0 +1,143 @@
+.. _`bio/clusterProfiler/hg38_tsv_to_genelist`:
+
+TSV TO GENELIST (HG38)
+======================
+
+Converts a TSV-formatted differential gene analysis to a GeneList object
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_hg38_tsv_to_genelist:
+        input:
+            tsv = "results.tsv"
+        output:
+            rds = "genelist.RDS"
+        wrapper:
+            "0.71.1-431-g041606a28/bio/clusterProfiler/hg38_tsv_to_genelist"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``conda-forge::r-base==4.0.3``
+* ``bioconda::bioconductor-org.hs.eg.db==3.12.0``
+* ``bioconda::bioconductor-annotationdbi==1.52.0``
+
+Input/Output
+------------
+**Input:**
+
+* A TSV formatted DGE result
+
+**Output:**
+
+* A RDS object containing the geneList
+
+
+
+Notes
+-----
+
+The geneList contains three features:
+
+* numeric vector: fold change or other type of numerical variable
+* named vector: every number was named by the corresponding gene ID
+* sorted vector: number should be sorted in decreasing order
+
+
+Parameters:
+
+* alpha_threshold: The padj threshold used to filter non significative events
+* fc_threshold: The fold change threshold used to filter non significative events
+* keytype: The type of genes identifiers used in DGE (ENSEMBL, SYMBOL, ...)
+* gene_id: the column that contains gene identifiers (or gene names, ...)
+* fold_change: the column containing fold changes (or stat change, ...)
+* padj: the column containing adjusted pvalues (or qvalues, ...)
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script takes a tsv-formatted dge result and build
+    # a clusterProfiler compatible geneList object
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+
+    # Handling annotations for dataframes object
+    base::library(package = "AnnotationDbi", quietly = TRUE);
+    # Loading database
+    base::library(package = "org.Hs.eg.db", quietly = TRUE);
+
+    get_parameter <- function(param_name, default_value) {
+      # Return the provided parameter or a default value otherwise
+      res <- default_value;
+      if (param_name %in% base::names(snakemake@params)) {
+        res <- base::as.character(x = snakemake@params[[param_name]]);
+      }
+      return(res)
+    }
+
+    # Loading input file
+    tsv <- utils::read.table(
+      file = base::as.character(x = snakemake@input[["tsv"]]),
+      header = TRUE,
+      sep = "\t",
+      stringsAsFactors = FALSE
+    );
+
+    gene_id_type <- get_parameter("gene_id_type", "ENSEMBL");
+    gene_id_col <- get_parameter("gene_id_col",  "ensembl_id");
+    fc_col <- get_parameter("fc_col", "stat_change");
+    padj_col <- get_parameter("padj_col", "padj");
+    base::message("Dataset and libraries loaded");
+
+    # Gathering results contained within the object and adding annotations
+    res <- tsv[, c(gene_id_col, fc_col, padj_col)];
+    res$entrez <- mapIds(
+      org.Hs.eg.db,
+      keys=res[, gene_id_col],
+      column="ENTREZID",
+      keytype=gene_id_type,
+      multiVals="first"
+    );
+    base::message(utils::head(x = res));
+
+    # Building genelist object from dataframe
+    geneList <- res[[fc_col]];
+    base::names(geneList) <- res$entrez;
+    geneList <- sort(x = geneList, decreasing = TRUE, na.last = NA);
+    base::message(utils::head(x = geneList));
+    base::saveRDS(
+      object = geneList,
+      file = base::as.character(x=snakemake@output[["rds"]])
+    );
+    base::message("Process over");
