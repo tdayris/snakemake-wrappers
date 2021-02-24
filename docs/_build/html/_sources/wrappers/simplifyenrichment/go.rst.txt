@@ -1,0 +1,198 @@
+.. _`bio/simplifyenrichment/go`:
+
+GO_SIMILARITY
+=============
+
+Load GO enriched terms, compute similarity on them and simplify the results
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_simplifyenrichment_go:
+        input:
+            tsv = "go.terms.tsv"
+        output:
+            png = "simplify.png",
+            simplify_rds = "simplify.RDS",
+            simplify_tsv = "simplify.tsv",
+            similarity_rds = "similarity.RDS",
+            similarity_tsv = "similarity.tsv"
+        wrapper:
+            "0.71.1-435-g5ccb306a4/bio/simplifyenrichment/go"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconda::bioconductor-simplifyenrichment==1.0.0``
+* ``bioconda::bioconductor-gosemsim==2.16.0``
+* ``bioconda::bioconductor-org.hs.eg.db==3.12.0``
+* ``conda-forge::r-magick==2.6.0``
+
+Input/Output
+------------
+**Input:**
+
+* A TSV formatted file containing GO terms
+
+**Output:**
+
+* An optional RDS-formatted simplified object
+* An optional RDS-formatted similarity object
+* An optional TSV-formatted simplified table
+* An optional TSV-formatted similarity table
+* A PNG image of the simplified similarity table
+
+
+
+Notes
+-----
+
+Parameters:
+
+* terms_col: Name of the column containing GO-terms
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script takes a TSV file with GO terms and clusters them
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    base::library(package = "simplifyEnrichment", quietly = TRUE);
+    base::library(package = "GOSemSim", quietly = TRUE);
+    base::library(package = "org.Hs.eg.db", quietly = TRUE);
+    base::message("Libraries loaded")
+
+    get_parameter <- function(param_name, default_value) {
+      # Return the provided parameter or a default value otherwise
+      res <- default_value;
+      if (param_name %in% base::names(snakemake@params)) {
+        res <- base::as.character(x = snakemake@params[[param_name]]);
+      }
+      return(res)
+    }
+
+    get_args <- function(param_name, mandatory_args) {
+      # Add user defined extra parameters to mendatory arguments
+      extra <- mandatory_args;
+      if (param_name %in% base::names(snakemake@params)) {
+        extra <- base::paste(
+          extra, base::as.character(snakemake@params[[param_name]]), sep=", "
+        )
+      }
+      return(extra)
+    }
+
+    # Loading input dataset
+    tsv <- utils::read.table(
+      file = snakemake@input[["tsv"]],
+      sep = "\t",
+      stringsAsFactors = FALSE,
+      header = TRUE
+    );
+
+    go_id_col <- get_parameter("go_id_col", "GO.terms");
+    similarity_extra <- get_args(
+      "similarity_extra", "go_id = tsv[[go_id_col]], db = 'org.Hs.eg.db'"
+    );
+    simplify_extra <- get_args("simplify_extra", "mat = similarity");
+    base::message("Input dataset loaded")
+
+    similarity_cmd <- base::paste0(
+      "simplifyEnrichment::GO_similarity(",
+      similarity_extra,
+      ")"
+    );
+    base::message(similarity_cmd);
+    similarity <- base::eval(base::parse(text = similarity_cmd));
+    base::message("Similarity computed")
+
+    simplify_cmd <- base::paste0(
+      "simplifyEnrichment::simplifyGO(",
+      simplify_extra,
+      ")"
+    );
+    base::message(simplify_cmd)
+
+    grDevices::png(
+      filename = base::as.character(x = snakemake@output[["png"]]),
+      width = 1024,
+      height = 768,
+      units = "px",
+      type = "cairo"
+    );
+
+    simplification <- base::eval(base::parse(text = simplify_cmd));
+
+    dev.off();
+    base::message("PNG saved");
+
+    if ("similarity_rds" %in% base::names(snakemake@output)) {
+      base::saveRDS(
+        object = similarity,
+        file = base::as.character(x = snakemake@output[["similarity_rds"]])
+      );
+    }
+
+    if ("similarity_tsv" %in% base::names(snakemake@output)) {
+      tsv <- base::as.data.frame(
+        x = similarity,
+        stringsAsFactors = FALSE,
+        row.names = FALSE
+      );
+      utils::write.table(
+        x = tsv,
+        file = base::as.character(x = snakemake@output[["similarity_tsv"]]),
+        sep = "\t",
+        row.names = FALSE
+      );
+    }
+
+    if ("simplify_rds" %in% base::names(snakemake@output)) {
+      base::saveRDS(
+        object = simplification,
+        file = base::as.character(x = snakemake@output[["simplify_rds"]])
+      );
+    }
+
+    if ("simplify_tsv" %in% base::names(snakemake@output)) {
+      tsv <- base::as.data.frame(
+        x = simplification,
+        stringsAsFactors = FALSE
+      );
+      utils::write.table(
+        x = tsv,
+        file = base::as.character(x = snakemake@output[["simplify_tsv"]]),
+        sep = "\t",
+        row.names = FALSE
+      );
+    }
