@@ -7,8 +7,8 @@ reference.
 """
 rule salmon_quant_paired:
     input:
-        r1="reads/{sample}_1.fastq.gz",
-        r2="reads/{sample}_2.fastq.gz",
+        r1="reads/{sample}_1.fq.gz",
+        r2="reads/{sample}_2.fq.gz",
         index="salmon/index"
     output:
         quant="salmon/pseudo_mapping/{sample}/quant.sf",
@@ -21,7 +21,7 @@ rule salmon_quant_paired:
             min(attempt * 5120 + 2048, 20480)
         )
     params:
-        libType = config("salmon_libType", "A"),
+        libType = config.get("salmon_libType", "A"),
         extra = config.get("salmon_quant_extra", "")
     log:
         "logs/salmon/quant/{sample}.log"
@@ -35,7 +35,7 @@ unpaired reads
 """
 use rule salmon_quant_paired as salmon_quant_unpaired with:
     input:
-        r="reads/{sample}_se.fastq.gz",
+        r="reads/{sample}.fq.gz",
         index="salmon/index"
 
 
@@ -47,7 +47,7 @@ This rule is cached since it should be used only once per reference genome.
 """
 rule salmon_index:
     input:
-        sequences="salmon/decoy/gentrome.fa",
+        sequences="salmon/decoy/gentrome.fasta",
         decoys="salmon/decoy/decoys.txt"
     output:
         index=directory("salmon/index")
@@ -55,11 +55,11 @@ rule salmon_index:
     cache: True
     threads: min(config.get("threads", 20), 20)
     resources:
-        time_min=lambda wildcards, attempt: (
-            attempt * (120 if "decoys" in snakemake.input.keys() else 45)
+        time_min=lambda wildcards, attempt, input: (
+            attempt * (120 if "decoys" in input.keys() else 45)
         ),
-        mem_mb=lambda wildcards, attempt: (
-            attempt * (15360 if "decoys" in snakemake.input.keys() else 10240)
+        mem_mb=lambda wildcards, attempt, input: (
+            attempt * (15360 if "decoys" in input.keys() else 10240)
         )
     params:
         extra=config.get("salmon_index_extra", "")
@@ -77,11 +77,11 @@ This rule is cached since it should be used only once per reference genome.
 """
 rule salmon_generate_decoy_sequence:
     input:
-        transcriptome="sequence/transcriptome.fa",
-        genome="sequence/genome.fa"
+        transcriptome="sequence/transcriptome.fasta",
+        genome="sequence/genome.fasta"
     output:
-        decoy="salmon/decoy/decoys.txt",
-        gentrome="salmon/decoy/gentrome.fa"
+        decoys="salmon/decoy/decoys.txt",
+        gentrome="salmon/decoy/gentrome.fasta"
     message: "Building gentrome and decoy sequences for Salmon"
     cache: True
     threads: 2

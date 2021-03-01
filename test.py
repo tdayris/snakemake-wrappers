@@ -156,6 +156,20 @@ def test_dada2_se_meta():
 
 
 @skip_if_not_modified
+def test_salmon_meta():
+    run(
+        "meta/bio/salmon",
+        [
+            "snakemake",
+            "--cores",
+            "2",
+            "--use-conda",
+            "salmon/pseudo_mapping/a/quant.sf"
+        ]
+    )
+
+
+@skip_if_not_modified
 def test_adapterremoval_pe_collapse_singletons():
     run(
         "bio/adapterremoval",
@@ -3606,6 +3620,7 @@ def test_gencode_corrections():
     )
 
 
+@skip_if_not_modified
 def test_ensembl_remove_patch_cdna():
     run(
         "bio/ensembl/remove_patch_cdna",
@@ -3613,10 +3628,27 @@ def test_ensembl_remove_patch_cdna():
     )
 
 
+@skip_if_not_modified
+def test_simplifyenrichment_go():
+    run(
+        "bio/simplifyenrichment/go",
+        ["snakemake", "--cores", "1", "simplify.png", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
 def test_deseq2_to_genelist():
     run(
         "bio/clusterProfiler/DESeq2_to_geneList",
         ["snakemake", "--cores", "1", "geneLists", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_hg38_tsv_to_genelist():
+    run(
+        "bio/clusterProfiler/hg38_tsv_to_genelist",
+        ["snakemake", "--cores", "1", "genelist.RDS", "--use-conda", "-F"]
     )
 
 
