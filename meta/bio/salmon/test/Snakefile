@@ -1,11 +1,14 @@
+from snakemake.utils import min_version
+min_version("6.0")
+
 """
 This rule pseudo-map and quantifies your paired reads over the indexed
 reference.
 """
 rule salmon_quant_paired:
     input:
-        r1="raw_data/{sample}_1.fastq.gz",
-        r2="raw_data/{sample}_2.fastq.gz",
+        r1="reads/{sample}_1.fastq.gz",
+        r2="reads/{sample}_2.fastq.gz",
         index="salmon/index"
     output:
         quant="salmon/pseudo_mapping/{sample}/quant.sf",
@@ -26,9 +29,13 @@ rule salmon_quant_paired:
         "master/bio/salmon/quant"
 
 
+"""
+This rule shows how to inherit from paired quantification rule to quantify
+unpaired reads
+"""
 use rule salmon_quant_paired as salmon_quant_unpaired with:
     input:
-        r="raw_data/{sample}_se.fastq.gz",
+        r="reads/{sample}_se.fastq.gz",
         index="salmon/index"
 
 
