@@ -184,6 +184,19 @@ def test_bwa_fixmate_meta():
 
 
 @skip_if_not_modified
+def test_fastq_screen_indexer_meta():
+    run(
+        "meta/bio/fastq_screen_indexer",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda"
+        ]
+    )
+
+
+@skip_if_not_modified
 def test_gatk_bqsr_meta():
     run(
         "meta/bio/gatk_bqsr",
