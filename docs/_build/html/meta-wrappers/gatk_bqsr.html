@@ -1,0 +1,429 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>GATK_BQSR &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SALMON" href="salmon.html" />
+    <link rel="prev" title="FASTQ_SCREEN_INDEXER" href="fastq_screen_indexer.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Snakemake Wrappers
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                heads/Unofficial
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Wrappers and Meta-Wrappers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dada2_pe.html">DADA2-PE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dada2_se.html">DADA2-SE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="download_references.html">DOWNLOAD REFERENCE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fastq_screen_indexer.html">FASTQ_SCREEN_INDEXER</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">GATK_BQSR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#used-wrappers">Used wrappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="salmon.html">SALMON</a></li>
+<li class="toctree-l2"><a class="reference internal" href="star_arriba.html">STAR-ARRIBA</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Snakemake Wrappers</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../meta-wrappers.html">Meta-Wrappers</a> &raquo;</li>
+        
+      <li>GATK_BQSR</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/meta-wrappers/gatk_bqsr.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gatk-bqsr">
+<span id="id1"></span><h1>GATK_BQSR<a class="headerlink" href="#gatk-bqsr" title="Permalink to this headline">¶</a></h1>
+<p>Compute and apply base recalibration on BAM files with GATK</p>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>This meta-wrapper can be used by integrating the following into your workflow:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule applies the BQSR to the mapped reads</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">gatk_apply_baserecalibrator</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">,</span>
+        <span class="n">ref</span><span class="o">=</span><span class="s2">&quot;reference/genome.fa&quot;</span><span class="p">,</span>
+        <span class="n">ref_idx</span><span class="o">=</span><span class="s2">&quot;reference/genome.fa.fai&quot;</span><span class="p">,</span>
+        <span class="n">ref_dict</span><span class="o">=</span><span class="s2">&quot;reference/genome.dict&quot;</span><span class="p">,</span>
+        <span class="n">recal_table</span><span class="o">=</span><span class="s2">&quot;gatk/recal_data_table/</span><span class="si">{sample}</span><span class="s2">.grp&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;gatk/recal_bam/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Applying BQSR on </span><span class="si">{wildcards.sample}</span><span class="s2"> with GATK&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">20240</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/gatk/applybqsr/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gatk_applybqsr_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-445-ga43be260d/bio/gatk/applybqsr&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule computes BQSR on mapped reads, given a knoledge database</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">gatk_compute_baserecalibration_table</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">,</span>
+        <span class="n">ref</span><span class="o">=</span><span class="s2">&quot;reference/genome.fa&quot;</span><span class="p">,</span>
+        <span class="n">ref_idx</span><span class="o">=</span><span class="s2">&quot;reference/genome.fa.fai&quot;</span><span class="p">,</span>
+        <span class="n">ref_dict</span><span class="o">=</span><span class="s2">&quot;reference/genome.dict&quot;</span><span class="p">,</span>
+        <span class="n">known</span><span class="o">=</span><span class="s2">&quot;reference/dbsnp.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">known_idx</span><span class="o">=</span><span class="s2">&quot;reference/dbsnp.vcf.gz.tbi&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">recal_table</span><span class="o">=</span><span class="s2">&quot;gatk/recal_data_table/</span><span class="si">{sample}</span><span class="s2">.grp&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Compute BQSR table from </span><span class="si">{wildcards.sample}</span><span class="s2"> with GATK&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4048</span><span class="p">,</span> <span class="mi">15360</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">120</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/gatk3/compute_bqsr/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gatk_bqsr_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-445-ga43be260d/bio/gatk/baserecalibrator&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule indexes the input genome sequence with Samtools. It is not</span>
+<span class="sd">explicitely requested by GATK, but it will crash if the genome sequence</span>
+<span class="sd">is not indexed.</span>
+
+<span class="sd">This rule is cached since it should be used only once per reference sequence</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">samtools_faidx</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fa&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fa.fai&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing reference fasta with Samtools&quot;</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">4098</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;samtools_faidx_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/samtools/faidx/</span><span class="si">{genome}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-445-ga43be260d/bio/samtools/faidx&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule creates a sequence dictionnary from a genome sequnece. It is not</span>
+<span class="sd">explicitely requested by GATK, but it will crash if the genome sequence</span>
+<span class="sd">is not indexed.</span>
+
+<span class="sd">This rule is cached since it should be used only once per reference sequence</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">picard_create_sequence_dictionnary</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fa&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.dict&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Creating sequence dictionnary over reference genome with Picard&quot;</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span> <span class="mi">8192</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;picard_create_sequence_dictionnary_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/picard/create_sequence_dictionnary/</span><span class="si">{genome}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-445-ga43be260d/bio/picard/createsequencedictionary&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule creates a TBI index for the known VCF file. It is not</span>
+<span class="sd">explicitely requested by GATK, but it will crash if the genome sequence</span>
+<span class="sd">is not indexed.</span>
+
+<span class="sd">This rule is cached since it should be used only once per reference sequence</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">tabix_index</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{known}</span><span class="s2">.vcf.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{known}</span><span class="s2">.vcf.gz.tbi&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing kown variants with Tabix&quot;</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">10240</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s2">&quot;-p vcf&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/tabix/index/</span><span class="si">{known}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-445-ga43be260d/bio/tabix&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule indexes the bam file with Samtools. It is not</span>
+<span class="sd">explicitely requested by GATK, but it will crash if the genome sequence</span>
+<span class="sd">is not indexed.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">samtools_index</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing mapped reads of </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">1536</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/samtools/sort/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-445-ga43be260d/bio/samtools/index&quot;</span>
+</pre></div>
+</div>
+<p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
+For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).</p>
+<p>When running with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
+</pre></div>
+</div>
+<p>the software dependencies will be automatically deployed into an isolated environment before execution.</p>
+</div>
+<div class="section" id="used-wrappers">
+<h2>Used wrappers<a class="headerlink" href="#used-wrappers" title="Permalink to this headline">¶</a></h2>
+<p>The following individual wrappers are used in this meta-wrapper:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../wrappers/gatk/baserecalibrator.html#bio-gatk-baserecalibrator"><span class="std std-ref">GATK BASERECALIBRATOR</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/gatk/applybqsr.html#bio-gatk-applybqsr"><span class="std std-ref">GATK APPLYBQSR</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/picard/createsequencedictionary.html#bio-picard-createsequencedictionary"><span class="std std-ref">PICARD CREATESEQUENCEDICTIONARY</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/samtools/faidx.html#bio-samtools-faidx"><span class="std std-ref">SAMTOOLS FAIDX</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/samtools/index.html#bio-samtools-index"><span class="std std-ref">SAMTOOLS INDEX</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/tabix.html#bio-tabix"><span class="std std-ref">TABIX</span></a></p></li>
+</ul>
+<p>Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.</p>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<p>From: <a class="reference external" href="https://gatk.broadinstitute.org/hc/en-us/articles/360035890531-Base-Quality-Score-Recalibration-BQSR">https://gatk.broadinstitute.org/hc/en-us/articles/360035890531-Base-Quality-Score-Recalibration-BQSR</a>-</p>
+<p>&gt; You should almost always perform recalibration on your sequencing data. In human data, given the exhaustive databases of variation we have available, almost all of the remaining mismatches – even in cancer – will be errors, so it’s super easy to ascertain an accurate error model for your data, which is essential for downstream analysis. For non-human data it can be a little bit more work since you may need to bootstrap your own set of variants if there are no such resources already available for you organism, but it’s worth it.</p>
+<p>Warning:</p>
+<ul class="simple">
+<li><p>Bam files must have read groups</p></li>
+</ul>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Thibault Dayris</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="salmon.html" class="btn btn-neutral float-right" title="SALMON" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="fastq_screen_indexer.html" class="btn btn-neutral float-left" title="FASTQ_SCREEN_INDEXER" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2016, The Snakemake team.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

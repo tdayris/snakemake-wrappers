@@ -43,7 +43,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="STAR-ARRIBA" href="star_arriba.html" />
-    <link rel="prev" title="FASTQ_SCREEN_INDEXER" href="fastq_screen_indexer.html" /> 
+    <link rel="prev" title="GATK_BQSR" href="gatk_bqsr.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -96,11 +96,13 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_pe.html">DADA2-PE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_se.html">DADA2-SE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="download_references.html">DOWNLOAD REFERENCE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fastq_screen_indexer.html">FASTQ_SCREEN_INDEXER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gatk_bqsr.html">GATK_BQSR</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">SALMON</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#used-wrappers">Used wrappers</a></li>
@@ -185,14 +187,17 @@
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This meta-wrapper can be used by integrating the following into your workflow:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">min_version</span>
+<span class="n">min_version</span><span class="p">(</span><span class="s2">&quot;6.0&quot;</span><span class="p">)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule pseudo-map and quantifies your paired reads over the indexed</span>
 <span class="sd">reference.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">salmon_quant_paired</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">r1</span><span class="o">=</span><span class="s2">&quot;raw_data/</span><span class="si">{sample}</span><span class="s2">_1.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">r2</span><span class="o">=</span><span class="s2">&quot;raw_data/</span><span class="si">{sample}</span><span class="s2">_2.fastq.gz&quot;</span><span class="p">,</span>
+        <span class="n">r1</span><span class="o">=</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">_1.fq.gz&quot;</span><span class="p">,</span>
+        <span class="n">r2</span><span class="o">=</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">_2.fq.gz&quot;</span><span class="p">,</span>
         <span class="n">index</span><span class="o">=</span><span class="s2">&quot;salmon/index&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">quant</span><span class="o">=</span><span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
@@ -205,17 +210,21 @@
             <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">5120</span> <span class="o">+</span> <span class="mi">2048</span><span class="p">,</span> <span class="mi">20480</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">libType</span> <span class="o">=</span> <span class="n">config</span><span class="p">(</span><span class="s2">&quot;salmon_libType&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">),</span>
+        <span class="n">libType</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;salmon_libType&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">),</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;salmon_quant_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/salmon/quant/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-437-g937888931/bio/salmon/quant&quot;</span>
+        <span class="s2">&quot;0.71.1-445-ga43be260d/bio/salmon/quant&quot;</span>
 
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule shows how to inherit from paired quantification rule to quantify</span>
+<span class="sd">unpaired reads</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="n">use</span> <span class="n">rule</span> <span class="n">salmon_quant_paired</span> <span class="k">as</span> <span class="n">salmon_quant_unpaired</span> <span class="k">with</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">r</span><span class="o">=</span><span class="s2">&quot;raw_data/</span><span class="si">{sample}</span><span class="s2">_se.fastq.gz&quot;</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">=</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.fq.gz&quot;</span><span class="p">,</span>
         <span class="n">index</span><span class="o">=</span><span class="s2">&quot;salmon/index&quot;</span>
 
 
@@ -227,7 +236,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">salmon_index</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">sequences</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/gentrome.fa&quot;</span><span class="p">,</span>
+        <span class="n">sequences</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/gentrome.fasta&quot;</span><span class="p">,</span>
         <span class="n">decoys</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/decoys.txt&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">index</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;salmon/index&quot;</span><span class="p">)</span>
@@ -235,18 +244,18 @@
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">threads</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="mi">20</span><span class="p">)</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">attempt</span> <span class="o">*</span> <span class="p">(</span><span class="mi">120</span> <span class="k">if</span> <span class="s2">&quot;decoys&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="mi">45</span><span class="p">)</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">attempt</span> <span class="o">*</span> <span class="p">(</span><span class="mi">120</span> <span class="k">if</span> <span class="s2">&quot;decoys&quot;</span> <span class="ow">in</span> <span class="nb">input</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="mi">45</span><span class="p">)</span>
         <span class="p">),</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">attempt</span> <span class="o">*</span> <span class="p">(</span><span class="mi">15360</span> <span class="k">if</span> <span class="s2">&quot;decoys&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="mi">10240</span><span class="p">)</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">attempt</span> <span class="o">*</span> <span class="p">(</span><span class="mi">15360</span> <span class="k">if</span> <span class="s2">&quot;decoys&quot;</span> <span class="ow">in</span> <span class="nb">input</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="mi">10240</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;salmon_index_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/salmon/index.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-437-g937888931/bio/salmon/index&quot;</span>
+        <span class="s2">&quot;0.71.1-445-ga43be260d/bio/salmon/index&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -257,11 +266,11 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">salmon_generate_decoy_sequence</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">transcriptome</span><span class="o">=</span><span class="s2">&quot;sequence/transcriptome.fa&quot;</span><span class="p">,</span>
-        <span class="n">genome</span><span class="o">=</span><span class="s2">&quot;sequence/genome.fa&quot;</span>
+        <span class="n">transcriptome</span><span class="o">=</span><span class="s2">&quot;sequence/transcriptome.fasta&quot;</span><span class="p">,</span>
+        <span class="n">genome</span><span class="o">=</span><span class="s2">&quot;sequence/genome.fasta&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">decoy</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/decoys.txt&quot;</span><span class="p">,</span>
-        <span class="n">gentrome</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/gentrome.fa&quot;</span>
+        <span class="n">decoys</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/decoys.txt&quot;</span><span class="p">,</span>
+        <span class="n">gentrome</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/gentrome.fasta&quot;</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Building gentrome and decoy sequences for Salmon&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
@@ -271,7 +280,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/salmon/decoys.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-437-g937888931/bio/salmon/generate_decoy&quot;</span>
+        <span class="s2">&quot;0.71.1-445-ga43be260d/bio/salmon/generate_decoy&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
@@ -307,7 +316,7 @@ For additional parameters in each individual wrapper, please refer to their corr
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="star_arriba.html" class="btn btn-neutral float-right" title="STAR-ARRIBA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="fastq_screen_indexer.html" class="btn btn-neutral float-left" title="FASTQ_SCREEN_INDEXER" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gatk_bqsr.html" class="btn btn-neutral float-left" title="GATK_BQSR" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

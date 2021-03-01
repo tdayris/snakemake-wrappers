@@ -13,14 +13,17 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    from snakemake.utils import min_version
+    min_version("6.0")
+
     """
     This rule pseudo-map and quantifies your paired reads over the indexed
     reference.
     """
     rule salmon_quant_paired:
         input:
-            r1="raw_data/{sample}_1.fastq.gz",
-            r2="raw_data/{sample}_2.fastq.gz",
+            r1="reads/{sample}_1.fq.gz",
+            r2="reads/{sample}_2.fq.gz",
             index="salmon/index"
         output:
             quant="salmon/pseudo_mapping/{sample}/quant.sf",
@@ -33,17 +36,21 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 min(attempt * 5120 + 2048, 20480)
             )
         params:
-            libType = config("salmon_libType", "A"),
+            libType = config.get("salmon_libType", "A"),
             extra = config.get("salmon_quant_extra", "")
         log:
             "logs/salmon/quant/{sample}.log"
         wrapper:
-            "0.71.1-437-g937888931/bio/salmon/quant"
+            "0.71.1-445-ga43be260d/bio/salmon/quant"
 
 
+    """
+    This rule shows how to inherit from paired quantification rule to quantify
+    unpaired reads
+    """
     use rule salmon_quant_paired as salmon_quant_unpaired with:
         input:
-            r="raw_data/{sample}_se.fastq.gz",
+            r="reads/{sample}.fq.gz",
             index="salmon/index"
 
 
@@ -55,7 +62,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule salmon_index:
         input:
-            sequences="salmon/decoy/gentrome.fa",
+            sequences="salmon/decoy/gentrome.fasta",
             decoys="salmon/decoy/decoys.txt"
         output:
             index=directory("salmon/index")
@@ -63,18 +70,18 @@ This meta-wrapper can be used by integrating the following into your workflow:
         cache: True
         threads: min(config.get("threads", 20), 20)
         resources:
-            time_min=lambda wildcards, attempt: (
-                attempt * (120 if "decoys" in snakemake.input.keys() else 45)
+            time_min=lambda wildcards, attempt, input: (
+                attempt * (120 if "decoys" in input.keys() else 45)
             ),
-            mem_mb=lambda wildcards, attempt: (
-                attempt * (15360 if "decoys" in snakemake.input.keys() else 10240)
+            mem_mb=lambda wildcards, attempt, input: (
+                attempt * (15360 if "decoys" in input.keys() else 10240)
             )
         params:
             extra=config.get("salmon_index_extra", "")
         log:
             "logs/salmon/index.log"
         wrapper:
-            "0.71.1-437-g937888931/bio/salmon/index"
+            "0.71.1-445-ga43be260d/bio/salmon/index"
 
 
     """
@@ -85,11 +92,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule salmon_generate_decoy_sequence:
         input:
-            transcriptome="sequence/transcriptome.fa",
-            genome="sequence/genome.fa"
+            transcriptome="sequence/transcriptome.fasta",
+            genome="sequence/genome.fasta"
         output:
-            decoy="salmon/decoy/decoys.txt",
-            gentrome="salmon/decoy/gentrome.fa"
+            decoys="salmon/decoy/decoys.txt",
+            gentrome="salmon/decoy/gentrome.fasta"
         message: "Building gentrome and decoy sequences for Salmon"
         cache: True
         threads: 2
@@ -99,7 +106,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/salmon/decoys.log"
         wrapper:
-            "0.71.1-437-g937888931/bio/salmon/generate_decoy"
+            "0.71.1-445-ga43be260d/bio/salmon/generate_decoy"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
