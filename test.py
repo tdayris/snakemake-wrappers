@@ -184,6 +184,20 @@ def test_bwa_fixmate_meta():
 
 
 @skip_if_not_modified
+def test_gatk_bqsr_meta():
+    run(
+        "meta/bio/gatk_bqsr",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "gatk/recal_bam/a.bam"
+        ]
+    )
+
+
+@skip_if_not_modified
 def test_adapterremoval_pe_collapse_singletons():
     run(
         "bio/adapterremoval",
