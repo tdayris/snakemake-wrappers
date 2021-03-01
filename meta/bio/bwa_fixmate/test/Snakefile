@@ -1,0 +1,128 @@
+from snakemake.utils import min_version
+min_version("6.0")
+
+
+"""
+This rule indexes the bam file since almost all downstream tools requires it
+"""
+rule samtools_index:
+    input:
+        "samtools/sort/{sample}.bam"
+    output:
+        "samtools/sort/{sample}.bam.bai"
+    message: "Indexing mapped reads of {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=1536,
+        time_min=lambda wildcards, attempt: attempt * 45
+    log:
+        "logs/samtools/sort/{sample}.log"
+    wrapper:
+        "master/bio/samtools/index"
+
+
+"""
+This rule sorts reads by position for further analyses.
+"""
+rule samtools_sort_coordinate:
+    input:
+        "samtools/fixmate/{sample}.bam"
+    output:
+        "samtools/sort/{sample}.bam"
+    message:
+        "Sorting {wildcards.sample} reads by query name for fixing mates"
+    threads:
+        config.get("threads", 10)
+    resources:
+        mem_mb=lambda wildcards, threads: threads * 1792,
+        time_min=lambda wildcards, attempt: attempt * 90
+    log:
+        "logs/samtools/query_sort_{sample}.log"
+    params:
+        extra = "-m 1536"
+    wrapper:
+        "master/bio/samtools/sort"
+
+
+"""
+BWA sometimes fails to annotate read mates correctly. We fix this behaviour
+with the rule below.
+"""
+rule samtools_fixmate:
+    input:
+        "bwa/mem/{sample}.bam"
+    output:
+        temp("samtools/fixmate/{sample}.bam")
+    message: "Fixing mate annotation on {wildcards.sample} with Samtools"
+    threads: config.get("threads", 10)
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 2048 + 2048, 8192)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 45, 180)
+        )
+    params:
+        "-cmr"
+    log:
+        "logs/samtools/fixmate/{sample}.log"
+    wrapper:
+        "masterbio/samtools/fixmate/"
+
+
+"""
+This rule maps your reads against the indexed reference with BWA.
+"""
+rule bwa_mem:
+    input:
+        reads = expand(
+            "reads/{sample}.{stream}.fastq",
+            stream=["1", "2"],
+            allow_missing=True
+        )
+    output:
+        temp("bwa/mem/{sample}.bam")
+    message: "Mapping {wildcards.sample} with BWA"
+    threads: config.get("threads", 10)
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 6144 + 2048, 20480)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 120, 480)
+        )
+    params:
+        index="{genome}",
+        extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
+        sort="samtools",         # We chose Samtools to sort by queryname
+        sort_order="queryname",  # Queryname sort is needed for a fixmate
+        sort_extra="-m 1536"     # We extand the sort buffer memory
+    log:
+        "log/bwa/mem/{sample}.log"
+    wrapper:
+        "master/bio/bwa/mem"
+
+
+"""
+Index your reference genome with BWA.
+
+This rule is cached since it should be used once per reference genome
+"""
+rule bwa_index:
+    input:
+        "sequence/{genome}.fasta"
+    output:
+        multiext("bwa/index/{genome}", ".amb", ".ann", ".bwt", ".pac", ".sa")
+    message: "Indexing reference genome with BWA"
+    cache: True
+    threads: 1
+    resources:
+        time_min=lambda wildcards, attempt: min(attempt * 90, 480),
+        mem_mb=lambda wildcards, attempt: min(attempt * 6144 + 2048, 20480)
+    params:
+        prefix="{genome}",
+        algorithm="bwtsw"
+    log:
+        "logs/bwa_index/{genome}.log"
+    wrapper:
+        "master/bio/bwa/index"

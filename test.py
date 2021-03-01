@@ -170,6 +170,20 @@ def test_salmon_meta():
 
 
 @skip_if_not_modified
+def test_bwa_fixmate_meta():
+    run(
+        "meta/bio/bwa_fixmate",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "samtools/sort/a.bam.bai"
+        ]
+    )
+
+
+@skip_if_not_modified
 def test_adapterremoval_pe_collapse_singletons():
     run(
         "bio/adapterremoval",
