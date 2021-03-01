@@ -1,0 +1,87 @@
+"""
+This rule pseudo-map and quantifies your paired reads over the indexed
+reference.
+"""
+rule salmon_quant_paired:
+    input:
+        r1="raw_data/{sample}_1.fastq.gz",
+        r2="raw_data/{sample}_2.fastq.gz",
+        index="salmon/index"
+    output:
+        quant="salmon/pseudo_mapping/{sample}/quant.sf",
+        lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json"
+    message: "Quantifying {wildcards.sample} with Salmon"
+    threads: min(config.get("threads", 20), 20)
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 60,
+        mem_mb=lambda wildcards, attempt: (
+            min(attempt * 5120 + 2048, 20480)
+        )
+    params:
+        libType = config("salmon_libType", "A"),
+        extra = config.get("salmon_quant_extra", "")
+    log:
+        "logs/salmon/quant/{sample}.log"
+    wrapper:
+        "master/bio/salmon/quant"
+
+
+use rule salmon_quant_paired as salmon_quant_unpaired with:
+    input:
+        r="raw_data/{sample}_se.fastq.gz",
+        index="salmon/index"
+
+
+"""
+Index your transcriptome or gentrome file with Salmon in order to map your
+reads against this reference.
+
+This rule is cached since it should be used only once per reference genome.
+"""
+rule salmon_index:
+    input:
+        sequences="salmon/decoy/gentrome.fa",
+        decoys="salmon/decoy/decoys.txt"
+    output:
+        index=directory("salmon/index")
+    message: "Indexing transcriptome/gentrome sequences with Salmon"
+    cache: True
+    threads: min(config.get("threads", 20), 20)
+    resources:
+        time_min=lambda wildcards, attempt: (
+            attempt * (120 if "decoys" in snakemake.input.keys() else 45)
+        ),
+        mem_mb=lambda wildcards, attempt: (
+            attempt * (15360 if "decoys" in snakemake.input.keys() else 10240)
+        )
+    params:
+        extra=config.get("salmon_index_extra", "")
+    log:
+        "logs/salmon/index.log"
+    wrapper:
+        "master/bio/salmon/index"
+
+
+"""
+This rule is optional in case you want to use decoy sequences within your
+transcriptome. See salmon documentation for more information.
+
+This rule is cached since it should be used only once per reference genome.
+"""
+rule salmon_generate_decoy_sequence:
+    input:
+        transcriptome="sequence/transcriptome.fa",
+        genome="sequence/genome.fa"
+    output:
+        decoy="salmon/decoy/decoys.txt",
+        gentrome="salmon/decoy/gentrome.fa"
+    message: "Building gentrome and decoy sequences for Salmon"
+    cache: True
+    threads: 2
+    resources:
+        time_min=lambda wildcards, attempt: min(attempt * 20, 30),
+        mem_mb=lambda wildcards, attempt: attempt * 512
+    log:
+        "logs/salmon/decoys.log"
+    wrapper:
+        "master/bio/salmon/generate_decoy"
