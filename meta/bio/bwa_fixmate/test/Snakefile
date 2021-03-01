@@ -39,7 +39,7 @@ rule samtools_sort_coordinate:
     log:
         "logs/samtools/query_sort_{sample}.log"
     params:
-        extra = "-m 1536"
+        extra = "-m 1536M"
     wrapper:
         "master/bio/samtools/sort"
 
@@ -67,7 +67,7 @@ rule samtools_fixmate:
     log:
         "logs/samtools/fixmate/{sample}.log"
     wrapper:
-        "masterbio/samtools/fixmate/"
+        "master/bio/samtools/fixmate"
 
 
 """
@@ -79,6 +79,9 @@ rule bwa_mem:
             "reads/{sample}.{stream}.fastq",
             stream=["1", "2"],
             allow_missing=True
+        ),
+        index=multiext(
+            "bwa/index/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"
         )
     output:
         temp("bwa/mem/{sample}.bam")
@@ -92,11 +95,11 @@ rule bwa_mem:
             lambda wildcards, attempt: min(attempt * 120, 480)
         )
     params:
-        index="{genome}",
+        index="bwa/index/genome",
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
         sort="samtools",         # We chose Samtools to sort by queryname
         sort_order="queryname",  # Queryname sort is needed for a fixmate
-        sort_extra="-m 1536"     # We extand the sort buffer memory
+        sort_extra="-m 1536M"     # We extand the sort buffer memory
     log:
         "log/bwa/mem/{sample}.log"
     wrapper:
@@ -110,9 +113,9 @@ This rule is cached since it should be used once per reference genome
 """
 rule bwa_index:
     input:
-        "sequence/{genome}.fasta"
+        "sequence/genome.fasta"
     output:
-        multiext("bwa/index/{genome}", ".amb", ".ann", ".bwt", ".pac", ".sa")
+        multiext("bwa/index/genome", ".amb", ".ann", ".bwt", ".pac", ".sa")
     message: "Indexing reference genome with BWA"
     cache: True
     threads: 1
@@ -120,9 +123,9 @@ rule bwa_index:
         time_min=lambda wildcards, attempt: min(attempt * 90, 480),
         mem_mb=lambda wildcards, attempt: min(attempt * 6144 + 2048, 20480)
     params:
-        prefix="{genome}",
+        prefix="bwa/index/genome",
         algorithm="bwtsw"
     log:
-        "logs/bwa_index/{genome}.log"
+        "logs/bwa_index/genome.log"
     wrapper:
         "master/bio/bwa/index"
