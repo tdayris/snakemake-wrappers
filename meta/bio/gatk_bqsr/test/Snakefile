@@ -37,7 +37,7 @@ rule gatk_compute_baserecalibration_table:
         known="reference/dbsnp.vcf.gz",
         known_idx="reference/dbsnp.vcf.gz.tbi"
     output:
-        recal_table="gatk/recal_data_table/{sample}.grp"
+        recal_table=temp("gatk/recal_data_table/{sample}.grp")
     message: "Compute BQSR table from {wildcards.sample} with GATK"
     threads: config.get("threads", 20)
     resources:
