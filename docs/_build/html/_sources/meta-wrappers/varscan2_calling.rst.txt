@@ -14,6 +14,28 @@ This meta-wrapper can be used by integrating the following into your workflow:
 .. code-block:: python
 
     """
+    This rule indexes the gzipped VCF as almost every downstream tool require
+    an indexed VCF file.
+    """
+    rule tabix_index:
+        input:
+            "bcftools/{sample}.vcf.gz"
+        output:
+            "bcftools/{sample}.vcf.gz.tbi"
+        message: "Indexing {wildcards.sample} calls with Tabix"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 1024, 10240),
+            time_min=lambda wildcards, attempt: attempt * 60
+        params:
+            "-p vcf"
+        log:
+            "logs/tabix/index/{sample}.log"
+        wrapper:
+            "0.71.1-450-gfbbac6571/bio/tabix"
+
+
+    """
     This rule concats snp and indel callings from Varscan2 in order to produce a
     full VCF file with both kind of variations.
     """
@@ -33,12 +55,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             config.get(
                 "bcftools_concat_extra",
-                "--allow-overlaps --naive --output-type z --threads 2"
+                "--output-type z --threads 2"
             )
         log:
             "logs/bcftools/concat/{sample}.log"
         wrapper:
-            "0.71.1-448-g8555c3e95/bio/bcftools/concat"
+            "0.71.1-450-gfbbac6571/bio/bcftools/concat"
 
 
     """
@@ -46,7 +68,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     VCF because BCFTools merging will be faster that way. Thus, unzipped VCF are
     temporary files.
     """
-    rule varscan2_snp_calling:
+    rule varscan2_indel_calling:
         input:
             "samtools/mpileup/{sample}.mpileup.gz"
         output:
@@ -61,7 +83,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/varscan/pileup2indel/call/{sample}.log"
         wrapper:
-            "0.71.1-448-g8555c3e95/bio/varscan/pileup2indel"
+            "0.71.1-450-gfbbac6571/bio/varscan/mpileup2indel"
 
 
     """
@@ -84,7 +106,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/varscan/pileup2snp/call/{sample}.log"
         wrapper:
-            "0.71.1-448-g8555c3e95/bio/varscan/pileup2snp"
+            "0.71.1-450-gfbbac6571/bio/varscan/mpileup2snp"
 
 
     """
@@ -94,21 +116,21 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule samtools_mpilup:
         input:
             bam="mapped/{sample}.bam",
-            reference_genome="genome.fa",
-            reference_genome_idx="genome.fa.fai",
+            reference_genome="reference/genome.fasta",
+            reference_genome_idx="reference/genome.fasta.fai",
         output:
             temp("samtools/mpileup/{sample}.mpileup.gz")
         message: "Building mpilup on {wildcards.sample} with samtools"
         threads: 2
         resources:
-            mem_mb=lambda wildcards, attempt: min(attempt * 4096, 20480)
+            mem_mb=lambda wildcards, attempt: min(attempt * 4096, 20480),
             time_min=lambda wildcards, attempt: attempt * 120
         log:
             "logs/samtools/mpileup/{sample}.log"
         params:
             extra=config.get("samtools_mpileup_extra", "")
         wrapper:
-            "0.71.1-448-g8555c3e95/bio/samtools/mpileup"
+            "0.71.1-450-gfbbac6571/bio/samtools/mpileup"
 
 
     """
@@ -120,9 +142,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule samtools_faidx:
         input:
-            "{genome}.fa"
+            "{genome}.fasta"
         output:
-            "{genome}.fa.fai"
+            "{genome}.fasta.fai"
         message: "Indexing reference fasta with Samtools"
         cache: True
         threads: 1
@@ -134,7 +156,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/faidx/{genome}.log"
         wrapper:
-            "0.71.1-448-g8555c3e95/bio/samtools/faidx"
+            "0.71.1-450-gfbbac6571/bio/samtools/faidx"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
@@ -159,7 +181,7 @@ The following individual wrappers are used in this meta-wrapper:
 
 * :ref:`bio/samtools/faidx`
 
-* :ref:`bio/samtools/mpilup`
+* :ref:`bio/samtools/mpileup`
 
 * :ref:`bio/tabix`
 

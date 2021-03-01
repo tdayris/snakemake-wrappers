@@ -189,6 +189,28 @@
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This meta-wrapper can be used by integrating the following into your workflow:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule indexes the gzipped VCF as almost every downstream tool require</span>
+<span class="sd">an indexed VCF file.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">tabix_index</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;bcftools/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;bcftools/</span><span class="si">{sample}</span><span class="s2">.vcf.gz.tbi&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing </span><span class="si">{wildcards.sample}</span><span class="s2"> calls with Tabix&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">10240</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s2">&quot;-p vcf&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/tabix/index/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-450-gfbbac6571/bio/tabix&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule concats snp and indel callings from Varscan2 in order to produce a</span>
 <span class="sd">full VCF file with both kind of variations.</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -208,12 +230,12 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;bcftools_concat_extra&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--allow-overlaps --naive --output-type z --threads 2&quot;</span>
+            <span class="s2">&quot;--output-type z --threads 2&quot;</span>
         <span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bcftools/concat/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-448-g8555c3e95/bio/bcftools/concat&quot;</span>
+        <span class="s2">&quot;0.71.1-450-gfbbac6571/bio/bcftools/concat&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -221,7 +243,7 @@
 <span class="sd">VCF because BCFTools merging will be faster that way. Thus, unzipped VCF are</span>
 <span class="sd">temporary files.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">rule</span> <span class="n">varscan2_snp_calling</span><span class="p">:</span>
+<span class="n">rule</span> <span class="n">varscan2_indel_calling</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="s2">&quot;samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span>
     <span class="n">output</span><span class="p">:</span>
@@ -236,7 +258,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/varscan/pileup2indel/call/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-448-g8555c3e95/bio/varscan/pileup2indel&quot;</span>
+        <span class="s2">&quot;0.71.1-450-gfbbac6571/bio/varscan/mpileup2indel&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -259,7 +281,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/varscan/pileup2snp/call/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-448-g8555c3e95/bio/varscan/pileup2snp&quot;</span>
+        <span class="s2">&quot;0.71.1-450-gfbbac6571/bio/varscan/mpileup2snp&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -269,21 +291,21 @@
 <span class="n">rule</span> <span class="n">samtools_mpilup</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
-        <span class="n">reference_genome</span><span class="o">=</span><span class="s2">&quot;genome.fa&quot;</span><span class="p">,</span>
-        <span class="n">reference_genome_idx</span><span class="o">=</span><span class="s2">&quot;genome.fa.fai&quot;</span><span class="p">,</span>
+        <span class="n">reference_genome</span><span class="o">=</span><span class="s2">&quot;reference/genome.fasta&quot;</span><span class="p">,</span>
+        <span class="n">reference_genome_idx</span><span class="o">=</span><span class="s2">&quot;reference/genome.fasta.fai&quot;</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Building mpilup on </span><span class="si">{wildcards.sample}</span><span class="s2"> with samtools&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">20480</span><span class="p">)</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">120</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;samtools_mpileup_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-448-g8555c3e95/bio/samtools/mpileup&quot;</span>
+        <span class="s2">&quot;0.71.1-450-gfbbac6571/bio/samtools/mpileup&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -295,9 +317,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">samtools_faidx</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fa&quot;</span>
+        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fasta&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fa.fai&quot;</span>
+        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fasta.fai&quot;</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing reference fasta with Samtools&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
@@ -309,7 +331,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/samtools/faidx/</span><span class="si">{genome}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-448-g8555c3e95/bio/samtools/faidx&quot;</span>
+        <span class="s2">&quot;0.71.1-450-gfbbac6571/bio/samtools/faidx&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
@@ -326,7 +348,7 @@ For additional parameters in each individual wrapper, please refer to their corr
 <ul class="simple">
 <li><p><a class="reference internal" href="../wrappers/bcftools/concat.html#bio-bcftools-concat"><span class="std std-ref">BCFTOOLS CONCAT</span></a></p></li>
 <li><p><a class="reference internal" href="../wrappers/samtools/faidx.html#bio-samtools-faidx"><span class="std std-ref">SAMTOOLS FAIDX</span></a></p></li>
-<li><p><span class="xref std std-ref">bio/samtools/mpilup</span></p></li>
+<li><p><a class="reference internal" href="../wrappers/samtools/mpileup.html#bio-samtools-mpileup"><span class="std std-ref">SAMTOOLS MPILEUP</span></a></p></li>
 <li><p><a class="reference internal" href="../wrappers/tabix.html#bio-tabix"><span class="std std-ref">TABIX</span></a></p></li>
 <li><p><a class="reference internal" href="../wrappers/varscan/mpileup2indel.html#bio-varscan-mpileup2indel"><span class="std std-ref">VARSCAN MPILEUP2INDEL</span></a></p></li>
 <li><p><a class="reference internal" href="../wrappers/varscan/mpileup2snp.html#bio-varscan-mpileup2snp"><span class="std std-ref">VARSCAN MPILEUP2SNP</span></a></p></li>
