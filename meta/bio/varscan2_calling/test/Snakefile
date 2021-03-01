@@ -1,4 +1,26 @@
 """
+This rule indexes the gzipped VCF as almost every downstream tool require
+an indexed VCF file.
+"""
+rule tabix_index:
+    input:
+        "bcftools/{sample}.vcf.gz"
+    output:
+        "bcftools/{sample}.vcf.gz.tbi"
+    message: "Indexing {wildcards.sample} calls with Tabix"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: min(attempt * 1024, 10240),
+        time_min=lambda wildcards, attempt: attempt * 60
+    params:
+        "-p vcf"
+    log:
+        "logs/tabix/index/{sample}.log"
+    wrapper:
+        "master/bio/tabix"
+
+
+"""
 This rule concats snp and indel callings from Varscan2 in order to produce a
 full VCF file with both kind of variations.
 """
@@ -18,7 +40,7 @@ rule bcftools_concat:
     params:
         config.get(
             "bcftools_concat_extra",
-            "--allow-overlaps --naive --output-type z --threads 2"
+            "--output-type z --threads 2"
         )
     log:
         "logs/bcftools/concat/{sample}.log"
@@ -31,7 +53,7 @@ This rule calls small indel variants with Varscan2. Results are set to unzipped
 VCF because BCFTools merging will be faster that way. Thus, unzipped VCF are
 temporary files.
 """
-rule varscan2_snp_calling:
+rule varscan2_indel_calling:
     input:
         "samtools/mpileup/{sample}.mpileup.gz"
     output:
@@ -46,7 +68,7 @@ rule varscan2_snp_calling:
     log:
         "logs/varscan/pileup2indel/call/{sample}.log"
     wrapper:
-        "master/bio/varscan/pileup2indel"
+        "master/bio/varscan/mpileup2indel"
 
 
 """
@@ -69,7 +91,7 @@ rule varscan2_snp_calling:
     log:
         "logs/varscan/pileup2snp/call/{sample}.log"
     wrapper:
-        "master/bio/varscan/pileup2snp"
+        "master/bio/varscan/mpileup2snp"
 
 
 """
@@ -79,14 +101,14 @@ reads and reference genome
 rule samtools_mpilup:
     input:
         bam="mapped/{sample}.bam",
-        reference_genome="genome.fa",
-        reference_genome_idx="genome.fa.fai",
+        reference_genome="reference/genome.fasta",
+        reference_genome_idx="reference/genome.fasta.fai",
     output:
         temp("samtools/mpileup/{sample}.mpileup.gz")
     message: "Building mpilup on {wildcards.sample} with samtools"
     threads: 2
     resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 4096, 20480)
+        mem_mb=lambda wildcards, attempt: min(attempt * 4096, 20480),
         time_min=lambda wildcards, attempt: attempt * 120
     log:
         "logs/samtools/mpileup/{sample}.log"
@@ -105,9 +127,9 @@ This rule is cached since it should be used only once per reference sequence
 """
 rule samtools_faidx:
     input:
-        "{genome}.fa"
+        "{genome}.fasta"
     output:
-        "{genome}.fa.fai"
+        "{genome}.fasta.fai"
     message: "Indexing reference fasta with Samtools"
     cache: True
     threads: 1

@@ -198,6 +198,20 @@ def test_gatk_bqsr_meta():
 
 
 @skip_if_not_modified
+def test_varscan2_calling_meta():
+    run(
+        "meta/bio/varscan2_calling",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "bcftools/a.chr21.vcf.gz.tbi"
+        ]
+    )
+
+
+@skip_if_not_modified
 def test_adapterremoval_pe_collapse_singletons():
     run(
         "bio/adapterremoval",
