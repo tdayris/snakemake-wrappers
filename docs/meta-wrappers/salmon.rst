@@ -1,0 +1,143 @@
+.. _`salmon`:
+
+SALMON
+======
+
+Pseudo map and quantify your reads over transcritome with `Salmon <https://salmon.readthedocs.io/en/latest/>`_
+
+
+Example
+-------
+
+This meta-wrapper can be used by integrating the following into your workflow:
+
+.. code-block:: python
+
+    """
+    This rule pseudo-map and quantifies your paired reads over the indexed
+    reference.
+    """
+    rule salmon_quant_paired:
+        input:
+            r1="raw_data/{sample}_1.fastq.gz",
+            r2="raw_data/{sample}_2.fastq.gz",
+            index="salmon/index"
+        output:
+            quant="salmon/pseudo_mapping/{sample}/quant.sf",
+            lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json"
+        message: "Quantifying {wildcards.sample} with Salmon"
+        threads: min(config.get("threads", 20), 20)
+        resources:
+            time_min=lambda wildcards, attempt: attempt * 60,
+            mem_mb=lambda wildcards, attempt: (
+                min(attempt * 5120 + 2048, 20480)
+            )
+        params:
+            libType = config("salmon_libType", "A"),
+            extra = config.get("salmon_quant_extra", "")
+        log:
+            "logs/salmon/quant/{sample}.log"
+        wrapper:
+            "0.71.1-437-g937888931/bio/salmon/quant"
+
+
+    use rule salmon_quant_paired as salmon_quant_unpaired with:
+        input:
+            r="raw_data/{sample}_se.fastq.gz",
+            index="salmon/index"
+
+
+    """
+    Index your transcriptome or gentrome file with Salmon in order to map your
+    reads against this reference.
+
+    This rule is cached since it should be used only once per reference genome.
+    """
+    rule salmon_index:
+        input:
+            sequences="salmon/decoy/gentrome.fa",
+            decoys="salmon/decoy/decoys.txt"
+        output:
+            index=directory("salmon/index")
+        message: "Indexing transcriptome/gentrome sequences with Salmon"
+        cache: True
+        threads: min(config.get("threads", 20), 20)
+        resources:
+            time_min=lambda wildcards, attempt: (
+                attempt * (120 if "decoys" in snakemake.input.keys() else 45)
+            ),
+            mem_mb=lambda wildcards, attempt: (
+                attempt * (15360 if "decoys" in snakemake.input.keys() else 10240)
+            )
+        params:
+            extra=config.get("salmon_index_extra", "")
+        log:
+            "logs/salmon/index.log"
+        wrapper:
+            "0.71.1-437-g937888931/bio/salmon/index"
+
+
+    """
+    This rule is optional in case you want to use decoy sequences within your
+    transcriptome. See salmon documentation for more information.
+
+    This rule is cached since it should be used only once per reference genome.
+    """
+    rule salmon_generate_decoy_sequence:
+        input:
+            transcriptome="sequence/transcriptome.fa",
+            genome="sequence/genome.fa"
+        output:
+            decoy="salmon/decoy/decoys.txt",
+            gentrome="salmon/decoy/gentrome.fa"
+        message: "Building gentrome and decoy sequences for Salmon"
+        cache: True
+        threads: 2
+        resources:
+            time_min=lambda wildcards, attempt: min(attempt * 20, 30),
+            mem_mb=lambda wildcards, attempt: attempt * 512
+        log:
+            "logs/salmon/decoys.log"
+        wrapper:
+            "0.71.1-437-g937888931/bio/salmon/generate_decoy"
+
+Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
+For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Used wrappers
+---------------------
+
+The following individual wrappers are used in this meta-wrapper:
+
+
+* :ref:`bio/salmon/generate_decoy`
+
+* :ref:`bio/salmon/index`
+
+* :ref:`bio/salmon/quant`
+
+
+Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
+
+
+
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
