@@ -22,33 +22,37 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule all:
         input:
             fasta = expand(
-                "refs/{build_release_organism}.{datatype}.fasta",
+                "refs/ensembl/{build_release_organism}.{datatype}.fasta",
                 build_release_organism=build_release_organism,
                 datatype=fasta_datatype
             ),
             fasta_index = expand(
-                "refs/{build_release_organism}.{datatype}.fasta.fai",
+                "refs/ensembl/{build_release_organism}.{datatype}.fasta.fai",
                 build_release_organism=build_release_organism,
                 datatype=fasta_datatype
             ),
             fasta_dict = expand(
-                "refs/{build_release_organism}.{datatype}.dict",
+                "refs/ensembl/{build_release_organism}.{datatype}.dict",
                 build_release_organism=build_release_organism,
                 datatype=fasta_datatype
             ),
             gtf = expand(
-                "refs/{build_release_organism}.gtf",
+                "refs/ensembl/{build_release_organism}.gtf",
                 build_release_organism=build_release_organism
             ),
             vcf = expand(
-                "refs/{build_release_organism}.all.vcf.gz",
+                "refs/ensembl/{build_release_organism}.all.vcf.gz",
                 build_release_organism=build_release_organism
             )
 
 
     rule get_genome:
         output:
-            "refs/{build}.{release}.{organism}.{datatype}.fasta"
+            "refs/ensembl/{build}.{release}.{organism}.{datatype}.fasta"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 512, 2048),
+            time_min=lambda wildcard, attempt: attempt * 120
         params:
             species="{organism}",
             datatype="{datatype}",
@@ -58,12 +62,16 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.71.1-451-gb2e59cf65/bio/reference/ensembl-sequence"
+            "0.71.1-453-g032eb4537/bio/reference/ensembl-sequence"
 
 
     rule get_annotation:
         output:
-            "refs/{build}.{release}.{organism}.gtf"
+            "refs/ensembl/{build}.{release}.{organism}.gtf"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 512, 2048),
+            time_min=lambda wildcard, attempt: attempt * 120
         params:
             species="{organism}",
             release="{release}",
@@ -74,42 +82,55 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/get_annotation/{build}.{release}.{organism}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.71.1-451-gb2e59cf65/bio/reference/ensembl-annotation"
+            "0.71.1-453-g032eb4537/bio/reference/ensembl-annotation"
 
 
     rule samtools_faidx_reference:
         input:
-            "refs/{build}.{release}.{organism}.{datatype}.fasta"
+            "refs/ensembl/{build}.{release}.{organism}.{datatype}.fasta"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 512, 2048),
+            time_min=lambda wildcard, attempt: attempt * 120
         output:
-            "refs/{build}.{release}.{organism}.{datatype}.fasta.fai"
+            "refs/ensembl/{build}.{release}.{organism}.{datatype}.fasta.fai"
         params:
             "" # optional params string
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.71.1-451-gb2e59cf65/bio/samtools/faidx"
+            "0.71.1-453-g032eb4537/bio/samtools/faidx"
 
 
     rule create_dict:
         input:
-            "refs/{build}.{release}.{organism}.{datatype}.fasta"
+            "refs/ensembl/{build}.{release}.{organism}.{datatype}.fasta"
         output:
-            "refs/{build}.{release}.{organism}.{datatype}.dict"
+            "refs/ensembl/{build}.{release}.{organism}.{datatype}.dict"
         log:
             "logs/picard/create_dict/{build}.{release}.{organism}.{datatype}.log"
         params:
             extra=""  # optional: extra arguments for picard.
         cache: True
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 512, 2048),
+            time_min=lambda wildcard, attempt: attempt * 120
         group: "index_fasta"
         wrapper:
-            "0.71.1-451-gb2e59cf65/bio/picard/createsequencedictionary"
+            "0.71.1-453-g032eb4537/bio/picard/createsequencedictionary"
 
 
     rule get_variation_with_contig_lengths:
         input:
-            fai="refs/{build}.{release}.{organism}.dna.fasta.fai"
+            fai="refs/ensembl/{build}.{release}.{organism}.dna.fasta.fai"
         output:
-            vcf="refs/{build}.{release}.{organism}.all.vcf.gz"
+            vcf="refs/ensembl/{build}.{release}.{organism}.all.vcf.gz"
+        cache: True
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 512, 2048),
+            time_min=lambda wildcard, attempt: attempt * 120
         params:
             species="{organism}",
             release="{release}",
@@ -118,7 +139,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/get_variation/{build}.{release}.{organism}.log"
         wrapper:
-            "0.71.1-451-gb2e59cf65/bio/reference/ensembl-variation"
+            "0.71.1-453-g032eb4537/bio/reference/ensembl-variation"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

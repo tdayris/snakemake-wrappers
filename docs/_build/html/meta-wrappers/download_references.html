@@ -98,6 +98,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clean_ngs.html">CLEAN_NGS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_pe.html">DADA2-PE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_se.html">DADA2-SE</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">DOWNLOAD REFERENCE</a><ul>
@@ -110,7 +111,9 @@
 <li class="toctree-l2"><a class="reference internal" href="fastq_screen_indexer.html">FASTQ_SCREEN_INDEXER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gatk_bqsr.html">GATK_BQSR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="salmon.html">SALMON</a></li>
+<li class="toctree-l2"><a class="reference internal" href="snpeff_annotate.html">SNPEFF_ANNOTATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="star_arriba.html">STAR-ARRIBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tximport_deseq2.html">TXIMPORT_DESEQ2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varscan2_calling.html">VARSCAN2_CALLING</a></li>
 </ul>
 </li>
@@ -198,33 +201,37 @@
 <span class="n">rule</span> <span class="nb">all</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">fasta</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;refs/</span><span class="si">{build_release_organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;refs/ensembl/</span><span class="si">{build_release_organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta&quot;</span><span class="p">,</span>
             <span class="n">build_release_organism</span><span class="o">=</span><span class="n">build_release_organism</span><span class="p">,</span>
             <span class="n">datatype</span><span class="o">=</span><span class="n">fasta_datatype</span>
         <span class="p">),</span>
         <span class="n">fasta_index</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;refs/</span><span class="si">{build_release_organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta.fai&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;refs/ensembl/</span><span class="si">{build_release_organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta.fai&quot;</span><span class="p">,</span>
             <span class="n">build_release_organism</span><span class="o">=</span><span class="n">build_release_organism</span><span class="p">,</span>
             <span class="n">datatype</span><span class="o">=</span><span class="n">fasta_datatype</span>
         <span class="p">),</span>
         <span class="n">fasta_dict</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;refs/</span><span class="si">{build_release_organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.dict&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;refs/ensembl/</span><span class="si">{build_release_organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.dict&quot;</span><span class="p">,</span>
             <span class="n">build_release_organism</span><span class="o">=</span><span class="n">build_release_organism</span><span class="p">,</span>
             <span class="n">datatype</span><span class="o">=</span><span class="n">fasta_datatype</span>
         <span class="p">),</span>
         <span class="n">gtf</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;refs/</span><span class="si">{build_release_organism}</span><span class="s2">.gtf&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;refs/ensembl/</span><span class="si">{build_release_organism}</span><span class="s2">.gtf&quot;</span><span class="p">,</span>
             <span class="n">build_release_organism</span><span class="o">=</span><span class="n">build_release_organism</span>
         <span class="p">),</span>
         <span class="n">vcf</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;refs/</span><span class="si">{build_release_organism}</span><span class="s2">.all.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;refs/ensembl/</span><span class="si">{build_release_organism}</span><span class="s2">.all.vcf.gz&quot;</span><span class="p">,</span>
             <span class="n">build_release_organism</span><span class="o">=</span><span class="n">build_release_organism</span>
         <span class="p">)</span>
 
 
 <span class="n">rule</span> <span class="n">get_genome</span><span class="p">:</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;refs/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta&quot;</span>
+        <span class="s2">&quot;refs/ensembl/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">2048</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">120</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">species</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{organism}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">datatype</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{datatype}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -234,12 +241,16 @@
         <span class="s2">&quot;logs/get_genome/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.log&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-451-gb2e59cf65/bio/reference/ensembl-sequence&quot;</span>
+        <span class="s2">&quot;0.71.1-453-g032eb4537/bio/reference/ensembl-sequence&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">get_annotation</span><span class="p">:</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;refs/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.gtf&quot;</span>
+        <span class="s2">&quot;refs/ensembl/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.gtf&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">2048</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">120</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">species</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{organism}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">release</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{release}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -250,42 +261,55 @@
         <span class="s2">&quot;logs/get_annotation/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.log&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-451-gb2e59cf65/bio/reference/ensembl-annotation&quot;</span>
+        <span class="s2">&quot;0.71.1-453-g032eb4537/bio/reference/ensembl-annotation&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">samtools_faidx_reference</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;refs/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta&quot;</span>
+        <span class="s2">&quot;refs/ensembl/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">2048</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">120</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;refs/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta.fai&quot;</span>
+        <span class="s2">&quot;refs/ensembl/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta.fai&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="s2">&quot;&quot;</span> <span class="c1"># optional params string</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">group</span><span class="p">:</span> <span class="s2">&quot;index_fasta&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-451-gb2e59cf65/bio/samtools/faidx&quot;</span>
+        <span class="s2">&quot;0.71.1-453-g032eb4537/bio/samtools/faidx&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">create_dict</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;refs/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta&quot;</span>
+        <span class="s2">&quot;refs/ensembl/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;refs/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.dict&quot;</span>
+        <span class="s2">&quot;refs/ensembl/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.dict&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/picard/create_dict/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>  <span class="c1"># optional: extra arguments for picard.</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">2048</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">120</span>
     <span class="n">group</span><span class="p">:</span> <span class="s2">&quot;index_fasta&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-451-gb2e59cf65/bio/picard/createsequencedictionary&quot;</span>
+        <span class="s2">&quot;0.71.1-453-g032eb4537/bio/picard/createsequencedictionary&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">get_variation_with_contig_lengths</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">fai</span><span class="o">=</span><span class="s2">&quot;refs/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.dna.fasta.fai&quot;</span>
+        <span class="n">fai</span><span class="o">=</span><span class="s2">&quot;refs/ensembl/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.dna.fasta.fai&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;refs/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.all.vcf.gz&quot;</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;refs/ensembl/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.all.vcf.gz&quot;</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">2048</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">120</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">species</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{organism}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">release</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{release}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -294,7 +318,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/get_variation/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-451-gb2e59cf65/bio/reference/ensembl-variation&quot;</span>
+        <span class="s2">&quot;0.71.1-453-g032eb4537/bio/reference/ensembl-variation&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

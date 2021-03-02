@@ -29,7 +29,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/sort/{sample}.log"
         wrapper:
-            "0.71.1-451-gb2e59cf65/bio/samtools/index"
+            "0.71.1-453-g032eb4537/bio/samtools/index"
 
 
     """
@@ -52,7 +52,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra = "-m 1536M"
         wrapper:
-            "0.71.1-451-gb2e59cf65/bio/samtools/sort"
+            "0.71.1-453-g032eb4537/bio/samtools/sort"
 
 
     """
@@ -78,7 +78,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/fixmate/{sample}.log"
         wrapper:
-            "0.71.1-451-gb2e59cf65/bio/samtools/fixmate"
+            "0.71.1-453-g032eb4537/bio/samtools/fixmate"
 
 
     """
@@ -114,7 +114,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "log/bwa/mem/{sample}.log"
         wrapper:
-            "0.71.1-451-gb2e59cf65/bio/bwa/mem"
+            "0.71.1-453-g032eb4537/bio/bwa/mem"
 
 
     """
@@ -139,7 +139,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bwa_index/genome.log"
         wrapper:
-            "0.71.1-451-gb2e59cf65/bio/bwa/index"
+            "0.71.1-453-g032eb4537/bio/bwa/index"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

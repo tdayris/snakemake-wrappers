@@ -13,8 +13,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    from snakemake.utils import min_version
+    min_version("6.0")
+
     from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
     HTTP = HTTPRemoteProvider()
+
+    module download_references:
+        meta_wrapper: "0.71.1-451-gb2e59cf65/meta/bio/download_references"
+
 
     ensembl_build_release_organism = [
         ["GRCh38", "99", "homo_sapiens"],
@@ -24,6 +31,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
         ["ICSASG_v2", "99", "salmo_salar"],
         ["R64-1-1", "99", "saccharomyces_cerevisiae"],
         ["Rnor_6.0", "99", "rattus_norvegicus"]
+    ]
+    not_ensembl_build_release_organism = [
+        ["TAIR", "10", "arabidopsis_thaliana", "TAIR"],
+        ["NC_001422", "174", "enterobacteria_phage_phix", "ncbi"]
     ]
 
     wildcard_constraints:
@@ -38,9 +49,16 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 "index/ensembl/{fasta}.dna.1.bt2",
                 fasta = [".".join(e) for e in ensembl_build_release_organism]
             )
+            expand(
+                "index/{source}/{fasta}.dna.1.bt2",
+                fasta = [
+                    ".".join(e[:-1]) for e in not_ensembl_build_release_organism
+                ],
+                source = [e[-1] for e in not_ensembl_build_release_organism]
+            )
 
 
-    rule get_genome_from_ensembl:
+    use rule get_genome from download_references with:
         output:
             "refs/ensembl/{build}.{release}.{organism}.{datatype}.fasta"
         params:
@@ -50,9 +68,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
             release="{release}"
         log:
             "logs/ensembl/{build}.{release}.{organism}.{datatype}.log"
-        cache: True  # save space and time with between workflow caching (see docs)
-        wrapper:
-            "0.71.1-451-gb2e59cf65/bio/reference/ensembl-sequence"
 
 
     rule download_tair10:
@@ -63,14 +78,18 @@ This meta-wrapper can be used by integrating the following into your workflow:
             )
         output:
             "refs/TAIR/TAIR.10.arabidopsis_thaliana.dna.fasta"
+        cache: True
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 512, 2048),
+            time_min=lambda wildcard, attempt: attempt * 120
         log:
             "logs/tair/TAIR.10.arabidopsis_thaliana.chr_all.log"
-        cache: True
         shell:
             "mv {input} {output} 2> {log}"
 
 
-    rule download_phix_nbci:
+    use rule download_tair10 as download_phix_nbci with:
         input:
             HTTP.remote(
                 "https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/enterobacteria_phage_phix174_sensu_lato_uid14015/NC_001422.fna",
@@ -80,26 +99,27 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "refs/ncbi/NC_001422.174.enterobacteria_phage_phix.dna.fasta"
         log:
             "logs/ncbi/NC_001422.174.enterobacteria_phage_phix.dna.log"
-        cache: True
-        shell:
-            "mv {input} {output} 2> {log}"
 
 
     rule bowtie2_build:
         input:
-            "refs/{source}/{build}.{release}.{organism}.dna.fasta"
+            reference = "refs/{source}/{build}.{release}.{organism}.dna.fasta"
         output:
             multiext(
                 "index/{source}/{build}.{release}.{organism}.dna",
                 ".1.bt2", ".2.bt2", ".3.bt2", ".4.bt2", ".rev.1.bt2", ".rev.2.bt2",
             )
+        cache: True
+        threads: config.get("threads", 10)
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
+            time_min=lambda wildcard, attempt: attempt * 45
         log:
             "logs/bwt2_build/{source}.{build}.{release}.{organism}.dna.log"
-        cache: True
         params:
             extra=""
         wrapper:
-            "0.71.1-451-gb2e59cf65/bio/bowtie2/build"
+            "0.71.1-453-g032eb4537/bio/bowtie2/build"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
