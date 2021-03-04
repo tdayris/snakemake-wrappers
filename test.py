@@ -489,7 +489,20 @@ def test_bwa_mapping_meta():
 def test_download_reference_meta():
     run(
         "meta/bio/download_references",
-        ["snakemake", "--cores", "1", "--use-conda",]
+        ["snakemake", "--cores", "1", "--use-conda"]
+    )
+
+
+@skip_if_not_modified
+def test_snpeff_annotate_meta():
+    run(
+        "meta/bio/snpeff_annotate",
+        [
+            "snakemake",
+            "--cores", "1",
+            "--use-conda",
+            "snpeff/calls/fake_KJ660346.vcf"
+        ]
     )
 
 
