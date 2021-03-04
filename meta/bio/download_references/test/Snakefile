@@ -7,33 +7,37 @@ build_release_organism = [
 rule all:
     input:
         fasta = expand(
-            "refs/{build_release_organism}.{datatype}.fasta",
+            "refs/ensembl/{build_release_organism}.{datatype}.fasta",
             build_release_organism=build_release_organism,
             datatype=fasta_datatype
         ),
         fasta_index = expand(
-            "refs/{build_release_organism}.{datatype}.fasta.fai",
+            "refs/ensembl/{build_release_organism}.{datatype}.fasta.fai",
             build_release_organism=build_release_organism,
             datatype=fasta_datatype
         ),
         fasta_dict = expand(
-            "refs/{build_release_organism}.{datatype}.dict",
+            "refs/ensembl/{build_release_organism}.{datatype}.dict",
             build_release_organism=build_release_organism,
             datatype=fasta_datatype
         ),
         gtf = expand(
-            "refs/{build_release_organism}.gtf",
+            "refs/ensembl/{build_release_organism}.gtf",
             build_release_organism=build_release_organism
         ),
         vcf = expand(
-            "refs/{build_release_organism}.all.vcf.gz",
+            "refs/ensembl/{build_release_organism}.all.vcf.gz",
             build_release_organism=build_release_organism
         )
 
 
 rule get_genome:
     output:
-        "refs/{build}.{release}.{organism}.{datatype}.fasta"
+        "refs/ensembl/{build}.{release}.{organism}.{datatype}.fasta"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcard, attempt: min(attempt * 512, 2048),
+        time_min=lambda wildcard, attempt: attempt * 120
     params:
         species="{organism}",
         datatype="{datatype}",
@@ -48,7 +52,11 @@ rule get_genome:
 
 rule get_annotation:
     output:
-        "refs/{build}.{release}.{organism}.gtf"
+        "refs/ensembl/{build}.{release}.{organism}.gtf"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcard, attempt: min(attempt * 512, 2048),
+        time_min=lambda wildcard, attempt: attempt * 120
     params:
         species="{organism}",
         release="{release}",
@@ -64,9 +72,13 @@ rule get_annotation:
 
 rule samtools_faidx_reference:
     input:
-        "refs/{build}.{release}.{organism}.{datatype}.fasta"
+        "refs/ensembl/{build}.{release}.{organism}.{datatype}.fasta"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcard, attempt: min(attempt * 512, 2048),
+        time_min=lambda wildcard, attempt: attempt * 120
     output:
-        "refs/{build}.{release}.{organism}.{datatype}.fasta.fai"
+        "refs/ensembl/{build}.{release}.{organism}.{datatype}.fasta.fai"
     params:
         "" # optional params string
     cache: True
@@ -77,14 +89,18 @@ rule samtools_faidx_reference:
 
 rule create_dict:
     input:
-        "refs/{build}.{release}.{organism}.{datatype}.fasta"
+        "refs/ensembl/{build}.{release}.{organism}.{datatype}.fasta"
     output:
-        "refs/{build}.{release}.{organism}.{datatype}.dict"
+        "refs/ensembl/{build}.{release}.{organism}.{datatype}.dict"
     log:
         "logs/picard/create_dict/{build}.{release}.{organism}.{datatype}.log"
     params:
         extra=""  # optional: extra arguments for picard.
     cache: True
+    threads: 1
+    resources:
+        mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
+        time_min=lambda wildcard, attempt: attempt * 120
     group: "index_fasta"
     wrapper:
         "master/bio/picard/createsequencedictionary"
@@ -92,9 +108,14 @@ rule create_dict:
 
 rule get_variation_with_contig_lengths:
     input:
-        fai="refs/{build}.{release}.{organism}.dna.fasta.fai"
+        fai="refs/ensembl/{build}.{release}.{organism}.dna.fasta.fai"
     output:
-        vcf="refs/{build}.{release}.{organism}.all.vcf.gz"
+        vcf="refs/ensembl/{build}.{release}.{organism}.all.vcf.gz"
+    cache: True
+    threads: 1
+    resources:
+        mem_mb=lambda wildcard, attempt: min(attempt * 512, 2048),
+        time_min=lambda wildcard, attempt: attempt * 120
     params:
         species="{organism}",
         release="{release}",
