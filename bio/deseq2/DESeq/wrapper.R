@@ -62,6 +62,7 @@ base::message("Wald test over, RDS saved");
 
 # Saving results as TSV
 names <- DESeq2::resultsNames(object = wald);
+print(names)
 
 if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
   # Recovreing extra parameters for TSV tables
@@ -104,29 +105,44 @@ if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
   }
 }
 
-if ("deseq2_tsv" %in% base::names(snakemake@output)) {
-  base::message("Saving results as TSV");
-  # This will save results based on their contrast identifier
-  # For more information, see deseq2 vignette or type ?results
-  constrast <- c(
-    base::as.character(x = snakemake@params[["factor"]]),
-    base::as.character(x = snakemake@params[["numerator"]]),
-    base::as.character(x = snakemake@params[["denominator"]])
-  );
-  extra_results <- base::paste(
-    "object=wald",
-    "contrast=constrast",
-    sep=", "
-  );
-  if ("extra_results" %in% base::names(snakemake@params)) {
-    extra_results <- base::paste(
-      extra_results,
-      base::as.character(x = snakemake@params[["extra_results"]]),
-      sep=", "
+if ("contrast" %in% base::names(snakemake@params)) {
+  contrast_length <- base::length(snakemake@params[["contrast"]]);
+  message(snakemake@params[["contrast"]], contrast_length);
+
+  extra_results <- "object=wald";
+  contrast <- NULL;
+
+  if (contrast_length == 1) {
+    contrast <- base::as.character(x=snakemake@params[["contrast"]]);
+    contrast <- base::paste0("name='", contrast[1], "'");
+
+  } else if (contrast_length == 2) {
+    contrast <- sapply(
+      snakemake@params[["contrast"]],
+      function(extra) base::as.character(x=extra)
+    );
+    contrast <- base::paste0(
+      "contrast=list('", contrast[1], "', '", contrast[2], "')"
+    );
+
+  } else if (contrast_length == 3) {
+    contrast <- sapply(
+      snakemake@params[["contrast"]],
+      function(extra) base::as.character(x=extra)
+    );
+    contrast <- base::paste0(
+      "contrast=c('",
+      contrast[1],
+      "', '",
+      contrast[2],
+      "', '",
+      contrast[3],
+      "')"
     );
   }
+  extra_results <- base::paste(extra_results, contrast, sep=", ");
   results_cmd <- base::paste0("DESeq2::results(", extra_results, ")");
-  base::message("Result extraction command:");
+  base::message("Result extraction command: ", results_cmd);
   results_frame <- base::eval(base::parse(text = results_cmd));
 
   # Saving table

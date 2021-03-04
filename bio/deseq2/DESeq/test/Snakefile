@@ -3,7 +3,7 @@ rule test_deseq:
         dds = "dds.RDS"
     output:
         rds = "wald.RDS",
-        #deseq2_result_dir = directory("tsv"),
+        deseq2_result_dir = directory("tsv"),
         deseq2_tsv = "DESeq2/Condition.tsv",
         normalized_counts = "counts.tsv",
         dst = "counts.RDS"
@@ -19,9 +19,9 @@ rule test_deseq:
             lambda wildcards, attempt: min(attempt * 10, 20)
         )
     params:
-        factor = "Cond",
-        numerator = "B",
-        denominator = "A"
+        #contrast = ["Loc_Biopsy_Other_vs_Lung"],
+        #contrast = ["Loc_Biopsy_Other_vs_Lung", "SexM.Loc_BiopsyOther"],
+        contrast = ["Cond", "B", "A"]
     log:
         "logs/test_nbinomWaldTest.log"
     wrapper:
