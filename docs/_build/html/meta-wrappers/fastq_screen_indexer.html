@@ -101,6 +101,7 @@
 <li class="toctree-l2"><a class="reference internal" href="clean_ngs.html">CLEAN_NGS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_pe.html">DADA2-PE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_se.html">DADA2-SE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deseq2_post_process.html">DESEQ2_POST_PROCESS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="download_references.html">DOWNLOAD REFERENCE</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">FASTQ_SCREEN_INDEXER</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
@@ -197,55 +198,51 @@
 <span class="kn">from</span> <span class="nn">snakemake.remote.HTTP</span> <span class="kn">import</span> <span class="n">RemoteProvider</span> <span class="k">as</span> <span class="n">HTTPRemoteProvider</span>
 <span class="n">HTTP</span> <span class="o">=</span> <span class="n">HTTPRemoteProvider</span><span class="p">()</span>
 
-<span class="n">module</span> <span class="n">download_references</span><span class="p">:</span>
-    <span class="n">meta_wrapper</span><span class="p">:</span> <span class="s2">&quot;0.71.1-451-gb2e59cf65/meta/bio/download_references&quot;</span>
 
-
-<span class="n">ensembl_build_release_organism</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">[</span><span class="s2">&quot;GRCh38&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;homo_sapiens&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;GRCm38&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;mus_musculus&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;BDGP6.28&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;drosophila_melanogaster&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;WBcel235&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;caenorhabditis_elegans&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;ICSASG_v2&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;salmo_salar&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;R64-1-1&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;saccharomyces_cerevisiae&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;Rnor_6.0&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;rattus_norvegicus&quot;</span><span class="p">]</span>
-<span class="p">]</span>
-<span class="n">not_ensembl_build_release_organism</span> <span class="o">=</span> <span class="p">[</span>
+<span class="n">build_release_organism</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;GRCh38&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;homo_sapiens&quot;</span><span class="p">,</span> <span class="s2">&quot;ensembl&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;GRCm38&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;mus_musculus&quot;</span><span class="p">,</span> <span class="s2">&quot;ensembl&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;BDGP6.28&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;drosophila_melanogaster&quot;</span><span class="p">,</span> <span class="s2">&quot;ensembl&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;WBcel235&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;caenorhabditis_elegans&quot;</span><span class="p">,</span> <span class="s2">&quot;ensembl&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;ICSASG_v2&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;salmo_salar&quot;</span><span class="p">,</span> <span class="s2">&quot;ensembl&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;R64-1-1&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;saccharomyces_cerevisiae&quot;</span><span class="p">,</span> <span class="s2">&quot;ensembl&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Rnor_6.0&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;rattus_norvegicus&quot;</span><span class="p">,</span> <span class="s2">&quot;ensembl&quot;</span><span class="p">],</span>
     <span class="p">[</span><span class="s2">&quot;TAIR&quot;</span><span class="p">,</span> <span class="s2">&quot;10&quot;</span><span class="p">,</span> <span class="s2">&quot;arabidopsis_thaliana&quot;</span><span class="p">,</span> <span class="s2">&quot;TAIR&quot;</span><span class="p">],</span>
     <span class="p">[</span><span class="s2">&quot;NC_001422&quot;</span><span class="p">,</span> <span class="s2">&quot;174&quot;</span><span class="p">,</span> <span class="s2">&quot;enterobacteria_phage_phix&quot;</span><span class="p">,</span> <span class="s2">&quot;ncbi&quot;</span><span class="p">]</span>
 <span class="p">]</span>
 
 <span class="n">wildcard_constraints</span><span class="p">:</span>
-    <span class="n">release</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ensembl_build_release_organism</span><span class="p">]),</span>
-    <span class="n">organism</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ensembl_build_release_organism</span><span class="p">]),</span>
-    <span class="n">build</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ensembl_build_release_organism</span><span class="p">])</span>
+    <span class="n">release</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">build_release_organism</span><span class="p">]),</span>
+    <span class="n">organism</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">build_release_organism</span><span class="p">])),</span>
+    <span class="n">build</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">build_release_organism</span><span class="p">]),</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">build_release_organism</span><span class="p">]))</span>
 
 
 <span class="n">rule</span> <span class="n">target</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;index/ensembl/</span><span class="si">{fasta}</span><span class="s2">.dna.1.bt2&quot;</span><span class="p">,</span>
-            <span class="n">fasta</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ensembl_build_release_organism</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;index/</span><span class="si">{source}</span><span class="s2">/</span><span class="si">{fasta}</span><span class="s2">.dna.1.bt2&quot;</span><span class="p">,</span>
-            <span class="n">fasta</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">e</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">not_ensembl_build_release_organism</span>
-            <span class="p">],</span>
-            <span class="n">source</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">not_ensembl_build_release_organism</span><span class="p">]</span>
-        <span class="p">)</span>
+        <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">&quot;index/</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">build</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">release</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">organism</span><span class="si">}</span><span class="s2">.dna.1.bt2&quot;</span>
+            <span class="k">for</span> <span class="n">build</span><span class="p">,</span> <span class="n">release</span><span class="p">,</span> <span class="n">organism</span><span class="p">,</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">build_release_organism</span>
+        <span class="p">]</span>
 
 
-<span class="n">use</span> <span class="n">rule</span> <span class="n">get_genome</span> <span class="kn">from</span> <span class="nn">download_references</span> <span class="k">with</span><span class="p">:</span>
+<span class="n">rule</span> <span class="n">get_genome</span><span class="p">:</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="s2">&quot;refs/ensembl/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.fasta&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">2048</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">120</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">species</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{organism}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">datatype</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{datatype}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">build</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{build}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">release</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{release}</span><span class="s2">&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/ensembl/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.log&quot;</span>
+        <span class="s2">&quot;logs/get_genome/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.log&quot;</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-459-g6aed01be9/bio/reference/ensembl-sequence&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">download_tair10</span><span class="p">:</span>
@@ -297,7 +294,7 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-453-g032eb4537/bio/bowtie2/build&quot;</span>
+        <span class="s2">&quot;0.71.1-459-g6aed01be9/bio/bowtie2/build&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

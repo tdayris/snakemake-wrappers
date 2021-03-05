@@ -331,7 +331,7 @@ and negative binomial GLM fitting and Wald test.</p>
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_deseq</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">dds</span> <span class="o">=</span> <span class="s2">&quot;Pairs_Group_Biopsy_Status_compairing_Paired_PD1_Baseline_vs_Paired_PD1_Progression/Wald_Pairs_Group_Biopsy_Status_compairing_Paired_PD1_Baseline_vs_Paired_PD1_Progression.RDS&quot;</span>
+        <span class="n">dds</span> <span class="o">=</span> <span class="s2">&quot;dds.RDS&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">rds</span> <span class="o">=</span> <span class="s2">&quot;wald.RDS&quot;</span><span class="p">,</span>
         <span class="n">deseq2_result_dir</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;tsv&quot;</span><span class="p">),</span>
@@ -350,13 +350,13 @@ and negative binomial GLM fitting and Wald test.</p>
             <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">factor</span> <span class="o">=</span> <span class="s2">&quot;Cond&quot;</span><span class="p">,</span>
-        <span class="n">numerator</span> <span class="o">=</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span>
-        <span class="n">denominator</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span>
+        <span class="c1">#contrast = [&quot;Loc_Biopsy_Other_vs_Lung&quot;],</span>
+        <span class="c1">#contrast = [&quot;Loc_Biopsy_Other_vs_Lung&quot;, &quot;SexM.Loc_BiopsyOther&quot;],</span>
+        <span class="n">contrast</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Cond&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">]</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_nbinomWaldTest.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-453-g032eb4537/bio/deseq2/DESeq&quot;</span>
+        <span class="s2">&quot;0.71.1-459-g6aed01be9/bio/deseq2/DESeq&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -511,29 +511,44 @@ When running with</p>
   <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="nf">if </span><span class="p">(</span><span class="s">&quot;deseq2_tsv&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">))</span> <span class="p">{</span>
-  <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Saving results as TSV&quot;</span><span class="p">);</span>
-  <span class="c1"># This will save results based on their contrast identifier</span>
-  <span class="c1"># For more information, see deseq2 vignette or type ?results</span>
-  <span class="n">constrast</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span>
-    <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;factor&quot;</span><span class="p">]]),</span>
-    <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;numerator&quot;</span><span class="p">]]),</span>
-    <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;denominator&quot;</span><span class="p">]])</span>
-  <span class="p">);</span>
-  <span class="n">extra_results</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span>
-    <span class="s">&quot;object=wald&quot;</span><span class="p">,</span>
-    <span class="s">&quot;contrast=constrast&quot;</span><span class="p">,</span>
-    <span class="n">sep</span><span class="o">=</span><span class="s">&quot;, &quot;</span>
-  <span class="p">);</span>
-  <span class="nf">if </span><span class="p">(</span><span class="s">&quot;extra_results&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
-    <span class="n">extra_results</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span>
-      <span class="n">extra_results</span><span class="p">,</span>
-      <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;extra_results&quot;</span><span class="p">]]),</span>
-      <span class="n">sep</span><span class="o">=</span><span class="s">&quot;, &quot;</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;contrast&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">contrast_length</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">length</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;contrast&quot;</span><span class="p">]]);</span>
+  <span class="nf">message</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;contrast&quot;</span><span class="p">]],</span> <span class="n">contrast_length</span><span class="p">);</span>
+
+  <span class="n">extra_results</span> <span class="o">&lt;-</span> <span class="s">&quot;object=wald&quot;</span><span class="p">;</span>
+  <span class="n">contrast</span> <span class="o">&lt;-</span> <span class="kc">NULL</span><span class="p">;</span>
+
+  <span class="nf">if </span><span class="p">(</span><span class="n">contrast_length</span> <span class="o">==</span> <span class="m">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">contrast</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;contrast&quot;</span><span class="p">]]);</span>
+    <span class="n">contrast</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span><span class="s">&quot;name=&#39;&quot;</span><span class="p">,</span> <span class="n">contrast</span><span class="p">[</span><span class="m">1</span><span class="p">],</span> <span class="s">&quot;&#39;&quot;</span><span class="p">);</span>
+
+  <span class="p">}</span> <span class="n">else</span> <span class="nf">if </span><span class="p">(</span><span class="n">contrast_length</span> <span class="o">==</span> <span class="m">2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">contrast</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span>
+      <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;contrast&quot;</span><span class="p">]],</span>
+      <span class="nf">function</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">extra</span><span class="p">)</span>
+    <span class="p">);</span>
+    <span class="n">contrast</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span>
+      <span class="s">&quot;contrast=list(&#39;&quot;</span><span class="p">,</span> <span class="n">contrast</span><span class="p">[</span><span class="m">1</span><span class="p">],</span> <span class="s">&quot;&#39;, &#39;&quot;</span><span class="p">,</span> <span class="n">contrast</span><span class="p">[</span><span class="m">2</span><span class="p">],</span> <span class="s">&quot;&#39;)&quot;</span>
+    <span class="p">);</span>
+
+  <span class="p">}</span> <span class="n">else</span> <span class="nf">if </span><span class="p">(</span><span class="n">contrast_length</span> <span class="o">==</span> <span class="m">3</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">contrast</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span>
+      <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;contrast&quot;</span><span class="p">]],</span>
+      <span class="nf">function</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">extra</span><span class="p">)</span>
+    <span class="p">);</span>
+    <span class="n">contrast</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span>
+      <span class="s">&quot;contrast=c(&#39;&quot;</span><span class="p">,</span>
+      <span class="n">contrast</span><span class="p">[</span><span class="m">1</span><span class="p">],</span>
+      <span class="s">&quot;&#39;, &#39;&quot;</span><span class="p">,</span>
+      <span class="n">contrast</span><span class="p">[</span><span class="m">2</span><span class="p">],</span>
+      <span class="s">&quot;&#39;, &#39;&quot;</span><span class="p">,</span>
+      <span class="n">contrast</span><span class="p">[</span><span class="m">3</span><span class="p">],</span>
+      <span class="s">&quot;&#39;)&quot;</span>
     <span class="p">);</span>
   <span class="p">}</span>
+  <span class="n">extra_results</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span><span class="n">extra_results</span><span class="p">,</span> <span class="n">contrast</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&quot;, &quot;</span><span class="p">);</span>
   <span class="n">results_cmd</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span><span class="s">&quot;DESeq2::results(&quot;</span><span class="p">,</span> <span class="n">extra_results</span><span class="p">,</span> <span class="s">&quot;)&quot;</span><span class="p">);</span>
-  <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Result extraction command:&quot;</span><span class="p">);</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Result extraction command: &quot;</span><span class="p">,</span> <span class="n">results_cmd</span><span class="p">);</span>
   <span class="n">results_frame</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">eval</span><span class="p">(</span><span class="n">base</span><span class="o">::</span><span class="nf">parse</span><span class="p">(</span><span class="n">text</span> <span class="o">=</span> <span class="n">results_cmd</span><span class="p">));</span>
 
   <span class="c1"># Saving table</span>

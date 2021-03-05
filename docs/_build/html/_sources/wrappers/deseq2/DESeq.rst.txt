@@ -17,7 +17,7 @@ This wrapper can be used in the following way:
 
     rule test_deseq:
         input:
-            dds = "Pairs_Group_Biopsy_Status_compairing_Paired_PD1_Baseline_vs_Paired_PD1_Progression/Wald_Pairs_Group_Biopsy_Status_compairing_Paired_PD1_Baseline_vs_Paired_PD1_Progression.RDS"
+            dds = "dds.RDS"
         output:
             rds = "wald.RDS",
             deseq2_result_dir = directory("tsv"),
@@ -36,13 +36,13 @@ This wrapper can be used in the following way:
                 lambda wildcards, attempt: min(attempt * 10, 20)
             )
         params:
-            factor = "Cond",
-            numerator = "B",
-            denominator = "A"
+            #contrast = ["Loc_Biopsy_Other_vs_Lung"],
+            #contrast = ["Loc_Biopsy_Other_vs_Lung", "SexM.Loc_BiopsyOther"],
+            contrast = ["Cond", "B", "A"]
         log:
             "logs/test_nbinomWaldTest.log"
         wrapper:
-            "0.71.1-453-g032eb4537/bio/deseq2/DESeq"
+            "0.71.1-459-g6aed01be9/bio/deseq2/DESeq"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -204,29 +204,44 @@ Code
       }
     }
 
-    if ("deseq2_tsv" %in% base::names(snakemake@output)) {
-      base::message("Saving results as TSV");
-      # This will save results based on their contrast identifier
-      # For more information, see deseq2 vignette or type ?results
-      constrast <- c(
-        base::as.character(x = snakemake@params[["factor"]]),
-        base::as.character(x = snakemake@params[["numerator"]]),
-        base::as.character(x = snakemake@params[["denominator"]])
-      );
-      extra_results <- base::paste(
-        "object=wald",
-        "contrast=constrast",
-        sep=", "
-      );
-      if ("extra_results" %in% base::names(snakemake@params)) {
-        extra_results <- base::paste(
-          extra_results,
-          base::as.character(x = snakemake@params[["extra_results"]]),
-          sep=", "
+    if ("contrast" %in% base::names(snakemake@params)) {
+      contrast_length <- base::length(snakemake@params[["contrast"]]);
+      message(snakemake@params[["contrast"]], contrast_length);
+
+      extra_results <- "object=wald";
+      contrast <- NULL;
+
+      if (contrast_length == 1) {
+        contrast <- base::as.character(x=snakemake@params[["contrast"]]);
+        contrast <- base::paste0("name='", contrast[1], "'");
+
+      } else if (contrast_length == 2) {
+        contrast <- sapply(
+          snakemake@params[["contrast"]],
+          function(extra) base::as.character(x=extra)
+        );
+        contrast <- base::paste0(
+          "contrast=list('", contrast[1], "', '", contrast[2], "')"
+        );
+
+      } else if (contrast_length == 3) {
+        contrast <- sapply(
+          snakemake@params[["contrast"]],
+          function(extra) base::as.character(x=extra)
+        );
+        contrast <- base::paste0(
+          "contrast=c('",
+          contrast[1],
+          "', '",
+          contrast[2],
+          "', '",
+          contrast[3],
+          "')"
         );
       }
+      extra_results <- base::paste(extra_results, contrast, sep=", ");
       results_cmd <- base::paste0("DESeq2::results(", extra_results, ")");
-      base::message("Result extraction command:");
+      base::message("Result extraction command: ", results_cmd);
       results_frame <- base::eval(base::parse(text = results_cmd));
 
       # Saving table

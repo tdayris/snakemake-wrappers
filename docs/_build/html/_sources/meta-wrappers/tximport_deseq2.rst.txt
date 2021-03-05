@@ -26,6 +26,18 @@ This meta-wrapper can be used by integrating the following into your workflow:
             deseq2_tsv = "deseq2/wald/results.tsv",
             normalized_counts = "deseq2/dst/counts.tsv",
             dst = "deseq2/dst/counts.RDS"
+        message: "Running DESeq2 analysis"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: attempt * 2048,
+            time_min=lambda wildcard, attempt: attempt * 60
+        params:
+            contrast = config.get("deseq2_contrast", ["Cond", "B", "A"]),
+        log:
+            "logs/deseq2/deseq.log"
+        wrapper:
+            "0.71.1-459-g6aed01be9/bio/deseq2/DESeq"
+
 
     """
     This rule formats counts for DESeq2. The design matrix and its corresponding
@@ -49,7 +61,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/deseq2_dataset_from_tximport.log"
         wrapper:
-            "0.71.1-453-g032eb4537/bio/deseq2/DESeqDataSetFromTximport/"
+            "0.71.1-459-g6aed01be9/bio/deseq2/DESeqDataSetFromTximport/"
 
 
     """
@@ -71,7 +83,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport.log"
         wrapper:
-            "0.71.1-453-g032eb4537/bio/tximport"
+            "0.71.1-459-g6aed01be9/bio/tximport"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

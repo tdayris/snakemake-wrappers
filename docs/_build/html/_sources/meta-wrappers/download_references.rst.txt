@@ -62,7 +62,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.71.1-453-g032eb4537/bio/reference/ensembl-sequence"
+            "0.71.1-459-g6aed01be9/bio/reference/ensembl-sequence"
 
 
     rule get_annotation:
@@ -82,7 +82,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/get_annotation/{build}.{release}.{organism}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.71.1-453-g032eb4537/bio/reference/ensembl-annotation"
+            "0.71.1-459-g6aed01be9/bio/reference/ensembl-annotation"
 
 
     rule samtools_faidx_reference:
@@ -99,7 +99,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.71.1-453-g032eb4537/bio/samtools/faidx"
+            "0.71.1-459-g6aed01be9/bio/samtools/faidx"
 
 
     rule create_dict:
@@ -114,11 +114,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
         cache: True
         threads: 1
         resources:
-            mem_mb=lambda wildcard, attempt: min(attempt * 512, 2048),
+            mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
             time_min=lambda wildcard, attempt: attempt * 120
         group: "index_fasta"
         wrapper:
-            "0.71.1-453-g032eb4537/bio/picard/createsequencedictionary"
+            "0.71.1-459-g6aed01be9/bio/picard/createsequencedictionary"
 
 
     rule get_variation_with_contig_lengths:
@@ -139,7 +139,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/get_variation/{build}.{release}.{organism}.log"
         wrapper:
-            "0.71.1-453-g032eb4537/bio/reference/ensembl-variation"
+            "0.71.1-459-g6aed01be9/bio/reference/ensembl-variation"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

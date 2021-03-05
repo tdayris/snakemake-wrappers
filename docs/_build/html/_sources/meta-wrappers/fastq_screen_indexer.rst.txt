@@ -19,55 +19,51 @@ This meta-wrapper can be used by integrating the following into your workflow:
     from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
     HTTP = HTTPRemoteProvider()
 
-    module download_references:
-        meta_wrapper: "0.71.1-451-gb2e59cf65/meta/bio/download_references"
 
-
-    ensembl_build_release_organism = [
-        ["GRCh38", "99", "homo_sapiens"],
-        ["GRCm38", "99", "mus_musculus"],
-        ["BDGP6.28", "99", "drosophila_melanogaster"],
-        ["WBcel235", "99", "caenorhabditis_elegans"],
-        ["ICSASG_v2", "99", "salmo_salar"],
-        ["R64-1-1", "99", "saccharomyces_cerevisiae"],
-        ["Rnor_6.0", "99", "rattus_norvegicus"]
-    ]
-    not_ensembl_build_release_organism = [
+    build_release_organism = [
+        ["GRCh38", "99", "homo_sapiens", "ensembl"],
+        ["GRCm38", "99", "mus_musculus", "ensembl"],
+        ["BDGP6.28", "99", "drosophila_melanogaster", "ensembl"],
+        ["WBcel235", "99", "caenorhabditis_elegans", "ensembl"],
+        ["ICSASG_v2", "99", "salmo_salar", "ensembl"],
+        ["R64-1-1", "99", "saccharomyces_cerevisiae", "ensembl"],
+        ["Rnor_6.0", "99", "rattus_norvegicus", "ensembl"],
         ["TAIR", "10", "arabidopsis_thaliana", "TAIR"],
         ["NC_001422", "174", "enterobacteria_phage_phix", "ncbi"]
     ]
 
     wildcard_constraints:
-        release = r"|".join([e[1] for e in ensembl_build_release_organism]),
-        organism = r"|".join([e[2] for e in ensembl_build_release_organism]),
-        build = r"|".join([e[0] for e in ensembl_build_release_organism])
+        release = r"|".join([e[1] for e in build_release_organism]),
+        organism = r"|".join(set([e[2] for e in build_release_organism])),
+        build = r"|".join([e[0] for e in build_release_organism]),
+        source = r"|".join(set([e[3] for e in build_release_organism]))
 
 
     rule target:
         input:
-            expand(
-                "index/ensembl/{fasta}.dna.1.bt2",
-                fasta = [".".join(e) for e in ensembl_build_release_organism]
-            )
-            expand(
-                "index/{source}/{fasta}.dna.1.bt2",
-                fasta = [
-                    ".".join(e[:-1]) for e in not_ensembl_build_release_organism
-                ],
-                source = [e[-1] for e in not_ensembl_build_release_organism]
-            )
+            [
+                f"index/{source}/{build}.{release}.{organism}.dna.1.bt2"
+                for build, release, organism, source in build_release_organism
+            ]
 
 
-    use rule get_genome from download_references with:
+    rule get_genome:
         output:
             "refs/ensembl/{build}.{release}.{organism}.{datatype}.fasta"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 512, 2048),
+            time_min=lambda wildcard, attempt: attempt * 120
         params:
             species="{organism}",
             datatype="{datatype}",
             build="{build}",
             release="{release}"
         log:
-            "logs/ensembl/{build}.{release}.{organism}.{datatype}.log"
+            "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
+        cache: True  # save space and time with between workflow caching (see docs)
+        wrapper:
+            "0.71.1-459-g6aed01be9/bio/reference/ensembl-sequence"
 
 
     rule download_tair10:
@@ -119,7 +115,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.71.1-453-g032eb4537/bio/bowtie2/build"
+            "0.71.1-459-g6aed01be9/bio/bowtie2/build"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
