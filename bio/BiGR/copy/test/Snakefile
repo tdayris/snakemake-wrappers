@@ -1,0 +1,35 @@
+rule test_bigr_copy_single:
+    output:
+        "dest/file.txt"
+    params:
+        input="src/file.txt"
+    wrapper:
+        "master/bio/BiGR/copy"
+
+
+rule test_bigr_copy_duo:
+    output:
+        "dest/file1.txt",
+        "dest/file2.txt"
+    params:
+        input=["src/file1.txt", "src/file2.txt"]
+    wrapper:
+        "master/bio/BiGR/copy"
+
+
+rule test_bigr_copy_concat:
+    output:
+        "dest/file_concat.txt"
+    params:
+        input=["src/file1.txt,src/file2.txt"]
+    wrapper:
+        "master/bio/BiGR/copy"
+
+
+rule test_bigr_copy_to_dir:
+    output:
+        directory("dest_dir")
+    params:
+        input=["src/file1.txt", "src/file2.txt"]
+    wrapper:
+        "master/bio/BiGR/copy"
