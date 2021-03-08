@@ -75,9 +75,7 @@ data = pandas.merge(
     how="left"
 )
 data = data[[
-    "Gene_ID", "Gene_Name",
-    "log2FoldChange", "padj",
-    "Chromosome", "Strand"
+    "Gene_ID", "Gene_Name", "log2FoldChange", "padj"
 ]]
 #data.rename(columns={"Gene_ID": "index"}, inplace=True)
 data.set_index("Gene_ID", inplace=True)
@@ -115,8 +113,7 @@ logging.debug(data.head())
 if "filtered_counts" in snakemake.output.keys():
     logging.debug("Saving filtered counts to TSV")
     deseq_cols = {
-        "log2FoldChange", "padj", "Chromosome", "Strand",
-        "Cluster_Sig", "Cluster_FC"
+        "log2FoldChange", "padj", "Cluster_Sig", "Cluster_FC"
     }
     samples_id = set(data.columns.tolist()) - deseq_cols
     tmp = data[data["Cluster_Sig"] == "Differentially_Expressed"]
@@ -128,8 +125,7 @@ if "filtered_counts" in snakemake.output.keys():
 if "filtered_deseq2" in snakemake.output.keys():
     logging.debug("Savig filtered deseq2 to TSV")
     deseq_cols = [
-        "Gene_Name", "log2FoldChange",
-        "padj", "Chromosome", "Strand"
+        "Gene_Name", "log2FoldChange", "padj"
     ]
     tmp = data[data["Cluster_Sig"] == "Differentially_Expressed"]
     tmp = tmp[tmp["Cluster_FC"] != "Non_Significative"]
