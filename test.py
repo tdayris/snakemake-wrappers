@@ -156,6 +156,20 @@ def test_dada2_se_meta():
 
 
 @skip_if_not_modified
+def test_tximport_deseq2_meta():
+    run(
+        "meta/bio/tximport_deseq2",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "deseq2/wald/Cond_compairing_B_vs_A.tsv"
+        ],
+    )
+
+
+@skip_if_not_modified
 def test_salmon_meta():
     run(
         "meta/bio/salmon",
@@ -3614,6 +3628,13 @@ def test_pcaexplorer_pair_corr():
     )
 
 
+def test_pandas_deseq2_merge():
+    run(
+        "bio/pandas/deseq2_merge",
+        ["snakemake", "--cores", "1", "merged.tsv", "--use-conda", "-F"]
+    )
+
+
 def test_deseq2_deseq_dataset_from_tximport():
     run(
         "bio/deseq2/DESeqDataSetFromTximport",
@@ -3836,10 +3857,28 @@ def test_clusterprofiler_enriched_upsetplot():
     )
 
 
+def test_bigr_copy():
+    run(
+        "bio/BiGR/copy",
+        ["snakemake", "--cores", "1", "dest/file.txt", "--use-conda", "-pF"]
+    )
+    run(
+        "bio/BiGR/copy",
+        ["snakemake", "--cores", "1", "dest/file1.txt", "--use-conda", "-pF"]
+    )
+    run(
+        "bio/BiGR/copy",
+        ["snakemake", "--cores", "1", "dest/file_concat.txt", "--use-conda", "-pF"]
+    )
+    run(
+        "bio/BiGR/copy",
+        ["snakemake", "--cores", "1", "dest_dir", "--use-conda", "-pF"]
+    )
+
 def test_deseq2_report():
     run(
         "bio/BiGR/deseq2_report",
-        ["snakemake", "--cores", "1", "Report.html", "--use-conda", "-F"]
+        ["snakemake", "--cores", "1", "Report.html", "--use-conda", "-pF"]
     )
 
 
