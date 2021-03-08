@@ -7,8 +7,15 @@ __license__ = "MIT"
 
 from bioinfokit import visuz
 import csv
+import logging
 import os
 import pandas
+
+logging.basicConfig(
+    filename=snakemake.log[0],
+    filemode="w",
+    level=logging.DEBUG
+)
 
 
 # Recover both figure format and name from output file name
@@ -18,6 +25,7 @@ figtype = figtype.strip(".").lower()
 # Detect delimiter with python
 with open(snakemake.input[0], "r") as table:
     dialect = csv.Sniffer().sniff(table.readline())
+    logging.debug(f"Detected dialect: {dialect.delimiter}")
 
 # Loading dataset
 df = pandas.read_csv(
@@ -25,6 +33,7 @@ df = pandas.read_csv(
     sep=dialect.delimiter,
     **snakemake.params.get("read_csv", {})
 )
+logging.debug(df.head())
 
 # Building and saving volcanoplot
 visuz.gene_exp.volcano(
