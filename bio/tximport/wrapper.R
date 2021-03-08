@@ -5,6 +5,12 @@ base::library("tximport");   # Perform actual count importation in R
 base::library("readr");      # Read faster!
 base::library("jsonlite");   # Importing inferential replicates
 
+# Sink the stderr and stdout to the snakemake log file
+# https://stackoverflow.com/a/48173272
+log.file<-file(snakemake@log[[1]],open="wt");
+base::sink(log.file);
+base::sink(log.file,type="message");
+
 # Cast input paths as character to avoid errors
 samples_paths <- sapply(               # Sequentially apply
   snakemake@input[["quant"]],          # ... to all quantification paths
@@ -54,3 +60,8 @@ base::saveRDS(                       # Save R object
   object = txi,                      # The txi object
   file = snakemake@output[["txi"]]   # Output path is provided by Snakemake
 );
+
+# Proper syntax to close the connection for the log file
+# but could be optional for Snakemake wrapper
+base::sink(type="message");
+base::sink();

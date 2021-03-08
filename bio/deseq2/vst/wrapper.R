@@ -13,6 +13,12 @@ base::library(package = "DESeq2", quietly = TRUE);
 # Handle large datasets
 base::library(package = "SummarizedExperiment", quietly = TRUE);
 
+# Sink the stderr and stdout to the snakemake log file
+# https://stackoverflow.com/a/48173272
+log.file<-file(snakemake@log[[1]],open="wt");
+base::sink(log.file);
+base::sink(log.file,type="message");
+
 # Cast input path as character
 dds_path <- base::as.character(x = snakemake@input[["dds"]]);
 dds <- base::readRDS(file = dds_path);
@@ -51,3 +57,8 @@ utils::write.table(
   sep = "\t",
   quote = FALSE
 );
+
+# Proper syntax to close the connection for the log file
+# but could be optional for Snakemake wrapper
+base::sink(type="message");
+base::sink();

@@ -12,6 +12,12 @@
 base::library(package = "SummarizedExperiment", quietly = TRUE);
 base::library(package = "DESeq2", quietly = TRUE);
 
+# Sink the stderr and stdout to the snakemake log file
+# https://stackoverflow.com/a/48173272
+log.file<-file(snakemake@log[[1]],open="wt");
+base::sink(log.file);
+base::sink(log.file,type="message");
+
 cleanColData <- function(dds, factor) {
   NApos <- base::is.na(dds[[factor]]);
   dds2 <- dds[, !NApos];
@@ -172,3 +178,8 @@ if ("dst" %in% base::names(snakemake@output)) {
     file = output_rds
   );
 }
+
+# Proper syntax to close the connection for the log file
+# but could be optional for Snakemake wrapper
+base::sink(type="message");
+base::sink();
