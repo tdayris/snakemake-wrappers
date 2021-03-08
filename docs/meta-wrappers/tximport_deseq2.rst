@@ -21,9 +21,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             dds="deseq2/dds.RDS"
         output:
-            rds = "deseq2/wald/results.RDS",
+            rds = "deseq2/wald/Cond_compairing_B_vs_A.RDS",
             deseq2_result_dir = directory("deseq2/tsv"),
-            deseq2_tsv = "deseq2/wald/results.tsv",
+            deseq2_tsv = "deseq2/wald/Cond_compairing_B_vs_A.tsv",
             normalized_counts = "deseq2/dst/counts.tsv",
             dst = "deseq2/dst/counts.RDS"
         message: "Running DESeq2 analysis"
@@ -36,7 +36,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/deseq.log"
         wrapper:
-            "0.71.1-459-g6aed01be9/bio/deseq2/DESeq"
+            "0.71.1-460-g2d0d5bf6e/bio/deseq2/DESeq"
 
 
     """
@@ -61,7 +61,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/deseq2_dataset_from_tximport.log"
         wrapper:
-            "0.71.1-459-g6aed01be9/bio/deseq2/DESeqDataSetFromTximport/"
+            "0.71.1-460-g2d0d5bf6e/bio/deseq2/DESeqDataSetFromTximport/"
 
 
     """
@@ -70,7 +70,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule tximport:
         input:
-            quant=expand("quant/{sample}/quant.sf")
+            quant=expand(
+                "quant/{sample}/quant.sf",
+                sample=[f"{chr(i)}.chr21" for i in range(97, 103)]
+            )
         output:
             txi=temp("tximport/txi.RDS")
         message: "Importing counts in DESeq2"
@@ -83,7 +86,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport.log"
         wrapper:
-            "0.71.1-459-g6aed01be9/bio/tximport"
+            "0.71.1-460-g2d0d5bf6e/bio/tximport"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
@@ -106,7 +109,7 @@ The following individual wrappers are used in this meta-wrapper:
 
 * :ref:`bio/tximport`
 
-* :ref:`bio/deseq2/deseq2/DESeqDataSetFromTximport`
+* :ref:`bio/deseq2/DESeqDataSetFromTximport`
 
 * :ref:`bio/deseq2/DESeq`
 

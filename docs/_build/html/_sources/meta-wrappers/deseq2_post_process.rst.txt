@@ -39,7 +39,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bioinfokit/volcanoplot.log"
         wrapper:
-            "0.71.1-459-g6aed01be9/bio/bioinfokit/volcanoplot"
+            "0.71.1-460-g2d0d5bf6e/bio/bioinfokit/volcanoplot"
 
 
     rule bioinfokit_sample_heatmap:
@@ -63,7 +63,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bioinfokit/sample_heatmap.png"
         wrapper:
-            "0.71.1-459-g6aed01be9/bio/bioinfokit/heatmap"
+            "0.71.1-460-g2d0d5bf6e/bio/bioinfokit/heatmap"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
