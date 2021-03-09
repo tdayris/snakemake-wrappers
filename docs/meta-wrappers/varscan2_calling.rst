@@ -32,7 +32,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tabix/index/{sample}.log"
         wrapper:
-            "0.71.1-473-g5572d4839/bio/tabix"
+            "0.71.1-475-g0022d7027/bio/tabix"
 
 
     """
@@ -53,14 +53,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcards, attempt: min(attempt * 1025, 4096),
             time_min=lambda wildcards, attempt: attempt * 45
         params:
-            config.get(
-                "bcftools_concat_extra",
-                "--output-type z --threads 2"
-            )
+            "--output-type z --threads 2"
         log:
             "logs/bcftools/concat/{sample}.log"
         wrapper:
-            "0.71.1-473-g5572d4839/bio/bcftools/concat"
+            "0.71.1-475-g0022d7027/bio/bcftools/concat"
 
 
     """
@@ -79,11 +76,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcards, attempt: min(attempt * 4096, 1536),
             time_min=lambda wildcards, attempt: attempt * 45
         params:
-            extra=config.get("varscan2_indel_extra", "--output-vcf 1")
+            extra="--output-vcf 1"
         log:
             "logs/varscan/pileup2indel/call/{sample}.log"
         wrapper:
-            "0.71.1-473-g5572d4839/bio/varscan/mpileup2indel"
+            "0.71.1-475-g0022d7027/bio/varscan/mpileup2indel"
 
 
     """
@@ -102,11 +99,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcards, attempt: min(attempt * 4096, 1536),
             time_min=lambda wildcards, attempt: attempt * 45
         params:
-            extra=config.get("varscan2_snp_extra", "--output-vcf 1")
+            extra="--output-vcf 1"
         log:
             "logs/varscan/pileup2snp/call/{sample}.log"
         wrapper:
-            "0.71.1-473-g5572d4839/bio/varscan/mpileup2snp"
+            "0.71.1-475-g0022d7027/bio/varscan/mpileup2snp"
 
 
     """
@@ -128,9 +125,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/mpileup/{sample}.log"
         params:
-            extra=config.get("samtools_mpileup_extra", "")
+            extra=""
         wrapper:
-            "0.71.1-473-g5572d4839/bio/samtools/mpileup"
+            "0.71.1-475-g0022d7027/bio/samtools/mpileup"
 
 
     """
@@ -152,11 +149,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcards, attempt: min(attempt * 1024, 4098),
             time_min=lambda wildcards, attempt: attempt * 45
         params:
-            config.get("samtools_faidx_extra", "")
+            ""
         log:
             "logs/samtools/faidx/{genome}.log"
         wrapper:
-            "0.71.1-473-g5572d4839/bio/samtools/faidx"
+            "0.71.1-475-g0022d7027/bio/samtools/faidx"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
