@@ -20,7 +20,7 @@ This wrapper can be used in the following way:
             rds = "geneList.RDS",
             translation_table = "complete_table.tsv"
         wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/clusterProfiler/bitr_GRCh38"
+            "0.71.1-469-g60ea58bee/bio/clusterProfiler/bitr_GRCh38"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -77,10 +77,15 @@ Code
     # __email__ = "thibault.dayris@gustaveroussy.fr"
     # __license__ = "MIT"
 
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt");
+    base::sink(log.file);
+    base::sink(log.file,type="message");
 
     base::library(package="clusterProfiler", quietly=TRUE);
     base::library(package="org.Hs.eg.db", quietly=TRUE);
-    base::message("Libraries loaded")
+    base::message("Libraries loaded");
 
     genes_id <- "Gene_ID";
     if ("gene_id" %in% base::names(snakemake@params)) {
@@ -132,4 +137,9 @@ Code
       object = gene_list,
       file = base::as.character(snakemake@output[["rds"]])
     );
-    base::message("Gene list saved")
+    base::message("Gene list saved");
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    base::sink(type="message");
+    base::sink();

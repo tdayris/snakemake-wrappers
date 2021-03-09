@@ -28,7 +28,7 @@ This wrapper can be used in the following way:
             levels = ["A", "B"],
             factor = "Cond"
         wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/deseq2/DESeqDataSetFromTximport/"
+            "0.71.1-469-g60ea58bee/bio/deseq2/DESeqDataSetFromTximport/"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -93,6 +93,12 @@ Code
 
     # This script takes a tximport object and builds a deseq2 dataset
     # for each formula given to snakemake.
+
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt");
+    base::sink(log.file);
+    base::sink(log.file,type="message");
 
     # Perform actual count importation in R
     base::library(package = "tximport", quietly = TRUE);
@@ -172,3 +178,8 @@ Code
     );
 
     base::write("Process over.", stderr());
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    base::sink(type="message");
+    base::sink();

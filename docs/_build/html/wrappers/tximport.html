@@ -321,13 +321,13 @@ and gene-level analysis.</p>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">quant</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;quant/A/quant.sf&quot;</span><span class="p">)</span>
         <span class="c1"># Optional transcript/gene links as described in tximport</span>
-        <span class="c1"># tx2gene = /path/to/tx2gene</span>
+        <span class="c1"># tx_to_gene = /path/to/tx2gene</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">txi</span> <span class="o">=</span> <span class="s2">&quot;txi.RDS&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;type=&#39;salmon&#39;, txOut=TRUE&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-460-g2d0d5bf6e/bio/tximport&quot;</span>
+        <span class="s2">&quot;0.71.1-469-g60ea58bee/bio/tximport&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -375,6 +375,12 @@ R wrapper. Supplementary options will cause unknown parameters error.</p>
 <span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="s">&quot;tximport&quot;</span><span class="p">);</span>   <span class="c1"># Perform actual count importation in R</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="s">&quot;readr&quot;</span><span class="p">);</span>      <span class="c1"># Read faster!</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="s">&quot;jsonlite&quot;</span><span class="p">);</span>   <span class="c1"># Importing inferential replicates</span>
+
+<span class="c1"># Sink the stderr and stdout to the snakemake log file</span>
+<span class="c1"># https://stackoverflow.com/a/48173272</span>
+<span class="n">log.file</span><span class="o">&lt;-</span><span class="nf">file</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">log</span><span class="p">[[</span><span class="m">1</span><span class="p">]],</span><span class="n">open</span><span class="o">=</span><span class="s">&quot;wt&quot;</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">log.file</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">log.file</span><span class="p">,</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;message&quot;</span><span class="p">);</span>
 
 <span class="c1"># Cast input paths as character to avoid errors</span>
 <span class="n">samples_paths</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span>               <span class="c1"># Sequentially apply</span>
@@ -425,6 +431,11 @@ R wrapper. Supplementary options will cause unknown parameters error.</p>
   <span class="n">object</span> <span class="o">=</span> <span class="n">txi</span><span class="p">,</span>                      <span class="c1"># The txi object</span>
   <span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;txi&quot;</span><span class="p">]]</span>   <span class="c1"># Output path is provided by Snakemake</span>
 <span class="p">);</span>
+
+<span class="c1"># Proper syntax to close the connection for the log file</span>
+<span class="c1"># but could be optional for Snakemake wrapper</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;message&quot;</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>

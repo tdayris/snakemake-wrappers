@@ -41,7 +41,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/salmon/quant/{sample}.log"
         wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/salmon/quant"
+            "0.71.1-469-g60ea58bee/bio/salmon/quant"
 
 
     """
@@ -81,7 +81,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/salmon/index.log"
         wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/salmon/index"
+            "0.71.1-469-g60ea58bee/bio/salmon/index"
 
 
     """
@@ -106,7 +106,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/salmon/decoys.log"
         wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/salmon/generate_decoy"
+            "0.71.1-469-g60ea58bee/bio/salmon/generate_decoy"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

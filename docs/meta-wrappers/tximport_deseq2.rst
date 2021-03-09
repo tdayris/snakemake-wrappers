@@ -13,6 +13,45 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    import os.path
+
+    normalized_counts_rst = (
+        "reports/normalized_counts.rst"
+        if os.path.exists("reports/normalized_counts.rst")
+        else None
+    )
+
+    deseq2_rst = (
+        "reports/deseq2_tsv.rst"
+        if os.path.exists("reports/deseq2_tsv.rst")
+        else None
+    )
+
+
+    """
+    This rule merges and filters DESeq2 results in order to have human-sized
+    result tables.
+    """
+    rule filter_deseq2:
+        input:
+            wald_tsv = "deseq2/wald/Cond_compairing_B_vs_A.tsv",
+            dst_tsv = "deseq2/dst/Cond_compairing_B_vs_A.tsv",
+            gene2gene = "deseq2/gene2gene.tsv"
+        output:
+            filtered_counts="deseq2/filtered/filtered_counts.tsv",
+            filtered_deseq2="deseq2/filtered/filtered_deseq2.tsv",
+            merged_table="deseq2/filtered/merged.tsv"
+        message: "Filtering and merging DESeq2 results"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: attempt * 4096,
+            time_min=lambda wildcard, attempt: attempt * 20
+        log:
+            "logs/deseq2/filter.log"
+        wrapper:
+            "0.71.1-469-g60ea58bee/bio/pandas/deseq2_merge"
+
+
     """
     This rule performs the size factor and dispersions estimations as well as the
     wald test.
@@ -21,11 +60,19 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             dds="deseq2/dds.RDS"
         output:
-            rds = "deseq2/wald/Cond_compairing_B_vs_A.RDS",
-            deseq2_result_dir = directory("deseq2/tsv"),
-            deseq2_tsv = "deseq2/wald/Cond_compairing_B_vs_A.tsv",
-            normalized_counts = "deseq2/dst/counts.tsv",
-            dst = "deseq2/dst/counts.RDS"
+            rds="deseq2/wald/Cond_compairing_B_vs_A.RDS",
+            deseq2_result_dir=directory("deseq2/tsv"),
+            deseq2_tsv=report(
+                "deseq2/wald/Cond_compairing_B_vs_A.tsv",
+                caption=deseq2_rst,
+                category="DESeq2 results"
+            ),
+            normalized_counts=report(
+                "deseq2/dst/Cond_compairing_B_vs_A.tsv",
+                caption=normalized_counts_rst ,
+                category="Normalized counts"
+            ),
+            dst="deseq2/dst/Cond_compairing_B_vs_A.RDS"
         message: "Running DESeq2 analysis"
         threads: 1
         resources:
@@ -36,7 +83,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/deseq.log"
         wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/deseq2/DESeq"
+            "0.71.1-469-g60ea58bee/bio/deseq2/DESeq"
 
 
     """
@@ -55,13 +102,13 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcard, attempt: min(attempt * 3072, 20480),
             time_min=lambda wildcard, attempt: attempt * 45
         params:
-            design=config.get("deseq2_formula", "~Condition"),
+            design=config.get("deseq2_formula", "~Cond"),
             levels=config.get("deseq2_levels", ["A", "B"]),
-            factor=config.get("deseq2_factor", "Condition")
+            factor=config.get("deseq2_factor", "Cond")
         log:
             "logs/deseq2/deseq2_dataset_from_tximport.log"
         wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/deseq2/DESeqDataSetFromTximport/"
+            "0.71.1-469-g60ea58bee/bio/deseq2/DESeqDataSetFromTximport/"
 
 
     """
@@ -73,7 +120,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             quant=expand(
                 "quant/{sample}/quant.sf",
                 sample=[f"{chr(i)}.chr21" for i in range(97, 103)]
-            )
+            ),
+            tx_to_gene="tximport/tx2gene.tsv"
         output:
             txi=temp("tximport/txi.RDS")
         message: "Importing counts in DESeq2"
@@ -82,11 +130,38 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcard, input: len(input.quant) * 1024,
             time_min=lambda wildcard, attempt: attempt * 45
         params:
-            extra=config.get("tximport_extra", "type='salmon'")
+            extra=config.get(
+                "tximport_extra",
+                "type='salmon', ignoreTxVersion=TRUE, ignoreAfterBar=TRUE"
+            )
         log:
             "logs/tximport.log"
         wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/tximport"
+            "0.71.1-469-g60ea58bee/bio/tximport"
+
+
+    """
+    This rule build the conversion table from transcript to genes and their names.
+    """
+    rule tx_to_gene:
+        input:
+            gtf="refs/ensembl/chr21.gtf"
+        output:
+            tx2gene_small="tximport/tx2gene.tsv"
+        message: "Building transcripts/genes conversion table"
+        cache: True
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: attempt * 1536,
+            time_min=lambda wildcard, attempt: attempt * 45
+        params:
+            gencode = True,
+            header = True,
+            positions = True
+        log:
+            "logs/tximport/tx2gene.log"
+        wrapper:
+            "0.71.1-469-g60ea58bee/bio/gtf/tx2gene"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
@@ -107,11 +182,15 @@ Used wrappers
 The following individual wrappers are used in this meta-wrapper:
 
 
+* :ref:`bio/gtf/tx2gene`
+
 * :ref:`bio/tximport`
 
 * :ref:`bio/deseq2/DESeqDataSetFromTximport`
 
 * :ref:`bio/deseq2/DESeq`
+
+* :ref:`bio/pandas/deseq2_merge`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.

@@ -20,7 +20,7 @@ This wrapper can be used in the following way:
             rds = "enrichGO.RDS",
             tsv = "enrichGO.tsv"
         wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/clusterProfiler/enrichGO"
+            "0.71.1-469-g60ea58bee/bio/clusterProfiler/enrichGO"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -85,12 +85,17 @@ Code
     # __email__ = "thibault.dayris@gustaveroussy.fr"
     # __license__ = "MIT"
 
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt");
+    base::sink(log.file);
+    base::sink(log.file,type="message");
+
     # Perform gene enrichment
     base::library(package = "DOSE", quietly = TRUE);
     base::library(package = "clusterProfiler", quietly = TRUE);
     # Loading databases
     base::library(package = "org.Hs.eg.db", quietly = TRUE);
-
 
     # Loading input dataset
     geneList <- base::readRDS(
@@ -136,3 +141,8 @@ Code
       x = gse_do,
       file = snakemake@output[["tsv"]]
     );
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    base::sink(type="message");
+    base::sink();

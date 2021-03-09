@@ -1,0 +1,210 @@
+.. _`bio/bioinfokit/pca`:
+
+PCA
+===
+
+Build a PCA and plot-it with Bioinfokit and scikit-learn
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_bioinfokit_pca:
+        input:
+            counts=""
+        output:
+            pca_2d=""
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioinfokit=1.0.8``
+* ``numpy=1.20.1``
+* ``pandas=1.2.3``
+* ``matplotlib=3.3.4``
+* ``seaborn=0.11.1``
+* ``matplotlib-venn=0.11.6``
+* ``adjusttext=0.7.3.1``
+
+Input/Output
+------------
+**Input:**
+
+* Normalized counts of each sample
+
+**Output:**
+
+* PNG-formatted PCA
+* Optional PNG-formatted Scree-plot
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for bioinfokit PCA"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020"
+    __email__ = "Thibault Dayris"
+    __license__ = "MIT"
+
+    import bioinfokit.visuz
+    import csv
+    import logging
+    import matplotlib.pyplot
+    import numpy
+    import os
+    import pandas
+    import seaborn
+
+
+    from sklearn.decomposition import PCA
+    from sklearn.preprocessing import StandardScaler
+
+
+    logging.basicConfig(
+        filename=snakemake.log[0],
+        filemode="w",
+        level=logging.DEBUG
+    )
+
+    # Detect delimiter with python
+    with open(snakemake.input[0], "r") as table:
+        dialect = csv.Sniffer().sniff(table.readline())
+
+    # Loading dataset
+    counts = pandas.read_csv(
+        snakemake.input[0],
+        sep=dialect.delimiter,
+        **snakemake.params.get("read_csv", {})
+    )
+
+    if snakemake.params.get("standardize", False) is True:
+        logging.debug("Standardizing data")
+        tmp = StandardScaler().fit_transform(counts)
+        counts = pandas.DataFrame(tmp, columns=counts.columns)
+        del tmp
+
+    logging.debug(counts.head())
+
+    pca = PCA().fit(counts)
+    loadings = pca.components_
+    num_pc = pca.n_features_
+
+    pc_list = ["PC"+str(i) for i in list(range(1, num_pc+1))]
+    loadings_df = pandas.DataFrame.from_dict(dict(zip(pc_list, loadings)))
+    loadings_df['variable'] = counts.columns.values
+    loadings_df = loadings_df.set_index('variable')
+    logging.debug("PCA loadings:")
+    logging.debug(loadings_df)
+
+    if "loadings_correlation_heatmap" in snakemake.output.keys():
+        logging.debug("Saving correlation heatmap")
+        seaborn.clustermap(
+            loadings_df, annot=True, cmap='Spectral',
+            row_cluster=True, col_cluster=True
+        )
+        matplotlib.pyplot.savefig(
+            snakemake.output["loadings_correlation_heatmap"],
+            bbox_inches="tight"
+        )
+
+
+    if "pca_scree" in snakemake.output.keys():
+        logging.debug("Saving PCA Screen plot")
+        bioinfokit.visuz.cluster.screeplot(
+            obj=[pc_list, pca.explained_variance_ratio_]
+        )
+        matplotlib.pyplot.savefig(
+            snakemake.output["pca_scree"],
+            bbox_inches="tight"
+        )
+
+
+    if "pca_2d" in snakemake.output.keys():
+        logging.debug("Saving 2D PCA")
+        bioinfokit.visuz.cluster.pcaplot(
+            x=loadings[0],
+            y=loadings[1],
+            labels=counts.columns.values,
+            var1=round(pca_out.explained_variance_ratio_[0]*100, 2),
+            var2=round(pca_out.explained_variance_ratio_[1]*100, 2),
+            show=False
+        )
+        matplotlib.pyplot.savefig(
+            snakemake.output["pca_2d"],
+            bbox_inches="tight"
+        )
+
+
+    if "pca_3d" in snakemake.output.keys():
+        logging.debug("Saving 3D PCA")
+        bioinfokit.visuz.cluster.pcaplot(
+            x=loadings[0],
+            y=loadings[1],
+            z=loadings[2],
+            labels=counts.columns.values,
+            var1=round(pca_out.explained_variance_ratio_[0]*100, 2),
+            var2=round(pca_out.explained_variance_ratio_[1]*100, 2),
+            var3=round(pca_out.explained_variance_ratio_[2]*100, 2),
+            show=False
+        )
+        matplotlib.pyplot.savefig(
+            snakemake.output["pca_3d"],
+            bbox_inches="tight"
+        )
+
+
+    if "biplot_2d" in snakemake.output.keys():
+        logging.debug("Saving 2D biplot")
+        bioinfokit.visuz.cluster.biplot(
+            cscore=pca_scores,
+            loadings=loadings,
+            labels=counts.columns.values,
+            var1=round(pca_out.explained_variance_ratio_[0]*100, 2),
+            var2=round(pca_out.explained_variance_ratio_[1]*100, 2),
+            show=False
+        )
+        matplotlib.pyplot.savefig(
+            snakemake.output["biplot_2d"],
+            bbox_inches="tight"
+        )
+
+    if "biplot_3d" in snakemake.output.keys():
+        logging.debug("Saving 2D biplot")
+        bioinfokit.visuz.cluster.biplot(
+            cscore=pca_scores,
+            loadings=loadings,
+            labels=counts.columns.values,
+            var1=round(pca_out.explained_variance_ratio_[0]*100, 2),
+            var2=round(pca_out.explained_variance_ratio_[1]*100, 2),
+            var3=round(pca_out.explained_variance_ratio_[2]*100, 2),
+            show=False
+        )
+        matplotlib.pyplot.savefig(
+            snakemake.output["biplot_3d"],
+            bbox_inches="tight"
+        )

@@ -25,7 +25,7 @@ This wrapper can be used in the following way:
         log:
             "logs.log"
         wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/pandas/deseq2_merge"
+            "0.71.1-469-g60ea58bee/bio/pandas/deseq2_merge"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -131,12 +131,12 @@ Code
         index_col=0,
         dtype={
             1: str,
-            2: numpy.float,
-            3: numpy.float,
-            4: numpy.float,
-            5: numpy.float,
-            6: numpy.float,
-            7: numpy.float,
+            2: float,
+            3: float,
+            4: float,
+            5: float,
+            6: float,
+            7: float,
         }
     )
 
@@ -148,26 +148,25 @@ Code
         header=0,
         index_col=None
     )
+    genetable.set_index("Gene_ID", inplace=True)
     logging.debug(genetable.head())
 
     data = pandas.merge(
         data.copy(),
         genetable,
         left_index=True,
-        right_on="Gene_ID",
+        right_index=True,
         how="left"
     )
+    logging.debug(data.head())
     data = data[[
-        "Gene_ID", "Gene_Name",
-        "log2FoldChange", "padj",
-        "Chromosome", "Strand"
+        "Gene_Name", "log2FoldChange", "padj"
     ]]
-    #data.rename(columns={"Gene_ID": "index"}, inplace=True)
-    data.set_index("Gene_ID", inplace=True)
+
     logging.debug(data.head())
 
     padjthreshold = float(snakemake.params.get("alpha", 0.05))
-    fc_threshold = float(snakemake.params.get("fold_change", 0.01))
+    fc_threshold = float(snakemake.params.get("fold_change", 0.001))
 
 
     data["Cluster_FC"] = [
@@ -194,32 +193,40 @@ Code
         right_index=True
     )
     logging.debug(data.head())
+    try:
+        data.set_index("Gene_Name", inplace=True)
+    except IndexError:
+        logging.debug(
+            "Duplicate gene name in Gene_Name column. They won't be used as genes "
+            "identifiers since it would lead to errors."
+        )
+    logging.debug(data.head())
 
     if "filtered_counts" in snakemake.output.keys():
         logging.debug("Saving filtered counts to TSV")
         deseq_cols = {
-            "log2FoldChange", "padj", "Chromosome", "Strand",
-            "Cluster_Sig", "Cluster_FC"
+            "log2FoldChange", "padj", "Cluster_Sig",
+            "Cluster_FC", "index", "Gene_Name"
         }
         samples_id = set(data.columns.tolist()) - deseq_cols
         tmp = data[data["Cluster_Sig"] == "Differentially_Expressed"]
         tmp = tmp[tmp["Cluster_FC"] != "Non_Significative"]
-        tmp = data[list(samples_id)]
+        tmp = tmp[list(samples_id)]
         tmp.to_csv(snakemake.output["filtered_counts"], sep="\t")
         del tmp
 
     if "filtered_deseq2" in snakemake.output.keys():
         logging.debug("Savig filtered deseq2 to TSV")
         deseq_cols = [
-            "Gene_Name", "log2FoldChange",
-            "padj", "Chromosome", "Strand"
+            "log2FoldChange", "padj"
         ]
         tmp = data[data["Cluster_Sig"] == "Differentially_Expressed"]
         tmp = tmp[tmp["Cluster_FC"] != "Non_Significative"]
-        tmp = data[deseq_cols]
+        tmp = tmp[deseq_cols]
         tmp.to_csv(snakemake.output["filtered_deseq2"], sep="\t")
         del tmp
 
     if "merged_table" in snakemake.output.keys():
         logging.debug("Saving complete table to TSV")
         data.to_csv(snakemake.output["merged_table"], sep="\t")
+        logging.debug(tmp.head())

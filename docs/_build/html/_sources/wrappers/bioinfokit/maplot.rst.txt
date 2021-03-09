@@ -27,8 +27,10 @@ This wrapper can be used in the following way:
                 'legendpos': 'lower right',
                 'legendlabels': ['Upregulated', 'Normal', 'Downregulated']
             }
+        log:
+            "bioinfokit.log"
         wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/bioinfokit/maplot"
+            "0.71.1-469-g60ea58bee/bio/bioinfokit/maplot"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -42,12 +44,12 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``bioinfokit=1.0.0``
-* ``numpy=1.19.2``
-* ``pandas=1.1.3``
-* ``matplotlib=3.3.2``
-* ``seaborn=0.11.0``
-* ``matplotlib-venn=0.11.5``
+* ``bioinfokit=1.0.8``
+* ``numpy=1.20.1``
+* ``pandas=1.2.3``
+* ``matplotlib=3.3.4``
+* ``seaborn=0.11.1``
+* ``matplotlib-venn=0.11.6``
 * ``adjusttext=0.7.3.1``
 
 Input/Output
@@ -92,9 +94,16 @@ Code
 
     from bioinfokit import visuz
     import csv
+    import logging
     import os
     import pandas
 
+
+    logging.basicConfig(
+        filename=snakemake.log[0],
+        filemode="w",
+        level=logging.DEBUG
+    )
 
     # Recover both figure format and name from output file name
     figname, figtype = os.path.splitext(snakemake.output[0])
@@ -103,6 +112,7 @@ Code
     # Detect delimiter with python
     with open(snakemake.input[0], "r") as table:
         dialect = csv.Sniffer().sniff(table.readline())
+        logging.debug(f"Detected dialect: {dialect.delimiter}")
 
     # Loading dataset
     df = pandas.read_csv(
@@ -110,6 +120,7 @@ Code
         sep=dialect.delimiter,
         **snakemake.params.get("read_csv", {})
     )
+    logging.debug(df.head())
 
     # Building and saving volcanoplot
     visuz.gene_exp.ma(

@@ -96,9 +96,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="bioinfokit.html">DESEQ2_POST_PROCESS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="clean_ngs.html">CLEAN_NGS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cluster_profiler.html">CLUSTER_PROFILER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_pe.html">DADA2-PE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_se.html">DADA2-SE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deseq2_post_process.html">DESEQ2_POST_PROCESS</a></li>
@@ -193,7 +195,46 @@
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This meta-wrapper can be used by integrating the following into your workflow:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="n">normalized_counts_rst</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;reports/normalized_counts.rst&quot;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;reports/normalized_counts.rst&quot;</span><span class="p">)</span>
+    <span class="k">else</span> <span class="kc">None</span>
+<span class="p">)</span>
+
+<span class="n">deseq2_rst</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;reports/deseq2_tsv.rst&quot;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;reports/deseq2_tsv.rst&quot;</span><span class="p">)</span>
+    <span class="k">else</span> <span class="kc">None</span>
+<span class="p">)</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule merges and filters DESeq2 results in order to have human-sized</span>
+<span class="sd">result tables.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">filter_deseq2</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">wald_tsv</span> <span class="o">=</span> <span class="s2">&quot;deseq2/wald/Cond_compairing_B_vs_A.tsv&quot;</span><span class="p">,</span>
+        <span class="n">dst_tsv</span> <span class="o">=</span> <span class="s2">&quot;deseq2/dst/Cond_compairing_B_vs_A.tsv&quot;</span><span class="p">,</span>
+        <span class="n">gene2gene</span> <span class="o">=</span> <span class="s2">&quot;deseq2/gene2gene.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">filtered_counts</span><span class="o">=</span><span class="s2">&quot;deseq2/filtered/filtered_counts.tsv&quot;</span><span class="p">,</span>
+        <span class="n">filtered_deseq2</span><span class="o">=</span><span class="s2">&quot;deseq2/filtered/filtered_deseq2.tsv&quot;</span><span class="p">,</span>
+        <span class="n">merged_table</span><span class="o">=</span><span class="s2">&quot;deseq2/filtered/merged.tsv&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Filtering and merging DESeq2 results&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/deseq2/filter.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-469-g60ea58bee/bio/pandas/deseq2_merge&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule performs the size factor and dispersions estimations as well as the</span>
 <span class="sd">wald test.</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -201,11 +242,19 @@
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">dds</span><span class="o">=</span><span class="s2">&quot;deseq2/dds.RDS&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">rds</span> <span class="o">=</span> <span class="s2">&quot;deseq2/wald/Cond_compairing_B_vs_A.RDS&quot;</span><span class="p">,</span>
-        <span class="n">deseq2_result_dir</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;deseq2/tsv&quot;</span><span class="p">),</span>
-        <span class="n">deseq2_tsv</span> <span class="o">=</span> <span class="s2">&quot;deseq2/wald/Cond_compairing_B_vs_A.tsv&quot;</span><span class="p">,</span>
-        <span class="n">normalized_counts</span> <span class="o">=</span> <span class="s2">&quot;deseq2/dst/counts.tsv&quot;</span><span class="p">,</span>
-        <span class="n">dst</span> <span class="o">=</span> <span class="s2">&quot;deseq2/dst/counts.RDS&quot;</span>
+        <span class="n">rds</span><span class="o">=</span><span class="s2">&quot;deseq2/wald/Cond_compairing_B_vs_A.RDS&quot;</span><span class="p">,</span>
+        <span class="n">deseq2_result_dir</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;deseq2/tsv&quot;</span><span class="p">),</span>
+        <span class="n">deseq2_tsv</span><span class="o">=</span><span class="n">report</span><span class="p">(</span>
+            <span class="s2">&quot;deseq2/wald/Cond_compairing_B_vs_A.tsv&quot;</span><span class="p">,</span>
+            <span class="n">caption</span><span class="o">=</span><span class="n">deseq2_rst</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;DESeq2 results&quot;</span>
+        <span class="p">),</span>
+        <span class="n">normalized_counts</span><span class="o">=</span><span class="n">report</span><span class="p">(</span>
+            <span class="s2">&quot;deseq2/dst/Cond_compairing_B_vs_A.tsv&quot;</span><span class="p">,</span>
+            <span class="n">caption</span><span class="o">=</span><span class="n">normalized_counts_rst</span> <span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;Normalized counts&quot;</span>
+        <span class="p">),</span>
+        <span class="n">dst</span><span class="o">=</span><span class="s2">&quot;deseq2/dst/Cond_compairing_B_vs_A.RDS&quot;</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Running DESeq2 analysis&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
@@ -216,7 +265,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deseq2/deseq.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-460-g2d0d5bf6e/bio/deseq2/DESeq&quot;</span>
+        <span class="s2">&quot;0.71.1-469-g60ea58bee/bio/deseq2/DESeq&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -235,13 +284,13 @@
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">3072</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">design</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deseq2_formula&quot;</span><span class="p">,</span> <span class="s2">&quot;~Condition&quot;</span><span class="p">),</span>
+        <span class="n">design</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deseq2_formula&quot;</span><span class="p">,</span> <span class="s2">&quot;~Cond&quot;</span><span class="p">),</span>
         <span class="n">levels</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deseq2_levels&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]),</span>
-        <span class="n">factor</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deseq2_factor&quot;</span><span class="p">,</span> <span class="s2">&quot;Condition&quot;</span><span class="p">)</span>
+        <span class="n">factor</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deseq2_factor&quot;</span><span class="p">,</span> <span class="s2">&quot;Cond&quot;</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deseq2/deseq2_dataset_from_tximport.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-460-g2d0d5bf6e/bio/deseq2/DESeqDataSetFromTximport/&quot;</span>
+        <span class="s2">&quot;0.71.1-469-g60ea58bee/bio/deseq2/DESeqDataSetFromTximport/&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -253,7 +302,8 @@
         <span class="n">quant</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;quant/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="si">}</span><span class="s2">.chr21&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">97</span><span class="p">,</span> <span class="mi">103</span><span class="p">)]</span>
-        <span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">tx_to_gene</span><span class="o">=</span><span class="s2">&quot;tximport/tx2gene.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">txi</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;tximport/txi.RDS&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Importing counts in DESeq2&quot;</span>
@@ -262,11 +312,38 @@
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">quant</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tximport_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;type=&#39;salmon&#39;&quot;</span><span class="p">)</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;tximport_extra&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type=&#39;salmon&#39;, ignoreTxVersion=TRUE, ignoreAfterBar=TRUE&quot;</span>
+        <span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/tximport.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-460-g2d0d5bf6e/bio/tximport&quot;</span>
+        <span class="s2">&quot;0.71.1-469-g60ea58bee/bio/tximport&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule build the conversion table from transcript to genes and their names.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">tx_to_gene</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">gtf</span><span class="o">=</span><span class="s2">&quot;refs/ensembl/chr21.gtf&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">tx2gene_small</span><span class="o">=</span><span class="s2">&quot;tximport/tx2gene.tsv&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Building transcripts/genes conversion table&quot;</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1536</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">gencode</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/tximport/tx2gene.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.71.1-469-g60ea58bee/bio/gtf/tx2gene&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
@@ -281,9 +358,11 @@ For additional parameters in each individual wrapper, please refer to their corr
 <h2>Used wrappers<a class="headerlink" href="#used-wrappers" title="Permalink to this headline">¶</a></h2>
 <p>The following individual wrappers are used in this meta-wrapper:</p>
 <ul class="simple">
+<li><p><a class="reference internal" href="../wrappers/gtf/tx2gene.html#bio-gtf-tx2gene"><span class="std std-ref">TX2GENE</span></a></p></li>
 <li><p><a class="reference internal" href="../wrappers/tximport.html#bio-tximport"><span class="std std-ref">TXIMPORT</span></a></p></li>
 <li><p><a class="reference internal" href="../wrappers/deseq2/DESeqDataSetFromTximport.html#bio-deseq2-deseqdatasetfromtximport"><span class="std std-ref">DESEQ DATASET FROM TXIMPORT</span></a></p></li>
 <li><p><a class="reference internal" href="../wrappers/deseq2/DESeq.html#bio-deseq2-deseq"><span class="std std-ref">DESEQ</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/pandas/deseq2_merge.html#bio-pandas-deseq2-merge"><span class="std std-ref">DESEQ2 MERGE</span></a></p></li>
 </ul>
 <p>Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.</p>
 </div>
