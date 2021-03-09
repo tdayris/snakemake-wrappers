@@ -8,16 +8,16 @@
 # This script takes a deseq2 dataset object and performs
 # a variance stabilizing transformations transformation on it
 
-# Differential Gene expression
-base::library(package = "DESeq2", quietly = TRUE);
-# Handle large datasets
-base::library(package = "SummarizedExperiment", quietly = TRUE);
-
 # Sink the stderr and stdout to the snakemake log file
 # https://stackoverflow.com/a/48173272
 log.file<-file(snakemake@log[[1]],open="wt");
 base::sink(log.file);
 base::sink(log.file,type="message");
+
+# Differential Gene expression
+base::library(package = "DESeq2", quietly = TRUE);
+# Handle large datasets
+base::library(package = "SummarizedExperiment", quietly = TRUE);
 
 # Cast input path as character
 dds_path <- base::as.character(x = snakemake@input[["dds"]]);

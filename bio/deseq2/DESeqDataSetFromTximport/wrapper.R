@@ -8,6 +8,12 @@
 # This script takes a tximport object and builds a deseq2 dataset
 # for each formula given to snakemake.
 
+# Sink the stderr and stdout to the snakemake log file
+# https://stackoverflow.com/a/48173272
+log.file<-file(snakemake@log[[1]],open="wt");
+base::sink(log.file);
+base::sink(log.file,type="message");
+
 # Perform actual count importation in R
 base::library(package = "tximport", quietly = TRUE);
 # Read faster!
@@ -18,12 +24,6 @@ base::library(package = "jsonlite", quietly = TRUE);
 base::library(package = "DESeq2", quietly = TRUE);
 
 base::write("Libraries loaded.", stderr());
-
-# Sink the stderr and stdout to the snakemake log file
-# https://stackoverflow.com/a/48173272
-log.file<-file(snakemake@log[[1]],open="wt");
-base::sink(log.file);
-base::sink(log.file,type="message");
 
 # Load txi object
 txi_rds_path <- base::as.character(x = snakemake@input[["tximport"]]);

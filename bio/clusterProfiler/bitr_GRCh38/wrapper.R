@@ -8,10 +8,15 @@
 # __email__ = "thibault.dayris@gustaveroussy.fr"
 # __license__ = "MIT"
 
+# Sink the stderr and stdout to the snakemake log file
+# https://stackoverflow.com/a/48173272
+log.file<-file(snakemake@log[[1]],open="wt");
+base::sink(log.file);
+base::sink(log.file,type="message");
 
 base::library(package="clusterProfiler", quietly=TRUE);
 base::library(package="org.Hs.eg.db", quietly=TRUE);
-base::message("Libraries loaded")
+base::message("Libraries loaded");
 
 genes_id <- "Gene_ID";
 if ("gene_id" %in% base::names(snakemake@params)) {
@@ -63,4 +68,9 @@ base::saveRDS(
   object = gene_list,
   file = base::as.character(snakemake@output[["rds"]])
 );
-base::message("Gene list saved")
+base::message("Gene list saved");
+
+# Proper syntax to close the connection for the log file
+# but could be optional for Snakemake wrapper
+base::sink(type="message");
+base::sink();

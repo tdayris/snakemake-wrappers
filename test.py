@@ -170,6 +170,22 @@ def test_tximport_deseq2_meta():
 
 
 @skip_if_not_modified
+def test_bioinfokit_meta():
+    run(
+        "meta/bio/bioinfokit",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            # "bioinfokit/figures/volcanoplot.png",
+            "bioinfokit/figures/sample_heatmap.png",
+            #"bioinfokit/figures/maplot.png",
+        ],
+    )
+
+
+@skip_if_not_modified
 def test_salmon_meta():
     run(
         "meta/bio/salmon",
