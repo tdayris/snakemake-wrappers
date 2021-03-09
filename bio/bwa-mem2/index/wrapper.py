@@ -7,7 +7,7 @@ from os import path
 
 from snakemake.shell import shell
 
-log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 # Check inputs/arguments.
 if len(snakemake.input) == 0:
@@ -21,4 +21,4 @@ prefix = snakemake.params.get("prefix", "")
 if len(prefix) > 0:
     prefix = "-p " + prefix
 
-shell("bwa-mem2 index" " {prefix}" " {snakemake.input[0]}" " {log}")
+shell("bwa-mem2 index {prefix} {snakemake.input[0]} {log}")
