@@ -27,8 +27,7 @@ rule samtools_sort_coordinate:
         "samtools/sort/{sample}.bam"
     message:
         "Sorting {wildcards.sample} reads by query name for fixing mates"
-    threads:
-        config.get("threads", 10)
+    threads: 20
     resources:
         mem_mb=lambda wildcards, threads: threads * 1792,
         time_min=lambda wildcards, attempt: attempt * 90
@@ -50,7 +49,7 @@ rule samtools_fixmate:
     output:
         temp("samtools/fixmate/{sample}.bam")
     message: "Fixing mate annotation on {wildcards.sample} with Samtools"
-    threads: config.get("threads", 20)
+    threads: 20
     resources:
         mem_mb = (
             lambda wildcards, attempt: min(attempt * 2048 + 2048, 8192)
@@ -82,7 +81,7 @@ rule bwa_mem:
     output:
         temp("bwa_mem2/mem/{sample}.bam")
     message: "Mapping {wildcards.sample} with BWA"
-    threads: config.get("threads", 20)
+    threads: 20
     resources:
         mem_mb = (
             lambda wildcards, attempt: min(attempt * 6144 + 2048, 20480)

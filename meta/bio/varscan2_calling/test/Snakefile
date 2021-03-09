@@ -38,10 +38,7 @@ rule bcftools_concat:
         mem_mb=lambda wildcards, attempt: min(attempt * 1025, 4096),
         time_min=lambda wildcards, attempt: attempt * 45
     params:
-        config.get(
-            "bcftools_concat_extra",
-            "--output-type z --threads 2"
-        )
+        "--output-type z --threads 2"
     log:
         "logs/bcftools/concat/{sample}.log"
     wrapper:
@@ -64,7 +61,7 @@ rule varscan2_indel_calling:
         mem_mb=lambda wildcards, attempt: min(attempt * 4096, 1536),
         time_min=lambda wildcards, attempt: attempt * 45
     params:
-        extra=config.get("varscan2_indel_extra", "--output-vcf 1")
+        extra="--output-vcf 1"
     log:
         "logs/varscan/pileup2indel/call/{sample}.log"
     wrapper:
@@ -87,7 +84,7 @@ rule varscan2_snp_calling:
         mem_mb=lambda wildcards, attempt: min(attempt * 4096, 1536),
         time_min=lambda wildcards, attempt: attempt * 45
     params:
-        extra=config.get("varscan2_snp_extra", "--output-vcf 1")
+        extra="--output-vcf 1"
     log:
         "logs/varscan/pileup2snp/call/{sample}.log"
     wrapper:
@@ -113,7 +110,7 @@ rule samtools_mpilup:
     log:
         "logs/samtools/mpileup/{sample}.log"
     params:
-        extra=config.get("samtools_mpileup_extra", "")
+        extra=""
     wrapper:
         "master/bio/samtools/mpileup"
 
@@ -137,7 +134,7 @@ rule samtools_faidx:
         mem_mb=lambda wildcards, attempt: min(attempt * 1024, 4098),
         time_min=lambda wildcards, attempt: attempt * 45
     params:
-        config.get("samtools_faidx_extra", "")
+        ""
     log:
         "logs/samtools/faidx/{genome}.log"
     wrapper:
