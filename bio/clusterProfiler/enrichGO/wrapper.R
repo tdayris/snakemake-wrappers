@@ -25,43 +25,38 @@ geneList <- base::readRDS(
   file = snakemake@input[["rds"]]
 );
 
-extra <- "geneList, verbose = TRUE";
-if ("gseDO_extra" %in% base::names(snakemake@params)) {
+extra <- "gene = base::names(geneList), readable = TRUE";
+if ("enrichGO_extra" %in% snakemake@params) {
   extra <- base::paste(
     extra,
-    snakemake@params[["gseDO_extra"]],
+    snakemake@params[["enrichGO_extra"]],
     sep = ", "
   )
 }
 
 command <- base::paste0(
-  "DOSE::gseDO(",
+  "clusterProfiler::enrichGO(",
   extra,
   ")"
 );
 base::message("Libraries and datasets loaded");
 base::message(command);
 
-# Performing GO enrichment
-gse_do <- base::eval(
+# Performing DisGeNET enrichment
+edgn <- base::eval(
   base::parse(
     text = command
   )
 );
 
-gse_do <- DOSE::setReadable(
-    x = gse_do,
-    OrgDb = org.Hs.eg.db
-);
-
 # Saving results
 base::saveRDS(
-  obj = gse_do,
+  obj = edgn,
   file = snakemake@output[["rds"]]
 );
 
 utils::write.table(
-  x = gse_do,
+  x = edgn,
   file = snakemake@output[["tsv"]]
 );
 
