@@ -206,7 +206,7 @@ def test_bwa_fixmate_meta():
         [
             "snakemake",
             "--cores",
-            "1",
+            "1", "-pr",
             "--use-conda",
             "samtools/sort/a.bam.bai"
         ]
