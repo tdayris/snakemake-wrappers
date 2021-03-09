@@ -29,7 +29,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/sort/{sample}.log"
         wrapper:
-            "0.71.1-469-g60ea58bee/bio/samtools/index"
+            "0.71.1-473-g5572d4839/bio/samtools/index"
 
 
     """
@@ -52,7 +52,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra = "-m 1536M"
         wrapper:
-            "0.71.1-469-g60ea58bee/bio/samtools/sort"
+            "0.71.1-473-g5572d4839/bio/samtools/sort"
 
 
     """
@@ -61,11 +61,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule samtools_fixmate:
         input:
-            "bwa/mem/{sample}.bam"
+            "bwa_mem2/mem/{sample}.bam"
         output:
             temp("samtools/fixmate/{sample}.bam")
         message: "Fixing mate annotation on {wildcards.sample} with Samtools"
-        threads: config.get("threads", 10)
+        threads: config.get("threads", 20)
         resources:
             mem_mb = (
                 lambda wildcards, attempt: min(attempt * 2048 + 2048, 8192)
@@ -78,7 +78,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/fixmate/{sample}.log"
         wrapper:
-            "0.71.1-469-g60ea58bee/bio/samtools/fixmate"
+            "0.71.1-473-g5572d4839/bio/samtools/fixmate"
 
 
     """
@@ -92,12 +92,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 allow_missing=True
             ),
             index=multiext(
-                "bwa/index/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"
+                "bwa_mem2/index/genome", ".0123", ".amb", ".ann", ".pac"
             )
         output:
-            temp("bwa/mem/{sample}.bam")
+            temp("bwa_mem2/mem/{sample}.bam")
         message: "Mapping {wildcards.sample} with BWA"
-        threads: config.get("threads", 10)
+        threads: config.get("threads", 20)
         resources:
             mem_mb = (
                 lambda wildcards, attempt: min(attempt * 6144 + 2048, 20480)
@@ -106,15 +106,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 lambda wildcards, attempt: min(attempt * 120, 480)
             )
         params:
-            index="bwa/index/genome",
+            index="bwa_mem2/index/genome",
             extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
             sort="samtools",         # We chose Samtools to sort by queryname
             sort_order="queryname",  # Queryname sort is needed for a fixmate
             sort_extra="-m 1536M"     # We extand the sort buffer memory
         log:
-            "log/bwa/mem/{sample}.log"
+            "log/bwa_mem2/mem/{sample}.log"
         wrapper:
-            "0.71.1-469-g60ea58bee/bio/bwa/mem"
+            "0.71.1-473-g5572d4839/bio/bwa-mem2/mem"
 
 
     """
@@ -126,7 +126,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             "sequence/genome.fasta"
         output:
-            multiext("bwa/index/genome", ".amb", ".ann", ".bwt", ".pac", ".sa")
+            multiext(
+                "bwa_mem2/index/genome", ".0123", ".amb", ".ann", ".pac"
+            )
         message: "Indexing reference genome with BWA"
         cache: True
         threads: 1
@@ -134,12 +136,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=lambda wildcards, attempt: min(attempt * 90, 480),
             mem_mb=lambda wildcards, attempt: min(attempt * 6144 + 2048, 20480)
         params:
-            prefix="bwa/index/genome",
-            algorithm="bwtsw"
+            prefix="bwa_mem2/index/genome"
         log:
-            "logs/bwa_index/genome.log"
+            "logs/bwa_mem2/index/genome.log"
         wrapper:
-            "0.71.1-469-g60ea58bee/bio/bwa/index"
+            "0.71.1-473-g5572d4839/bio/bwa-mem2/index"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
@@ -166,9 +167,9 @@ The following individual wrappers are used in this meta-wrapper:
 
 * :ref:`bio/samtools/fixmate`
 
-* :ref:`bio/bwa/mem`
+* :ref:`bio/bwa-mem2/mem`
 
-* :ref:`bio/bwa/index`
+* :ref:`bio/bwa-mem2/index`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.

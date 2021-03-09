@@ -28,7 +28,7 @@ This wrapper can be used in the following way:
             sort_extra=""            # Extra args for samtools/picard.
         threads: 8
         wrapper:
-            "0.71.1-469-g60ea58bee/bio/bwa-mem2/mem"
+            "0.71.1-473-g5572d4839/bio/bwa-mem2/mem"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -42,7 +42,7 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``bwa-mem2==2.0``
+* ``bwa-mem2==2.1``
 * ``samtools==1.10``
 * ``picard==2.23``
 
@@ -82,7 +82,7 @@ Code
     sort_order = snakemake.params.get("sort_order", "coordinate")
     sort_extra = snakemake.params.get("sort_extra", "")
 
-    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
     # Check inputs/arguments.
     if not isinstance(snakemake.input.reads, str) and len(snakemake.input.reads) not in {
