@@ -13,6 +13,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    try:
+        if config == dict():
+            configfile: "config.yaml"
+    except NameError:
+        config = {"threads": 20}
+
     """
     This rule indexes the bam file since almost all downstream tools requires it
     """
@@ -29,7 +35,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/sort/{sample}.log"
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/samtools/index"
+            "0.72.0-485-g7ec4df6d4/bio/samtools/index"
 
 
     """
@@ -42,7 +48,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "samtools/sort/{sample}.bam"
         message:
             "Sorting {wildcards.sample} reads by query name for fixing mates"
-        threads: 20
+        threads: config.get("threads", 20)
         resources:
             mem_mb=lambda wildcards, threads: threads * 1792,
             time_min=lambda wildcards, attempt: attempt * 90
@@ -51,7 +57,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra = "-m 1536M"
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/samtools/sort"
+            "0.72.0-485-g7ec4df6d4/bio/samtools/sort"
 
 
     """
@@ -64,7 +70,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         output:
             temp("samtools/fixmate/{sample}.bam")
         message: "Fixing mate annotation on {wildcards.sample} with Samtools"
-        threads: 20
+        threads: config.get("threads", 20)
         resources:
             mem_mb = (
                 lambda wildcards, attempt: min(attempt * 2048 + 2048, 8192)
@@ -77,7 +83,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/fixmate/{sample}.log"
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/samtools/fixmate"
+            "0.72.0-485-g7ec4df6d4/bio/samtools/fixmate"
 
 
     """
@@ -96,7 +102,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         output:
             temp("bwa_mem2/mem/{sample}.bam")
         message: "Mapping {wildcards.sample} with BWA"
-        threads: 20
+        threads: config.get("threads", 20)
         resources:
             mem_mb = (
                 lambda wildcards, attempt: min(attempt * 6144 + 2048, 20480)
@@ -113,7 +119,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "log/bwa_mem2/mem/{sample}.log"
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/bwa-mem2/mem"
+            "0.72.0-485-g7ec4df6d4/bio/bwa-mem2/mem"
 
 
     """
@@ -139,7 +145,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bwa_mem2/index/genome.log"
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/bwa-mem2/index"
+            "0.72.0-485-g7ec4df6d4/bio/bwa-mem2/index"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

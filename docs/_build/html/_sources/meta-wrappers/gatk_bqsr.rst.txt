@@ -13,6 +13,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    try:
+        if config == dict():
+            configfile: "config.yaml"
+    except NameError:
+        config = {"threads": 20}
+
     """
     This rule applies the BQSR to the mapped reads
     """
@@ -36,7 +42,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/gatk/applybqsr"
+            "0.72.0-485-g7ec4df6d4/bio/gatk/applybqsr"
 
 
     """
@@ -54,7 +60,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         output:
             recal_table=temp("gatk/recal_data_table/{sample}.grp")
         message: "Compute BQSR table from {wildcards.sample} with GATK"
-        threads: 20
+        threads: config.get("threads", 20)
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 4048, 15360),
             time_min=lambda wildcards, attempt: attempt * 120
@@ -63,7 +69,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/gatk/baserecalibrator"
+            "0.72.0-485-g7ec4df6d4/bio/gatk/baserecalibrator"
 
 
     """
@@ -89,7 +95,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/faidx/{genome}.log"
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/samtools/faidx"
+            "0.72.0-485-g7ec4df6d4/bio/samtools/faidx"
 
 
     """
@@ -115,7 +121,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/picard/create_sequence_dictionnary/{genome}.log"
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/picard/createsequencedictionary"
+            "0.72.0-485-g7ec4df6d4/bio/picard/createsequencedictionary"
 
 
     """
@@ -141,7 +147,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tabix/index/{known}.log"
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/tabix"
+            "0.72.0-485-g7ec4df6d4/bio/tabix"
 
 
     """
@@ -162,7 +168,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/sort/{sample}.log"
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/samtools/index"
+            "0.72.0-485-g7ec4df6d4/bio/samtools/index"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

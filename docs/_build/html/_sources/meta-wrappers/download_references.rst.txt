@@ -13,11 +13,30 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
-    fasta_datatype = ["dna", "cdna", "ncrna"]
-    build_release_organism = [
-        "GRCh38.99.homo_sapiens",
-        "GRCm38.99.mus_musculus"
-    ]
+    try:
+        if config == dict():
+            configfile: "config.yaml"
+    except NameError:
+        config = {
+            "download_references": {
+                "fasta_datatype": ["dna", "cdna", "ncrna"],
+                "build_release_organism": [
+                    "GRCh38.99.homo_sapiens",
+                    "GRCm38.99.mus_musculus"
+                ]
+            }
+        }
+
+    fasta_datatype = config.get("download_references", {}).get(
+        "fasta_datatype", ["dna", "cdna", "ncrna"]
+    )
+    build_release_organism = config.get("download_references", {}).get(
+        "build_release_organism",
+        [
+            "GRCh38.99.homo_sapiens",
+            "GRCm38.99.mus_musculus"
+        ]
+    )
 
     rule all:
         input:
@@ -62,7 +81,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/reference/ensembl-sequence"
+            "0.72.0-485-g7ec4df6d4/bio/reference/ensembl-sequence"
 
 
     rule get_annotation:
@@ -82,7 +101,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/get_annotation/{build}.{release}.{organism}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/reference/ensembl-annotation"
+            "0.72.0-485-g7ec4df6d4/bio/reference/ensembl-annotation"
 
 
     rule samtools_faidx_reference:
@@ -99,7 +118,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/samtools/faidx"
+            "0.72.0-485-g7ec4df6d4/bio/samtools/faidx"
 
 
     rule create_dict:
@@ -118,7 +137,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=lambda wildcard, attempt: attempt * 120
         group: "index_fasta"
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/picard/createsequencedictionary"
+            "0.72.0-485-g7ec4df6d4/bio/picard/createsequencedictionary"
 
 
     rule get_variation_with_contig_lengths:
@@ -139,7 +158,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/get_variation/{build}.{release}.{organism}.log"
         wrapper:
-            "0.72.0-482-g7989e15a3/bio/reference/ensembl-variation"
+            "0.72.0-485-g7ec4df6d4/bio/reference/ensembl-variation"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
