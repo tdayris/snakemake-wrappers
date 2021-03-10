@@ -1,8 +1,27 @@
-fasta_datatype = ["dna", "cdna", "ncrna"]
-build_release_organism = [
-    "GRCh38.99.homo_sapiens",
-    "GRCm38.99.mus_musculus"
-]
+try:
+    if config == dict():
+        configfile: "config.yaml"
+except NameError:
+    config = {
+        "download_references": {
+            "fasta_datatype": ["dna", "cdna", "ncrna"],
+            "build_release_organism": [
+                "GRCh38.99.homo_sapiens",
+                "GRCm38.99.mus_musculus"
+            ]
+        }
+    }
+
+fasta_datatype = config.get("download_references", {}).get(
+    "fasta_datatype", ["dna", "cdna", "ncrna"]
+)
+build_release_organism = config.get("download_references", {}).get(
+    "build_release_organism",
+    [
+        "GRCh38.99.homo_sapiens",
+        "GRCm38.99.mus_musculus"
+    ]
+)
 
 rule all:
     input:
