@@ -33,7 +33,7 @@ This wrapper can be used in the following way:
             normalize=False,  # flag to use bcftools norm to normalize indels
         threads: 2
         wrapper:
-            "0.71.1-475-g0022d7027/bio/freebayes"
+            "0.72.0-482-g7989e15a3/bio/freebayes"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -97,8 +97,10 @@ Code
         freebayes = "freebayes"
     else:
         chunksize = snakemake.params.get("chunksize", 100000)
-        regions = "<(fasta_generate_regions.py {snakemake.input.ref}.fai {chunksize})".format(
-            snakemake=snakemake, chunksize=chunksize
+        regions = (
+            "<(fasta_generate_regions.py {snakemake.input.ref}.fai {chunksize})".format(
+                snakemake=snakemake, chunksize=chunksize
+            )
         )
         if snakemake.input.get("regions", ""):
             regions = (

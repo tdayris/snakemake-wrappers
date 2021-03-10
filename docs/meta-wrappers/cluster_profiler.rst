@@ -28,7 +28,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/clusterProfiler/pathview/{pathway_id}.log"
         wrapper:
-            "0.71.1-475-g0022d7027/bio/clusterProfiler/pathview"
+            "0.72.0-482-g7989e15a3/bio/clusterProfiler/pathview"
 
 
     rule cluster_profiler_upsetplot:
@@ -46,7 +46,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/clusterProfiler/upsetplot/upsetplot_{database}.log"
         wrapper:
-            "0.71.1-475-g0022d7027/bio/clusterProfiler/upsetplot"
+            "0.72.0-482-g7989e15a3/bio/clusterProfiler/upsetplot"
 
 
     rule cluster_profiler_heatplot:
@@ -65,7 +65,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/clusterProfiler/heatplot/heatplot_{database}.log"
         wrapper:
-            "0.71.1-475-g0022d7027/bio/clusterProfiler/heatplot"
+            "0.72.0-482-g7989e15a3/bio/clusterProfiler/heatplot"
 
 
     rule cluster_profiler_cnetplot:
@@ -84,7 +84,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/clusterProfiler/cnetplot/cnetplot_{database}.log"
         wrapper:
-            "0.71.1-475-g0022d7027/bio/clusterProfiler/cnetplot"
+            "0.72.0-482-g7989e15a3/bio/clusterProfiler/cnetplot"
 
 
     rule cluster_profiler_dotplot:
@@ -102,7 +102,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/clusterProfiler/dotplot/dotplot_{database}.log"
         wrapper:
-            "0.71.1-475-g0022d7027/bio/clusterProfiler/dotplot"
+            "0.72.0-482-g7989e15a3/bio/clusterProfiler/dotplot"
 
 
     rule cluster_profiler_barplot:
@@ -120,7 +120,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/clusterProfiler/barplot/barplot_{database}.log"
         wrapper:
-            "0.71.1-475-g0022d7027/bio/clusterProfiler/barplot"
+            "0.72.0-482-g7989e15a3/bio/clusterProfiler/barplot"
 
 
     rule cluster_profiler_enrich_go:
@@ -139,7 +139,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/clusterProfiler/enrich/GO_{onthology}/enrichGO_{onthology}.log"
         wrapper:
-            "0.71.1-475-g0022d7027/bio/clusterProfiler/enrichGO"
+            "0.72.0-482-g7989e15a3/bio/clusterProfiler/enrichGO"
 
 
     rule translate_genes_identifiers_hg38:
@@ -160,7 +160,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/clusterProfiler/bitr_GRCh38.log"
         wrapper:
-            "0.71.1-475-g0022d7027/bio/clusterProfiler/bitr_GRCh38"
+            "0.72.0-482-g7989e15a3/bio/clusterProfiler/bitr_GRCh38"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

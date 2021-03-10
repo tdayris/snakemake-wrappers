@@ -1,0 +1,82 @@
+.. _`bio/sambamba/markdup`:
+
+SAMBAMBA MARKDUP
+================
+
+Marks (default) or removes duplicate reads in BAM file. See details `here https://lomereiter.github.io/sambamba/docs/sambamba-markdup.html`_
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule sambamba_markdup:
+        input:
+            "mapped/{sample}.bam"
+        output:
+            "mapped/{sample}.rmdup.bam"
+        params:
+            extra="-r"  # optional parameters
+        log:
+            "logs/sambamba-markdup/{sample}.log"
+        threads: 8
+        wrapper:
+            "0.72.0-482-g7989e15a3/bio/sambamba/markdup"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``sambamba==0.8.0``
+
+Input/Output
+------------
+**Input:**
+
+* bam file
+
+**Output:**
+
+* deduplicated bam file
+
+
+
+
+Authors
+-------
+
+* Jan Forster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2021, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+
+    import os
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "sambamba markdup {snakemake.params.extra} -t {snakemake.threads} "
+        "{snakemake.input[0]} {snakemake.output[0]} "
+        "{log}"
+    )

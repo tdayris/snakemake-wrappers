@@ -25,7 +25,7 @@ This wrapper can be used in the following way:
             "logs/fastqc/{sample}.log"
         threads: 1
         wrapper:
-            "0.71.1-475-g0022d7027/bio/fastqc"
+            "0.72.0-482-g7989e15a3/bio/fastqc"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -75,6 +75,7 @@ Code
 
 
     from os import path
+    import re
     from tempfile import TemporaryDirectory
 
     from snakemake.shell import shell
@@ -86,9 +87,14 @@ Code
         """Returns basename of file path, without the file extension."""
 
         base = path.basename(file_path)
-
-        split_ind = 2 if base.endswith(".fastq.gz") else 1
-        base = ".".join(base.split(".")[:-split_ind])
+        # Remove file extension(s) (similar to the internal fastqc approach)
+        base = re.sub("\\.gz$", "", base)
+        base = re.sub("\\.bz2$", "", base)
+        base = re.sub("\\.txt$", "", base)
+        base = re.sub("\\.fastq$", "", base)
+        base = re.sub("\\.fq$", "", base)
+        base = re.sub("\\.sam$", "", base)
+        base = re.sub("\\.bam$", "", base)
 
         return base
 

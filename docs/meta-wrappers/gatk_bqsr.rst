@@ -36,7 +36,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.71.1-475-g0022d7027/bio/gatk/applybqsr"
+            "0.72.0-482-g7989e15a3/bio/gatk/applybqsr"
 
 
     """
@@ -63,7 +63,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.71.1-475-g0022d7027/bio/gatk/baserecalibrator"
+            "0.72.0-482-g7989e15a3/bio/gatk/baserecalibrator"
 
 
     """
@@ -89,7 +89,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/faidx/{genome}.log"
         wrapper:
-            "0.71.1-475-g0022d7027/bio/samtools/faidx"
+            "0.72.0-482-g7989e15a3/bio/samtools/faidx"
 
 
     """
@@ -115,7 +115,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/picard/create_sequence_dictionnary/{genome}.log"
         wrapper:
-            "0.71.1-475-g0022d7027/bio/picard/createsequencedictionary"
+            "0.72.0-482-g7989e15a3/bio/picard/createsequencedictionary"
 
 
     """
@@ -141,7 +141,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tabix/index/{known}.log"
         wrapper:
-            "0.71.1-475-g0022d7027/bio/tabix"
+            "0.72.0-482-g7989e15a3/bio/tabix"
 
 
     """
@@ -162,7 +162,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/sort/{sample}.log"
         wrapper:
-            "0.71.1-475-g0022d7027/bio/samtools/index"
+            "0.72.0-482-g7989e15a3/bio/samtools/index"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

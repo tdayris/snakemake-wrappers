@@ -16,10 +16,13 @@ This wrapper can be used in the following way:
     rule annotate_variants:
         input:
             calls="variants.bcf",  # .vcf, .vcf.gz or .bcf
-            cache="resources/vep/cache",
+            cache="resources/vep/cache", # can be omitted if fasta and gff are specified
             plugins="resources/vep/plugins",
-            # optionally add reference genome fasta to speed up annotation
+            # optionally add reference genome fasta
             # fasta="genome.fasta",
+            # fai="genome.fasta.fai", # fasta index
+            # gff="annotation.gff",
+            # csi="annotation.gff.csi", # tabix index
         output:
             calls="variants.annotated.bcf",  # .vcf, .vcf.gz or .bcf
             stats="variants.html"
@@ -32,7 +35,7 @@ This wrapper can be used in the following way:
             "logs/vep/annotate.log"
         threads: 4
         wrapper:
-            "0.71.1-475-g0022d7027/bio/vep/annotate"
+            "0.72.0-482-g7989e15a3/bio/vep/annotate"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -46,8 +49,8 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``ensembl-vep=101``
-* ``bcftools=1.9``
+* ``ensembl-vep=102``
+* ``bcftools=1.10``
 
 
 
@@ -85,12 +88,8 @@ Code
 
     fork = "--fork {}".format(snakemake.threads) if snakemake.threads > 1 else ""
     stats = snakemake.output.stats
-    cache = snakemake.input.cache
+    cache = snakemake.input.get("cache", "")
     plugins = snakemake.input.plugins
-
-    entrypath = get_only_child_dir(get_only_child_dir(Path(cache)))
-    species = entrypath.parent.name
-    release, build = entrypath.name.split("_")
 
     load_plugins = " ".join(map("--plugin {}".format, snakemake.params.plugins))
 
@@ -105,19 +104,27 @@ Code
     if fasta:
         fasta = "--fasta {}".format(fasta)
 
+    gff = snakemake.input.get("gff", "")
+    if gff:
+        gff = "--gff {}".format(gff)
+
+    if cache:
+        entrypath = get_only_child_dir(get_only_child_dir(Path(cache)))
+        species = entrypath.parent.name
+        release, build = entrypath.name.split("_")
+        cache = (
+            "--offline --cache --dir_cache {cache} --cache_version {release} --species {species} --assembly {build}"
+        ).format(cache=cache, release=release, build=build, species=species)
+
     shell(
         "(bcftools view {snakemake.input.calls} | "
         "vep {extra} {fork} "
         "--format vcf "
         "--vcf "
-        "--cache "
-        "--cache_version {release} "
-        "--species {species} "
-        "--assembly {build} "
-        "--dir_cache {cache} "
-        "--dir_plugins {plugins} "
+        "{cache} "
+        "{gff} "
         "{fasta} "
-        "--offline "
+        "--dir_plugins {plugins} "
         "{load_plugins} "
         "--output_file STDOUT "
         "--stats_file {stats} | "

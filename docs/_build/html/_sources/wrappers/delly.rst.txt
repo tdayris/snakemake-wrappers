@@ -27,7 +27,7 @@ This wrapper can be used in the following way:
             "logs/delly.log"
         threads: 2  # It is best to use as many threads as samples
         wrapper:
-            "0.71.1-475-g0022d7027/bio/delly"
+            "0.72.0-482-g7989e15a3/bio/delly"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -67,7 +67,9 @@ Code
 
 
     exclude = (
-        "-x {}".format(snakemake.input.exlude) if snakemake.input.get("exlude", "") else ""
+        "-x {}".format(snakemake.input.exclude)
+        if snakemake.input.get("exclude", "")
+        else ""
     )
 
     extra = snakemake.params.get("extra", "")

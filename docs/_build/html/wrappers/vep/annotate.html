@@ -324,10 +324,13 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">annotate_variants</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">calls</span><span class="o">=</span><span class="s2">&quot;variants.bcf&quot;</span><span class="p">,</span>  <span class="c1"># .vcf, .vcf.gz or .bcf</span>
-        <span class="n">cache</span><span class="o">=</span><span class="s2">&quot;resources/vep/cache&quot;</span><span class="p">,</span>
+        <span class="n">cache</span><span class="o">=</span><span class="s2">&quot;resources/vep/cache&quot;</span><span class="p">,</span> <span class="c1"># can be omitted if fasta and gff are specified</span>
         <span class="n">plugins</span><span class="o">=</span><span class="s2">&quot;resources/vep/plugins&quot;</span><span class="p">,</span>
-        <span class="c1"># optionally add reference genome fasta to speed up annotation</span>
+        <span class="c1"># optionally add reference genome fasta</span>
         <span class="c1"># fasta=&quot;genome.fasta&quot;,</span>
+        <span class="c1"># fai=&quot;genome.fasta.fai&quot;, # fasta index</span>
+        <span class="c1"># gff=&quot;annotation.gff&quot;,</span>
+        <span class="c1"># csi=&quot;annotation.gff.csi&quot;, # tabix index</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">calls</span><span class="o">=</span><span class="s2">&quot;variants.annotated.bcf&quot;</span><span class="p">,</span>  <span class="c1"># .vcf, .vcf.gz or .bcf</span>
         <span class="n">stats</span><span class="o">=</span><span class="s2">&quot;variants.html&quot;</span>
@@ -340,7 +343,7 @@
         <span class="s2">&quot;logs/vep/annotate.log&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.71.1-475-g0022d7027/bio/vep/annotate&quot;</span>
+        <span class="s2">&quot;0.72.0-482-g7989e15a3/bio/vep/annotate&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -353,8 +356,8 @@ When running with</p>
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">ensembl-vep=101</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bcftools=1.9</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ensembl-vep=102</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bcftools=1.10</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="authors">
@@ -387,12 +390,8 @@ When running with</p>
 
 <span class="n">fork</span> <span class="o">=</span> <span class="s2">&quot;--fork </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">threads</span><span class="p">)</span> <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">threads</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
 <span class="n">stats</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">stats</span>
-<span class="n">cache</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">cache</span>
+<span class="n">cache</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cache&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">plugins</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">plugins</span>
-
-<span class="n">entrypath</span> <span class="o">=</span> <span class="n">get_only_child_dir</span><span class="p">(</span><span class="n">get_only_child_dir</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">cache</span><span class="p">)))</span>
-<span class="n">species</span> <span class="o">=</span> <span class="n">entrypath</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span>
-<span class="n">release</span><span class="p">,</span> <span class="n">build</span> <span class="o">=</span> <span class="n">entrypath</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
 
 <span class="n">load_plugins</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="s2">&quot;--plugin </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">plugins</span><span class="p">))</span>
 
@@ -407,19 +406,27 @@ When running with</p>
 <span class="k">if</span> <span class="n">fasta</span><span class="p">:</span>
     <span class="n">fasta</span> <span class="o">=</span> <span class="s2">&quot;--fasta </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fasta</span><span class="p">)</span>
 
+<span class="n">gff</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gff&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">gff</span><span class="p">:</span>
+    <span class="n">gff</span> <span class="o">=</span> <span class="s2">&quot;--gff </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gff</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">cache</span><span class="p">:</span>
+    <span class="n">entrypath</span> <span class="o">=</span> <span class="n">get_only_child_dir</span><span class="p">(</span><span class="n">get_only_child_dir</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">cache</span><span class="p">)))</span>
+    <span class="n">species</span> <span class="o">=</span> <span class="n">entrypath</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">release</span><span class="p">,</span> <span class="n">build</span> <span class="o">=</span> <span class="n">entrypath</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+    <span class="n">cache</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;--offline --cache --dir_cache </span><span class="si">{cache}</span><span class="s2"> --cache_version </span><span class="si">{release}</span><span class="s2"> --species </span><span class="si">{species}</span><span class="s2"> --assembly </span><span class="si">{build}</span><span class="s2">&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="n">release</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">,</span> <span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">)</span>
+
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;(bcftools view </span><span class="si">{snakemake.input.calls}</span><span class="s2"> | &quot;</span>
     <span class="s2">&quot;vep </span><span class="si">{extra}</span><span class="s2"> </span><span class="si">{fork}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;--format vcf &quot;</span>
     <span class="s2">&quot;--vcf &quot;</span>
-    <span class="s2">&quot;--cache &quot;</span>
-    <span class="s2">&quot;--cache_version </span><span class="si">{release}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot;--species </span><span class="si">{species}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot;--assembly </span><span class="si">{build}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot;--dir_cache </span><span class="si">{cache}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot;--dir_plugins </span><span class="si">{plugins}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{cache}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{gff}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;</span><span class="si">{fasta}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot;--offline &quot;</span>
+    <span class="s2">&quot;--dir_plugins </span><span class="si">{plugins}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;</span><span class="si">{load_plugins}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;--output_file STDOUT &quot;</span>
     <span class="s2">&quot;--stats_file </span><span class="si">{stats}</span><span class="s2"> | &quot;</span>
