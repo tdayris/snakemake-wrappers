@@ -49,6 +49,27 @@ bioinfokit_maplot_rst = rst_exists("reports/bioinfokit_maplot.rst")
 
 
 """
+This rule builds several PCA and their scree plot
+"""
+rule bioinfokit_pcaplots:
+    input:
+        counts="deseq2/filtered/filtered_counts.tsv"
+    output:
+        loadings_correlation_heatmap="bioinfokit/figures/loadings.png",
+        pca_scree="bioinfokit/figures/screeplot.png",
+        pca_2d="bioinfokit/figures/pca2d.png",
+        pca_3d="bioinfokit/figures/pca3d.png",
+        biplot_2d="bioinfokit/figures/biplot2d.png",
+        biplot_3d="bioinfokit/figures/biplot3d.png"
+    params:
+        read_csv={"header": 0, "index_col": 0}
+    log:
+        "logs/pca.log"
+    wrapper:
+        "master/bio/bioinfokit/pca"
+
+
+"""
 This rule builds a Volcanoplot from DESeq2 results
 """
 rule bioinfokit_volcanoplot:
