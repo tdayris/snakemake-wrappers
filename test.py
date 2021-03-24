@@ -178,9 +178,9 @@ def test_bioinfokit_meta():
             "--cores",
             "1",
             "--use-conda",
-            # "bioinfokit/figures/volcanoplot.png",
+            "bioinfokit/figures/volcanoplot.png",
             "bioinfokit/figures/sample_heatmap.png",
-            #"bioinfokit/figures/maplot.png",
+            "bioinfokit/figures/maplot.png",
         ],
     )
 
