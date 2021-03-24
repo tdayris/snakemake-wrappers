@@ -64,6 +64,27 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 
     """
+    This rule builds several PCA and their scree plot
+    """
+    rule bioinfokit_pcaplots:
+        input:
+            counts="deseq2/filtered/filtered_counts.tsv"
+        output:
+            loadings_correlation_heatmap="bioinfokit/figures/loadings.png",
+            pca_scree="bioinfokit/figures/screeplot.png",
+            pca_2d="bioinfokit/figures/pca2d.png",
+            pca_3d="bioinfokit/figures/pca3d.png",
+            biplot_2d="bioinfokit/figures/biplot2d.png",
+            biplot_3d="bioinfokit/figures/biplot3d.png"
+        params:
+            read_csv={"header": 0, "index_col": 0}
+        log:
+            "logs/pca.log"
+        wrapper:
+            "0.72.0-496-g97f5b53da/bio/bioinfokit/pca"
+
+
+    """
     This rule builds a Volcanoplot from DESeq2 results
     """
     rule bioinfokit_volcanoplot:
@@ -98,7 +119,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bioinfokit/volcanoplot.log"
         wrapper:
-            "0.72.0-493-g8b815973b/bio/bioinfokit/volcanoplot"
+            "0.72.0-496-g97f5b53da/bio/bioinfokit/volcanoplot"
 
     """
     This rule creates a sample clustered heatmap from the filtered-counts table
@@ -128,7 +149,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bioinfokit/sample_heatmap.png"
         wrapper:
-            "0.72.0-493-g8b815973b/bio/bioinfokit/heatmap"
+            "0.72.0-496-g97f5b53da/bio/bioinfokit/heatmap"
 
 
     """
@@ -161,7 +182,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bioinfokit/maplot.png"
         wrapper:
-            "0.72.0-493-g8b815973b/bio/bioinfokit/maplot"
+            "0.72.0-496-g97f5b53da/bio/bioinfokit/maplot"
 
 
     """
@@ -187,7 +208,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/filter.log"
         wrapper:
-            "0.72.0-493-g8b815973b/bio/pandas/deseq2_merge"
+            "0.72.0-496-g97f5b53da/bio/pandas/deseq2_merge"
 
 
 
@@ -212,7 +233,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport/tx2gene.log"
         wrapper:
-            "0.72.0-493-g8b815973b/bio/gtf/tx2gene"
+            "0.72.0-496-g97f5b53da/bio/gtf/tx2gene"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
@@ -232,6 +253,8 @@ Used wrappers
 
 The following individual wrappers are used in this meta-wrapper:
 
+
+* :ref:`bio/bioinfokit/pca`
 
 * :ref:`bio/bioinfokit/heatmap`
 

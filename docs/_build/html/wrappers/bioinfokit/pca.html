@@ -326,9 +326,20 @@
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_bioinfokit_pca</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">counts</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+        <span class="n">counts</span><span class="o">=</span><span class="s2">&quot;cot_pca.csv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">pca_2d</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+        <span class="n">loadings_correlation_heatmap</span><span class="o">=</span><span class="s2">&quot;figures/loadings.png&quot;</span><span class="p">,</span>
+        <span class="n">pca_scree</span><span class="o">=</span><span class="s2">&quot;figures/screeplot.png&quot;</span><span class="p">,</span>
+        <span class="n">pca_2d</span><span class="o">=</span><span class="s2">&quot;figures/pca2d.png&quot;</span><span class="p">,</span>
+        <span class="n">pca_3d</span><span class="o">=</span><span class="s2">&quot;figures/pca3d.png&quot;</span><span class="p">,</span>
+        <span class="n">biplot_2d</span><span class="o">=</span><span class="s2">&quot;figures/biplot2d.png&quot;</span><span class="p">,</span>
+        <span class="n">biplot_3d</span><span class="o">=</span><span class="s2">&quot;figures/biplot3d.png&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">read_csv</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/pca.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.72.0-496-g97f5b53da/bio/bioinfokit/pca&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -386,9 +397,10 @@ When running with</p>
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">import</span> <span class="nn">seaborn</span>
 
-
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
 
 
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
@@ -396,6 +408,7 @@ When running with</p>
     <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
     <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
 <span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;matplotlib.font_manager&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
 
 <span class="c1"># Detect delimiter with python</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">table</span><span class="p">:</span>
@@ -417,8 +430,10 @@ When running with</p>
 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 
 <span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+<span class="n">pca_scores</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
 <span class="n">loadings</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">components_</span>
 <span class="n">num_pc</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">n_features_</span>
+<span class="n">variance_ratio</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span>
 
 <span class="n">pc_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PC&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_pc</span><span class="o">+</span><span class="mi">1</span><span class="p">))]</span>
 <span class="n">loadings_df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">pc_list</span><span class="p">,</span> <span class="n">loadings</span><span class="p">)))</span>
@@ -437,83 +452,81 @@ When running with</p>
         <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;loadings_correlation_heatmap&quot;</span><span class="p">],</span>
         <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
     <span class="p">)</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
 
 
 <span class="k">if</span> <span class="s2">&quot;pca_scree&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Saving PCA Screen plot&quot;</span><span class="p">)</span>
-    <span class="n">bioinfokit</span><span class="o">.</span><span class="n">visuz</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">screeplot</span><span class="p">(</span>
-        <span class="n">obj</span><span class="o">=</span><span class="p">[</span><span class="n">pc_list</span><span class="p">,</span> <span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">]</span>
-    <span class="p">)</span>
-    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
-        <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;pca_scree&quot;</span><span class="p">],</span>
-        <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
-    <span class="p">)</span>
+    <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tempdir</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Saving PCA Screen plot&quot;</span><span class="p">)</span>
+        <span class="n">figtype</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;pca_scree&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">bioinfokit</span><span class="o">.</span><span class="n">visuz</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">screeplot</span><span class="p">(</span>
+            <span class="n">obj</span><span class="o">=</span><span class="p">[</span><span class="n">pc_list</span><span class="p">,</span> <span class="n">variance_ratio</span><span class="p">],</span>
+            <span class="n">figtype</span><span class="o">=</span><span class="n">figtype</span><span class="p">,</span>
+            <span class="n">show</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;screeplot.png&quot;</span><span class="p">,</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;pca_scree&quot;</span><span class="p">])</span>
 
 
 <span class="k">if</span> <span class="s2">&quot;pca_2d&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Saving 2D PCA&quot;</span><span class="p">)</span>
+    <span class="n">figtype</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;pca_2d&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">bioinfokit</span><span class="o">.</span><span class="n">visuz</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">pcaplot</span><span class="p">(</span>
         <span class="n">x</span><span class="o">=</span><span class="n">loadings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
         <span class="n">y</span><span class="o">=</span><span class="n">loadings</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">figtype</span><span class="o">=</span><span class="n">figtype</span><span class="p">,</span>
         <span class="n">labels</span><span class="o">=</span><span class="n">counts</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-        <span class="n">var1</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">pca_out</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="n">var2</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">pca_out</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">var1</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">variance_ratio</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">var2</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">variance_ratio</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
         <span class="n">show</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span>
-    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
-        <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;pca_2d&quot;</span><span class="p">],</span>
-        <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
-    <span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;pcaplot_2d.png&quot;</span><span class="p">,</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;pca_2d&quot;</span><span class="p">])</span>
 
 
 <span class="k">if</span> <span class="s2">&quot;pca_3d&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Saving 3D PCA&quot;</span><span class="p">)</span>
+    <span class="n">figtype</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;pca_3d&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">bioinfokit</span><span class="o">.</span><span class="n">visuz</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">pcaplot</span><span class="p">(</span>
         <span class="n">x</span><span class="o">=</span><span class="n">loadings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
         <span class="n">y</span><span class="o">=</span><span class="n">loadings</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
         <span class="n">z</span><span class="o">=</span><span class="n">loadings</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="n">figtype</span><span class="o">=</span><span class="n">figtype</span><span class="p">,</span>
         <span class="n">labels</span><span class="o">=</span><span class="n">counts</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-        <span class="n">var1</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">pca_out</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="n">var2</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">pca_out</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="n">var3</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">pca_out</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">var1</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">variance_ratio</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">var2</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">variance_ratio</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">var3</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">variance_ratio</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
         <span class="n">show</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span>
-    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
-        <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;pca_3d&quot;</span><span class="p">],</span>
-        <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
-    <span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;pcaplot_3d.png&quot;</span><span class="p">,</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;pca_3d&quot;</span><span class="p">])</span>
 
 
 <span class="k">if</span> <span class="s2">&quot;biplot_2d&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Saving 2D biplot&quot;</span><span class="p">)</span>
+    <span class="n">figtype</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;biplot_2d&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">bioinfokit</span><span class="o">.</span><span class="n">visuz</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">biplot</span><span class="p">(</span>
         <span class="n">cscore</span><span class="o">=</span><span class="n">pca_scores</span><span class="p">,</span>
         <span class="n">loadings</span><span class="o">=</span><span class="n">loadings</span><span class="p">,</span>
+        <span class="n">figtype</span><span class="o">=</span><span class="n">figtype</span><span class="p">,</span>
         <span class="n">labels</span><span class="o">=</span><span class="n">counts</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-        <span class="n">var1</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">pca_out</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="n">var2</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">pca_out</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">var1</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">variance_ratio</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">var2</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">variance_ratio</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
         <span class="n">show</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span>
-    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
-        <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;biplot_2d&quot;</span><span class="p">],</span>
-        <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
-    <span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;biplot_2d.png&quot;</span><span class="p">,</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;biplot_2d&quot;</span><span class="p">])</span>
 
 <span class="k">if</span> <span class="s2">&quot;biplot_3d&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Saving 2D biplot&quot;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Saving 3D biplot&quot;</span><span class="p">)</span>
+    <span class="n">figtype</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;biplot_3d&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">bioinfokit</span><span class="o">.</span><span class="n">visuz</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">biplot</span><span class="p">(</span>
         <span class="n">cscore</span><span class="o">=</span><span class="n">pca_scores</span><span class="p">,</span>
         <span class="n">loadings</span><span class="o">=</span><span class="n">loadings</span><span class="p">,</span>
+        <span class="n">figtype</span><span class="o">=</span><span class="n">figtype</span><span class="p">,</span>
         <span class="n">labels</span><span class="o">=</span><span class="n">counts</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-        <span class="n">var1</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">pca_out</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="n">var2</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">pca_out</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="n">var3</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">pca_out</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">var1</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">variance_ratio</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">var2</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">variance_ratio</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">var3</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">variance_ratio</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
         <span class="n">show</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span>
-    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
-        <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;biplot_3d&quot;</span><span class="p">],</span>
-        <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
-    <span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;biplot_3d.png&quot;</span><span class="p">,</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;biplot_3d&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>

@@ -15,9 +15,20 @@ This wrapper can be used in the following way:
 
     rule test_bioinfokit_pca:
         input:
-            counts=""
+            counts="cot_pca.csv"
         output:
-            pca_2d=""
+            loadings_correlation_heatmap="figures/loadings.png",
+            pca_scree="figures/screeplot.png",
+            pca_2d="figures/pca2d.png",
+            pca_3d="figures/pca3d.png",
+            biplot_2d="figures/biplot2d.png",
+            biplot_3d="figures/biplot3d.png"
+        params:
+            read_csv={"header": 0}
+        log:
+            "logs/pca.log"
+        wrapper:
+            "0.72.0-496-g97f5b53da/bio/bioinfokit/pca"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -80,9 +91,10 @@ Code
     import pandas
     import seaborn
 
-
+    from snakemake.shell import shell
     from sklearn.decomposition import PCA
     from sklearn.preprocessing import StandardScaler
+    from tempfile import TemporaryDirectory
 
 
     logging.basicConfig(
@@ -90,6 +102,7 @@ Code
         filemode="w",
         level=logging.DEBUG
     )
+    logging.getLogger('matplotlib.font_manager').disabled = True
 
     # Detect delimiter with python
     with open(snakemake.input[0], "r") as table:
@@ -111,8 +124,10 @@ Code
     logging.debug(counts.head())
 
     pca = PCA().fit(counts)
+    pca_scores = PCA().fit_transform(counts)
     loadings = pca.components_
     num_pc = pca.n_features_
+    variance_ratio = pca.explained_variance_ratio_
 
     pc_list = ["PC"+str(i) for i in list(range(1, num_pc+1))]
     loadings_df = pandas.DataFrame.from_dict(dict(zip(pc_list, loadings)))
@@ -131,80 +146,78 @@ Code
             snakemake.output["loadings_correlation_heatmap"],
             bbox_inches="tight"
         )
+        matplotlib.pyplot.clf()
 
 
     if "pca_scree" in snakemake.output.keys():
-        logging.debug("Saving PCA Screen plot")
-        bioinfokit.visuz.cluster.screeplot(
-            obj=[pc_list, pca.explained_variance_ratio_]
-        )
-        matplotlib.pyplot.savefig(
-            snakemake.output["pca_scree"],
-            bbox_inches="tight"
-        )
+        with TemporaryDirectory() as tempdir:
+            logging.debug("Saving PCA Screen plot")
+            figtype = snakemake.output["pca_scree"].split(".")[-1]
+            bioinfokit.visuz.cluster.screeplot(
+                obj=[pc_list, variance_ratio],
+                figtype=figtype,
+                show=False
+            )
+            os.rename("screeplot.png", snakemake.output["pca_scree"])
 
 
     if "pca_2d" in snakemake.output.keys():
         logging.debug("Saving 2D PCA")
+        figtype = snakemake.output["pca_2d"].split(".")[-1]
         bioinfokit.visuz.cluster.pcaplot(
             x=loadings[0],
             y=loadings[1],
+            figtype=figtype,
             labels=counts.columns.values,
-            var1=round(pca_out.explained_variance_ratio_[0]*100, 2),
-            var2=round(pca_out.explained_variance_ratio_[1]*100, 2),
+            var1=round(variance_ratio[0]*100, 2),
+            var2=round(variance_ratio[1]*100, 2),
             show=False
         )
-        matplotlib.pyplot.savefig(
-            snakemake.output["pca_2d"],
-            bbox_inches="tight"
-        )
+        os.rename("pcaplot_2d.png", snakemake.output["pca_2d"])
 
 
     if "pca_3d" in snakemake.output.keys():
         logging.debug("Saving 3D PCA")
+        figtype = snakemake.output["pca_3d"].split(".")[-1]
         bioinfokit.visuz.cluster.pcaplot(
             x=loadings[0],
             y=loadings[1],
             z=loadings[2],
+            figtype=figtype,
             labels=counts.columns.values,
-            var1=round(pca_out.explained_variance_ratio_[0]*100, 2),
-            var2=round(pca_out.explained_variance_ratio_[1]*100, 2),
-            var3=round(pca_out.explained_variance_ratio_[2]*100, 2),
+            var1=round(variance_ratio[0]*100, 2),
+            var2=round(variance_ratio[1]*100, 2),
+            var3=round(variance_ratio[2]*100, 2),
             show=False
         )
-        matplotlib.pyplot.savefig(
-            snakemake.output["pca_3d"],
-            bbox_inches="tight"
-        )
+        os.rename("pcaplot_3d.png", snakemake.output["pca_3d"])
 
 
     if "biplot_2d" in snakemake.output.keys():
         logging.debug("Saving 2D biplot")
+        figtype = snakemake.output["biplot_2d"].split(".")[-1]
         bioinfokit.visuz.cluster.biplot(
             cscore=pca_scores,
             loadings=loadings,
+            figtype=figtype,
             labels=counts.columns.values,
-            var1=round(pca_out.explained_variance_ratio_[0]*100, 2),
-            var2=round(pca_out.explained_variance_ratio_[1]*100, 2),
+            var1=round(variance_ratio[0]*100, 2),
+            var2=round(variance_ratio[1]*100, 2),
             show=False
         )
-        matplotlib.pyplot.savefig(
-            snakemake.output["biplot_2d"],
-            bbox_inches="tight"
-        )
+        os.rename("biplot_2d.png", snakemake.output["biplot_2d"])
 
     if "biplot_3d" in snakemake.output.keys():
-        logging.debug("Saving 2D biplot")
+        logging.debug("Saving 3D biplot")
+        figtype = snakemake.output["biplot_3d"].split(".")[-1]
         bioinfokit.visuz.cluster.biplot(
             cscore=pca_scores,
             loadings=loadings,
+            figtype=figtype,
             labels=counts.columns.values,
-            var1=round(pca_out.explained_variance_ratio_[0]*100, 2),
-            var2=round(pca_out.explained_variance_ratio_[1]*100, 2),
-            var3=round(pca_out.explained_variance_ratio_[2]*100, 2),
+            var1=round(variance_ratio[0]*100, 2),
+            var2=round(variance_ratio[1]*100, 2),
+            var3=round(variance_ratio[2]*100, 2),
             show=False
         )
-        matplotlib.pyplot.savefig(
-            snakemake.output["biplot_3d"],
-            bbox_inches="tight"
-        )
+        os.rename("biplot_3d.png", snakemake.output["biplot_3d"])

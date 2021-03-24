@@ -246,6 +246,27 @@
 
 
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule builds several PCA and their scree plot</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">bioinfokit_pcaplots</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">counts</span><span class="o">=</span><span class="s2">&quot;deseq2/filtered/filtered_counts.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">loadings_correlation_heatmap</span><span class="o">=</span><span class="s2">&quot;bioinfokit/figures/loadings.png&quot;</span><span class="p">,</span>
+        <span class="n">pca_scree</span><span class="o">=</span><span class="s2">&quot;bioinfokit/figures/screeplot.png&quot;</span><span class="p">,</span>
+        <span class="n">pca_2d</span><span class="o">=</span><span class="s2">&quot;bioinfokit/figures/pca2d.png&quot;</span><span class="p">,</span>
+        <span class="n">pca_3d</span><span class="o">=</span><span class="s2">&quot;bioinfokit/figures/pca3d.png&quot;</span><span class="p">,</span>
+        <span class="n">biplot_2d</span><span class="o">=</span><span class="s2">&quot;bioinfokit/figures/biplot2d.png&quot;</span><span class="p">,</span>
+        <span class="n">biplot_3d</span><span class="o">=</span><span class="s2">&quot;bioinfokit/figures/biplot3d.png&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">read_csv</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;index_col&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/pca.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.72.0-496-g97f5b53da/bio/bioinfokit/pca&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule builds a Volcanoplot from DESeq2 results</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">bioinfokit_volcanoplot</span><span class="p">:</span>
@@ -280,7 +301,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bioinfokit/volcanoplot.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/bioinfokit/volcanoplot&quot;</span>
+        <span class="s2">&quot;0.72.0-496-g97f5b53da/bio/bioinfokit/volcanoplot&quot;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule creates a sample clustered heatmap from the filtered-counts table</span>
@@ -310,7 +331,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bioinfokit/sample_heatmap.png&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/bioinfokit/heatmap&quot;</span>
+        <span class="s2">&quot;0.72.0-496-g97f5b53da/bio/bioinfokit/heatmap&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -343,7 +364,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bioinfokit/maplot.png&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/bioinfokit/maplot&quot;</span>
+        <span class="s2">&quot;0.72.0-496-g97f5b53da/bio/bioinfokit/maplot&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -369,7 +390,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deseq2/filter.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/pandas/deseq2_merge&quot;</span>
+        <span class="s2">&quot;0.72.0-496-g97f5b53da/bio/pandas/deseq2_merge&quot;</span>
 
 
 
@@ -394,7 +415,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/tximport/tx2gene.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/gtf/tx2gene&quot;</span>
+        <span class="s2">&quot;0.72.0-496-g97f5b53da/bio/gtf/tx2gene&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
@@ -409,6 +430,7 @@ For additional parameters in each individual wrapper, please refer to their corr
 <h2>Used wrappers<a class="headerlink" href="#used-wrappers" title="Permalink to this headline">¶</a></h2>
 <p>The following individual wrappers are used in this meta-wrapper:</p>
 <ul class="simple">
+<li><p><a class="reference internal" href="../wrappers/bioinfokit/pca.html#bio-bioinfokit-pca"><span class="std std-ref">PCA</span></a></p></li>
 <li><p><a class="reference internal" href="../wrappers/bioinfokit/heatmap.html#bio-bioinfokit-heatmap"><span class="std std-ref">BIOINFOKIT HEATMAP</span></a></p></li>
 <li><p><a class="reference internal" href="../wrappers/bioinfokit/maplot.html#bio-bioinfokit-maplot"><span class="std std-ref">BIOINFOKIT MA PLOT</span></a></p></li>
 <li><p><a class="reference internal" href="../wrappers/bioinfokit/volcanoplot.html#bio-bioinfokit-volcanoplot"><span class="std std-ref">BIOINFOKIT VOLCANOPLOT</span></a></p></li>
