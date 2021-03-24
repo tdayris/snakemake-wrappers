@@ -211,30 +211,6 @@
 
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This rule merges and filters DESeq2 results in order to have human-sized</span>
-<span class="sd">result tables.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="n">rule</span> <span class="n">filter_deseq2</span><span class="p">:</span>
-    <span class="nb">input</span><span class="p">:</span>
-        <span class="n">wald_tsv</span> <span class="o">=</span> <span class="s2">&quot;deseq2/wald/Cond_compairing_B_vs_A.tsv&quot;</span><span class="p">,</span>
-        <span class="n">dst_tsv</span> <span class="o">=</span> <span class="s2">&quot;deseq2/dst/Cond_compairing_B_vs_A.tsv&quot;</span><span class="p">,</span>
-        <span class="n">gene2gene</span> <span class="o">=</span> <span class="s2">&quot;deseq2/gene2gene.tsv&quot;</span>
-    <span class="n">output</span><span class="p">:</span>
-        <span class="n">filtered_counts</span><span class="o">=</span><span class="s2">&quot;deseq2/filtered/filtered_counts.tsv&quot;</span><span class="p">,</span>
-        <span class="n">filtered_deseq2</span><span class="o">=</span><span class="s2">&quot;deseq2/filtered/filtered_deseq2.tsv&quot;</span><span class="p">,</span>
-        <span class="n">merged_table</span><span class="o">=</span><span class="s2">&quot;deseq2/filtered/merged.tsv&quot;</span>
-    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Filtering and merging DESeq2 results&quot;</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
-    <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span>
-    <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/deseq2/filter.log&quot;</span>
-    <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-485-g7ec4df6d4/bio/pandas/deseq2_merge&quot;</span>
-
-
-<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule performs the size factor and dispersions estimations as well as the</span>
 <span class="sd">wald test.</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -265,7 +241,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deseq2/deseq.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-485-g7ec4df6d4/bio/deseq2/DESeq&quot;</span>
+        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/deseq2/DESeq&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -290,7 +266,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deseq2/deseq2_dataset_from_tximport.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-485-g7ec4df6d4/bio/deseq2/DESeqDataSetFromTximport/&quot;</span>
+        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/deseq2/DESeqDataSetFromTximport/&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -319,7 +295,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/tximport.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-485-g7ec4df6d4/bio/tximport&quot;</span>
+        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/tximport&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -343,7 +319,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/tximport/tx2gene.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-485-g7ec4df6d4/bio/gtf/tx2gene&quot;</span>
+        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/gtf/tx2gene&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

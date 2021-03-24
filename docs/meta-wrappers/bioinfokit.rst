@@ -17,6 +17,40 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     from typing import Optional
 
+    default_config = {
+        "thresholds":{
+            "alpha": 0.05,
+            "fc_threshold": 0.01
+        },
+        "bioinfokit": {
+            "maplot_extra": {
+                "lfc": "log2FoldChange",
+                "ct_count": "a.chr21",
+                "st_count": "e.chr21"
+            },
+            "heatmap_extra": {
+                "rowclus": True,
+                "colclus": True
+            },
+            "volcanoplot_extra": {
+                "lfc": "log2FoldChange",
+                "pv": "padj",
+                "geneid": "Unnamed: 0",
+                "lfc_thr": (0.001, 0.001),
+                "pv_thr": (0.05, 0.05),
+                "gstyle": 2,
+                "sign_line": True,
+                "plotlegend": True
+            }
+        }
+    }
+
+    try:
+        if config == dict():
+            config = default_config
+    except NameError:
+        config = default_config
+
     def rst_exists(path: str) -> Optional[str]:
         """
         If a provided rst path exists, then it is returned,
@@ -49,23 +83,22 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             read_csv={
                 "header": 0,
-                "index_col": None,
-                #"usecols": ["Unnamed: 0", "log2FoldChange", "padj"]
+                "index_col": None
             },
-            volcano={
+            volcano=config["bioinfokit"].get("volcanoplot_extra", {
                 "lfc": "log2FoldChange",
                 "pv": "padj",
                 "geneid": "Unnamed: 0",
-                "lfc_thr": config.get("lfc_thr", (0.001, 0.001)),
-                "pv_thr": config.get("pv_thr", (0.05, 0.05)),
+                "lfc_thr": (0.001, 0.001),
+                "pv_thr": (0.05, 0.05),
                 "gstyle": 2,
                 "sign_line": True,
                 "plotlegend": True
-            }
+            })
         log:
             "logs/bioinfokit/volcanoplot.log"
         wrapper:
-            "0.72.0-485-g7ec4df6d4/bio/bioinfokit/volcanoplot"
+            "0.72.0-493-g8b815973b/bio/bioinfokit/volcanoplot"
 
     """
     This rule creates a sample clustered heatmap from the filtered-counts table
@@ -88,14 +121,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 "header": 0,
                 "index_col": 0
             },
-            hmap={
+            hmap=config["bioinfokit"].get("heatmap_extra", {
                 "rowclus": True,
                 "colclus": True
-            }
+            })
         log:
             "logs/bioinfokit/sample_heatmap.png"
         wrapper:
-            "0.72.0-485-g7ec4df6d4/bio/bioinfokit/heatmap"
+            "0.72.0-493-g8b815973b/bio/bioinfokit/heatmap"
 
 
     """
@@ -120,14 +153,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 "header": 0,
                 "index_col": 0
             },
-            hmap={
-                "rowclus": True,
-                "colclus": True
-            }
+            maplot=config["bioinfokit"].get("maplot_extra", {
+                "lfc": "log2FoldChange",
+                "ct_count": "a.chr21",
+                "st_count": "e.chr21"
+            })
         log:
             "logs/bioinfokit/maplot.png"
         wrapper:
-            "0.72.0-485-g7ec4df6d4/bio/bioinfokit/maplot"
+            "0.72.0-493-g8b815973b/bio/bioinfokit/maplot"
 
 
     """
@@ -147,10 +181,13 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcard, attempt: attempt * 4096,
             time_min=lambda wildcard, attempt: attempt * 20
+        params:
+            alpha=config["thresholds"].get("deseq2_alpha", 0.05),
+            fc_threshold=config["thresholds"].get("fc_threshold", 0.01)
         log:
             "logs/deseq2/filter.log"
         wrapper:
-            "0.72.0-485-g7ec4df6d4/bio/pandas/deseq2_merge"
+            "0.72.0-493-g8b815973b/bio/pandas/deseq2_merge"
 
 
 
@@ -175,7 +212,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport/tx2gene.log"
         wrapper:
-            "0.72.0-485-g7ec4df6d4/bio/gtf/tx2gene"
+            "0.72.0-493-g8b815973b/bio/gtf/tx2gene"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

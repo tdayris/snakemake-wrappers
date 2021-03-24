@@ -29,30 +29,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 
     """
-    This rule merges and filters DESeq2 results in order to have human-sized
-    result tables.
-    """
-    rule filter_deseq2:
-        input:
-            wald_tsv = "deseq2/wald/Cond_compairing_B_vs_A.tsv",
-            dst_tsv = "deseq2/dst/Cond_compairing_B_vs_A.tsv",
-            gene2gene = "deseq2/gene2gene.tsv"
-        output:
-            filtered_counts="deseq2/filtered/filtered_counts.tsv",
-            filtered_deseq2="deseq2/filtered/filtered_deseq2.tsv",
-            merged_table="deseq2/filtered/merged.tsv"
-        message: "Filtering and merging DESeq2 results"
-        threads: 1
-        resources:
-            mem_mb=lambda wildcard, attempt: attempt * 4096,
-            time_min=lambda wildcard, attempt: attempt * 20
-        log:
-            "logs/deseq2/filter.log"
-        wrapper:
-            "0.72.0-485-g7ec4df6d4/bio/pandas/deseq2_merge"
-
-
-    """
     This rule performs the size factor and dispersions estimations as well as the
     wald test.
     """
@@ -83,7 +59,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/deseq.log"
         wrapper:
-            "0.72.0-485-g7ec4df6d4/bio/deseq2/DESeq"
+            "0.72.0-493-g8b815973b/bio/deseq2/DESeq"
 
 
     """
@@ -108,7 +84,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/deseq2_dataset_from_tximport.log"
         wrapper:
-            "0.72.0-485-g7ec4df6d4/bio/deseq2/DESeqDataSetFromTximport/"
+            "0.72.0-493-g8b815973b/bio/deseq2/DESeqDataSetFromTximport/"
 
 
     """
@@ -137,7 +113,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport.log"
         wrapper:
-            "0.72.0-485-g7ec4df6d4/bio/tximport"
+            "0.72.0-493-g8b815973b/bio/tximport"
 
 
     """
@@ -161,7 +137,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport/tx2gene.log"
         wrapper:
-            "0.72.0-485-g7ec4df6d4/bio/gtf/tx2gene"
+            "0.72.0-493-g8b815973b/bio/gtf/tx2gene"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

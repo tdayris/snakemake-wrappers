@@ -199,6 +199,40 @@
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
+<span class="n">default_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;thresholds&quot;</span><span class="p">:{</span>
+        <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+        <span class="s2">&quot;fc_threshold&quot;</span><span class="p">:</span> <span class="mf">0.01</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;bioinfokit&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;maplot_extra&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;lfc&quot;</span><span class="p">:</span> <span class="s2">&quot;log2FoldChange&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ct_count&quot;</span><span class="p">:</span> <span class="s2">&quot;a.chr21&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;st_count&quot;</span><span class="p">:</span> <span class="s2">&quot;e.chr21&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;heatmap_extra&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;rowclus&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;colclus&quot;</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;volcanoplot_extra&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;lfc&quot;</span><span class="p">:</span> <span class="s2">&quot;log2FoldChange&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pv&quot;</span><span class="p">:</span> <span class="s2">&quot;padj&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;geneid&quot;</span><span class="p">:</span> <span class="s2">&quot;Unnamed: 0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;lfc_thr&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">),</span>
+            <span class="s2">&quot;pv_thr&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span>
+            <span class="s2">&quot;gstyle&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;sign_line&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;plotlegend&quot;</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">config</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">():</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">default_config</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">default_config</span>
+
 <span class="k">def</span> <span class="nf">rst_exists</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    If a provided rst path exists, then it is returned,</span>
@@ -231,23 +265,22 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="n">read_csv</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;index_col&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="c1">#&quot;usecols&quot;: [&quot;Unnamed: 0&quot;, &quot;log2FoldChange&quot;, &quot;padj&quot;]</span>
+            <span class="s2">&quot;index_col&quot;</span><span class="p">:</span> <span class="kc">None</span>
         <span class="p">},</span>
-        <span class="n">volcano</span><span class="o">=</span><span class="p">{</span>
+        <span class="n">volcano</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;bioinfokit&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;volcanoplot_extra&quot;</span><span class="p">,</span> <span class="p">{</span>
             <span class="s2">&quot;lfc&quot;</span><span class="p">:</span> <span class="s2">&quot;log2FoldChange&quot;</span><span class="p">,</span>
             <span class="s2">&quot;pv&quot;</span><span class="p">:</span> <span class="s2">&quot;padj&quot;</span><span class="p">,</span>
             <span class="s2">&quot;geneid&quot;</span><span class="p">:</span> <span class="s2">&quot;Unnamed: 0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;lfc_thr&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lfc_thr&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)),</span>
-            <span class="s2">&quot;pv_thr&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pv_thr&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)),</span>
+            <span class="s2">&quot;lfc_thr&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">),</span>
+            <span class="s2">&quot;pv_thr&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span>
             <span class="s2">&quot;gstyle&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
             <span class="s2">&quot;sign_line&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
             <span class="s2">&quot;plotlegend&quot;</span><span class="p">:</span> <span class="kc">True</span>
-        <span class="p">}</span>
+        <span class="p">})</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bioinfokit/volcanoplot.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-485-g7ec4df6d4/bio/bioinfokit/volcanoplot&quot;</span>
+        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/bioinfokit/volcanoplot&quot;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule creates a sample clustered heatmap from the filtered-counts table</span>
@@ -270,14 +303,14 @@
             <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="s2">&quot;index_col&quot;</span><span class="p">:</span> <span class="mi">0</span>
         <span class="p">},</span>
-        <span class="n">hmap</span><span class="o">=</span><span class="p">{</span>
+        <span class="n">hmap</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;bioinfokit&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;heatmap_extra&quot;</span><span class="p">,</span> <span class="p">{</span>
             <span class="s2">&quot;rowclus&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
             <span class="s2">&quot;colclus&quot;</span><span class="p">:</span> <span class="kc">True</span>
-        <span class="p">}</span>
+        <span class="p">})</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bioinfokit/sample_heatmap.png&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-485-g7ec4df6d4/bio/bioinfokit/heatmap&quot;</span>
+        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/bioinfokit/heatmap&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -302,14 +335,15 @@
             <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="s2">&quot;index_col&quot;</span><span class="p">:</span> <span class="mi">0</span>
         <span class="p">},</span>
-        <span class="n">hmap</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;rowclus&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s2">&quot;colclus&quot;</span><span class="p">:</span> <span class="kc">True</span>
-        <span class="p">}</span>
+        <span class="n">maplot</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;bioinfokit&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;maplot_extra&quot;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s2">&quot;lfc&quot;</span><span class="p">:</span> <span class="s2">&quot;log2FoldChange&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ct_count&quot;</span><span class="p">:</span> <span class="s2">&quot;a.chr21&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;st_count&quot;</span><span class="p">:</span> <span class="s2">&quot;e.chr21&quot;</span>
+        <span class="p">})</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bioinfokit/maplot.png&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-485-g7ec4df6d4/bio/bioinfokit/maplot&quot;</span>
+        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/bioinfokit/maplot&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -329,10 +363,13 @@
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;thresholds&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deseq2_alpha&quot;</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span>
+        <span class="n">fc_threshold</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;thresholds&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fc_threshold&quot;</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deseq2/filter.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-485-g7ec4df6d4/bio/pandas/deseq2_merge&quot;</span>
+        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/pandas/deseq2_merge&quot;</span>
 
 
 
@@ -357,7 +394,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/tximport/tx2gene.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-485-g7ec4df6d4/bio/gtf/tx2gene&quot;</span>
+        <span class="s2">&quot;0.72.0-493-g8b815973b/bio/gtf/tx2gene&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
