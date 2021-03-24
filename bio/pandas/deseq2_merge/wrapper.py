@@ -146,4 +146,4 @@ if "filtered_deseq2" in snakemake.output.keys():
 if "merged_table" in snakemake.output.keys():
     logging.debug("Saving complete table to TSV")
     data.to_csv(snakemake.output["merged_table"], sep="\t")
-    logging.debug(tmp.head())
+    logging.debug(data.head())
