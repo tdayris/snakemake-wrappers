@@ -1,0 +1,16 @@
+rule test_bioinfokit_pca:
+    input:
+        counts="cot_pca.csv"
+    output:
+        loadings_correlation_heatmap="figures/loadings.png",
+        pca_scree="figures/screeplot.png",
+        pca_2d="figures/pca2d.png",
+        pca_3d="figures/pca3d.png",
+        biplot_2d="figures/biplot2d.png",
+        biplot_3d="figures/biplot3d.png"
+    params:
+        read_csv={"header": 0}
+    log:
+        "logs/pca.log"
+    wrapper:
+        "master/bio/bioinfokit/pca"
