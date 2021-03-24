@@ -17,6 +17,7 @@ logging.basicConfig(
     filemode="w",
     level=logging.DEBUG
 )
+logging.getLogger('matplotlib.font_manager').disabled = True
 
 
 # Recover both figure format and name from output file name
