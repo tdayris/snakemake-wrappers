@@ -40,7 +40,8 @@ ops = {
     ">=": operator.ge,
     "==": operator.eq,
     "<": operator.lt,
-    "<=": operator.le
+    "<=": operator.le,
+    "!=": operator.ne
 }
 
 if (sep := snakemake.params.get("separator", "\t")) != "\t":
@@ -64,6 +65,10 @@ if (filters := snakemake.params.get("filters", None)) is not None:
     logging.debug(f"The table will be filtered according to: {filters}")
     for filter in filters:
         data = filter_dataframe(data.copy, *filter)
+
+if (drop_any_na := snakemake.params.get("dropna", False)) is True:
+    logging.debug("Dropping NAs")
+    data.dropna(axis=0, how="any", inplace=True)
 
 logging.debug(f"Head of the final DataFrame:\n{data.head()}")
 
