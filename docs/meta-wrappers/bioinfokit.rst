@@ -81,7 +81,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/pca.log"
         wrapper:
-            "0.72.0-496-g97f5b53da/bio/bioinfokit/pca"
+            "0.72.0-501-g28151774c/bio/bioinfokit/pca"
 
 
     """
@@ -119,7 +119,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bioinfokit/volcanoplot.log"
         wrapper:
-            "0.72.0-496-g97f5b53da/bio/bioinfokit/volcanoplot"
+            "0.72.0-501-g28151774c/bio/bioinfokit/volcanoplot"
 
     """
     This rule creates a sample clustered heatmap from the filtered-counts table
@@ -149,7 +149,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bioinfokit/sample_heatmap.png"
         wrapper:
-            "0.72.0-496-g97f5b53da/bio/bioinfokit/heatmap"
+            "0.72.0-501-g28151774c/bio/bioinfokit/heatmap"
 
 
     """
@@ -182,7 +182,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bioinfokit/maplot.png"
         wrapper:
-            "0.72.0-496-g97f5b53da/bio/bioinfokit/maplot"
+            "0.72.0-501-g28151774c/bio/bioinfokit/maplot"
 
 
     """
@@ -208,7 +208,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/filter.log"
         wrapper:
-            "0.72.0-496-g97f5b53da/bio/pandas/deseq2_merge"
+            "0.72.0-501-g28151774c/bio/pandas/deseq2_merge"
 
 
 
@@ -233,7 +233,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport/tx2gene.log"
         wrapper:
-            "0.72.0-496-g97f5b53da/bio/gtf/tx2gene"
+            "0.72.0-501-g28151774c/bio/gtf/tx2gene"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

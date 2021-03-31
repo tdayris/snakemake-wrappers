@@ -24,7 +24,7 @@ This wrapper can be used in the following way:
         log:
             "filter.log"
         wrapper:
-            "0.72.0-496-g97f5b53da/bio/pandas/filter_table"
+            "0.72.0-501-g28151774c/bio/pandas/filter_table"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -118,7 +118,8 @@ Code
         ">=": operator.ge,
         "==": operator.eq,
         "<": operator.lt,
-        "<=": operator.le
+        "<=": operator.le,
+        "!=": operator.ne
     }
 
     if (sep := snakemake.params.get("separator", "\t")) != "\t":
@@ -142,6 +143,10 @@ Code
         logging.debug(f"The table will be filtered according to: {filters}")
         for filter in filters:
             data = filter_dataframe(data.copy, *filter)
+
+    if (drop_any_na := snakemake.params.get("dropna", False)) is True:
+        logging.debug("Dropping NAs")
+        data.dropna(axis=0, how="any", inplace=True)
 
     logging.debug(f"Head of the final DataFrame:\n{data.head()}")
 
