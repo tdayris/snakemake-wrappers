@@ -181,7 +181,23 @@ def test_bioinfokit_meta():
             "bioinfokit/figures/volcanoplot.png",
             "bioinfokit/figures/sample_heatmap.png",
             "bioinfokit/figures/maplot.png",
+            "bioinfokit/figures/loadings.png",
+            "--pr"
         ],
+    )
+
+
+@skip_if_not_modified
+def test_clusterprofiler_meta():
+    run(
+        "meta/bio/cluster_profiler",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            ""
+        ]
     )
 
 
@@ -3626,6 +3642,13 @@ def test_deseq2_to_gseaapp():
         ["snakemake", "results/complete.tsv", "--use-conda", "-F", "--cores", "1"],
     )
 
+@skip_if_not_modified
+def test_deseq2_deseq_dataset_from_tximport():
+    run(
+        "bio/deseq2/DESeqDataSetFromMatrix",
+        ["snakemake", "dds.RDS", "--use-conda", "-F", "--cores", "1"]
+    )
+
 
 def test_tx_to_gene():
     run(
@@ -4276,6 +4299,13 @@ def test_bioinfokit_volcanoplot():
     run(
         "bio/bioinfokit/volcanoplot",
         ["snakemake", "--cores", "1", "figures/testvolcano.png", "--use-conda", "-F"]
+    )
+
+@skip_if_not_modified
+def test_bioinfokit_pca():
+    run(
+        "bio/bioinfokit/pca",
+        ["snakemake", "--cores", "1", "figures/pca2d.png", "--use-conda", "-prF"]
     )
 
 
