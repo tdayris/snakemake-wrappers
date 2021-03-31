@@ -16,8 +16,6 @@ base::sink(log.file,type="message");
 
 # Differential Gene expression
 base::library(package = "DESeq2", quietly = TRUE);
-# Handle large datasets
-base::library(package = "SummarizedExperiment", quietly = TRUE);
 
 # Cast input path as character
 dds_path <- base::as.character(x = snakemake@input[["dds"]]);
