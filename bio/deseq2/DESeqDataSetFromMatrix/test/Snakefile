@@ -5,6 +5,8 @@ rule test_deseq2_from_data_matrix:
     output:
         dds="dds.RDS"
     params:
-        extra=" design=base::as.formula('~Cond') "
+        extra=" design=base::as.formula('~Cond') ",
+        factor="Cond",
+        level=["A", "B"]
     wrapper:
         "master/bio/deseq2/DESeqDataSetFromMatrix"
