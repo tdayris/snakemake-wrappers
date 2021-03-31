@@ -1,0 +1,10 @@
+rule test_deseq2_from_data_matrix:
+    input:
+        counts="counts.tsv",
+        coldata="colData.tsv"
+    output:
+        dds="dds.RDS"
+    params:
+        extra=" design=base::as.formula('~Cond') "
+    wrapper:
+        "master/bio/deseq2/DESeqDataSetFromMatrix"
