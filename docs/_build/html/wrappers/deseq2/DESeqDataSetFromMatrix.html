@@ -336,9 +336,11 @@
     <span class="n">output</span><span class="p">:</span>
         <span class="n">dds</span><span class="o">=</span><span class="s2">&quot;dds.RDS&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot; design=base::as.formula(&#39;~Cond&#39;) &quot;</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot; design=base::as.formula(&#39;~Cond&#39;) &quot;</span><span class="p">,</span>
+        <span class="n">factor</span><span class="o">=</span><span class="s2">&quot;Cond&quot;</span><span class="p">,</span>
+        <span class="n">level</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-501-g28151774c/bio/deseq2/DESeqDataSetFromMatrix&quot;</span>
+        <span class="s2">&quot;0.72.0-504-g15bd6157e/bio/deseq2/DESeqDataSetFromMatrix&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -452,6 +454,22 @@ with the paramerer : <cite>count_gene_col</cite>.</p>
     <span class="p">)</span>
   <span class="p">)</span>
 <span class="p">);</span>
+
+<span class="n">levels</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="s">&quot;levels&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">));</span>
+<span class="n">factor</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="s">&quot;factor&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">));</span>
+<span class="nf">if </span><span class="p">(</span><span class="n">levels</span> <span class="o">&amp;</span> <span class="n">factor</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1"># Levels should come with reference as first item</span>
+  <span class="n">levels</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span>
+    <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;levels&quot;</span><span class="p">]],</span>
+    <span class="nf">function</span><span class="p">(</span><span class="n">level</span><span class="p">)</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">level</span><span class="p">)</span>
+  <span class="p">);</span>
+  <span class="n">factor</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;factor&quot;</span><span class="p">]]);</span>
+
+  <span class="n">dds</span><span class="p">[[</span><span class="n">factor</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">factor</span><span class="p">(</span><span class="n">dds</span><span class="p">[[</span><span class="n">factor</span><span class="p">]],</span> <span class="n">levels</span> <span class="o">=</span> <span class="n">levels</span><span class="p">);</span>
+  <span class="n">dds</span><span class="p">[[</span><span class="n">factor</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="n">stats</span><span class="o">::</span><span class="nf">relevel</span><span class="p">(</span><span class="n">dds</span><span class="p">[[</span><span class="n">factor</span><span class="p">]],</span> <span class="n">ref</span> <span class="o">=</span> <span class="n">levels</span><span class="p">[[</span><span class="m">1</span><span class="p">]]);</span>
+  <span class="n">dds</span><span class="p">[[</span><span class="n">factor</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="nf">droplevels</span><span class="p">(</span><span class="n">dds</span><span class="p">[[</span><span class="n">factor</span><span class="p">]]);</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">write</span><span class="p">(</span><span class="s">&quot;Factors have been releveled&quot;</span><span class="p">,</span> <span class="nf">stderr</span><span class="p">());</span>
+<span class="p">}</span>
 
 
 <span class="c1"># Save as RDS</span>
