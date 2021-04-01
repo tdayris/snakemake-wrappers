@@ -19,6 +19,9 @@ samples_paths <- sapply(               # Sequentially apply
 
 # Collapse path into a character vector
 samples_paths <- base::paste0(samples_paths, collapse = '", "');
+if ("sample_names" %in% base::names(snakemake@params)) {
+  names(samples_paths) <- snakemake@params[["names"]];
+}
 
 # Building function arguments
 extra <- base::paste0('files = c("', samples_paths, '")');
