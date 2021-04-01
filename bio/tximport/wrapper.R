@@ -17,14 +17,12 @@ samples_paths <- sapply(               # Sequentially apply
   function(quant) as.character(quant)  # ... a cast as character
 );
 
-# Collapse path into a character vector
-samples_paths <- base::paste0(samples_paths, collapse = '", "');
 if ("sample_names" %in% base::names(snakemake@params)) {
   names(samples_paths) <- snakemake@params[["sample_names"]];
 }
 
 # Building function arguments
-extra <- base::paste0('files = c("', samples_paths, '")');
+extra <- base::paste0('files = c(samples_paths)');
 
 # Check if user provided optional transcript to gene table
 if ("tx_to_gene" %in% names(snakemake@input)) {
