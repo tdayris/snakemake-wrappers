@@ -60,3 +60,6 @@ if snakemake.params.get("norm", True) is True:
 
 if snakemake.params.get("EaCoN_dev", False) is True:
     shell('R --vanilla -e \'options(unzip = "internal"); Sys.setenv(TAR = \"$(which tar)\"); devtools::install_github("gustaveroussy/EaCoN", force=TRUE); \' {log}')
+
+if snakemake.params.get("EaCoN_chromosomes", False) is True:
+    shell('R --vanilla -e \'options(unzip = "internal"); Sys.setenv(TAR = \"$(which tar)\"); devtools::install_github("aoumess/chromosomes", force=TRUE);\' {log}')
