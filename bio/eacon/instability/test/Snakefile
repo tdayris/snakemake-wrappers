@@ -1,0 +1,28 @@
+rule test_eacon_genomic_instability:
+    input:
+        gamma_eval = multiext(
+            "{sample}/ASCAT/ASCN/{sample}.gemmeEval",
+            ".png",
+            ".txt"
+        )
+        gamma_results = expand(
+            "{sample}/ASCAT/ASCN/gamma{gammas}/{sample}.{files},
+            gammas=[f"{x/100:.2f}" for x in range(30, 95, 5)],
+            files=[
+                ".rawprofile.png",
+                ".Rorschach.clown.png",
+                ".TCNvsL2R.png",
+                ".cn",
+                "_model.txt",
+                ".ASCAT.png",
+                ".ASCAT.RDS"
+            ]
+        )
+    output:
+        "{sample}/{sample}_GIS_from_best_gamma.txt"
+    log:
+        "logs/eacon_genomic_instability.log"
+    params:
+        indir = "{sample}"  # Required!
+    wrapper:
+        "master/bio/eacon/instability"
