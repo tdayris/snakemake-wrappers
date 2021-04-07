@@ -1,7 +1,17 @@
 rule test_eacon_install:
     output:
         directory("sources")
+    params:
+        OncoScan = True,
+        OncoScanCNV = True,
+        CytoScan750K = True,
+        CytoScanHD = True,
+        genomewide = False,  # WARNING: Untrusted
+        norm = True,
+        EaCoN_dev = True,
+        EaCoN_chromosomes = True
+    cache: True
     log:
-        "install.log"
+        "logs/EaCoN/install.log"
     wrapper:
-        "master/bio/eacon/install"
+        "/bio/eacon/install"

@@ -47,7 +47,7 @@ if snakemake.params.get("CytoScanHD", True) is True:
     shell('R  --vanilla CMD INSTALL --clean --data-compress=gzip {out_dir}/CytoScanHD.Array.na36.r1_0.1.0.tar.gz {log}')
 
 if snakemake.params.get("genomewide", False) is True:
-    shell('R --vanilla CMD \'install_github("gustaveroussy/apt.snp6.1.20.0");\' {log}')
+    shell('R --vanilla CMD \'devtools::install_github("gustaveroussy/apt.snp6.1.20.0");\' {log}')
     shell('wget "https://nextcloud.gustaveroussy.fr/s/46iyPjPPjFsni5S/download" -O {out_dir}/GenomeWideSNP.6.na35.r1_0.1.0.tar.gz {log}')
     shell('R  --vanilla CMD INSTALL --clean --data-compress=gzip {out_dir}/GenomeWideSNP.6.na35.r1_0.1.0.tar.gz {log}')
 
