@@ -16,10 +16,20 @@ This wrapper can be used in the following way:
     rule test_eacon_install:
         output:
             directory("sources")
+        params:
+            OncoScan = True,
+            OncoScanCNV = True,
+            CytoScan750K = True,
+            CytoScanHD = True,
+            genomewide = False,  # WARNING: Untrusted
+            norm = True,
+            EaCoN_dev = True,
+            EaCoN_chromosomes = True
+        cache: True
         log:
-            "install.log"
+            "logs/EaCoN/install.log"
         wrapper:
-            "0.72.0-512-gb940f0d55/bio/eacon/install"
+            "0.72.0-523-gc911c3b69/bio/eacon/install"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -53,6 +63,8 @@ Software dependencies
 * ``bioconda:r-facets==0.5.14``
 * ``bioconda:cnv_facets==0.16.0``
 * ``bioconda:ascat==2.5.2``
+* ``conda-forge:r-foreach==1.5.1``
+* ``conda-forge:r-dplyr==1.0.5``
 
 Input/Output
 ------------
@@ -77,6 +89,8 @@ Parameters:
 * CytoScanHD: Install array specific libraries
 * norm: Install normalization methods (required for EaCoN)
 * EaCoN_dev: Install development version of EaCoN (overloads conda install)
+* EaCoN_chromosomes: Install EaCoN chromosome annotation
+* genomewide: Install genome wide information for WES and WGS
 
 
 
@@ -141,7 +155,7 @@ Code
         shell('R  --vanilla CMD INSTALL --clean --data-compress=gzip {out_dir}/CytoScanHD.Array.na36.r1_0.1.0.tar.gz {log}')
 
     if snakemake.params.get("genomewide", False) is True:
-        shell('R --vanilla CMD \'install_github("gustaveroussy/apt.snp6.1.20.0");\' {log}')
+        shell('R --vanilla CMD \'devtools::install_github("gustaveroussy/apt.snp6.1.20.0");\' {log}')
         shell('wget "https://nextcloud.gustaveroussy.fr/s/46iyPjPPjFsni5S/download" -O {out_dir}/GenomeWideSNP.6.na35.r1_0.1.0.tar.gz {log}')
         shell('R  --vanilla CMD INSTALL --clean --data-compress=gzip {out_dir}/GenomeWideSNP.6.na35.r1_0.1.0.tar.gz {log}')
 

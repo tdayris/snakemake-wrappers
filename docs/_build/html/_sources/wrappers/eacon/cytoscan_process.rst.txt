@@ -13,17 +13,34 @@ This wrapper can be used in the following way:
 
 .. code-block:: python
 
-    rule test_eacon_cytoscan_process:
+    rule eacon_cytoscan_process:
         input:
-            cel = "{sample}.CEL"
+            install = "sources",
+            cel = "{sample}.CEL",
         output:
-            qc = multiext(
-                "{sample}/{sample}_2.4.0_nar33.r4",
-                ".qc.txt",
-                ".log"
+            qc_txt = "{sample}/{sample}_2.4.0_{nar}.qc.txt".format(
+                sample="{sample}",
+                nar=config["params"]["nar"]
+            ),
+            log = "{sample}/{sample}_2.4.0_{nar}.log".format(
+                sample="{sample}",
+                nar=config["params"]["nar"]
             ),
             txt = "{sample}/{sample}_CELfile.txt",
-            rds = "{sample}/{sample}_CytoScanHD_Array_hg19_processed.RDS"
+            png = "{sample}/{sample}_{arraytype}_{genome}_rawplot.png".format(
+                sample="{sample}",
+                arraytype=config["params"]["arraytype"],
+                genome=config["params"]["genome"]
+            ),
+            rds = "{sample}/{sample}_{arraytype}_{genome}_processed.RDS".format(
+                sample="{sample}",
+                genome=config["params"]["genome"],
+                arraytype = config["params"]["arraytype"]
+            )
+        log:
+            "logs/EaCoN/{sample}/cytoscan_process.log"
+        wrapper:
+            "/bio/eacon/cytoscan_process"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -37,25 +54,28 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``conda-forge:r-devtools=2.3.2``
-* ``conda-forge:r-dbi=1.1.0``
-* ``conda-forge:r-rsqlite=2.2.1``
-* ``bioconda:r-eacon=0.3.4_1``
-* ``bioconda:bioconductor-bsgenome=1.54.0``
-* ``bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg19=1.4.0``
-* ``bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg38=1.4.1``
-* ``bioconda:bioconductor-bsgenome.hsapiens.1000genomes.hs37d5=0.99.1``
-* ``bioconda:bioconductor-affxparser=1.58.0``
-* ``bioconda:bioconductor-biostrings=2.54.0``
-* ``bioconda:bioconductor-aroma.light=3.16.0``
-* ``bioconda:bioconductor-copynumber=1.26.0``
-* ``bioconda:bioconductor-genomicranges=1.38.0``
-* ``bioconda:bioconductor-rhdf5=2.30.0``
-* ``bioconda:bioconductor-limma=3.42.0``
-* ``bioconda:r-sequenza=3.0.0``
-* ``bioconda:r-facets=0.5.14``
-* ``bioconda:cnv_facets=0.16.0``
-* ``bioconda:ascat=2.5.2``
+* ``conda-forge:r-devtools==2.3.2``
+* ``conda-forge:r-dbi==1.1.0``
+* ``conda-forge:r-rsqlite==2.2.1``
+* ``conda-forge:r-rmarkdown==2.4``
+* ``bioconda:r-eacon==0.3.4_1``
+* ``bioconda:bioconductor-bsgenome==1.54.0``
+* ``bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg19==1.4.0``
+* ``bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg38==1.4.1``
+* ``bioconda:bioconductor-bsgenome.hsapiens.1000genomes.hs37d5==0.99.1``
+* ``bioconda:bioconductor-affxparser==1.58.0``
+* ``bioconda:bioconductor-biostrings==2.54.0``
+* ``bioconda:bioconductor-aroma.light==3.16.0``
+* ``bioconda:bioconductor-copynumber==1.26.0``
+* ``bioconda:bioconductor-genomicranges==1.38.0``
+* ``bioconda:bioconductor-rhdf5==2.30.0``
+* ``bioconda:bioconductor-limma==3.42.0``
+* ``bioconda:r-sequenza==3.0.0``
+* ``bioconda:r-facets==0.5.14``
+* ``bioconda:cnv_facets==0.16.0``
+* ``bioconda:ascat==2.5.2``
+* ``conda-forge:r-foreach==1.5.1``
+* ``conda-forge:r-dplyr==1.0.5``
 
 Input/Output
 ------------
@@ -99,6 +119,11 @@ Code
     # __email__ = "thibault.dayris@gustaveroussy.fr"
     # __license__ = "MIT"
 
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt");
+    base::sink(log.file);
+    base::sink(log.file,type="message");
 
     library(package = "EaCoN", quietly = TRUE);
 
@@ -131,3 +156,8 @@ Code
         text = command
       )
     );
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    base::sink(type="message");
+    base::sink();

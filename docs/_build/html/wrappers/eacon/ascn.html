@@ -328,30 +328,71 @@
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_eacon_ascn</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_gamma_files</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="nb">eval</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/ASCAT/ASCN/</span><span class="si">{sample}</span><span class="s2">.gammaEval.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">sample</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="n">ext</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="s2">&quot;txt&quot;</span><span class="p">]</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Sometimes EaCoN formats floats with trailing zeros, sometimes it does not</span>
+    <span class="n">gamma_formats</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="o">/</span><span class="mi">100</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">95</span><span class="p">,</span> <span class="mi">5</span><span class="p">)],</span>
+        <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="o">/</span><span class="mi">100</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">95</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span>
+    <span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/ASCAT/ASCN/gamma</span><span class="si">{g1}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.gamma</span><span class="si">{g2}{files}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">sample</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">g1</span><span class="o">=</span><span class="n">g1</span><span class="p">,</span>
+            <span class="n">g2</span><span class="o">=</span><span class="n">g2</span><span class="p">,</span>
+            <span class="n">files</span><span class="o">=</span><span class="n">ext</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="ow">in</span> <span class="n">gamma_formats</span>
+        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="s2">&quot;.cn&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;_model.txt&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
+    <span class="n">results</span> <span class="o">+=</span> <span class="p">[</span>
+        <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/ASCAT/ASCN/gamma</span><span class="si">{g1}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{files}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">sample</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">g1</span><span class="o">=</span><span class="n">g1</span><span class="p">,</span>
+            <span class="n">g2</span><span class="o">=</span><span class="n">g2</span><span class="p">,</span>
+            <span class="n">files</span><span class="o">=</span><span class="n">ext</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="ow">in</span> <span class="n">gamma_formats</span>
+        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="s2">&quot;.rawprofile.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;.Rorschach.clown.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;.ASCN.ASCAT.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;.ASCN.ASCAT.RDS&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;.TCNvsL2R.png&quot;</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;eval&quot;</span><span class="p">:</span> <span class="nb">eval</span><span class="p">,</span>
+        <span class="s2">&quot;gamma_results&quot;</span><span class="p">:</span> <span class="n">results</span>
+    <span class="p">}</span>
+
+
+<span class="n">rule</span> <span class="n">eacon_ascn</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">rds</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/ASCAT/L2R/</span><span class="si">{sample}</span><span class="s2">.SEG.ASCAT.RDS&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">gamma_eval</span> <span class="o">=</span> <span class="n">multiext</span><span class="p">(</span>
-            <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/ASCAT/ASCN/</span><span class="si">{sample}</span><span class="s2">.gemmeEval&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;.png&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;.txt&quot;</span>
-        <span class="p">)</span>
-        <span class="n">gamma_results</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/ASCAT/ASCN/gamma</span><span class="si">{gammas}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{files}</span><span class="s2">,</span>
-            <span class="n">gammas</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="o">/</span><span class="mi">100</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">95</span><span class="p">,</span> <span class="mi">5</span><span class="p">)],</span>
-            <span class="n">files</span><span class="o">=</span><span class="p">[</span>
-                <span class="s2">&quot;.rawprofile.png&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;.Rorschach.clown.png&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;.TCNvsL2R.png&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;.cn&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;_model.txt&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;.ASCAT.png&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;.ASCAT.RDS&quot;</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
+        <span class="o">**</span><span class="n">get_gamma_files</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">1024</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/EaCoN/</span><span class="si">{sample}</span><span class="s2">/ascn.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-512-gb940f0d55/bio/eacon/ascn&quot;</span>
+        <span class="s2">&quot;0.72.0-523-gc911c3b69/bio/eacon/ascn&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -364,25 +405,28 @@ When running with</p>
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge:r-devtools=2.3.2</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge:r-dbi=1.1.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge:r-rsqlite=2.2.1</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:r-eacon=0.3.4_1</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-bsgenome=1.54.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg19=1.4.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg38=1.4.1</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-bsgenome.hsapiens.1000genomes.hs37d5=0.99.1</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-affxparser=1.58.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-biostrings=2.54.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-aroma.light=3.16.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-copynumber=1.26.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-genomicranges=1.38.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-rhdf5=2.30.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-limma=3.42.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:r-sequenza=3.0.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:r-facets=0.5.14</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:cnv_facets=0.16.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:ascat=2.5.2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge:r-devtools==2.3.2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge:r-dbi==1.1.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge:r-rsqlite==2.2.1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge:r-rmarkdown==2.4</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:r-eacon==0.3.4_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-bsgenome==1.54.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg19==1.4.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg38==1.4.1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-bsgenome.hsapiens.1000genomes.hs37d5==0.99.1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-affxparser==1.58.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-biostrings==2.54.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-aroma.light==3.16.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-copynumber==1.26.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-genomicranges==1.38.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-rhdf5==2.30.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:bioconductor-limma==3.42.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:r-sequenza==3.0.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:r-facets==0.5.14</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:cnv_facets==0.16.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:ascat==2.5.2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge:r-foreach==1.5.1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge:r-dplyr==1.0.5</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="input-output">
@@ -417,6 +461,12 @@ When running with</p>
 <span class="c1"># __email__ = &quot;thibault.dayris@gustaveroussy.fr&quot;</span>
 <span class="c1"># __license__ = &quot;MIT&quot;</span>
 
+<span class="c1"># Sink the stderr and stdout to the snakemake log file</span>
+<span class="c1"># https://stackoverflow.com/a/48173272</span>
+<span class="n">log.file</span><span class="o">&lt;-</span><span class="nf">file</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">log</span><span class="p">[[</span><span class="m">1</span><span class="p">]],</span><span class="n">open</span><span class="o">=</span><span class="s">&quot;wt&quot;</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">log.file</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">log.file</span><span class="p">,</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;message&quot;</span><span class="p">);</span>
+
 <span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;EaCoN&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
 
 <span class="c1"># Load user data</span>
@@ -446,6 +496,11 @@ When running with</p>
     <span class="n">text</span> <span class="o">=</span> <span class="n">command</span>
   <span class="p">)</span>
 <span class="p">);</span>
+
+<span class="c1"># Proper syntax to close the connection for the log file</span>
+<span class="c1"># but could be optional for Snakemake wrapper</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;message&quot;</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>

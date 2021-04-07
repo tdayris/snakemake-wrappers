@@ -13,11 +13,11 @@ This wrapper can be used in the following way:
 
 .. code-block:: python
 
-    rule test_eacon_annotate:
+    rule eacon_annotate:
         input:
             rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS",
             grd = "grd.pl",
-            database = "database"
+            ldb = "databases"
         output:
             multiext(
                 "{sample}/ASCAT/L2R/{sample}",
@@ -32,13 +32,17 @@ This wrapper can be used in the following way:
             ),
             expand(
                 "{sample}/ASCAT/L2R/chromosomes/{chromosome}",
-                chromosome = [f"chr{i}.png" for i in list(map(str, range(1, 23))) + ["X", "Y"]],
+                chromosome = [
+                    f"chr{i}.png" for i in list(map(str, range(1, 23))) + ["X", "Y"]
+                ],
                 allow_missing=True
             ),
             "{sample}/ASCAT/L2R/{sample}.REPORT.html",
             directory("{sample}/ASCAT/L2R/{sample}_solo.hg19")
+        log:
+            "logs/EaCoN/{sample}/annotate.log"
         wrapper:
-            "0.72.0-512-gb940f0d55/bio/eacon/annotate"
+            "0.72.0-523-gc911c3b69/bio/eacon/annotate"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -52,26 +56,28 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``conda-forge:r-devtools=2.3.2``
-* ``conda-forge:r-dbi=1.1.0``
-* ``conda-forge:r-rsqlite=2.2.1``
-* ``conda-forge:r-rmarkdown=2.4``
-* ``bioconda:r-eacon=0.3.4_1``
-* ``bioconda:bioconductor-bsgenome=1.54.0``
-* ``bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg19=1.4.0``
-* ``bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg38=1.4.1``
-* ``bioconda:bioconductor-bsgenome.hsapiens.1000genomes.hs37d5=0.99.1``
-* ``bioconda:bioconductor-affxparser=1.58.0``
-* ``bioconda:bioconductor-biostrings=2.54.0``
-* ``bioconda:bioconductor-aroma.light=3.16.0``
-* ``bioconda:bioconductor-copynumber=1.26.0``
-* ``bioconda:bioconductor-genomicranges=1.38.0``
-* ``bioconda:bioconductor-rhdf5=2.30.0``
-* ``bioconda:bioconductor-limma=3.42.0``
-* ``bioconda:r-sequenza=3.0.0``
-* ``bioconda:r-facets=0.5.14``
-* ``bioconda:cnv_facets=0.16.0``
-* ``bioconda:ascat=2.5.2``
+* ``conda-forge:r-devtools==2.3.2``
+* ``conda-forge:r-dbi==1.1.0``
+* ``conda-forge:r-rsqlite==2.2.1``
+* ``conda-forge:r-rmarkdown==2.4``
+* ``bioconda:r-eacon==0.3.4_1``
+* ``bioconda:bioconductor-bsgenome==1.54.0``
+* ``bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg19==1.4.0``
+* ``bioconda:bioconductor-bsgenome.hsapiens.ucsc.hg38==1.4.1``
+* ``bioconda:bioconductor-bsgenome.hsapiens.1000genomes.hs37d5==0.99.1``
+* ``bioconda:bioconductor-affxparser==1.58.0``
+* ``bioconda:bioconductor-biostrings==2.54.0``
+* ``bioconda:bioconductor-aroma.light==3.16.0``
+* ``bioconda:bioconductor-copynumber==1.26.0``
+* ``bioconda:bioconductor-genomicranges==1.38.0``
+* ``bioconda:bioconductor-rhdf5==2.30.0``
+* ``bioconda:bioconductor-limma==3.42.0``
+* ``bioconda:r-sequenza==3.0.0``
+* ``bioconda:r-facets==0.5.14``
+* ``bioconda:cnv_facets==0.16.0``
+* ``bioconda:ascat==2.5.2``
+* ``conda-forge:r-foreach==1.5.1``
+* ``conda-forge:r-dplyr==1.0.5``
 
 Input/Output
 ------------
@@ -83,16 +89,9 @@ Input/Output
 
 **Output:**
 
-* A RDS file
+* Multiple PNG and text files.
+* HTML report
 
-
-
-Notes
------
-
-Use extra parameters to st optional arguments
-
-Warning: This is very deeply linked to Gustave Roussy institute internal usage. GRD is not maintained and not easily share-able.
 
 
 
@@ -116,6 +115,12 @@ Code
     # __email__ = "thibault.dayris@gustaveroussy.fr"
     # __license__ = "MIT"
 
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt");
+    base::sink(log.file);
+    base::sink(log.file,type="message");
+
     library(package = "EaCoN", quietly = TRUE);
     library(package = "devtools", quietly = TRUE);
 
@@ -124,54 +129,34 @@ Code
       x = snakemake@input[["rds"]]
     )
 
-    extra <- "";
-    if ("extra" %in% base::names(snakemake@params)) {
-      extra <- base::paste0(
-        ", ",
-        base::as.character(x = snakemake@params[["extra"]])
-      );
-    }
-
-    grd_path <- base::normalizepath(
+    grd_path <- base::normalizePath(
       path = base::as.character(x=snakemake@input[["grd"]])
     );
 
-    base::Sys.setenv(
-      PATH = paste(
-        base::Sys.getenv("PATH"),
-        grd_path,
-        sep=":"
-      )
+    ldb <- base::normalizePath(
+      path = base::as.character(x=snakemake@input[["ldb"]])
     );
-
-    # Build command line
-    command <- base::paste0(
-      "EaCoN::ASCN.ff(",
-      "RDS.file = rds_path, ",
-      "grd = grd_path, "
-      extra,
-      ")"
-    );
-
-    # Run EaCoN
-    base::eval(
-      base::parse(
-        text = command
-      )
-    );
-
 
     base::Sys.setenv(
       PATH = paste(
         base::Sys.getenv("PATH"),
-        snakemake@config[["params"]][["scripts"]],
+        base::dirname(grd_path),
         sep=":"
       )
     );
+
+    print(base::Sys.getenv("PATH"));
+
 
     EaCoN::Annotate.ff(
-      RDS.file = snakemake@input[["rds"]],
-      author.name = "STRonGR",
-      ldb = snakemake@input[["ldb"]],
+      RDS.file = rds_path,
+      author.name = "BiGR",
+      ldb = ldb,
       solo = TRUE
     );
+
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    base::sink(type="message");
+    base::sink();

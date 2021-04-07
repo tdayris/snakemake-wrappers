@@ -331,10 +331,20 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_eacon_install</span><span class="p">:</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;sources&quot;</span><span class="p">)</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">OncoScan</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">OncoScanCNV</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">CytoScan750K</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">CytoScanHD</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">genomewide</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># WARNING: Untrusted</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">EaCoN_dev</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">EaCoN_chromosomes</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;install.log&quot;</span>
+        <span class="s2">&quot;logs/EaCoN/install.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-512-gb940f0d55/bio/eacon/install&quot;</span>
+        <span class="s2">&quot;0.72.0-523-gc911c3b69/bio/eacon/install&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -367,6 +377,8 @@ When running with</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">bioconda:r-facets==0.5.14</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">bioconda:cnv_facets==0.16.0</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">bioconda:ascat==2.5.2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge:r-foreach==1.5.1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge:r-dplyr==1.0.5</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="input-output">
@@ -390,6 +402,8 @@ When running with</p>
 <li><p>CytoScanHD: Install array specific libraries</p></li>
 <li><p>norm: Install normalization methods (required for EaCoN)</p></li>
 <li><p>EaCoN_dev: Install development version of EaCoN (overloads conda install)</p></li>
+<li><p>EaCoN_chromosomes: Install EaCoN chromosome annotation</p></li>
+<li><p>genomewide: Install genome wide information for WES and WGS</p></li>
 </ul>
 </div>
 <div class="section" id="authors">
@@ -450,7 +464,7 @@ When running with</p>
     <span class="n">shell</span><span class="p">(</span><span class="s1">&#39;R  --vanilla CMD INSTALL --clean --data-compress=gzip </span><span class="si">{out_dir}</span><span class="s1">/CytoScanHD.Array.na36.r1_0.1.0.tar.gz </span><span class="si">{log}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;genomewide&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-    <span class="n">shell</span><span class="p">(</span><span class="s1">&#39;R --vanilla CMD </span><span class="se">\&#39;</span><span class="s1">install_github(&quot;gustaveroussy/apt.snp6.1.20.0&quot;);</span><span class="se">\&#39;</span><span class="s1"> </span><span class="si">{log}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s1">&#39;R --vanilla CMD </span><span class="se">\&#39;</span><span class="s1">devtools::install_github(&quot;gustaveroussy/apt.snp6.1.20.0&quot;);</span><span class="se">\&#39;</span><span class="s1"> </span><span class="si">{log}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">shell</span><span class="p">(</span><span class="s1">&#39;wget &quot;https://nextcloud.gustaveroussy.fr/s/46iyPjPPjFsni5S/download&quot; -O </span><span class="si">{out_dir}</span><span class="s1">/GenomeWideSNP.6.na35.r1_0.1.0.tar.gz </span><span class="si">{log}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">shell</span><span class="p">(</span><span class="s1">&#39;R  --vanilla CMD INSTALL --clean --data-compress=gzip </span><span class="si">{out_dir}</span><span class="s1">/GenomeWideSNP.6.na35.r1_0.1.0.tar.gz </span><span class="si">{log}</span><span class="s1">&#39;</span><span class="p">)</span>
 
