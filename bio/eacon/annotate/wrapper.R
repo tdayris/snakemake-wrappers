@@ -44,8 +44,7 @@ EaCoN::Annotate.ff(
   RDS.file = rds_path,
   author.name = "BiGR",
   ldb = ldb,
-  solo = TRUE,
-  force = TRUE
+  solo = TRUE
 );
 
 
