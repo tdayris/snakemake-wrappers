@@ -1,11 +1,68 @@
-rule test_eacon_ascn:
+
+def get_gamma_files(config):
+    eval = [
+        "{sample}/ASCAT/ASCN/{sample}.gammaEval.{ext}".format(
+            sample="{sample}", ext=ext
+        )
+        for ext in ["png", "txt"]
+    ]
+
+    # Sometimes EaCoN formats floats with trailing zeros, sometimes it does not
+    gamma_formats = zip(
+        [f"{x/100:.2f}" for x in range(35, 95, 5)],
+        [f"{x/100}" for x in range(35, 95, 5)]
+    )
+
+    results = [
+        "{sample}/ASCAT/ASCN/gamma{g1}/{sample}.gamma{g2}{files}".format(
+            sample="{sample}",
+            g1=g1,
+            g2=g2,
+            files=ext
+        )
+        for g1, g2 in gamma_formats
+        for ext in [
+            ".cn",
+            "_model.txt",
+        ]
+    ]
+    results += [
+        "{sample}/ASCAT/ASCN/gamma{g1}/{sample}.{files}".format(
+            sample="{sample}",
+            g1=g1,
+            g2=g2,
+            files=ext
+        )
+        for g1, g2 in gamma_formats
+        for ext in [
+            ".rawprofile.png",
+            ".Rorschach.clown.png",
+            ".ASCN.ASCAT.png",
+            ".ASCN.ASCAT.RDS",
+            ".TCNvsL2R.png"
+        ]
+    ]
+
+    return {
+        "eval": eval,
+        "gamma_results": results
+    }
+
+
+rule eacon_ascn:
     input:
         rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS"
     output:
-        gamma_eval = multiext(
-            "{sample}/ASCAT/ASCN/{sample}.gemmeEval",
-            ".png",
-            ".txt"
-        )
-    wrapper:
-        "master/bio/eacon/ascn"
+        **get_gamma_files(config=config)
+    threads: 1
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 35,
+        mem_mb=lambda wildcards, attempt: attempt * 3 * 1024
+    log:
+        "logs/EaCoN/{sample}/ascn.log"
+    params:
+        extra = ""
+    conda:
+        "envs/EaCoN.yaml"
+    script:
+        "scripts/EaCoN_ascn.R"
