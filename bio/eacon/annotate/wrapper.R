@@ -7,6 +7,12 @@
 # __email__ = "thibault.dayris@gustaveroussy.fr"
 # __license__ = "MIT"
 
+# Sink the stderr and stdout to the snakemake log file
+# https://stackoverflow.com/a/48173272
+log.file<-file(snakemake@log[[1]],open="wt");
+base::sink(log.file);
+base::sink(log.file,type="message");
+
 library(package = "EaCoN", quietly = TRUE);
 library(package = "devtools", quietly = TRUE);
 
@@ -15,54 +21,35 @@ rds_path <- base::as.character(
   x = snakemake@input[["rds"]]
 )
 
-extra <- "";
-if ("extra" %in% base::names(snakemake@params)) {
-  extra <- base::paste0(
-    ", ",
-    base::as.character(x = snakemake@params[["extra"]])
-  );
-}
-
-grd_path <- base::normalizepath(
+grd_path <- base::normalizePath(
   path = base::as.character(x=snakemake@input[["grd"]])
 );
 
-base::Sys.setenv(
-  PATH = paste(
-    base::Sys.getenv("PATH"),
-    grd_path,
-    sep=":"
-  )
+ldb <- base::normalizePath(
+  path = base::as.character(x=snakemake@input[["ldb"]])
 );
-
-# Build command line
-command <- base::paste0(
-  "EaCoN::ASCN.ff(",
-  "RDS.file = rds_path, ",
-  "grd = grd_path, "
-  extra,
-  ")"
-);
-
-# Run EaCoN
-base::eval(
-  base::parse(
-    text = command
-  )
-);
-
 
 base::Sys.setenv(
   PATH = paste(
     base::Sys.getenv("PATH"),
-    snakemake@config[["params"]][["scripts"]],
+    base::dirname(grd_path),
     sep=":"
   )
 );
+
+print(base::Sys.getenv("PATH"));
+
 
 EaCoN::Annotate.ff(
-  RDS.file = snakemake@input[["rds"]],
-  author.name = "STRonGR",
-  ldb = snakemake@input[["ldb"]],
-  solo = TRUE
+  RDS.file = rds_path,
+  author.name = "BiGR",
+  ldb = ldb,
+  solo = TRUE,
+  force = TRUE
 );
+
+
+# Proper syntax to close the connection for the log file
+# but could be optional for Snakemake wrapper
+base::sink(type="message");
+base::sink();

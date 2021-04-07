@@ -1,8 +1,8 @@
-rule test_eacon_annotate:
+rule eacon_annotate:
     input:
         rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS",
         grd = "grd.pl",
-        database = "database"
+        ldb = "databases"
     output:
         multiext(
             "{sample}/ASCAT/L2R/{sample}",
@@ -17,10 +17,14 @@ rule test_eacon_annotate:
         ),
         expand(
             "{sample}/ASCAT/L2R/chromosomes/{chromosome}",
-            chromosome = [f"chr{i}.png" for i in list(map(str, range(1, 23))) + ["X", "Y"]],
+            chromosome = [
+                f"chr{i}.png" for i in list(map(str, range(1, 23))) + ["X", "Y"]
+            ],
             allow_missing=True
         ),
         "{sample}/ASCAT/L2R/{sample}.REPORT.html",
         directory("{sample}/ASCAT/L2R/{sample}_solo.hg19")
+    log:
+        "logs/EaCoN/{sample}/annotate.log"
     wrapper:
-        "master/bio/eacon/annotate"
+        "/bio/eacon/annotate"
