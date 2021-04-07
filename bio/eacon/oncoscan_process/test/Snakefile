@@ -1,16 +1,18 @@
-rule test_eacon_oncoscan_process:
+rule eacon_oncoscan_process:
     input:
         install = "sources",
         ATChannelCel = "{sample}_A.CEL",
         GCChannelCel = "{sample}_C.CEL"
     output:
-        qc = multiext(
-            "{sample}/{sample}_2.4.0_nar33.r2",
-            ".qc.txt",
-            ".log",
-            ".paircheck.txt"
-        ),
-        txt = "{sample}/{sample}_nar33.r2_hg19_rawplot.png",
+        qc_txt = "{sample}/{sample}_2.4.0_na33.r2.qc.txt",
+        log = "{sample}/{sample}_2.4.0_na33.r2.log",
+        paircheck = "{sample}/{sample}_2.4.0_na33.r2.paircheck.txt",
+        pairs = "{sample}/{sample}_pairs.txt",
+        png = "{sample}/{sample}_OncoScan_CNV_hg19_rawplot.png",
         rds = "{sample}/{sample}_OncoScan_CNV_hg19_processed.RDS"
+    log:
+        "logs/EaCoN/{sample}/oncoscan_process.log"
+    params:
+        extra = "force=TRUE"
     wrapper:
-        "master/bio/eacon/oncoscan_process"
+        "/bio/eacon/oncoscan_process"
