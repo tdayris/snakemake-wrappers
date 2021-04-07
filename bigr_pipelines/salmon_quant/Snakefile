@@ -1,0 +1,30 @@
+from snakemake.utils import min_version
+from pathlib import Path
+from yaml import dump
+min_version("6.0")
+
+default_salmon_config = {
+    "design": "design.tsv"
+    "ref": {
+        "gtf": "/path/to/gtf",
+        "transcriptome": "/path/to/fasta",
+        "genome": "/path/to/other/fasta"
+    },
+    "params":
+        "salmon_libtype": "A",
+        "salmon_quant_extra": "--numBootstraps 100 --validateMappings --gcBias --seqBias --posBias",
+        "salmon_index_extra": "--keepDuplicates --gencode"
+}
+
+config_path = Path("config.yaml")
+if not config_path.exists():
+    sample_at_identifiers = [
+        cel.name[:-len("_A.CEL")]
+        for cel in config_path.parent.iterdir()
+        if cel.endswith("_A.CEL")
+    ]
+    default_cytoscan_process_config["samples"] = sample_at_identifiers
+    with config_path.open("w") as config_stream:
+        config_stream.write(
+            dump(default_cytoscan_process_config, default_flow_style=False)
+        )

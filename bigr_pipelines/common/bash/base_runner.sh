@@ -1,0 +1,52 @@
+set -e
+
+# This function only changes echo headers
+# for user's sake.
+function message() {
+  # Define local variables
+  local status=${1}         # Either INFO, CMD, ERROR or DOC
+  local message="${2:-1}"   # Your message
+
+  # Classic switch based on status
+  if [ ${status} = INFO ]; then
+    >&2 echo -e "\033[1;36m@INFO:\033[0m ${message}"
+  elif [ ${status} = CMD ]; then
+    >&2 echo -e "\033[1;32m@CMD:\033[0m ${message}"
+  elif [ ${status} = ERROR ]; then
+    >&2 echo -e "\033[41m@ERROR:\033[0m ${message}"
+  elif [ ${status} = DOC ]; then
+    >&2 echo -e "\033[0;33m@DOC:\033[0m ${message}"
+  else
+    error_handling ${LINENO} 1 "Unknown message type: ${status}"
+  fi
+}
+
+# This function will take error messages and exit the program
+function error_handling() {
+  # Geathering input parameter (message, third parameter is optionnal)
+  echo -ne "\n"
+  local parent_lineno="$1"
+  local code="$2"
+  local message="${3:-1}"
+
+  # Checking the presence or absence of message
+  if [[ -n "$message" ]] ; then
+    # Case message is present
+    message ERROR "Error on or near line ${parent_lineno}:\n ${message}"
+    message ERROR "Exiting with status ${code}"
+  else
+    # Case message is not present
+    message ERROR "Error on or near line ${parent_lineno}"
+    message ERROR "Exiting with status ${code}"
+  fi
+
+  # Exiting with given error code
+  exit "${code}"
+}
+
+declare -x CONDA_ENV_PATH="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/env/"
+declare -x SNAKEMAKE_OUTPUT_CACHE="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/cache"
+export SNAKEMAKE_OUTPUT_CACHE CONDA_ENV_PATH
+message INFO "The following variables have been added to your environment:"
+message INFO "SNAKEMAKE_OUTPUT_CACHE=${SNAKEMAKE_OUTPUT_CACHE}"
+message INFO "CONDA_ENV_PATH=${CONDA_ENV_PATH}"
