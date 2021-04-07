@@ -1,15 +1,23 @@
-rule test_eacon_segment:
+rule EaCoN_segment:
     input:
         rds = "{sample}/{sample}_OncoScan_CNV_hg19_processed.RDS"
     output:
         files = multiext(
             "{sample}/ASCAT/L2R/{sample}",
-            "Cut.cbs",
-            "NoCut.cbs",
-            "Rorschach.png",
-            "SegmentedBAF.txt"
+            ".Cut.cbs",
+            ".NoCut.cbs",
+            ".Rorschach.png",
+            ".SegmentedBAF.txt"
         ),
         rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS",
-        png = "{sample}/ASCAT/L2R/{sample}.SEG.png"
+        png = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.png"
+    threads: 1
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 35,
+        mem_mb=lambda wildcards, attempt: attempt * 3 * 1024
+    log:
+        "logs/EaCoN/{sample}/segment.log"
+    params:
+        extra = ""
     wrapper:
         "master/bio/eacon/segment"
