@@ -1,28 +1,67 @@
-rule test_eacon_genomic_instability:
+
+def get_gamma_files(config):
+    eval = [
+        "{sample}/ASCAT/ASCN/{sample}.gammaEval.{ext}".format(
+            sample="{sample}", ext=ext
+        )
+        for ext in ["png", "txt"]
+    ]
+
+    # Sometimes EaCoN formats floats with trailing zeros, sometimes it does not
+    gamma_formats = zip(
+        [f"{x/100:.2f}" for x in range(35, 95, 5)],
+        [f"{x/100}" for x in range(35, 95, 5)]
+    )
+
+    results = [
+        "{sample}/ASCAT/ASCN/gamma{g1}/{sample}.gamma{g2}{files}".format(
+            sample="{sample}",
+            g1=g1,
+            g2=g2,
+            files=ext
+        )
+        for g1, g2 in gamma_formats
+        for ext in [
+            ".cn",
+            "_model.txt",
+        ]
+    ]
+    results += [
+        "{sample}/ASCAT/ASCN/gamma{g1}/{sample}.{files}".format(
+            sample="{sample}",
+            g1=g1,
+            g2=g2,
+            files=ext
+        )
+        for g1, g2 in gamma_formats
+        for ext in [
+            ".rawprofile.png",
+            ".Rorschach.clown.png",
+            ".ASCN.ASCAT.png",
+            ".ASCN.ASCAT.RDS",
+            ".TCNvsL2R.png"
+        ]
+    ]
+
+    return {
+        "eval": eval,
+        "gamma_results": results
+    }
+
+rule eacon_genomic_instability:
     input:
-        gamma_eval = multiext(
-            "{sample}/ASCAT/ASCN/{sample}.gemmeEval",
-            ".png",
-            ".txt"
-        )
-        gamma_results = expand(
-            "{sample}/ASCAT/ASCN/gamma{gammas}/{sample}.{files},
-            gammas=[f"{x/100:.2f}" for x in range(30, 95, 5)],
-            files=[
-                ".rawprofile.png",
-                ".Rorschach.clown.png",
-                ".TCNvsL2R.png",
-                ".cn",
-                "_model.txt",
-                ".ASCAT.png",
-                ".ASCAT.RDS"
-            ]
-        )
+        **get_gamma_files(config=config)
     output:
         "{sample}/{sample}_GIS_from_best_gamma.txt"
+    threads: 1
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 35,
+        mem_mb=lambda wildcards, attempt: attempt * 2 * 1024
     log:
-        "logs/eacon_genomic_instability.log"
+        "logs/EaCoN/{sample}/genomic_instability.log"
     params:
-        indir = "{sample}"  # Required!
+        indir = "{sample}",  # Required!
+        genome = "hg19",
+        segmenter = "ASCAT"
     wrapper:
-        "master/bio/eacon/instability"
+        "/bio/eacon/instability"

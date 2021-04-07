@@ -13,6 +13,10 @@ log.file <- file(
 base::sink(log.file);
 base::sink(log.file,type="message");
 
+base::library(package="ASCAT", quietly=TRUE);
+base::library(package="EaCoN", quietly=TRUE);
+base::library(package="chromosomes", quietly=TRUE);
+
 indir <- base::as.character(x=snakemake@params[["indir"]]);
 
 genome <- "hg19";
@@ -25,51 +29,35 @@ if ("segmenter" %in% base::names(snakemake@params)) {
   genome <- base::as.character(x=snakemake@params[["segmenter"]]);
 }
 
-## Checking args
-if (is.null(indir)) stop(
-  "An EaCoN results directory is required !"
-);
-if (!file.exists(indir)) stop(
-  paste0("Input directory '", infile, "' could not be found !")
-);
-
-## Checking if chromosomes is installed
-if (!('chromosomes' %in% installed.packages())) {
-  if (!('devtools' %in% installed.packages())) {
-    install.packages('devtools')
-  }
-  devtools::install_github('aoumess/chromosomes')
-}
-
 ## Loading chromosomes data
-data(list = genome, package = "chromosomes", envir = environment());
+utils::data(list = genome, package = "chromosomes", envir = environment());
 
 
 ## Loading the gammaEval file
-samplename <- basename(indir);
+samplename <- base::basename(path=indir);
 if ("sample_name" %in% base::names(snakemake@params)) {
   samplename <- base::as.character(x=snakemake@params[["samplename"]]);
 }
-tcnsegdir <- paste0(indir, '/', segmenter, '/ASCN/');
-gE <- read.table(
-    paste0(tcnsegdir, samplename, '.gammaEval.txt'),
+tcnsegdir <- base::paste0(indir, '/', segmenter, '/ASCN/');
+gE <- utils::read.table(
+    base::paste0(tcnsegdir, samplename, '.gammaEval.txt'),
     header = TRUE,
     sep = "\t"
 );
 
 
 ## Looking for the optimal model
-gE$round.psi <- round(gE$psi)
-gE$round.psi.diff <- abs(gE$psi - gE$round.psi)
-gE$gof.rank <- rank(gE$GoF)
-gE$rpd.rank <- rank(gE$round.psi.diff)
+gE$round.psi <- base::round(gE$psi)
+gE$round.psi.diff <- base::abs(gE$psi - gE$round.psi)
+gE$gof.rank <- base::rank(gE$GoF)
+gE$rpd.rank <- base::rank(gE$round.psi.diff)
 gE$score <- gE$gof.rank - gE$rpd.rank
 
-best.gamma <- sprintf("%.2f", gE$gamma[which.max(gE$score)])
+best.gamma <- base::sprintf("%.2f", gE$gamma[base::which.max(gE$score)])
 
 ## Loading TCN-CBS file
-as.res <- readRDS(
-  file = paste0(
+as.res <- base::readRDS(
+  file = base::paste0(
     tcnsegdir, '/gamma', best.gamma, '/', samplename, '.ASCN.ASCAT.RDS'
   )
 );
@@ -83,29 +71,31 @@ ploidy <- as.res$ploidy$ascat
 gof <- as.res$goodnessOfFit
 ### Sum of segments lengths multiplied by the absolute difference to diploidy,
 ### divided by the genome length.
-SKOR1 <- sum(
-  abs(as.res$segments$TCN - 2
+SKOR1 <- base::sum(
+  base::abs(as.res$segments$TCN - 2
 ) * as.res$segments$Width) / cs$genome.length
 ### Sum of segments lengths multiplied by the absolute difference
 ### to exact ASCAT2-predicted ploidy, divided by the genome length.
-SKOR2 <- sum(
-  abs(as.res$segments$TCN - ploidy
+SKOR2 <- base::sum(
+  base::abs(as.res$segments$TCN - ploidy
 ) * as.res$segments$Width) / cs$genome.length
 ### Sum of segments lengths multiplied by the absolute difference to rounded ASCAT2-predicted ploidy, divided by the genome length.
-SKOR3 <- sum(
-  abs(as.res$segments$TCN - round(ploidy)
+SKOR3 <- base::sum(
+  base::abs(as.res$segments$TCN - base::round(ploidy)
 ) * as.res$segments$Width) / cs$genome.length
 ### Nb of segments
-NBSEG <- nrow(as.res$segments)
+NBSEG <- base::nrow(as.res$segments)
 ### Compute a score on a per-chromosome basis, taking the longest ACN (in bp)
 ### as normal basis
 library(foreach)
 suppressPackageStartupMessages(library(dplyr))
-LOKAL1 <- sum(foreach (k = unique(as.res$segments$chr), .combine = "c") %do% {
-  miniseg <- tibble::as_tibble(as.res$segments[as.res$segments$chr == k,])
-  basistbl <- miniseg %>% group_by(TCN) %>% summarise(sum(Width))
-  basis <- basistbl$TCN[which.max(as.data.frame(basistbl)[,2])]
-  KSCOR <- sum(abs(miniseg$TCN  - basis) * miniseg$Width) / cs$genome.length
+LOKAL1 <- base::sum(foreach (k = unique(as.res$segments$chr), .combine = "c") %do% {
+  miniseg <- tibble::as_tibble(as.res$segments[as.res$segments$chr == k,]);
+  basistbl <- miniseg %>% dplyr::group_by(
+    TCN
+  ) %>% dplyr::summarise(base::sum(Width));
+  basis <- basistbl$TCN[base::which.max(as.data.frame(basistbl)[,2])];
+  KSCOR <- base::sum(base::abs(miniseg$TCN  - basis) * miniseg$Width) / cs$genome.length
   return(KSCOR)
 })
 
@@ -122,9 +112,9 @@ outdf <- data.frame(
   LOCAL1 = LOKAL1,
   stringsAsFactors = FALSE
 );
-write.table(
+utils::write.table(
     x = outdf,
-    file = paste0(
+    file = base::paste0(
       indir, '/', samplename, '_GIS_from_best_gamma.txt'
     ),
     quote = FALSE,
