@@ -1,0 +1,1 @@
+This directory should not be modified manually. It contains main environment used to run all pipelines.
