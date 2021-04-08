@@ -26,7 +26,7 @@ if ("genome" %in% base::names(snakemake@params)) {
 
 segmenter <- "ASCAT";
 if ("segmenter" %in% base::names(snakemake@params)) {
-  genome <- base::as.character(x=snakemake@params[["segmenter"]]);
+  segmenter <- base::as.character(x=snakemake@params[["segmenter"]]);
 }
 
 ## Loading chromosomes data
