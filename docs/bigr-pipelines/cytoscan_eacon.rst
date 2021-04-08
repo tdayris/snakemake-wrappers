@@ -8,9 +8,23 @@ Analyse Cytoscans with EaCoN on Flamingo
 Usage
 -----
 
-1. Go to your repository with CEL Cytoscan files: `cd /path/to/CEL/dir`
-2. Run pipeline: `bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/cytoscan_eacon/run.sh"`
+In order to run the pipeline, use the following commands
 
+.. list-table::
+  :widths: 10 80
+  :header-rows: 1
+  :align: left
+
+  * - 
+    - .. code-block:: bash 
+
+        
+
+        cd /path/to/CEL/dir
+
+        
+
+        bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/cytoscan_eacon/run.sh
 
 
 

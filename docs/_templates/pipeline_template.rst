@@ -8,7 +8,17 @@
 Usage
 -----
 
-{{ usage }}
+In order to run the pipeline, use the following commands
+
+.. list-table::
+  :widths: 10 80
+  :header-rows: 1
+  :align: left
+
+  * - {{ section }}
+    - .. code-block:: bash {% for cmd in usage %}
+
+        {{ cmd | replace("\#", "#")}}{% endfor %}
 
 {% if notes %}
 
