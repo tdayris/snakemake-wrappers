@@ -21,6 +21,51 @@ In order to run the pipeline, use the following commands
   bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/cytoscan_eacon/run.sh
 
 
+Input/Output
+------------
+
+
+**Input:**
+
+ 
+  
+* A single CEL file
+  
+ 
+
+
+**Output:**
+
+ 
+  
+* Complete EaCoN anaysis directory
+  
+ 
+  
+* HTML report
+  
+ 
+
+
+
+
+
+Used meta-wrappers
+------------------
+
+The following individual meta-wrappers are used in this pipeline:
+
+
+* :ref:`meta/bio/eacon_cytoscan`
+
+* :ref:`meta/bio/eacon_post_process`
+
+
+Please refer to each meta-wrapper in above list for additional configuration parameters and information about the executed code.
+
+
+
+
 
 
 Authors

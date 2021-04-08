@@ -14,8 +14,6 @@ In order to run the pipeline, use the following commands
 
   {{ cmd | replace("\#", "#") }}{% endfor %}
 
-{% if notes %}
-
 {% if input and output %}
 Input/Output
 ------------
@@ -35,25 +33,21 @@ Input/Output
 
 {% endfor %}
 {% endif %}
-
 {% if usedmetawrappers|length %}
-
 
 Used meta-wrappers
 ------------------
 
 The following individual meta-wrappers are used in this pipeline:
 
-{% for uw in usedmetawrappers %}
-* :ref:`{{ uw }}`
+{% for umw in usedmetawrappers %}
+* :ref:`{{ umw }}`
 {% endfor %}
 
-Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
+Please refer to each meta-wrapper in above list for additional configuration parameters and information about the executed code.
 
 {% endif %}
-
 {% if usedwrappers|length %}
-
 
 Used wrappers
 -------------
@@ -67,6 +61,7 @@ The following individual wrappers are used in this pipeline:
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
 
 {% endif %}
+{% if notes %}
 
 Notes
 -----
