@@ -10,14 +10,9 @@ Usage
 
 In order to run the pipeline, use the following commands
 
-.. list-table::
-  :widths: 10 80
-  :header-rows: 1
-  :align: left
+.. code-block:: bash {% for cmd in usage %}
 
-  .. code-block:: bash {% for cmd in usage %}
-
-      {{ cmd | replace("\#", "#")}}{% endfor %}
+  {{ cmd | replace("\#", "#") }}{% endfor %}
 
 {% if notes %}
 
