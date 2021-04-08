@@ -92,7 +92,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Wrappers and Meta-Wrappers</span></p>
+              <p class="caption"><span class="caption-text">Wrappers, Meta-Wrappers and Pipelines</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../../wrappers.html">Wrappers</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../BiGR.html">BIGR</a></li>
@@ -250,6 +250,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../meta-wrappers.html">Meta-Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pipelines.html">BiGR Pipelines</a></li>
 </ul>
 
             
@@ -392,7 +393,7 @@
         <span class="n">genome</span> <span class="o">=</span> <span class="s2">&quot;hg19&quot;</span><span class="p">,</span>
         <span class="n">segmenter</span> <span class="o">=</span> <span class="s2">&quot;ASCAT&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-523-gc911c3b69/bio/eacon/instability&quot;</span>
+        <span class="s2">&quot;0.72.0-527-g77ebd74e2/bio/eacon/instability&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -477,7 +478,7 @@ When running with</p>
 
 <span class="n">segmenter</span> <span class="o">&lt;-</span> <span class="s">&quot;ASCAT&quot;</span><span class="p">;</span>
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;segmenter&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
-  <span class="n">genome</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;segmenter&quot;</span><span class="p">]]);</span>
+  <span class="n">segmenter</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;segmenter&quot;</span><span class="p">]]);</span>
 <span class="p">}</span>
 
 <span class="c1">## Loading chromosomes data</span>
@@ -505,6 +506,8 @@ When running with</p>
 <span class="n">gE</span><span class="o">$</span><span class="n">score</span> <span class="o">&lt;-</span> <span class="n">gE</span><span class="o">$</span><span class="n">gof.rank</span> <span class="o">-</span> <span class="n">gE</span><span class="o">$</span><span class="n">rpd.rank</span>
 
 <span class="n">best.gamma</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">sprintf</span><span class="p">(</span><span class="s">&quot;%.2f&quot;</span><span class="p">,</span> <span class="n">gE</span><span class="o">$</span><span class="n">gamma</span><span class="p">[</span><span class="n">base</span><span class="o">::</span><span class="nf">which.max</span><span class="p">(</span><span class="n">gE</span><span class="o">$</span><span class="n">score</span><span class="p">)])</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">gE</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">gE</span><span class="p">[</span><span class="n">gE</span><span class="o">$</span><span class="n">gamma</span> <span class="o">==</span> <span class="n">best.gamma</span><span class="p">,</span> <span class="p">]);</span>
 
 <span class="c1">## Loading TCN-CBS file</span>
 <span class="n">as.res</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">readRDS</span><span class="p">(</span>
@@ -553,9 +556,9 @@ When running with</p>
 <span class="c1">## Generating output</span>
 <span class="n">outdf</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span>
   <span class="n">best.gamma</span> <span class="o">=</span> <span class="n">best.gamma</span><span class="p">,</span>
-  <span class="n">psi</span> <span class="o">=</span> <span class="n">gE</span><span class="p">[</span><span class="n">best.gamma</span><span class="p">,</span> <span class="n">psi</span><span class="p">],</span>
-  <span class="n">gof</span> <span class="o">=</span> <span class="n">gE</span><span class="p">[</span><span class="n">best.gamma</span><span class="p">,</span> <span class="n">gof</span><span class="p">],</span>
-  <span class="n">score</span> <span class="o">=</span> <span class="n">gE</span><span class="p">[</span><span class="n">best.gamma</span><span class="p">,</span> <span class="n">score</span><span class="p">],</span>
+  <span class="n">psi</span> <span class="o">=</span> <span class="n">gE</span><span class="p">[</span><span class="n">gE</span><span class="o">$</span><span class="n">gamma</span> <span class="o">==</span> <span class="n">best.gamma</span><span class="p">,</span> <span class="s">&quot;psi&quot;</span><span class="p">],</span>
+  <span class="n">gof</span> <span class="o">=</span> <span class="n">gE</span><span class="p">[</span><span class="n">gE</span><span class="o">$</span><span class="n">gamma</span> <span class="o">==</span> <span class="n">best.gamma</span><span class="p">,</span> <span class="s">&quot;GoF&quot;</span><span class="p">],</span>
+  <span class="n">score</span> <span class="o">=</span> <span class="n">gE</span><span class="p">[</span><span class="n">gE</span><span class="o">$</span><span class="n">gamma</span> <span class="o">==</span> <span class="n">best.gamma</span><span class="p">,</span> <span class="s">&quot;score&quot;</span><span class="p">],</span>
   <span class="n">SCORE1</span> <span class="o">=</span> <span class="n">SKOR1</span><span class="p">,</span>
   <span class="n">SCORE2</span> <span class="o">=</span> <span class="n">SKOR2</span><span class="p">,</span>
   <span class="n">SCORE3</span> <span class="o">=</span> <span class="n">SKOR3</span><span class="p">,</span>

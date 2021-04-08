@@ -6,11 +6,14 @@ import subprocess
 
 DISCIPLINES = ["bio", "utils"]
 META_DISCIPLINES = ["bio"]
+PIPELINE_DISCIPLINES = ["bigr_pipelines"]
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WRAPPER_DIR = os.path.dirname(BASE_DIR)
 OUTPUT_DIR = os.path.join(BASE_DIR, "wrappers")
 META_OUTPUT_DIR = os.path.join(BASE_DIR, "meta-wrappers")
+PIPELINE_OUTPUT_DIR = os.path.join(BASE_DIR, "bigr-pipelines")
+
 SCRIPTS = {"wrapper.py", "wrapper.R"}
 BLACKLIST = {
     ".snakemake",
@@ -27,6 +30,12 @@ BLACKLIST = {
     "test.py",
     ".pytest_cache",
 } | SCRIPTS
+PIPELINE_BLACKLIST = {
+    "common",
+    "oncoscan_eacon",
+    "salmon_quant",
+    "README.md"
+}
 TAG = subprocess.check_output(["git", "describe", "--tags"]).decode().strip()
 
 
@@ -38,6 +47,9 @@ with open(os.path.join(BASE_DIR, "_templates", "wrapper.rst")) as f:
 
 with open(os.path.join(BASE_DIR, "_templates", "meta_wrapper.rst")) as f:
     TEMPLATE_META = Template(f.read())
+
+with open(os.path.join(BASE_DIR, "_templates", "pipeline_template.rst")) as f:
+    TEMPLATE_PIPELINE = Template(f.read())
 
 
 def get_tool_dir(tool):
@@ -117,6 +129,10 @@ def render_meta(path, target):
         with open(wrapperpath) as env:
             env = yaml.load(env, Loader=yaml.BaseLoader)
             used_wrappers = env["wrappers"]
+            used_wrappers = [
+                f"master{uw}" if uw.startswith("/") else uw
+                for uw in used_wrappers
+            ]
     else:
         used_wrappers = []
 
@@ -124,6 +140,7 @@ def render_meta(path, target):
 
     name = meta["name"].replace(" ", "_") + ".rst"
     os.makedirs(os.path.dirname(target), exist_ok=True)
+
     with open(target, "w") as readme:
         rst = TEMPLATE_META.render(
             snakefile=snakefile,
@@ -133,6 +150,20 @@ def render_meta(path, target):
         readme.write(rst)
     return name
 
+
+def render_pipeline(path, target):
+    print("rendering", path)
+    with open(os.path.join(path, "meta.yaml")) as meta:
+        meta = yaml.load(meta, Loader=yaml.BaseLoader)
+
+    name = meta["name"].replace(" ", "_") + ".rst"
+    os.makedirs(os.path.dirname(target), exist_ok=True)
+    with open(target, "w") as readme:
+        rst = TEMPLATE_PIPELINE.render(
+            **meta
+        )
+        readme.write(rst)
+    return name
 
 def setup(*args):
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -182,6 +213,14 @@ def setup(*args):
                 continue
             path = os.path.join(WRAPPER_DIR, "meta", discipline, subwf)
             render_meta(path, os.path.join(META_OUTPUT_DIR, subwf + ".rst"))
+
+    os.makedirs(PIPELINE_OUTPUT_DIR, exist_ok=True)
+    for discipline in PIPELINE_DISCIPLINES:
+        for pipeline in os.listdir(os.path.join(WRAPPER_DIR, discipline)):
+            if pipeline in PIPELINE_BLACKLIST:
+                continue
+            path = os.path.join(WRAPPER_DIR, discipline, pipeline)
+            render_pipeline(path, os.path.join(PIPELINE_OUTPUT_DIR, pipeline + ".rst"))
 
 
 if __name__ == "__main__":

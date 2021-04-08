@@ -165,19 +165,19 @@ Used wrappers
 The following individual wrappers are used in this meta-wrapper:
 
 
-* :ref:`/bio/eacon/install`
+* :ref:`master/bio/eacon/install`
 
-* :ref:`/bio/eacon/cytoscan_process`
+* :ref:`master/bio/eacon/cytoscan_process`
 
-* :ref:`/bio/eacon/segment`
+* :ref:`master/bio/eacon/segment`
 
-* :ref:`/bio/eacon/databases`
+* :ref:`master/bio/eacon/databases`
 
-* :ref:`/bio/eacon/ascn`
+* :ref:`master/bio/eacon/ascn`
 
-* :ref:`/bio/eacon/annotate`
+* :ref:`master/bio/eacon/annotate`
 
-* :ref:`/bio/eacon/instability`
+* :ref:`master/bio/eacon/instability`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.

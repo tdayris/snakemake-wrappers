@@ -79,7 +79,7 @@ This wrapper can be used in the following way:
             genome = "hg19",
             segmenter = "ASCAT"
         wrapper:
-            "0.72.0-523-gc911c3b69/bio/eacon/instability"
+            "0.72.0-527-g77ebd74e2/bio/eacon/instability"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -169,7 +169,7 @@ Code
 
     segmenter <- "ASCAT";
     if ("segmenter" %in% base::names(snakemake@params)) {
-      genome <- base::as.character(x=snakemake@params[["segmenter"]]);
+      segmenter <- base::as.character(x=snakemake@params[["segmenter"]]);
     }
 
     ## Loading chromosomes data
@@ -197,6 +197,8 @@ Code
     gE$score <- gE$gof.rank - gE$rpd.rank
 
     best.gamma <- base::sprintf("%.2f", gE$gamma[base::which.max(gE$score)])
+    print(gE)
+    print(gE[gE$gamma == best.gamma, ]);
 
     ## Loading TCN-CBS file
     as.res <- base::readRDS(
@@ -245,9 +247,9 @@ Code
     ## Generating output
     outdf <- data.frame(
       best.gamma = best.gamma,
-      psi = gE[best.gamma, psi],
-      gof = gE[best.gamma, gof],
-      score = gE[best.gamma, score],
+      psi = gE[gE$gamma == best.gamma, "psi"],
+      gof = gE[gE$gamma == best.gamma, "GoF"],
+      score = gE[gE$gamma == best.gamma, "score"],
       SCORE1 = SKOR1,
       SCORE2 = SKOR2,
       SCORE3 = SKOR3,

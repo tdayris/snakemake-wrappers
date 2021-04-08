@@ -34,7 +34,7 @@ Here, Snakemake will automatically download the corresponding wrapper from https
 
 Each wrapper defines required software packages and versions. In combination with the ``--use-conda`` flag of Snakemake, these will be deployed automatically.
 
-Contribute 
+Contribute
 ----------
 
 We invite anybody to contribute to the Snakemake Wrapper Repository.
@@ -55,7 +55,7 @@ Contributions should follow the coding style of the already present examples, i.
   `default anaconda channels <https://anaconda.org/anaconda>`_ or via the
   `conda <https://conda.io/docs/>`_ channels
   `bioconda <https://bioconda.github.io/recipes.html>`_ or
-  `conda-forge <https://conda-forge.org/feedstocks/>`_. 
+  `conda-forge <https://conda-forge.org/feedstocks/>`_.
   Other sustainable community maintained channels are possible as well.)
 * provide a minimal test case in a subfolder called ``test``, with an example
   ``Snakefile`` that shows how to use the wrapper, some minimal testing data
@@ -102,7 +102,8 @@ with ``make clean``.
    :maxdepth: 4
    :glob:
    :hidden:
-   :caption: Wrappers and Meta-Wrappers
-      
+   :caption: Wrappers, Meta-Wrappers and Pipelines
+
    wrappers
    meta-wrappers
+   pipelines
