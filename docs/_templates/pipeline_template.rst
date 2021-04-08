@@ -15,10 +15,9 @@ In order to run the pipeline, use the following commands
   :header-rows: 1
   :align: left
 
-  * - {{ section }}
-    - .. code-block:: bash {% for cmd in usage %}
+  .. code-block:: bash {% for cmd in usage %}
 
-        {{ cmd | replace("\#", "#")}}{% endfor %}
+      {{ cmd | replace("\#", "#")}}{% endfor %}
 
 {% if notes %}
 
