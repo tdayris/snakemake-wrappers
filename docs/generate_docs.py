@@ -166,6 +166,10 @@ def render_pipeline(path, target):
                 for uw in used_wrappers
             ]
             used_metawrappers = env.get("meta-wrappers", [])
+            used_metawrappers = [
+                f"master{umw}" if umw.startswith("/") else umw
+                for umw in used_metawrappers
+            ]
     else:
         used_wrappers = []
         used_metawrappers = []

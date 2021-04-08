@@ -29,7 +29,7 @@ Input/Output
 
  
   
-* A single CEL file
+* CEL files
   
  
 
