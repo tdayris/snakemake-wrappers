@@ -1,0 +1,1 @@
+This directory must not be modified manually. It contains between-workflow cached data.

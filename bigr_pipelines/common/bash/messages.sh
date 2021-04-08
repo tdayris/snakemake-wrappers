@@ -23,6 +23,8 @@ function message() {
     >&2 echo -e "\033[41m@ERROR:\033[0m ${message}"
   elif [ ${status} = DOC ]; then
     >&2 echo -e "\033[0;33m@DOC:\033[0m ${message}"
+  elif [ ${status} = WARNING ]; then
+    >&2 echo -e "\033[1;33m@WARNING:\033[0m ${message}"
   else
     error_handling ${LINENO} 1 "Unknown message type: ${status}"
   fi

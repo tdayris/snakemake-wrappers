@@ -1,0 +1,1 @@
+This directory must not be modified manually. It contains conda environments for each wrapper.
