@@ -16,7 +16,7 @@ In order to run the pipeline, use the following commands
 
   cd /path/to/CEL/dir
 
-  {'\# Copy/paster the following line': ''}
+  # Copy/paster the following line
 
   bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/cytoscan_eacon/run.sh
 
