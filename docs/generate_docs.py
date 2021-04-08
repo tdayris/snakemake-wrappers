@@ -156,10 +156,26 @@ def render_pipeline(path, target):
     with open(os.path.join(path, "meta.yaml")) as meta:
         meta = yaml.load(meta, Loader=yaml.BaseLoader)
 
+    wrapperpath = os.path.join(path, "used_wrappers.yaml")
+    if os.path.exists(wrapperpath):
+        with open(wrapperpath) as env:
+            env = yaml.load(env, Loader=yaml.BaseLoader)
+            used_wrappers = env.get("wrappers", [])
+            used_wrappers = [
+                f"master{uw}" if uw.startswith("/") else uw
+                for uw in used_wrappers
+            ]
+            used_metawrappers = env.get("meta-wrappers", [])
+    else:
+        used_wrappers = []
+        used_metawrappers = []
+
     name = meta["name"].replace(" ", "_") + ".rst"
     os.makedirs(os.path.dirname(target), exist_ok=True)
     with open(target, "w") as readme:
         rst = TEMPLATE_PIPELINE.render(
+        usedwrappers=used_wrappers,
+        usedmetawrappers=used_metawrappers,
             **meta
         )
         readme.write(rst)

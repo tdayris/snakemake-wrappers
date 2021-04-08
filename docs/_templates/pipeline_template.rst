@@ -36,6 +36,38 @@ Input/Output
 {% endfor %}
 {% endif %}
 
+{% if usedmetawrappers|length %}
+
+
+Used meta-wrappers
+------------------
+
+The following individual meta-wrappers are used in this pipeline:
+
+{% for uw in usedmetawrappers %}
+* :ref:`{{ uw }}`
+{% endfor %}
+
+Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
+
+{% endif %}
+
+{% if usedwrappers|length %}
+
+
+Used wrappers
+-------------
+
+The following individual wrappers are used in this pipeline:
+
+{% for uw in usedwrappers %}
+* :ref:`{{ uw }}`
+{% endfor %}
+
+Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
+
+{% endif %}
+
 Notes
 -----
 
