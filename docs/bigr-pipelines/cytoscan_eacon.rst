@@ -12,11 +12,11 @@ In order to run the pipeline, use the following commands
 
 .. code-block:: bash 
 
-  
+  # Go to your directory containing CEL files
 
   cd /path/to/CEL/dir
 
-  
+  {'\# Copy/paster the following line': ''}
 
   bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/cytoscan_eacon/run.sh
 
