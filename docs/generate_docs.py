@@ -172,10 +172,11 @@ def render_pipeline(path, target):
 
     name = meta["name"].replace(" ", "_") + ".rst"
     os.makedirs(os.path.dirname(target), exist_ok=True)
+    print(used_metawrappers, used_wrappers, meta)
     with open(target, "w") as readme:
         rst = TEMPLATE_PIPELINE.render(
-        usedwrappers=used_wrappers,
-        usedmetawrappers=used_metawrappers,
+            usedwrappers=used_wrappers,
+            usedmetawrappers=used_metawrappers,
             **meta
         )
         readme.write(rst)
