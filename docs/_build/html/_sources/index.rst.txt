@@ -1,6 +1,6 @@
 
-The Snakemake Wrappers repository
-=================================
+The Unofficial Snakemake Wrappers repository
+============================================
 
 .. image:: https://img.shields.io/badge/snakemake-≥5.7.0-brightgreen.svg?style=flat-square
       :target: http://snakemake.readthedocs.io

@@ -80,10 +80,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 sample=config["samples"]
             ),
             # EaCoN new instability scoring feature
-            instability = expand(
-                "{sample}/{sample}_GIS_from_best_gamma.txt",
-                sample=config["samples"]
-            )
+            #instability = expand(
+            #    "{sample}/{sample}_GIS_from_best_gamma.txt",
+            #    sample=config["samples"]
+            #)
 
     # Import all rules from the eacon_post_process meta wrapper
     use rule * from post_process_eacon as post_process_*

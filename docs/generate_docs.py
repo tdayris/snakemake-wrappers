@@ -32,7 +32,6 @@ BLACKLIST = {
 } | SCRIPTS
 PIPELINE_BLACKLIST = {
     "common",
-    "oncoscan_eacon",
     "salmon_quant",
     "README.md"
 }
@@ -176,7 +175,6 @@ def render_pipeline(path, target):
 
     name = meta["name"].replace(" ", "_") + ".rst"
     os.makedirs(os.path.dirname(target), exist_ok=True)
-    print(used_metawrappers, used_wrappers, meta)
     with open(target, "w") as readme:
         rst = TEMPLATE_PIPELINE.render(
             usedwrappers=used_wrappers,
