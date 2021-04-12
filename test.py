@@ -182,7 +182,7 @@ def test_bioinfokit_meta():
             "bioinfokit/figures/sample_heatmap.png",
             "bioinfokit/figures/maplot.png",
             "bioinfokit/figures/loadings.png",
-            "--pr"
+            "-pr"
         ],
     )
 
@@ -3641,6 +3641,7 @@ def test_deseq2_to_gseaapp():
         "bio/pandas/deseq2_to_gseaapp",
         ["snakemake", "results/complete.tsv", "--use-conda", "-F", "--cores", "1"],
     )
+
 
 @skip_if_not_modified
 def test_deseq2_deseq_dataset_from_tximport():

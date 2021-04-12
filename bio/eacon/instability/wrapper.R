@@ -54,6 +54,8 @@ gE$rpd.rank <- base::rank(gE$round.psi.diff)
 gE$score <- gE$gof.rank - gE$rpd.rank
 
 best.gamma <- base::sprintf("%.2f", gE$gamma[base::which.max(gE$score)])
+print(gE)
+print(gE[gE$gamma == best.gamma, ]);
 
 ## Loading TCN-CBS file
 as.res <- base::readRDS(
@@ -102,9 +104,9 @@ LOKAL1 <- base::sum(foreach (k = unique(as.res$segments$chr), .combine = "c") %d
 ## Generating output
 outdf <- data.frame(
   best.gamma = best.gamma,
-  psi = gE[best.gamma, psi],
-  gof = gE[best.gamma, gof],
-  score = gE[best.gamma, score],
+  psi = gE[gE$gamma == best.gamma, "psi"],
+  gof = gE[gE$gamma == best.gamma, "GoF"],
+  score = gE[gE$gamma == best.gamma, "score"],
   SCORE1 = SKOR1,
   SCORE2 = SKOR2,
   SCORE3 = SKOR3,
