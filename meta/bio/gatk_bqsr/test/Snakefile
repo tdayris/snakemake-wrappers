@@ -1,8 +1,24 @@
+default_config_gatk_bqsr = {
+    "threads": 20,
+    "genome": "reference/genome.fa",
+    "dbsnp": "reference/dbsnp.vcf.gz"
+}
+
+def get_fasta_index_from_genome_path(genome_path: str) -> str:
+    return genome_path + ".fai"
+
+def get_fasta_dict_from_genome_path(genome_path: str) -> str:
+    return ".".join(genome_path.split(".")[:-1]) + ".dict"
+
+
+def get_vcf_tbi_from_db_path(db_path: str) -> str:
+    return db_path + ".tbi"
+
 try:
     if config == dict():
-        config = {"threads": 20}
+        config = default_config_gatk_bqsr
 except NameError:
-    config = {"threads": 20}
+    config = default_config_gatk_bqsr
 
 """
 This rule applies the BQSR to the mapped reads
@@ -11,9 +27,9 @@ rule gatk_apply_baserecalibrator:
     input:
         bam="mapped/{sample}.bam",
         bam_index="mapped/{sample}.bam.bai",
-        ref="reference/genome.fa",
-        ref_idx="reference/genome.fa.fai",
-        ref_dict="reference/genome.dict",
+        ref=config["genome"],
+        ref_idx=get_fasta_index_from_genome_path(config["genome"]),
+        ref_dict=get_fasta_dict_from_genome_path(config["genome"]),
         recal_table="gatk/recal_data_table/{sample}.grp"
     output:
         bam="gatk/recal_bam/{sample}.bam"
@@ -37,11 +53,11 @@ rule gatk_compute_baserecalibration_table:
     input:
         bam="mapped/{sample}.bam",
         bam_index="mapped/{sample}.bam.bai",
-        ref="reference/genome.fa",
-        ref_idx="reference/genome.fa.fai",
-        ref_dict="reference/genome.dict",
-        known="reference/dbsnp.vcf.gz",
-        known_idx="reference/dbsnp.vcf.gz.tbi"
+        ref=config["genome"],
+        ref_idx=get_fasta_index_from_genome_path(config["genome"]),
+        ref_dict=get_fasta_dict_from_genome_path(config["genome"]),
+        known=config["dbsnp"],
+        known_idx=get_vcf_tbi_from_db_path(config["dbsnp"])
     output:
         recal_table=temp("gatk/recal_data_table/{sample}.grp")
     message: "Compute BQSR table from {wildcards.sample} with GATK"
@@ -66,9 +82,9 @@ This rule is cached since it should be used only once per reference sequence
 """
 rule samtools_faidx:
     input:
-        "{genome}.fa"
+        config["genome"]
     output:
-        "{genome}.fa.fai"
+        get_fasta_dict_from_genome_path(config["genome"])
     message: "Indexing reference fasta with Samtools"
     cache: True
     threads: 1
@@ -92,9 +108,9 @@ This rule is cached since it should be used only once per reference sequence
 """
 rule picard_create_sequence_dictionnary:
     input:
-        "{genome}.fa"
+        config["genome"]
     output:
-        "{genome}.dict"
+        get_fasta_dict_from_genome_path(config["genome"])
     message: "Creating sequence dictionnary over reference genome with Picard"
     cache: True
     threads: 1
@@ -118,9 +134,9 @@ This rule is cached since it should be used only once per reference sequence
 """
 rule tabix_index:
     input:
-        "{known}.vcf.gz"
+        config["dbsnp"]
     output:
-        "{known}.vcf.gz.tbi"
+        get_vcf_tbi_from_db_path(config["dbsnp"])
     message: "Indexing kown variants with Tabix"
     cache: True
     threads: 1

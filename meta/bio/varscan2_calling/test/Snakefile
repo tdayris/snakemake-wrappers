@@ -1,8 +1,16 @@
+default_config_varscan2_calling = {
+    "genome": "reference/genome.fasta",
+}
+
+def get_fasta_index_from_genome_path(genome_path: str) -> str:
+    return genome_path + ".fai"
+
+
 try:
     if config == dict():
-        config = {}
+        config = default_config_varscan2_calling
 except NameError:
-    config = {}
+    config = default_config_varscan2_calling
 
 
 """
@@ -105,8 +113,8 @@ reads and reference genome
 rule samtools_mpilup:
     input:
         bam="mapped/{sample}.bam",
-        reference_genome="reference/genome.fasta",
-        reference_genome_idx="reference/genome.fasta.fai",
+        reference_genome=config["genome"]
+        reference_genome_idx=get_fasta_index_from_genome_path(config["genome"]),
     output:
         temp("samtools/mpileup/{sample}.mpileup.gz")
     message: "Building mpilup on {wildcards.sample} with samtools"
@@ -131,9 +139,9 @@ This rule is cached since it should be used only once per reference sequence
 """
 rule samtools_faidx:
     input:
-        "{genome}.fasta"
+        config["genome"]
     output:
-        "{genome}.fasta.fai"
+        get_fasta_index_from_genome_path(config["genome"])
     message: "Indexing reference fasta with Samtools"
     cache: True
     threads: 1
