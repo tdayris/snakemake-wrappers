@@ -47,7 +47,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tabix/index/{sample}.log"
         wrapper:
-            "0.72.0-551-g3f16566da/bio/tabix"
+            "0.72.0-558-g97f44f15f/bio/tabix"
 
 
     """
@@ -72,7 +72,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bcftools/concat/{sample}.log"
         wrapper:
-            "0.72.0-551-g3f16566da/bio/bcftools/concat"
+            "0.72.0-558-g97f44f15f/bio/bcftools/concat"
 
 
     """
@@ -95,7 +95,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/varscan/pileup2indel/call/{sample}.log"
         wrapper:
-            "0.72.0-551-g3f16566da/bio/varscan/mpileup2indel"
+            "0.72.0-558-g97f44f15f/bio/varscan/mpileup2indel"
 
 
     """
@@ -118,7 +118,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/varscan/pileup2snp/call/{sample}.log"
         wrapper:
-            "0.72.0-551-g3f16566da/bio/varscan/mpileup2snp"
+            "0.72.0-558-g97f44f15f/bio/varscan/mpileup2snp"
 
 
     """
@@ -142,7 +142,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.72.0-551-g3f16566da/bio/samtools/mpileup"
+            "0.72.0-558-g97f44f15f/bio/samtools/mpileup"
 
 
     """
@@ -168,7 +168,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/faidx/{genome}.log"
         wrapper:
-            "0.72.0-551-g3f16566da/bio/samtools/faidx"
+            "0.72.0-558-g97f44f15f/bio/samtools/faidx"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
