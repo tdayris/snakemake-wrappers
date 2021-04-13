@@ -206,9 +206,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.
 <h2>Used meta-wrappers<a class="headerlink" href="#used-meta-wrappers" title="Permalink to this headline">¶</a></h2>
 <p>The following individual meta-wrappers are used in this pipeline:</p>
 <ul class="simple">
-<li><p><span class="xref std std-ref">master/bio/bwa_fixmate</span></p></li>
-<li><p><span class="xref std std-ref">master/bio/gatk_bqsr</span></p></li>
-<li><p><span class="xref std std-ref">master/bio/varscan2_calling</span></p></li>
+<li><p><span class="xref std std-ref">bio/bwa_fixmate</span></p></li>
+<li><p><span class="xref std std-ref">bio/gatk_bqsr</span></p></li>
+<li><p><span class="xref std std-ref">bio/varscan2_calling</span></p></li>
 </ul>
 <p>Please refer to each meta-wrapper in above list for additional configuration parameters and information about the executed code.</p>
 </div>
@@ -216,15 +216,15 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.
 <h2>Used wrappers<a class="headerlink" href="#used-wrappers" title="Permalink to this headline">¶</a></h2>
 <p>The following individual wrappers are used in this pipeline:</p>
 <ul class="simple">
-<li><p><span class="xref std std-ref">master/bio/bigr/copy</span></p></li>
-<li><p><span class="xref std std-ref">master/bio/fastp</span></p></li>
-<li><p><span class="xref std std-ref">master/bio/snpeff/annotate</span></p></li>
-<li><p><span class="xref std std-ref">master/bio/snpsift/varType</span></p></li>
-<li><p><span class="xref std std-ref">master/bio/snpsift/genesets</span></p></li>
-<li><p><span class="xref std std-ref">master/bio/snpsift/annotate</span></p></li>
-<li><p><span class="xref std std-ref">master/bio/snpsift/gwascat</span></p></li>
-<li><p><span class="xref std std-ref">master/bio/compress/pbgzip</span></p></li>
-<li><p><span class="xref std std-ref">master/bio/tabix</span></p></li>
+<li><p><a class="reference internal" href="../wrappers/BiGR/copy.html#bio-bigr-copy"><span class="std std-ref">IGR_COPY</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/fastp.html#bio-fastp"><span class="std std-ref">FASTP</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/snpeff/annotate.html#bio-snpeff-annotate"><span class="std std-ref">SNPEFF</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/snpsift/varType.html#bio-snpsift-vartype"><span class="std std-ref">SNPSIFT VARTYPE</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/snpsift/genesets.html#bio-snpsift-genesets"><span class="std std-ref">SNPSIFT GENES SETS</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/snpsift/annotate.html#bio-snpsift-annotate"><span class="std std-ref">SNPSIFT ANNOTATE</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/snpsift/gwascat.html#bio-snpsift-gwascat"><span class="std std-ref">SNPSIFT GWAS CATALOG</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/compress/pbgzip.html#bio-compress-pbgzip"><span class="std std-ref">COMPRESS_PBGZIP</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/tabix.html#bio-tabix"><span class="std std-ref">TABIX</span></a></p></li>
 </ul>
 <p>Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.</p>
 </div>
@@ -232,31 +232,37 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <p>The only difference with a classic WES pipeline is the absence of duplicates removal.</p>
 <p>Prerequisites:</p>
-<dl>
-<dt>..list-table:: Desgin file format</dt><dd><dl class="field-list simple">
-<dt class="field-odd">widths</dt>
-<dd class="field-odd"><p>33 33 33</p>
-</dd>
-<dt class="field-even">header-rows</dt>
-<dd class="field-even"><p>1</p>
-</dd>
-</dl>
 <ul class="simple">
-<li><ul>
-<li><p>Sample_id</p></li>
-<li><p>Upstream_fastq</p></li>
-<li><p>Downstream_fastq</p></li>
+<li><p>A TSV formatted design file with the following columns:</p></li>
 </ul>
-</li>
-<li><ul>
-<li><p>Name of the Sample1</p></li>
-<li><p>Path to upstream fastq file</p></li>
-<li><p>Path to downstream fastq file</p></li>
-</ul>
-</li>
-</ul>
-</dd>
-</dl>
+<table class="colwidths-given docutils align-default" id="id2">
+<caption><span class="caption-text">Desgin file format</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sample_id</p></th>
+<th class="head"><p>Upstream_fastq</p></th>
+<th class="head"><p>Downstream_fastq</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Name of the Sample1</p></td>
+<td><p>Path to upstream fastq file</p></td>
+<td><p>Path to downstream fastq file</p></td>
+</tr>
+<tr class="row-odd"><td><p>Name of the Sample2</p></td>
+<td><p>Path to upstream fastq file</p></td>
+<td><p>Path to downstream fastq file</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>

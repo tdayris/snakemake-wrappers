@@ -57,15 +57,15 @@ Used wrappers
 The following individual wrappers are used in this pipeline:
 
 
-* :ref:`master/bio/snpeff/annotate`
+* :ref:`bio/snpeff/annotate`
 
-* :ref:`master/bio/snpsift/varType`
+* :ref:`bio/snpsift/varType`
 
-* :ref:`master/bio/snpsift/genesets`
+* :ref:`bio/snpsift/genesets`
 
-* :ref:`master/bio/snpsift/annotate`
+* :ref:`bio/snpsift/annotate`
 
-* :ref:`master/bio/snpsift/gwascat`
+* :ref:`bio/snpsift/gwascat`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.

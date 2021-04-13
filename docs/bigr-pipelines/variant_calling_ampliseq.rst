@@ -48,11 +48,11 @@ Used meta-wrappers
 The following individual meta-wrappers are used in this pipeline:
 
 
-* :ref:`master/bio/bwa_fixmate`
+* :ref:`bio/bwa_fixmate`
 
-* :ref:`master/bio/gatk_bqsr`
+* :ref:`bio/gatk_bqsr`
 
-* :ref:`master/bio/varscan2_calling`
+* :ref:`bio/varscan2_calling`
 
 
 Please refer to each meta-wrapper in above list for additional configuration parameters and information about the executed code.
@@ -66,23 +66,23 @@ Used wrappers
 The following individual wrappers are used in this pipeline:
 
 
-* :ref:`master/bio/bigr/copy`
+* :ref:`bio/bigr/copy`
 
-* :ref:`master/bio/fastp`
+* :ref:`bio/fastp`
 
-* :ref:`master/bio/snpeff/annotate`
+* :ref:`bio/snpeff/annotate`
 
-* :ref:`master/bio/snpsift/varType`
+* :ref:`bio/snpsift/varType`
 
-* :ref:`master/bio/snpsift/genesets`
+* :ref:`bio/snpsift/genesets`
 
-* :ref:`master/bio/snpsift/annotate`
+* :ref:`bio/snpsift/annotate`
 
-* :ref:`master/bio/snpsift/gwascat`
+* :ref:`bio/snpsift/gwascat`
 
-* :ref:`master/bio/compress/pbgzip`
+* :ref:`bio/compress/pbgzip`
 
-* :ref:`master/bio/tabix`
+* :ref:`bio/tabix`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
@@ -97,7 +97,9 @@ The only difference with a classic WES pipeline is the absence of duplicates rem
 
 Prerequisites:
 
-..list-table:: Desgin file format
+* A TSV formatted design file with the following columns:
+
+.. list-table:: Desgin file format
   :widths: 33 33 33
   :header-rows: 1
 
@@ -107,6 +109,12 @@ Prerequisites:
   * - Name of the Sample1
     - Path to upstream fastq file
     - Path to downstream fastq file
+  * - Name of the Sample2
+    - Path to upstream fastq file
+    - Path to downstream fastq file
+  * - ...
+    - ...
+    - ...
 
 
 
