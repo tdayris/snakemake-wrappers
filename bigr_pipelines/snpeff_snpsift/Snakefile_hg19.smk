@@ -28,7 +28,7 @@ rule test_snpsift_vartype:
 rule snpeff_annotate:
     input:
         calls="snpsift/vartype/{sample}.vcf",
-        db="/mnt/beegfs/database/bioinfo/Index_DB/SnpEff/GRCh38.86/"
+        db="/mnt/beegfs/database/bioinfo/Index_DB/SnpEff/GRCh37.75/"
     output:
         calls=temp("snpeff/{sample}.vcf"),   # annotated calls (vcf, bcf, or vcf.gz)
         stats="snpeff/{sample}.html",        # summary statistics (in HTML), optional
@@ -55,25 +55,10 @@ rule test_snpsift_gmt:
         "/bio/snpsift/genesets"
 
 
-rule snpsift_clinvar:
-    input:
-        call="snpsift/gmt/{sample}.vcf",
-        database="/mnt/beegfs/database/bioinfo/Index_DB/ClinVar/GRCh38/clinvar_20210102.vcf.gz"
-    output:
-        call=temp("snpsift/clinvar/{sample}.vcf")
-    log:
-        "logs/snpsift/clinvar/{sample}.log"
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-        time_min=lambda wildcards, attempt: attempt * 45
-    wrapper:
-        "/bio/snpsift/annotate"
-
-
 rule snpsift_kaviar:
     input:
-        call="snpsift/clinvar/{sample}.vcf",
-        database="/mnt/beegfs/database/bioinfo/Index_DB/Kaviar/HG38/Kaviar-160204-Public/vcfs/Kaviar-160204-Public-hg38-trim.vcf.gz"
+        call="snpeff/{sample}.vcf",
+        database="/mnt/beegfs/database/bioinfo/Index_DB/Kaviar/HG19/Kaviar-160204-Public/vcfs/Kaviar-160204-Public-hg19-trim.vcf.gz"
     output:
         call=temp("snpeff/kaviar/{sample}.vcf")
     log:
@@ -88,7 +73,7 @@ rule snpsift_kaviar:
 rule snpsift_dbsnp:
     input:
         call="snpeff/kaviar/{sample}.vcf",
-        database="/mnt/beegfs/database/bioinfo/Index_DB/dbSNP/GRCh38p7/All_20180418.vcf.gz"
+        database="/mnt/beegfs/database/bioinfo/Index_DB/dbSNP/hg19/144_20150605/All_20150605.vcf.gz"
     output:
         call=temp("snpeff/dbsnp/{sample}.vcf")
     log:
@@ -98,16 +83,16 @@ rule snpsift_dbsnp:
         time_min=lambda wildcards, attempt: attempt * 45
     wrapper:
         "/bio/snpsift/annotate"
-
-
-rule snpsift_exac:
+        
+        
+rule snpsift_cosmic:
     input:
-        call="snpeff/dbsnp/{sample}.vcf",
-        database="/mnt/beegfs/database/bioinfo/Index_DB/Exac/release1/ExAC.r1.sites.vep.vcf.gz"
+        call="snpeff/kaviar/{sample}.vcf",
+        database="/mnt/beegfs/database/bioinfo/COSMIC/73_20150629/CosmicCodingMuts.vcf"
     output:
-        call=temp("snpeff/exac/{sample}.vcf")
+        call=temp("snpeff/cosmic/{sample}.vcf")
     log:
-        "logs/snpsift/exac/{sample}.log"
+        "logs/snpsift/cosmic/{sample}.log"
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
         time_min=lambda wildcards, attempt: attempt * 45
@@ -117,7 +102,7 @@ rule snpsift_exac:
 
 rule snpsift_gwascat:
     input:
-        call = "snpeff/exac/{sample}.vcf",
+        call = "snpeff/cosmic/{sample}.vcf",
         gwascat = "/mnt/beegfs/database/bioinfo/Index_DB/GWASCatalog/gwas_catalog_v1.0.2-studies_r2020-05-03.tsv"
     output:
         call = "snpeff/gwascat/{sample}.vcf"
