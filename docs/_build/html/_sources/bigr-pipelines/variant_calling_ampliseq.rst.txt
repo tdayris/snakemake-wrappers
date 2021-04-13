@@ -97,8 +97,6 @@ The only difference with a classic WES pipeline is the absence of duplicates rem
 
 Prerequisites:
 
-* A TSV formatted design file with the following columns:
-
 ..list-table:: Desgin file format
   :widths: 33 33 33
   :header-rows: 1
