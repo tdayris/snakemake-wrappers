@@ -11,6 +11,11 @@ declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/snpeff_snpsift"
 export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 message INFO "Environment loaded"
 
+SNAKEFILE="${PIPELINE_PATH}/Snakefile"
+if [ "${1}" = "hg19" ]; then
+  SNAKEFILE="${PIPELINE_PATH}/Snakefile_hg19.smk"
+fi
+
 # Run pipeline
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
-snakemake -s "${PIPELINE_PATH}/Snakefile" --cache eacon_install eacon_databases --profile "${SNAKEMAKE_PROFILE_PATH}" && message INFO "EaCoN successful" || error_handling "${LINENO}" 2 "Error while running Cytoscan pipeline"
+snakemake -s "${SNAKEFILE}" --cache eacon_install eacon_databases --profile "${SNAKEMAKE_PROFILE_PATH}" && message INFO "SnpEff/SnpSift successful" || error_handling "${LINENO}" 2 "Error while running SnpEff/SnpSift pipeline"
