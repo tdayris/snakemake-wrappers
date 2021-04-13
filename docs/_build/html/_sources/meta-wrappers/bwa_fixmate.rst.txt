@@ -13,11 +13,16 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    defualt_config_bwa_fixmate = {
+        "threads": 20,
+        "genome": "sequence/genome.fasta"
+    }
+
     try:
         if config == dict():
-            config = {"threads": 20}
+            config = defualt_config_bwa_fixmate
     except NameError:
-        config = {"threads": 20}
+        config = defualt_config_bwa_fixmate
 
     """
     This rule indexes the bam file since almost all downstream tools requires it
@@ -26,7 +31,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             "samtools/sort/{sample}.bam"
         output:
-            "samtools/sort/{sample}.bam.bai"
+            temp("samtools/sort/{sample}.bam.bai")
         message: "Indexing mapped reads of {wildcards.sample}"
         threads: 1
         resources:
@@ -45,7 +50,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             "samtools/fixmate/{sample}.bam"
         output:
-            "samtools/sort/{sample}.bam"
+            temp("mapped/{sample}.bam")
         message:
             "Sorting {wildcards.sample} reads by query name for fixing mates"
         threads: config.get("threads", 20)
@@ -129,7 +134,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule bwa_index:
         input:
-            "sequence/genome.fasta"
+            config["genome"]
         output:
             multiext(
                 "bwa_mem2/index/genome", ".0123", ".amb", ".ann", ".pac"

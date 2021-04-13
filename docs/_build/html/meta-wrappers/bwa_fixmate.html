@@ -197,11 +197,16 @@
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This meta-wrapper can be used by integrating the following into your workflow:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">defualt_config_bwa_fixmate</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="s2">&quot;sequence/genome.fasta&quot;</span>
+<span class="p">}</span>
+
+<span class="k">try</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">config</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">():</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">defualt_config_bwa_fixmate</span>
 <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">defualt_config_bwa_fixmate</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule indexes the bam file since almost all downstream tools requires it</span>
@@ -210,7 +215,7 @@
     <span class="nb">input</span><span class="p">:</span>
         <span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing mapped reads of </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
@@ -229,7 +234,7 @@
     <span class="nb">input</span><span class="p">:</span>
         <span class="s2">&quot;samtools/fixmate/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Sorting </span><span class="si">{wildcards.sample}</span><span class="s2"> reads by query name for fixing mates&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
@@ -313,7 +318,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">bwa_index</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;sequence/genome.fasta&quot;</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">multiext</span><span class="p">(</span>
             <span class="s2">&quot;bwa_mem2/index/genome&quot;</span><span class="p">,</span> <span class="s2">&quot;.0123&quot;</span><span class="p">,</span> <span class="s2">&quot;.amb&quot;</span><span class="p">,</span> <span class="s2">&quot;.ann&quot;</span><span class="p">,</span> <span class="s2">&quot;.pac&quot;</span>

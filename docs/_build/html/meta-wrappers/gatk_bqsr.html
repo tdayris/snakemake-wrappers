@@ -198,11 +198,27 @@
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This meta-wrapper can be used by integrating the following into your workflow:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">default_config_gatk_bqsr</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="s2">&quot;reference/genome.fa&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbsnp&quot;</span><span class="p">:</span> <span class="s2">&quot;reference/dbsnp.vcf.gz&quot;</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">get_fasta_index_from_genome_path</span><span class="p">(</span><span class="n">genome_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">genome_path</span> <span class="o">+</span> <span class="s2">&quot;.fai&quot;</span>
+
+<span class="k">def</span> <span class="nf">get_fasta_dict_from_genome_path</span><span class="p">(</span><span class="n">genome_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">genome_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;.dict&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">get_vcf_tbi_from_db_path</span><span class="p">(</span><span class="n">db_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">db_path</span> <span class="o">+</span> <span class="s2">&quot;.tbi&quot;</span>
+
+<span class="k">try</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">config</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">():</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">default_config_gatk_bqsr</span>
 <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">default_config_gatk_bqsr</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule applies the BQSR to the mapped reads</span>
@@ -211,9 +227,9 @@
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
         <span class="n">bam_index</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">,</span>
-        <span class="n">ref</span><span class="o">=</span><span class="s2">&quot;reference/genome.fa&quot;</span><span class="p">,</span>
-        <span class="n">ref_idx</span><span class="o">=</span><span class="s2">&quot;reference/genome.fa.fai&quot;</span><span class="p">,</span>
-        <span class="n">ref_dict</span><span class="o">=</span><span class="s2">&quot;reference/genome.dict&quot;</span><span class="p">,</span>
+        <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span>
+        <span class="n">ref_idx</span><span class="o">=</span><span class="n">get_fasta_index_from_genome_path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
+        <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_fasta_dict_from_genome_path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
         <span class="n">recal_table</span><span class="o">=</span><span class="s2">&quot;gatk/recal_data_table/</span><span class="si">{sample}</span><span class="s2">.grp&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;gatk/recal_bam/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span>
@@ -227,7 +243,7 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-548-gc28bfdd03/bio/gatk/applybqsr&quot;</span>
+        <span class="s2">&quot;0.72.0-551-g3f16566da/bio/gatk/applybqsr&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -237,11 +253,11 @@
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
         <span class="n">bam_index</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">,</span>
-        <span class="n">ref</span><span class="o">=</span><span class="s2">&quot;reference/genome.fa&quot;</span><span class="p">,</span>
-        <span class="n">ref_idx</span><span class="o">=</span><span class="s2">&quot;reference/genome.fa.fai&quot;</span><span class="p">,</span>
-        <span class="n">ref_dict</span><span class="o">=</span><span class="s2">&quot;reference/genome.dict&quot;</span><span class="p">,</span>
-        <span class="n">known</span><span class="o">=</span><span class="s2">&quot;reference/dbsnp.vcf.gz&quot;</span><span class="p">,</span>
-        <span class="n">known_idx</span><span class="o">=</span><span class="s2">&quot;reference/dbsnp.vcf.gz.tbi&quot;</span>
+        <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span>
+        <span class="n">ref_idx</span><span class="o">=</span><span class="n">get_fasta_index_from_genome_path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
+        <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_fasta_dict_from_genome_path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
+        <span class="n">known</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">],</span>
+        <span class="n">known_idx</span><span class="o">=</span><span class="n">get_vcf_tbi_from_db_path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">])</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">recal_table</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;gatk/recal_data_table/</span><span class="si">{sample}</span><span class="s2">.grp&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Compute BQSR table from </span><span class="si">{wildcards.sample}</span><span class="s2"> with GATK&quot;</span>
@@ -254,7 +270,7 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-548-gc28bfdd03/bio/gatk/baserecalibrator&quot;</span>
+        <span class="s2">&quot;0.72.0-551-g3f16566da/bio/gatk/baserecalibrator&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -266,9 +282,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">samtools_faidx</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fa&quot;</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fa.fai&quot;</span>
+        <span class="n">get_fasta_dict_from_genome_path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">])</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing reference fasta with Samtools&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
@@ -280,7 +296,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/samtools/faidx/</span><span class="si">{genome}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-548-gc28bfdd03/bio/samtools/faidx&quot;</span>
+        <span class="s2">&quot;0.72.0-551-g3f16566da/bio/samtools/faidx&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -292,9 +308,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">picard_create_sequence_dictionnary</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fa&quot;</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.dict&quot;</span>
+        <span class="n">get_fasta_dict_from_genome_path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">])</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Creating sequence dictionnary over reference genome with Picard&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
@@ -306,7 +322,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/picard/create_sequence_dictionnary/</span><span class="si">{genome}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-548-gc28bfdd03/bio/picard/createsequencedictionary&quot;</span>
+        <span class="s2">&quot;0.72.0-551-g3f16566da/bio/picard/createsequencedictionary&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -318,9 +334,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">tabix_index</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{known}</span><span class="s2">.vcf.gz&quot;</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{known}</span><span class="s2">.vcf.gz.tbi&quot;</span>
+        <span class="n">get_vcf_tbi_from_db_path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">])</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing kown variants with Tabix&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
@@ -332,7 +348,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/tabix/index/</span><span class="si">{known}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-548-gc28bfdd03/bio/tabix&quot;</span>
+        <span class="s2">&quot;0.72.0-551-g3f16566da/bio/tabix&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -353,7 +369,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/samtools/sort/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-548-gc28bfdd03/bio/samtools/index&quot;</span>
+        <span class="s2">&quot;0.72.0-551-g3f16566da/bio/samtools/index&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

@@ -56,7 +56,7 @@ Used meta-wrappers
 The following individual meta-wrappers are used in this pipeline:
 
 
-* :ref:`meta/bio/eacon_cytoscan`
+* :ref:`meta/bio/eacon_oncoscan`
 
 * :ref:`meta/bio/eacon_post_process`
 

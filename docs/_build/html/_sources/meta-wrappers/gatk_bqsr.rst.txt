@@ -13,11 +13,27 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    default_config_gatk_bqsr = {
+        "threads": 20,
+        "genome": "reference/genome.fa",
+        "dbsnp": "reference/dbsnp.vcf.gz"
+    }
+
+    def get_fasta_index_from_genome_path(genome_path: str) -> str:
+        return genome_path + ".fai"
+
+    def get_fasta_dict_from_genome_path(genome_path: str) -> str:
+        return ".".join(genome_path.split(".")[:-1]) + ".dict"
+
+
+    def get_vcf_tbi_from_db_path(db_path: str) -> str:
+        return db_path + ".tbi"
+
     try:
         if config == dict():
-            config = {"threads": 20}
+            config = default_config_gatk_bqsr
     except NameError:
-        config = {"threads": 20}
+        config = default_config_gatk_bqsr
 
     """
     This rule applies the BQSR to the mapped reads
@@ -26,9 +42,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             bam="mapped/{sample}.bam",
             bam_index="mapped/{sample}.bam.bai",
-            ref="reference/genome.fa",
-            ref_idx="reference/genome.fa.fai",
-            ref_dict="reference/genome.dict",
+            ref=config["genome"],
+            ref_idx=get_fasta_index_from_genome_path(config["genome"]),
+            ref_dict=get_fasta_dict_from_genome_path(config["genome"]),
             recal_table="gatk/recal_data_table/{sample}.grp"
         output:
             bam="gatk/recal_bam/{sample}.bam"
@@ -42,7 +58,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.72.0-548-gc28bfdd03/bio/gatk/applybqsr"
+            "0.72.0-551-g3f16566da/bio/gatk/applybqsr"
 
 
     """
@@ -52,11 +68,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             bam="mapped/{sample}.bam",
             bam_index="mapped/{sample}.bam.bai",
-            ref="reference/genome.fa",
-            ref_idx="reference/genome.fa.fai",
-            ref_dict="reference/genome.dict",
-            known="reference/dbsnp.vcf.gz",
-            known_idx="reference/dbsnp.vcf.gz.tbi"
+            ref=config["genome"],
+            ref_idx=get_fasta_index_from_genome_path(config["genome"]),
+            ref_dict=get_fasta_dict_from_genome_path(config["genome"]),
+            known=config["dbsnp"],
+            known_idx=get_vcf_tbi_from_db_path(config["dbsnp"])
         output:
             recal_table=temp("gatk/recal_data_table/{sample}.grp")
         message: "Compute BQSR table from {wildcards.sample} with GATK"
@@ -69,7 +85,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.72.0-548-gc28bfdd03/bio/gatk/baserecalibrator"
+            "0.72.0-551-g3f16566da/bio/gatk/baserecalibrator"
 
 
     """
@@ -81,9 +97,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule samtools_faidx:
         input:
-            "{genome}.fa"
+            config["genome"]
         output:
-            "{genome}.fa.fai"
+            get_fasta_dict_from_genome_path(config["genome"])
         message: "Indexing reference fasta with Samtools"
         cache: True
         threads: 1
@@ -95,7 +111,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/faidx/{genome}.log"
         wrapper:
-            "0.72.0-548-gc28bfdd03/bio/samtools/faidx"
+            "0.72.0-551-g3f16566da/bio/samtools/faidx"
 
 
     """
@@ -107,9 +123,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule picard_create_sequence_dictionnary:
         input:
-            "{genome}.fa"
+            config["genome"]
         output:
-            "{genome}.dict"
+            get_fasta_dict_from_genome_path(config["genome"])
         message: "Creating sequence dictionnary over reference genome with Picard"
         cache: True
         threads: 1
@@ -121,7 +137,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/picard/create_sequence_dictionnary/{genome}.log"
         wrapper:
-            "0.72.0-548-gc28bfdd03/bio/picard/createsequencedictionary"
+            "0.72.0-551-g3f16566da/bio/picard/createsequencedictionary"
 
 
     """
@@ -133,9 +149,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule tabix_index:
         input:
-            "{known}.vcf.gz"
+            config["dbsnp"]
         output:
-            "{known}.vcf.gz.tbi"
+            get_vcf_tbi_from_db_path(config["dbsnp"])
         message: "Indexing kown variants with Tabix"
         cache: True
         threads: 1
@@ -147,7 +163,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tabix/index/{known}.log"
         wrapper:
-            "0.72.0-548-gc28bfdd03/bio/tabix"
+            "0.72.0-551-g3f16566da/bio/tabix"
 
 
     """
@@ -168,7 +184,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/sort/{sample}.log"
         wrapper:
-            "0.72.0-548-gc28bfdd03/bio/samtools/index"
+            "0.72.0-551-g3f16566da/bio/samtools/index"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

@@ -3,7 +3,7 @@
 SNPEFF_SNPSIFT
 ==============
 
-Annotate VCF with SnpEff and SNpSift
+Annotate VCF files with SnpEff and SNpSift
 
 Usage
 -----
@@ -14,11 +14,15 @@ In order to run the pipeline, use the following commands
 
   # Go to your directory containing VCF files
 
-  cd /path/to/CEL/dir
+  cd /path/to/VCF/dir
 
-  # Copy/paster the following line
+  # Copy/paste the following line for **HG38**
 
   bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh
+
+  # Copy/paste the following line for **HG19**
+
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh hg19
 
 
 Input/Output
@@ -46,10 +50,11 @@ Input/Output
 
 
 
-Used meta-wrappers
-------------------
 
-The following individual meta-wrappers are used in this pipeline:
+Used wrappers
+-------------
+
+The following individual wrappers are used in this pipeline:
 
 
 * :ref:`master/bio/snpeff/annotate`
@@ -63,8 +68,7 @@ The following individual meta-wrappers are used in this pipeline:
 * :ref:`master/bio/snpsift/gwascat`
 
 
-Please refer to each meta-wrapper in above list for additional configuration parameters and information about the executed code.
-
+Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
 
 
 

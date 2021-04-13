@@ -198,11 +198,19 @@
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This meta-wrapper can be used by integrating the following into your workflow:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">default_config_varscan2_calling</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="s2">&quot;reference/genome.fasta&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">get_fasta_index_from_genome_path</span><span class="p">(</span><span class="n">genome_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">genome_path</span> <span class="o">+</span> <span class="s2">&quot;.fai&quot;</span>
+
+
+<span class="k">try</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">config</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">():</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">default_config_varscan2_calling</span>
 <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">default_config_varscan2_calling</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -224,7 +232,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/tabix/index/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-548-gc28bfdd03/bio/tabix&quot;</span>
+        <span class="s2">&quot;0.72.0-551-g3f16566da/bio/tabix&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -249,7 +257,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bcftools/concat/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-548-gc28bfdd03/bio/bcftools/concat&quot;</span>
+        <span class="s2">&quot;0.72.0-551-g3f16566da/bio/bcftools/concat&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -272,7 +280,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/varscan/pileup2indel/call/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-548-gc28bfdd03/bio/varscan/mpileup2indel&quot;</span>
+        <span class="s2">&quot;0.72.0-551-g3f16566da/bio/varscan/mpileup2indel&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -295,7 +303,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/varscan/pileup2snp/call/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-548-gc28bfdd03/bio/varscan/mpileup2snp&quot;</span>
+        <span class="s2">&quot;0.72.0-551-g3f16566da/bio/varscan/mpileup2snp&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -305,8 +313,8 @@
 <span class="n">rule</span> <span class="n">samtools_mpilup</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
-        <span class="n">reference_genome</span><span class="o">=</span><span class="s2">&quot;reference/genome.fasta&quot;</span><span class="p">,</span>
-        <span class="n">reference_genome_idx</span><span class="o">=</span><span class="s2">&quot;reference/genome.fasta.fai&quot;</span><span class="p">,</span>
+        <span class="n">reference_genome</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]</span>
+        <span class="n">reference_genome_idx</span><span class="o">=</span><span class="n">get_fasta_index_from_genome_path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Building mpilup on </span><span class="si">{wildcards.sample}</span><span class="s2"> with samtools&quot;</span>
@@ -319,7 +327,7 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-548-gc28bfdd03/bio/samtools/mpileup&quot;</span>
+        <span class="s2">&quot;0.72.0-551-g3f16566da/bio/samtools/mpileup&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -331,9 +339,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">samtools_faidx</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fasta&quot;</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{genome}</span><span class="s2">.fasta.fai&quot;</span>
+        <span class="n">get_fasta_index_from_genome_path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">])</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing reference fasta with Samtools&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
@@ -345,7 +353,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/samtools/faidx/</span><span class="si">{genome}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-548-gc28bfdd03/bio/samtools/faidx&quot;</span>
+        <span class="s2">&quot;0.72.0-551-g3f16566da/bio/samtools/faidx&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

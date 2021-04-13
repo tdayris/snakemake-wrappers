@@ -13,11 +13,19 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    default_config_varscan2_calling = {
+        "genome": "reference/genome.fasta",
+    }
+
+    def get_fasta_index_from_genome_path(genome_path: str) -> str:
+        return genome_path + ".fai"
+
+
     try:
         if config == dict():
-            config = {}
+            config = default_config_varscan2_calling
     except NameError:
-        config = {}
+        config = default_config_varscan2_calling
 
 
     """
@@ -39,7 +47,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tabix/index/{sample}.log"
         wrapper:
-            "0.72.0-548-gc28bfdd03/bio/tabix"
+            "0.72.0-551-g3f16566da/bio/tabix"
 
 
     """
@@ -64,7 +72,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bcftools/concat/{sample}.log"
         wrapper:
-            "0.72.0-548-gc28bfdd03/bio/bcftools/concat"
+            "0.72.0-551-g3f16566da/bio/bcftools/concat"
 
 
     """
@@ -87,7 +95,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/varscan/pileup2indel/call/{sample}.log"
         wrapper:
-            "0.72.0-548-gc28bfdd03/bio/varscan/mpileup2indel"
+            "0.72.0-551-g3f16566da/bio/varscan/mpileup2indel"
 
 
     """
@@ -110,7 +118,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/varscan/pileup2snp/call/{sample}.log"
         wrapper:
-            "0.72.0-548-gc28bfdd03/bio/varscan/mpileup2snp"
+            "0.72.0-551-g3f16566da/bio/varscan/mpileup2snp"
 
 
     """
@@ -120,8 +128,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule samtools_mpilup:
         input:
             bam="mapped/{sample}.bam",
-            reference_genome="reference/genome.fasta",
-            reference_genome_idx="reference/genome.fasta.fai",
+            reference_genome=config["genome"]
+            reference_genome_idx=get_fasta_index_from_genome_path(config["genome"]),
         output:
             temp("samtools/mpileup/{sample}.mpileup.gz")
         message: "Building mpilup on {wildcards.sample} with samtools"
@@ -134,7 +142,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.72.0-548-gc28bfdd03/bio/samtools/mpileup"
+            "0.72.0-551-g3f16566da/bio/samtools/mpileup"
 
 
     """
@@ -146,9 +154,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule samtools_faidx:
         input:
-            "{genome}.fasta"
+            config["genome"]
         output:
-            "{genome}.fasta.fai"
+            get_fasta_index_from_genome_path(config["genome"])
         message: "Indexing reference fasta with Samtools"
         cache: True
         threads: 1
@@ -160,7 +168,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/faidx/{genome}.log"
         wrapper:
-            "0.72.0-548-gc28bfdd03/bio/samtools/faidx"
+            "0.72.0-551-g3f16566da/bio/samtools/faidx"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
