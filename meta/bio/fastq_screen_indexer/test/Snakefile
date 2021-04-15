@@ -4,6 +4,8 @@ min_version("6.0")
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 HTTP = HTTPRemoteProvider()
 
+localrules: get_genome, download_tair10, download_phix_nbci
+
 
 build_release_organism = [
     ["GRCh38", "99", "homo_sapiens", "ensembl"],
@@ -27,7 +29,8 @@ wildcard_constraints:
 rule target:
     input:
         [
-            f"index/{source}/{build}.{release}.{organism}.dna.1.bt2"
+            f"refs/{source}/{build}.{release}.{organism}.dna.fasta"
+            #f"index/{source}/{build}.{release}.{organism}.dna.1.bt2"
             for build, release, organism, source in build_release_organism
         ]
 
