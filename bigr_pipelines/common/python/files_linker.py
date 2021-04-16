@@ -12,21 +12,22 @@ def link_fq(
     ) -> dict[str, str]:
     """
     Case r2 are provided:
-    Build a dictionnary containing the following paris:
-    original_r1_name: reads/{sample}.1.fastq.gz
-    original_r1_name: reads/{sample}.2.fastq.gz
+    Build a dictionnary containing the following pairs:
+    original_r1_name: reads/{sample}.1.fq.gz
+    original_r2_name: reads/{sample}.2.fq.gz
 
     Otherwise:
     Build a dictionnary containing the following fastq:
-    original_r1_name: reads/{sample}.fastq.gz
+    original_name: reads/{sample}.fq.gz
     """
-    if r2_path is None:
+    if r2_paths is None:
         return {
-            r1: f"reads/{sample}.fastq.gz
+            r1: f"reads/{sample}.fq.gz"
             for sample, r1 in zip(sample_names, r1_paths)
         }
 
     link_dict = {}
     for sample, r1, r2 in zip(sample_names, r1_paths, r2_paths):
-        link_dict[f"reads/{sample}.1.fastq.gz"] = r1
-        link_dict[f"reads/{sample}.2.fastq.gz"] = r2
+        link_dict[f"reads/{sample}.1.fq.gz"] = r1
+        link_dict[f"reads/{sample}.2.fq.gz"] = r2
+    return link_dict

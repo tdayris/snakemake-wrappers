@@ -6,6 +6,8 @@ This file contains usefull functions for file managment:
 * get a dictionnary from a basename (fasta)
 """
 
+import pandas
+
 from pathlib import Path
 
 from os.path import commonprefix
@@ -21,7 +23,7 @@ def get_fasta_dict_from_genome_path(genome_path: str) -> str:
 
 
 def get_vcf_tbi_from_vcf_path(vcf_path: str) -> str:
-    return db_path + ".tbi"
+    return vcf_path + ".tbi"
 
 def search_files(dirpath: FilePathType, ext: Optional[str] = None) -> list[str]:
     result = []
