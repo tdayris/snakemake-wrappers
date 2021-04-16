@@ -11,6 +11,14 @@ function conda_activate () {
   source "$(conda info --base)/etc/profile.d/conda.sh" && conda activate && conda activate "${1}"
 }
 
+function profiles () {
+  local PROFILE_NAME="${1}"
+  case PROFILE_NAME in
+    "demux") echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/demux"; break;;
+    "slurm") echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/slurm"; break;;
+    "clinics") echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/clinics"; break;;
+}
+
 # Add shortcut to conda environment, the main environment with resources to execute all pipelines
 declare -x CONDA_ENV_PATH="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/env/"
 
