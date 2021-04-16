@@ -58,7 +58,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.72.0-574-gb9a1b13c8/bio/gatk/applybqsr"
+            "/bio/gatk/applybqsr"
 
 
     """
@@ -85,7 +85,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.72.0-574-gb9a1b13c8/bio/gatk/baserecalibrator"
+            "/bio/gatk/baserecalibrator"
 
 
     """
@@ -111,7 +111,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/faidx/{genome}.log"
         wrapper:
-            "0.72.0-574-gb9a1b13c8/bio/samtools/faidx"
+            "/bio/samtools/faidx"
 
 
     """
@@ -135,9 +135,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             ""
         log:
-            "logs/picard/create_sequence_dictionnary/{genome}.log"
+            "logs/picard/create_sequence_dictionnary/genome.log"
         wrapper:
-            "0.72.0-574-gb9a1b13c8/bio/picard/createsequencedictionary"
+            "/bio/picard/createsequencedictionary"
 
 
     """
@@ -161,9 +161,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             "-p vcf"
         log:
-            "logs/tabix/index/{known}.log"
+            "logs/tabix/index/dbSNP.log"
         wrapper:
-            "0.72.0-574-gb9a1b13c8/bio/tabix"
+            "/bio/tabix"
 
 
     """
@@ -184,7 +184,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/sort/{sample}.log"
         wrapper:
-            "0.72.0-574-gb9a1b13c8/bio/samtools/index"
+            "/bio/samtools/index"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

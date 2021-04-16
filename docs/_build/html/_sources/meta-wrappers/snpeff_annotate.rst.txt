@@ -34,7 +34,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/snpeff/annotate/{sample}.log"
         wrapper:
-            "0.72.0-574-gb9a1b13c8/bio/snpeff/annotate"
+            "0.72.0-580-ge53da8937/bio/snpeff/annotate"
 
 
     """
@@ -56,7 +56,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/snpeff/download/{reference}.log"
         wrapper:
-            "0.72.0-574-gb9a1b13c8/bio/snpeff/download"
+            "0.72.0-580-ge53da8937/bio/snpeff/download"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

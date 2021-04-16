@@ -134,3 +134,7 @@ Authors
 
 
 * Thibault Dayris
+
+* M boyba Diop
+
+* Marc Deloger

@@ -63,6 +63,8 @@ The following individual wrappers are used in this pipeline:
 
 * :ref:`bio/multiqc`
 
+* :ref:`bio/fastq_screen`
+
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
 
@@ -73,6 +75,21 @@ Notes
 -----
 
 This simple pipeline is here to assess the quality after automatic sequencing process. Keep in mind that FastQC is built for DNASeq, and may raise non-critical warnings.
+
+This pipeline requires either (1) a two columned design file called 'design.tsv', or (2) available fastq files in the current directory.
+
+.. list-table:: Desgin file format
+    :widths: 33 33 33
+    :header-rows: 1
+
+    * - Sample_id
+      - Upstream_fastq
+    * - Name of the Sample1
+      - Path to upstream fastq file
+    * - Name of the Sample2
+      - Path to upstream fastq file
+    * - ...
+      - ...
 
 
 
