@@ -89,7 +89,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.72.0-560-g28998a654/bio/reference/ensembl-sequence"
+            "/bio/reference/ensembl-sequence"
 
 
     rule get_annotation:
@@ -109,7 +109,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/get_annotation/{build}.{release}.{organism}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.72.0-560-g28998a654/bio/reference/ensembl-annotation"
+            "/bio/reference/ensembl-annotation"
 
 
     rule samtools_faidx_reference:
@@ -126,7 +126,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         cache: True
         group: "index_fasta"
         wrapper:
-            "0.72.0-560-g28998a654/bio/samtools/faidx"
+            "/bio/samtools/faidx"
 
 
     rule create_dict:
@@ -145,7 +145,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=lambda wildcard, attempt: attempt * 120
         group: "index_fasta"
         wrapper:
-            "0.72.0-560-g28998a654/bio/picard/createsequencedictionary"
+            "/bio/picard/createsequencedictionary"
 
 
     rule get_variation_with_contig_lengths:
@@ -166,7 +166,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/get_variation/{build}.{release}.{organism}.log"
         wrapper:
-            "0.72.0-560-g28998a654/bio/reference/ensembl-variation"
+            "/bio/reference/ensembl-variation"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

@@ -50,7 +50,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             "samtools/fixmate/{sample}.bam"
         output:
-            temp("mapped/{sample}.bam")
+            temp("samtools/sort/{sample}.bam")
         message:
             "Sorting {wildcards.sample} reads by query name for fixing mates"
         threads: config.get("threads", 20)

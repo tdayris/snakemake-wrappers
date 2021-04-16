@@ -106,6 +106,7 @@
 <li class="toctree-l2"><a class="reference internal" href="deseq2_post_process.html">DESEQ2_POST_PROCESS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="download_references.html">DOWNLOAD REFERENCE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eacon_cytoscan.html">EACON CYTOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eacon_oncoscan.html">EACON CYTOSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eacon_post_process.html">EACON POST PROCESS</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">FASTQ_SCREEN_INDEXER</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
@@ -203,6 +204,8 @@
 <span class="kn">from</span> <span class="nn">snakemake.remote.HTTP</span> <span class="kn">import</span> <span class="n">RemoteProvider</span> <span class="k">as</span> <span class="n">HTTPRemoteProvider</span>
 <span class="n">HTTP</span> <span class="o">=</span> <span class="n">HTTPRemoteProvider</span><span class="p">()</span>
 
+<span class="n">localrules</span><span class="p">:</span> <span class="n">get_genome</span><span class="p">,</span> <span class="n">download_tair10</span><span class="p">,</span> <span class="n">download_phix_nbci</span>
+
 
 <span class="n">build_release_organism</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">[</span><span class="s2">&quot;GRCh38&quot;</span><span class="p">,</span> <span class="s2">&quot;99&quot;</span><span class="p">,</span> <span class="s2">&quot;homo_sapiens&quot;</span><span class="p">,</span> <span class="s2">&quot;ensembl&quot;</span><span class="p">],</span>
@@ -226,7 +229,8 @@
 <span class="n">rule</span> <span class="n">target</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;index/</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">build</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">release</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">organism</span><span class="si">}</span><span class="s2">.dna.1.bt2&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;refs/</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">build</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">release</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">organism</span><span class="si">}</span><span class="s2">.dna.fasta&quot;</span>
+            <span class="c1">#f&quot;index/{source}/{build}.{release}.{organism}.dna.1.bt2&quot;</span>
             <span class="k">for</span> <span class="n">build</span><span class="p">,</span> <span class="n">release</span><span class="p">,</span> <span class="n">organism</span><span class="p">,</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">build_release_organism</span>
         <span class="p">]</span>
 
@@ -247,7 +251,7 @@
         <span class="s2">&quot;logs/get_genome/</span><span class="si">{build}</span><span class="s2">.</span><span class="si">{release}</span><span class="s2">.</span><span class="si">{organism}</span><span class="s2">.</span><span class="si">{datatype}</span><span class="s2">.log&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-560-g28998a654/bio/reference/ensembl-sequence&quot;</span>
+        <span class="s2">&quot;0.72.0-574-gb9a1b13c8/bio/reference/ensembl-sequence&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">download_tair10</span><span class="p">:</span>
@@ -299,7 +303,7 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-560-g28998a654/bio/bowtie2/build&quot;</span>
+        <span class="s2">&quot;0.72.0-574-gb9a1b13c8/bio/bowtie2/build&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

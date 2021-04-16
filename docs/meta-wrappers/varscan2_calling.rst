@@ -47,7 +47,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tabix/index/{sample}.log"
         wrapper:
-            "0.72.0-560-g28998a654/bio/tabix"
+            "/bio/tabix"
 
 
     """
@@ -72,7 +72,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bcftools/concat/{sample}.log"
         wrapper:
-            "0.72.0-560-g28998a654/bio/bcftools/concat"
+            "/bio/bcftools/concat"
 
 
     """
@@ -95,7 +95,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/varscan/pileup2indel/call/{sample}.log"
         wrapper:
-            "0.72.0-560-g28998a654/bio/varscan/mpileup2indel"
+            "/bio/varscan/mpileup2indel"
 
 
     """
@@ -118,7 +118,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/varscan/pileup2snp/call/{sample}.log"
         wrapper:
-            "0.72.0-560-g28998a654/bio/varscan/mpileup2snp"
+            "/bio/varscan/mpileup2snp"
 
 
     """
@@ -128,7 +128,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule samtools_mpilup:
         input:
             bam="mapped/{sample}.bam",
-            reference_genome=config["genome"]
+            reference_genome=config["genome"],
             reference_genome_idx=get_fasta_index_from_genome_path(config["genome"]),
         output:
             temp("samtools/mpileup/{sample}.mpileup.gz")
@@ -142,7 +142,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.72.0-560-g28998a654/bio/samtools/mpileup"
+            "/bio/samtools/mpileup"
 
 
     """
@@ -166,9 +166,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             ""
         log:
-            "logs/samtools/faidx/{genome}.log"
+            "logs/samtools/faidx/genome.log"
         wrapper:
-            "0.72.0-560-g28998a654/bio/samtools/faidx"
+            "/bio/samtools/faidx"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

@@ -12,6 +12,16 @@ In order to run the pipeline, use the following commands
 
 .. code-block:: bash 
 
+  # Go to your working directory
+
+  cd /path/to/my/working/directory
+
+  # Build a design file (see below)
+
+  # Copy/paste the following line for **HG38**
+
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh
+
   # Copy/paste the following line for **HG19**
 
   bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh hg19
@@ -97,7 +107,7 @@ The only difference with a classic WES pipeline is the absence of duplicates rem
 
 Prerequisites:
 
-* A TSV formatted design file with the following columns:
+* A TSV formatted design file, *named 'design.tsv'* with the following columns:
 
 .. list-table:: Desgin file format
   :widths: 33 33 33

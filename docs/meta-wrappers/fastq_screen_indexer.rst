@@ -19,6 +19,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
     from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
     HTTP = HTTPRemoteProvider()
 
+    localrules: get_genome, download_tair10, download_phix_nbci
+
 
     build_release_organism = [
         ["GRCh38", "99", "homo_sapiens", "ensembl"],
@@ -42,7 +44,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule target:
         input:
             [
-                f"index/{source}/{build}.{release}.{organism}.dna.1.bt2"
+                f"refs/{source}/{build}.{release}.{organism}.dna.fasta"
+                #f"index/{source}/{build}.{release}.{organism}.dna.1.bt2"
                 for build, release, organism, source in build_release_organism
             ]
 
@@ -63,7 +66,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.72.0-560-g28998a654/bio/reference/ensembl-sequence"
+            "0.72.0-574-gb9a1b13c8/bio/reference/ensembl-sequence"
 
 
     rule download_tair10:
@@ -115,7 +118,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.72.0-560-g28998a654/bio/bowtie2/build"
+            "0.72.0-574-gb9a1b13c8/bio/bowtie2/build"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
