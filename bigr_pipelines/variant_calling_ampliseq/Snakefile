@@ -22,7 +22,7 @@ localrules: bigr_copy
 
 design = read_design("design.tsv")
 
-config_path = Path("config_variant_calling_ampliseq_hg19.yaml")
+config_path = Path("config_variant_calling_ampliseq.yaml")
 if not config_path.exists() or True:
     write_yaml_from_path(config_path, config)
 
@@ -31,7 +31,7 @@ configfile: config_path
 localrules: bigr_copy
 
 wildcard_constraints:
-    sample = r"|".join(config["design"]["Sample_id"]),
+    sample = r"|".join(design["Sample_id"]),
     stream = r"1|2"
 
 module bwa_fixmate:
@@ -56,12 +56,14 @@ fastq_links = link_fq(
 
 rule all:
     input:
+        #expand(
+        #    "snpsift/gwascat/{sample}.vcf.gz",
+        #    sample=design["Sample_id"]
+        #),
         expand(
             "snpsift/gwascat/{sample}.vcf.gz",
-            sample=design["Sample_id"]
-        ),
-        expand(
-            "snpsift/gwascat/{sample}.vcf.gz.tbi",
+            #"snpsift/cosmic/{sample}.vcf",
+            #stream=["1", "2"],
             sample=design["Sample_id"]
         )
     message:
