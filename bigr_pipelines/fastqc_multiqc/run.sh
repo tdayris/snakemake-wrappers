@@ -1,0 +1,27 @@
+set -e
+
+# This adds several functions and variable in the environment
+PIPELINE_PREFIX="/mnt/beegfs/pipelines/snakemake-wrappers"
+source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/messages.sh"
+source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/environment.sh"
+
+PROFILE="slurm";
+
+while [ "$#" -gt 0 ]; do
+  case "${1}" in
+    -p|--profile) PROFILE="${2}"; shift 2;;
+    -*|*) error_handling ${LINENO} 1 "Unknown arguments ${1}"; exit 1;;
+  esac
+done
+
+# Define pipeline related variables
+declare -x SNAKEMAKE_PROFILE_PATH=$( profile "${PROFILE}" )
+declare -x SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
+declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/fastqc_multiqc"
+export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH SNAKEFILE_PATH
+message INFO "Environment loaded"
+
+
+# Run pipeline
+conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
+snakemake -s "${SNAKEFILE_PATH}" --cache eacon_install eacon_databases --profile "${SNAKEMAKE_PROFILE_PATH}" && message INFO "FastQC/MultiQC pipeline successful" || error_handling "${LINENO}" 2 "Error while running pipeline, see snakemake logging"
