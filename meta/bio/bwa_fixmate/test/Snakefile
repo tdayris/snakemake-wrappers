@@ -129,7 +129,7 @@ rule bwa_index:
     threads: 1
     resources:
         time_min=lambda wildcards, attempt: min(attempt * 90, 480),
-        mem_mb=lambda wildcards, attempt: min(attempt * 6144 + 2048, 20480)
+        mem_mb=lambda wildcards, attempt: attempt * 6144 + 4096
     params:
         prefix="bwa_mem2/index/genome"
     log:
