@@ -22,8 +22,16 @@ localrules: bigr_copy
 
 design = read_design("design.tsv")
 
+config_path = Path("config_variant_calling_ampliseq_hg19.yaml")
+if not config_path.exists() or True:
+    write_yaml_from_path(config_path, config)
+
+configfile: config_path
+
+localrules: bigr_copy
+
 wildcard_constraints:
-    sample = r"|".join(design["Sample_id"]),
+    sample = r"|".join(config["design"]["Sample_id"]),
     stream = r"1|2"
 
 module bwa_fixmate:
