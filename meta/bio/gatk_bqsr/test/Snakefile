@@ -43,7 +43,7 @@ rule gatk_apply_baserecalibrator:
     params:
         extra=""
     wrapper:
-        "master/bio/gatk/applybqsr"
+        "/bio/gatk/applybqsr"
 
 
 """
@@ -70,7 +70,7 @@ rule gatk_compute_baserecalibration_table:
     params:
         extra=""
     wrapper:
-        "master/bio/gatk/baserecalibrator"
+        "/bio/gatk/baserecalibrator"
 
 
 """
@@ -96,7 +96,7 @@ rule samtools_faidx:
     log:
         "logs/samtools/faidx/{genome}.log"
     wrapper:
-        "master/bio/samtools/faidx"
+        "/bio/samtools/faidx"
 
 
 """
@@ -120,9 +120,9 @@ rule picard_create_sequence_dictionnary:
     params:
         ""
     log:
-        "logs/picard/create_sequence_dictionnary/{genome}.log"
+        "logs/picard/create_sequence_dictionnary/genome.log"
     wrapper:
-        "master/bio/picard/createsequencedictionary"
+        "/bio/picard/createsequencedictionary"
 
 
 """
@@ -146,9 +146,9 @@ rule tabix_index:
     params:
         "-p vcf"
     log:
-        "logs/tabix/index/{known}.log"
+        "logs/tabix/index/dbSNP.log"
     wrapper:
-        "master/bio/tabix"
+        "/bio/tabix"
 
 
 """
@@ -169,4 +169,4 @@ rule samtools_index:
     log:
         "logs/samtools/sort/{sample}.log"
     wrapper:
-        "master/bio/samtools/index"
+        "/bio/samtools/index"
