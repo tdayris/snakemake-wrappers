@@ -13,11 +13,12 @@ function conda_activate () {
 
 function profiles () {
   local PROFILE_NAME="${1}"
+  message INFO "Looking for profile named: ${PROFILE_NAME}"
   case PROFILE_NAME in
-    "demux") echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/demux"; break;;
-    "slurm") echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/slurm"; break;;
-    "clinics") echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/clinics"; break;;
-    *) echo "Unknown profile name"; break;;
+    demux) echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/demux";;
+    slurm) echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/slurm";;
+    clinics) echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/clinics";;
+    *) echo "Unknown profile name";;
   esac
 }
 
@@ -29,3 +30,5 @@ declare -x SNAKEMAKE_OUTPUT_CACHE="/mnt/beegfs/pipelines/snakemake-wrappers/bigr
 
 # Export previously defined variables to current environment
 export SNAKEMAKE_OUTPUT_CACHE CONDA_ENV_PATH
+
+message INFO "sourced: environment.sh"

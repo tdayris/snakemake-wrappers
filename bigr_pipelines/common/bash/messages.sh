@@ -52,3 +52,5 @@ function error_handling() {
   # Exiting with given error code
   exit "${code}"
 }
+
+message INFO "sourced: message functions"
