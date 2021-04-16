@@ -1,17 +1,23 @@
 import sys
 
-sys.path.append("../common/python")
+sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
 
-from file_manager import read_design
+from file_manager import (
+    read_design,
+    get_fasta_index_from_genome_path,
+    get_fasta_dict_from_genome_path,
+    get_vcf_tbi_from_vcf_path
+)
 from files_linker import link_fq
-
+from write_yaml import write_yaml_from_path
+from pathlib import Path
 from snakemake.utils import min_version
 min_version("6.0")
 
 container: "docker://continuumio/miniconda3:4.4.10"
 
 default_config_variant_calling_ampliseq = {
-    "design" = read_design("design.tsv"),
+    "design": read_design("design.head.tsv"),
     "threads": 20,
     "ref": {
         "fasta": "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Gencode/GRCH37/release_19/DNA/GRCh37.p13.genome.fa",
@@ -28,11 +34,6 @@ default_config_variant_calling_ampliseq = {
     }
 }
 
-fastq_links = link_fq(
-    condig["design"].Sample_id,
-    condig["design"].Upstream_fastq,
-    condig["design"].Downstream_fastq
-)
 
 try:
     if config == dict():
@@ -40,41 +41,50 @@ try:
 except NameError:
     config = default_config_variant_calling_ampliseq
 
+config_path = Path("config_variant_calling_ampliseq_hg19.yaml")
+if not config_path.exists() or True:
+    write_yaml_from_path(config_path, config)
+
+configfile: config_path
+
+localrules: bigr_copy
+
+wildcard_constraints:
+    sample = r"|".join(config["design"]["Sample_id"]),
+    stream = r"1|2"
 
 module bwa_fixmate:
-    snakefile: "../../meta/bio/bwa_fixmate"
-    configfile: {
-        "threads": config["threads"],
-        "genome": config["ref"]["fasta"]
-    }
+    snakefile: "../../meta/bio/bwa_fixmate/test/Snakefile"
+    config: {"threads": config["threads"], "genome": config["ref"]["fasta"]}
 
 
 module gatk_bqsr:
-    snakefile: "../../meta/bio/gatk_bqsr"
-    configfile: {
-        "threads": config["threads"],
-        "genome": config["ref"]["fasta"],
-        "dbsnp": config["ref"]["dbsnp"]
-    }
+    snakefile: "../../meta/bio/gatk_bqsr/test/Snakefile"
+    config: {"threads": config["threads"], "genome": config["ref"]["fasta"], "dbsnp": config["ref"]["dbsnp"]}
 
 
 module varscan2_calling:
-    snakefile: "../../meta/bio/varscan2_calling"
-    configfile: {
-        "genome": config["ref"]["fasta"]
-    }
+    snakefile: "../../meta/bio/varscan2_calling/test/Snakefile"
+    config: {"genome": config["ref"]["fasta"]}
 
+fastq_links = link_fq(
+    config["design"].Sample_id,
+    config["design"].Upstream_file,
+    config["design"].Downstream_file
+)
 
 rule all:
     input:
         expand(
-            "snpeff/gwascat/{sample}.vcf.gz",
+            "snpsift/gwascat/{sample}.vcf.gz",
             sample=config["design"]["Sample_id"]
         ),
         expand(
-            "snpeff/gwascat/{sample}.vcf.gz.tbi",
+            "snpsift/gwascat/{sample}.vcf.gz.tbi",
             sample=config["design"]["Sample_id"]
-        ),
+        )
+    message:
+        "Finishing the Ampliseq variant calling"
 
 #################################
 ### FINAL VCF FILE INDEXATION ###
@@ -82,11 +92,13 @@ rule all:
 
 rule tabix_index:
     input:
-        "snpeff/gwascat/{sample}.vcf.gz"
+        "snpsift/gwascat/{sample}.vcf.gz"
     output:
-        "snpeff/gwascat/{sample}.vcf.gz.tbi"
+        "snpsift/gwascat/{sample}.vcf.gz.tbi"
     message:
         "Indexing {wildcards.sample} final annotated VCF with tabix"
+    group:
+        "Final_compression_{sample}"
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1020,
@@ -99,11 +111,13 @@ rule tabix_index:
 
 rule compress_pbgzip:
     input:
-        "snpeff/gwascat/{sample}.vcf"
+        "snpsift/gwascat/{sample}.vcf"
     output:
-        "snpeff/gwascat/{sample}.vcf.gz"
+        "snpsift/gwascat/{sample}.vcf.gz"
     message:
         "Compressing {wildcards.sample} final annotated VCF with pbgzip"
+    group:
+        "Final_compression_{sample}"
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1020,
@@ -119,38 +133,50 @@ rule compress_pbgzip:
 
 rule snpsift_gwascat:
     input:
-        call = "snpeff/cosmic/{sample}.vcf",
+        call = "snpsift/cosmic/{sample}.vcf",
         gwascat = config["ref"]["gwascat"]
     output:
-        call = temp("snpeff/gwascat/{sample}.vcf")
+        call = temp("snpsift/gwascat/{sample}.vcf")
+    message:
+        "Annotating {wildcards.sample} with GWAS Catalog"
+    threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
         time_min=lambda wildcards, attempt: attempt * 45
+    log:
+        "logs/snpsift/gwascat/{sample}.log"
     wrapper:
         "/bio/snpsift/gwascat"
 
 
 rule snpsift_cosmic:
     input:
-        call="snpeff/dbsnp/{sample}.vcf",
+        call="snpsift/dbsnp/{sample}.vcf",
         database=config["ref"]["cosmic"]
     output:
-        call=temp("snpeff/cosmic/{sample}.vcf")
-    log:
-        "logs/snpsift/cosmic/{sample}.log"
+        call=temp("snpsift/cosmic/{sample}.vcf")
+    message:
+        "Annotating {wildcards.sample} with COSMIC"
+    threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
         time_min=lambda wildcards, attempt: attempt * 45
+    log:
+        "logs/snpsift/cosmic/{sample}.log"
     wrapper:
         "/bio/snpsift/annotate"
 
 
 rule snpsift_dbsnp:
     input:
-        call="snpeff/kaviar/{sample}.vcf",
+        call="snpsift/kaviar/{sample}.vcf",
         database=config["ref"]["dbsnp"]
     output:
-        call=temp("snpeff/dbsnp/{sample}.vcf")
+        call=temp("snpsift/dbsnp/{sample}.vcf")
+
+    message:
+        "Annotating {wildcards.sample} with dbSNP"
+    threads: 1
     log:
         "logs/snpsift/dbsnp/{sample}.log"
     resources:
@@ -165,7 +191,11 @@ rule snpsift_kaviar:
         call="snpsift/gmt/{sample}.vcf",
         database=config["ref"]["kaviar"]
     output:
-        call=temp("snpeff/kaviar/{sample}.vcf")
+        call=temp("snpsift/kaviar/{sample}.vcf")
+
+    message:
+        "Annotating {wildcards.sample} with Kaviar"
+    threads: 1
     log:
         "logs/snpsift/kaviar/{sample}.log"
     resources:
@@ -181,6 +211,9 @@ rule snpsift_gmt:
         gmt = config["ref"]["gmt"]
     output:
         call = temp("snpsift/gmt/{sample}.vcf")
+    message:
+        "Annotating {wildcards.sample} with MSigDB"
+    threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
         time_min=lambda wildcards, attempt: attempt * 45
@@ -196,6 +229,9 @@ rule snpeff_annotate:
         calls=temp("snpeff/{sample}.vcf"),
         stats="snpeff/{sample}.html",
         csvstats="snpeff/{sample}.csv"
+    message:
+        "Annotating {wildcards.sample} with Ensembl"
+    threads: 1
     log:
         "logs/snpeff/{sample}.log"
     resources:
@@ -211,6 +247,9 @@ rule snpsift_vartype:
         vcf_tbi="bcftools/{sample}.vcf.gz.tbi"
     output:
         vcf=temp("snpsift/vartype/{sample}.vcf")
+    message:
+        "Annotating variant types in {wildcards.sample}"
+    threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
         time_min=lambda wildcards, attempt: attempt * 45
@@ -224,9 +263,9 @@ rule snpsift_vartype:
 ### VARIANT CALLING VARSCAN ###
 ###############################
 
-use rule * from varscan2_calling as varscan2_calling_*
+use rule * from varscan2_calling as *
 
-use rule varscan2_calling_samtools_mpilup with:
+use rule samtools_mpilup from varscan2_calling with:
     input:
         bam="gatk/recal_bam/{sample}.bam",
         reference_genome=config['ref']['fasta'],
@@ -237,7 +276,7 @@ use rule varscan2_calling_samtools_mpilup with:
 ### GATK BAM RECALIBRATION ###
 ##############################
 
-use rule gatk_apply_baserecalibrator from gatk_bqsr as gatk_bqsr_apply_baserecalibrator with:
+use rule gatk_apply_baserecalibrator from gatk_bqsr with:
     input:
         bam="samtools/sort/{sample}.bam",
         bam_index="samtools/sort/{sample}.bam.bai",
@@ -247,7 +286,7 @@ use rule gatk_apply_baserecalibrator from gatk_bqsr as gatk_bqsr_apply_baserecal
         recal_table="gatk/recal_data_table/{sample}.grp"
 
 
-use rule gatk_compute_baserecalibration_table from gatk_bqsr as gatk_bqsr_compute_baserecalibration_table_bigr_hg19 with:
+use rule gatk_compute_baserecalibration_table from gatk_bqsr with:
     input:
         bam="samtools/sort/{sample}.bam",
         bam_index="samtools/sort/{sample}.bam.bai",
@@ -255,7 +294,7 @@ use rule gatk_compute_baserecalibration_table from gatk_bqsr as gatk_bqsr_comput
         ref_idx=get_fasta_index_from_genome_path(config['ref']['fasta']),
         ref_dict=get_fasta_dict_from_genome_path(config['ref']['fasta']),
         known=config['ref']['dbsnp'],
-        known_idx=get_vcf_tbi_from_db_path(config['ref']['dbsnp'])
+        known_idx=get_vcf_tbi_from_vcf_path(config['ref']['dbsnp'])
 
 
 ###################
@@ -264,13 +303,15 @@ use rule gatk_compute_baserecalibration_table from gatk_bqsr as gatk_bqsr_comput
 
 use rule * from bwa_fixmate as bwa_fixmate_*
 
-use rule bwa_fixmate_bwa_mem as bwa_fixmate_bwa_mem_bigr with:
+use rule bwa_mem from bwa_fixmate with:
     input:
-        reads = expand(
-            "fastp/trimmed/pe/{sample}.{stream}.fastq",
+        reads=expand(
             "fastp/trimmed/pe/{sample}.{stream}.fastq",
             stream=["1", "2"],
             allow_missing=True
+        ),
+        index=multiext(
+            "bwa_mem2/index/genome", ".0123", ".amb", ".ann", ".pac"
         )
 
 
@@ -287,7 +328,6 @@ rule fastp_clean:
         ),
     output:
         trimmed=expand(
-            "fastp/trimmed/pe/{sample}.{stream}.fastq",
             "fastp/trimmed/pe/{sample}.{stream}.fastq",
             stream=["1", "2"],
             allow_missing=True
@@ -322,8 +362,8 @@ rule bigr_copy:
         mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
         time_min=lambda wildcard, attempt: attempt * 45
     params:
-        input=lambda wildcards, output: fastq_links[output]
+        input=lambda wildcards, output: fastq_links[output[0]]
     log:
         "logs/bigr_copy/{sample}.{stream}.log"
     wrapper:
-        "bio/bigr/copy"
+        "/bio/BiGR/copy"
