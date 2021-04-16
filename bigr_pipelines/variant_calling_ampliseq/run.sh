@@ -9,11 +9,19 @@ source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/environment.sh"
 declare -x SNAKEMAKE_PROFILE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/slurm"
 declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/variant_calling_ampliseq"
 export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
-message INFO "Environment loaded"
 
 SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
+CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
 if [ "${1}" = "hg19" ]; then
-  SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile_hg19.smk"
+  CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"
+fi
+message INFO "Environment loaded"
+
+if [ ! -f "config.yaml" ]; then
+  message INFO "Missing config file, falling back to default arguments"
+  cp "${CONFIG_PATH}" "config.yaml"
+else
+  message INFO "Config file already provided"
 fi
 
 # Run pipeline
