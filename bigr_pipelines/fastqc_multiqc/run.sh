@@ -15,12 +15,12 @@ while [ "$#" -gt 0 ]; do
 done
 
 # Define pipeline related variables
-declare -x SNAKEMAKE_PROFILE_PATH=$( profile "${PROFILE}" )
-declare -x SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
+declare -x SNAKEMAKE_PROFILE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/${PROFILE}"
 declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/fastqc_multiqc"
+declare -x SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
 export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH SNAKEFILE_PATH
 message INFO "Environment loaded"
-
+message INFO "${SNAKEMAKE_PROFILE_PATH}"
 
 # Run pipeline
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
