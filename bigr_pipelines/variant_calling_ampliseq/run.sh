@@ -17,13 +17,13 @@ if [ "${1}" = "hg19" ]; then
 fi
 message INFO "Environment loaded"
 
-if [ ! -f "config.yaml" ]; then
+if [ ! -f "config_variant_calling_ampliseq.yaml" ]; then
   message INFO "Missing config file, falling back to default arguments"
-  cp "${CONFIG_PATH}" "config.yaml"
+  cp "${CONFIG_PATH}" "config_variant_calling_ampliseq.yaml"
 else
   message INFO "Config file already provided"
 fi
 
 # Run pipeline
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
-snakemake -s "${SNAKEFILE_PATH}" --cache eacon_install eacon_databases --profile "${SNAKEMAKE_PROFILE_PATH}" -n && message INFO "Variant calling successful" || error_handling "${LINENO}" 2 "Error while running variant calling pipeline"
+snakemake -s "${SNAKEFILE_PATH}" --configfile "config_variant_calling_ampliseq.yaml" --cache eacon_install eacon_databases --profile "${SNAKEMAKE_PROFILE_PATH}" && message INFO "Variant calling successful" || error_handling "${LINENO}" 2 "Error while running variant calling pipeline"

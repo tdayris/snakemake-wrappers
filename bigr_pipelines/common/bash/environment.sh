@@ -17,6 +17,8 @@ function profiles () {
     "demux") echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/demux"; break;;
     "slurm") echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/slurm"; break;;
     "clinics") echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/clinics"; break;;
+    *) echo "Unknown profile name"; break;;
+  esac
 }
 
 # Add shortcut to conda environment, the main environment with resources to execute all pipelines
