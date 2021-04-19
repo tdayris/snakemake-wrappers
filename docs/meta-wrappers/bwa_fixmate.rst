@@ -144,7 +144,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             time_min=lambda wildcards, attempt: min(attempt * 90, 480),
-            mem_mb=lambda wildcards, attempt: min(attempt * 6144 + 2048, 20480)
+            mem_mb=lambda wildcards, attempt: min(attempt * 2048 + 61440, 71680)
         params:
             prefix="bwa_mem2/index/genome"
         log:
