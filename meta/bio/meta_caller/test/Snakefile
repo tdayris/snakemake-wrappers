@@ -1,0 +1,154 @@
+from pathlib import Path
+from snakemake.utils import min_version
+min_version("6.0")
+
+
+def search_bam_samples(path: str):
+    for f in Path(path).iterdir():
+        if f.name.endswith(".bam") and f.is_file():
+            yield(str(f.name)[:-len(".bam")])
+        elif f.is_dir() and not f.name.startswith(".snakemake"):
+            yield from search_bam_samples(f.absolute())
+
+
+
+def get_fasta_index_from_genome_path(genome_path: str) -> str:
+    return genome_path + ".fai"
+
+
+def get_dict_from_genome_path(genome_path: str) -> str:
+    return ".".join(genome_path.split(".")[:-1]) + ".dict"
+
+
+default_config_meta_caller = {
+    "samples": list(search_bam_samples(".")),
+    "genome": "reference/genome.fasta",
+    "threads": 20
+}
+
+
+try:
+    if config == dict():
+        config = default_config_meta_caller
+except NameError:
+    config = default_config_meta_caller
+
+
+tools_and_subcommands = [
+    ("varscan2", "concat"),
+    ("gatk", "mutect2"),
+]
+
+wildcard_constraints:
+    sample = r"|".join(config["samples"]),
+    tool = r"|".join([i[0] for i in tools_and_subcommands]),
+    subcommand = r"|".join([i[-1] for i in tools_and_subcommands])
+
+
+ruleorder: index_datasets_samtools_faidx > varscan2_calling_samtools_faidx
+
+
+rule target:
+    input:
+        expand(
+            "bcftools/merge/{sample}.vcf.gz",
+            sample=config["samples"]
+        )
+    message:
+        "Finishing the meta_caller meta-wrapper"
+
+
+module varscan2_calling:
+    snakefile: "../../varscan2_calling/test/Snakefile"
+    config: config
+
+module index_datasets:
+    snakefile: "../../index_datasets/test/Snakefile"
+    config: config
+
+
+use rule * from varscan2_calling as varscan2_calling_*
+
+use rule * from index_datasets as index_datasets_*
+
+
+use rule bcftools_concat from varscan2_calling with:
+    output:
+        "varscan2/concat/{sample}.vcf.gz"
+
+
+rule bcftools_merge:
+    input:
+        calls=[
+            "varscan2/concat/{sample}.vcf.gz",
+            "gatk/mutect2/{sample}.vcf.gz"
+        ],
+        calls_indexes=[
+            "varscan2/concat/{sample}.vcf.gz.tbi",
+            "gatk/mutect2/{sample}.vcf.gz.tbi"
+        ]
+    output:
+        "bcftools/merge/{sample}.vcf.gz"
+    message:
+        "Merging multiple calls for {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
+        time_min=lambda wildcards, attempt: attempt * 45
+    log:
+        "logs/bcftools/merge/{sample}.log"
+    params:
+        "-m none --missing-to-ref --force-samples"
+    wrapper:
+        "/bio/bcftools/merge"
+
+
+use rule tabix_index from varscan2_calling with:
+    input:
+        "{tool}/{subcommand}/{sample}.vcf.gz"
+    output:
+        temp("{tool}/{subcommand}/{sample}.vcf.gz.tbi")
+    message:
+        "Indexing compressed VCF for sample {wildcards.sample} "
+        "(for {wildcards.tool}, {wildcards.subcommand})"
+    log:
+        "logs/{tool}/{subcommand}/tabix/index/{sample}.log"
+
+
+rule pbgzip:
+    input:
+        "{tool}/{subcommand}/{sample}.vcf"
+    output:
+        temp("{tool}/{subcommand}/{sample}.vcf.gz")
+    message:
+        "Compressing {sample} calling with Prallel Block GZip "
+        "(for {wildcards.tool}, {wildcards.subcommand})"
+    threads: config.get("threads", 20)
+    resources:
+        mem_mb=lambda wildcards, attempt: min(attempt * 512, 2048),
+        time_min=lambda wildcards, attempt: attempt * 30
+    log:
+        "logs/{tool}/{subcommand}/pbgzip/{sample}.log"
+    wrapper:
+        "/bio/compress/pbgzip"
+
+
+rule mutect2:
+    input:
+        fasta = config["genome"],
+        fasta_index = get_fasta_index_from_genome_path(config["genome"]),
+        fasta_dict = get_dict_from_genome_path(config['genome']),
+        map = "mapped/{sample}.bam",
+        map_index = "mapped/{sample}.bam.bai",
+    output:
+        vcf = "gatk/mutect2/{sample}.vcf.gz"
+    message:
+        "Calling variants in {wildcards.sample} with Mutect2"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
+        time_min=lambda wildcards, attempt: attempt * 45
+    log:
+        "logs/gatk/mutect/{sample}.log"
+    wrapper:
+         "/bio/gatk/mutect"

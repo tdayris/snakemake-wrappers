@@ -216,6 +216,20 @@ def test_salmon_meta():
 
 
 @skip_if_not_modified
+def test_meta_caller_meta():
+    run(
+        "meta/bio/meta_caller",
+        [
+            "snakemake",
+            "--cores",
+            "2",
+            "--use-conda",
+            "bcftools/merge/a.chr21.vcf.gz"
+        ]
+    )
+
+
+@skip_if_not_modified
 def test_bwa_fixmate_meta():
     run(
         "meta/bio/bwa_fixmate",
