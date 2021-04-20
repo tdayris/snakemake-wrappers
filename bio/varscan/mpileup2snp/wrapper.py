@@ -21,10 +21,17 @@ java_opts = get_java_opts(snakemake)
 # - One for unzipping with zcat
 # - One for running varscan
 pileup = (
-    " cat {} ".format(snakemake.input[0])
-    if not snakemake.input[0].endswith("gz")
-    else " zcat {} ".format(snakemake.input[0])
+    " cat {} ".format(snakemake.input["pileup"])
+    if not snakemake.input["pileup"].endswith("gz")
+    else " zcat {} ".format(snakemake.input["pileup"])
 )
+
+if str(snakemake.output[0]).endswith(("vcf", "vcf.gz")):
+    if "--output-vcf" not in extra:
+        extra += " --output-vcf 1"
+
+if "sample_list" in snakemake.input.keys():
+    extra += " --vcf-sample-list {} ".format(snakemake.input['sample_list'])
 
 # Building output directories
 makedirs(op.dirname(snakemake.output[0]))
