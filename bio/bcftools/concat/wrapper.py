@@ -10,6 +10,6 @@ log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 shell(
     "bcftools concat {snakemake.params} -o {snakemake.output[0]} "
-    "{snakemake.input.calls} "
+    "{snakemake.input.calls} --threads {snakemake.threads} "
     "{log}"
 )
