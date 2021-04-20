@@ -17,6 +17,23 @@ if snakemake.output.get("bam", None) is not None:
 else:
     bam_output = ""
 
+
+germline_resource = ""
+if "germline" in snakemake.input.keys():
+    germline_resource = "--germline-resource {}".format(
+        snakemake.input["germline"]
+    )
+
+
+intervals = ""
+if "intervals" in snakemake.input.keys():
+    intervals = "--intervals {}".format(snakemake.input["intervals"])
+
+
+f1r2 = ""
+if "f1r2" in snakemake.output.keys():
+    f1r2 = "--f1r2-tar-gz {}".format(snakemake.output["f1r2"])
+
 extra = snakemake.params.get("extra", "")
 java_opts = get_java_opts(snakemake)
 
@@ -24,6 +41,9 @@ shell(
     "gatk --java-options '{java_opts}' Mutect2 "  # Tool and its subprocess
     "--input {snakemake.input.map} "  # Path to input mapping file
     "{bam_output} "  # Path to output bam file, optional
+    "{f1r2} "  # Path to output f1r2 count file
+    "{germline_resource} "  # Path to optional germline resource VCF
+    "{intervals} "  # Path to optional intervals
     "--output {snakemake.output.vcf} "  # Path to output vcf file
     "--reference {snakemake.input.fasta} "  # Path to reference fasta file
     "{extra} "  # Extra parameters
