@@ -18,6 +18,10 @@ This wrapper can be used in the following way:
         input:
             vcf="calls/snvs.vcf",
             ref="genome.fasta",
+            # Optional BAM
+            # bam="",
+            # Optional LearnReadOrientationModel result
+            # f1r2=""
         output:
             vcf="calls/snvs.mutect.filtered.vcf",
         log:
@@ -32,7 +36,7 @@ This wrapper can be used in the following way:
         resources:
             mem_mb=1024,
         wrapper:
-            "0.72.0-593-g526efbb3a/bio/gatk/filtermutectcalls"
+            "0.72.0-610-g1b61cb767/bio/gatk/filtermutectcalls"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -46,7 +50,7 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``gatk4==4.1.4.1``
+* ``gatk4==4.2.0.0``
 * ``snakemake-wrapper-utils==0.1.3``
 
 Input/Output
@@ -96,10 +100,27 @@ Code
 
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
+    bam = ""
+    if "bam" in snakemake.input.keys():
+        bam = " --input {}".format(snakemake.input["bam"])
+
+
+    contamination = ""
+    if "contamination" in snakemake.input.keys():
+        contamination = "--contamination-table {}".format(
+            snakemake.input["contamination"]
+        )
+
+    f1r2 = ""
+    if "f1r2" in snakemake.input.keys():
+        f1r2 = "--orientation-bias-artifact-priors {}".format(
+            snakemake.input["f1r2"]
+        )
+
     shell(
         "gatk --java-options '{java_opts}' FilterMutectCalls "
         "-R {snakemake.input.ref} -V {snakemake.input.vcf} "
-        "{extra} "
+        "{extra} {contamination} {f1r2} {bam} "
         "-O {snakemake.output.vcf} "
         "{log}"
     )

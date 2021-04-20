@@ -117,7 +117,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             )
         params:
             index="bwa_mem2/index/genome",
-            extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
+            extra=r"-R '@RG\tID:{sample}\tSM:{sample}' -M -A 2 -E 1",
             sort="samtools",         # We chose Samtools to sort by queryname
             sort_order="queryname",  # Queryname sort is needed for a fixmate
             sort_extra="-m 1536M"     # We extand the sort buffer memory
