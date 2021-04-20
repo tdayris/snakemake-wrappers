@@ -1,39 +1,37 @@
-default_config_varscan2_calling = {
+default_config_varscan2_germline = {
+    # Your genome sequence
     "genome": "reference/genome.fasta",
-    "bed": None
+    # Path to a BED containing the kit's catpured regions
+    "bed": "reference/regions.bed"
 }
 
-def get_fasta_index_from_genome_path(genome_path: str) -> str:
+def get_fai(genome_path: str) -> str:
     return genome_path + ".fai"
 
+def get_bai(bam_path: str) -> str:
+    return bam_path + "bai"
 
-try:
-    if config == dict():
-        config = default_config_varscan2_calling
-except NameError:
-    config = default_config_varscan2_calling
+## Required modules :
+## This module includes fasta indexes and fasta dictionnaries
+# module index_datasets:
+#     snakefile: "../../index_datasets/test/Snakefile"
+#     config: config
+#
+# use rule * from index_datasets as index_datasets_*
 
+## This module includes GATK recalibration
+# module gatk_bqsr:
+#     snakefile: "../../gatk_bqsr/test/Snakefile"
+#     config: config
+#
+# use rule * from gatk_bqsr as gatk_bqsr_*
 
-"""
-This rule indexes the gzipped VCF as almost every downstream tool require
-an indexed VCF file.
-"""
-rule tabix_index:
-    input:
-        "bcftools/{sample}.vcf.gz"
-    output:
-        "bcftools/{sample}.vcf.gz.tbi"
-    message: "Indexing {wildcards.sample} calls with Tabix"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 1024, 10240),
-        time_min=lambda wildcards, attempt: attempt * 60
-    params:
-        "-p vcf"
-    log:
-        "logs/tabix/index/{sample}.log"
-    wrapper:
-        "/bio/tabix"
+## This module includes BWA mapping and Samtools corrections
+# module bwa_fixmate:
+#     snakefile: "../../bwa_fixmate/test/Snakefile"
+#     config: config
+#
+# use rule * from bwa_fixmate as bwa_fixmate_*
 
 
 """
@@ -48,15 +46,15 @@ rule bcftools_concat:
             allow_missing=True
         )
     output:
-        "bcftools/{sample}.vcf.gz"
+        temp("vascan2/concat/{sample}.vcf.gz")
     threads: 2
     resources:
         mem_mb=lambda wildcards, attempt: min(attempt * 1025, 4096),
         time_min=lambda wildcards, attempt: attempt * 45
     params:
-        "--output-type z --threads 2"
+        "--output-type z --remove-duplicates --allow-overlaps"
     log:
-        "logs/bcftools/concat/{sample}.log"
+        "logs/varscan/pileup2indel/concat/{sample}.log"
     wrapper:
         "/bio/bcftools/concat"
 
@@ -68,16 +66,17 @@ temporary files.
 """
 rule varscan2_indel_calling:
     input:
-        "samtools/mpileup/{sample}.mpileup.gz"
+        pileup="samtools/mupleup/{sample}.mpileup.gz",
+        sample_list="varscan2/mpileup2cns/{sample}.sample.list"
     output:
         temp("varscan2/calling/indel/{sample}.vcf")
     message: "Calling Indels on {wildcards.sample} with Varscan2"
     threads: 2
     resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 4096, 1536),
+        mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
         time_min=lambda wildcards, attempt: attempt * 45
     params:
-        extra="--output-vcf 1"
+        extra="--p-value 0.05 --variants"
     log:
         "logs/varscan/pileup2indel/call/{sample}.log"
     wrapper:
@@ -91,20 +90,41 @@ temporary files.
 """
 rule varscan2_snp_calling:
     input:
-        "samtools/mpileup/{sample}.mpileup.gz"
+        pileup="samtools/mupleup/{sample}.mpileup.gz",
+        sample_list="varscan2/mpileup2cns/{sample}.sample.list"
     output:
         temp("varscan2/calling/snp/{sample}.vcf")
     message: "Calling SNP on {wildcards.sample} with Varscan2"
     threads: 2
     resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 4096, 1536),
+        mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
         time_min=lambda wildcards, attempt: attempt * 45
     params:
-        extra="--output-vcf 1"
+        extra="--p-value 0.05 --variants"
     log:
         "logs/varscan/pileup2snp/call/{sample}.log"
     wrapper:
         "/bio/varscan/mpileup2snp"
+
+
+"""
+This rule provides a list of sample names (here, only one) for Varscan2
+"""
+rule varscan2_sample_list:
+    output:
+        temp("varscan2/mpileup2cns/{sample}.sample.list")
+    message:
+        "Building sample list for Varscan2 mpileup2cns"
+    threads: 1
+    resources:
+        mem_mb=128,
+        time_min=2
+    params:
+        '"{sample}"'
+    log:
+        "logs/varscan2/mpileup2cns/{sample}.list.log"
+    shell:
+        "echo {params} > {output} 2> {log}"
 
 
 """
@@ -113,9 +133,11 @@ reads and reference genome
 """
 rule samtools_mpilup:
     input:
-        bam="mapped/{sample}.bam",
+        bam="gatk/recal_bam/{sample}.bam",
+        bam_index=get_bai("gatk/recal_bam/{sample}.bam"),
         reference_genome=config["genome"],
-        reference_genome_idx=get_fasta_index_from_genome_path(config["genome"]),
+        reference_genome_idx=get_fai(config["genome"]),
+        bed=config["bed"]
     output:
         temp("samtools/mpileup/{sample}.mpileup.gz")
     message: "Building mpilup on {wildcards.sample} with samtools"
@@ -126,32 +148,6 @@ rule samtools_mpilup:
     log:
         "logs/samtools/mpileup/{sample}.log"
     params:
-        extra=""
+        extra="--count-orphans --no-BAQ"
     wrapper:
         "/bio/samtools/mpileup"
-
-
-"""
-This rule indexes the input genome sequence with Samtools. It is not
-explicitely requested by Samtools, but it will crash if the genome sequence
-is not indexed.
-
-This rule is cached since it should be used only once per reference sequence
-"""
-rule samtools_faidx:
-    input:
-        config["genome"]
-    output:
-        get_fasta_index_from_genome_path(config["genome"])
-    message: "Indexing reference fasta with Samtools"
-    cache: True
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 1024, 4098),
-        time_min=lambda wildcards, attempt: attempt * 45
-    params:
-        ""
-    log:
-        "logs/samtools/faidx/genome.log"
-    wrapper:
-        "/bio/samtools/faidx"
