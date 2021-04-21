@@ -50,6 +50,21 @@ Input/Output
 
 
 
+Used meta-wrappers
+------------------
+
+The following individual meta-wrappers are used in this pipeline:
+
+
+* :ref:`meta/bio/snpeff_annotate`
+
+* :ref:`meta/bio/snpsift`
+
+
+Please refer to each meta-wrapper in above list for additional configuration parameters and information about the executed code.
+
+
+
 
 Used wrappers
 -------------
@@ -57,15 +72,11 @@ Used wrappers
 The following individual wrappers are used in this pipeline:
 
 
-* :ref:`bio/snpeff/annotate`
+* :ref:`bio/tabix`
 
-* :ref:`bio/snpsift/varType`
+* :ref:`bio/compress/pbgzip`
 
-* :ref:`bio/snpsift/genesets`
-
-* :ref:`bio/snpsift/annotate`
-
-* :ref:`bio/snpsift/gwascat`
+* :ref:`bio/multiqc`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
