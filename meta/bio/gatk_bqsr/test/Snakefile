@@ -1,17 +1,17 @@
 default_config_gatk_bqsr = {
     "threads": 20,
-    "genome": "reference/genome.fa",
+    "genome": "reference/genome.fasta",
     "dbsnp": "reference/dbsnp.vcf.gz"
 }
 
-def get_fasta_index_from_genome_path(genome_path: str) -> str:
+def get_fai(genome_path: str) -> str:
     return genome_path + ".fai"
 
-def get_fasta_dict_from_genome_path(genome_path: str) -> str:
+def get_dict(genome_path: str) -> str:
     return ".".join(genome_path.split(".")[:-1]) + ".dict"
 
 
-def get_vcf_tbi_from_db_path(db_path: str) -> str:
+def get_tbi(db_path: str) -> str:
     return db_path + ".tbi"
 
 try:
@@ -28,8 +28,8 @@ rule gatk_apply_baserecalibrator:
         bam="mapped/{sample}.bam",
         bam_index="mapped/{sample}.bam.bai",
         ref=config["genome"],
-        ref_idx=get_fasta_index_from_genome_path(config["genome"]),
-        ref_dict=get_fasta_dict_from_genome_path(config["genome"]),
+        ref_idx=get_fai(config["genome"]),
+        ref_dict=get_dict(config["genome"]),
         recal_table="gatk/recal_data_table/{sample}.grp"
     output:
         bam="gatk/recal_bam/{sample}.bam"
@@ -54,10 +54,10 @@ rule gatk_compute_baserecalibration_table:
         bam="mapped/{sample}.bam",
         bam_index="mapped/{sample}.bam.bai",
         ref=config["genome"],
-        ref_idx=get_fasta_index_from_genome_path(config["genome"]),
-        ref_dict=get_fasta_dict_from_genome_path(config["genome"]),
+        ref_idx=get_fai(config["genome"]),
+        ref_dict=get_dict(config["genome"]),
         known=config["dbsnp"],
-        known_idx=get_vcf_tbi_from_db_path(config["dbsnp"])
+        known_idx=get_tbi(config["dbsnp"])
     output:
         recal_table=temp("gatk/recal_data_table/{sample}.grp")
     message: "Compute BQSR table from {wildcards.sample} with GATK"
@@ -71,102 +71,3 @@ rule gatk_compute_baserecalibration_table:
         extra=""
     wrapper:
         "/bio/gatk/baserecalibrator"
-
-
-"""
-This rule indexes the input genome sequence with Samtools. It is not
-explicitely requested by GATK, but it will crash if the genome sequence
-is not indexed.
-
-This rule is cached since it should be used only once per reference sequence
-"""
-rule samtools_faidx:
-    input:
-        config["genome"]
-    output:
-        get_fasta_dict_from_genome_path(config["genome"])
-    message: "Indexing reference fasta with Samtools"
-    cache: True
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 1024, 4098),
-        time_min=lambda wildcards, attempt: attempt * 45
-    params:
-        ""
-    log:
-        "logs/samtools/faidx/{genome}.log"
-    wrapper:
-        "/bio/samtools/faidx"
-
-
-"""
-This rule creates a sequence dictionnary from a genome sequnece. It is not
-explicitely requested by GATK, but it will crash if the genome sequence
-is not indexed.
-
-This rule is cached since it should be used only once per reference sequence
-"""
-rule picard_create_sequence_dictionnary:
-    input:
-        config["genome"]
-    output:
-        get_fasta_dict_from_genome_path(config["genome"])
-    message: "Creating sequence dictionnary over reference genome with Picard"
-    cache: True
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 2048, 8192),
-        time_min=lambda wildcards, attempt: attempt * 45
-    params:
-        ""
-    log:
-        "logs/picard/create_sequence_dictionnary/genome.log"
-    wrapper:
-        "/bio/picard/createsequencedictionary"
-
-
-"""
-This rule creates a TBI index for the known VCF file. It is not
-explicitely requested by GATK, but it will crash if the genome sequence
-is not indexed.
-
-This rule is cached since it should be used only once per reference sequence
-"""
-rule tabix_index:
-    input:
-        config["dbsnp"]
-    output:
-        get_vcf_tbi_from_db_path(config["dbsnp"])
-    message: "Indexing kown variants with Tabix"
-    cache: True
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 1024, 10240),
-        time_min=lambda wildcards, attempt: attempt * 60
-    params:
-        "-p vcf"
-    log:
-        "logs/tabix/index/dbSNP.log"
-    wrapper:
-        "/bio/tabix"
-
-
-"""
-This rule indexes the bam file with Samtools. It is not
-explicitely requested by GATK, but it will crash if the genome sequence
-is not indexed.
-"""
-rule samtools_index:
-    input:
-        "mapped/{sample}.bam"
-    output:
-        "mapped/{sample}.bam.bai"
-    message: "Indexing mapped reads of {wildcards.sample}"
-    threads: 1
-    resources:
-        mem_mb=1536,
-        time_min=lambda wildcards, attempt: attempt * 45
-    log:
-        "logs/samtools/sort/{sample}.log"
-    wrapper:
-        "/bio/samtools/index"
