@@ -13,6 +13,7 @@ from snakemake.shell import shell
 
 # Extract arguments.
 extra = snakemake.params.get("extra", "")
+threads = snakemake.threads - 1
 
 sort = snakemake.params.get("sort", "none")
 sort_order = snakemake.params.get("sort_order", "coordinate")
@@ -61,7 +62,7 @@ else:
 
 shell(
     "(bwa-mem2 mem"
-    " -t {snakemake.threads}"
+    " -t {threads}"
     " {extra}"
     " {snakemake.params.index}"
     " {snakemake.input.reads}"
