@@ -82,7 +82,7 @@ This rule maps your reads against the indexed reference with BWA.
 rule bwa_mem:
     input:
         reads = expand(
-            "reads/{sample}.{stream}.fastq",
+            "reads/{sample}.{stream}.fq.gz",
             stream=["1", "2"],
             allow_missing=True
         ),
@@ -98,7 +98,7 @@ rule bwa_mem:
         time_min=lambda wildcards, attempt: attempt * 120
     params:
         index="bwa_mem2/index/genome",
-        extra=r"-R '@RG\tID:{sample}\tSM:{sample}' -M -A 2 -E 1",
+        extra=r"-R '@RG\tID:{sample}\tSM:{sample}\tPU:{sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
         sort="samtools",         # We chose Samtools to sort by queryname
         sort_order="queryname",  # Queryname sort is needed for a fixmate
         sort_extra="-m 1536M"     # We extand the sort buffer memory
