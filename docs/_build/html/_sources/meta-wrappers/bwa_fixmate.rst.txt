@@ -97,7 +97,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule bwa_mem:
         input:
             reads = expand(
-                "reads/{sample}.{stream}.fastq",
+                "reads/{sample}.{stream}.fq.gz",
                 stream=["1", "2"],
                 allow_missing=True
             ),
@@ -109,20 +109,16 @@ This meta-wrapper can be used by integrating the following into your workflow:
         message: "Mapping {wildcards.sample} with BWA"
         threads: config.get("threads", 20)
         resources:
-            mem_mb = (
-                lambda wildcards, attempt: min(attempt * 6144 + 2048, 20480)
-            ),
-            time_min = (
-                lambda wildcards, attempt: min(attempt * 120, 480)
-            )
+            mem_mb=lambda wildcards, attempt: attempt * 6144 + 61440,
+            time_min=lambda wildcards, attempt: attempt * 120
         params:
             index="bwa_mem2/index/genome",
-            extra=r"-R '@RG\tID:{sample}\tSM:{sample}' -M -A 2 -E 1",
+            extra=r"-R '@RG\tID:{sample}\tSM:{sample}\tPU:{sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
             sort="samtools",         # We chose Samtools to sort by queryname
             sort_order="queryname",  # Queryname sort is needed for a fixmate
             sort_extra="-m 1536M"     # We extand the sort buffer memory
         log:
-            "log/bwa_mem2/mem/{sample}.log"
+            "logs/bwa_mem2/mem/{sample}.log"
         wrapper:
             "/bio/bwa-mem2/mem"
 
@@ -143,8 +139,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
         cache: True
         threads: 1
         resources:
-            time_min=lambda wildcards, attempt: min(attempt * 90, 480),
-            mem_mb=lambda wildcards, attempt: min(attempt * 2048 + 61440, 71680)
+            mem_mb=lambda wildcards, attempt: attempt * 6144 + 61440,
+            time_min=lambda wildcards, attempt: attempt * 120
         params:
             prefix="bwa_mem2/index/genome"
         log:

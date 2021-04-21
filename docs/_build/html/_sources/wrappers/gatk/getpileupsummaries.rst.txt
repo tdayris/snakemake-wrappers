@@ -35,7 +35,7 @@ This wrapper can be used in the following way:
         resources:
             mem_mb=1024
         wrapper:
-            "0.72.0-611-gaf13248b8/bio/gatk/getpileupsummaries"
+            "0.72.0-626-g7bb2aef9f/bio/gatk/getpileupsummaries"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -103,17 +103,17 @@ Code
     from snakemake_wrapper_utils.java import get_java_opts
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
-    intervals = snakemake.input.intervals
+    intervals = snakemake.input["intervals"]
     if isinstance(intervals, str):
         intervals = [intervals]
     intervals = list(map("--intervals {}".format, intervals))
 
-    bams = snakemake.input.bam
+    bams = snakemake.input["bam"]
     if isinstance(bams, str):
         bams = [bams]
     bams = list(map("--input {}".format, bams))
 
-    variants = "--variant {}".format(snakemake.input["vcf"])
+    variants = "--variant {}".format(snakemake.input["variants"])
 
     extra = snakemake.params.get("extra", "")
     java_opts = get_java_opts(snakemake)
@@ -121,5 +121,5 @@ Code
 
     shell(
         "gatk --java-options '{java_opts}' GetPileupSummaries {extra} "
-        "{bams} --output {snakemake.output.table} {log}"
+        "{bams} {variants} {intervals} --output {snakemake.output.table} {log}"
     )

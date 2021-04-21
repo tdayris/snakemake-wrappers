@@ -20,33 +20,24 @@ This meta-wrapper can be used by integrating the following into your workflow:
         "bed": "reference/regions.bed"
     }
 
+    try:
+        if config == dict():
+            config = default_config_varscan2_germline
+    except NameError:
+        config = default_config_varscan2_germline
+
     def get_fai(genome_path: str) -> str:
         return genome_path + ".fai"
 
     def get_bai(bam_path: str) -> str:
-        return bam_path + "bai"
+        return bam_path + ".bai"
 
-    ## Required modules :
-    ## This module includes fasta indexes and fasta dictionnaries
-    # module index_datasets:
-    #     snakefile: "../../index_datasets/test/Snakefile"
+    # # This module includes VCF compression and indexation
+    # module compress_index_vcf:
+    #     snakefile: "../../compress_index_vcf/test/Snakefile"
     #     config: config
     #
-    # use rule * from index_datasets as index_datasets_*
-
-    ## This module includes GATK recalibration
-    # module gatk_bqsr:
-    #     snakefile: "../../gatk_bqsr/test/Snakefile"
-    #     config: config
-    #
-    # use rule * from gatk_bqsr as gatk_bqsr_*
-
-    ## This module includes BWA mapping and Samtools corrections
-    # module bwa_fixmate:
-    #     snakefile: "../../bwa_fixmate/test/Snakefile"
-    #     config: config
-    #
-    # use rule * from bwa_fixmate as bwa_fixmate_*
+    # use rule * from compress_index_vcf as compress_index_vcf_*
 
 
     """
@@ -56,10 +47,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule bcftools_concat:
         input:
             calls=expand(
-                "varscan2/calling/{kind}/{sample}.vcf",
+                "varscan2/calling/{sample}.{kind}.vcf.gz",
                 kind=["snp", "indel"],
                 allow_missing=True
-            )
+            ),
+            calls_index=expand(
+                "varscan2/calling/{sample}.{kind}.vcf.gz.tbi",
+                kind=["snp", "indel"],
+                allow_missing=True
+            ),
         output:
             temp("vascan2/concat/{sample}.vcf.gz")
         threads: 2
@@ -81,10 +77,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule varscan2_indel_calling:
         input:
-            pileup="samtools/mupleup/{sample}.mpileup.gz",
+            pileup="samtools/mpileup/{sample}.mpileup.gz",
             sample_list="varscan2/mpileup2cns/{sample}.sample.list"
         output:
-            temp("varscan2/calling/indel/{sample}.vcf")
+            temp("varscan2/calling/{sample}.indel.vcf")
         message: "Calling Indels on {wildcards.sample} with Varscan2"
         threads: 2
         resources:
@@ -105,10 +101,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule varscan2_snp_calling:
         input:
-            pileup="samtools/mupleup/{sample}.mpileup.gz",
+            pileup="samtools/mpileup/{sample}.mpileup.gz",
             sample_list="varscan2/mpileup2cns/{sample}.sample.list"
         output:
-            temp("varscan2/calling/snp/{sample}.vcf")
+            temp("varscan2/calling/{sample}.snp.vcf")
         message: "Calling SNP on {wildcards.sample} with Varscan2"
         threads: 2
         resources:

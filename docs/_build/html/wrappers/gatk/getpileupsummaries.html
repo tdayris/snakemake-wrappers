@@ -361,7 +361,7 @@
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="mi">1024</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-611-gaf13248b8/bio/gatk/getpileupsummaries&quot;</span>
+        <span class="s2">&quot;0.72.0-626-g7bb2aef9f/bio/gatk/getpileupsummaries&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -424,17 +424,17 @@ When running with</p>
 <span class="kn">from</span> <span class="nn">snakemake_wrapper_utils.java</span> <span class="kn">import</span> <span class="n">get_java_opts</span>
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="n">intervals</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">intervals</span>
+<span class="n">intervals</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;intervals&quot;</span><span class="p">]</span>
 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">intervals</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
     <span class="n">intervals</span> <span class="o">=</span> <span class="p">[</span><span class="n">intervals</span><span class="p">]</span>
 <span class="n">intervals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="s2">&quot;--intervals </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">intervals</span><span class="p">))</span>
 
-<span class="n">bams</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">bam</span>
+<span class="n">bams</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;bam&quot;</span><span class="p">]</span>
 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bams</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
     <span class="n">bams</span> <span class="o">=</span> <span class="p">[</span><span class="n">bams</span><span class="p">]</span>
 <span class="n">bams</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="s2">&quot;--input </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">bams</span><span class="p">))</span>
 
-<span class="n">variants</span> <span class="o">=</span> <span class="s2">&quot;--variant </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;vcf&quot;</span><span class="p">])</span>
+<span class="n">variants</span> <span class="o">=</span> <span class="s2">&quot;--variant </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;variants&quot;</span><span class="p">])</span>
 
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">java_opts</span> <span class="o">=</span> <span class="n">get_java_opts</span><span class="p">(</span><span class="n">snakemake</span><span class="p">)</span>
@@ -442,7 +442,7 @@ When running with</p>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;gatk --java-options &#39;</span><span class="si">{java_opts}</span><span class="s2">&#39; GetPileupSummaries </span><span class="si">{extra}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot;</span><span class="si">{bams}</span><span class="s2"> --output </span><span class="si">{snakemake.output.table}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;</span><span class="si">{bams}</span><span class="s2"> </span><span class="si">{variants}</span><span class="s2"> </span><span class="si">{intervals}</span><span class="s2"> --output </span><span class="si">{snakemake.output.table}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

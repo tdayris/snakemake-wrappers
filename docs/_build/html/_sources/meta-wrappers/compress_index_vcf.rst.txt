@@ -31,7 +31,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             "-p vcf"
         log:
-            "logs/tabix/index/{sample}.log"
+            "logs/{tool}/{subcommand}/tabix/index/{sample}.log"
         wrapper:
             "/bio/tabix"
 
@@ -55,7 +55,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             ""
         log:
-            "logs/pbgzip/{tool}/{subcommand}/{sample}.log"
+            "logs/{tool}/{subcommand}/pbgzip/{sample}.log"
         wrapper:
             "/bio/compress/pbgzip"
 

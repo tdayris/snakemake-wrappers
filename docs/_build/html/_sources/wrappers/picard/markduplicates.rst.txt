@@ -16,7 +16,7 @@ This wrapper can be used in the following way:
 
     rule mark_duplicates:
         input:
-            "mapped/{sample}.bam"
+            bam="mapped/{sample}.bam"
         output:
             bam="dedup/{sample}.bam",
             metrics="dedup/{sample}.metrics.txt"
@@ -31,7 +31,7 @@ This wrapper can be used in the following way:
         resources:
             mem_mb=1024
         wrapper:
-            "0.72.0-611-gaf13248b8/bio/picard/markduplicates"
+            "0.72.0-626-g7bb2aef9f/bio/picard/markduplicates"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -90,7 +90,7 @@ Code
         "picard MarkDuplicates "  # Tool and its subcommand
         "{java_opts} "  # Automatic java option
         "{extra} "  # User defined parmeters
-        "INPUT={snakemake.input} "  # Input file
+        "INPUT={snakemake.input.bam} "  # Input file
         "OUTPUT={snakemake.output.bam} "  # Output bam
         "METRICS_FILE={snakemake.output.metrics} "  # Output metrics
         "{log}"  # Logging

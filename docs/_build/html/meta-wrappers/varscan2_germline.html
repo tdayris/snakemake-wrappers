@@ -113,6 +113,7 @@
 <li class="toctree-l2"><a class="reference internal" href="gatk_bqsr.html">GATK_BQSR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="index_datasets.html">INDEX_DATASETS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="meta_caller.html">META_CALLER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meta_caller_germline.html">META_CALLER_GERMLINE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mutect2_germline.html">MUTECT2_GERMLINE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="salmon.html">SALMON</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpeff_annotate.html">SNPEFF_ANNOTATE</a></li>
@@ -213,33 +214,24 @@
     <span class="s2">&quot;bed&quot;</span><span class="p">:</span> <span class="s2">&quot;reference/regions.bed&quot;</span>
 <span class="p">}</span>
 
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">config</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">():</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">default_config_varscan2_germline</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">default_config_varscan2_germline</span>
+
 <span class="k">def</span> <span class="nf">get_fai</span><span class="p">(</span><span class="n">genome_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">genome_path</span> <span class="o">+</span> <span class="s2">&quot;.fai&quot;</span>
 
 <span class="k">def</span> <span class="nf">get_bai</span><span class="p">(</span><span class="n">bam_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">bam_path</span> <span class="o">+</span> <span class="s2">&quot;bai&quot;</span>
+    <span class="k">return</span> <span class="n">bam_path</span> <span class="o">+</span> <span class="s2">&quot;.bai&quot;</span>
 
-<span class="c1">## Required modules :</span>
-<span class="c1">## This module includes fasta indexes and fasta dictionnaries</span>
-<span class="c1"># module index_datasets:</span>
-<span class="c1">#     snakefile: &quot;../../index_datasets/test/Snakefile&quot;</span>
+<span class="c1"># # This module includes VCF compression and indexation</span>
+<span class="c1"># module compress_index_vcf:</span>
+<span class="c1">#     snakefile: &quot;../../compress_index_vcf/test/Snakefile&quot;</span>
 <span class="c1">#     config: config</span>
 <span class="c1">#</span>
-<span class="c1"># use rule * from index_datasets as index_datasets_*</span>
-
-<span class="c1">## This module includes GATK recalibration</span>
-<span class="c1"># module gatk_bqsr:</span>
-<span class="c1">#     snakefile: &quot;../../gatk_bqsr/test/Snakefile&quot;</span>
-<span class="c1">#     config: config</span>
-<span class="c1">#</span>
-<span class="c1"># use rule * from gatk_bqsr as gatk_bqsr_*</span>
-
-<span class="c1">## This module includes BWA mapping and Samtools corrections</span>
-<span class="c1"># module bwa_fixmate:</span>
-<span class="c1">#     snakefile: &quot;../../bwa_fixmate/test/Snakefile&quot;</span>
-<span class="c1">#     config: config</span>
-<span class="c1">#</span>
-<span class="c1"># use rule * from bwa_fixmate as bwa_fixmate_*</span>
+<span class="c1"># use rule * from compress_index_vcf as compress_index_vcf_*</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -249,10 +241,15 @@
 <span class="n">rule</span> <span class="n">bcftools_concat</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;varscan2/calling/</span><span class="si">{kind}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;varscan2/calling/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{kind}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
             <span class="n">kind</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;snp&quot;</span><span class="p">,</span> <span class="s2">&quot;indel&quot;</span><span class="p">],</span>
             <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">calls_index</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;varscan2/calling/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{kind}</span><span class="s2">.vcf.gz.tbi&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;snp&quot;</span><span class="p">,</span> <span class="s2">&quot;indel&quot;</span><span class="p">],</span>
+            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">),</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;vascan2/concat/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
@@ -274,10 +271,10 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">varscan2_indel_calling</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">pileup</span><span class="o">=</span><span class="s2">&quot;samtools/mupleup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span><span class="p">,</span>
+        <span class="n">pileup</span><span class="o">=</span><span class="s2">&quot;samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span><span class="p">,</span>
         <span class="n">sample_list</span><span class="o">=</span><span class="s2">&quot;varscan2/mpileup2cns/</span><span class="si">{sample}</span><span class="s2">.sample.list&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/calling/indel/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/calling/</span><span class="si">{sample}</span><span class="s2">.indel.vcf&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Calling Indels on </span><span class="si">{wildcards.sample}</span><span class="s2"> with Varscan2&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">resources</span><span class="p">:</span>
@@ -298,10 +295,10 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">varscan2_snp_calling</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">pileup</span><span class="o">=</span><span class="s2">&quot;samtools/mupleup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span><span class="p">,</span>
+        <span class="n">pileup</span><span class="o">=</span><span class="s2">&quot;samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span><span class="p">,</span>
         <span class="n">sample_list</span><span class="o">=</span><span class="s2">&quot;varscan2/mpileup2cns/</span><span class="si">{sample}</span><span class="s2">.sample.list&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/calling/snp/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/calling/</span><span class="si">{sample}</span><span class="s2">.snp.vcf&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Calling SNP on </span><span class="si">{wildcards.sample}</span><span class="s2"> with Varscan2&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">resources</span><span class="p">:</span>

@@ -17,24 +17,30 @@ This meta-wrapper can be used by integrating the following into your workflow:
         # Your genome sequence
         "genome": "reference/genome.fasta",
         # Path to a VCF containing AF fields
-        "known": "reference/germline.vcf"
+        "known": "reference/dbsnp.vcf.gz",
         # Path to a BED containing the kit's catpured regions
         "bed": "reference/regions.bed",
         # Path to dbSNP vcf, its tbi should be aside.
         "dbsnp": "reference/dbsnp.vcf.gz"
     }
 
+    try:
+        if config == dict():
+            config = default_config_mutect2_germline
+    except NameError:
+        config = default_config_mutect2_germline
+
     def get_fai(genome_path: str) -> str:
         return genome_path + ".fai"
 
     def get_dict(genome_path: str) -> str:
-        return ".".join(".".split(genome_path)[:-1]) + ".dict"
+        return ".".join(genome_path.split(".")[:-1]) + ".dict"
 
     def get_tbi(vcf_path: str) -> str:
-        return vcf_path + "tbi"
+        return vcf_path + ".tbi"
 
     def get_bai(bam_path: str) -> str:
-        return bam_path + "bai"
+        return bam_path + ".bai"
 
 
     ## Required modules :
@@ -51,6 +57,13 @@ This meta-wrapper can be used by integrating the following into your workflow:
     #     config: config
     #
     # use rule * from bwa_fixmate as bwa_fixmate_*
+    #
+    ## This module includes VCF compression and indexation
+    # module compress_index_vcf:
+    #     snakefile: "../../compress_index_vcf/test/Snakefile"
+    #     config: config
+    #
+    # use rule * from compress_index_vcf as compress_index_vcf_*
 
     #####################
     ### Apply filters ###
@@ -61,7 +74,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule muterc2_filter:
         input:
-            vcf="gatk/mutect2/{sample}.vcf.gz",
+            vcf="mutect2/call/{sample}.vcf.gz",
             ref=config["genome"],
             fasta_index=get_fai(config["genome"]),
             fasta_dict=get_dict(config["genome"]),
@@ -70,7 +83,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             bam_index=get_bai("samtools/sort/{sample}.bam"),
             f1r2="gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz"
         output:
-            vcf="gatk/mutect2/filter/contamination/{sample}.vcf.gz"
+            vcf=temp("mutect2/filter/{sample}.vcf.gz")
         message:
             "Filtering Mutect2 calls for {wildcards.sample}"
         threads: 1
@@ -91,7 +104,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule learn_read_orientation_model:
         input:
-            f1r2="gatk/mutect2/f1r2/{sample}.tar.gz"
+            f1r2="mutect2/f1r2/{sample}.tar.gz"
         output:
             temp("gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz")
         message:
@@ -116,7 +129,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule calculate_contamination:
         input:
-            summary="{sample}_tumor_pileup_summary.table""
+            summary="gatk/getpileupsummaries/{sample}_getpileupsummaries.table"
         output:
             table=temp("summary/{sample}_calculate_contamination.table")
         group:
@@ -125,7 +138,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "Summarizing read support for known variant sites to further "
             "estimate contamination on {wildcards.sample}"
         threads: 1
-        resource:
+        resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
             time_min=lambda wildcards, attempt: attempt * 35
         log:
@@ -141,7 +154,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             bam="samtools/sort/{sample}.bam",
             bam_index=get_bai("samtools/sort/{sample}.bam"),
-            interval=config["bed"],
+            intervals=config["bed"],
             variants=config["known"],
             variants_index=get_tbi(config["known"])
         output:
@@ -152,7 +165,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "Summarizing read support for known variant sites to further "
             "estimate contamination on {wildcards.sample}"
         threads: 1
-        resource:
+        resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
             time_min=lambda wildcards, attempt: attempt * 35
         log:
@@ -164,7 +177,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
     ######################
     ### Actual Calling ###
     ######################
-
     """
     This rule calls germline variants with GATK Mutect2
     """
@@ -179,8 +191,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             germline_tbi=get_tbi(config["known"]),
             intervals=config["bed"]
         output:
-            vcf=temp("gatk/mutect2/call/{sample}.vcf.gz"),
-            f1r2=temp("gatk/mutect2/f1r2/{sample}.tar.gz")
+            vcf=temp("mutect2/call/{sample}.vcf.gz"),
+            f1r2=temp("mutect2/f1r2/{sample}.tar.gz")
         message:
             "Calling variants on {wildcards.sample} with GATK Mutect2"
         threads: 4
