@@ -12,10 +12,11 @@ export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 message INFO "Environment loaded"
 
 SNAKEFILE="${PIPELINE_PATH}/Snakefile"
+CONFIG_PATH="config.hg38.yaml"
 if [ "${1}" = "hg19" ]; then
-  SNAKEFILE="${PIPELINE_PATH}/Snakefile_hg19.smk"
+  CONFIG_PATH="config.hg19.yaml"
 fi
 
 # Run pipeline
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
-snakemake -s "${SNAKEFILE}" --cache eacon_install eacon_databases --profile "${SNAKEMAKE_PROFILE_PATH}" && message INFO "SnpEff/SnpSift successful" || error_handling "${LINENO}" 2 "Error while running SnpEff/SnpSift pipeline"
+snakemake -s "${SNAKEFILE}" --profile "${SNAKEMAKE_PROFILE_PATH}" --configfile ${CONFIG_PATH} && message INFO "SnpEff/SnpSift successful" || error_handling "${LINENO}" 2 "Error while running SnpEff/SnpSift pipeline"

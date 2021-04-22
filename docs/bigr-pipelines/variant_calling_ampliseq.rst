@@ -58,11 +58,13 @@ Used meta-wrappers
 The following individual meta-wrappers are used in this pipeline:
 
 
-* :ref:`bio/bwa_fixmate`
+* :ref:`meta/bio/bwa_fixmate`
 
-* :ref:`bio/gatk_bqsr`
+* :ref:`meta/bio/gatk_bqsr`
 
-* :ref:`bio/varscan2_calling`
+* :ref:`meta/bio/varscan2_calling`
+
+* :ref:`bigr_pipelines/snpeff_snpsift`
 
 
 Please refer to each meta-wrapper in above list for additional configuration parameters and information about the executed code.
@@ -80,19 +82,13 @@ The following individual wrappers are used in this pipeline:
 
 * :ref:`bio/fastp`
 
-* :ref:`bio/snpeff/annotate`
-
-* :ref:`bio/snpsift/varType`
-
-* :ref:`bio/snpsift/genesets`
-
-* :ref:`bio/snpsift/annotate`
-
-* :ref:`bio/snpsift/gwascat`
-
 * :ref:`bio/compress/pbgzip`
 
 * :ref:`bio/tabix`
+
+* :ref:`bio/multiqc`
+
+* :ref:`bio/picard/collectalignmentsummarymetrics`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.

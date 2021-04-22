@@ -34,20 +34,6 @@ wildcard_constraints:
     sample = r"|".join(design["Sample_id"]),
     stream = r"1|2"
 
-module bwa_fixmate:
-    snakefile: "../../meta/bio/bwa_fixmate/test/Snakefile"
-    config: {"threads": config["threads"], "genome": config["ref"]["fasta"]}
-
-
-module gatk_bqsr:
-    snakefile: "../../meta/bio/gatk_bqsr/test/Snakefile"
-    config: {"threads": config["threads"], "genome": config["ref"]["fasta"], "dbsnp": config["ref"]["dbsnp"]}
-
-
-module varscan2_calling:
-    snakefile: "../../meta/bio/varscan2_calling/test/Snakefile"
-    config: {"genome": config["ref"]["fasta"]}
-
 fastq_links = link_fq(
     design.Sample_id,
     design.Upstream_file,
@@ -68,6 +54,51 @@ rule all:
         )
     message:
         "Finishing the Ampliseq variant calling"
+
+#################
+### Gather QC ###
+#################
+
+use rule multiqc from snpeff_snpsift_meta with:
+    input:
+        html=expand(
+            "fastp/html/pe/{sample}.fastp.html",
+            sample=design["Sample_id"]
+        ),
+        json=expand(
+            "fastp/json/pe/{sample}.fastp.json",
+            sample=design["Sample_id"]
+        ),
+        picard=expand(
+            "picard/alignment_summary/{sample}.summary.txt",
+            sample=design["Sample_id"]
+        )
+
+
+rule alignment_summary:
+    input:
+        bam="samtools/sort/{sample}.bam",
+        bam_index="samtools/sort/{sample}.bam.bai",
+        ref=config['ref']['fasta'],
+        ref_idx=get_fasta_index_from_genome_path(config['ref']['fasta']),
+        ref_dict=get_fasta_dict_from_genome_path(config['ref']['fasta']),
+    output:
+        temp("picard/alignment_summary/{sample}.summary.txt")
+    message:
+        "Collecting alignment metrics on GATK recalibrated {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1020,
+        time_min=lambda wildcards, attempt: attempt * 45
+    log:
+        "logs/picard/alignment_summary/{sample}.log"
+    params:
+        "VALIDATION_STRINGENCY=LENIENT "
+        "METRIC_ACCUMULATION_LEVEL=null "
+        "METRIC_ACCUMULATION_LEVEL=SAMPLE"
+    wrapper:
+        "/bio/picard/collectalignmentsummarymetrics"
+
 
 #################################
 ### FINAL VCF FILE INDEXATION ###
@@ -114,141 +145,24 @@ rule compress_pbgzip:
 ### VCF FILE ANNOTATION ###
 ###########################
 
-rule snpsift_gwascat:
-    input:
-        call = "snpsift/cosmic/{sample}.vcf",
-        gwascat = config["ref"]["gwascat"]
-    output:
-        call = temp("snpsift/gwascat/{sample}.vcf")
-    message:
-        "Annotating {wildcards.sample} with GWAS Catalog"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-        time_min=lambda wildcards, attempt: attempt * 45
-    log:
-        "logs/snpsift/gwascat/{sample}.log"
-    wrapper:
-        "/bio/snpsift/gwascat"
+module snpeff_snpsift_meta:
+    snakefile: "../snpeff_snpsift/Snakefile.smk"
+    config: config
 
-
-rule snpsift_cosmic:
-    input:
-        call="snpsift/dbsnp/{sample}.vcf",
-        database=config["ref"]["cosmic"]
-    output:
-        call=temp("snpsift/cosmic/{sample}.vcf")
-    message:
-        "Annotating {wildcards.sample} with COSMIC"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-        time_min=lambda wildcards, attempt: attempt * 45
-    log:
-        "logs/snpsift/cosmic/{sample}.log"
-    wrapper:
-        "/bio/snpsift/annotate"
-
-
-rule snpsift_dbsnp:
-    input:
-        call="snpsift/kaviar/{sample}.vcf",
-        database=config["ref"]["dbsnp"]
-    output:
-        call=temp("snpsift/dbsnp/{sample}.vcf")
-
-    message:
-        "Annotating {wildcards.sample} with dbSNP"
-    threads: 1
-    log:
-        "logs/snpsift/dbsnp/{sample}.log"
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-        time_min=lambda wildcards, attempt: attempt * 45
-    wrapper:
-        "/bio/snpsift/annotate"
-
-
-rule snpsift_kaviar:
-    input:
-        call="snpsift/gmt/{sample}.vcf",
-        database=config["ref"]["kaviar"]
-    output:
-        call=temp("snpsift/kaviar/{sample}.vcf")
-
-    message:
-        "Annotating {wildcards.sample} with Kaviar"
-    threads: 1
-    log:
-        "logs/snpsift/kaviar/{sample}.log"
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-        time_min=lambda wildcards, attempt: attempt * 45
-    wrapper:
-        "/bio/snpsift/annotate"
-
-
-rule snpsift_gmt:
-    input:
-        call = "snpeff/{sample}.vcf",
-        gmt = config["ref"]["gmt"]
-    output:
-        call = temp("snpsift/gmt/{sample}.vcf")
-    message:
-        "Annotating {wildcards.sample} with MSigDB"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-        time_min=lambda wildcards, attempt: attempt * 45
-    wrapper:
-        "/bio/snpsift/genesets"
-
-
-rule snpeff_annotate:
-    input:
-        calls="snpsift/vartype/{sample}.vcf",
-        db=config["ref"]["snpeff"]
-    output:
-        calls=temp("snpeff/{sample}.vcf"),
-        stats="snpeff/{sample}.html",
-        csvstats="snpeff/{sample}.csv"
-    message:
-        "Annotating {wildcards.sample} with Ensembl"
-    threads: 1
-    log:
-        "logs/snpeff/{sample}.log"
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-        time_min=lambda wildcards, attempt: attempt * 45
-    wrapper:
-        "/bio/snpeff/annotate"
-
-
-rule snpsift_vartype:
-    input:
-        vcf="bcftools/{sample}.vcf.gz",
-        vcf_tbi="bcftools/{sample}.vcf.gz.tbi"
-    output:
-        vcf=temp("snpsift/vartype/{sample}.vcf")
-    message:
-        "Annotating variant types in {wildcards.sample}"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-        time_min=lambda wildcards, attempt: attempt * 45
-    log:
-        "logs/snpsift/varType/{sample}.log"
-    wrapper:
-        "/bio/snpsift/varType"
+use rule * from snpeff_snpsift_meta as snpeff_snpsift_*
 
 
 ###############################
 ### VARIANT CALLING VARSCAN ###
 ###############################
 
-use rule * from varscan2_calling as *
+module varscan2_calling_meta:
+    snakefile: "../../meta/bio/varscan2_calling/test/Snakefile"
+    config: {"genome": config["ref"]["fasta"], "bed": config["ref"]["capture_kit_bed"]}
 
-use rule samtools_mpilup from varscan2_calling with:
+use rule * from varscan2_calling_meta as *
+
+use rule samtools_mpilup from varscan2_calling_meta with:
     input:
         bam="gatk/recal_bam/{sample}.bam",
         reference_genome=config['ref']['fasta'],
@@ -259,7 +173,12 @@ use rule samtools_mpilup from varscan2_calling with:
 ### GATK BAM RECALIBRATION ###
 ##############################
 
-use rule gatk_apply_baserecalibrator from gatk_bqsr with:
+module gatk_bqsr_meta:
+    snakefile: "../../meta/bio/gatk_bqsr/test/Snakefile"
+    config: {"threads": config["threads"], "genome": config["ref"]["fasta"], "dbsnp": config["ref"]["dbsnp"]}
+
+
+use rule gatk_apply_baserecalibrator from gatk_bqsr_meta with:
     input:
         bam="samtools/sort/{sample}.bam",
         bam_index="samtools/sort/{sample}.bam.bai",
@@ -269,7 +188,7 @@ use rule gatk_apply_baserecalibrator from gatk_bqsr with:
         recal_table="gatk/recal_data_table/{sample}.grp"
 
 
-use rule gatk_compute_baserecalibration_table from gatk_bqsr with:
+use rule gatk_compute_baserecalibration_table from gatk_bqsr_meta with:
     input:
         bam="samtools/sort/{sample}.bam",
         bam_index="samtools/sort/{sample}.bam.bai",
@@ -284,9 +203,13 @@ use rule gatk_compute_baserecalibration_table from gatk_bqsr with:
 ### BWA MAPPING ###
 ###################
 
-use rule * from bwa_fixmate as bwa_fixmate_*
+module bwa_fixmate_meta:
+    snakefile: "../../meta/bio/bwa_fixmate/test/Snakefile"
+    config: {"threads": config["threads"], "genome": config["ref"]["fasta"]}
 
-use rule bwa_mem from bwa_fixmate with:
+use rule * from bwa_fixmate_meta as bwa_fixmate_meta_*
+
+use rule bwa_mem from bwa_fixmate_meta with:
     input:
         reads=expand(
             "fastp/trimmed/pe/{sample}.{stream}.fastq",
@@ -316,7 +239,7 @@ rule fastp_clean:
             allow_missing=True
         ),
         html="fastp/html/pe/{sample}.fastp.html",
-        json="fastp/json/pe/{sample}.fastp.json"
+        json=temp("fastp/json/pe/{sample}.fastp.json")
     message: "Cleaning {wildcards.sample} with Fastp"
     threads: 1
     resources:

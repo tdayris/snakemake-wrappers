@@ -21,9 +21,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
             calls="calling/{sample}.vcf",
             db="snpeff/download/ebola_zaire"
         output:
-            calls="snpeff/calls/{sample}.vcf",
+            calls=temp("snpeff/calls/{sample}.vcf"),
             stats="snpeff/report/{sample}.html",
-            csvstats="snpeff/csvstats/{sample}.csv"
+            csvstats=temp("snpeff/csvstats/{sample}.csv")
         message: "Annotating {wildcards.sample} with SnpEff"
         threads: 3
         resources:
@@ -34,7 +34,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/snpeff/annotate/{sample}.log"
         wrapper:
-            "0.72.0-580-ge53da8937/bio/snpeff/annotate"
+            "0.72.0-628-g7174a7dc2/bio/snpeff/annotate"
 
 
     """
@@ -56,7 +56,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/snpeff/download/{reference}.log"
         wrapper:
-            "0.72.0-580-ge53da8937/bio/snpeff/download"
+            "0.72.0-628-g7174a7dc2/bio/snpeff/download"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

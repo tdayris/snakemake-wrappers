@@ -1,0 +1,110 @@
+.. _`bio/gatk/learnreadorientationmodel`:
+
+GATK LEARNREADORIENTATIONMODEL
+==============================
+
+Run gatk LearnReadOrientationModel to estimate orientation bias
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_learn_read_orientation_model:
+        input:
+            f1r2="f1r2.tar.gz"
+        output:
+            "artifacts-prior.tar.gz"
+        log:
+            "logs/gatk/learnreadorientationmodel/{sample}.log"
+        params:
+            extra="",  # optional
+            java_opts="", # optional
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
+        wrapper:
+            "0.72.0-628-g7174a7dc2/bio/gatk/learnreadorientationmodel"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``gatk4==4.2.0.0``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* f1r2 tar.gz formatted archive
+
+**Output:**
+
+* GATK artifact model
+
+
+
+Notes
+-----
+
+* The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
+* The `extra` param alllows for additional program arguments.
+* For more inforamtion see, https://software.broadinstitute.org/gatk/documentation/article?id=11050
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python
+
+    """
+    Snakemake wrapper for GATK LearnReadOrientationModel
+    """
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2021, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    import os
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
+
+
+    shell(
+        "gatk --java-options '{java_opts}' "  # Base GATK Call with java arguments
+        "LearnReadOrientationModel {extra} "  # Optional arguments
+        "--input {snakemake.input.f1r2} "  # Path to input bam file
+        "--output {snakemake.output[0]} {log}"  # Path to output file
+    )

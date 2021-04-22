@@ -6,9 +6,9 @@ rule snpeff:
         calls="calling/{sample}.vcf",
         db="snpeff/download/ebola_zaire"
     output:
-        calls="snpeff/calls/{sample}.vcf",
+        calls=temp("snpeff/calls/{sample}.vcf"),
         stats="snpeff/report/{sample}.html",
-        csvstats="snpeff/csvstats/{sample}.csv"
+        csvstats=temp("snpeff/csvstats/{sample}.csv")
     message: "Annotating {wildcards.sample} with SnpEff"
     threads: 3
     resources:

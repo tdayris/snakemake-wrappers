@@ -16,7 +16,7 @@ shell(
     "picard MarkDuplicates "  # Tool and its subcommand
     "{java_opts} "  # Automatic java option
     "{extra} "  # User defined parmeters
-    "INPUT={snakemake.input} "  # Input file
+    "INPUT={snakemake.input.bam} "  # Input file
     "OUTPUT={snakemake.output.bam} "  # Output bam
     "METRICS_FILE={snakemake.output.metrics} "  # Output metrics
     "{log}"  # Logging

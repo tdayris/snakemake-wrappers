@@ -33,7 +33,7 @@ This wrapper can be used in the following way:
         log:
             "logs/varscan_{sample}.log"
         wrapper:
-            "0.72.0-580-ge53da8937/bio/varscan/mpileup2snp"
+            "0.72.0-628-g7174a7dc2/bio/varscan/mpileup2snp"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -109,10 +109,17 @@ Code
     # - One for unzipping with zcat
     # - One for running varscan
     pileup = (
-        " cat {} ".format(snakemake.input[0])
-        if not snakemake.input[0].endswith("gz")
-        else " zcat {} ".format(snakemake.input[0])
+        " cat {} ".format(snakemake.input["pileup"])
+        if not snakemake.input["pileup"].endswith("gz")
+        else " zcat {} ".format(snakemake.input["pileup"])
     )
+
+    if str(snakemake.output[0]).endswith(("vcf", "vcf.gz")):
+        if "--output-vcf" not in extra:
+            extra += " --output-vcf 1"
+
+    if "sample_list" in snakemake.input.keys():
+        extra += " --vcf-sample-list {} ".format(snakemake.input['sample_list'])
 
     # Building output directories
     makedirs(op.dirname(snakemake.output[0]))

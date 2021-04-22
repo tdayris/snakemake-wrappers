@@ -1,0 +1,126 @@
+default_config={
+    "samples"=["test"],
+    "ref": {
+        "cosmic": "/path/to/annotation",
+        "dbsnp": "/path/to/annotation",
+        "fasta": "/path/to/annotation",
+        "gmt": "/path/to/annotation",
+        "gwascat": "/path/to/annotation",
+        "kaviar": "/path/to/annotation",
+    }
+}
+
+
+rule all:
+    input:
+        expand(
+            "snpsift/cosmic/{sample}.vcf",
+            sample=config["samples"]
+        )
+
+rule snpsift_gwascat:
+    input:
+        call = "snpsift/cosmic/{sample}.vcf",
+        gwascat = config["ref"]["gwascat"]
+    output:
+        call = temp("snpsift/gwascat/{sample}.vcf")
+    message:
+        "Annotating {wildcards.sample} with GWAS Catalog"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+        time_min=lambda wildcards, attempt: attempt * 45
+    log:
+        "logs/snpsift/gwascat/{sample}.log"
+    wrapper:
+        "/bio/snpsift/gwascat"
+
+
+rule snpsift_cosmic:
+    input:
+        call="snpsift/dbsnp/{sample}.vcf",
+        database=config["ref"]["cosmic"]
+    output:
+        call=temp("snpsift/cosmic/{sample}.vcf")
+    message:
+        "Annotating {wildcards.sample} with COSMIC"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+        time_min=lambda wildcards, attempt: attempt * 45
+    log:
+        "logs/snpsift/cosmic/{sample}.log"
+    wrapper:
+        "/bio/snpsift/annotate"
+
+
+rule snpsift_dbsnp:
+    input:
+        call="snpsift/kaviar/{sample}.vcf",
+        database=config["ref"]["dbsnp"]
+    output:
+        call=temp("snpsift/dbsnp/{sample}.vcf")
+
+    message:
+        "Annotating {wildcards.sample} with dbSNP"
+    threads: 1
+    log:
+        "logs/snpsift/dbsnp/{sample}.log"
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+        time_min=lambda wildcards, attempt: attempt * 45
+    wrapper:
+        "/bio/snpsift/annotate"
+
+
+rule snpsift_kaviar:
+    input:
+        call="snpsift/gmt/{sample}.vcf",
+        database=config["ref"]["kaviar"]
+    output:
+        call=temp("snpsift/kaviar/{sample}.vcf")
+
+    message:
+        "Annotating {wildcards.sample} with Kaviar"
+    threads: 1
+    log:
+        "logs/snpsift/kaviar/{sample}.log"
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+        time_min=lambda wildcards, attempt: attempt * 45
+    wrapper:
+        "/bio/snpsift/annotate"
+
+
+rule snpsift_gmt:
+    input:
+        call = "snpsift/vartype/{sample}.vcf",
+        gmt = config["ref"]["gmt"]
+    output:
+        call = temp("snpsift/gmt/{sample}.vcf")
+    message:
+        "Annotating {wildcards.sample} with MSigDB"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+        time_min=lambda wildcards, attempt: attempt * 45
+    wrapper:
+        "/bio/snpsift/genesets"
+
+
+rule snpsift_vartype:
+    input:
+        vcf="snpeff/{sample}.vcf.gz",
+        vcf_tbi="snpeff/{sample}.vcf.gz.tbi"
+    output:
+        vcf=temp("snpsift/vartype/{sample}.vcf")
+    message:
+        "Annotating variant types in {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+        time_min=lambda wildcards, attempt: attempt * 45
+    log:
+        "logs/snpsift/varType/{sample}.log"
+    wrapper:
+        "/bio/snpsift/varType"

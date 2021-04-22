@@ -15,6 +15,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     default_config_varscan2_calling = {
         "genome": "reference/genome.fasta",
+        "bed": None
     }
 
     def get_fasta_index_from_genome_path(genome_path: str) -> str:

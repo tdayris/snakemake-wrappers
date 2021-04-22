@@ -79,7 +79,7 @@ This simple pipeline is here to assess the quality after automatic sequencing pr
 This pipeline requires either (1) a two columned design file called 'design.tsv', or (2) available fastq files in the current directory.
 
 .. list-table:: Desgin file format
-    :widths: 33 33 33
+    :widths: 33 33
     :header-rows: 1
 
     * - Sample_id

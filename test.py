@@ -216,6 +216,20 @@ def test_salmon_meta():
 
 
 @skip_if_not_modified
+def test_meta_caller_meta():
+    run(
+        "meta/bio/meta_caller",
+        [
+            "snakemake",
+            "--cores",
+            "2",
+            "--use-conda",
+            "bcftools/merge/a.chr21.vcf.gz"
+        ]
+    )
+
+
+@skip_if_not_modified
 def test_bwa_fixmate_meta():
     run(
         "meta/bio/bwa_fixmate",
@@ -761,6 +775,16 @@ def test_art_profiler_illumina():
 def test_bcftools_filter_vcf():
     run("bio/bcftools/filter",
         ["snakemake", "--cores", "1", "a.filter.vcf", "--use-conda", "-F"])
+
+
+@skip_if_not_modified
+def test_bcftools_query():
+    run("bio/bcftools/query",
+        ["snakemake", "--cores", "1", "a.bed", "--use-conda", "-F"])
+    run("bio/bcftools/query",
+        ["snakemake", "--cores", "1", "a.samples.list", "--use-conda", "-F"])
+    run("bio/bcftools/query",
+        ["snakemake", "--cores", "1", "a.query.tsv", "--use-conda", "-F"])
 
 
 @skip_if_not_modified

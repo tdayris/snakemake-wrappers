@@ -1,0 +1,27 @@
+rule test_bcftools_query_to_bed:
+    input:
+        "a.bcf"
+    output:
+        bed = "a.bed"
+    wrapper:
+        "master/bio/bcftools/query"
+
+
+rule test_bcftools_query_sample_list:
+    input:
+        "a.bcf"
+    output:
+        sample_list="a.samples.list"
+    wrapper:
+        "master/bio/bcftools/query"
+
+
+rule test_bcftools_query:
+    input:
+        "a.bcf"
+    output:
+        "a.query.tsv"
+    params:
+        extra="-f 'GQ:[ %GQ] \t GT:[ %GT]\n'"
+    wrapper:
+        "master/bio/bcftools/query"
