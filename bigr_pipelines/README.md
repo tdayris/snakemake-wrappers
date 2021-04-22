@@ -15,3 +15,5 @@ WARNING: You do not have to install anything. You do not need to update anything
 2. Run pipeline: `bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/run.sh"`
 
 ->Test: `bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/test.sh"`
+
+
