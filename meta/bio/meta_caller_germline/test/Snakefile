@@ -1,0 +1,109 @@
+rule bcftools_merge:
+    input:
+        calls=[
+            "vascan2/concat/{sample}.fai.vcf.gz",
+            "mutect2/filter/{sample}.fai.vcf.gz"
+        ],
+        calls_index=[
+            "vascan2/concat/{sample}.fai.vcf.gz.tbi",
+            "mutect2/filter/{sample}.fai.vcf.gz.tbi"
+        ],
+        regions=config["bed"]
+    output:
+        temp("meta_caller/calls/{sample}.vcf.gz")
+    message:
+        "Merging calls from Mutect2 and Varscan2 for {wildcards.sample}"
+    threads: 2
+    resources:
+        mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
+        time_min=lambda wildcards, attempt: attempt * 30
+    log:
+        "logs/bcftools/merge/{sample}.log"
+    params:
+        "--merge none"
+    wrapper:
+        "/bio/bcftools/merge"
+
+########################
+### Renaming samples ###
+########################
+
+rule rehead_before_merge:
+    input:
+        vcf="{tool}/{subcommand}/{sample}.vcf.gz",
+        fai=get_fasta_index_from_genome_path(config["genome"]),
+        samples = "{tool}/{subcommand}/reheader/{sample}.renamed.sample.list",
+    output:
+        temp("{tool}/{subcommand}/{sample}.fai.vcf.gz")
+    message:
+        "Adding sequence info in header {wildcards.sample} "
+        "(considering {wildcards.tool}, {wildcards.subcommand})"
+    group:
+        "Rename_{wildcards.sample}"
+    threads: 2
+    resources:
+        mem_mb=512,
+        time_min=10
+    log:
+        "logs/{tool}/{subcommand}/rehead/{sample}.log"
+    wrapper:
+        "/bio/bcftools/reheader"
+
+
+rule bcftools_name_correspondancy:
+    input:
+        "{tool}/{subcommand}/reheader/{sample}.sample.list",
+        "{tool}/{subcommand}/reheader/caller_name.lst"
+    output:
+        temp("{tool}/{subcommand}/reheader/{sample}.renamed.sample.list")
+    message:
+        "Renaming sample list from {wildcards.sample}"
+    group:
+        "Rename_{wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=128,
+        time_min=2
+    log:
+        "logs/{tool}/{subcommand}/rehead/{sample}.sample_list.renamed.log"
+    shell:
+        "paste {input} > {output} 2> {log}"
+
+
+rule bcftools_sample_list:
+    input:
+        "{tool}/{subcommand}/{sample}.vcf.gz"
+    output:
+        sample_list=temp("{tool}/{subcommand}/reheader/{sample}.sample.list")
+    message:
+        "Extracting sample list from {wildcards.sample}"
+    group:
+        "Rename_{wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: min(attempt * 512, 4096),
+        time_min=lambda wildcards, attempt: attempt * 5
+    log:
+        "logs/{tool}/{subcommand}/rehead/{sample}.sample_list.log"
+    wrapper:
+        "/bio/bcftools/query"
+
+
+rule tool_name:
+    output:
+        temp("{tool}/{subcommand}/reheader/caller_name.lst")
+    message:
+        "Building list of caller to rehead final vcf files"
+    threads: 1
+    resources:
+        mem_mb=125,
+        time_min=2
+    log:
+        "logs/{tool}/{subcommand}/rehead/tool_name.log"
+    params:
+        lambda wildcards: {
+            "varscan2_concat": "Varscan2",
+            "mutect2_filter": "Mutect2",
+        }.get(f"{wildcards.tool}_{wildcards.subcommand}")
+    shell:
+        "echo {params} > {output} 2> {log}"
