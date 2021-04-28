@@ -1,12 +1,16 @@
+import os
+import pandas
 import sys
 
 sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
 
 from file_manager import (
     read_design,
-    get_fasta_index_from_genome_path,
-    get_fasta_dict_from_genome_path,
-    get_vcf_tbi_from_vcf_path
+    get_fai,
+    get_dict,
+    get_tbi,
+    search_fastq_pairs,
+    build_design
 )
 from files_linker import link_fq
 from write_yaml import write_yaml_from_path
@@ -16,11 +20,20 @@ min_version("6.0")
 
 container: "docker://continuumio/miniconda3:4.4.10"
 
-configfile: "config.yaml"
+try:
+    configfile: "config_variant_calling_ampliseq.yaml"
+except FileNotFoundError:
+    configfile: "config.yaml"
 
 localrules: bigr_copy
 
-design = read_design("design.tsv")
+design_path = Path(config["design"])
+if not design_path.exists():
+    print("Missing design, looking for fastq fils in current directory tree...")
+    design = build_design(os.getcwd(), search_fastq_pairs)
+else:
+    print("Design file provided {}".format(design_path.absolute()))
+    design = read_design(design_path)
 
 config_path = Path("config_variant_calling_ampliseq.yaml")
 if not config_path.exists() or True:
@@ -29,10 +42,11 @@ if not config_path.exists() or True:
 configfile: config_path
 
 localrules: bigr_copy
+ruleorder: bwa_mem > bwa_fixmate_meta_bwa_mem
 
 wildcard_constraints:
     sample = r"|".join(design["Sample_id"]),
-    stream = r"1|2"
+    stream = r"1|2|R1|R2"
 
 fastq_links = link_fq(
     design.Sample_id,
@@ -42,24 +56,22 @@ fastq_links = link_fq(
 
 rule all:
     input:
-        #expand(
-        #    "snpsift/gwascat/{sample}.vcf.gz",
-        #    sample=design["Sample_id"]
-        #),
-        expand(
-            "snpsift/gwascat/{sample}.vcf.gz",
-            #"snpsift/cosmic/{sample}.vcf",
-            #stream=["1", "2"],
-            sample=design["Sample_id"]
-        )
+        calls=expand(
+            #"snpsift/cosmic/{sample}.vcf.gz{index}",
+            "mutect2/filter/{sample}.vcf.gz",
+            sample=design["Sample_id"].tolist()[0],
+            #index=["", ".tbi"]
+        ),
+        #html="multiqc/SnpEff_annotation.html"
     message:
         "Finishing the Ampliseq variant calling"
+
 
 #################
 ### Gather QC ###
 #################
 
-use rule multiqc from snpeff_snpsift_meta with:
+rule multiqc:
     input:
         html=expand(
             "fastp/html/pe/{sample}.fastp.html",
@@ -73,6 +85,18 @@ use rule multiqc from snpeff_snpsift_meta with:
             "picard/alignment_summary/{sample}.summary.txt",
             sample=design["Sample_id"]
         )
+    output:
+        "multiqc/SnpEff_annotation.html"
+    message:
+        "Aggregating quality reports from SnpEff"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
+        time_min=lambda wildcards, attempt: attempt * 35
+    log:
+        "logs/multiqc.log"
+    wrapper:
+        "/bio/multiqc"
 
 
 rule alignment_summary:
@@ -80,8 +104,8 @@ rule alignment_summary:
         bam="samtools/sort/{sample}.bam",
         bam_index="samtools/sort/{sample}.bam.bai",
         ref=config['ref']['fasta'],
-        ref_idx=get_fasta_index_from_genome_path(config['ref']['fasta']),
-        ref_dict=get_fasta_dict_from_genome_path(config['ref']['fasta']),
+        ref_idx=get_fai(config['ref']['fasta']),
+        ref_dict=get_dict(config['ref']['fasta']),
     output:
         temp("picard/alignment_summary/{sample}.summary.txt")
     message:
@@ -104,69 +128,74 @@ rule alignment_summary:
 ### FINAL VCF FILE INDEXATION ###
 #################################
 
-rule tabix_index:
-    input:
-        "snpsift/gwascat/{sample}.vcf.gz"
-    output:
-        "snpsift/gwascat/{sample}.vcf.gz.tbi"
-    message:
-        "Indexing {wildcards.sample} final annotated VCF with tabix"
-    group:
-        "Final_compression_{sample}"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020,
-        time_min=lambda wildcards, attempt: attempt * 45
-    log:
-        "logs/pbgzip/post_gwascat/{sample}.log"
-    wrapper:
-        "/bio/tabix"
-
-
-rule compress_pbgzip:
-    input:
-        "snpsift/gwascat/{sample}.vcf"
-    output:
-        "snpsift/gwascat/{sample}.vcf.gz"
-    message:
-        "Compressing {wildcards.sample} final annotated VCF with pbgzip"
-    group:
-        "Final_compression_{sample}"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020,
-        time_min=lambda wildcards, attempt: attempt * 45
-    log:
-        "logs/pbgzip/post_gwascat/{sample}.log"
-    wrapper:
-        "/bio/compress/pbgzip"
-
-###########################
-### VCF FILE ANNOTATION ###
-###########################
-
-module snpeff_snpsift_meta:
-    snakefile: "../snpeff_snpsift/Snakefile.smk"
+module compress_index_vcf_meta:
+    snakefile: "../../meta/bio/compress_index_vcf/test/Snakefile"
     config: config
 
-use rule * from snpeff_snpsift_meta as snpeff_snpsift_*
+use rule * from compress_index_vcf_meta as compress_index_vcf_*
+
+######################
+### VCF annotation ###
+######################
 
 
-###############################
-### VARIANT CALLING VARSCAN ###
-###############################
+module snpeff_meta:
+    snakefile: "../../meta/bio/snpeff_annotate/test/Snakefile"
+    config: config
 
-module varscan2_calling_meta:
-    snakefile: "../../meta/bio/varscan2_calling/test/Snakefile"
+use rule snpeff from snpeff_meta with:
+    input:
+        calls="meta_caller/calls/{sample}.vcf.gz",
+        calls_index=get_tbi("meta_caller/calls/{sample}.vcf.gz"),
+        db=config["ref"]["snpeff"]
+
+
+module snpsift:
+    snakefile: "../../meta/bio/snpsift/test/Snakefile"
+    config: config
+
+use rule * from snpsift as snpsift_*
+
+
+
+#####################################
+### Merge variant calling results ###
+#####################################
+
+module metacaller_germline_meta:
+    snakefile: "../../meta/bio/meta_caller_germline/test/Snakefile"
     config: {"genome": config["ref"]["fasta"], "bed": config["ref"]["capture_kit_bed"]}
 
-use rule * from varscan2_calling_meta as *
 
-use rule samtools_mpilup from varscan2_calling_meta with:
+use rule * from metacaller_germline_meta as *
+
+
+###############################
+### Variant calling Mutect2 ###
+###############################
+
+
+module gatk_mutect2_germline_meta:
+    snakefile: "../../meta/bio/mutect2_germline/test/Snakefile"
+    config: {"genome": config["ref"]["fasta"], "known": config["ref"]["af_only"], "bed": config["ref"]["capture_kit_bed"], "dbsnp": config["ref"]["dbsnp"]}
+
+use rule * from gatk_mutect2_germline_meta as gatk_mutect2_germline_*
+
+################################
+### Variant Calling Varscan2 ###
+################################
+
+module varscan2_germline_meta:
+    snakefile: "../../meta/bio/varscan2_germline/test/Snakefile"
+    config: {"genome": config["ref"]["fasta"], "bed": config["ref"]["capture_kit_bed"]}
+
+use rule * from varscan2_germline_meta as *
+
+use rule samtools_mpilup from varscan2_germline_meta with:
     input:
         bam="gatk/recal_bam/{sample}.bam",
         reference_genome=config['ref']['fasta'],
-        reference_genome_idx=get_fasta_index_from_genome_path(config['ref']['fasta']),
+        reference_genome_idx=get_fai(config['ref']['fasta']),
 
 
 ##############################
@@ -183,8 +212,8 @@ use rule gatk_apply_baserecalibrator from gatk_bqsr_meta with:
         bam="samtools/sort/{sample}.bam",
         bam_index="samtools/sort/{sample}.bam.bai",
         ref=config['ref']['fasta'],
-        ref_idx=get_fasta_index_from_genome_path(config['ref']['fasta']),
-        ref_dict=get_fasta_dict_from_genome_path(config['ref']['fasta']),
+        ref_idx=get_fai(config['ref']['fasta']),
+        ref_dict=get_dict(config['ref']['fasta']),
         recal_table="gatk/recal_data_table/{sample}.grp"
 
 
@@ -193,10 +222,10 @@ use rule gatk_compute_baserecalibration_table from gatk_bqsr_meta with:
         bam="samtools/sort/{sample}.bam",
         bam_index="samtools/sort/{sample}.bam.bai",
         ref=config['ref']['fasta'],
-        ref_idx=get_fasta_index_from_genome_path(config['ref']['fasta']),
-        ref_dict=get_fasta_dict_from_genome_path(config['ref']['fasta']),
+        ref_idx=get_fai(config['ref']['fasta']),
+        ref_dict=get_dict(config['ref']['fasta']),
         known=config['ref']['dbsnp'],
-        known_idx=get_vcf_tbi_from_vcf_path(config['ref']['dbsnp'])
+        known_idx=get_tbi(config['ref']['dbsnp'])
 
 
 ###################

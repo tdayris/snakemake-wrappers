@@ -11,11 +11,18 @@ declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/variant_calling_ampl
 export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 
 SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
-CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
-if [ "${1}" = "hg19" ]; then
-  CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"
+CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"
+if [ "${1}" = "hg38" ]; then
+  CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
+  message WARNING "HG38 has not been tested."
 fi
 message INFO "Environment loaded"
+
+if [ -f "config.yaml" ]; then
+  if [ ! -f "config_variant_calling_ampliseq.yaml" ]; then
+    cp -v "config.yaml" "config_variant_calling_ampliseq.yaml"
+  fi
+fi
 
 if [ ! -f "config_variant_calling_ampliseq.yaml" ]; then
   message INFO "Missing config file, falling back to default arguments"
@@ -26,4 +33,4 @@ fi
 
 # Run pipeline
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
-snakemake -s "${SNAKEFILE_PATH}" --configfile "config_variant_calling_ampliseq.yaml" --cache eacon_install eacon_databases --profile "${SNAKEMAKE_PROFILE_PATH}" --attempt 3 "bwa_mem2/index/genome.0123" && message INFO "Variant calling successful" || error_handling "${LINENO}" 2 "Error while running variant calling pipeline"
+snakemake -s "${SNAKEFILE_PATH}" --configfile "config_variant_calling_ampliseq.yaml" --cache eacon_install eacon_databases --profile "${SNAKEMAKE_PROFILE_PATH}" --attempt 3 && message INFO "Variant calling successful" || error_handling "${LINENO}" 2 "Error while running variant calling pipeline"

@@ -1,12 +1,18 @@
+def get_fai(genome_path: str) -> str:
+    return genome_path + ".fai"
+
+def get_tbi(vcf_path: str) -> str:
+    return vcf_path + ".tbi"
+
 rule bcftools_merge:
     input:
         calls=[
-            "vascan2/concat/{sample}.fai.vcf.gz",
-            "mutect2/filter/{sample}.fai.vcf.gz"
+            "varscan2/mpileup2cns_reheaded/{sample}.vcf.gz",
+            "mutect2/filter_reheaded/{sample}.vcf.gz"
         ],
         calls_index=[
-            "vascan2/concat/{sample}.fai.vcf.gz.tbi",
-            "mutect2/filter/{sample}.fai.vcf.gz.tbi"
+            get_tbi("varscan2/mpileup2cns_reheaded/{sample}.vcf.gz"),
+            get_tbi("mutect2/filter_reheaded/{sample}.vcf.gz")
         ],
         regions=config["bed"]
     output:
@@ -31,10 +37,11 @@ rule bcftools_merge:
 rule rehead_before_merge:
     input:
         vcf="{tool}/{subcommand}/{sample}.vcf.gz",
-        fai=get_fasta_index_from_genome_path(config["genome"]),
+        vcf_index=get_tbi("{tool}/{subcommand}/{sample}.vcf.gz"),
+        fai=get_fai(config["genome"]),
         samples = "{tool}/{subcommand}/reheader/{sample}.renamed.sample.list",
     output:
-        temp("{tool}/{subcommand}/{sample}.fai.vcf.gz")
+        temp("{tool}/{subcommand}_reheaded/{sample}.vcf.gz")
     message:
         "Adding sequence info in header {wildcards.sample} "
         "(considering {wildcards.tool}, {wildcards.subcommand})"
@@ -102,7 +109,7 @@ rule tool_name:
         "logs/{tool}/{subcommand}/rehead/tool_name.log"
     params:
         lambda wildcards: {
-            "varscan2_concat": "Varscan2",
+            "varscan2_mpileup2cns": "Varscan2",
             "mutect2_filter": "Mutect2",
         }.get(f"{wildcards.tool}_{wildcards.subcommand}")
     shell:
