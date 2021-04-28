@@ -1,4 +1,4 @@
-"""Snakemake wrapper for SnpSift geneSets"""
+"""Snakemake wrapper for SnpSift extractFields"""
 
 __author__ = "Thibault Dayris"
 __copyright__ = "Copyright 2020, Dayris Thibault"
@@ -18,21 +18,14 @@ min_threads = 1
 incall = snakemake.input["call"]
 if snakemake.input["call"].endswith("bcf"):
     min_threads += 1
-    incall = "< <(bcftools view {})".format(incall)
+    incall = "bcftools view {}".format(incall)
 elif snakemake.input["call"].endswith("gz"):
     min_threads += 1
-    incall = "< <(gunzip -c {})".format(incall)
-
-# Compression shall be done according to user-defined output
-outcall = snakemake.output["call"]
-if snakemake.output["call"].endswith("gz"):
-    min_threads += 1
-    outcall = "| gzip -c > {}".format(outcall)
-elif snakemake.output["call"].endswith("bcf"):
-    min_threads += 1
-    outcall = "| bcftools view > {}".format(outcall)
+    incall = "gunzip -c {}".format(incall)
 else:
-    outcall = "> {}".format(outcall)
+    incall = "cat {}".format(incall)
+    min_threads += 1
+
 
 # Each (un)compression step raises the threads requirements
 if snakemake.threads < min_threads:
@@ -47,10 +40,11 @@ if isinstance(fields, list):
     fields = " ".join(fields)
 
 shell(
+    "{incall} | "
     "SnpSift extractFields"  # Tool and its subcommand
     " {java_opts} {extra}"  # Extra parameters
-    " {incall}"  # Path to input vcf file
+    " - "  # Path to input vcf file
     " {fields}"  # The fields to extract
-    " {outcall}"  # Path to output file
+    " > {snakemake.output.tsv}"  # Path to output file
     " {log}"  # Logging behaviour
 )
