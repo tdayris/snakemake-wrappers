@@ -36,7 +36,7 @@ if "sample_list" in snakemake.input.keys():
 makedirs(op.dirname(snakemake.output[0]))
 
 shell(
-    "varscan mpileup2cnp "  # Tool and its subprocess
+    "varscan mpileup2cns "  # Tool and its subprocess
     "<( {pileup} ) "
     "{java_opts} {extra} "  # Extra parameters
     "> {snakemake.output[0]} "  # Path to vcf file
