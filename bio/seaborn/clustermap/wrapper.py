@@ -96,6 +96,9 @@ data = (data.reset_index()
 condition_colors = (pandas.Series(data.columns.get_level_values(cond_id),
                                   index=data.columns)
                           .map(cond_colors))
+logging.debug("Colors:")
+logging.debug(condition_colors)
+
 
 data = data.corr()
 logging.debug("Correlation table:")
@@ -124,6 +127,8 @@ ax = seaborn.clustermap(
     ),
     robust=(snakemake.params.get("robust", True) is True)
 )
+
+logging.info("Seaborn object build, modifying axes names")
 
 # Rotate sample id to make them readable
 matplotlib.pyplot.setp(
