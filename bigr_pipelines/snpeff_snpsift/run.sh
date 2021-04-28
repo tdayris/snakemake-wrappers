@@ -17,6 +17,10 @@ if [ "${1}" = "hg19" ]; then
   CONFIG_PATH="config.hg19.yaml"
 fi
 
+if [ ! -d "calls" ]; then
+  error_handling "${LINENO}" 1 "VCF files must be in a directory called 'calls'"
+fi
+
 # Run pipeline
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
 snakemake -s "${SNAKEFILE}" --profile "${SNAKEMAKE_PROFILE_PATH}" --configfile ${CONFIG_PATH} && message INFO "SnpEff/SnpSift successful" || error_handling "${LINENO}" 2 "Error while running SnpEff/SnpSift pipeline"
