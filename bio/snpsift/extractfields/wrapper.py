@@ -23,16 +23,6 @@ elif snakemake.input["call"].endswith("gz"):
     min_threads += 1
     incall = "< <(gunzip -c {})".format(incall)
 
-# Compression shall be done according to user-defined output
-outcall = snakemake.output["call"]
-if snakemake.output["call"].endswith("gz"):
-    min_threads += 1
-    outcall = "| gzip -c > {}".format(outcall)
-elif snakemake.output["call"].endswith("bcf"):
-    min_threads += 1
-    outcall = "| bcftools view > {}".format(outcall)
-else:
-    outcall = "> {}".format(outcall)
 
 # Each (un)compression step raises the threads requirements
 if snakemake.threads < min_threads:
@@ -51,6 +41,6 @@ shell(
     " {java_opts} {extra}"  # Extra parameters
     " {incall}"  # Path to input vcf file
     " {fields}"  # The fields to extract
-    " {outcall}"  # Path to output file
+    " > {snakemake.output.tsv}"  # Path to output file
     " {log}"  # Logging behaviour
 )

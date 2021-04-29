@@ -17,6 +17,22 @@ log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 # extra parameters
 extra = snakemake.params.get("extra", "")
 
+# Moose previously passed booleans for no_lane_splitting parameter
+if config.params.get("no_lane_splitting", False) is True:
+    extra += " --no-lane-splitting"
+
+
+# Moose previously passed base_mask as a string in params
+if (base_mask := config.params.get("use_bases_mask", None)) is not None:
+    extra += "--use-bases-mask {}".format(base_mask)
+
+
+# Moose previously passed barcode mismatches through params
+if (mismatches := config.params.get("barcode_mismatches", None)) is not None:
+    extra += " --barcode-mismatches {mismatches}"
+
+
+
 # path to runfolder directory
 io_parameters = " --runfolder-dir {} ".format(snakemake.input["run_dir"])
 

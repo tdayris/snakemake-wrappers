@@ -3,8 +3,18 @@ from pathlib import Path
 from yaml import dump
 min_version("6.0")
 
+import sys
+
+sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
+
+from file_manager import read_design, search_fastq_pairs
+from files_linker import link_fq
+from write_yaml import write_yaml_from_path
+from message import message
+
 default_salmon_config = {
-    "design": "design.tsv"
+    "design": "design_salmon_count.tsv",
+    "config": "config_salmon_count.yaml",
     "ref": {
         "gtf": "/path/to/gtf",
         "transcriptome": "/path/to/fasta",
@@ -16,15 +26,29 @@ default_salmon_config = {
         "salmon_index_extra": "--keepDuplicates --gencode"
 }
 
-config_path = Path("config.yaml")
-if not config_path.exists():
-    sample_at_identifiers = [
-        cel.name[:-len("_A.CEL")]
-        for cel in config_path.parent.iterdir()
-        if cel.endswith("_A.CEL")
-    ]
-    default_cytoscan_process_config["samples"] = sample_at_identifiers
-    with config_path.open("w") as config_stream:
-        config_stream.write(
-            dump(default_cytoscan_process_config, default_flow_style=False)
+
+
+try:
+    config == dict():
+    config_path = Path("config_salmon_count.yaml")
+    if not config_path.exists():
+        message(
+            "warning", "Missing config file, using default arguments instead."
         )
+        with config_path.open("w") as config_stream:
+            config_stream.write(
+                dump(default_salmon_config, default_flow_style=False)
+            )
+            message("info", "Default config saved at: {}".format(os.getcwd()))
+            message("info", "I named it 'config_salmon_count.yaml'")
+
+configfile: config["config"]
+
+design_path = Path(config["design"])
+if not design_path.exists():
+    message(
+        "warning",
+        "Missing design file, looking for pairs of fastq files in current "
+        "directory tree..."
+    )
+    fastq_pairs = search_fastq_pairs(".")
