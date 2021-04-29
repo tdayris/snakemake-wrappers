@@ -47,7 +47,7 @@ configfile: str(config_path)
 module post_process_eacon:
     snakefile: "../../eacon_post_process/test/Snakefile"
     config: config
-    
+
 print(config)
 
 rule default_oncoscan_process_all:
@@ -82,14 +82,12 @@ rule eacon_oncoscan_process:
         GCChannelCel = "{sample}_C.CEL"
     output:
         qc_txt = "{sample}/{sample}_2.4.0_{nar}.qc.txt".format(
-            sample="{sample}",
-            nar=config["params"]["nar"]
+            sample="{sample}", nar=config["params"]["nar"]
         ),
         log = "{sample}/{sample}_2.4.0_{nar}.log".format(
-            sample="{sample}",
-            nar=config["params"]["nar"]
+            sample="{sample}", nar=config["params"]["nar"]
         ),
-        txt = "{sample}/{sample}_CELfile.txt",
+        txt = "{sample}/{sample}_pairs.txt",
         png = "{sample}/{sample}_{arraytype}_{genome}_rawplot.png".format(
             sample="{sample}",
             arraytype=config["params"]["arraytype"],
@@ -99,6 +97,9 @@ rule eacon_oncoscan_process:
             sample="{sample}",
             genome=config["params"]["genome"],
             arraytype = config["params"]["arraytype"]
+        ),
+        pairs = "{sample}/{sample}_2.4.0_{nar}.paircheck.txt".format(
+            sample="{sample}", nar=config["params"]["nar"]
         )
     threads: 1
     resources:

@@ -175,7 +175,7 @@ if "padj_sig" in snakemake.output.keys():
 if "padj_fc" in snakemake.output.keys():
     logging.debug("Prining the adjusted P-Value / FoldChange table")
     tmp = data.copy()
-    tmp = tmp[tmp["Cluster_FC"] != "Non_Significative"]
+    tmp = tmp[tmp["Cluster_Sig"] != "Non_Significative"]
     tmp.dropna(
         inplace=True,
         subset=["log2FoldChange", "padj"]

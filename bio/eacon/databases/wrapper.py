@@ -11,7 +11,7 @@ from snakemake.shell import shell
 log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
 
 if "databases" in snakemake.output.keys():
-    shell("wget -O {snakemake.output.databases}.tar.bz2 https://nextcloud.gustaveroussy.fr/s/E7P3oTKS2Lo2x87/download?path=Onco_Cyto/Annotations/EaCoN_databases.tar.bz2 {log}")
+    shell("wget -O {snakemake.output.databases}.tar.bz2 https://nextcloud.gustaveroussy.fr/s/jZkw6cCsAKMGXsz/download {log}")
     shell("tar -xvjf {snakemake.output.databases}.tar.bz2 {log}")
 
 if "grd" in snakemake.output.keys():
