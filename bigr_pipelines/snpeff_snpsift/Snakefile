@@ -19,6 +19,79 @@ rule all:
     message:
         "Finishing the annotation pipeline"
 
+#####################
+### Export to TSV ###
+#####################
+
+rule extractfields:
+    input:
+        call="snpsift/cosmic/{sample}.vcf.gz",
+        call_index="snpsift/cosmic/{sample}.vcf.gz.tbi"
+    output:
+        tsv=protected("snpsift/extractFields/{sample}.tsv")
+    message:
+        "Making {wildcards.sample} annotated VCF readable"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
+        time_min=lambda wildcards, attempt: attempt * 20
+    log:
+        "logs/snpsift/extractFields/{sample}.log"
+    params:
+        fields=[
+            "CHROM",
+            "POS",
+            "ID",
+            "REF",
+            "ALT",
+            "ANN[*].GENE",
+            "ANN[*].GENEID",
+            "ANN[*].HGVS_C", # (alias HGVS_DNA, CODON): Variant in HGVS (DNA) notation
+            "ANN[*].HGVS_P", # (alias HGVS, HGVS_PROT, AA): Variant in HGVS (protein) notation
+            "STRAND", # "Gene strand"
+            "ANN[*].FEATURE",
+            "ANN[*].FEATUREID",
+            "ANN[*].BIOTYPE", # Biotype, as described by the annotations (e.g. 'protein_coding')
+            "ANN[*].IMPACT", # { HIGH, MODERATE, LOW, MODIFIER }
+            "ANN[*].EFFECT", # (alias ANNOTATION): Effect in Sequence ontology terms (e.g. 'missense_variant', 'synonymous_variant', 'stop_gained', etc.)
+            "ANN[*].CDNA_POS", # (alias POS_CDNA)
+            "ANN[*].CDNA_LEN", # (alias LEN_CDNA)
+            "ANN[*].CDS_POS", # (alias POS_CDS)
+            "ANN[*].CDS_LEN", # (alias LEN_CDS)
+            "ANN[*].AA_POS", # (alias POS_AA)
+            "ANN[*].AA_LEN", # (alias LEN_AA)
+            "FILTER",
+            "ADP", # "Average per-sample depth of bases with Phred score >= 15"
+            "LOF[*].GENE",  # predicted Loss of function
+            "LOF[*].GENEID",
+            "LOF[*].NUMTR", # Number of transcripts affected
+            "LOF[*].PERC", # percentage of transcripts
+            "NMD[*].GENE", # "Predicted nonsense mediated decay effects for this variant."
+            "NMD[*].GENEID",
+            "NMD[*].NUMTR",
+            "NMD[*].PERC",
+            "VARTYPE", # "Comma separated list of variant types. One per allele"
+            "HOM", # "Variant is homozygous"
+            "HET", # "Variant is heterozygous"
+            "AC", # "Allele Count"
+            "AF", # "Allele Frequency"
+            "AN", #"Total number of alleles in data sources"
+            "DS", # "Data Sources containing allele"
+            "CDA", # "Variation is interrogated in a clinical diagnostic assay"
+            "OTH", # "Has other variant with exactly the same set of mapped positions on NCBI refernce assembly."
+            "COMMON", # A common SNP is one that has at least one 1000Genomes population with a minor allel e of frequency >= 1% and for which 2 or more founders contribute to that minor allele frequency.
+            "VLD", # "Is Validated.  This bit is set if the variant has 2+ minor allele count based on frequency or genotype data."
+            "MUT", # "Is mutation (journal citation, explicit fact): a low frequency variation that is cited in journal and other reputable sources"
+            "INT", # "In Intron"
+            "PMC", # "Links exist to PubMed Central article"
+            "HD", # "Marker is on high density genotyping kit (50K density or greater).  The variant may have phenotype associations present in dbGaP."
+            "PM", # "Variant is Precious(Clinical,Pubmed Cited)"
+        ],
+        extra="-s '\t' -e '.'"
+    wrapper:
+        "/bio/snpsift/extractfields"
+
+
 ###############
 ### MultiQC ###
 ###############
