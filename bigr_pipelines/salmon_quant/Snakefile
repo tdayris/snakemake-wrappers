@@ -12,56 +12,9 @@ from files_linker import link_fq
 from write_yaml import write_yaml_from_path
 from message import message
 
-default_salmon_config = {
-    "design": "design_salmon_count.tsv",
-    "config": "config_salmon_count.yaml",
-    "ref": {
-        "gtf": "/path/to/gtf",
-        "transcriptome": "/path/to/fasta",
-        "genome": "/path/to/other/fasta"
-    },
-    "params":
-        "salmon_libtype": "A",
-        "salmon_quant_extra": "--numBootstraps 100 --validateMappings --gcBias --seqBias --posBias",
-        "salmon_index_extra": "--keepDuplicates --gencode",
-        "fastp_adapters": "",
-        "fastp_extra": (
-            "--cut_front "
-            "--cut_tail "
-            "--cut_window_size 6 "
-            "--cut_mean_quality 10 "
-            "--unqualified_percent_limit 50 "
-            "--n_base_limit 7 "
-            "--average_qual 0 "
-            "--length_required 15 "
-            "--overrepresentation_analysis"
-        )
-}
-
-try:
-    config == dict():
-    config_path = Path("config_salmon_count.yaml")
-    if not config_path.exists():
-        message(
-            "warning", "Missing config file, using default arguments instead."
-        )
-        with config_path.open("w") as config_stream:
-            config_stream.write(
-                dump(default_salmon_config, default_flow_style=False)
-            )
-            message("info", "Default config saved at: {}".format(os.getcwd()))
-            message("info", "I named it 'config_salmon_count.yaml'")
-
-configfile: config["config"]
-
-design_path = Path(config["design"])
-if not design_path.exists():
-    message(
-        "warning",
-        "Missing design file, looking for pairs of fastq files in current "
-        "directory tree..."
-    )
-    fastq_pairs = search_fastq_pairs(".")
+default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/config.hg38.yaml")
+configfile: get_config(default_config)
+design = read_design(os.getcwd(), search_fastq_pairs)
 
 
 #############################
