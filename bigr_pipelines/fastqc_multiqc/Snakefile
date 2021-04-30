@@ -2,88 +2,71 @@ import sys
 
 sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python")
 
-from file_manager import read_design, search_files, search_fastq_files
+from file_manager import *
 from files_linker import link_fq
-from write_yaml import write_yaml_from_path
+from write_yaml import *
 from pathlib import Path
 
 from snakemake.utils import min_version
 min_version("6.0")
 
-default_config_fastqc_multiqc = {
-    "design": "design.tsv",
-    "fastq_screen": {
-        "database": {
-            "Contaminants": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Adapters"
-            },
-            "Arabidopsis_thaliana.TAIR10": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Arabidopsis"
-            },
-            "BDGP6": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Drosophila"
-            },
-            "Ecoli": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/E_coli"
-            },
-            "Homo_sapiens.GRCh38": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Human"
-            },
-            "Lambda": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Lambda"
-            },
-            "mitochondria": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Mitochondria"
-            },
-            "Mus_musculus.GRCm38": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Mouse"
-            },
-            "phi_plus_SNPs": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/PhiX"
-            },
-            "Rnor_6.0": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Rat"
-            },
-            "GRCm38_rRNA": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/rRNA"
-            },
-            "Vectors": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Vectors"
-            },
-            "Worm": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Worm"
-            },
-            "Yeast": {
-                "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Yeast"
-            }
-        },
-        'aligner_paths': {'bowtie2': 'bowtie2'}
-    }
-}
+# default_config_fastqc_multiqc = {
+#     "design": "design.tsv",
+#     "fastq_screen": {
+#         "database": {
+#             "Contaminants": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Adapters"
+#             },
+#             "Arabidopsis_thaliana.TAIR10": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Arabidopsis"
+#             },
+#             "BDGP6": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Drosophila"
+#             },
+#             "Ecoli": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/E_coli"
+#             },
+#             "Homo_sapiens.GRCh38": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Human"
+#             },
+#             "Lambda": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Lambda"
+#             },
+#             "mitochondria": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Mitochondria"
+#             },
+#             "Mus_musculus.GRCm38": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Mouse"
+#             },
+#             "phi_plus_SNPs": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/PhiX"
+#             },
+#             "Rnor_6.0": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Rat"
+#             },
+#             "GRCm38_rRNA": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/rRNA"
+#             },
+#             "Vectors": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Vectors"
+#             },
+#             "Worm": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Worm"
+#             },
+#             "Yeast": {
+#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Yeast"
+#             }
+#         },
+#         'aligner_paths': {'bowtie2': 'bowtie2'}
+#     }
+# }
 
-try:
-    if config == dict():
-        config = default_config_fastqc_multiqc
-except NameError:
-    config = default_config_fastqc_multiqc
-
-config_path = Path("config.yaml")
-if not config_path.exists():
-    write_yaml_from_path(config_path, config)
+default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/config.yaml")
+config_path = get_config()
+design = get_design(os.getcwd(), search_fastq_pairs)
 
 configfile: config_path
 container: "docker://continuumio/miniconda3:4.4.10"
-
-design_path = config.get("design", None)
-design = None
-if design_path is not None:
-    design = read_design(design_path)
-else:
-    fq_list = search_fastq_files(".")
-    design = pandas.DataFrame({
-        "Sample_id": [fq.name for fq in fq_list],
-        "Upstream_file": [str(fq.absolute()) for fq in fq_list]
-    })
 
 
 ##################################
