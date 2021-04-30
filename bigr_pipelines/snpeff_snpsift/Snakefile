@@ -1,14 +1,30 @@
+import logging
+import os
+import pandas
+import sys
+
+sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
+
+from file_manager import *
+from files_linker import link_fq
+from write_yaml import read_yaml
+from pathlib import Path
+from messages import CustomFormatter
+from snakemake.utils import min_version
+min_version("6.0")
+
+default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/config.hg38.yaml")
+configfile: get_config(default_config)
+design = build_design(os.getcwd(), search_fastq_pairs)
+
 from pathlib import Path
 
 
-try:
-    samples_list = sample=[
-        str(f.name)[:-len(".vcf.gz")]
-        for f in Path("calls").iterdir()
-        if str(f.name).lower().endswith(".vcf.gz")
-    ]
-except FileNotFoundError:
-    samples_list=[]
+samples_list = design["Sample_id"]
+
+
+wildcard_constraints:
+    sample = r"|".join(samples_list)
 
 
 rule all:
@@ -114,7 +130,11 @@ rule multiqc:
             sample=samples_list
         )
     output:
-        "multiqc/SnpEff_annotation.html"
+        report(
+            "multiqc/SnpEff_annotation.html",
+            caption="../common/reports/multiqc.rst",
+            category="Quality Controls"
+        )
     message:
         "Aggregating quality reports from SnpEff"
     threads: 1

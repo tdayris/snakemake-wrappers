@@ -1,52 +1,33 @@
+import logging
 import os
 import pandas
 import sys
 
 sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
 
-from file_manager import (
-    read_design,
-    get_fai,
-    get_dict,
-    get_tbi,
-    search_fastq_pairs,
-    build_design
-)
+from file_manager import *
 from files_linker import link_fq
-from write_yaml import write_yaml_from_path
+from write_yaml import read_yaml
 from pathlib import Path
+from messages import CustomFormatter
 from snakemake.utils import min_version
 min_version("6.0")
 
+
 container: "docker://continuumio/miniconda3:4.4.10"
-
-try:
-    configfile: "config_variant_calling_ampliseq.yaml"
-except FileNotFoundError:
-    configfile: "config.yaml"
-
-localrules: bigr_copy
-
-design_path = Path(config["design"])
-if not design_path.exists():
-    print("Missing design, looking for fastq fils in current directory tree...")
-    design = build_design(os.getcwd(), search_fastq_pairs)
-else:
-    print("Design file provided {}".format(design_path.absolute()))
-    design = read_design(design_path)
-
-config_path = Path("config_variant_calling_ampliseq.yaml")
-if not config_path.exists() or True:
-    write_yaml_from_path(config_path, config)
-
-configfile: config_path
-
 localrules: bigr_copy
 ruleorder: bwa_mem > bwa_fixmate_meta_bwa_mem
+
+
+default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/config.hg38.yaml")
+configfile: get_config(default_config)
+design = get_design(os.getcwd(), search_fastq_pairs)
+
 
 wildcard_constraints:
     sample = r"|".join(design["Sample_id"]),
     stream = r"1|2|R1|R2"
+
 
 fastq_links = link_fq(
     design.Sample_id,
@@ -86,7 +67,11 @@ rule multiqc:
             sample=design["Sample_id"]
         )
     output:
-        "multiqc/SnpEff_annotation.html"
+        report(
+            "multiqc/SnpEff_annotation.html",
+            caption="../common/reports/multiqc.rst",
+            category="Quality Controls"
+        )
     message:
         "Aggregating quality reports from SnpEff"
     threads: 1
