@@ -39,6 +39,17 @@ module salmon_meta:
 use rule * from salmon_meta as salmon_meta_*
 
 
+use rule salmon_quant_paired from salmon_meta with:
+    output:
+        quant=report(
+            "salmon/pseudo_mapping/{sample}/quant.sf",
+            category="2. Raw Salmon output",
+            caption="../../common/reports/salmon_quant.rst"
+        ),
+        lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
+        mapping=temp("salmon/bams/{sample}.bam")
+
+
 ############################
 ### FASTP FASTQ CLEANING ###
 ############################
