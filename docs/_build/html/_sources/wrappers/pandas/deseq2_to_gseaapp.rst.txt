@@ -37,7 +37,7 @@ This wrapper can be used in the following way:
         log:
             "logs/test_deseq2_to_gseapp.log"
         wrapper:
-            "0.72.0-628-g7174a7dc2/bio/pandas/deseq2_to_gseaapp"
+            "0.72.0-654-g6a19d0684/bio/pandas/deseq2_to_gseaapp"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -272,7 +272,7 @@ Code
     if "padj_fc" in snakemake.output.keys():
         logging.debug("Prining the adjusted P-Value / FoldChange table")
         tmp = data.copy()
-        tmp = tmp[tmp["Cluster_FC"] != "Non_Significative"]
+        tmp = tmp[tmp["Cluster_Sig"] != "Non_Significative"]
         tmp.dropna(
             inplace=True,
             subset=["log2FoldChange", "padj"]

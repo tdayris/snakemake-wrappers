@@ -207,15 +207,21 @@
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This meta-wrapper can be used by integrating the following into your workflow:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">bcftools_merge</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_fai</span><span class="p">(</span><span class="n">genome_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">genome_path</span> <span class="o">+</span> <span class="s2">&quot;.fai&quot;</span>
+
+<span class="k">def</span> <span class="nf">get_tbi</span><span class="p">(</span><span class="n">vcf_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">vcf_path</span> <span class="o">+</span> <span class="s2">&quot;.tbi&quot;</span>
+
+<span class="n">rule</span> <span class="n">bcftools_merge</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">calls</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">&quot;vascan2/concat/</span><span class="si">{sample}</span><span class="s2">.fai.vcf.gz&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;mutect2/filter/</span><span class="si">{sample}</span><span class="s2">.fai.vcf.gz&quot;</span>
+            <span class="s2">&quot;varscan2/mpileup2cns_reheaded/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;mutect2/filter_reheaded/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
         <span class="p">],</span>
         <span class="n">calls_index</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">&quot;vascan2/concat/</span><span class="si">{sample}</span><span class="s2">.fai.vcf.gz.tbi&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;mutect2/filter/</span><span class="si">{sample}</span><span class="s2">.fai.vcf.gz.tbi&quot;</span>
+            <span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;varscan2/mpileup2cns_reheaded/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">),</span>
+            <span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;mutect2/filter_reheaded/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
         <span class="p">],</span>
         <span class="n">regions</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;bed&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
@@ -240,10 +246,11 @@
 <span class="n">rule</span> <span class="n">rehead_before_merge</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
-        <span class="n">fai</span><span class="o">=</span><span class="n">get_fasta_index_from_genome_path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
+        <span class="n">vcf_index</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">),</span>
+        <span class="n">fai</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
         <span class="n">samples</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/reheader/</span><span class="si">{sample}</span><span class="s2">.renamed.sample.list&quot;</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.fai.vcf.gz&quot;</span><span class="p">)</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">_reheaded/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Adding sequence info in header </span><span class="si">{wildcards.sample}</span><span class="s2"> &quot;</span>
         <span class="s2">&quot;(considering </span><span class="si">{wildcards.tool}</span><span class="s2">, </span><span class="si">{wildcards.subcommand}</span><span class="s2">)&quot;</span>
@@ -311,7 +318,7 @@
         <span class="s2">&quot;logs/</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/rehead/tool_name.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;varscan2_concat&quot;</span><span class="p">:</span> <span class="s2">&quot;Varscan2&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;varscan2_mpileup2cns&quot;</span><span class="p">:</span> <span class="s2">&quot;Varscan2&quot;</span><span class="p">,</span>
             <span class="s2">&quot;mutect2_filter&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2&quot;</span><span class="p">,</span>
         <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">tool</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">subcommand</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">shell</span><span class="p">:</span>

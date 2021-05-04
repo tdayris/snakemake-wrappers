@@ -41,70 +41,16 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 
     """
-    This rule concats snp and indel callings from Varscan2 in order to produce a
-    full VCF file with both kind of variations.
-    """
-    rule bcftools_concat:
-        input:
-            calls=expand(
-                "varscan2/calling/{sample}.{kind}.vcf.gz",
-                kind=["snp", "indel"],
-                allow_missing=True
-            ),
-            calls_index=expand(
-                "varscan2/calling/{sample}.{kind}.vcf.gz.tbi",
-                kind=["snp", "indel"],
-                allow_missing=True
-            ),
-        output:
-            temp("vascan2/concat/{sample}.vcf.gz")
-        threads: 2
-        resources:
-            mem_mb=lambda wildcards, attempt: min(attempt * 1025, 4096),
-            time_min=lambda wildcards, attempt: attempt * 45
-        params:
-            "--output-type z --remove-duplicates --allow-overlaps"
-        log:
-            "logs/varscan/pileup2indel/concat/{sample}.log"
-        wrapper:
-            "/bio/bcftools/concat"
-
-
-    """
-    This rule calls small indel variants with Varscan2. Results are set to unzipped
+    This rule calls snp/indel variants with Varscan2. Results are set to unzipped
     VCF because BCFTools merging will be faster that way. Thus, unzipped VCF are
     temporary files.
     """
-    rule varscan2_indel_calling:
+    rule varscan2_calling:
         input:
             pileup="samtools/mpileup/{sample}.mpileup.gz",
             sample_list="varscan2/mpileup2cns/{sample}.sample.list"
         output:
-            temp("varscan2/calling/{sample}.indel.vcf")
-        message: "Calling Indels on {wildcards.sample} with Varscan2"
-        threads: 2
-        resources:
-            mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
-            time_min=lambda wildcards, attempt: attempt * 45
-        params:
-            extra="--p-value 0.05 --variants"
-        log:
-            "logs/varscan/pileup2indel/call/{sample}.log"
-        wrapper:
-            "/bio/varscan/mpileup2indel"
-
-
-    """
-    This rule calls snp variants with Varscan2. Results are set to unzipped
-    VCF because BCFTools merging will be faster that way. Thus, unzipped VCF are
-    temporary files.
-    """
-    rule varscan2_snp_calling:
-        input:
-            pileup="samtools/mpileup/{sample}.mpileup.gz",
-            sample_list="varscan2/mpileup2cns/{sample}.sample.list"
-        output:
-            temp("varscan2/calling/{sample}.snp.vcf")
+            temp("varscan2/mpileup2cns/{sample}.vcf")
         message: "Calling SNP on {wildcards.sample} with Varscan2"
         threads: 2
         resources:
@@ -115,7 +61,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/varscan/pileup2snp/call/{sample}.log"
         wrapper:
-            "/bio/varscan/mpileup2snp"
+            "/bio/varscan/mpileup2cns"
 
 
     """
@@ -131,7 +77,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=128,
             time_min=2
         params:
-            '"{sample}"'
+            '"varscan2_{sample}"'
         log:
             "logs/varscan2/mpileup2cns/{sample}.list.log"
         shell:

@@ -337,7 +337,7 @@
         <span class="p">),</span>
         <span class="n">out_dir</span> <span class="o">=</span> <span class="s2">&quot;test/output&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-628-g7174a7dc2/bio/bcl2fastq&quot;</span>
+        <span class="s2">&quot;0.72.0-654-g6a19d0684/bio/bcl2fastq&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -390,6 +390,22 @@ When running with</p>
 
 <span class="c1"># extra parameters</span>
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="c1"># Moose previously passed booleans for no_lane_splitting parameter</span>
+<span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;no_lane_splitting&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">extra</span> <span class="o">+=</span> <span class="s2">&quot; --no-lane-splitting&quot;</span>
+
+
+<span class="c1"># Moose previously passed base_mask as a string in params</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">base_mask</span> <span class="o">:=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_bases_mask&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">extra</span> <span class="o">+=</span> <span class="s2">&quot;--use-bases-mask </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base_mask</span><span class="p">)</span>
+
+
+<span class="c1"># Moose previously passed barcode mismatches through params</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">mismatches</span> <span class="o">:=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;barcode_mismatches&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">extra</span> <span class="o">+=</span> <span class="s2">&quot; --barcode-mismatches </span><span class="si">{mismatches}</span><span class="s2">&quot;</span>
+
+
 
 <span class="c1"># path to runfolder directory</span>
 <span class="n">io_parameters</span> <span class="o">=</span> <span class="s2">&quot; --runfolder-dir </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;run_dir&quot;</span><span class="p">])</span>

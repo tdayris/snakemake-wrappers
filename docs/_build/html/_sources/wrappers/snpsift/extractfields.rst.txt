@@ -27,7 +27,7 @@ This wrapper can be used in the following way:
         params:
             fields = ["GT"]
         wrapper:
-            "0.72.0-628-g7174a7dc2/bio/snpsift/extractfields"
+            "0.72.0-654-g6a19d0684/bio/snpsift/extractfields"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -69,7 +69,7 @@ Code
 
 .. code-block:: python
 
-    """Snakemake wrapper for SnpSift geneSets"""
+    """Snakemake wrapper for SnpSift extractFields"""
 
     __author__ = "Thibault Dayris"
     __copyright__ = "Copyright 2020, Dayris Thibault"
@@ -89,21 +89,14 @@ Code
     incall = snakemake.input["call"]
     if snakemake.input["call"].endswith("bcf"):
         min_threads += 1
-        incall = "< <(bcftools view {})".format(incall)
+        incall = "bcftools view {}".format(incall)
     elif snakemake.input["call"].endswith("gz"):
         min_threads += 1
-        incall = "< <(gunzip -c {})".format(incall)
-
-    # Compression shall be done according to user-defined output
-    outcall = snakemake.output["call"]
-    if snakemake.output["call"].endswith("gz"):
-        min_threads += 1
-        outcall = "| gzip -c > {}".format(outcall)
-    elif snakemake.output["call"].endswith("bcf"):
-        min_threads += 1
-        outcall = "| bcftools view > {}".format(outcall)
+        incall = "gunzip -c {}".format(incall)
     else:
-        outcall = "> {}".format(outcall)
+        incall = "cat {}".format(incall)
+        min_threads += 1
+
 
     # Each (un)compression step raises the threads requirements
     if snakemake.threads < min_threads:
@@ -118,10 +111,11 @@ Code
         fields = " ".join(fields)
 
     shell(
+        "{incall} | "
         "SnpSift extractFields"  # Tool and its subcommand
         " {java_opts} {extra}"  # Extra parameters
-        " {incall}"  # Path to input vcf file
+        " - "  # Path to input vcf file
         " {fields}"  # The fields to extract
-        " {outcall}"  # Path to output file
+        " > {snakemake.output.tsv}"  # Path to output file
         " {log}"  # Logging behaviour
     )

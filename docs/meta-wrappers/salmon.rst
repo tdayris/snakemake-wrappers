@@ -16,6 +16,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
     from snakemake.utils import min_version
     min_version("6.0")
 
+    default_salmon_config = {
+        "genome": "/path/to/sequence.fasta",
+        "transcriptome": "/path/to/transcriptome.fasta"
+    }
+
     """
     This rule pseudo-map and quantifies your paired reads over the indexed
     reference.
@@ -24,10 +29,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             r1="reads/{sample}_1.fq.gz",
             r2="reads/{sample}_2.fq.gz",
-            index="salmon/index"
+            index="salmon/index",
+            gtf=config["gtf"]
         output:
             quant="salmon/pseudo_mapping/{sample}/quant.sf",
-            lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json"
+            lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
+            mapping=temp("salmon/bams/{sample}.bam")
         message: "Quantifying {wildcards.sample} with Salmon"
         threads: min(config.get("threads", 20), 20)
         resources:
@@ -36,8 +43,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 min(attempt * 5120 + 2048, 20480)
             )
         params:
-            libType = config.get("salmon_libType", "A"),
-            extra = config.get("salmon_quant_extra", "")
+            libType = config.get("salmon_libtype", "A"),
+            extra = config.get("salmon_quant_extra", "--numBootstraps 100 --validateMappings --gcBias --seqBias --posBias")
         log:
             "logs/salmon/quant/{sample}.log"
         wrapper:
@@ -77,7 +84,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 attempt * (15360 if "decoys" in input.keys() else 10240)
             )
         params:
-            extra=config.get("salmon_index_extra", "")
+            extra=config.get("salmon_index_extra", "--keepDuplicates --gencode")
         log:
             "logs/salmon/index.log"
         wrapper:
@@ -92,8 +99,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule salmon_generate_decoy_sequence:
         input:
-            transcriptome="sequence/transcriptome.fasta",
-            genome="sequence/genome.fasta"
+            transcriptome=config["transcriptome"],
+            genome=config["genome"]
         output:
             decoys="salmon/decoy/decoys.txt",
             gentrome="salmon/decoy/gentrome.fasta"

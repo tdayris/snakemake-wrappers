@@ -35,7 +35,7 @@ This wrapper can be used in the following way:
         log:
             "logs/seaborn_clustermap.log"
         wrapper:
-            "0.72.0-628-g7174a7dc2/bio/seaborn/clustermap"
+            "0.72.0-654-g6a19d0684/bio/seaborn/clustermap"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -199,6 +199,9 @@ Code
     condition_colors = (pandas.Series(data.columns.get_level_values(cond_id),
                                       index=data.columns)
                               .map(cond_colors))
+    logging.debug("Colors:")
+    logging.debug(condition_colors)
+
 
     data = data.corr()
     logging.debug("Correlation table:")
@@ -227,6 +230,8 @@ Code
         ),
         robust=(snakemake.params.get("robust", True) is True)
     )
+
+    logging.info("Seaborn object build, modifying axes names")
 
     # Rotate sample id to make them readable
     matplotlib.pyplot.setp(

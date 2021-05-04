@@ -202,7 +202,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=(
                 "--max-reads-per-alignment-start 0 "
-                "--tumor-sample {sample} "
+                "--tumor-sample Mutect2_{sample} "
                 "--disable-read-filter MateOnSameContigOrNoMappedMateReadFilter "
             )
         log:

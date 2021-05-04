@@ -14,7 +14,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
 .. code-block:: python
 
     default_config={
-        "samples"=["test"],
+        "samples":["test"],
         "ref": {
             "cosmic": "/path/to/annotation",
             "dbsnp": "/path/to/annotation",
@@ -25,13 +25,19 @@ This meta-wrapper can be used by integrating the following into your workflow:
         }
     }
 
+    try:
+        if config == dict():
+            config = default_config
+    except NameError:
+        config = default_config
 
-    rule all:
-        input:
-            expand(
-                "snpsift/cosmic/{sample}.vcf",
-                sample=config["samples"]
-            )
+
+    #rule all:
+    #    input:
+    #        expand(
+    #            "snpsift/cosmic/{sample}.vcf",
+    #            sample=config["samples"]
+    #        )
 
     rule snpsift_gwascat:
         input:
@@ -125,8 +131,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     rule snpsift_vartype:
         input:
-            vcf="snpeff/{sample}.vcf.gz",
-            vcf_tbi="snpeff/{sample}.vcf.gz.tbi"
+            vcf="snpeff/calls/{sample}.vcf.gz",
+            vcf_tbi="snpeff/calls/{sample}.vcf.gz.tbi"
         output:
             vcf=temp("snpsift/vartype/{sample}.vcf")
         message:

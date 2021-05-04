@@ -97,14 +97,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
             GCChannelCel = "{sample}_C.CEL"
         output:
             qc_txt = "{sample}/{sample}_2.4.0_{nar}.qc.txt".format(
-                sample="{sample}",
-                nar=config["params"]["nar"]
+                sample="{sample}", nar=config["params"]["nar"]
             ),
             log = "{sample}/{sample}_2.4.0_{nar}.log".format(
-                sample="{sample}",
-                nar=config["params"]["nar"]
+                sample="{sample}", nar=config["params"]["nar"]
             ),
-            txt = "{sample}/{sample}_CELfile.txt",
+            txt = "{sample}/{sample}_pairs.txt",
             png = "{sample}/{sample}_{arraytype}_{genome}_rawplot.png".format(
                 sample="{sample}",
                 arraytype=config["params"]["arraytype"],
@@ -114,6 +112,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 sample="{sample}",
                 genome=config["params"]["genome"],
                 arraytype = config["params"]["arraytype"]
+            ),
+            pairs = "{sample}/{sample}_2.4.0_{nar}.paircheck.txt".format(
+                sample="{sample}", nar=config["params"]["nar"]
             )
         threads: 1
         resources:

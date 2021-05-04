@@ -207,7 +207,7 @@
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This meta-wrapper can be used by integrating the following into your workflow:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">default_config</span><span class="o">=</span><span class="p">{</span>
-    <span class="s2">&quot;samples&quot;</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;samples&quot;</span><span class="p">:[</span><span class="s2">&quot;test&quot;</span><span class="p">],</span>
     <span class="s2">&quot;ref&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;cosmic&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/annotation&quot;</span><span class="p">,</span>
         <span class="s2">&quot;dbsnp&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/annotation&quot;</span><span class="p">,</span>
@@ -218,13 +218,19 @@
     <span class="p">}</span>
 <span class="p">}</span>
 
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">config</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">():</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">default_config</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">default_config</span>
 
-<span class="n">rule</span> <span class="nb">all</span><span class="p">:</span>
-    <span class="nb">input</span><span class="p">:</span>
-        <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;snpsift/cosmic/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">]</span>
-        <span class="p">)</span>
+
+<span class="c1">#rule all:</span>
+<span class="c1">#    input:</span>
+<span class="c1">#        expand(</span>
+<span class="c1">#            &quot;snpsift/cosmic/{sample}.vcf&quot;,</span>
+<span class="c1">#            sample=config[&quot;samples&quot;]</span>
+<span class="c1">#        )</span>
 
 <span class="n">rule</span> <span class="n">snpsift_gwascat</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
@@ -318,8 +324,8 @@
 
 <span class="n">rule</span> <span class="n">snpsift_vartype</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;snpeff/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
-        <span class="n">vcf_tbi</span><span class="o">=</span><span class="s2">&quot;snpeff/</span><span class="si">{sample}</span><span class="s2">.vcf.gz.tbi&quot;</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;snpeff/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">vcf_tbi</span><span class="o">=</span><span class="s2">&quot;snpeff/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz.tbi&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">vcf</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/vartype/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>

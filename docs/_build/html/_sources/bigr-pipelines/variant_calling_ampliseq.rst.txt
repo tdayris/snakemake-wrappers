@@ -18,13 +18,15 @@ In order to run the pipeline, use the following commands
 
   # Build a design file (see below)
 
-  # Copy/paste the following line for **HG38**
+  # Copy/paste the following line for **HG19**
 
   bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh
 
-  # Copy/paste the following line for **HG19**
+  # Copy/paste the following line for **HG38**
 
-  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh hg19
+  {'\# WARNING': 'HG38 remains not tested (possible wrong capture kit)'}
+
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh hg38
 
 
 Input/Output

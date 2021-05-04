@@ -235,70 +235,16 @@
 
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This rule concats snp and indel callings from Varscan2 in order to produce a</span>
-<span class="sd">full VCF file with both kind of variations.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="n">rule</span> <span class="n">bcftools_concat</span><span class="p">:</span>
-    <span class="nb">input</span><span class="p">:</span>
-        <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;varscan2/calling/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{kind}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;snp&quot;</span><span class="p">,</span> <span class="s2">&quot;indel&quot;</span><span class="p">],</span>
-            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">),</span>
-        <span class="n">calls_index</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;varscan2/calling/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{kind}</span><span class="s2">.vcf.gz.tbi&quot;</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;snp&quot;</span><span class="p">,</span> <span class="s2">&quot;indel&quot;</span><span class="p">],</span>
-            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">),</span>
-    <span class="n">output</span><span class="p">:</span>
-        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;vascan2/concat/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
-    <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1025</span><span class="p">,</span> <span class="mi">4096</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
-    <span class="n">params</span><span class="p">:</span>
-        <span class="s2">&quot;--output-type z --remove-duplicates --allow-overlaps&quot;</span>
-    <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/varscan/pileup2indel/concat/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
-    <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/bcftools/concat&quot;</span>
-
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This rule calls small indel variants with Varscan2. Results are set to unzipped</span>
+<span class="sd">This rule calls snp/indel variants with Varscan2. Results are set to unzipped</span>
 <span class="sd">VCF because BCFTools merging will be faster that way. Thus, unzipped VCF are</span>
 <span class="sd">temporary files.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">rule</span> <span class="n">varscan2_indel_calling</span><span class="p">:</span>
+<span class="n">rule</span> <span class="n">varscan2_calling</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">pileup</span><span class="o">=</span><span class="s2">&quot;samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span><span class="p">,</span>
         <span class="n">sample_list</span><span class="o">=</span><span class="s2">&quot;varscan2/mpileup2cns/</span><span class="si">{sample}</span><span class="s2">.sample.list&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/calling/</span><span class="si">{sample}</span><span class="s2">.indel.vcf&quot;</span><span class="p">)</span>
-    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Calling Indels on </span><span class="si">{wildcards.sample}</span><span class="s2"> with Varscan2&quot;</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
-    <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">15360</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
-    <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--p-value 0.05 --variants&quot;</span>
-    <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/varscan/pileup2indel/call/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
-    <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/varscan/mpileup2indel&quot;</span>
-
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This rule calls snp variants with Varscan2. Results are set to unzipped</span>
-<span class="sd">VCF because BCFTools merging will be faster that way. Thus, unzipped VCF are</span>
-<span class="sd">temporary files.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="n">rule</span> <span class="n">varscan2_snp_calling</span><span class="p">:</span>
-    <span class="nb">input</span><span class="p">:</span>
-        <span class="n">pileup</span><span class="o">=</span><span class="s2">&quot;samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span><span class="p">,</span>
-        <span class="n">sample_list</span><span class="o">=</span><span class="s2">&quot;varscan2/mpileup2cns/</span><span class="si">{sample}</span><span class="s2">.sample.list&quot;</span>
-    <span class="n">output</span><span class="p">:</span>
-        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/calling/</span><span class="si">{sample}</span><span class="s2">.snp.vcf&quot;</span><span class="p">)</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/mpileup2cns/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Calling SNP on </span><span class="si">{wildcards.sample}</span><span class="s2"> with Varscan2&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">resources</span><span class="p">:</span>
@@ -309,7 +255,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/varscan/pileup2snp/call/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/varscan/mpileup2snp&quot;</span>
+        <span class="s2">&quot;/bio/varscan/mpileup2cns&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -325,7 +271,7 @@
         <span class="n">mem_mb</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="mi">2</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="s1">&#39;&quot;</span><span class="si">{sample}</span><span class="s1">&quot;&#39;</span>
+        <span class="s1">&#39;&quot;varscan2_</span><span class="si">{sample}</span><span class="s1">&quot;&#39;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/varscan2/mpileup2cns/</span><span class="si">{sample}</span><span class="s2">.list.log&quot;</span>
     <span class="n">shell</span><span class="p">:</span>
