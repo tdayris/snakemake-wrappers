@@ -12,6 +12,6 @@ extra = snakemake.params
 java_opts = get_java_opts(snakemake)
 
 shell(
-    "INPUT={snakemake.input.bam} OUTPUT={snakemake.output[0]} "
+    "picard INPUT={snakemake.input.bam} OUTPUT={snakemake.output[0]} "
     "REFERENCE_SEQUENCE={snakemake.input.ref} {log}"
 )
