@@ -8,6 +8,7 @@ import os
 from snakemake.shell import shell
 
 
+log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 out_name, out_ext = os.path.splitext(snakemake.output[0])
 
 tmp_dir = snakemake.params.get("tmp_dir", "")
@@ -15,6 +16,9 @@ if tmp_dir:
     prefix = os.path.join(tmp_dir, os.path.basename(out_name))
 else:
     prefix = out_name
+
+if not os.path.exists(tmp_dir):
+    os.makedirs(name=tmp_dir, exist_ok=True)
 
 # Samtools takes additional threads through its option -@
 # One thread for samtools
@@ -28,5 +32,5 @@ if "mem_mb" in snakemake.resources.keys() and "-m" not in extra:
 
 shell(
     "samtools sort {snakemake.params.extra} {threads} -o {snakemake.output[0]} "
-    "-T {prefix} {snakemake.input[0]}"
+    "-T {prefix} {snakemake.input[0]} {log}"
 )
