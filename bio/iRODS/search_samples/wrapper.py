@@ -4,10 +4,19 @@ from irods.session import iRODSSession
 import ssl
 import os
 import pandas
+import logging
+
+logging.basicConfig(
+    filename=snakemake.log[0],
+    filemode="w",
+    level=logging.DEBUG
+)
 
 # Let user provide specific irods env file
 env_path = snakemake.input.get("env_file", '~/.irods/irods_environment.json')
 env_file = os.path.expanduser(env_path)
+
+logging.info("Env file found at: %s", env_file)
 
 ssl_context = ssl.create_default_context(
     purpose=ssl.Purpose.SERVER_AUTH,
@@ -25,7 +34,7 @@ if (samples_file = snakemake.input.get("samples", None)) is not None:
         for sample in samples_stream:
             sample_list.append(sample[:-1])
 sample_list = list(set(sample_list))  # Drop duplicates
-
+logging.debug("Sample list defined as: %s", str(sample_list))
 
 # Open session
 with iRODSSession(irods_env_file=env_file, **ssl_settings) as session:
@@ -33,6 +42,7 @@ with iRODSSession(irods_env_file=env_file, **ssl_settings) as session:
         Collection.name,      DataObject.id,       DataObject.name,
         DataObject.size,      DataObject.checksum, DataObjectMeta
     )
+    logging.info("Query performed")
     result_dict = {}
 
     # Format query result
@@ -52,8 +62,12 @@ with iRODSSession(irods_env_file=env_file, **ssl_settings) as session:
 
     # Filter query
     results = pandas.DataFrame.from_dict(result_dict, orient='index')
+    logging.info("Query formatted")
+    logging.debug(results.head())
     results = results[results["patientAlias"].isin(sample_list)]
+    logging.info("Query filtered")
     results.reset_index(inplace=True)
     results.rename({"index": "Sample_id"}, inplace=True)
+    logging.info("Column renamed")
 
     results.to_csv(snakemake.output[0], sep="\t")
