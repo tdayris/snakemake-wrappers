@@ -29,7 +29,7 @@ ssl_settings = {'ssl_context': ssl_context}
 
 # Let user input multiple source of samples
 sample_list = snakemake.params.get("samples", [])
-if (samples_file = snakemake.input.get("samples", None)) is not None:
+if (samples_file := snakemake.input.get("samples", None)) is not None:
     with open(samples_file, "r") as samples_stream:
         for sample in samples_stream:
             sample_list.append(sample[:-1])
@@ -47,9 +47,7 @@ with iRODSSession(irods_env_file=env_file, **ssl_settings) as session:
 
     # Format query result
     for res in query:
-        key = (
-            res[DataObject.id]
-        )
+        key = (res[DataObject.id])
         try:
             result_dict[key][str(res[DataObjectMeta.name])] = str(res[DataObjectMeta.value])
         except KeyError:
@@ -64,10 +62,6 @@ with iRODSSession(irods_env_file=env_file, **ssl_settings) as session:
     results = pandas.DataFrame.from_dict(result_dict, orient='index')
     logging.info("Query formatted")
     logging.debug(results.head())
-    results = results[results["patientAlias"].isin(sample_list)]
-    logging.info("Query filtered")
     results.reset_index(inplace=True)
-    results.rename({"index": "Sample_id"}, inplace=True)
-    logging.info("Column renamed")
 
     results.to_csv(snakemake.output[0], sep="\t")
