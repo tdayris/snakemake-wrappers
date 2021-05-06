@@ -8,6 +8,11 @@
 # This script takes a deseq2 transform object and performs
 # a pca on it before plotting requested axes
 
+# Sink the stderr and stdout to the snakemake log file
+# https://stackoverflow.com/a/48173272
+log.file<-file(snakemake@log[[1]],open="wt");
+base::sink(log.file);
+base::sink(log.file,type="message");
 
 base::library(package = "DESeq2");        # Differential analysis
 base::library(package = "pcaExplorer");   # Handles PCAs
@@ -34,6 +39,14 @@ if ("extra" %in% names(snakemake@params)) {
   );
 }
 
+command <- base::paste0(
+  "pcaExplorer::pcaplot(",
+  extra,
+  ");"
+);
+
+base::message(command);
+
 # Build plot
 w <- 1024;
 if ("w" %in% base::names(snakemake@params)) {
@@ -52,18 +65,16 @@ png(
   type = "cairo"
 );
 
-command <- base::paste0(
-  "pcaExplorer::pcaplot(",
-  extra,
-  ");"
-);
-
-base::message(command);
-
 base::eval(
   base::parse(
     text = command
   )
 );
 
-dev.off()
+dev.off();
+
+
+# Proper syntax to close the connection for the log file
+# but could be optional for Snakemake wrapper
+base::sink(type="message");
+base::sink();
