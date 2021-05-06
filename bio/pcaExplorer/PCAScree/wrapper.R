@@ -46,11 +46,11 @@ base::message(command);
 
 # Build plot
 w <- 1024;
-if ("w" in base::names(snakemake@params)) {
+if ("w" %in% base::names(snakemake@params)) {
   w <- base::as.numeric(snakemake@params[["w"]]);
 }
 h <- 768;
-if ("h" in base::names(snakemake@params)) {
+if ("h" %in% base::names(snakemake@params)) {
   h <- base::as.numeric(snakemake@params[["h"]]);
 }
 
