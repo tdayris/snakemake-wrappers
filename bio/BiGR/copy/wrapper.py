@@ -15,7 +15,7 @@ from tempfile import TemporaryDirectory
 
 
 # Prepare logging
-log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+log = snakemake.log_fmt_shell(stdout=False, stderr=True, append=True)
 extra_cp = snakemake.params.get("extra", "-v")
 extra_iget = snakemake.params.get("extra_irods", "-vK")
 
@@ -52,7 +52,7 @@ def iRODS_copy(src: str,
 
 
 def copy(src: str, dest: str) -> None:
-    if src.startswith("/iRODS"):
+    if src.startswith("/odin/kdi/dataset/"):
         iRODS_copy(src, dest)
     else:
         bash_copy(src, dest)
@@ -81,7 +81,7 @@ sources = snakemake.params.get("input", snakemake.input)
 if len(destinations := snakemake.output) == 1:
     # Then there is only one directory as a destination
     destination = op.realpath(str(destinations))
-    shell(f"mkdir --parents --verbose {op.dirname(destination)}")
+    shell(f"mkdir --parents --verbose {op.dirname(destination)} {log}")
     if isinstance(sources, str):
         copy_or_concat(sources, destination)
     else:
@@ -90,6 +90,7 @@ if len(destinations := snakemake.output) == 1:
 elif len(sources) == len(destinations):
     # Then there muse be as many paths as source
     for source, destination in zip(sources, destinations):
+        shell(f"mkdir --parents --verbose {op.dirname(destination)} {log}")
         copy_or_concat(source, destination)
 else:
     print(len(sources), len(destinations), sources, destinations)
