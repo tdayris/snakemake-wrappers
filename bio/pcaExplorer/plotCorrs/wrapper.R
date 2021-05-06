@@ -70,10 +70,19 @@ command <- base::paste0(
 base::message(command);
 
 # Build plot
+w <- 1024;
+if ("w" in base::names(snakemake@params)) {
+  w <- base::as.numeric(snakemake@params[["w"]]);
+}
+h <- 768;
+if ("h" in base::names(snakemake@params)) {
+  h <- base::as.numeric(snakemake@params[["h"]]);
+}
+
 png(
   filename = snakemake@output[["png"]],
-  width = 1024,
-  height = 768,
+  width = w,
+  height = h,
   units = "px",
   type = "cairo"
 );
