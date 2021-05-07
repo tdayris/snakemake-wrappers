@@ -45,7 +45,7 @@ dds_path <- base::as.character(
 dds <- base::readRDS(file = dds_path);
 
 base::message(colData(dds));
-base::message(head(pca));
+base::message(pca);
 corrs_pca <- tryCatch({
     pcaExplorer::correlatePCs(pca, colData(dds))
   },
