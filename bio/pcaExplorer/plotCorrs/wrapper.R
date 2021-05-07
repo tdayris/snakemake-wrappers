@@ -48,8 +48,11 @@ base::message("Printing coldata:");
 base::print(dds);
 base::print(colData(dds));
 
+base::message("Factor of interest");
+base::message(base::as.character(x = snakemake@params[["factor"]]));
+
 base::message("Printing pca:");
-base::message(head(pca));
+base::message(colnames(pca));
 
 corrs_pca <- tryCatch({
     pcaExplorer::correlatePCs(pca, colData(dds))
