@@ -45,8 +45,8 @@ dds_path <- base::as.character(
 dds <- base::readRDS(file = dds_path);
 
 base::message("Printing coldata:");
-base::message(dds);
-base::message(colData(dds));
+base::print(dds);
+base::print(colData(dds));
 
 base::message("Printing pca:");
 base::message(head(pca));
