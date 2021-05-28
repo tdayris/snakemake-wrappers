@@ -12,7 +12,7 @@ from tempfile import TemporaryDirectory
 
 from snakemake.shell import shell
 
-log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 
 def basename_without_ext(file_path):
@@ -35,8 +35,8 @@ def basename_without_ext(file_path):
 # use the same fastqc dir, we create a temp dir.
 with TemporaryDirectory() as tempdir:
     shell(
-        "fastqc {snakemake.params} --quiet -t {snakemake.threads} "
-        "--outdir {tempdir} {snakemake.input[0]}"
+        "fastqc {snakemake.params} -t {snakemake.threads} "
+        "--outdir {tempdir:q} {snakemake.input[0]:q}"
         " {log}"
     )
 
