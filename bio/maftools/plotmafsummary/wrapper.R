@@ -19,6 +19,14 @@ if ("png_extra" %in% base::names(snakemake@params)) {
   );
 }
 
+colors <- NULL;
+if ("color_named_vector" %in% base::names(snakemake@params)) {
+  vc_nonSyn <- snakemake@params[["non_synonymous"]];
+  colors <- snakemake@params[["color_named_vector"]];
+  names(colors) <- vc_nonSyn;
+  print(colors);
+}
+
 png_cmd_line <- base::paste0("grDevices::png(", png_extra, ")");
 base::message(png_cmd_line);
 
@@ -27,7 +35,7 @@ maf_obj <- base::readRDS(
   file = base::as.character(x = snakemake@input[["rds"]])
 );
 
-maftools_extra <- "maf = maf_obj";
+maftools_extra <- "maf = maf_obj, color = colors";
 if ("maftools_extra" %in% base::names(snakemake@params)) {
   maftools_extra <- paste(
     maftools_extra, snakemake@params[["maftools_extra"]], sep = ", "
