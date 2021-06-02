@@ -1,0 +1,97 @@
+.. _`bio/gatk/scatterintervalsbyns`:
+
+GATK SCATTERINTERVALSBYNS
+=========================
+
+Run gatk ScatterIntervalsByNs.
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule gatk_scatter_interval_by_ns:
+        input:
+            ref="genome.fasta",
+            fai="genome.fasta.fai",
+            dict="genome.dict",
+        output:
+            intervals="genome.intervals"
+        log:
+            "logs/genome.log"
+        params:
+            extra="--MAX_TO_MERGE 10 --OUTPUT_TYPE ACGT",
+    	java_opts="", # optional
+        resources:
+            mem_mb=1024,
+        wrapper:
+            "0.74.0-690-g395727bdf/bio/gatk/scatterintervalsbyns"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``gatk4==4.2.0.0``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* reference genome
+
+**Output:**
+
+* interval list
+
+
+
+Notes
+-----
+
+* The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-XX:ParallelGCThreads=10" (not for `-XmX` or `-Djava.io.tmpdir`, since they are handled automatically).
+* The `extra` param allows for additional program arguments.
+* For more information see, https://gatk.broadinstitute.org/hc/en-us/articles/360057440251-ScatterIntervalsByNs-Picard-
+
+
+
+Authors
+-------
+
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Filipe G. Vieira"
+    __copyright__ = "Copyright 2021, Filipe G. Vieira"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
+
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    shell(
+        "gatk --java-options '{java_opts}' ScatterIntervalsByNs --REFERENCE {snakemake.input.ref} "
+        "{extra} --OUTPUT {snakemake.output.intervals} {log}"
+    )

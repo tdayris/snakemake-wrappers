@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
 
@@ -31,6 +33,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -103,13 +106,16 @@
 <li class="toctree-l2"><a class="reference internal" href="arriba.html">ARRIBA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="art.html">ART</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bamtools.html">BAMTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bbtools.html">BBTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bcftools.html">BCFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCF2FASTQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bedtools.html">BEDTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="benchmark.html">BENCHMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biobambam2.html">BIOBAMBAM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bioinfokit.html">BIOINFOKIT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="biomaRt.html">BIOMART</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bismark.html">BISMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blast.html">BLAST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bowtie2.html">BOWTIE2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="busco.html">BUSCO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa.html">BWA</a></li>
@@ -176,9 +182,11 @@
 <li class="toctree-l2"><a class="reference internal" href="md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="multiqc.html">MULTIQC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nanosim-h.html">NANOSIM-H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nextflow.html">NEXTFLOW</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ngs-disambiguate.html">NGS-DISAMBIGUATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="open-cravat.html">OPEN-CRAVAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="optitype.html">OPTITYPE</a></li>
@@ -327,13 +335,31 @@
     <span class="n">output</span><span class="p">:</span>
         <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;wgs&quot;</span><span class="p">,</span>   <span class="c1"># {wgs, wes}</span>
+        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;wgs&quot;</span><span class="p">,</span>   <span class="c1"># {wgs, wes, pacbio, hybrid}</span>
+        <span class="n">sample_name</span><span class="o">=</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="n">w</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span> <span class="c1"># optional</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deepvariant/</span><span class="si">{sample}</span><span class="s2">/stdout.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-654-g6a19d0684/bio/deepvariant&quot;</span>
+        <span class="s2">&quot;0.74.0-690-g395727bdf/bio/deepvariant&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">deepvariant_gvcf</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;mapped/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">ref</span><span class="o">=</span><span class="s2">&quot;genome/genome.fasta&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;gvcf_calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">gvcf</span><span class="o">=</span><span class="s2">&quot;gvcf_calls/</span><span class="si">{sample}</span><span class="s2">.g.vcf.gz&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;wgs&quot;</span><span class="p">,</span>   <span class="c1"># {wgs, wes, pacbio, hybrid}</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/deepvariant/</span><span class="si">{sample}</span><span class="s2">/stdout.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.74.0-690-g395727bdf/bio/deepvariant&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -346,9 +372,7 @@ When running with</p>
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">deepvariant=0.10.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">tensorflow-estimator=2.0.0</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">unzip=6.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">deepvariant==1.1.0</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="input-output">
@@ -375,6 +399,7 @@ When running with</p>
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Tetsuro Hisayoshi</p></li>
+<li><p>Nikos Tsardakas Renhuldt</p></li>
 </ul>
 </div>
 <div class="section" id="code">
@@ -394,9 +419,20 @@ When running with</p>
 <span class="n">log_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-<span class="c1"># sample basename</span>
-<span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">bam</span><span class="p">[</span><span class="mi">0</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># sample name defaults to basename</span>
+<span class="n">sample_name</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;sample_name&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">bam</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">)</span>
 
+
+<span class="n">make_examples_gvcf</span> <span class="o">=</span> <span class="n">postprocess_gvcf</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">gvcf</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gvcf&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">gvcf</span><span class="p">:</span>
+    <span class="n">make_examples_gvcf</span> <span class="o">=</span> <span class="s2">&quot;--gvcf </span><span class="si">{tmp_dir}</span><span class="s2"> &quot;</span>
+    <span class="n">postprocess_gvcf</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;--gvcf_infile </span><span class="si">{tmp_dir}</span><span class="s2">/</span><span class="si">{sample_name}</span><span class="s2">.gvcf.tfrecord@</span><span class="si">{snakemake.threads}</span><span class="s2">.gz &quot;</span>
+        <span class="s2">&quot;--gvcf_outfile </span><span class="si">{snakemake.output.gvcf}</span><span class="s2"> &quot;</span>
+    <span class="p">)</span>
 
 <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
     <span class="n">shell</span><span class="p">(</span>
@@ -404,19 +440,19 @@ When running with</p>
         <span class="s2">&quot;--cores </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
         <span class="s2">&quot;--ref </span><span class="si">{snakemake.input.ref}</span><span class="s2"> &quot;</span>
         <span class="s2">&quot;--reads </span><span class="si">{snakemake.input.bam}</span><span class="s2"> &quot;</span>
-        <span class="s2">&quot;--sample </span><span class="si">{basename}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;--sample </span><span class="si">{sample_name}</span><span class="s2"> &quot;</span>
         <span class="s2">&quot;--examples </span><span class="si">{tmp_dir}</span><span class="s2"> &quot;</span>
-        <span class="s2">&quot;--logdir </span><span class="si">{log_dir}</span><span class="s2"> &quot;</span>
-        <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;--logdir </span><span class="si">{log_dir}</span><span class="s2"> &quot;</span> <span class="o">+</span> <span class="n">make_examples_gvcf</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;dv_call_variants.py &quot;</span>
         <span class="s2">&quot;--cores </span><span class="si">{snakemake.threads}</span><span class="s2"> &quot;</span>
-        <span class="s2">&quot;--outfile </span><span class="si">{tmp_dir}</span><span class="s2">/</span><span class="si">{basename}</span><span class="s2">.tmp &quot;</span>
-        <span class="s2">&quot;--sample </span><span class="si">{basename}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;--outfile </span><span class="si">{tmp_dir}</span><span class="s2">/</span><span class="si">{sample_name}</span><span class="s2">.tmp &quot;</span>
+        <span class="s2">&quot;--sample </span><span class="si">{sample_name}</span><span class="s2"> &quot;</span>
         <span class="s2">&quot;--examples </span><span class="si">{tmp_dir}</span><span class="s2"> &quot;</span>
         <span class="s2">&quot;--model </span><span class="si">{snakemake.params.model}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;dv_postprocess_variants.py &quot;</span>
         <span class="s2">&quot;--ref </span><span class="si">{snakemake.input.ref}</span><span class="s2"> &quot;</span>
-        <span class="s2">&quot;--infile </span><span class="si">{tmp_dir}</span><span class="s2">/</span><span class="si">{basename}</span><span class="s2">.tmp &quot;</span>
+        <span class="o">+</span> <span class="n">postprocess_gvcf</span>
+        <span class="o">+</span> <span class="s2">&quot;--infile </span><span class="si">{tmp_dir}</span><span class="s2">/</span><span class="si">{sample_name}</span><span class="s2">.tmp &quot;</span>
         <span class="s2">&quot;--outfile </span><span class="si">{snakemake.output.vcf}</span><span class="s2"> ) </span><span class="si">{log}</span><span class="s2">&quot;</span>
     <span class="p">)</span>
 </pre></div>

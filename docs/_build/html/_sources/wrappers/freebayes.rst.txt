@@ -33,7 +33,7 @@ This wrapper can be used in the following way:
             normalize=False,  # flag to use bcftools norm to normalize indels
         threads: 2
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/freebayes"
+            "0.74.0-690-g395727bdf/bio/freebayes"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -53,6 +53,27 @@ Software dependencies
 * ``bedtools>=2.29``
 * ``sed=4.7``
 
+Input/Output
+------------
+**Input:**
+
+* SAM/BAM/CRAM file(s)
+* reference genome
+
+**Output:**
+
+* VCF/VCF.gz/BCF file
+
+
+
+Notes
+-----
+
+* The `extra` param allows for additional arguments for freebayes.
+* The `uncompressed_bcf`param allows for uncompressed BCF output.
+* The `normalize` param allows to use `bcftools norm` to normalize indels.
+* The `chunkzise` param allows setting reference genome chunk size for parallelization (default: 100000)
+* For more inforamtion see, https://github.com/freebayes/freebayes
 
 
 
@@ -61,6 +82,7 @@ Authors
 
 * Johannes Köster
 * Felix Mölder
+* Filipe G. Vieira
 
 
 Code
@@ -74,6 +96,7 @@ Code
     __license__ = "MIT"
 
 
+    from os import path
     from snakemake.shell import shell
 
     shell.executable("bash")
@@ -84,14 +107,33 @@ Code
     norm = snakemake.params.get("normalize", False)
     assert norm in [True, False]
 
-    pipe = ""
-    if snakemake.output[0].endswith(".bcf"):
-        if norm:
-            pipe = "| bcftools norm -Ob -"
+
+    # Infer output format
+    uncompressed_bcf = snakemake.params.get("uncompressed_bcf", False)
+    out_name, out_ext = path.splitext(snakemake.output[0])
+    if out_ext == ".vcf":
+        out_format = "v"
+    elif out_ext == ".bcf":
+        if uncompressed_bcf:
+            out_format = "u"
         else:
-            pipe = "| bcftools view -Ob -"
-    elif norm:
-        pipe = "| bcftools norm -"
+            out_format = "b"
+    elif out_ext == ".gz":
+        out_name, out_ext = path.splitext(out_name)
+        if out_ext == ".vcf":
+            out_format = "z"
+        else:
+            raise ValueError("output file with invalid extension (.vcf, .vcf.gz, .bcf).")
+    else:
+        raise ValueError("output file with invalid extension (.vcf, .vcf.gz, .bcf).")
+
+
+    pipe = ""
+    if norm:
+        pipe = f"| bcftools norm --output-type {out_format} -"
+    else:
+        pipe = f"| bcftools view --output-type {out_format} -"
+
 
     if snakemake.threads == 1:
         freebayes = "freebayes"

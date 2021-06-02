@@ -59,7 +59,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/deseq.log"
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/deseq2/DESeq"
+            "0.74.0-690-g395727bdf/bio/deseq2/DESeq"
 
 
     """
@@ -84,7 +84,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/deseq2_dataset_from_tximport.log"
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/deseq2/DESeqDataSetFromTximport/"
+            "0.74.0-690-g395727bdf/bio/deseq2/DESeqDataSetFromTximport/"
 
 
     """
@@ -113,7 +113,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport.log"
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/tximport"
+            "0.74.0-690-g395727bdf/bio/tximport"
 
 
     """
@@ -137,7 +137,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport/tx2gene.log"
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/gtf/tx2gene"
+            "0.74.0-690-g395727bdf/bio/gtf/tx2gene"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

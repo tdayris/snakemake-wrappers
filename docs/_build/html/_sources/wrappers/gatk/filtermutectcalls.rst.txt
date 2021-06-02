@@ -36,7 +36,7 @@ This wrapper can be used in the following way:
         resources:
             mem_mb=1024,
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/gatk/filtermutectcalls"
+            "0.74.0-690-g395727bdf/bio/gatk/filtermutectcalls"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -71,7 +71,7 @@ Notes
 
 * The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
 * The `extra` param alllows for additional program arguments.
-* For more inforamtion see, https://software.broadinstitute.org/gatk/documentation/article?id=11050
+* For more information see, https://software.broadinstitute.org/gatk/documentation/article?id=11050
 
 
 
@@ -111,6 +111,19 @@ Code
             snakemake.input["contamination"]
         )
 
+
+    segmentation = ""
+    if "segmentation" in snakemake.input.keys():
+        segmentation = "--tumor-segmentation {}".format(
+            snakemake.input["segmentation"]
+        )
+
+
+    stats = ""
+    if "stats" in snakemake.output.keys():
+        stats = "--stats {}".format(snakemake.output["stats"])
+
+
     f1r2 = ""
     if "f1r2" in snakemake.input.keys():
         f1r2 = "--orientation-bias-artifact-priors {}".format(
@@ -120,7 +133,7 @@ Code
     shell(
         "gatk --java-options '{java_opts}' FilterMutectCalls "
         "-R {snakemake.input.ref} -V {snakemake.input.vcf} "
-        "{extra} {contamination} {f1r2} {bam} "
+        "{extra} {contamination} {f1r2} {segmentation} {stats} {bam} "
         "-O {snakemake.output.vcf} "
         "{log}"
     )

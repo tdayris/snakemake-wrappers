@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
 
@@ -31,6 +33,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -103,13 +106,16 @@
 <li class="toctree-l2"><a class="reference internal" href="arriba.html">ARRIBA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="art.html">ART</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bamtools.html">BAMTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bbtools.html">BBTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bcftools.html">BCFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCF2FASTQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bedtools.html">BEDTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="benchmark.html">BENCHMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biobambam2.html">BIOBAMBAM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bioinfokit.html">BIOINFOKIT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="biomaRt.html">BIOMART</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bismark.html">BISMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blast.html">BLAST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bowtie2.html">BOWTIE2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="busco.html">BUSCO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa.html">BWA</a></li>
@@ -143,6 +149,8 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">FREEBAYES</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code">Code</a></li>
 </ul>
@@ -174,9 +182,11 @@
 <li class="toctree-l2"><a class="reference internal" href="md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="multiqc.html">MULTIQC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nanosim-h.html">NANOSIM-H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nextflow.html">NEXTFLOW</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ngs-disambiguate.html">NGS-DISAMBIGUATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="open-cravat.html">OPEN-CRAVAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="optitype.html">OPTITYPE</a></li>
@@ -338,7 +348,7 @@
         <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># flag to use bcftools norm to normalize indels</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-654-g6a19d0684/bio/freebayes&quot;</span>
+        <span class="s2">&quot;0.74.0-690-g395727bdf/bio/freebayes&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -358,11 +368,34 @@ When running with</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">sed=4.7</span></code></p></li>
 </ul>
 </div>
+<div class="section" id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>SAM/BAM/CRAM file(s)</p></li>
+<li><p>reference genome</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>VCF/VCF.gz/BCF file</p></li>
+</ul>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The <cite>extra</cite> param allows for additional arguments for freebayes.</p></li>
+<li><p>The <a href="#id1"><span class="problematic" id="id2">`</span></a>uncompressed_bcf`param allows for uncompressed BCF output.</p></li>
+<li><p>The <cite>normalize</cite> param allows to use <cite>bcftools norm</cite> to normalize indels.</p></li>
+<li><p>The <cite>chunkzise</cite> param allows setting reference genome chunk size for parallelization (default: 100000)</p></li>
+<li><p>For more inforamtion see, <a class="reference external" href="https://github.com/freebayes/freebayes">https://github.com/freebayes/freebayes</a></p></li>
+</ul>
+</div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Johannes Köster</p></li>
 <li><p>Felix Mölder</p></li>
+<li><p>Filipe G. Vieira</p></li>
 </ul>
 </div>
 <div class="section" id="code">
@@ -373,6 +406,7 @@ When running with</p>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
 
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
 <span class="n">shell</span><span class="o">.</span><span class="n">executable</span><span class="p">(</span><span class="s2">&quot;bash&quot;</span><span class="p">)</span>
@@ -383,14 +417,33 @@ When running with</p>
 <span class="n">norm</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;normalize&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 <span class="k">assert</span> <span class="n">norm</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
 
-<span class="n">pipe</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.bcf&quot;</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">norm</span><span class="p">:</span>
-        <span class="n">pipe</span> <span class="o">=</span> <span class="s2">&quot;| bcftools norm -Ob -&quot;</span>
+
+<span class="c1"># Infer output format</span>
+<span class="n">uncompressed_bcf</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;uncompressed_bcf&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">out_name</span><span class="p">,</span> <span class="n">out_ext</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">if</span> <span class="n">out_ext</span> <span class="o">==</span> <span class="s2">&quot;.vcf&quot;</span><span class="p">:</span>
+    <span class="n">out_format</span> <span class="o">=</span> <span class="s2">&quot;v&quot;</span>
+<span class="k">elif</span> <span class="n">out_ext</span> <span class="o">==</span> <span class="s2">&quot;.bcf&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">uncompressed_bcf</span><span class="p">:</span>
+        <span class="n">out_format</span> <span class="o">=</span> <span class="s2">&quot;u&quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">pipe</span> <span class="o">=</span> <span class="s2">&quot;| bcftools view -Ob -&quot;</span>
-<span class="k">elif</span> <span class="n">norm</span><span class="p">:</span>
-    <span class="n">pipe</span> <span class="o">=</span> <span class="s2">&quot;| bcftools norm -&quot;</span>
+        <span class="n">out_format</span> <span class="o">=</span> <span class="s2">&quot;b&quot;</span>
+<span class="k">elif</span> <span class="n">out_ext</span> <span class="o">==</span> <span class="s2">&quot;.gz&quot;</span><span class="p">:</span>
+    <span class="n">out_name</span><span class="p">,</span> <span class="n">out_ext</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">out_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">out_ext</span> <span class="o">==</span> <span class="s2">&quot;.vcf&quot;</span><span class="p">:</span>
+        <span class="n">out_format</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;output file with invalid extension (.vcf, .vcf.gz, .bcf).&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;output file with invalid extension (.vcf, .vcf.gz, .bcf).&quot;</span><span class="p">)</span>
+
+
+<span class="n">pipe</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="n">norm</span><span class="p">:</span>
+    <span class="n">pipe</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;| bcftools norm --output-type </span><span class="si">{</span><span class="n">out_format</span><span class="si">}</span><span class="s2"> -&quot;</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">pipe</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;| bcftools view --output-type </span><span class="si">{</span><span class="n">out_format</span><span class="si">}</span><span class="s2"> -&quot;</span>
+
 
 <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">threads</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
     <span class="n">freebayes</span> <span class="o">=</span> <span class="s2">&quot;freebayes&quot;</span>

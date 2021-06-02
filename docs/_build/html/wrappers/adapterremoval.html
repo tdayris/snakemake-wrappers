@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
 
@@ -31,6 +33,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -111,13 +114,16 @@
 <li class="toctree-l2"><a class="reference internal" href="arriba.html">ARRIBA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="art.html">ART</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bamtools.html">BAMTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bbtools.html">BBTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bcftools.html">BCFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCF2FASTQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bedtools.html">BEDTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="benchmark.html">BENCHMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biobambam2.html">BIOBAMBAM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bioinfokit.html">BIOINFOKIT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="biomaRt.html">BIOMART</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bismark.html">BISMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blast.html">BLAST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bowtie2.html">BOWTIE2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="busco.html">BUSCO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa.html">BWA</a></li>
@@ -176,9 +182,11 @@
 <li class="toctree-l2"><a class="reference internal" href="md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="multiqc.html">MULTIQC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nanosim-h.html">NANOSIM-H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nextflow.html">NEXTFLOW</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ngs-disambiguate.html">NGS-DISAMBIGUATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="open-cravat.html">OPEN-CRAVAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="optitype.html">OPTITYPE</a></li>
@@ -316,7 +324,7 @@
             
   <div class="section" id="adapterremoval">
 <span id="bio-adapterremoval"></span><h1>ADAPTERREMOVAL<a class="headerlink" href="#adapterremoval" title="Permalink to this headline">¶</a></h1>
-<p>rapid adapter trimming, identification, and read merging. For more information see <a class="reference external" href="https://adapterremoval.readthedocs.io/en/latest/">AdapterRemoval documentation</a>.</p>
+<p>rapid adapter trimming, identification, and read merging.</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -324,31 +332,30 @@
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">sample</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;reads/se/</span><span class="si">{sample}</span><span class="s2">.fastq&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">fq</span><span class="o">=</span><span class="s2">&quot;trimmed/se/</span><span class="si">{sample}</span><span class="s2">.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">discarded</span><span class="o">=</span><span class="s2">&quot;trimmed/se/</span><span class="si">{sample}</span><span class="s2">.discarded.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">settings</span><span class="o">=</span><span class="s2">&quot;stats/se/</span><span class="si">{sample}</span><span class="s2">.settings&quot;</span>
+        <span class="n">fq</span><span class="o">=</span><span class="s2">&quot;trimmed/se/</span><span class="si">{sample}</span><span class="s2">.fastq.gz&quot;</span><span class="p">,</span>                               <span class="c1"># trimmed reads</span>
+        <span class="n">discarded</span><span class="o">=</span><span class="s2">&quot;trimmed/se/</span><span class="si">{sample}</span><span class="s2">.discarded.fastq.gz&quot;</span><span class="p">,</span>              <span class="c1"># reads that did not pass filters</span>
+        <span class="n">settings</span><span class="o">=</span><span class="s2">&quot;stats/se/</span><span class="si">{sample}</span><span class="s2">.settings&quot;</span>                            <span class="c1"># parameters as well as overall statistics</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/adapterremoval/se/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">adapters</span><span class="o">=</span><span class="s2">&quot;--adapter1 ACGGCTAGCTA&quot;</span><span class="p">,</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">merge_singletons</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Irrelevant for SE; just for testing purposes</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-654-g6a19d0684/bio/adapterremoval&quot;</span>
+        <span class="s2">&quot;0.74.0-690-g395727bdf/bio/adapterremoval&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">adapterremoval_pe</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">sample</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;reads/pe/</span><span class="si">{sample}</span><span class="s2">.1.fastq&quot;</span><span class="p">,</span> <span class="s2">&quot;reads/pe/</span><span class="si">{sample}</span><span class="s2">.2.fastq&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">fq1</span><span class="o">=</span><span class="s2">&quot;trimmed/pe/</span><span class="si">{sample}</span><span class="s2">_R1.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">fq2</span><span class="o">=</span><span class="s2">&quot;trimmed/pe/</span><span class="si">{sample}</span><span class="s2">_R2.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">collapsed</span><span class="o">=</span><span class="s2">&quot;trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.collapsed.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">collapsed_trunc</span><span class="o">=</span><span class="s2">&quot;trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.collapsed_trunc.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">singleton</span><span class="o">=</span><span class="s2">&quot;trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.singleton.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">discarded</span><span class="o">=</span><span class="s2">&quot;trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.discarded.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">settings</span><span class="o">=</span><span class="s2">&quot;stats/pe/</span><span class="si">{sample}</span><span class="s2">.settings&quot;</span>
+        <span class="n">fq1</span><span class="o">=</span><span class="s2">&quot;trimmed/pe/</span><span class="si">{sample}</span><span class="s2">_R1.fastq.gz&quot;</span><span class="p">,</span>                           <span class="c1"># trimmed mate1 reads</span>
+        <span class="n">fq2</span><span class="o">=</span><span class="s2">&quot;trimmed/pe/</span><span class="si">{sample}</span><span class="s2">_R2.fastq.gz&quot;</span><span class="p">,</span>                           <span class="c1"># trimmed mate2 reads</span>
+        <span class="n">collapsed</span><span class="o">=</span><span class="s2">&quot;trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.collapsed.fastq.gz&quot;</span><span class="p">,</span>              <span class="c1"># overlapping mate-pairs which have been merged into a single read</span>
+        <span class="n">collapsed_trunc</span><span class="o">=</span><span class="s2">&quot;trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.collapsed_trunc.fastq.gz&quot;</span><span class="p">,</span>  <span class="c1"># collapsed reads that were quality trimmed</span>
+        <span class="n">singleton</span><span class="o">=</span><span class="s2">&quot;trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.singleton.fastq.gz&quot;</span><span class="p">,</span>              <span class="c1"># mate-pairs for which the mate has been discarded</span>
+        <span class="n">discarded</span><span class="o">=</span><span class="s2">&quot;trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.discarded.fastq.gz&quot;</span><span class="p">,</span>              <span class="c1"># reads that did not pass filters</span>
+        <span class="n">settings</span><span class="o">=</span><span class="s2">&quot;stats/pe/</span><span class="si">{sample}</span><span class="s2">.settings&quot;</span>                            <span class="c1"># parameters as well as overall statistics</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/adapterremoval/pe/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
@@ -356,27 +363,7 @@
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--collapse --collapse-deterministic&quot;</span><span class="p">,</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-654-g6a19d0684/bio/adapterremoval&quot;</span>
-
-
-<span class="n">rule</span> <span class="n">adapterremoval_pe_collapse_single</span><span class="p">:</span>
-    <span class="nb">input</span><span class="p">:</span>
-        <span class="n">sample</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;reads/pe/</span><span class="si">{sample}</span><span class="s2">.1.fastq&quot;</span><span class="p">,</span> <span class="s2">&quot;reads/pe/</span><span class="si">{sample}</span><span class="s2">.2.fastq&quot;</span><span class="p">]</span>
-    <span class="n">output</span><span class="p">:</span>
-        <span class="n">fq1</span><span class="o">=</span><span class="s2">&quot;trimmed/pe_collapse/</span><span class="si">{sample}</span><span class="s2">_R1.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">fq2</span><span class="o">=</span><span class="s2">&quot;trimmed/pe_collapse/</span><span class="si">{sample}</span><span class="s2">_R2.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">singleton</span><span class="o">=</span><span class="s2">&quot;trimmed/pe_collapse/</span><span class="si">{sample}</span><span class="s2">.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">discarded</span><span class="o">=</span><span class="s2">&quot;trimmed/pe_collapse/</span><span class="si">{sample}</span><span class="s2">.discarded.fastq.gz&quot;</span><span class="p">,</span>
-        <span class="n">settings</span><span class="o">=</span><span class="s2">&quot;stats/pe_collapse/</span><span class="si">{sample}</span><span class="s2">.settings&quot;</span>
-    <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/adapterremoval/pe_collapse/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
-    <span class="n">params</span><span class="p">:</span>
-        <span class="n">adapters</span><span class="o">=</span><span class="s2">&quot;--adapter1 ACGGCTAGCTA --adapter2 AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC&quot;</span><span class="p">,</span>
-        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--collapse --collapse-deterministic&quot;</span><span class="p">,</span>
-        <span class="n">merge_singletons</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
-    <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-654-g6a19d0684/bio/adapterremoval&quot;</span>
+        <span class="s2">&quot;0.74.0-690-g395727bdf/bio/adapterremoval&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -389,7 +376,7 @@ When running with</p>
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">adapterremoval==2.3.1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">adapterremoval=2.3</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="input-output">
@@ -397,23 +384,23 @@ When running with</p>
 <p><strong>Input:</strong></p>
 <ul class="simple">
 <li><p>raw fastq file with R1 reads</p></li>
-<li><p>raw fastq file with R2 reads</p></li>
+<li><p>raw fastq file with R2 reads (PE only)</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
 <li><p>trimmed fastq file with R1 reads</p></li>
-<li><p>trimmed fastq file with R2 reads</p></li>
-<li><p>fastq file with singleton reads (those where mate was filtered out)</p></li>
-<li><p>fastq file with collapsed reads (only for PE and if collapsing of reads is enabled)</p></li>
-<li><p>fastq file with collapsed truncated reads, i.e. that were trimmed due the presence of low-quality or ambiguous nucleotides (only for PE and if collapsing of reads is enabled)</p></li>
-<li><p>fastq file with discarded reads</p></li>
+<li><p>trimmed fastq file with R2 reads (PE only)</p></li>
+<li><p>fastq file with singleton reads (PE only; PE reads for which the mate has been discarded)</p></li>
+<li><p>fastq file with collapsed reads (PE only; overlapping mate-pairs which have been merged into a single read)</p></li>
+<li><p>fastq file with collapsed truncated reads (PE only; collapsed reads that were quality trimmed)</p></li>
+<li><p>fastq file with discarded reads (reads that did not pass filters)</p></li>
 <li><p>settings and stats file</p></li>
 </ul>
 </div>
 <div class="section" id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>If <cite>merge_singletons</cite> is set (only for PE and if collapsing of reads is enabled), then <cite>collapsed</cite> and <cite>collapsed truncated</cite> files are not created and reads are appended to the <cite>singleton</cite> file.</p></li>
+<li><p>For more information see, <a class="reference external" href="https://adapterremoval.readthedocs.io/en/latest/">https://adapterremoval.readthedocs.io/en/latest/</a></p></li>
 </ul>
 </div>
 <div class="section" id="authors">
@@ -430,14 +417,10 @@ When running with</p>
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">re</span>
 
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
 <span class="n">adapters</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;adapters&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="n">collapse_pe</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="kc">True</span> <span class="k">if</span> <span class="s2">&quot;--collapse &quot;</span> <span class="ow">in</span> <span class="n">extra</span> <span class="ow">or</span> <span class="s2">&quot;--collapse-deterministic &quot;</span> <span class="ow">in</span> <span class="n">extra</span> <span class="k">else</span> <span class="kc">False</span>
-<span class="p">)</span>
-<span class="n">merge_singletons</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;merge_singletons&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
@@ -485,17 +468,28 @@ When running with</p>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">trimmed</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;--output1 </span><span class="si">{</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">fq1</span><span class="si">}</span><span class="s2"> --output2 </span><span class="si">{</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">fq2</span><span class="si">}</span><span class="s2">&quot;</span>
 
+    <span class="c1"># Output singleton files</span>
+    <span class="n">singleton</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;singleton&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">singleton</span><span class="p">:</span>
+        <span class="n">trimmed</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; --singleton </span><span class="si">{</span><span class="n">singleton</span><span class="si">}</span><span class="s2">&quot;</span>
 
-<span class="c1"># Collapsed reads output</span>
-<span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-    <span class="n">trimmed</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; --singleton </span><span class="si">{</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">singleton</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">if</span> <span class="n">collapse_pe</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">merge_singletons</span><span class="p">:</span>
-            <span class="n">out_collapsed</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span>
-            <span class="n">out_collapsed_trunc</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span>
-            <span class="n">trimmed</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; --outputcollapsed </span><span class="si">{</span><span class="n">out_collapsed</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> --outputcollapsedtruncated </span><span class="si">{</span><span class="n">out_collapsed_trunc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">trimmed</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; --outputcollapsed </span><span class="si">{</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">collapsed</span><span class="si">}</span><span class="s2"> --outputcollapsedtruncated </span><span class="si">{</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">collapsed_trunc</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="c1"># Output collapsed PE reads</span>
+    <span class="n">collapsed</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;collapsed&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">collapsed</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;--collapse\b&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;output.collapsed specified but &#39;--collapse&#39; option missing from params.extra&quot;</span>
+            <span class="p">)</span>
+        <span class="n">trimmed</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; --outputcollapsed </span><span class="si">{</span><span class="n">collapsed</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># Output collapsed and truncated PE reads</span>
+    <span class="n">collapsed_trunc</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;collapsed_trunc&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">collapsed_trunc</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;--collapse\b&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;output.collapsed_trunc specified but &#39;--collapse&#39; option missing from params.extra&quot;</span>
+            <span class="p">)</span>
+        <span class="n">trimmed</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; --outputcollapsedtruncated </span><span class="si">{</span><span class="n">collapsed_trunc</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
 <span class="n">shell</span><span class="p">(</span>
@@ -509,13 +503,6 @@ When running with</p>
     <span class="s2">&quot;--settings </span><span class="si">{snakemake.output.settings}</span><span class="s2">&quot;</span>
     <span class="s2">&quot;) </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
-
-
-<span class="k">if</span> <span class="n">collapse_pe</span> <span class="ow">and</span> <span class="n">merge_singletons</span><span class="p">:</span>
-    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;cat </span><span class="si">{out_collapsed.name}</span><span class="s2"> &gt;&gt; </span><span class="si">{snakemake.output.singleton}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">out_collapsed</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;cat </span><span class="si">{out_collapsed_trunc.name}</span><span class="s2"> &gt;&gt; </span><span class="si">{snakemake.output.singleton}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">out_collapsed_trunc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>

@@ -1,0 +1,222 @@
+.. _`bio/mosdepth`:
+
+MOSDEPTH
+========
+
+fast BAM/CRAM depth calculation https://github.com/brentp/mosdepth
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule mosdepth:
+        input:
+            bam = "aligned/{dataset}.bam",
+            bai = "aligned/{dataset}.bam.bai",
+        output:
+            "mosdepth/{dataset}.mosdepth.global.dist.txt",
+            "mosdepth/{dataset}.per-base.bed.gz", # produced unless --no-per-base specified
+            summary = "mosdepth/{dataset}.mosdepth.summary.txt", # this named output is required for prefix parsing
+        log:
+            "logs/mosdepth/{dataset}.log"
+        params:
+            extra = "--fast-mode",  # optional
+        threads:  # additional decompression threads through `--threads`
+            4     # This value - 1 will be sent to `--threads`
+        wrapper: "0.74.0-690-g395727bdf/bio/mosdepth"
+
+
+    rule mosdepth_bed:
+        input:
+            bam = "aligned/{dataset}.bam",
+            bai = "aligned/{dataset}.bam.bai",
+            bed = "test.bed",
+        output:
+            "mosdepth_bed/{dataset}.mosdepth.global.dist.txt",
+            "mosdepth_bed/{dataset}.mosdepth.region.dist.txt",
+            "mosdepth_bed/{dataset}.regions.bed.gz",
+            summary = "mosdepth_bed/{dataset}.mosdepth.summary.txt", # this named output is required for prefix parsing
+        log:
+            "logs/mosdepth_bed/{dataset}.log"
+        params:
+            extra = "--no-per-base --use-median",  # optional
+        threads:  # additional decompression threads through `--threads`
+            4     # This value - 1 will be sent to `--threads`
+        wrapper: "0.74.0-690-g395727bdf/bio/mosdepth"
+
+
+    rule mosdepth_by_threshold:
+        input:
+            bam = "aligned/{dataset}.bam",
+            bai = "aligned/{dataset}.bam.bai",
+        output:
+            "mosdepth_by_threshold/{dataset}.mosdepth.global.dist.txt",
+            "mosdepth_by_threshold/{dataset}.mosdepth.region.dist.txt",
+            "mosdepth_by_threshold/{dataset}.regions.bed.gz",
+            "mosdepth_by_threshold/{dataset}.thresholds.bed.gz", # needs to go with params.thresholds spec
+            summary = "mosdepth_by_threshold/{dataset}.mosdepth.summary.txt", # this named output is required for prefix parsing
+        log:
+            "logs/mosdepth_by/{dataset}.log"
+        params:
+            by = "500",  # optional, window size,  specifies --by for mosdepth.region.dist.txt and regions.bed.gz
+            thresholds = "1,5,10,30", # optional, specifies --thresholds for thresholds.bed.gz
+        threads:  # additional decompression threads through `--threads`
+            4     # This value - 1 will be sent to `--threads`
+        wrapper: "0.74.0-690-g395727bdf/bio/mosdepth"
+
+
+    rule mosdepth_quantize_precision:
+        input:
+            bam = "aligned/{dataset}.bam",
+            bai = "aligned/{dataset}.bam.bai",
+        output:
+            "mosdepth_quantize_precision/{dataset}.mosdepth.global.dist.txt",
+            "mosdepth_quantize_precision/{dataset}.quantized.bed.gz", # optional, needs to go with params.quantize spec
+            summary = "mosdepth_quantize_precision/{dataset}.mosdepth.summary.txt", # this named output is required for prefix parsing
+        log:
+            "logs/mosdepth_quantize_precision/{dataset}.log"
+        params:
+            extra = "--no-per-base",  # optional
+            quantize = "0:1:5:150", # optional, specifies --quantize for quantized.bed.gz
+            precision = "5", # optional, set decimals of precision
+        threads:  # additional decompression threads through `--threads`
+            4     # This value - 1 will be sent to `--threads`
+        wrapper: "0.74.0-690-g395727bdf/bio/mosdepth"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``mosdepth==0.3.1``
+
+
+
+
+Authors
+-------
+
+* William Rowell
+* David Lähnemann
+* Filipe Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "William Rowell"
+    __copyright__ = "Copyright 2020, William Rowell"
+    __email__ = "wrowell@pacb.com"
+    __license__ = "MIT"
+
+    import sys
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    bed = snakemake.input.get("bed", "")
+    by = snakemake.params.get("by", "")
+    if by:
+        if bed:
+            sys.exit(
+                "Either provide a bed input file OR a window size via params.by, not both."
+            )
+        else:
+            by = f"--by {by}"
+    if bed:
+        by = f"--by {bed}"
+
+    quantize_out = False
+    thresholds_out = False
+    regions_bed_out = False
+    region_dist_out = False
+    for file in snakemake.output:
+        if ".per-base." in file and "--no-per-base" in extra:
+            sys.exit(
+                "You asked not to generate per-base output (--no-per-base), but your rule specifies a '.per-base.' output file. Remove one of the two."
+            )
+        if ".quantized.bed.gz" in file:
+            quantize_out = True
+        if ".thresholds.bed.gz" in file:
+            thresholds_out = True
+        if ".mosdepth.region.dist.txt" in file:
+            region_dist_out = True
+        if ".regions.bed.gz" in file:
+            regions_bed_out = True
+
+
+    if by and not regions_bed_out:
+        sys.exit(
+            "You ask for by-region output. Please also specify *.regions.bed.gz as a rule output."
+        )
+
+    if by and not region_dist_out:
+        sys.exit(
+            "You ask for by-region output. Please also specify *.mosdepth.region.dist.txt as a rule output."
+        )
+
+    if (region_dist_out or regions_bed_out) and not by:
+        sys.exit(
+            "You specify *.regions.bed.gz and/or *.mosdepth.region.dist.txt as a rule output. You also need to ask for by-region output via 'input.bed' or 'params.by'."
+        )
+
+    quantize = snakemake.params.get("quantize", "")
+    if quantize:
+        if not quantize_out:
+            sys.exit(
+                "You ask for quantized output via params.quantize. Please also specify *.quantized.bed.gz as a rule output."
+            )
+        quantize = f"--quantize {quantize}"
+
+    if not quantize and quantize_out:
+        sys.exit(
+            "The rule has output *.quantized.bed.gz specified. Please also specify params.quantize to actually generate it."
+        )
+
+
+    thresholds = snakemake.params.get("thresholds", "")
+    if thresholds:
+        if not thresholds_out:
+            sys.exit(
+                "You ask for --thresholds output via params.thresholds. Please also specify *.thresholds.bed.gz as a rule output."
+            )
+        thresholds = f"--thresholds {thresholds}"
+
+    if not thresholds and thresholds_out:
+        sys.exit(
+            "The rule has output *.thresholds.bed.gz specified. Please also specify params.thresholds to actually generate it."
+        )
+
+
+    precision = snakemake.params.get("precision", "")
+    if precision:
+        precision = f"MOSDEPTH_PRECISION={precision}"
+
+
+    # mosdepth takes additional threads through its option --threads
+    # One thread for mosdepth
+    # Other threads are *additional* decompression threads passed to the '--threads' argument
+    threads = "" if snakemake.threads <= 1 else "--threads {}".format(snakemake.threads - 1)
+
+
+    # named output summary = "*.mosdepth.summary.txt" is required
+    prefix = snakemake.output.summary.replace(".mosdepth.summary.txt", "")
+
+
+    shell(
+        "({precision} mosdepth {threads} {by} {quantize} {thresholds} {extra} {prefix} {snakemake.input.bam}) {log}"
+    )

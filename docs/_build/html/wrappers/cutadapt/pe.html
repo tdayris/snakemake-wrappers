@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme.css" type="text/css" />
 
@@ -31,6 +33,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -103,13 +106,16 @@
 <li class="toctree-l2"><a class="reference internal" href="../arriba.html">ARRIBA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../art.html">ART</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bamtools.html">BAMTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bbtools.html">BBTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bcftools.html">BCFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bcl2fastq.html">BCF2FASTQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bedtools.html">BEDTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../benchmark.html">BENCHMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../biobambam2.html">BIOBAMBAM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bioinfokit.html">BIOINFOKIT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../biomaRt.html">BIOMART</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bismark.html">BISMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../blast.html">BLAST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bowtie2.html">BOWTIE2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../busco.html">BUSCO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bwa.html">BWA</a></li>
@@ -179,9 +185,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../nanosim-h.html">NANOSIM-H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nextflow.html">NEXTFLOW</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ngs-disambiguate.html">NGS-DISAMBIGUATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../open-cravat.html">OPEN-CRAVAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
@@ -341,7 +349,7 @@
         <span class="s2">&quot;logs/cutadapt/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span> <span class="c1"># set desired number of threads here</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.72.0-654-g6a19d0684/bio/cutadapt/pe&quot;</span>
+        <span class="s2">&quot;0.74.0-690-g395727bdf/bio/cutadapt/pe&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -354,7 +362,7 @@ When running with</p>
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">cutadapt==2.10</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cutadapt==3.4</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="input-output">
@@ -402,8 +410,8 @@ When running with</p>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;cutadapt&quot;</span>
-    <span class="s2">&quot; </span><span class="si">{snakemake.params.adapters}</span><span class="s2">&quot;</span>
-    <span class="s2">&quot; </span><span class="si">{snakemake.params.extra}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{adapters}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; -o </span><span class="si">{snakemake.output.fastq1}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; -p </span><span class="si">{snakemake.output.fastq2}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; -j </span><span class="si">{snakemake.threads}</span><span class="s2">&quot;</span>

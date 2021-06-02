@@ -22,7 +22,7 @@ This wrapper can be used in the following way:
             " "
         threads: 3
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/samtools/bam2fq/interleaved"
+            "0.74.0-690-g395727bdf/bio/samtools/bam2fq/interleaved"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -62,6 +62,7 @@ Code
     import os
     from snakemake.shell import shell
 
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
     prefix = os.path.splitext(snakemake.output[0])[0]
 
@@ -69,5 +70,6 @@ Code
         "samtools bam2fq {snakemake.params} "
         " -@ {snakemake.threads} "
         " {snakemake.input[0]}"
-        " >{snakemake.output[0]} "
+        " > {snakemake.output[0]} "
+        "{log}"
     )

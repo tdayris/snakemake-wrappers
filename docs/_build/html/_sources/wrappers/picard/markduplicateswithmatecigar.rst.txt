@@ -3,7 +3,7 @@
 PICARD MARKDUPLICATESWITHMATECIGAR
 ==================================
 
-Mark PCR and optical duplicates with picard tools, taking into account the CIGAR of the mate. For more information about MarkDuplicatesWithMateCigar see `picard documentation <https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicatesWithMateCigar>`_.
+Mark PCR and optical duplicates with picard tools, taking into account the CIGAR of the mate.
 
 
 
@@ -27,7 +27,7 @@ This wrapper can be used in the following way:
         resources:
             mem_mb=1024
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/picard/markduplicateswithmatecigar"
+            "0.74.0-690-g395727bdf/bio/picard/markduplicateswithmatecigar"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -42,6 +42,7 @@ Software dependencies
 ---------------------
 
 * ``picard==2.22.1``
+* ``snakemake-wrapper-utils==0.1.3``
 
 Input/Output
 ------------
@@ -53,6 +54,14 @@ Input/Output
 
 * bam file with marked or removed duplicates
 
+
+
+Notes
+-----
+
+* The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-XX:ParallelGCThreads=10" (not for `-XmX` or `-Djava.io.tmpdir`, since they are handled automatically).
+* The `extra` param alllows for additional program arguments.
+* For more information see, https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicatesWithMateCigar
 
 
 
@@ -75,29 +84,12 @@ Code
 
 
     from snakemake.shell import shell
-
-
-    extra = snakemake.params.get("extra", "")
-    java_opts = snakemake.params.get("java_opts", "")
-
-    # Getting memory in megabytes, if java opts is not filled with -Xmx parameter
-    # By doing so, backward compatibility is preserved
-    if "mem_mb" in snakemake.resources.keys() and not "-Xmx" in java_opts:
-        java_opts += " -Xmx{}M".format(snakemake.resources["mem_mb"])
-
-    # Getting memory in gigabytes, for user convenience. Please prefer the use
-    # of mem_mb over mem_gb as advised in documentation.
-    elif "mem_gb" in snakemake.resources.keys() and not "-Xmx" in java_opts:
-        java_opts += " -Xmx{}G".format(snakemake.resources["mem_gb"])
-
-    # Getting java temp directory from output files list, if -Djava.io.tmpdir
-    # is not provided in java parameters. By doing so, backward compatibility is
-    # not borken.
-    if "java_temp" in snakemake.output.keys() and not "-Djava.io.tmpdir" in java_opts:
-        java_opts += " -Djava.io.tmpdir={}".format(snakemake.output["java_temp"])
-
+    from snakemake_wrapper_utils.java import get_java_opts
 
     log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
 
 
     shell(

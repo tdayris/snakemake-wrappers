@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme.css" type="text/css" />
 
@@ -31,6 +33,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -103,13 +106,16 @@
 <li class="toctree-l2"><a class="reference internal" href="../arriba.html">ARRIBA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../art.html">ART</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bamtools.html">BAMTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bbtools.html">BBTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bcftools.html">BCFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bcl2fastq.html">BCF2FASTQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bedtools.html">BEDTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../benchmark.html">BENCHMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../biobambam2.html">BIOBAMBAM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bioinfokit.html">BIOINFOKIT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../biomaRt.html">BIOMART</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bismark.html">BISMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../blast.html">BLAST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bowtie2.html">BOWTIE2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../busco.html">BUSCO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bwa.html">BWA</a></li>
@@ -182,9 +188,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../nanosim-h.html">NANOSIM-H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nextflow.html">NEXTFLOW</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ngs-disambiguate.html">NGS-DISAMBIGUATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../open-cravat.html">OPEN-CRAVAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
@@ -370,10 +378,10 @@ When running with</p>
 <p><strong>Input:</strong></p>
 <ul class="simple">
 <li><p>bam file</p></li>
-<li><p>vcf files</p></li>
 <li><p>reference genome</p></li>
 <li><p>target intervals to realign</p></li>
 <li><p>bed file (optional)</p></li>
+<li><p>vcf files known variation (optional)</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
@@ -387,7 +395,7 @@ When running with</p>
 <ul class="simple">
 <li><p>The <cite>java_opts</cite> param allows for additional arguments to be passed to the java compiler, e.g. “-XX:ParallelGCThreads=10” (memory is automatically inferred from <cite>resources</cite> and temp dir from <cite>output.java_temp</cite>.</p></li>
 <li><p>The <cite>extra</cite> param alllows for additional program arguments.</p></li>
-<li><p>For more inforamtion see, <a class="reference external" href="https://software.broadinstitute.org/gatk/documentation/article?id=11050">https://software.broadinstitute.org/gatk/documentation/article?id=11050</a></p></li>
+<li><p>For more information see, <a class="reference external" href="https://github.com/broadinstitute/gatk-docs/blob/master/gatk3-tutorials/(howto)_Perform_local_realignment_around_indels.md">https://github.com/broadinstitute/gatk-docs/blob/master/gatk3-tutorials/(howto)_Perform_local_realignment_around_indels.md</a></p></li>
 <li><p>Gatk3.jar is not included in the bioconda package, i.e it need to be added to the conda environment manually.</p></li>
 </ul>
 </div>
@@ -410,21 +418,22 @@ When running with</p>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 <span class="kn">from</span> <span class="nn">snakemake_wrapper_utils.java</span> <span class="kn">import</span> <span class="n">get_java_opts</span>
 
-<span class="n">input_known</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">known</span>
+
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">java_opts</span> <span class="o">=</span> <span class="n">get_java_opts</span><span class="p">(</span><span class="n">snakemake</span><span class="p">)</span>
 
 
-<span class="n">bed</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bed&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">bed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="n">bed</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bed&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">bed</span><span class="p">:</span>
     <span class="n">bed</span> <span class="o">=</span> <span class="s2">&quot;-L &quot;</span> <span class="o">+</span> <span class="n">bed</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="n">bed</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 
-<span class="n">input_known_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<span class="k">for</span> <span class="n">known</span> <span class="ow">in</span> <span class="n">input_known</span><span class="p">:</span>
-    <span class="n">input_known_string</span> <span class="o">=</span> <span class="n">input_known_string</span> <span class="o">+</span> <span class="s2">&quot; -known </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">known</span><span class="p">)</span>
+<span class="n">known</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;known&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">known</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">known</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">known</span> <span class="o">=</span> <span class="s2">&quot;-known </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">known</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">known</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="s2">&quot;-known </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">known</span><span class="p">))</span>
 
 
 <span class="n">output_bai</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bai&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -440,7 +449,7 @@ When running with</p>
     <span class="s2">&quot; </span><span class="si">{extra}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; -I </span><span class="si">{snakemake.input.bam}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; -R </span><span class="si">{snakemake.input.ref}</span><span class="s2">&quot;</span>
-    <span class="s2">&quot; </span><span class="si">{input_known_string}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot; </span><span class="si">{known}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; </span><span class="si">{bed}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; --targetIntervals </span><span class="si">{snakemake.input.target_intervals}</span><span class="s2">&quot;</span>
     <span class="s2">&quot; -o </span><span class="si">{snakemake.output.bam}</span><span class="s2">&quot;</span>

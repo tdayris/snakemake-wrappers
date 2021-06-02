@@ -32,7 +32,7 @@ This wrapper can be used in the following way:
         log:
             "logs/mutect_{sample}.log"
         wrapper:
-             "0.72.0-654-g6a19d0684/bio/gatk/mutect"
+             "0.74.0-690-g395727bdf/bio/gatk/mutect"
 
     rule mutect2_bam:
         input:
@@ -54,7 +54,7 @@ This wrapper can be used in the following way:
         log:
             "logs/mutect_{sample}.log"
         wrapper:
-             "0.72.0-654-g6a19d0684/bio/gatk/mutect"
+             "0.74.0-690-g395727bdf/bio/gatk/mutect"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -132,11 +132,16 @@ Code
     if "f1r2" in snakemake.output.keys():
         f1r2 = "--f1r2-tar-gz {}".format(snakemake.output["f1r2"])
 
+    tumor = ""
+    if "tumor" in snakemake.input.keys():
+        tumor = "--input {}".format(snakemake.input["tumor"])
+
     extra = snakemake.params.get("extra", "")
     java_opts = get_java_opts(snakemake)
 
     shell(
         "gatk --java-options '{java_opts}' Mutect2 "  # Tool and its subprocess
+        " {tumor} "  # Path to tumor input file
         "--input {snakemake.input.map} "  # Path to input mapping file
         "{bam_output} "  # Path to output bam file, optional
         "{f1r2} "  # Path to output f1r2 count file

@@ -33,7 +33,7 @@ This wrapper can be used in the following way:
             "logs/{sample}/mapdamage2.log"
         threads: 1  # MapDamage2 is not threaded
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/mapdamage2"
+            "0.74.0-690-g395727bdf/bio/mapdamage2"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -73,6 +73,10 @@ Code
     extra = snakemake.params.get("extra", "")
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
+    in_bam = snakemake.input.get("bam", "")
+    if in_bam:
+        in_bam = "--input " + in_bam
+
     output_folder = os.path.dirname(snakemake.output.get("log", ""))
     if not output_folder:
         raise ValueError("mapDamage2 rule needs output 'log'.")
@@ -80,13 +84,11 @@ Code
     rescaled_bam = snakemake.output.get("rescaled_bam", "")
     if rescaled_bam:
         rescaled_bam = "--rescale-out " + rescaled_bam
-    else:
-        rescaled_bam = ""
 
 
     shell(
         "mapDamage "
-        "--input {snakemake.input.bam} "
+        "{in_bam} "
         "--reference {snakemake.input.ref} "
         "--folder {output_folder} "
         "{rescaled_bam} "

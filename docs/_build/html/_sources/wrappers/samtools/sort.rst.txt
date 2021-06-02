@@ -24,7 +24,7 @@ This wrapper can be used in the following way:
         threads:  # Samtools takes additional threads through its option -@
             8     # This value - 1 will be sent to -@.
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/samtools/sort"
+            "0.74.0-690-g395727bdf/bio/samtools/sort"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -69,6 +69,8 @@ Code
     import os
     from snakemake.shell import shell
 
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
     out_name, out_ext = os.path.splitext(snakemake.output[0])

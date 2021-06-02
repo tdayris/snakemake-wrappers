@@ -24,7 +24,7 @@ This wrapper can be used in the following way:
             filter="-i 'QUAL > 5'",
             extra="",
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/bcftools/filter"
+            "0.74.0-690-g395727bdf/bio/bcftools/filter"
 
 
     rule bcf_filter_o_vcf_gz:
@@ -38,7 +38,7 @@ This wrapper can be used in the following way:
             filter="-i 'QUAL > 5'",
             extra="",
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/bcftools/filter"
+            "0.74.0-690-g395727bdf/bio/bcftools/filter"
 
 
     rule bcf_filter_o_bcf:
@@ -52,21 +52,22 @@ This wrapper can be used in the following way:
             filter="-i 'QUAL > 5'",
             extra="",
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/bcftools/filter"
+            "0.74.0-690-g395727bdf/bio/bcftools/filter"
 
 
-    rule bcf_filter_o_bcf_gz:
+    rule bcf_filter_o_uncompressed_bcf:
         input:
             "{prefix}.bcf",
         output:
-            "{prefix}.filter.bcf.gz",
+            "{prefix}.filter.uncompressed.bcf",
         log:
-            "log/{prefix}.filter.bcf.gz.log",
+            "log/{prefix}.filter.uncompressed.bcf.log",
         params:
+            uncompressed_bcf=True,
             filter="-i 'QUAL > 5'",
             extra="",
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/bcftools/filter"
+            "0.74.0-690-g395727bdf/bio/bcftools/filter"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -80,8 +81,28 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``bcftools==1.12``
+* ``bcftools==1.9``
+* ``snakemake-wrapper-utils==0.2.0``
 
+Input/Output
+------------
+**Input:**
+
+* VCF/BCF file
+
+**Output:**
+
+* Filtered VCF/BCF file
+
+
+
+Notes
+-----
+
+* The `uncompressed_bcf` param allows to specify that a BCF output should be uncompressed (ignored otherwise).
+* The `bcftools_use_mem` param controls whether to pass the resources.mem_mb to bcftools
+* The `extra` param alllows for additional program arguments (not `--threads, `-O/--output-type`, `-m/--max-mem`, or `-T/--temp-dir`).
+* For more information see, https://samtools.github.io/bcftools/bcftools.html
 
 
 
@@ -89,6 +110,7 @@ Authors
 -------
 
 * Patrik Smeds
+* Nikos Tsardakas Renhuldt
 
 
 Code
@@ -103,18 +125,10 @@ Code
 
 
     from snakemake.shell import shell
+    from snakemake_wrapper_utils.bcftools import get_bcftools_opts
 
+    bcftools_opts = get_bcftools_opts(snakemake)
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
-    if snakemake.output[0].endswith("bcf"):
-        output_format = "-Ou"
-    elif snakemake.output[0].endswith("bcf.gz"):
-        output_format = "-Ob"
-    elif snakemake.output[0].endswith("vcf"):
-        output_format = "-Ov"
-    elif snakemake.output[0].endswith("vcf.gz"):
-        output_format = "-Oz"
-
 
     if len(snakemake.input) > 1:
         raise Exception("Only one input file expected, got: " + str(len(snakemake.input)))
@@ -126,8 +140,8 @@ Code
     extra = snakemake.params.get("extra", "")
 
     shell(
-        "bcftools filter {filter} {extra} {snakemake.input[0]} "
-        "{output_format} "
+        "bcftools filter {filter} {snakemake.input[0]} "
+        "{bcftools_opts} "
         "-o {snakemake.output[0]} "
         "{log}"
     )

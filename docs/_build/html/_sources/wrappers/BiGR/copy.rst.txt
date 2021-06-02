@@ -19,7 +19,7 @@ This wrapper can be used in the following way:
         params:
             input="src/file.txt"
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/BiGR/copy"
+            "0.74.0-690-g395727bdf/bio/BiGR/copy"
 
 
     rule test_bigr_copy_duo:
@@ -29,7 +29,7 @@ This wrapper can be used in the following way:
         params:
             input=["src/file1.txt", "src/file2.txt"]
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/BiGR/copy"
+            "0.74.0-690-g395727bdf/bio/BiGR/copy"
 
 
     rule test_bigr_copy_concat:
@@ -38,7 +38,7 @@ This wrapper can be used in the following way:
         params:
             input=["src/file1.txt,src/file2.txt"]
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/BiGR/copy"
+            "0.74.0-690-g395727bdf/bio/BiGR/copy"
 
 
     rule test_bigr_copy_to_dir:
@@ -47,7 +47,7 @@ This wrapper can be used in the following way:
         params:
             input=["src/file1.txt", "src/file2.txt"]
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/BiGR/copy"
+            "0.74.0-690-g395727bdf/bio/BiGR/copy"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -114,7 +114,7 @@ Code
 
 
     # Prepare logging
-    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True, append=True)
     extra_cp = snakemake.params.get("extra", "-v")
     extra_iget = snakemake.params.get("extra_irods", "-vK")
 
@@ -151,7 +151,7 @@ Code
 
 
     def copy(src: str, dest: str) -> None:
-        if src.startswith("/iRODS"):
+        if src.startswith("/odin/kdi/dataset/"):
             iRODS_copy(src, dest)
         else:
             bash_copy(src, dest)
@@ -180,7 +180,7 @@ Code
     if len(destinations := snakemake.output) == 1:
         # Then there is only one directory as a destination
         destination = op.realpath(str(destinations))
-        shell(f"mkdir --parents --verbose {op.dirname(destination)}")
+        shell(f"mkdir --parents --verbose {op.dirname(destination)} {log}")
         if isinstance(sources, str):
             copy_or_concat(sources, destination)
         else:
@@ -189,6 +189,7 @@ Code
     elif len(sources) == len(destinations):
         # Then there muse be as many paths as source
         for source, destination in zip(sources, destinations):
+            shell(f"mkdir --parents --verbose {op.dirname(destination)} {log}")
             copy_or_concat(source, destination)
     else:
         print(len(sources), len(destinations), sources, destinations)

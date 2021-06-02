@@ -3,7 +3,7 @@
 ADAPTERREMOVAL
 ==============
 
-rapid adapter trimming, identification, and read merging. For more information see `AdapterRemoval documentation <https://adapterremoval.readthedocs.io/en/latest/>`_.
+rapid adapter trimming, identification, and read merging.
 
 
 Example
@@ -18,31 +18,30 @@ This wrapper can be used in the following way:
         input:
             sample=["reads/se/{sample}.fastq"]
         output:
-            fq="trimmed/se/{sample}.fastq.gz",
-            discarded="trimmed/se/{sample}.discarded.fastq.gz",
-            settings="stats/se/{sample}.settings"
+            fq="trimmed/se/{sample}.fastq.gz",                               # trimmed reads
+            discarded="trimmed/se/{sample}.discarded.fastq.gz",              # reads that did not pass filters
+            settings="stats/se/{sample}.settings"                            # parameters as well as overall statistics
         log:
             "logs/adapterremoval/se/{sample}.log"
         params:
             adapters="--adapter1 ACGGCTAGCTA",
             extra="",
-            merge_singletons=True,  # Irrelevant for SE; just for testing purposes
         threads: 1
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/adapterremoval"
+            "0.74.0-690-g395727bdf/bio/adapterremoval"
 
 
     rule adapterremoval_pe:
         input:
             sample=["reads/pe/{sample}.1.fastq", "reads/pe/{sample}.2.fastq"]
         output:
-            fq1="trimmed/pe/{sample}_R1.fastq.gz",
-            fq2="trimmed/pe/{sample}_R2.fastq.gz",
-            collapsed="trimmed/pe/{sample}.collapsed.fastq.gz",
-            collapsed_trunc="trimmed/pe/{sample}.collapsed_trunc.fastq.gz",
-            singleton="trimmed/pe/{sample}.singleton.fastq.gz",
-            discarded="trimmed/pe/{sample}.discarded.fastq.gz",
-            settings="stats/pe/{sample}.settings"
+            fq1="trimmed/pe/{sample}_R1.fastq.gz",                           # trimmed mate1 reads
+            fq2="trimmed/pe/{sample}_R2.fastq.gz",                           # trimmed mate2 reads
+            collapsed="trimmed/pe/{sample}.collapsed.fastq.gz",              # overlapping mate-pairs which have been merged into a single read
+            collapsed_trunc="trimmed/pe/{sample}.collapsed_trunc.fastq.gz",  # collapsed reads that were quality trimmed
+            singleton="trimmed/pe/{sample}.singleton.fastq.gz",              # mate-pairs for which the mate has been discarded
+            discarded="trimmed/pe/{sample}.discarded.fastq.gz",              # reads that did not pass filters
+            settings="stats/pe/{sample}.settings"                            # parameters as well as overall statistics
         log:
             "logs/adapterremoval/pe/{sample}.log"
         params:
@@ -50,27 +49,7 @@ This wrapper can be used in the following way:
             extra="--collapse --collapse-deterministic",
         threads: 2
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/adapterremoval"
-
-
-    rule adapterremoval_pe_collapse_single:
-        input:
-            sample=["reads/pe/{sample}.1.fastq", "reads/pe/{sample}.2.fastq"]
-        output:
-            fq1="trimmed/pe_collapse/{sample}_R1.fastq.gz",
-            fq2="trimmed/pe_collapse/{sample}_R2.fastq.gz",
-            singleton="trimmed/pe_collapse/{sample}.fastq.gz",
-            discarded="trimmed/pe_collapse/{sample}.discarded.fastq.gz",
-            settings="stats/pe_collapse/{sample}.settings"
-        log:
-            "logs/adapterremoval/pe_collapse/{sample}.log"
-        params:
-            adapters="--adapter1 ACGGCTAGCTA --adapter2 AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC",
-            extra="--collapse --collapse-deterministic",
-            merge_singletons=True,
-        threads: 2
-        wrapper:
-            "0.72.0-654-g6a19d0684/bio/adapterremoval"
+            "0.74.0-690-g395727bdf/bio/adapterremoval"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -84,23 +63,23 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``adapterremoval==2.3.1``
+* ``adapterremoval=2.3``
 
 Input/Output
 ------------
 **Input:**
 
 * raw fastq file with R1 reads
-* raw fastq file with R2 reads
+* raw fastq file with R2 reads (PE only)
 
 **Output:**
 
 * trimmed fastq file with R1 reads
-* trimmed fastq file with R2 reads
-* fastq file with singleton reads (those where mate was filtered out)
-* fastq file with collapsed reads (only for PE and if collapsing of reads is enabled)
-* fastq file with collapsed truncated reads, i.e. that were trimmed due the presence of low-quality or ambiguous nucleotides (only for PE and if collapsing of reads is enabled)
-* fastq file with discarded reads
+* trimmed fastq file with R2 reads (PE only)
+* fastq file with singleton reads (PE only; PE reads for which the mate has been discarded)
+* fastq file with collapsed reads (PE only; overlapping mate-pairs which have been merged into a single read)
+* fastq file with collapsed truncated reads (PE only; collapsed reads that were quality trimmed)
+* fastq file with discarded reads (reads that did not pass filters)
 * settings and stats file
 
 
@@ -108,7 +87,7 @@ Input/Output
 Notes
 -----
 
-* If `merge_singletons` is set (only for PE and if collapsing of reads is enabled), then `collapsed` and `collapsed truncated` files are not created and reads are appended to the `singleton` file.
+* For more information see, https://adapterremoval.readthedocs.io/en/latest/
 
 
 
@@ -129,14 +108,10 @@ Code
 
     from snakemake.shell import shell
     from pathlib import Path
-    import tempfile
+    import re
 
     extra = snakemake.params.get("extra", "") + " "
     adapters = snakemake.params.get("adapters", "")
-    collapse_pe = (
-        True if "--collapse " in extra or "--collapse-deterministic " in extra else False
-    )
-    merge_singletons = snakemake.params.get("merge_singletons", False)
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 
@@ -184,17 +159,28 @@ Code
     else:
         trimmed = f"--output1 {snakemake.output.fq1} --output2 {snakemake.output.fq2}"
 
+        # Output singleton files
+        singleton = snakemake.output.get("singleton", None)
+        if singleton:
+            trimmed += f" --singleton {singleton}"
 
-    # Collapsed reads output
-    if n == 2:
-        trimmed += f" --singleton {snakemake.output.singleton}"
-        if collapse_pe:
-            if merge_singletons:
-                out_collapsed = tempfile.NamedTemporaryFile()
-                out_collapsed_trunc = tempfile.NamedTemporaryFile()
-                trimmed += f" --outputcollapsed {out_collapsed.name} --outputcollapsedtruncated {out_collapsed_trunc.name}"
-            else:
-                trimmed += f" --outputcollapsed {snakemake.output.collapsed} --outputcollapsedtruncated {snakemake.output.collapsed_trunc}"
+        # Output collapsed PE reads
+        collapsed = snakemake.output.get("collapsed", None)
+        if collapsed:
+            if not re.search(r"--collapse\b", extra):
+                raise ValueError(
+                    "output.collapsed specified but '--collapse' option missing from params.extra"
+                )
+            trimmed += f" --outputcollapsed {collapsed}"
+
+        # Output collapsed and truncated PE reads
+        collapsed_trunc = snakemake.output.get("collapsed_trunc", None)
+        if collapsed_trunc:
+            if not re.search(r"--collapse\b", extra):
+                raise ValueError(
+                    "output.collapsed_trunc specified but '--collapse' option missing from params.extra"
+                )
+            trimmed += f" --outputcollapsedtruncated {collapsed_trunc}"
 
 
     shell(
@@ -208,10 +194,3 @@ Code
         "--settings {snakemake.output.settings}"
         ") {log}"
     )
-
-
-    if collapse_pe and merge_singletons:
-        shell("cat {out_collapsed.name} >> {snakemake.output.singleton}")
-        out_collapsed.close()
-        shell("cat {out_collapsed_trunc.name} >> {snakemake.output.singleton}")
-        out_collapsed_trunc.close()

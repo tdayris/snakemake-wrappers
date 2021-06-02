@@ -23,7 +23,7 @@ This wrapper can be used in the following way:
             "-E" # optional params string
         threads: 2
         wrapper:
-            "0.72.0-654-g6a19d0684/bio/samtools/calmd"
+            "0.74.0-690-g395727bdf/bio/samtools/calmd"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -61,9 +61,11 @@ Code
     from os import path
     from snakemake.shell import shell
 
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
     out_name, out_ext = path.splitext(snakemake.output[0])
     out_ext = out_ext[1:].upper()
 
     shell(
-        "samtools calmd --threads {snakemake.threads} {snakemake.params} --output-fmt {out_ext} {snakemake.input.aln} {snakemake.input.ref} > {snakemake.output[0]}"
+        "samtools calmd --threads {snakemake.threads} {snakemake.params} --output-fmt {out_ext} {snakemake.input.aln} {snakemake.input.ref} > {snakemake.output[0]} {log}"
     )
