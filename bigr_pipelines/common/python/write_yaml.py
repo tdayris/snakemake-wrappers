@@ -20,7 +20,8 @@ def write_yaml(output_yaml: Union[str, Path], data: dict[str, Any]) -> None:
     """
     Save given dictionnary as Yaml-formatted text file
     """
-    if isinstance(str, output_yaml):
+    print(data)
+    if isinstance(output_yaml, str):
         write_yaml_from_str(output_yaml, data)
     else:
         write_yaml_from_path(output_yaml, data)
@@ -46,6 +47,10 @@ def write_yaml_from_path(output_yaml: Path, data: dict[str, Any]) -> None:
 
 def read_yaml(yaml_path: Union[str, Path]) -> dict[str, Any]:
     res = {}
-    if Path(yaml_path).exists:
-        res = yaml.load(yaml_path)
+    if isinstance(yaml_path, str):
+        yaml_path = Path(yaml_path)
+
+    if yaml_path.exists():
+        with yaml_path.open("r") as yaml_stream:
+            res = yaml.safe_load(yaml_stream)
     return res
