@@ -16,7 +16,7 @@ from pathlib import Path
 from os.path import commonprefix, basename
 from typing import Any, Callable, Optional, Union
 
-from write_yaml import write_yaml_from_path
+from write_yaml import *
 
 FilePathType = Union[str, Path]
 
@@ -70,7 +70,7 @@ def search_files(dirpath: FilePathType, ext: Optional[str] = None) -> list[str]:
 
 
 def search_vcf_files(dirpath: FilePathType) -> dict[str, str]:
-    suffixes = ["vcf", "vcf.gz", "bcf"]
+    suffixes = ("vcf", "vcf.gz", "bcf")
     return {
         remove_suffixes(basename(vcf), suffixes): vcf
         for vcf in search_files(dirpath, ext=suffixes)
@@ -82,23 +82,24 @@ def search_vcf(dirpath: FilePathType) -> dict[str, str]:
 
 
 def search_fastq_files(dirpath: FilePathType) -> dict[str, str]:
-    suffixes = ["fastq", "fq", "fastq.gz", "fq.gz"]
+    suffixes = (".fastq", ".fq", ".fastq.gz", ".fq.gz")
     return {
         remove_suffixes(basename(fastq), suffixes): fastq
-        for fastq in search_files(dirpath, ext=suffixes)
+        for fastq in sorted(search_files(dirpath, ext=suffixes))
     }
 
 
 def search_fastq_pairs(dirpath: FilePathType) -> dict[str, dict[str, str]]:
+    suffixes = (".fastq", ".fq", ".fastq.gz", ".fq.gz")
     return {
-        commonprefix([Path(r1).name, Path(r2).name]): {
+        remove_suffixes(basename(r1), suffixes): {
             "Upstream_file": r1, "Downstream_file": r2
-        } for r1, r2 in zip(*[iter(search_fastq_files(dirpath))]*2)
+        } for r1, r2 in zip(*[iter(sorted(search_fastq_files(dirpath).values()))]*2)
     }
 
 
 def search_mapping(dirpath: FilePathType) -> dict[str, str]:
-    suffixes = ["sam", "bam", "cram"]
+    suffixes = ("sam", "bam", "cram")
     return {
         remove_suffixes(basename(mapping), suffixes): mapping
         for mapping in search_files(dirpath, ext=suffixes)
@@ -123,9 +124,9 @@ def read_design(design_path: FilePathType) -> pandas.DataFrame:
 
 def build_design(
         dirpath: FilePathType,
-        search_fn: Callable[FilePathType, dict[str, dict[str, str]]]) \
+        search_func: Callable[FilePathType, dict[str, dict[str, str]]]) \
         -> pandas.DataFrame:
-    design = (pandas.DataFrame.from_dict(search_fn(dirpath), orient="index")
+    design = (pandas.DataFrame.from_dict(search_func(dirpath), orient="index")
                               .reset_index()
                               .rename(columns={"index": "Sample_id"}))
     design["Sample_id"] = [x.strip(".") for x in design["Sample_id"]]
@@ -135,7 +136,7 @@ def build_design(
 
 def get_design(
         dirpath: FilePathType,
-        search_fn: Callable[FilePathType, dict[str, dict[str, str]]]) \
+        search_func: Callable[FilePathType, dict[str, dict[str, str]]]) \
         -> pandas.DataFrame:
     design = None
     if (design_path := Path("design.tsv")).exists():
@@ -143,7 +144,7 @@ def get_design(
         design = read_design(design_path)
     else:
         logging.info("Design file not found, looking for avilable input files")
-        design = build_design(dirpath, search_fn)
+        design = build_design(dirpath, search_func)
     return design
 
 
@@ -154,13 +155,16 @@ def get_config(default_config: dict[str, Any]) -> str:
         logging.info(
             "Generic config file not found, falling back to default arguments"
         )
-        write_yaml_from_path(config_path, default_config)
+        if isinstance(default_config, str):
+            write_yaml(output_yaml=config_path, data=read_yaml(default_config))
+        else:
+            write_yaml(output_yaml=config_path, data=default_config)
     return str(config_path.absolute())
 
 
 def design_config(
         default_config: dict[str, Any],
         dirpath: FilePathType,
-        search_fn: Callable[FilePathType, dict[str, dict[str, str]]]) \
+        search_func: Callable[FilePathType, dict[str, dict[str, str]]]) \
         -> list[Union[pandas.DataFrame, str]]:
-    return [get_design(dirpath, search_fn), get_config(default_config)]
+    return [get_design(dirpath, search_func), get_config(default_config)]
