@@ -89,6 +89,18 @@ def search_fastq_files(dirpath: FilePathType) -> dict[str, str]:
     }
 
 
+def search_fastq_somatic(dirpath: FilePathType) -> dict[str, str]:
+    suffixes = ["fastq", "fq", "fastq.gz", "fq.gz"]
+    return {
+        remove_suffixes(basename(t1), suffixes): {
+            "Tumor_upstream_file": t1,
+            "Tumor_downstream_file": t2,
+            "Normal_upstream_file": n1,
+            "Normal_downstream_file": n2
+        } for n1, n2, t1, t2 in zip(*[iter(search_fastq_files(dirpath))]*4)
+    }
+
+
 def search_fastq_pairs(dirpath: FilePathType) -> dict[str, dict[str, str]]:
     return {
         commonprefix([Path(r1).name, Path(r2).name]): {
