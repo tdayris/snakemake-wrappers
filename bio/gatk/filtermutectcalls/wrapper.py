@@ -23,6 +23,19 @@ if "contamination" in snakemake.input.keys():
         snakemake.input["contamination"]
     )
 
+
+segmentation = ""
+if "segmentation" in snakemake.input.keys():
+    segmentation = "--tumor-segmentation {}".format(
+        snakemake.input["segmentation"]
+    )
+
+
+stats = ""
+if "stats" in snakemake.output.keys():
+    stats = "--stats {}".format(snakemake.output["stats"])
+
+
 f1r2 = ""
 if "f1r2" in snakemake.input.keys():
     f1r2 = "--orientation-bias-artifact-priors {}".format(
@@ -32,7 +45,7 @@ if "f1r2" in snakemake.input.keys():
 shell(
     "gatk --java-options '{java_opts}' FilterMutectCalls "
     "-R {snakemake.input.ref} -V {snakemake.input.vcf} "
-    "{extra} {contamination} {f1r2} {bam} "
+    "{extra} {contamination} {f1r2} {segmentation} {stats} {bam} "
     "-O {snakemake.output.vcf} "
     "{log}"
 )

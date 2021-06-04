@@ -34,11 +34,16 @@ f1r2 = ""
 if "f1r2" in snakemake.output.keys():
     f1r2 = "--f1r2-tar-gz {}".format(snakemake.output["f1r2"])
 
+tumor = ""
+if "tumor" in snakemake.input.keys():
+    tumor = "--input {}".format(snakemake.input["tumor"])
+
 extra = snakemake.params.get("extra", "")
 java_opts = get_java_opts(snakemake)
 
 shell(
     "gatk --java-options '{java_opts}' Mutect2 "  # Tool and its subprocess
+    " {tumor} "  # Path to tumor input file
     "--input {snakemake.input.map} "  # Path to input mapping file
     "{bam_output} "  # Path to output bam file, optional
     "{f1r2} "  # Path to output f1r2 count file
