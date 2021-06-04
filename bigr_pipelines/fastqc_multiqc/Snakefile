@@ -3,67 +3,22 @@ import sys
 sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python")
 
 from file_manager import *
-from files_linker import link_fq
+from files_linker import *
 from write_yaml import *
 from pathlib import Path
 
 from snakemake.utils import min_version
 min_version("6.0")
 
-# default_config_fastqc_multiqc = {
-#     "design": "design.tsv",
-#     "fastq_screen": {
-#         "database": {
-#             "Contaminants": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Adapters"
-#             },
-#             "Arabidopsis_thaliana.TAIR10": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Arabidopsis"
-#             },
-#             "BDGP6": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Drosophila"
-#             },
-#             "Ecoli": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/E_coli"
-#             },
-#             "Homo_sapiens.GRCh38": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Human"
-#             },
-#             "Lambda": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Lambda"
-#             },
-#             "mitochondria": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Mitochondria"
-#             },
-#             "Mus_musculus.GRCm38": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Mouse"
-#             },
-#             "phi_plus_SNPs": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/PhiX"
-#             },
-#             "Rnor_6.0": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Rat"
-#             },
-#             "GRCm38_rRNA": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/rRNA"
-#             },
-#             "Vectors": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Vectors"
-#             },
-#             "Worm": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Worm"
-#             },
-#             "Yeast": {
-#                 "bowtie2": "/mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Yeast"
-#             }
-#         },
-#         'aligner_paths': {'bowtie2': 'bowtie2'}
-#     }
-# }
-
 default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/config.yaml")
-config_path = get_config()
+config_path = get_config(default_config)
 design = get_design(os.getcwd(), search_fastq_pairs)
+
+fastq_links = link_fq(
+    design.Sample_id,
+    design.Upstream_file,
+    design.Downstream_file
+)
 
 configfile: config_path
 container: "docker://continuumio/miniconda3:4.4.10"
@@ -76,23 +31,27 @@ container: "docker://continuumio/miniconda3:4.4.10"
 rule multiqc:
     input:
         fqc_zip=expand(
-            "fastqc/{sample}_fastqc.zip",
-            sample=design["Sample_id"]
+            "fastqc/{sample}_{stream}_fastqc.zip",
+            sample=design["Sample_id"],
+            stream=["1", "2"]
         ),
         fqc_html=expand(
-            "fastqc/{sample}.html",
-            sample=design["Sample_id"]
+            "fastqc/{sample}.{stream}.html",
+            sample=design["Sample_id"],
+            stream=["1", "2"]
         ),
         txt=expand(
-            "fastq_screen/{sample}.fastq_screen.txt",
-            sample=design["Sample_id"]
+            "fastq_screen/{sample}.{stream}.fastq_screen.txt",
+            sample=design["Sample_id"],
+            stream=["1", "2"]
         ),
         png=expand(
-            "fastq_screen/{sample}.fastq_screen.png",
-            sample=design["Sample_id"]
+            "fastq_screen/{sample}.{stream}.fastq_screen.png",
+            sample=design["Sample_id"],
+            stream=["1", "2"]
         ),
     output:
-        "multiqc.html"
+        "multiqc/multiqc.html"
     message:
         "Gathering all quality reports"
     threads: 1
@@ -113,12 +72,12 @@ rule multiqc:
 
 rule fastqc:
     input:
-        "reads/{sample}.fq.gz"
+        "reads/{sample}.{stream}.fq.gz"
     output:
-        html="fastqc/{sample}.html",
-        zip="fastqc/{sample}_fastqc.zip"
+        html="fastqc/{sample}.{stream}.html",
+        zip="fastqc/{sample}_{stream}_fastqc.zip"
     message:
-        "Assessing quality of {wildcards.sample}, "
+        "Assessing quality of {wildcards.sample}, ({wildcards.stream})"
     threads: 1
     resources:
         mem_mb=lambda wildcard, attempt: min(attempt * 1024, 4096),
@@ -126,29 +85,29 @@ rule fastqc:
     params:
         ""
     log:
-        "logs/fastqc/{sample}.log"
+        "logs/fastqc/{sample}.{stream}.log"
     wrapper:
         "/bio/fastqc"
 
 
 rule fastq_screen:
     input:
-        "reads/{sample}.fq.gz"
+        "reads/{sample}.{stream}.fq.gz"
     output:
-        txt="fastq_screen/{sample}.fastq_screen.txt",
-        png="fastq_screen/{sample}.fastq_screen.png"
+        txt="fastq_screen/{sample}.{stream}.fastq_screen.txt",
+        png="fastq_screen/{sample}.{stream}.fastq_screen.png"
     message:
-        "Assessing quality of {wildcards.sample}"
+        "Assessing quality of {wildcards.sample}, stream {wildcards.stream}"
     threads: config.get("threads", 20)
     resources:
         mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
         time_min=lambda wildcard, attempt: attempt * 50
     params:
-        fastq_screen_config="fastq_screen.conf",
+        fastq_screen_config=config["fastq_screen"],
         subset=100000,
         aligner='bowtie2'
     log:
-        "logs/fastqc/{sample}.log"
+        "logs/fastq_screen/{sample}.{stream}.log"
     wrapper:
         "/bio/fastq_screen"
 
@@ -167,8 +126,8 @@ rule bigr_copy:
         mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
         time_min=lambda wildcard, attempt: attempt * 45
     params:
-        input=lambda wildcards, output: fastq_links[output]
+        input=lambda wildcards, output: fastq_links[output[0]]
     log:
         "logs/bigr_copy/{sample}.log"
     wrapper:
-        "/bio/bigr/copy"
+        "/bio/BiGR/copy"

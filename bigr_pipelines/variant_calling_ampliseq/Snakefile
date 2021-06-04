@@ -13,6 +13,11 @@ from messages import CustomFormatter
 from snakemake.utils import min_version
 min_version("6.0")
 
+logging.basicConfig(
+    filename="snakemake.log",
+    filemode="w",
+    level=logging.DEBUG
+)
 
 container: "docker://continuumio/miniconda3:4.4.10"
 localrules: bigr_copy
@@ -38,10 +43,10 @@ fastq_links = link_fq(
 rule all:
     input:
         calls=expand(
-            #"snpsift/cosmic/{sample}.vcf.gz{index}",
-            "mutect2/filter/{sample}.vcf.gz",
+            "snpsift/cosmic/{sample}.vcf.gz{index}",
+            #"mutect2/filter/{sample}.vcf.gz",
             sample=design["Sample_id"].tolist()[0],
-            #index=["", ".tbi"]
+            index=["", ".tbi"]
         ),
         #html="multiqc/SnpEff_annotation.html"
     message:
@@ -183,6 +188,38 @@ module metacaller_germline_meta:
 
 use rule * from metacaller_germline_meta as *
 
+
+############################################################################
+### Correcting Mutect2 :                                                 ###
+### AS_FilterStatus: Number=1 and not Number=A which violates VCF format ###
+### AD becomes ADM: AD is reserved for Allele Depth, Mutect2 stores      ###
+###                 multiple information under "AD" field.               ###
+############################################################################
+
+rule correct_mutect2_vcf:
+    input:
+        "mutect2/filter_reheaded/{sample}.vcf.gz"
+    output:
+        temp("mutect2/corrected/{sample}.vcf")
+    message:
+        "Renaming reserved AD field and fixing AS_FilterStrand format error"
+        " on {wildcards.sample}"
+    threads: 3
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 256,
+        time_min=lambda wildcards, attempt: attempt * 20
+    log:
+        "logs/mutect2/correct_fields/{sample}.log"
+    params:
+        rename_ad="'s/=AD;/=ADM;/g'",
+        rename_ad_format="'s/:AD:/:ADM:/g'",
+        fix_as_filterstatus="'s/ID=AS_FilterStatus,Number=A/ID=AS_FilterStatus,Number=1/g'"
+    shell:
+        "(gunzip -c {input} | "
+        "sed {params.rename_ad} | "
+        "sed {params.rename_ad_format} | "
+        "sed {params.fix_as_filterstatus}) "
+        "> {output} 2> {log}"
 
 ###############################
 ### Variant calling Mutect2 ###

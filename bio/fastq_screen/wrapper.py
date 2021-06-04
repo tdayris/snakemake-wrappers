@@ -13,7 +13,7 @@ _config = snakemake.params["fastq_screen_config"]
 subset = snakemake.params.get("subset", 100000)
 aligner = snakemake.params.get("aligner", "bowtie2")
 extra = snakemake.params.get("extra", "")
-log = snakemake.log_fmt_shell()
+log = snakemake.log_fmt_shell(append=True)
 
 # snakemake.params.fastq_screen_config can be either a dict or a string. If
 # string, interpret as a filename pointing to the fastq_screen config file.
@@ -31,6 +31,8 @@ if isinstance(_config, dict):
     config_file = tmp
 else:
     config_file = _config
+    
+shell("cat {config_file} {log} 2>&1")
 
 # fastq_screen hard-codes filenames according to this prefix. We will send
 # hard-coded output to a temp dir, and then move them later.
