@@ -13,4 +13,4 @@ message INFO "Environment loaded"
 
 # Run pipeline
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
-snakemake -s "${PIPELINE_PATH}/test/Snakefile" --profile "${SNAKEMAKE_PROFILE_PATH}" --cache eacon_install eacon_databases && message INFO "EaCoN successful" || error_handling "${LINENO}" 2 "Error while running Oncoscan pipeline"
+snakemake -s "${PIPELINE_PATH}/test/Snakefile" --profile "${SNAKEMAKE_PROFILE_PATH}" --cache eacon_install post_process_eacon_databases eacon_databases && message INFO "EaCoN successful" || error_handling "${LINENO}" 2 "Error while running Oncoscan pipeline"
