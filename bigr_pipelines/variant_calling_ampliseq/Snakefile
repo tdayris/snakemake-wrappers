@@ -65,6 +65,12 @@ rule multiqc:
         picard=expand(
             "picard/alignment_summary/{sample}.summary.txt",
             sample=design["Sample_id"]
+        ),
+        fastq_screen=expand(
+            "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+            sample=design["Sample_id"],
+            stream=["1", "2"],
+            ext=["txt", "png"]
         )
     output:
         report(
@@ -107,6 +113,29 @@ rule alignment_summary:
         "METRIC_ACCUMULATION_LEVEL=SAMPLE"
     wrapper:
         "/bio/picard/collectalignmentsummarymetrics"
+
+
+rule fastq_screen:
+    input:
+        "reads/{sample}.{stream}.fq.gz",
+        "fastq_screen.conf"
+    output:
+        txt=temp("fastq_screen/{sample}.{stream}.fastq_screen.txt"),
+        png=temp("fastq_screen/{sample}.{stream}.fastq_screen.png")
+    message:
+        "Assessing quality of {wildcards.sample}, {wildcards.stream}"
+    threads: config.get("threads", 20)
+    resources:
+        mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
+        time_min=lambda wildcard, attempt: attempt * 50
+    params:
+        fastq_screen_config=config["fastq_screen"],
+        subset=100000,
+        aligner='bowtie2'
+    log:
+        "logs/fastqc/{sample}.{stream}.log"
+    wrapper:
+        "/bio/fastq_screen"
 
 
 #################################
