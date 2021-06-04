@@ -31,3 +31,50 @@ def link_fq(
         link_dict[f"reads/{sample}.1.fq.gz"] = r1
         link_dict[f"reads/{sample}.2.fq.gz"] = r2
     return link_dict
+
+
+def link_fq_somatic(
+        sample_names: list[str],
+        n1_paths: list[str],
+        t1_path: list[str],
+        n2_paths: Optional[list[str]] = None,
+        t2_path: Optional[list[str]] = None
+    ) -> dict[str, dict[str, str]]:
+    """
+    Case r2 are provided:
+    Build a dictionnary containing the following pairs:
+    normal:
+        original_r1_name: reads/normal/{sample}.1.fq.gz
+        original_r2_name: reads/normal/{sample}.2.fq.gz
+    tumor:
+        original_r1_name: reads/tumor/{sample}.1.fq.gz
+        original_r2_name: reads/tumor/{sample}.2.fq.gz
+
+    Otherwise:
+    Build a dictionnary containing the following fastq:
+    tumor:
+        original_name: reads/tumor/{sample}.fq.gz
+    normal:
+        original_name: reads/normal/{sample}.fq.gz
+    """
+    link_dict = {
+        "normal": {},
+        "tumor": {}
+    }
+    if n2 is None:
+        for sample, n1 in zip(sample_names, n1_paths):
+            link_dict["normal"][f"reads/normal/{sample}.fq.gz"] = n1
+    else:
+        for sample, n1, n2 in zip(sample_names, n1_paths, n2_paths):
+            link_dict["normal"][f"reads/normal/{sample}.1.fq.gz"] = n1
+            link_dict["normal"][f"reads/normal/{sample}.2.fq.gz"] = n2
+
+    if t2 is None:
+        for sample, t1 in zip(sample_names, t1_paths):
+            result["tumor"][f"reads/tumor/{sample}.fq.gz"] = t1
+    else:
+        for sample, t1, t2 in zip(sample_names, t1_paths, t2_paths):
+            link_dict["tumor"][f"reads/tumor/{sample}.1.fq.gz"] = t1
+            link_dict["tumor"][f"reads/tumor/{sample}.2.fq.gz"] = t2
+
+    return link_dict
