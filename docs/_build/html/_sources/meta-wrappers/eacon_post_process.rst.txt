@@ -126,10 +126,19 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     rule eacon_databases:
         output:
-            databases = directory("databases"),
-            grd = "grd"
+            databases = directory("databases")
         log:
             "logs/EaCoN/databases.log"
+        cache: True
+        wrapper:
+            "/bio/eacon/databases"
+
+
+    rule eacon_grd:
+        output:
+            grd = "grd"
+        log:
+            "logs/EaCoN/grd.log"
         cache: True
         wrapper:
             "/bio/eacon/databases"

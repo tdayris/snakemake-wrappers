@@ -23,11 +23,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             calls=[
                 "varscan2/mpileup2cns_reheaded/{sample}.vcf.gz",
-                "mutect2/filter_reheaded/{sample}.vcf.gz"
+                "mutect2/corrected/{sample}.vcf.gz"
             ],
             calls_index=[
                 get_tbi("varscan2/mpileup2cns_reheaded/{sample}.vcf.gz"),
-                get_tbi("mutect2/filter_reheaded/{sample}.vcf.gz")
+                get_tbi("mutect2/corrected/{sample}.vcf.gz")
             ],
             regions=config["bed"]
         output:

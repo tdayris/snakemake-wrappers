@@ -50,7 +50,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             "samtools/fixmate/{sample}.bam"
         output:
-            temp("samtools/sort/{sample}.bam")
+            temp("samtools/sort/{sample}.bam"),
+            tmp_dir = temp(directory("samtools/fixmate/{sample}.tmp"))
         message:
             "Sorting {wildcards.sample} reads by query name for fixing mates"
         threads: config.get("threads", 20)
@@ -60,7 +61,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/query_sort_{sample}.log"
         params:
-            extra = "-m 1536M"
+            extra = "-m 1536M",
+            tmp_dir = "samtools/fixmate/{sample}.tmp"
         wrapper:
             "/bio/samtools/sort"
 

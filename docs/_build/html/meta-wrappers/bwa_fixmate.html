@@ -247,7 +247,8 @@
     <span class="nb">input</span><span class="p">:</span>
         <span class="s2">&quot;samtools/fixmate/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">)</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">),</span>
+        <span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;samtools/fixmate/</span><span class="si">{sample}</span><span class="s2">.tmp&quot;</span><span class="p">))</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Sorting </span><span class="si">{wildcards.sample}</span><span class="s2"> reads by query name for fixing mates&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
@@ -257,7 +258,8 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/samtools/query_sort_</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;-m 1536M&quot;</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;-m 1536M&quot;</span><span class="p">,</span>
+        <span class="n">tmp_dir</span> <span class="o">=</span> <span class="s2">&quot;samtools/fixmate/</span><span class="si">{sample}</span><span class="s2">.tmp&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;/bio/samtools/sort&quot;</span>
 
