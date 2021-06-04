@@ -9,6 +9,12 @@
 # transformed data counts object, and an organism
 # name, then returns a limma quick pca 2 gene onthology
 
+# Sink the stderr and stdout to the snakemake log file
+# https://stackoverflow.com/a/48173272
+log.file<-file(snakemake@log[[1]],open="wt");
+base::sink(log.file);
+base::sink(log.file,type="message");
+
 base::library(package = "DESeq2");        # Differential Gene expression
 base::library(package = "pcaExplorer");   # Handles PCA
 base::library(package = "DelayedArray");  # Handle in-memory array-like datasets
@@ -74,3 +80,9 @@ base::saveRDS(
 base::message(
   "Process over"
 );
+
+
+# Proper syntax to close the connection for the log file
+# but could be optional for Snakemake wrapper
+base::sink(type="message");
+base::sink();

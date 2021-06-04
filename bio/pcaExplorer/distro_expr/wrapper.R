@@ -8,6 +8,12 @@
 # This script takes a deseq2 transform object and performs
 # plot over expression distribution
 
+# Sink the stderr and stdout to the snakemake log file
+# https://stackoverflow.com/a/48173272
+log.file<-file(snakemake@log[[1]],open="wt");
+base::sink(log.file);
+base::sink(log.file,type="message");
+
 
 base::library(package = "DESeq2");        # Differential analysis
 base::library(package = "pcaExplorer");   # Handles PCAs
@@ -35,10 +41,19 @@ if ("extra" %in% names(snakemake@params)) {
 }
 
 # Build plot
+w <- 1024;
+if ("w" %in% base::names(snakemake@params)) {
+  w <- base::as.numeric(snakemake@params[["w"]]);
+}
+h <- 768;
+if ("h" %in% base::names(snakemake@params)) {
+  h <- base::as.numeric(snakemake@params[["h"]]);
+}
+
 png(
   filename = snakemake@output[["png"]],
-  width = 1024,
-  height = 768,
+  width = w,
+  height = h,
   units = "px",
   type = "cairo"
 );
@@ -57,4 +72,10 @@ base::eval(
   )
 );
 
-dev.off()
+dev.off();
+
+
+# Proper syntax to close the connection for the log file
+# but could be optional for Snakemake wrapper
+base::sink(type="message");
+base::sink();
