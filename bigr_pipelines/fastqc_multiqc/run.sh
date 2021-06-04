@@ -24,4 +24,4 @@ message INFO "${SNAKEMAKE_PROFILE_PATH}"
 
 # Run pipeline
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
-snakemake -s "${SNAKEFILE_PATH}" --cache eacon_install eacon_databases --profile "${SNAKEMAKE_PROFILE_PATH}" && message INFO "FastQC/MultiQC pipeline successful" || error_handling "${LINENO}" 2 "Error while running pipeline, see snakemake logging"
+snakemake -s "${SNAKEFILE_PATH}" --profile "${SNAKEMAKE_PROFILE_PATH}"
