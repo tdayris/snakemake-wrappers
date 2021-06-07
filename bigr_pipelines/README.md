@@ -15,3 +15,15 @@ WARNING: You do not have to install anything. You do not need to update anything
 2.  Run pipeline: `bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/run.sh"`
 
 ->Test: `bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/test.sh"`
+
+# Variant Calling Ampliseq (HG19):
+1. Go to your repository with Fastq files: `cd /path/to/fastq/dir`
+2. Run pipeline: `bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/run.sh"`
+
+->Test: `bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/test.sh"`
+
+# Variant Calling Ampliseq (HG38):
+1. Go to your repository with Fastq files: `cd /path/to/fastq/dir`
+2. Run pipeline: `bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/run.sh" hg38`
+
+Warning: Ampliseq capture kits are made based on HG19.
