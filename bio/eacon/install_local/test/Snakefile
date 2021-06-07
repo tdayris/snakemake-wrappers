@@ -1,0 +1,27 @@
+rule test_eacon_install_local:
+    input:
+        r_packages = [
+            "affy.CN.norm.data_0.1.2.tar.gz",
+            "CytoScan750K.Array.na33.r4_0.1.0.tar.gz",
+            "CytoScan750K.Array.na36.r1_0.1.0.tar.gz",
+            "CytoScanHD.Array.na33.r4_0.1.0.tar.gz",
+            "CytoScanHD.Array.na36.r1_0.1.0.tar.gz",
+            "OncoScanCNV.na33.r2_0.1.0.tar.gz",
+            "OncoScanCNV.na36.r1_0.1.0.tar.gz",
+            "OncoScan.na33.r4_0.1.0.tar.gz",
+            "OncoScan.na36.r1_0.1.0.tar.gz",
+            "rcnorm_0.1.5.tar.gz"
+        ],
+        git_packages = [
+            "EaCoN_master.tar.gz",
+            "EaCoN_Chromosomes.tar.gz",
+            "apt.cytoscan.2.4.0.tar.gz",
+            "apt.oncoscan.2.4.0.tar.gz"
+        ]
+    output:
+        temp(touch('install.ok'))
+    cache: True
+    log:
+        "logs/EaCoN/install.log"
+    wrapper:
+        "master/bio/eacon/install_local"
