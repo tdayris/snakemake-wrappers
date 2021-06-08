@@ -141,7 +141,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         cache: True
         threads: 1
         resources:
-            mem_mb=lambda wildcards, attempt: attempt * 6144 + 61440,
+            mem_mb=lambda wildcards, attempt: attempt * 6144 + 66560,
             time_min=lambda wildcards, attempt: attempt * 120
         params:
             prefix="bwa_mem2/index/genome"

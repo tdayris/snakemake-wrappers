@@ -20,13 +20,13 @@ In order to run the pipeline, use the following commands
 
   # Copy/paste the following line for **HG19**
 
-  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/run.sh
 
   # Copy/paste the following line for **HG38**
 
   {'\# WARNING': 'HG38 remains not tested (possible wrong capture kit)'}
 
-  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh hg38
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/run.sh hg38
 
 
 Input/Output
@@ -91,6 +91,8 @@ The following individual wrappers are used in this pipeline:
 * :ref:`bio/multiqc`
 
 * :ref:`bio/picard/collectalignmentsummarymetrics`
+
+* :ref:`bio/fastq_screen`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.

@@ -1,9 +1,9 @@
-.. _`EaCoN Cytoscan`:
+.. _`EaCoN Oncoscan`:
 
-EACON CYTOSCAN
+EACON ONCOSCAN
 ==============
 
-Analyse CNV on CytoScanHD Arrays with EaCoN
+Analyse CNV on OncoScanHD Arrays with EaCoN
 
 
 Example
@@ -171,7 +171,7 @@ The following individual wrappers are used in this meta-wrapper:
 
 * :ref:`master/bio/eacon/install`
 
-* :ref:`master/bio/eacon/cytoscan_process`
+* :ref:`master/bio/eacon/oncoscan_process`
 
 * :ref:`master/bio/eacon/segment`
 

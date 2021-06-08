@@ -110,7 +110,7 @@
 <li class="toctree-l2"><a class="reference internal" href="deseq2_post_process.html">DESEQ2_POST_PROCESS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="download_references.html">DOWNLOAD REFERENCE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eacon_cytoscan.html">EACON CYTOSCAN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="eacon_oncoscan.html">EACON CYTOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eacon_oncoscan.html">EACON ONCOSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eacon_post_process.html">EACON POST PROCESS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fastq_screen_indexer.html">FASTQ_SCREEN_INDEXER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gatk_bqsr.html">GATK_BQSR</a></li>
@@ -236,6 +236,27 @@
 <span class="c1">#            sample=config[&quot;samples&quot;]</span>
 <span class="c1">#        )</span>
 
+
+<span class="n">rule</span> <span class="n">snpsift_dbnsfp</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="s2">&quot;snpsift/gwascat/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+        <span class="n">dbNSFP</span> <span class="o">=</span> <span class="s2">&quot;/path/to/dbNSFP.txt.gz&quot;</span><span class="p">,</span>
+        <span class="n">dbNSFP_tbi</span> <span class="o">=</span> <span class="s2">&quot;/path/to/dbNSFP.txt.gz.tbi&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/dbnsfp/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with dbNSFP&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/snpsift/dbnsfp/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;/bio/snpsift/dbnsfp&quot;</span>
+
+
+
 <span class="n">rule</span> <span class="n">snpsift_gwascat</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">call</span> <span class="o">=</span> <span class="s2">&quot;snpsift/cosmic/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
@@ -360,6 +381,7 @@ For additional parameters in each individual wrapper, please refer to their corr
 <li><p><a class="reference internal" href="../wrappers/snpsift/genesets.html#bio-snpsift-genesets"><span class="std std-ref">SNPSIFT GENES SETS</span></a></p></li>
 <li><p><a class="reference internal" href="../wrappers/snpsift/annotate.html#bio-snpsift-annotate"><span class="std std-ref">SNPSIFT ANNOTATE</span></a></p></li>
 <li><p><a class="reference internal" href="../wrappers/snpsift/gwascat.html#bio-snpsift-gwascat"><span class="std std-ref">SNPSIFT GWAS CATALOG</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/snpsift/dbnsfp.html#bio-snpsift-dbnsfp"><span class="std std-ref">SNPSIFT DBNSFP</span></a></p></li>
 </ul>
 <p>Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.</p>
 </div>
