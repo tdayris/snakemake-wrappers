@@ -24,6 +24,27 @@ except NameError:
 #            sample=config["samples"]
 #        )
 
+
+rule snpsift_dbnsfp:
+    input:
+        call = "snpsift/gwascat/{sample}.vcf",
+        dbNSFP = "/path/to/dbNSFP.txt.gz",
+        dbNSFP_tbi = "/path/to/dbNSFP.txt.gz.tbi"
+    output:
+        call = temp("snpsift/dbnsfp/{sample}.vcf")
+    message:
+        "Annotating {wildcards.sample} with dbNSFP"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+        time_min=lambda wildcards, attempt: attempt * 45
+    log:
+        "logs/snpsift/dbnsfp/{sample}.log"
+    wrapper:
+        "/bio/snpsift/dbnsfp"
+
+
+
 rule snpsift_gwascat:
     input:
         call = "snpsift/cosmic/{sample}.vcf",
