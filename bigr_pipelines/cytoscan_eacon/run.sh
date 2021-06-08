@@ -7,7 +7,7 @@ source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/environment.sh"
 
 # Define pipeline related variables
 declare -x SNAKEMAKE_PROFILE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/clinics"
-declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/meta/bio/eacon_cytoscan"
+declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/cytoscan_eacon/Snakefile"
 export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 message INFO "Environment loaded"
 
