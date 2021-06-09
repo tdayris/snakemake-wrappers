@@ -36,6 +36,38 @@ module salmon_meta:
     config: salmon_config
 
 
+rule multiqc:
+    input:
+        salmon=expand(
+            "salmon/pseudo_mapping/{sample}/quant.sf",
+            sample=design["Sample_id"]
+        ),
+        html=expand(
+            "fastp/html/pe/{sample}.fastp.html",
+            sample=design["Sample_id"]
+        ),
+        json=expand(
+            "fastp/json/pe/{sample}.fastp.json",
+            sample=design["Sample_id"]
+        )
+    output:
+        report(
+            "multiqc/MultiQC.html",
+            caption="../common/reports/multiqc.rst",
+            category="Quality Controls"
+        )
+    message:
+        "Aggregating quality reports from Fastp and Salmon"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
+        time_min=lambda wildcards, attempt: attempt * 35
+    log:
+        "logs/multiqc.log"
+    wrapper:
+        "/bio/multiqc"
+
+
 use rule * from salmon_meta as salmon_meta_*
 
 
