@@ -69,6 +69,19 @@ Notes
 {{ notes }}
 {% endif %}
 
+{% if pipeline_snakefile_path %}
+
+Snakefile
+---------
+
+The pipeline contains the following steps:
+
+.. code-block:: python
+
+{{ pipeline_snakefile_path }}
+
+{% endif %}
+
 
 Authors
 -------

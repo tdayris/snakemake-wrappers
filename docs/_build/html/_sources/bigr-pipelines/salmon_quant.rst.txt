@@ -1,0 +1,248 @@
+.. _`salmon_quant (under development)`:
+
+SALMON_QUANT (UNDER DEVELOPMENT)
+================================
+
+Perform trimming and quantification on RNASeq
+
+Usage
+-----
+
+In order to run the pipeline, use the following commands
+
+.. code-block:: bash 
+
+  # Go to your working directory
+
+  cd /path/to/my/working/directory
+
+  # Build a design file (see below)
+
+  # Copy/paste the following line for **HG19**
+
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
+
+  # Copy/paste the following line for **HG38**
+
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh hg38
+
+
+Input/Output
+------------
+
+
+**Input:**
+
+ 
+  
+* Fastq files
+  
+ 
+
+
+**Output:**
+
+ 
+  
+* Salmon quantification
+  
+ 
+  
+* Quality controls
+  
+ 
+  
+* Trimmed fastq files
+  
+ 
+
+
+
+
+
+
+
+Notes
+-----
+
+Prerequisites:
+
+* A TSV formatted design file, *named 'design.tsv'* with the following columns:
+
+.. list-table:: Desgin file format
+  :widths: 33 33 33
+  :header-rows: 1
+
+  * - Sample_id
+    - Upstream_fastq
+    - Downstream_fastq
+  * - Name of the Sample1
+    - Path to upstream fastq file
+    - Path to downstream fastq file
+  * - Name of the Sample2
+    - Path to upstream fastq file
+    - Path to downstream fastq file
+  * - ...
+    - ...
+    - ...
+
+
+
+
+
+Snakefile
+---------
+
+The pipeline contains the following steps:
+
+.. code-block:: python
+
+    from snakemake.utils import min_version
+    from pathlib import Path
+    from yaml import dump
+    min_version("6.0")
+
+    import sys
+
+    sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
+
+    from file_manager import read_design, search_fastq_pairs
+    from files_linker import link_fq
+    from write_yaml import write_yaml_from_path
+    from message import message
+
+    default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/config.hg38.yaml")
+    configfile: get_config(default_config)
+    design = read_design(os.getcwd(), search_fastq_pairs)
+
+
+    #############################
+    ### Salmon quantification ###
+    #############################
+
+    salmon_config = {
+        "genome": config["ref"]["genome"],
+        "transcriptome": config["ref"]["transcriptome"],
+        "gtf": config["ref"]["gtf"],
+        "salmon_libtype": config["params"]["salmon_libtype"],
+        "salmon_quant_extra": config["params"]["salmon_quant_extra"],
+        "salmon_index_extra": config["params"]["salmon_index_extra"]
+    }
+
+
+    module salmon_meta:
+        snakefile: "../../meta/bio/salmon/test/Snakefile"
+        config: salmon_config
+
+
+    rule multiqc:
+        input:
+            salmon=expand(
+                "salmon/pseudo_mapping/{sample}/quant.sf",
+                sample=design["Sample_id"]
+            ),
+            html=expand(
+                "fastp/html/pe/{sample}.fastp.html",
+                sample=design["Sample_id"]
+            ),
+            json=expand(
+                "fastp/json/pe/{sample}.fastp.json",
+                sample=design["Sample_id"]
+            )
+        output:
+            report(
+                "multiqc/MultiQC.html",
+                caption="../common/reports/multiqc.rst",
+                category="Quality Controls"
+            )
+        message:
+            "Aggregating quality reports from Fastp and Salmon"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
+            time_min=lambda wildcards, attempt: attempt * 35
+        log:
+            "logs/multiqc.log"
+        wrapper:
+            "/bio/multiqc"
+
+
+    use rule * from salmon_meta as salmon_meta_*
+
+
+    use rule salmon_quant_paired from salmon_meta with:
+        output:
+            quant=report(
+                "salmon/pseudo_mapping/{sample}/quant.sf",
+                category="2. Raw Salmon output",
+                caption="../../common/reports/salmon_quant.rst"
+            ),
+            lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
+            mapping=temp("salmon/bams/{sample}.bam")
+
+
+    ############################
+    ### FASTP FASTQ CLEANING ###
+    ############################
+
+    rule fastp_clean:
+        input:
+            sample=expand(
+                "reads/{sample}.{stream}.fq.gz",
+                stream=["1", "2"],
+                allow_missing=True
+            ),
+        output:
+            trimmed=expand(
+                "fastp/trimmed/pe/{sample}.{stream}.fastq",
+                stream=["1", "2"],
+                allow_missing=True
+            ),
+            html="fastp/html/pe/{sample}.fastp.html",
+            json=temp("fastp/json/pe/{sample}.fastp.json")
+        message: "Cleaning {wildcards.sample} with Fastp"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
+            time_min=lambda wildcard, attempt: attempt * 45
+        params:
+            adapters=config["params"].get("fastp_adapters", None),
+            extra=config["params"].get("fastp_extra", "")
+        log:
+            "logs/fastp/{sample}.log"
+        wrapper:
+            "/bio/fastp"
+
+
+    #################################################
+    ### Gather files from iRODS or mounting point ###
+    #################################################
+
+    rule bigr_copy:
+        output:
+            "reads/{sample}.{stream}.fq.gz"
+        message:
+            "Gathering {wildcards.sample} fastq file ({wildcards.stream})"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
+            time_min=lambda wildcard, attempt: attempt * 45
+        params:
+            input=lambda wildcards, output: fastq_links[output[0]]
+        log:
+            "logs/bigr_copy/{sample}.{stream}.log"
+        wrapper:
+            "/bio/BiGR/copy"
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+* M boyba Diop
+
+* Marc Deloger

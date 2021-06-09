@@ -1,7 +1,7 @@
-.. _`FastQC_MultiQC`:
+.. _`FastQC_MultiQC (under development)`:
 
-FASTQC_MULTIQC
-==============
+FASTQC_MULTIQC (UNDER DEVELOPMENT)
+==================================
 
 Simply run FastQC and MultiQC on available Fastq files
 
@@ -90,6 +90,151 @@ This pipeline requires either (1) a two columned design file called 'design.tsv'
       - Path to upstream fastq file
     * - ...
       - ...
+
+
+
+
+
+Snakefile
+---------
+
+The pipeline contains the following steps:
+
+.. code-block:: python
+
+    import sys
+
+    sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python")
+
+    from file_manager import *
+    from files_linker import *
+    from write_yaml import *
+    from pathlib import Path
+
+    from snakemake.utils import min_version
+    min_version("6.0")
+
+    default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/config.yaml")
+    config_path = get_config(default_config)
+    design = get_design(os.getcwd(), search_fastq_pairs)
+
+    fastq_links = link_fq(
+        design.Sample_id,
+        design.Upstream_file,
+        design.Downstream_file
+    )
+
+    configfile: config_path
+    container: "docker://continuumio/miniconda3:4.4.10"
+
+
+    ##################################
+    ### Gather all quality reports ###
+    ##################################
+
+    rule multiqc:
+        input:
+            fqc_zip=expand(
+                "fastqc/{sample}_{stream}_fastqc.zip",
+                sample=design["Sample_id"],
+                stream=["1", "2"]
+            ),
+            fqc_html=expand(
+                "fastqc/{sample}.{stream}.html",
+                sample=design["Sample_id"],
+                stream=["1", "2"]
+            ),
+            txt=expand(
+                "fastq_screen/{sample}.{stream}.fastq_screen.txt",
+                sample=design["Sample_id"],
+                stream=["1", "2"]
+            ),
+            png=expand(
+                "fastq_screen/{sample}.{stream}.fastq_screen.png",
+                sample=design["Sample_id"],
+                stream=["1", "2"]
+            ),
+        output:
+            "multiqc/multiqc.html"
+        message:
+            "Gathering all quality reports"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 1024, 4096),
+            time_min=lambda wildcard, attempt: attempt * 50
+        params:
+            ""
+        log:
+            "logs/multiqc.log"
+        wrapper:
+            "/bio/multiqc"
+
+
+    #########################################
+    ### Assess quality of each fastq file ###
+    #########################################
+
+    rule fastqc:
+        input:
+            "reads/{sample}.{stream}.fq.gz"
+        output:
+            html="fastqc/{sample}.{stream}.html",
+            zip="fastqc/{sample}_{stream}_fastqc.zip"
+        message:
+            "Assessing quality of {wildcards.sample}, ({wildcards.stream})"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 1024, 4096),
+            time_min=lambda wildcard, attempt: attempt * 50
+        params:
+            ""
+        log:
+            "logs/fastqc/{sample}.{stream}.log"
+        wrapper:
+            "/bio/fastqc"
+
+
+    rule fastq_screen:
+        input:
+            "reads/{sample}.{stream}.fq.gz"
+        output:
+            txt="fastq_screen/{sample}.{stream}.fastq_screen.txt",
+            png="fastq_screen/{sample}.{stream}.fastq_screen.png"
+        message:
+            "Assessing quality of {wildcards.sample}, stream {wildcards.stream}"
+        threads: config.get("threads", 20)
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
+            time_min=lambda wildcard, attempt: attempt * 50
+        params:
+            fastq_screen_config=config["fastq_screen"],
+            subset=100000,
+            aligner='bowtie2'
+        log:
+            "logs/fastq_screen/{sample}.{stream}.log"
+        wrapper:
+            "/bio/fastq_screen"
+
+
+    #################################################
+    ### Gather files from iRODS or mounting point ###
+    #################################################
+
+    rule bigr_copy:
+        output:
+            "reads/{sample}.fq.gz"
+        message:
+            "Gathering {wildcards.sample} fastq file"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
+            time_min=lambda wildcard, attempt: attempt * 45
+        params:
+            input=lambda wildcards, output: fastq_links[output[0]]
+        log:
+            "logs/bigr_copy/{sample}.log"
+        wrapper:
+            "/bio/BiGR/copy"
 
 
 

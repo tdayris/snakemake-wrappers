@@ -15,6 +15,13 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     import os.path
 
+    config = dict(
+        design="/path/to/design.tsv",
+        gtf="/path/to/annotation.gtf",
+        tximport_extra="type='salmon', ignoreTxVersion=TRUE, ignoreAfterBar=TRUE"
+    )
+
+
     normalized_counts_rst = (
         "reports/normalized_counts.rst"
         if os.path.exists("reports/normalized_counts.rst")
@@ -59,7 +66,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/deseq.log"
         wrapper:
-            "0.74.0-713-g8ba913077/bio/deseq2/DESeq"
+            "0.74.0-725-gb3fc51778/bio/deseq2/DESeq"
 
 
     """
@@ -78,13 +85,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcard, attempt: min(attempt * 3072, 20480),
             time_min=lambda wildcard, attempt: attempt * 45
         params:
-            design=config.get("deseq2_formula", "~Cond"),
-            levels=config.get("deseq2_levels", ["A", "B"]),
-            factor=config.get("deseq2_factor", "Cond")
+            contrast=["Cond", "B", "A"]
         log:
             "logs/deseq2/deseq2_dataset_from_tximport.log"
         wrapper:
-            "0.74.0-713-g8ba913077/bio/deseq2/DESeqDataSetFromTximport/"
+            "0.74.0-725-gb3fc51778/bio/deseq2/DESeqDataSetFromTximport/"
 
 
     """
@@ -113,7 +118,30 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport.log"
         wrapper:
-            "0.74.0-713-g8ba913077/bio/tximport"
+            "0.74.0-725-gb3fc51778/bio/tximport"
+
+
+    """
+    Split a complex design into simple ones with one factor of interest and two
+    levels to compare.
+    """
+    rule split_design:
+        input:
+            design=config["design"]
+        output:
+            "deseq2/design/DGE_considering_factor_Cond_comparing_test_A_vs_ref_B.tsv"
+        threads: 1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 10240)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 20, 200)
+            )
+        log:
+            "logs/split_design.log"
+        wrapper:
+            "/bio/BiGR/split_design"
 
 
     """
@@ -121,9 +149,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule tx_to_gene:
         input:
-            gtf="refs/ensembl/chr21.gtf"
+            gtf=config["gtf"]
         output:
-            tx2gene_small="tximport/tx2gene.tsv"
+            tx2gene_small=temp("tximport/tx2gene.tsv")
         message: "Building transcripts/genes conversion table"
         cache: True
         threads: 1
@@ -137,7 +165,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport/tx2gene.log"
         wrapper:
-            "0.74.0-713-g8ba913077/bio/gtf/tx2gene"
+            "/bio/gtf/tx2gene"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

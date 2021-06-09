@@ -63,6 +63,31 @@ Under development. Do no use.
 
 
 
+
+Snakefile
+---------
+
+The pipeline contains the following steps:
+
+.. code-block:: python
+
+    rule search_samples:
+        input:
+            samples="samples.txt"
+        output:
+            "design.tsv"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attemmt * 25
+        log:
+            "logs/search_samples.log"
+        wrapper:
+            "/bio/iRODS/search_samples"
+
+
+
+
 Authors
 -------
 

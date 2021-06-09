@@ -1,7 +1,7 @@
-.. _`SnpEff_SnpSift`:
+.. _`SnpEff_SnpSift (under development)`:
 
-SNPEFF_SNPSIFT
-==============
+SNPEFF_SNPSIFT (UNDER DEVELOPMENT)
+==================================
 
 Annotate VCF files with SnpEff and SNpSift
 
@@ -81,6 +81,230 @@ The following individual wrappers are used in this pipeline:
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
 
+
+
+
+
+
+Snakefile
+---------
+
+The pipeline contains the following steps:
+
+.. code-block:: python
+
+    import logging
+    import os
+    import pandas
+    import sys
+
+    sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
+
+    from file_manager import *
+    from files_linker import link_fq
+    from write_yaml import read_yaml
+    from pathlib import Path
+    from messages import CustomFormatter
+    from snakemake.utils import min_version
+    min_version("6.0")
+
+    default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/config.hg38.yaml")
+    configfile: get_config(default_config)
+    design = build_design(os.getcwd(), search_fastq_pairs)
+
+    from pathlib import Path
+
+
+    samples_list = design["Sample_id"]
+
+
+    wildcard_constraints:
+        sample = r"|".join(samples_list)
+
+
+    rule all:
+        input:
+            calls=expand(
+                "snpsift/cosmic/{sample}.vcf.gz{index}",
+                sample=samples_list,
+                index=["", ".tbi"]
+            ),
+            qc="multiqc/SnpEff_annotation.html",
+            tsv=expand(
+                "snpsift/extractFields/{sample}.tsv",
+                sample=samples_list
+            )
+        message:
+            "Finishing the annotation pipeline"
+
+    #####################
+    ### Export to TSV ###
+    #####################
+
+    rule extractfields:
+        input:
+            call="snpsift/cosmic/{sample}.vcf.gz",
+            call_index="snpsift/cosmic/{sample}.vcf.gz.tbi"
+        output:
+            tsv=protected("snpsift/extractFields/{sample}.tsv")
+        message:
+            "Making {wildcards.sample} annotated VCF readable"
+        threads: 2
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
+            time_min=lambda wildcards, attempt: attempt * 20
+        log:
+            "logs/snpsift/extractFields/{sample}.log"
+        params:
+            fields=[
+                "CHROM",
+                "POS",
+                "ID",
+                "REF",
+                "ALT",
+                "ANN[*].GENE",
+                "ANN[*].GENEID",
+                "ANN[*].HGVS_C", # (alias HGVS_DNA, CODON): Variant in HGVS (DNA) notation
+                "ANN[*].HGVS_P", # (alias HGVS, HGVS_PROT, AA): Variant in HGVS (protein) notation
+                "STRAND", # "Gene strand"
+                "ANN[*].FEATURE",
+                "ANN[*].FEATUREID",
+                "ANN[*].BIOTYPE", # Biotype, as described by the annotations (e.g. 'protein_coding')
+                "ANN[*].IMPACT", # { HIGH, MODERATE, LOW, MODIFIER }
+                "ANN[*].EFFECT", # (alias ANNOTATION): Effect in Sequence ontology terms (e.g. 'missense_variant', 'synonymous_variant', 'stop_gained', etc.)
+                "ANN[*].CDNA_POS", # (alias POS_CDNA)
+                "ANN[*].CDNA_LEN", # (alias LEN_CDNA)
+                "ANN[*].CDS_POS", # (alias POS_CDS)
+                "ANN[*].CDS_LEN", # (alias LEN_CDS)
+                "ANN[*].AA_POS", # (alias POS_AA)
+                "ANN[*].AA_LEN", # (alias LEN_AA)
+                "FILTER",
+                "ADP", # "Average per-sample depth of bases with Phred score >= 15"
+                "LOF[*].GENE",  # predicted Loss of function
+                "LOF[*].GENEID",
+                "LOF[*].NUMTR", # Number of transcripts affected
+                "LOF[*].PERC", # percentage of transcripts
+                "NMD[*].GENE", # "Predicted nonsense mediated decay effects for this variant."
+                "NMD[*].GENEID",
+                "NMD[*].NUMTR",
+                "NMD[*].PERC",
+                "VARTYPE", # "Comma separated list of variant types. One per allele"
+                "HOM", # "Variant is homozygous"
+                "HET", # "Variant is heterozygous"
+                "AC", # "Allele Count"
+                "AF", # "Allele Frequency"
+                "AN", #"Total number of alleles in data sources"
+                "DS", # "Data Sources containing allele"
+                "CDA", # "Variation is interrogated in a clinical diagnostic assay"
+                "OTH", # "Has other variant with exactly the same set of mapped positions on NCBI refernce assembly."
+                "COMMON", # A common SNP is one that has at least one 1000Genomes population with a minor allel e of frequency >= 1% and for which 2 or more founders contribute to that minor allele frequency.
+                "VLD", # "Is Validated.  This bit is set if the variant has 2+ minor allele count based on frequency or genotype data."
+                "MUT", # "Is mutation (journal citation, explicit fact): a low frequency variation that is cited in journal and other reputable sources"
+                "INT", # "In Intron"
+                "PMC", # "Links exist to PubMed Central article"
+                "HD", # "Marker is on high density genotyping kit (50K density or greater).  The variant may have phenotype associations present in dbGaP."
+                "PM", # "Variant is Precious(Clinical,Pubmed Cited)"
+            ],
+            extra="-s '\t' -e '.'"
+        wrapper:
+            "/bio/snpsift/extractfields"
+
+
+    ###############
+    ### MultiQC ###
+    ###############
+
+    rule multiqc:
+        input:
+            expand(
+                "snpeff/report/{sample}.html",
+                sample=samples_list
+            ),
+            expand(
+                "snpeff/csvstats/{sample}.csv",
+                sample=samples_list
+            )
+        output:
+            report(
+                "multiqc/SnpEff_annotation.html",
+                caption="../common/reports/multiqc.rst",
+                category="Quality Controls"
+            )
+        message:
+            "Aggregating quality reports from SnpEff"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
+            time_min=lambda wildcards, attempt: attempt * 35
+        log:
+            "logs/multiqc.log"
+        wrapper:
+            "/bio/multiqc"
+
+
+    #################################
+    ### FINAL VCF FILE INDEXATION ###
+    #################################
+
+    rule tabix_index:
+        input:
+            "{tools}/{subcommand}/{sample}.vcf.gz"
+        output:
+            "{tools}/{subcommand}/{sample}.vcf.gz.tbi"
+        message:
+            "Indexing {wildcards.sample} final annotated VCF with tabix"
+        group:
+            "Final_compression_{sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1020,
+            time_min=lambda wildcards, attempt: attempt * 45
+        log:
+            "logs/{tools}/{subcommand}/tabix/{sample}.log"
+        wrapper:
+            "/bio/tabix"
+
+
+    rule compress_pbgzip:
+        input:
+            "{tools}/{subcommand}/{sample}.vcf"
+        output:
+            "{tools}/{subcommand}/{sample}.vcf.gz"
+        message:
+            "Compressing {wildcards.sample} final annotated VCF with pbgzip"
+        group:
+            "Final_compression_{sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1020,
+            time_min=lambda wildcards, attempt: attempt * 45
+        log:
+            "logs/{tools}/{subcommand}/pbgzip/{sample}.log"
+        wrapper:
+            "/bio/compress/pbgzip"
+
+
+    ######################
+    ### VCF annotation ###
+    ######################
+
+
+    module snpeff_meta:
+        snakefile: "../../meta/bio/snpeff_annotate/test/Snakefile"
+        config: config
+
+    use rule snpeff from snpeff_meta with:
+        input:
+            calls="calls/{sample}.vcf.gz",
+            calls_index="calls/{sample}.vcf.gz.tbi",
+            db=config["ref"]["snpeff"]
+
+
+    module snpsift:
+        snakefile: "../../meta/bio/snpsift/test/Snakefile"
+        config: config
+
+    use rule * from snpsift as snpsift_*
 
 
 

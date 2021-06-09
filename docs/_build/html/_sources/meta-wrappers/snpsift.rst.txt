@@ -18,6 +18,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         "ref": {
             "cosmic": "/path/to/annotation",
             "dbsnp": "/path/to/annotation",
+            "dbnsfp": "/path/to/annotaion",
             "fasta": "/path/to/annotation",
             "gmt": "/path/to/annotation",
             "gwascat": "/path/to/annotation",
@@ -43,8 +44,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule snpsift_dbnsfp:
         input:
             call = "snpsift/gwascat/{sample}.vcf",
-            dbNSFP = "/path/to/dbNSFP.txt.gz",
-            dbNSFP_tbi = "/path/to/dbNSFP.txt.gz.tbi"
+            dbNSFP = config["ref"]["dbnsfp"],
+            dbNSFP_tbi = config["ref"]["dbnsfp"] + ".tbi"
         output:
             call = temp("snpsift/dbnsfp/{sample}.vcf")
         message:

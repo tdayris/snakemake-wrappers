@@ -213,6 +213,13 @@
 <p>This meta-wrapper can be used by integrating the following into your workflow:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span>
 
+<span class="n">config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">design</span><span class="o">=</span><span class="s2">&quot;/path/to/design.tsv&quot;</span><span class="p">,</span>
+    <span class="n">gtf</span><span class="o">=</span><span class="s2">&quot;/path/to/annotation.gtf&quot;</span><span class="p">,</span>
+    <span class="n">tximport_extra</span><span class="o">=</span><span class="s2">&quot;type=&#39;salmon&#39;, ignoreTxVersion=TRUE, ignoreAfterBar=TRUE&quot;</span>
+<span class="p">)</span>
+
+
 <span class="n">normalized_counts_rst</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">&quot;reports/normalized_counts.rst&quot;</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;reports/normalized_counts.rst&quot;</span><span class="p">)</span>
@@ -257,7 +264,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deseq2/deseq.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.74.0-713-g8ba913077/bio/deseq2/DESeq&quot;</span>
+        <span class="s2">&quot;0.74.0-725-gb3fc51778/bio/deseq2/DESeq&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -276,13 +283,11 @@
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">3072</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">design</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deseq2_formula&quot;</span><span class="p">,</span> <span class="s2">&quot;~Cond&quot;</span><span class="p">),</span>
-        <span class="n">levels</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deseq2_levels&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]),</span>
-        <span class="n">factor</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deseq2_factor&quot;</span><span class="p">,</span> <span class="s2">&quot;Cond&quot;</span><span class="p">)</span>
+        <span class="n">contrast</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Cond&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">]</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deseq2/deseq2_dataset_from_tximport.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.74.0-713-g8ba913077/bio/deseq2/DESeqDataSetFromTximport/&quot;</span>
+        <span class="s2">&quot;0.74.0-725-gb3fc51778/bio/deseq2/DESeqDataSetFromTximport/&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -311,7 +316,30 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/tximport.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.74.0-713-g8ba913077/bio/tximport&quot;</span>
+        <span class="s2">&quot;0.74.0-725-gb3fc51778/bio/tximport&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Split a complex design into simple ones with one factor of interest and two</span>
+<span class="sd">levels to compare.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">split_design</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">design</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;design&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;deseq2/design/DGE_considering_factor_Cond_comparing_test_A_vs_ref_B.tsv&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">10240</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">time_min</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/split_design.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;/bio/BiGR/split_design&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -319,9 +347,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">tx_to_gene</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">gtf</span><span class="o">=</span><span class="s2">&quot;refs/ensembl/chr21.gtf&quot;</span>
+        <span class="n">gtf</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;gtf&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">tx2gene_small</span><span class="o">=</span><span class="s2">&quot;tximport/tx2gene.tsv&quot;</span>
+        <span class="n">tx2gene_small</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;tximport/tx2gene.tsv&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Building transcripts/genes conversion table&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
@@ -335,7 +363,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/tximport/tx2gene.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.74.0-713-g8ba913077/bio/gtf/tx2gene&quot;</span>
+        <span class="s2">&quot;/bio/gtf/tx2gene&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

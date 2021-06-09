@@ -45,7 +45,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="EACON_CYTOSCAN" href="cytoscan_eacon.html" />
+    <link rel="next" title="EACON_CYTOSCAN (UNDER DEVELOPMENT)" href="cytoscan_eacon.html" />
     <link rel="prev" title="WES_GERMLINE" href="WES_germline.html" /> 
 </head>
 
@@ -106,16 +106,18 @@
 <li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#used-wrappers">Used wrappers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snakefile">Snakefile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT</a></li>
-<li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
-<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline_wes.html">VARIANT_CALLING_GERMLINE_WES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline_wes.html">VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)</a></li>
 </ul>
 </li>
 </ul>
@@ -221,6 +223,202 @@
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <p>notes</p>
 </div>
+<div class="section" id="snakefile">
+<h2>Snakefile<a class="headerlink" href="#snakefile" title="Permalink to this headline">¶</a></h2>
+<p>The pipeline contains the following steps:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">min_version</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+
+<span class="n">min_version</span><span class="p">(</span><span class="s2">&quot;6.0&quot;</span><span class="p">)</span>
+
+<span class="n">default_moose_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># Path to interop_dir, the initial input directory given by sequencer</span>
+    <span class="s2">&quot;interop_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;.&quot;</span>
+    <span class="c1"># Path to run directory, the final output directory where fastq files</span>
+    <span class="c1"># are expected to be.</span>
+    <span class="s2">&quot;run_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
+    <span class="c1"># Path to sample_sheet</span>
+    <span class="s2">&quot;sample_sheet&quot;</span><span class="p">:</span> <span class="s2">&quot;sample_sheet.csv&quot;</span><span class="p">,</span>
+    <span class="c1"># Path to the default configfile</span>
+    <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="s2">&quot;/home/svc_moose@intra.igr.fr/repo_git/MoOSe/moose_pipeline/config.yaml&quot;</span><span class="p">,</span>
+    <span class="c1"># Flowcell size (small = 1, medium = 2, big = 3, very big = 4)</span>
+    <span class="c1"># Each increase of this value will add 12 extra hours to both</span>
+    <span class="c1"># bcl2fastq and rsync step</span>
+    <span class="s2">&quot;flowcell_size&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="c1"># Wether we are working with dual indexing, there are additional output</span>
+    <span class="c1"># files which have to be listed for better tracking.</span>
+    <span class="s2">&quot;dual&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="c1"># Wether we are working with UMI, there are additional output</span>
+    <span class="c1"># files which have to be listed for better tracking.</span>
+    <span class="s2">&quot;umi&quot;</span><span class="p">:</span> <span class="kc">False</span>
+<span class="p">}</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">config</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">():</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">default_moose_config</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">default_moose_config</span>
+
+<span class="k">def</span> <span class="nf">list_undetermined</span><span class="p">(</span><span class="n">dual</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">umi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Based on the possible sequencing mode,</span>
+<span class="sd">    return the expected undetermined files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">yield from</span> <span class="p">[</span><span class="s2">&quot;R1&quot;</span><span class="p">,</span> <span class="s2">&quot;R2&quot;</span><span class="p">,</span> <span class="s2">&quot;I1&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">dual</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="s2">&quot;I2&quot;</span>
+
+    <span class="k">if</span> <span class="n">umi</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="s2">&quot;R3&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">fastq_replace_suffix</span><span class="p">(</span><span class="n">fastq_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.fastq&quot;</span><span class="p">,</span> <span class="s2">&quot;.fq&quot;</span><span class="p">,</span> <span class="s2">&quot;.fastq.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;.fq.gz&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">fastq_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">fastq_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="n">new_suffix</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not guess fastq suffix for </span><span class="si">{</span><span class="n">fastq_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_prefix</span><span class="p">(</span><span class="n">fastq_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">yield from</span> <span class="p">[</span><span class="n">fastq_file_prefix</span><span class="p">(</span><span class="n">fq</span><span class="p">)</span> <span class="k">for</span> <span class="n">fq</span> <span class="ow">in</span> <span class="n">fastq_list</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">get_md5</span><span class="p">(</span><span class="n">fastq_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">yield from</span> <span class="p">[</span><span class="n">fastq_file_prefix</span><span class="p">(</span><span class="n">fq</span><span class="p">,</span> <span class="s2">&quot;.fastq.gz.md5&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">fq</span> <span class="ow">in</span> <span class="n">fastq_list</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">get_fastqc_html</span><span class="p">(</span><span class="n">fastq_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">yield from</span> <span class="p">[</span><span class="n">fastq_file_prefix</span><span class="p">(</span><span class="n">fq</span><span class="p">,</span> <span class="s2">&quot;_fastqc.html&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">fq</span> <span class="ow">in</span> <span class="n">fastq_list</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">get_fastqc_zip</span><span class="p">(</span><span class="n">fastq_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">yield from</span> <span class="p">[</span><span class="n">fastq_file_prefix</span><span class="p">(</span><span class="n">fq</span><span class="p">,</span> <span class="s2">&quot;_fastqc.zip&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">fq</span> <span class="ow">in</span> <span class="n">fastq_list</span><span class="p">]</span>
+
+
+<span class="n">workdir</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;run_dir&quot;</span><span class="p">]</span>
+<span class="n">configfile</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span>
+
+
+<span class="n">onstart</span><span class="p">:</span>
+    <span class="n">touch</span><span class="p">(</span><span class="s2">&quot;pipeline.running&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting the demux pipeline&quot;</span><span class="p">)</span>
+
+<span class="n">onsuccess</span><span class="p">:</span>
+    <span class="n">touch</span><span class="p">(</span><span class="s2">&quot;pipeline.successful&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pipeline is over and successful&quot;</span><span class="p">)</span>
+
+<span class="n">onerror</span><span class="p">:</span>
+    <span class="n">touch</span><span class="p">(</span><span class="s2">&quot;pipeline.failed&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pipeline returned non-zero status&quot;</span><span class="p">)</span>
+
+
+<span class="n">rule</span> <span class="nb">all</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">qc</span><span class="o">=</span><span class="s2">&quot;multiqc.html&quot;</span><span class="p">,</span>
+        <span class="n">fastq</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastqc/</span><span class="si">{sample}</span><span class="s2">.fastq.gz&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+
+<span class="n">module</span> <span class="n">fastqc_multiqc</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../fastqc_multiqc/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">()</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">fastqc_multiqc</span> <span class="k">as</span> <span class="o">*</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">rule</span> <span class="n">multiqc</span> <span class="n">form</span> <span class="n">fastqc_multiqc</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">fqc_zip</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastqc/</span><span class="si">{sample}</span><span class="s2">_fastqc.zip&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">fqc_html</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastqc/</span><span class="si">{sample}</span><span class="s2">_fastqc.html&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">txt</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.fastq_screen.txt&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">png</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.fastq_screen.png&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">bcl_stats</span><span class="o">=</span><span class="s2">&quot;unaligned/Stats/&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Previously moose used to copy files before bcl2fastq. This copy is kept</span>
+<span class="sd">separately.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">rsync_interop</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;interop_dir&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;InterOp&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Copying InterOp dir from </span><span class="si">{input}</span><span class="s2"> to </span><span class="si">{output}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;flowcell_size&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s2">&quot;--verbose &quot;</span>  <span class="c1"># Increase verbosity</span>
+        <span class="s2">&quot;--checksum &quot;</span>  <span class="c1"># Checksum</span>
+        <span class="s2">&quot;--recursive &quot;</span>  <span class="c1"># Recursive copy</span>
+        <span class="s2">&quot;--update &quot;</span>  <span class="c1"># Do not copy files that already exists</span>
+        <span class="s2">&quot;--links &quot;</span>  <span class="c1"># Symlinks stay as symlinks</span>
+        <span class="s2">&quot;--perms &quot;</span>  <span class="c1"># Preserve permissions</span>
+        <span class="s2">&quot;--times &quot;</span>  <span class="c1"># Perserve modification times</span>
+        <span class="s2">&quot;--human-readable&quot;</span>  <span class="c1"># Number in humand readable formats</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/rsync/interop.log&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;rsync </span><span class="si">{params}</span><span class="s2"> </span><span class="si">{input}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2"> &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Actual demultiplexing step</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">bcl2fastq</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">run_dir</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;run_dir&quot;</span><span class="p">],</span>
+        <span class="n">sample_sheet</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_sheet&quot;</span><span class="p">],</span>
+        <span class="n">interop_dir</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;InterOp&quot;</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">reports_dir</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;unaligned/Reports/&quot;</span><span class="p">),</span>
+        <span class="n">stats_json</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;unaligned/Stats/&quot;</span><span class="p">)</span>
+        <span class="n">undetermined</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;unaligned/Undetermined_S0_</span><span class="si">{undetermined}</span><span class="s2">_001.fastq.gz,</span>
+            <span class="n">undetermined</span><span class="o">=</span><span class="n">list_undetermined</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;dual&quot;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;umi&quot;</span><span class="p">])</span>
+        <span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Running bcl2fastq on </span><span class="si">{config[&#39;run_dir&#39;]}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="mi">36</span><span class="p">)</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">10240</span> <span class="o">+</span> <span class="mi">20480</span><span class="p">,</span> <span class="mi">51200</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">*</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;flowcell_size&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bcl2fastq/demux.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;--fastq-compression-level 6 &quot;</span>
+            <span class="s2">&quot;--mask-short-adapter-reads 1 &quot;</span>
+            <span class="s2">&quot;--create-fastq-for-index-reads &quot;</span>
+        <span class="p">),</span>
+        <span class="n">out_dir</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;out_dir&quot;</span><span class="p">],</span>
+        <span class="n">use_bases_mask</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_bases_mask&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">no_lane_splitting</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;no_lane_splitting&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="n">barcode_mismatches</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;barcode_mismatches&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;/bio/bcl2fastq&quot;</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -239,7 +437,7 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="cytoscan_eacon.html" class="btn btn-neutral float-right" title="EACON_CYTOSCAN" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cytoscan_eacon.html" class="btn btn-neutral float-right" title="EACON_CYTOSCAN (UNDER DEVELOPMENT)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="WES_germline.html" class="btn btn-neutral float-left" title="WES_GERMLINE" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

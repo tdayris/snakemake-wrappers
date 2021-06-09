@@ -32,8 +32,8 @@ BLACKLIST = {
 } | SCRIPTS
 PIPELINE_BLACKLIST = {
     "common",
-    "salmon_quant",
-    "README.md"
+    "README.md",
+    "salmon_tximport_deseq2"
 }
 TAG = subprocess.check_output(["git", "describe", "--tags"]).decode().strip()
 
@@ -73,7 +73,11 @@ def render_tool(tool, subcmds):
 
 
 def render_snakefile(path):
-    with open(os.path.join(path, "test", "Snakefile")) as snakefile:
+    render_snakefile_path = os.path.join(path, "test", "Snakefile")
+    if not os.path.exists(os.path.join(path, "test", "Snakefile")):
+        render_snakefile_path = path
+
+    with open(render_snakefile_path) as snakefile:
         lines = filter(lambda line: "# [hide]" not in line, snakefile)
         snakefile = textwrap.indent(
             "\n".join(l.rstrip() for l in lines), "    "
@@ -172,6 +176,10 @@ def render_pipeline(path, target):
     else:
         used_wrappers = []
         used_metawrappers = []
+
+    pipeline_snakefile_path = os.path.join(path, "Snakefile")
+    if os.path.exists(pipeline_snakefile_path):
+        meta["pipeline_snakefile_path"] = render_snakefile(pipeline_snakefile_path)
 
     name = meta["name"].replace(" ", "_") + ".rst"
     os.makedirs(os.path.dirname(target), exist_ok=True)
