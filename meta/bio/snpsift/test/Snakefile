@@ -3,6 +3,7 @@ default_config={
     "ref": {
         "cosmic": "/path/to/annotation",
         "dbsnp": "/path/to/annotation",
+        "dbnsfp": "/path/to/annotaion",
         "fasta": "/path/to/annotation",
         "gmt": "/path/to/annotation",
         "gwascat": "/path/to/annotation",
@@ -28,7 +29,7 @@ except NameError:
 rule snpsift_dbnsfp:
     input:
         call = "snpsift/gwascat/{sample}.vcf",
-        dbNSFP = "/path/to/dbNSFP.txt.gz",
+        dbNSFP = config["ref"]["dbnsfp"],
         dbNSFP_tbi = "/path/to/dbNSFP.txt.gz.tbi"
     output:
         call = temp("snpsift/dbnsfp/{sample}.vcf")
