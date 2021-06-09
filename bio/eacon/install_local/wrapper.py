@@ -18,7 +18,5 @@ for package in snakemake.input.get("r_packages", []):
 
 for package in snakemake.input.get("git_packages", []):
     shell(
-        'R --vanilla -e \'options(unzip = "internal"); '
-        'Sys.setenv(TAR = \"$(which tar)\"); '
-        'devtools::install("{package}", force=TRUE);\' {log}'
+        'R  --vanilla CMD INSTALL --clean --data-compress=gzip {package} {log}'
     )
