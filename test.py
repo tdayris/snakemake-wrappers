@@ -4214,13 +4214,6 @@ def test_snpsift_annotate():
     )
 
 
-def test_snpsift_gwascat():
-    run(
-        "bio/snpsift/gwasCat",
-        ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"]
-    )
-
-
 def test_snpsift_dbnsfp():
     run(
         "bio/snpsift/dbnsfp",
