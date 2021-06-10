@@ -12,8 +12,8 @@ reference.
 """
 rule salmon_quant_paired:
     input:
-        r1="reads/{sample}_1.fq.gz",
-        r2="reads/{sample}_2.fq.gz",
+        r1="reads/{sample}.1.fq.gz",
+        r2="reads/{sample}.2.fq.gz",
         index="salmon/index",
         gtf=config["gtf"]
     output:
@@ -25,7 +25,7 @@ rule salmon_quant_paired:
     resources:
         time_min=lambda wildcards, attempt: attempt * 60,
         mem_mb=lambda wildcards, attempt: (
-            min(attempt * 5120 + 2048, 20480)
+            attempt * 5120 + 20480
         )
     params:
         libType = config.get("salmon_libtype", "A"),
@@ -34,16 +34,6 @@ rule salmon_quant_paired:
         "logs/salmon/quant/{sample}.log"
     wrapper:
         "/bio/salmon/quant"
-
-
-"""
-This rule shows how to inherit from paired quantification rule to quantify
-unpaired reads
-"""
-use rule salmon_quant_paired as salmon_quant_unpaired with:
-    input:
-        r="reads/{sample}.fq.gz",
-        index="salmon/index"
 
 
 """
