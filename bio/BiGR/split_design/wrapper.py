@@ -49,7 +49,7 @@ complete_design = pandas.read_csv(
 )
 logging.info("Input design loaded")
 
-if "columns_to_aggregate" in snakemake.params.keys():
+if "columns_to_aggregate" in snakemake.params.keys() and snakemake.params["columns_to_aggregate"] is not None:
     for cols in snakemake.params["columns_to_aggregate"]:
         complete_design["_".join(cols)] = (
             complete_design[cols].astype(str)
@@ -59,7 +59,7 @@ if "columns_to_aggregate" in snakemake.params.keys():
         )
         logging.info("%s aggregated", str(cols))
 
-if "columns_to_remove" in snakemake.params.keys():
+if "columns_to_remove" in snakemake.params.keys() and snakemake.params["columns_to_remove"] is not None:
     removed = snakemake.params["columns_to_remove"]
     complete_design.drop(removed, axis=1, inplace=True)
     logging.info("Columns %s removed", str(removed))
