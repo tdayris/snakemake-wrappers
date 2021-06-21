@@ -27,7 +27,7 @@ dst_path <- base::as.character(
   x = snakemake@input[["dst"]]
 );
 dst <- base::readRDS(file = dst_path);
-
+print(head(dst))
 
 # Load extra parameters
 extra <- "x = dst"
