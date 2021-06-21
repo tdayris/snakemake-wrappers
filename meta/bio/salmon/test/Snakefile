@@ -25,7 +25,7 @@ rule salmon_quant_paired:
     resources:
         time_min=lambda wildcards, attempt: attempt * 60,
         mem_mb=lambda wildcards, attempt: (
-            attempt * 5120 + 20480
+            attempt * 5120 + 25600
         )
     params:
         libType = config.get("salmon_libtype", "A"),
@@ -56,7 +56,7 @@ rule salmon_index:
             attempt * (120 if "decoys" in input.keys() else 45)
         ),
         mem_mb=lambda wildcards, attempt, input: (
-            attempt * (15360 if "decoys" in input.keys() else 10240)
+            attempt * (25600 if "decoys" in input.keys() else 10240)
         )
     params:
         extra=config.get("salmon_index_extra", "--keepDuplicates --gencode")
