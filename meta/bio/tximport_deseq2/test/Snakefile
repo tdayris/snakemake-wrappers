@@ -1,4 +1,33 @@
-import os.path
+default_tximport_deseq2_config = {
+    "gtf": "annotation.gtf",
+    "design": "design.tsv",
+    "output_prefixes": ["DGE"],
+    "comparison_levels": [["Cond", "A", "B"]],
+    "samples_per_prefixes": {"DGE": ["S1", "S2", "S3", "S4"]}
+}
+
+try:
+    if config == dict():
+        config = default_tximport_deseq2_config
+except NameError:
+    config = default_tximport_deseq2_config
+
+# Requires a list of constrasts as defined in DESeq2:
+# [factor, ref, test]
+# This list should be named: comparison_levels
+
+# Requires a list of comparison names, in the same order as the previous levels
+# It should be named: output_prefixes
+
+contrasts = dict(zip(
+    config["output_prefixes"],
+    config["comparison_levels"]
+))
+
+
+###############
+### Reports ###
+###############
 
 normalized_counts_rst = (
     "reports/normalized_counts.rst"
@@ -13,38 +42,91 @@ deseq2_rst = (
 )
 
 
+###################
+### Readability ###
+###################
+
+
+rule rbt_csv_report:
+    input:
+        "deseq2/{comparison}/{comparison}.{content}.tsv"
+    output:
+        directory("deseq2/{comparison}/{comparison}.{content}/")
+    message: "Making DESeq2 results readable and searchable"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 5
+    log:
+        "logs/rbt/csv-report/{comparison}.{content}.log"
+    params:
+        '--separator "\\t" '
+        '--sort-column stat_change '
+        '--sort-order ascending '
+        '--rows-per-page 50'
+    wrapper:
+        "/bio/rbt/csvreport"
+
+
+rule deseq2_readable:
+    input:
+        tsv = "deseq2/{comparison}/wald.{comparison}.tsv",
+        gene2gene = "tximport/gene2gene.tsv"
+    output:
+        fc_sig = temp("deseq2/{comparison}/{comparison}.DE_genes_with_FC.tsv"),
+        padj_sig = temp("deseq2/{comparison}/{comparison}.DE_genes_with_padj.tsv"),
+        complete = temp("deseq2/{comparison}/{comparison}.complete_results.tsv")
+    message:
+        "Annotating output results for {wildcards.comparison}"
+    threads: 1
+    resources:
+        mem_mb = (
+            lambda wildcards, attempt: min(attempt * 1024, 10240)
+        ),
+        time_min = (
+            lambda wildcards, attempt: min(attempt * 20, 200)
+        )
+    log:
+        "logs/deseq2/readable/{comparison}.log"
+    wrapper:
+        "/bio/pandas/deseq2_to_gseaapp"
+
+
+##############
+### DESeq2 ###
+##############
+
 """
 This rule performs the size factor and dispersions estimations as well as the
 wald test.
 """
 rule deseq2:
     input:
-        dds="deseq2/dds.RDS"
+        dds="deseq2/{comparison}/dds.{comparison}.RDS"
     output:
-        rds="deseq2/wald/Cond_compairing_B_vs_A.RDS",
-        deseq2_result_dir=directory("deseq2/tsv"),
+        rds=temp("deseq2/{comparison}/wald.{comparison}.RDS"),
         deseq2_tsv=report(
-            "deseq2/wald/Cond_compairing_B_vs_A.tsv",
+            "deseq2/{comparison}/wald.{comparison}.tsv",
             caption=deseq2_rst,
             category="DESeq2 results"
         ),
         normalized_counts=report(
-            "deseq2/dst/Cond_compairing_B_vs_A.tsv",
+            "deseq2/{comparison}/dst.{comparison}.tsv",
             caption=normalized_counts_rst ,
             category="Normalized counts"
         ),
-        dst="deseq2/dst/Cond_compairing_B_vs_A.RDS"
-    message: "Running DESeq2 analysis"
+        dst=temp("deseq2/{comparison}/dst.{comparison}.RDS")
+    message: "Running DESeq2 analysis for {wildcards.comparison}"
     threads: 1
     resources:
-        mem_mb=lambda wildcard, attempt: attempt * 2048,
-        time_min=lambda wildcard, attempt: attempt * 60
+        mem_mb=lambda wildcards, attempt: attempt * 2048,
+        time_min=lambda wildcards, attempt: attempt * 60
     params:
-        contrast = config.get("deseq2_contrast", ["Cond", "B", "A"]),
+        contrast=lambda wildcards: contrasts[wildcards.comparison]
     log:
-        "logs/deseq2/deseq.log"
+        "logs/deseq2/deseq/{comparison}.log"
     wrapper:
-        "master/bio/deseq2/DESeq"
+        "/bio/deseq2/DESeq"
 
 
 """
@@ -53,24 +135,28 @@ formula are included.
 """
 rule deseq2_dataset_from_tximport:
     input:
-        tximport="tximport/txi.RDS",
-        coldata="coldata.tsv",
+        tximport="tximport/txi.{comparison}.RDS",
+        coldata="deseq2/designs/{comparison}.tsv",
     output:
-        dds="deseq2/dds.RDS"
-    message: "Formatting counts for DESeq2",
+        dds=temp("deseq2/{comparison}/dds.{comparison}.RDS")
+    message: "Formatting {wildcards.comparison} counts for DESeq2",
     threads: 1
     resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 3072, 20480),
-        time_min=lambda wildcard, attempt: attempt * 45
+        mem_mb=lambda wildcards, attempt: min(attempt * 3072, 20480),
+        time_min=lambda wildcards, attempt: attempt * 45
     params:
-        design=config.get("deseq2_formula", "~Cond"),
-        levels=config.get("deseq2_levels", ["A", "B"]),
-        factor=config.get("deseq2_factor", "Cond")
+        design=lambda wildcards: f"~{contrasts[wildcards.comparison][0]}",
+        levels=lambda wildcards: contrasts[wildcards.comparison][1:],
+        factor=lambda wildcards: contrasts[wildcards.comparison][0]
     log:
-        "logs/deseq2/deseq2_dataset_from_tximport.log"
+        "logs/deseq2/deseq2_dataset_from_tximport/{comparison}.log"
     wrapper:
-        "master/bio/deseq2/DESeqDataSetFromTximport/"
+        "/bio/deseq2/DESeqDataSetFromTximport"
 
+
+##########################
+### Counts aggregation ###
+##########################
 
 """
 This rule imports counts from tables to R data object. Its memory requirements
@@ -78,27 +164,27 @@ are linked to the number of samples
 """
 rule tximport:
     input:
-        quant=expand(
-            "quant/{sample}/quant.sf",
-            sample=[f"{chr(i)}.chr21" for i in range(97, 103)]
+        quant=lambda wildcards: expand(
+            "salmon/pseudo_mapping/{sample}/quant.sf",
+            sample=config["samples_per_prefixes"][wildcards.comparison]
         ),
         tx_to_gene="tximport/tx2gene.tsv"
     output:
-        txi=temp("tximport/txi.RDS")
-    message: "Importing counts in DESeq2"
+        txi=temp("tximport/txi.{comparison}.RDS")
+    message: "Importing counts in DESeq2 for {wildcards.comparison}"
     threads: 1
     resources:
-        mem_mb=lambda wildcard, input: len(input.quant) * 1024,
-        time_min=lambda wildcard, attempt: attempt * 45
+        mem_mb=lambda wildcards, input: len(input.quant) * 1024,
+        time_min=lambda wildcards, attempt: attempt * 45
     params:
         extra=config.get(
             "tximport_extra",
             "type='salmon', ignoreTxVersion=TRUE, ignoreAfterBar=TRUE"
         )
     log:
-        "logs/tximport.log"
+        "logs/tximport/{comparison}.log"
     wrapper:
-        "master/bio/tximport"
+        "/bio/tximport"
 
 
 """
@@ -106,15 +192,16 @@ This rule build the conversion table from transcript to genes and their names.
 """
 rule tx_to_gene:
     input:
-        gtf="refs/ensembl/chr21.gtf"
+        gtf=config["gtf"]
     output:
-        tx2gene_small="tximport/tx2gene.tsv"
+        tx2gene_small="tximport/tx2gene.tsv",
+        gene2gene_large="tximport/gene2gene.tsv"
     message: "Building transcripts/genes conversion table"
     cache: True
     threads: 1
     resources:
-        mem_mb=lambda wildcard, attempt: attempt * 1536,
-        time_min=lambda wildcard, attempt: attempt * 45
+        mem_mb=lambda wildcards, attempt: attempt * 2048,
+        time_min=lambda wildcards, attempt: attempt * 45
     params:
         gencode = True,
         header = True,
@@ -122,4 +209,32 @@ rule tx_to_gene:
     log:
         "logs/tximport/tx2gene.log"
     wrapper:
-        "master/bio/gtf/tx2gene"
+        "/bio/gtf/tx2gene"
+
+
+######################
+### Design parsing ###
+######################
+
+
+rule split_design:
+    input:
+        design=config["design"]["path"],
+    output:
+        expand(
+            "deseq2/designs/{comparison}.tsv",
+            comparison=config["output_prefixes"]
+        )
+    message:
+        "Expanding design in order to make results more readeble"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 10
+    log:
+        "logs/deseq2/split_design.log"
+    params:
+        columns_to_aggregate=config["design"].get("aggregate_col"),
+        columns_to_remove=config["design"].get("remove_col")
+    wrapper:
+        "/bio/BiGR/split_design"
