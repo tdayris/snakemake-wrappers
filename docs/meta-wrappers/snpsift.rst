@@ -43,7 +43,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     rule snpsift_dbnsfp:
         input:
-            call = "snpsift/gwascat/{sample}.vcf",
+            call = "snpsift/cosmic/{sample}.vcf",
             dbNSFP = config["ref"]["dbnsfp"],
             dbNSFP_tbi = config["ref"]["dbnsfp"] + ".tbi"
         output:

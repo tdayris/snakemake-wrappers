@@ -118,6 +118,12 @@ The pipeline contains the following steps:
     config_path = get_config(default_config)
     design = get_design(os.getcwd(), search_fastq_pairs)
 
+    logging.basicConfig(
+        filename="snakemake.fastqc_multiqc.log",
+        filemode="w",
+        level=logging.DEBUG
+    )
+
     fastq_links = link_fq(
         design.Sample_id,
         design.Upstream_file,

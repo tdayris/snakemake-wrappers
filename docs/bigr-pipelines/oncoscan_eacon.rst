@@ -121,9 +121,10 @@ The pipeline contains the following steps:
 
     # The configfile name is hard coded. It should be: "config.yaml"
     configfile: str(config_path)
+    ruleorder: eacon_annotate > post_process_eacon_annotate
 
     module post_process_eacon:
-        snakefile: "../../eacon_post_process/test/Snakefile"
+        snakefile: "../../meta/bio/eacon_post_process/test/Snakefile"
         config: config
 
     print(config)
@@ -145,16 +146,16 @@ The pipeline contains the following steps:
                 sample=config["samples"]
             ),
             # EaCoN new instability scoring feature
-            #instability = expand(
-            #    "{sample}/{sample}_GIS_from_best_gamma.txt",
-            #    sample=config["samples"]
-            #)
+            instability = expand(
+                "{sample}/{sample}_GIS_from_best_gamma.txt",
+                sample=config["samples"]
+            )
 
     # Import all rules from the eacon_post_process meta wrapper
     use rule * from post_process_eacon as post_process_*
 
 
-    use rule post_process_eacon_annotate with:
+    use rule eacon_annotate from post_process_eacon with:
         input:
             rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS",
             grd = "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/scripts/grd",
@@ -200,17 +201,27 @@ The pipeline contains the following steps:
 
 
     rule eacon_install:
+        input:
+            r_packages = [
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/affy.CN.norm.data_0.1.2.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/CytoScan750K.Array.na33.r4_0.1.0.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/CytoScan750K.Array.na36.r1_0.1.0.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/CytoScanHD.Array.na33.r4_0.1.0.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/CytoScanHD.Array.na36.r1_0.1.0.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/OncoScanCNV.na33.r2_0.1.0.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/OncoScanCNV.na36.r1_0.1.0.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/OncoScan.na33.r4_0.1.0.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/OncoScan.na36.r1_0.1.0.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/rcnorm_0.1.5.tar.gz"
+            ],
+            git_packages = [
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.74.0-764-g3b0788731.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_Chromosomes.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.cytoscan.2.4.0.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.oncoscan.2.4.0.tar.gz"
+            ]
         output:
-            directory("sources")
-        params:
-            OncoScan = True,
-            OncoScanCNV = True,
-            CytoScan750K = True,
-            CytoScanHD = True,
-            genomewide = False,  # WARNING: Genome wide information not installed
-            norm = True,
-            EaCoN_dev = True,
-            EaCoN_chromosomes = True
+            temp(touch('install.ok'))
         cache: True
         threads: 1
         resources:
@@ -219,7 +230,7 @@ The pipeline contains the following steps:
         log:
             "logs/EaCoN/install.log"
         wrapper:
-            "/bio/eacon/install"
+            "/bio/eacon/install_local"
 
 
 

@@ -71,17 +71,57 @@ The pipeline contains the following steps:
 
 .. code-block:: python
 
+    rule name_cols:
+        input:
+            "irods/filtered.tsv"
+        output:
+            "design.tsv"
+        group:
+            "format"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 512,
+            time_min=lambda wildcards, attempt: attempt * 5
+        log:
+            "logs/irods/cols.log"
+        params:
+            ""
+        shell:
+            'cat <(echo -e "Upstream_file\tSample_id\tDownstream_file") {input} > {output} 2> {log}'
+
+
+    rule filter_results:
+        input:
+            table="irods/table.tsv",
+            samples="samples.txt"
+        output:
+            temp("irods/filtered.tsv")
+        group:
+            "format"
+        threads: 7
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 512,
+            time_min=lambda wildcards, attempt: attempt * 5
+        log:
+            "logs/irods/filter.log"
+        params:
+            re='mRNA-seq',
+            subset='-f3,16'
+        shell:
+            "grep --file={input.samples} {input.table} | grep {params.re} | cut {params.subset} | sort | uniq | paste - - | cut -f1-3 > {output} 2> {log}"
+
+
     rule search_samples:
         input:
             samples="samples.txt"
         output:
-            "design.tsv"
+            "irods/table.tsv"
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 2048,
-            time_min=lambda wildcards, attempt: attemmt * 25
+            time_min=lambda wildcards, attempt: attempt * 25
         log:
-            "logs/search_samples.log"
+            "logs/irods/search_samples.log"
         wrapper:
             "/bio/iRODS/search_samples"
 

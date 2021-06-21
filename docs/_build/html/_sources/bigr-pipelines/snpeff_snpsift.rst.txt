@@ -125,7 +125,7 @@ The pipeline contains the following steps:
     rule all:
         input:
             calls=expand(
-                "snpsift/cosmic/{sample}.vcf.gz{index}",
+                "snpsift/dbnsfp/{sample}.vcf.gz{index}",
                 sample=samples_list,
                 index=["", ".tbi"]
             ),

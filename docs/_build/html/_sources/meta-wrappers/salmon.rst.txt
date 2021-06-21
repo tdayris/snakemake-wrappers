@@ -27,8 +27,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule salmon_quant_paired:
         input:
-            r1="reads/{sample}_1.fq.gz",
-            r2="reads/{sample}_2.fq.gz",
+            r1="reads/{sample}.1.fq.gz",
+            r2="reads/{sample}.2.fq.gz",
             index="salmon/index",
             gtf=config["gtf"]
         output:
@@ -40,7 +40,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             time_min=lambda wildcards, attempt: attempt * 60,
             mem_mb=lambda wildcards, attempt: (
-                min(attempt * 5120 + 2048, 20480)
+                attempt * 5120 + 25600
             )
         params:
             libType = config.get("salmon_libtype", "A"),
@@ -49,16 +49,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/salmon/quant/{sample}.log"
         wrapper:
             "/bio/salmon/quant"
-
-
-    """
-    This rule shows how to inherit from paired quantification rule to quantify
-    unpaired reads
-    """
-    use rule salmon_quant_paired as salmon_quant_unpaired with:
-        input:
-            r="reads/{sample}.fq.gz",
-            index="salmon/index"
 
 
     """
@@ -81,7 +71,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 attempt * (120 if "decoys" in input.keys() else 45)
             ),
             mem_mb=lambda wildcards, attempt, input: (
-                attempt * (15360 if "decoys" in input.keys() else 10240)
+                attempt * (25600 if "decoys" in input.keys() else 10240)
             )
         params:
             extra=config.get("salmon_index_extra", "--keepDuplicates --gencode")

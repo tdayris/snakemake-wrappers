@@ -184,7 +184,7 @@ The pipeline contains the following steps:
     rule all:
         input:
             calls=expand(
-                "snpsift/cosmic/{sample}.vcf.gz{index}",
+                "snpsift/dbnsfp/{sample}.vcf.gz{index}",
                 #"mutect2/filter/{sample}.vcf.gz",
                 sample=design["Sample_id"].tolist()[0],
                 index=["", ".tbi"]

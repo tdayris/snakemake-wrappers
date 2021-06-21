@@ -1,9 +1,9 @@
-.. _`DESeq2_post_process`:
+.. _`deseq2_post_process`:
 
 DESEQ2_POST_PROCESS
 ===================
 
-Plot various information based on DESeq2 results
+Post process DESeq2 results and create QC report.
 
 
 Example
@@ -13,57 +13,247 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
-    rule bioinfokit_volcanoplot:
-        input:
-            "deseq2/wald/results.tsv"
-        output:
-            "bioinfokit/volcanoplot.png"
-        message: "Plotting Volcanoplot with Bioinfokit"
-        threads: 1
-        resources:
-            mem_mb=lambda wildcards, attempt: min(attempt * 2048, 10240),
-            time_min=lambda wildcards, attempt: attempt * 20
-        params:
-            read_csv={
-                "header": 0,
-                "index_col": None,
-                "usecols": ["Unnamed: 0", "log2FoldChange", "padj"]
-            }
-            volcano={
-                "lfc": "log2FoldChange",
-                "pv": "padj",
-                "geneid": "Unnamed: 0",
-                "gstyle": 2,
-                "sign_line": True
-            }
-        log:
-            "logs/bioinfokit/volcanoplot.log"
-        wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/bioinfokit/volcanoplot"
+    default_deseq2_post_process_config = {
+        "condition_dict": {"DGE": {"S1": "A", "S2": "A", "S3": "B", "S4": "B"}},
+        "samples_per_prefixes": {"DGE": ["S1", "S2", "S3", "S4"]}
+    }
+
+    # This meta requires a list of sample per comparison level, since multiple
+    # comparison may include different number of samples.
+    # This dictionary should be named "samples_per_prefixes"
+
+    # This meta requires an assignation between samples and their conditions
+    # for each level of comparison. This is for colors in legends and has no
+    # other impact on results.
+
+    try:
+        if config == dict():
+            config = default_deseq2_post_process_config
+    except NameError:
+        config = default_deseq2_post_process_config
 
 
-    rule bioinfokit_sample_heatmap:
+    ########################
+    ### Quality controls ###
+    ########################
+
+    rule multiqc:
         input:
-            "deseq2/dst/counts.tsv"
+            salmon=lambda wildcards: [
+                f"salmon/pseudo_mapping/{sample}/quant.sf"
+                for sample in config["samples_per_prefixes"][wildcards.comparison]
+            ],
+            html=lambda wildcards: [
+                f"fastp/html/pe/{sample}.fastp.html"
+                for sample in config["samples_per_prefixes"][wildcards.comparison]
+            ],
+            json=lambda wildcards: [
+                f"fastp/json/pe/{sample}.fastp.json"
+                for sample in config["samples_per_prefixes"][wildcards.comparison]
+            ],
+            config="multiqc/{comparison}/multiqc_config.yaml"
         output:
-            "bioinfokit/sample_heatmap.png"
+            "multiqc/{comparison}/MultiQC.{comparison}.html"
+        message:
+            "Aggregating quality reports from Fastp, Salmon, PCAExplorer"
         threads: 1
         resources:
-            mem_mb=lambda wildcard, attempt: min(attempt * 2048, 10240),
-            time_min=lambda wildcards, attempt: attempt * 20
-        params:
-            read_csv={
-                "header": 0,
-                "index_col": 0
-            },
-            hmap={
-                "rowclus": True,
-                "colclus": True
-            }
+            mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
+            time_min=lambda wildcards, attempt: attempt * 35
         log:
-            "logs/bioinfokit/sample_heatmap.png"
+            "logs/multiqc/{comparison}.log"
+        params:
+            "--config multiqc/{comparison}/multiqc_config.yaml"
         wrapper:
-            "0.71.1-460-g2d0d5bf6e/bio/bioinfokit/heatmap"
+            "/bio/multiqc"
+
+
+    rule multiqc_config:
+        input:
+             #pairwise_scatterplot = "image.png",
+             #clustermap_sample = "image.png",
+             #clustermap_sample = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap/ClusteredHeatmap.samples.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png",
+             pca_plot = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca/pca_{factor}_ax_1_ax_2_with_elipse.png",
+             volcanoplot = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/volcano/Volcano.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png",
+             distro_expr = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/distro_expr/distro_expr.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png",
+             ma_plot = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/maplot/maplot.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png"
+             #pca_axes_correlation = "image.png",
+        output:
+            multiqc_config = "multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/multiqc_config.yaml",
+            plots = [
+                #temp("pairwise_scatterplot_mqc.png"),
+                #temp("clustermap_sample_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca_plot_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/volcanoplot_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/distro_expr_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/ma_plot_mqc.png"),
+                #temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap_sample_mqc.png"),
+                #temp("pca_axes_correlation_mqc.png")
+            ]
+        message:
+            "Configuring MultiQC for specialized report on {wildcards.factor} ({wildcards.test} vs {wildcards.ref})"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 512,
+            time_min=lambda wildcards, attempt: attempt * 5
+        log:
+            "logs/multiqc/config.{factor}.{test}.{ref}.log"
+        params:
+            title = "Differentiel Gene Expression",
+            subtitle = "Comparing {factor}: {test} (test) VS {ref} (reference)",
+            intro_text = "This differential analysis covers {test} vs {ref}. {ref} is the reference. A fold change of 1.5 for the gene XXX means XXX is 1.5 times more expressed in {test} than in {ref}, and this difference is significative when pvalue is low (lower than 0.05).",
+            report_comment = "This report has been made at Gustave Roussy.",
+            show_analysis_paths = False,
+            show_analysis_time = True,
+            #custom_logo = '../IGR_Logo.jpeg',
+            #custom_logo_url = 'https://gitlab.com/bioinfo_gustaveroussy/bigr',
+            #custom_logo_title = 'BiGR, Gustave Roussy Intitute',
+            report_header_info = [
+                {"Contact E-mail": "bigr@gustaveroussy.fr"},
+                {"Application Type": "RNA-seq"},
+                {"Project Type": "Application"},
+                #{"Sequencing Platform": "HiSeq 2500 High Output V4"},
+                #{"Sequencing Setup": "2x125"}
+            ]
+        wrapper:
+            "/bio/BiGR/multiqc_rnaseq_report"
+
+    ###############
+    ### Seaborn ###
+    ###############
+
+    """
+    This rule creates a sample-clustered heatmap
+    """
+    rule seaborn_clustermap:
+        input:
+            counts = "deseq2/{comparison}/wald.{comparison}.tsv"
+        output:
+            png = "figures/{comparison}/clustermap/ClusteredHeatmap.samples.{comparison}.png"
+        message:
+            "Plotting clustered heatmap for {wildcards.comparison}"
+        threads: 1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 512, 1024)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 10, 20)
+            )
+        params:
+            conditions=lambda wildcards: config["condition_dict"][wildcards.comparison],
+            factor="{comparison}"
+        log:
+            "logs/seaborn/clustermap/{comparison}.log"
+        wrapper:
+            "/bio/seaborn/clustermap"
+
+    #######################
+    ### EnhancedVolcano ###
+    #######################
+
+    """
+    This rules computes and plots a Volcano-plot
+    """
+    rule enhancedvolcano_volcanoplot:
+        input:
+            deseq2_tsv="deseq2/{comparison}/wald.{comparison}.tsv"
+        output:
+            png="figures/{comparison}/volcano/Volcano.{comparison}.png"
+        message: "Plotting Volcanoplot for {wildcards.comparison}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15
+        params:
+            alpha_threshold=config["thresholds"].get("alpha", 0.05),
+            fc_threshold=config["thresholds"].get("fc", 0.6)
+        log:
+            "logs/enhanced_volcano/{comparison}.log"
+        wrapper:
+            "/bio/enhancedVolcano/volcano-deseq2"
+
+
+    ####################
+    ### PCA Explorer ###
+    ####################
+
+    """
+    This rule simply plots the PCA
+    """
+    rule pcaexplorer_pca:
+        input:
+            dst = "deseq2/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/wald.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.RDS"
+        output:
+            png = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca/pca_{factor}_ax_{a}_ax_{b}_{elipse}.png"
+        message:
+            "Plotting PCA for ({wildcards.factor}:"
+            "{wildcards.a}/{wildcards.b}:{wildcards.elipse})"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 10240)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 20, 200)
+            )
+        params:
+            extra = (
+                lambda wildcards: f"intgroup = c('{wildcards.factor}'), ntop = 100, pcX = {wildcards.a}, pcY = {wildcards.b}, ellipse = {'TRUE' if wildcards.elipse == 'with_elipse' else 'FALSE'}"
+            ),
+            w = 1024,
+            h = 768
+        log:
+            "logs/pcaexplorer/PCA/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca_ingroup_{factor}_ax_{a}_{b}_{elipse}.log"
+        wrapper:
+            "/bio/pcaExplorer/PCA"
+
+
+    rule pca_explorer_distro_expr:
+        input:
+            dst = "deseq2/{comparison}/wald.{comparison}.tsv"
+        output:
+            png = "figures/{comparison}/distro_expr/distro_expr.{comparison}.png"
+        message:
+            "Plotting expression distributions for {wildcards.comparison}"
+        threads: 1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 10240)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 20, 200)
+            )
+        log:
+            "logs/pcaexplorer/distro_expr/{comparison}.log"
+        wrapper:
+            "/bio/pcaExplorer/distro_expr"
+
+
+    ##############
+    ### DESeq2 ###
+    ##############
+
+    rule deseq2_maplot:
+        input:
+            res = "deseq2/{comparison}/wald.{comparison}.tsv"
+        output:
+            png = "figures/{comparison}/maplot/maplot.{comparison}.png"
+        message:
+            "Building MA-plot for {wildcards.comparison}"
+        threads: 1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 10240)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 20, 200)
+            )
+        log:
+            "logs/deseq2/maplot/maplot.{comparison}.log"
+        wrapper:
+            "/bio/deseq2/plotMA"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
@@ -84,20 +274,23 @@ Used wrappers
 The following individual wrappers are used in this meta-wrapper:
 
 
-* :ref:`bio/bioinfokit/volcanoplot`
+* :ref:`bio/multiqc`
+
+* :ref:`bio/BiGR/multiqc_rnaseq_report`
+
+* :ref:`bio/seaborn/clustermap`
+
+* :ref:`bio/enhancedVolcano/volcano-deseq2`
+
+* :ref:`bio/pcaExplorer/PCA`
+
+* :ref:`bio/pcaExplorer/distro_expr`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
 
 
 
-
-
-
-Notes
------
-
-MultiQC report is based on configurations from in-house scripts.
 
 
 

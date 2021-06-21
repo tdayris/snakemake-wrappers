@@ -45,7 +45,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="FASTQC_MULTIQC (UNDER DEVELOPMENT)" href="fastqc_multiqc.html" />
+    <link rel="next" title="SALMON_QUANT (UNDER DEVELOPMENT)" href="dge_deseq2.html" />
     <link rel="prev" title="EACON_CYTOSCAN (UNDER DEVELOPMENT)" href="cytoscan_eacon.html" /> 
 </head>
 
@@ -112,6 +112,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="dge_deseq2.html">SALMON_QUANT (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT (UNDER DEVELOPMENT)</a></li>
@@ -226,17 +227,57 @@
 <div class="section" id="snakefile">
 <h2>Snakefile<a class="headerlink" href="#snakefile" title="Permalink to this headline">¶</a></h2>
 <p>The pipeline contains the following steps:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">search_samples</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">name_cols</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;irods/filtered.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;design.tsv&quot;</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;format&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/irods/cols.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s2">&quot;&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s1">&#39;cat &lt;(echo -e &quot;Upstream_file</span><span class="se">\t</span><span class="s1">Sample_id</span><span class="se">\t</span><span class="s1">Downstream_file&quot;) </span><span class="si">{input}</span><span class="s1"> &gt; </span><span class="si">{output}</span><span class="s1"> 2&gt; </span><span class="si">{log}</span><span class="s1">&#39;</span>
+
+
+<span class="n">rule</span> <span class="n">filter_results</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">table</span><span class="o">=</span><span class="s2">&quot;irods/table.tsv&quot;</span><span class="p">,</span>
+        <span class="n">samples</span><span class="o">=</span><span class="s2">&quot;samples.txt&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;irods/filtered.tsv&quot;</span><span class="p">)</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;format&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">7</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/irods/filter.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">re</span><span class="o">=</span><span class="s1">&#39;mRNA-seq&#39;</span><span class="p">,</span>
+        <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;-f3,16&#39;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;grep --file=</span><span class="si">{input.samples}</span><span class="s2"> </span><span class="si">{input.table}</span><span class="s2"> | grep </span><span class="si">{params.re}</span><span class="s2"> | cut </span><span class="si">{params.subset}</span><span class="s2"> | sort | uniq | paste - - | cut -f1-3 &gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">search_samples</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">samples</span><span class="o">=</span><span class="s2">&quot;samples.txt&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;design.tsv&quot;</span>
+        <span class="s2">&quot;irods/table.tsv&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attemmt</span> <span class="o">*</span> <span class="mi">25</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">25</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/search_samples.log&quot;</span>
+        <span class="s2">&quot;logs/irods/search_samples.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;/bio/iRODS/search_samples&quot;</span>
 </pre></div>
@@ -256,7 +297,7 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="fastqc_multiqc.html" class="btn btn-neutral float-right" title="FASTQC_MULTIQC (UNDER DEVELOPMENT)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="dge_deseq2.html" class="btn btn-neutral float-right" title="SALMON_QUANT (UNDER DEVELOPMENT)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="cytoscan_eacon.html" class="btn btn-neutral float-left" title="EACON_CYTOSCAN (UNDER DEVELOPMENT)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

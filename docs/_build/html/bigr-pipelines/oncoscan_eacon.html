@@ -104,6 +104,7 @@
 <li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCL2FASTQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dge_deseq2.html">SALMON_QUANT (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">EACON_ONCOSCAN (UNDER DEVELOPMENT)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
@@ -273,9 +274,10 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/run.
 
 <span class="c1"># The configfile name is hard coded. It should be: &quot;config.yaml&quot;</span>
 <span class="n">configfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">eacon_annotate</span> <span class="o">&gt;</span> <span class="n">post_process_eacon_annotate</span>
 
 <span class="n">module</span> <span class="n">post_process_eacon</span><span class="p">:</span>
-    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../eacon_post_process/test/Snakefile&quot;</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/eacon_post_process/test/Snakefile&quot;</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
@@ -297,16 +299,16 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/run.
             <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">]</span>
         <span class="p">),</span>
         <span class="c1"># EaCoN new instability scoring feature</span>
-        <span class="c1">#instability = expand(</span>
-        <span class="c1">#    &quot;{sample}/{sample}_GIS_from_best_gamma.txt&quot;,</span>
-        <span class="c1">#    sample=config[&quot;samples&quot;]</span>
-        <span class="c1">#)</span>
+        <span class="n">instability</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">_GIS_from_best_gamma.txt&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
 
 <span class="c1"># Import all rules from the eacon_post_process meta wrapper</span>
 <span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">post_process_eacon</span> <span class="k">as</span> <span class="n">post_process_</span><span class="o">*</span>
 
 
-<span class="n">use</span> <span class="n">rule</span> <span class="n">post_process_eacon_annotate</span> <span class="k">with</span><span class="p">:</span>
+<span class="n">use</span> <span class="n">rule</span> <span class="n">eacon_annotate</span> <span class="kn">from</span> <span class="nn">post_process_eacon</span> <span class="k">with</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">rds</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/ASCAT/L2R/</span><span class="si">{sample}</span><span class="s2">.SEG.ASCAT.RDS&quot;</span><span class="p">,</span>
         <span class="n">grd</span> <span class="o">=</span> <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/scripts/grd&quot;</span><span class="p">,</span>
@@ -352,17 +354,27 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/run.
 
 
 <span class="n">rule</span> <span class="n">eacon_install</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">r_packages</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/affy.CN.norm.data_0.1.2.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/CytoScan750K.Array.na33.r4_0.1.0.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/CytoScan750K.Array.na36.r1_0.1.0.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/CytoScanHD.Array.na33.r4_0.1.0.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/CytoScanHD.Array.na36.r1_0.1.0.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/OncoScanCNV.na33.r2_0.1.0.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/OncoScanCNV.na36.r1_0.1.0.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/OncoScan.na33.r4_0.1.0.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/OncoScan.na36.r1_0.1.0.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/rcnorm_0.1.5.tar.gz&quot;</span>
+        <span class="p">],</span>
+        <span class="n">git_packages</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.74.0-764-g3b0788731.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_Chromosomes.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.cytoscan.2.4.0.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.oncoscan.2.4.0.tar.gz&quot;</span>
+        <span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;sources&quot;</span><span class="p">)</span>
-    <span class="n">params</span><span class="p">:</span>
-        <span class="n">OncoScan</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">OncoScanCNV</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">CytoScan750K</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">CytoScanHD</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">genomewide</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># WARNING: Genome wide information not installed</span>
-        <span class="n">norm</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">EaCoN_dev</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">EaCoN_chromosomes</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">temp</span><span class="p">(</span><span class="n">touch</span><span class="p">(</span><span class="s1">&#39;install.ok&#39;</span><span class="p">))</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
@@ -371,7 +383,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/run.
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/EaCoN/install.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/eacon/install&quot;</span>
+        <span class="s2">&quot;/bio/eacon/install_local&quot;</span>
 </pre></div>
 </div>
 </div>

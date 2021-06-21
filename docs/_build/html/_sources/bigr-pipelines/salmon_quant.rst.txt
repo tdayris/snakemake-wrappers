@@ -106,15 +106,28 @@ The pipeline contains the following steps:
 
     sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
 
-    from file_manager import read_design, search_fastq_pairs
-    from files_linker import link_fq
-    from write_yaml import write_yaml_from_path
-    from message import message
+    from file_manager import *
+    from files_linker import *
+    from write_yaml import *
+    from messages import message
+
+    logging.basicConfig(
+        filename="snakemake.salmon_quant.log",
+        filemode="w",
+        level=logging.DEBUG
+    )
 
     default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/config.hg38.yaml")
     configfile: get_config(default_config)
-    design = read_design(os.getcwd(), search_fastq_pairs)
+    design = get_design(os.getcwd(), search_fastq_pairs)
 
+    fastq_links = link_fq(
+        design.Sample_id,
+        design.Upstream_file,
+        design.Downstream_file
+    )
+
+    ruleorder: salmon_meta_salmon_quant_paired > salmon_quant_paired
 
     #############################
     ### Salmon quantification ###

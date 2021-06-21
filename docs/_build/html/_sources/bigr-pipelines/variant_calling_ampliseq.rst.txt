@@ -153,7 +153,7 @@ The pipeline contains the following steps:
     min_version("6.0")
 
     logging.basicConfig(
-        filename="snakemake.log",
+        filename="snakemake.variant_calling_ampliseq.log",
         filemode="w",
         level=logging.DEBUG
     )
@@ -183,7 +183,7 @@ The pipeline contains the following steps:
         input:
             calls=expand(
                 "snpsift/dbnsfp/{sample}.vcf.gz{index}",
-                sample=design["Sample_id"].tolist()[0],
+                sample=design["Sample_id"].tolist(),
                 index=["", ".tbi"]
             ),
             html="multiqc/variant_calling_ampliseq.html"

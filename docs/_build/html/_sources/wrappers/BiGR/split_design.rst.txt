@@ -21,7 +21,7 @@ This wrapper can be used in the following way:
         log:
             "split_design.log"
         wrapper:
-            "0.74.0-725-gb3fc51778/bio/BiGR/split_design"
+            "0.74.0-764-g3b0788731/bio/BiGR/split_design"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -119,7 +119,7 @@ Code
     )
     logging.info("Input design loaded")
 
-    if "columns_to_aggregate" in snakemake.params.keys():
+    if "columns_to_aggregate" in snakemake.params.keys() and snakemake.params["columns_to_aggregate"] is not None:
         for cols in snakemake.params["columns_to_aggregate"]:
             complete_design["_".join(cols)] = (
                 complete_design[cols].astype(str)
@@ -129,7 +129,7 @@ Code
             )
             logging.info("%s aggregated", str(cols))
 
-    if "columns_to_remove" in snakemake.params.keys():
+    if "columns_to_remove" in snakemake.params.keys() and snakemake.params["columns_to_remove"] is not None:
         removed = snakemake.params["columns_to_remove"]
         complete_design.drop(removed, axis=1, inplace=True)
         logging.info("Columns %s removed", str(removed))

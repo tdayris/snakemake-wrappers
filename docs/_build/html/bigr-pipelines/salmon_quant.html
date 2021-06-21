@@ -104,6 +104,7 @@
 <li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCL2FASTQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dge_deseq2.html">SALMON_QUANT (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">SALMON_QUANT (UNDER DEVELOPMENT)</a><ul>
@@ -270,15 +271,28 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/&quot;</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">file_manager</span> <span class="kn">import</span> <span class="n">read_design</span><span class="p">,</span> <span class="n">search_fastq_pairs</span>
-<span class="kn">from</span> <span class="nn">files_linker</span> <span class="kn">import</span> <span class="n">link_fq</span>
-<span class="kn">from</span> <span class="nn">write_yaml</span> <span class="kn">import</span> <span class="n">write_yaml_from_path</span>
-<span class="kn">from</span> <span class="nn">message</span> <span class="kn">import</span> <span class="n">message</span>
+<span class="kn">from</span> <span class="nn">file_manager</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">files_linker</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">write_yaml</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">messages</span> <span class="kn">import</span> <span class="n">message</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;snakemake.salmon_quant.log&quot;</span><span class="p">,</span>
+    <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+<span class="p">)</span>
 
 <span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/config.hg38.yaml&quot;</span><span class="p">)</span>
 <span class="n">configfile</span><span class="p">:</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
-<span class="n">design</span> <span class="o">=</span> <span class="n">read_design</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">search_fastq_pairs</span><span class="p">)</span>
+<span class="n">design</span> <span class="o">=</span> <span class="n">get_design</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">search_fastq_pairs</span><span class="p">)</span>
 
+<span class="n">fastq_links</span> <span class="o">=</span> <span class="n">link_fq</span><span class="p">(</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">,</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">Upstream_file</span><span class="p">,</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">Downstream_file</span>
+<span class="p">)</span>
+
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">salmon_meta_salmon_quant_paired</span> <span class="o">&gt;</span> <span class="n">salmon_quant_paired</span>
 
 <span class="c1">#############################</span>
 <span class="c1">### Salmon quantification ###</span>

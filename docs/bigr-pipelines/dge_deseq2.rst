@@ -1,0 +1,403 @@
+.. _`salmon_quant (under development)`:
+
+SALMON_QUANT (UNDER DEVELOPMENT)
+================================
+
+Perform trimming and quantification on RNASeq
+
+Usage
+-----
+
+In order to run the pipeline, use the following commands
+
+.. code-block:: bash 
+
+  # Go to your working directory
+
+  cd /path/to/my/working/directory
+
+  # Build a design file (see below)
+
+  # Copy/paste the following line for **HG19**
+
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
+
+  # Copy/paste the following line for **HG38**
+
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh hg38
+
+
+Input/Output
+------------
+
+
+**Input:**
+
+ 
+  
+* Fastq files
+  
+ 
+
+
+**Output:**
+
+ 
+  
+* Salmon quantification
+  
+ 
+  
+* Quality controls
+  
+ 
+  
+* Trimmed fastq files
+  
+ 
+
+
+
+
+
+
+
+Notes
+-----
+
+Prerequisites:
+
+* A TSV formatted design file, *named 'design.tsv'* with the following columns:
+
+.. list-table:: Desgin file format
+  :widths: 33 33 33
+  :header-rows: 1
+
+  * - Sample_id
+    - Upstream_fastq
+    - Downstream_fastq
+  * - Name of the Sample1
+    - Path to upstream fastq file
+    - Path to downstream fastq file
+  * - Name of the Sample2
+    - Path to upstream fastq file
+    - Path to downstream fastq file
+  * - ...
+    - ...
+    - ...
+
+
+
+
+
+Snakefile
+---------
+
+The pipeline contains the following steps:
+
+.. code-block:: python
+
+    from snakemake.utils import min_version
+    from pathlib import Path
+    from yaml import dump
+    min_version("6.0")
+
+    import sys
+
+    sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
+
+    from dataframes import *
+    from file_manager import *
+    from files_linker import *
+    from graphics import *
+    from write_yaml import *
+    from messages import message
+
+
+    #################
+    ### Preambule ###
+    #################
+
+    logging.basicConfig(
+        filename="snakemake.dge_deseq2.log",
+        filemode="w",
+        level=logging.DEBUG
+    )
+    logging.warning(
+        "This pipeline is under active development. It does not work "
+        "and should not be trusted."
+    )
+
+    default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/dge_deseq2/config.hg38.yaml")
+    configfile: get_config(default_config)
+    design = pandas.read_csv("design.tsv", sep="\t", header=0, index_col=0)
+
+    fastq_links = link_fq(
+        design.index,
+        design.Upstream_file,
+        design.Downstream_file
+    )
+
+    ruleorder: salmon_meta_salmon_quant_paired > salmon_quant_paired
+    ruleorder: deseq2_post_process_multiqc > multiqc
+
+    # A list that holds all comparisons expected for this snakemake pipeline
+    comparison_levels = list(yield_comps(
+        complete_design=design.copy(),
+        aggregate=config["design"].get("aggregate_col"),
+        remove=config["design"].get("remove_col")
+    ))
+
+    # Stored as a list for futrther re-use
+    output_prefixes = [
+        f"DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}"
+        for factor, test, ref in comparison_levels
+    ]
+
+    # An iterator that holds all samples involved in the comparisons
+    # listed above
+    samples_iterator = yield_samples(
+        complete_design=design.copy(),
+        aggregate=config["design"].get("aggregate_col"),
+        remove=config["design"].get("remove_col")
+    )
+
+    samples_per_prefixes = dict(zip(output_prefixes, samples_iterator))
+    logging.debug(samples_per_prefixes)
+
+    expected_pcas = [
+        f"figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca/pca_{factor}_{axes}_{elipse}.png"
+        for (factor, test, ref) in comparison_levels
+        for axes in ["ax_1_ax_2", "ax_2_ax_3"] # , "ax_3_ax_4"]
+        for elipse in ["with_elipse", "without_elipse"]
+    ]
+
+    condition_dict = {
+        f"DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}": relation_condition_sample(design.copy(), factor)
+        for factor, test, ref in comparison_levels
+    }
+
+
+    ############################
+    ### Wilcards constraints ###
+    ############################
+
+    wildcard_constraints:
+        comparison=r"|".join(output_prefixes),
+        factor=r"|".join([i[0] for i in comparison_levels]),
+        test=r"|".join([i[1] for i in comparison_levels]),
+        ref=r"|".join([i[2] for i in comparison_levels]),
+        axes=r"|".join(["ax_1_ax_2", "ax_2_ax_3", "ax_3_ax_4"]),
+        elipse=r"|".join(["with_elipse", "without_elipse"])
+
+
+    ###################
+    ### Target rule ###
+    ###################
+
+    rule target:
+        input:
+            multiqc=expand(
+                "multiqc/{comparison}/MultiQC.{comparison}.html",
+                comparison=output_prefixes
+            ),
+            deseq2_wald=expand(
+                "deseq2/{comparison}/wald.{comparison}.RDS",
+                comparison=output_prefixes
+            ),
+            pcas=expected_pcas
+
+
+    ##############################
+    ### DESeq2 post processing ###
+    ##############################
+
+
+    deseq2_post_process_config = {
+        "condition_dict": condition_dict,
+        "samples_per_prefixes": samples_per_prefixes,
+        "thresholds": config["thresholds"]
+    }
+
+
+    module deseq2_post_process:
+        snakefile: "../../meta/bio/deseq2_post_process/test/Snakefile"
+        config: deseq2_post_process_config
+
+
+    use rule * from deseq2_post_process as deseq2_post_process_*
+
+
+    use rule multiqc from deseq2_post_process with:
+        input:
+            txt=expand(
+                "fastq_screen/{sample}.{stream}.fastq_screen.txt",
+                sample=design.index,
+                stream=["1", "2"]
+            ),
+            png=expand(
+                "fastq_screen/{sample}.{stream}.fastq_screen.png",
+                sample=design.index,
+                stream=["1", "2"]
+            ),
+            salmon=lambda wildcards: [
+                f"salmon/pseudo_mapping/{sample}/quant.sf"
+                for sample in samples_per_prefixes[wildcards.comparison]
+            ],
+            html=lambda wildcards: [
+                f"fastp/html/pe/{sample}.fastp.html"
+                for sample in samples_per_prefixes[wildcards.comparison]
+            ],
+            json=lambda wildcards: [
+                f"fastp/json/pe/{sample}.fastp.json"
+                for sample in samples_per_prefixes[wildcards.comparison]
+            ],
+            config="multiqc/{comparison}/multiqc_config.yaml"
+
+
+    ###########################
+    ### tximprot and DESeq2 ###
+    ###########################
+
+    deseq2_config = {
+        "gtf": config["ref"]["gtf"],
+        "design": config["design"],
+        "output_prefixes": output_prefixes,
+        "comparison_levels": comparison_levels,
+        "samples_per_prefixes": samples_per_prefixes
+    }
+
+
+    module tximport_deseq2:
+        snakefile: "../../meta/bio/tximport_deseq2/test/Snakefile"
+        config: deseq2_config
+
+
+    use rule * from tximport_deseq2 as tximport_deseq2_*
+
+
+    #############################
+    ### Salmon quantification ###
+    #############################
+
+    salmon_config = {
+        "genome": config["ref"]["genome"],
+        "transcriptome": config["ref"]["transcriptome"],
+        "gtf": config["ref"]["gtf"],
+        "salmon_libtype": config["params"]["salmon_libtype"],
+        "salmon_quant_extra": config["params"]["salmon_quant_extra"],
+        "salmon_index_extra": config["params"]["salmon_index_extra"]
+    }
+
+
+    module salmon_meta:
+        snakefile: "../../meta/bio/salmon/test/Snakefile"
+        config: salmon_config
+
+
+    use rule * from salmon_meta as salmon_meta_*
+
+
+    use rule salmon_quant_paired from salmon_meta with:
+        output:
+            quant=report(
+                "salmon/pseudo_mapping/{sample}/quant.sf",
+                category="2. Raw Salmon output",
+                caption="../../common/reports/salmon_quant.rst"
+            ),
+            lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
+            mapping=temp("salmon/bams/{sample}.bam")
+
+
+    ####################################
+    ### FastQ Screen quality control ###
+    ####################################
+
+
+    rule fastq_screen:
+        input:
+            "reads/{sample}.{stream}.fq.gz"
+        output:
+            txt="fastq_screen/{sample}.{stream}.fastq_screen.txt",
+            png="fastq_screen/{sample}.{stream}.fastq_screen.png"
+        message:
+            "Assessing quality of {wildcards.sample}, stream {wildcards.stream}"
+        threads: config.get("threads", 20)
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
+            time_min=lambda wildcard, attempt: attempt * 50
+        params:
+            fastq_screen_config=config["fastq_screen"],
+            subset=100000,
+            aligner='bowtie2'
+        log:
+            "logs/fastq_screen/{sample}.{stream}.log"
+        wrapper:
+            "/bio/fastq_screen"
+
+
+    ############################
+    ### FASTP FASTQ CLEANING ###
+    ############################
+
+    rule fastp_clean:
+        input:
+            sample=expand(
+                "reads/{sample}.{stream}.fq.gz",
+                stream=["1", "2"],
+                allow_missing=True
+            ),
+        output:
+            trimmed=expand(
+                "fastp/trimmed/pe/{sample}.{stream}.fastq",
+                stream=["1", "2"],
+                allow_missing=True
+            ),
+            html="fastp/html/pe/{sample}.fastp.html",
+            json=temp("fastp/json/pe/{sample}.fastp.json")
+        message: "Cleaning {wildcards.sample} with Fastp"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
+            time_min=lambda wildcards, attempt: attempt * 45
+        params:
+            adapters=config["params"].get("fastp_adapters", None),
+            extra=config["params"].get("fastp_extra", "")
+        log:
+            "logs/fastp/{sample}.log"
+        wrapper:
+            "/bio/fastp"
+
+
+    #################################################
+    ### Gather files from iRODS or mounting point ###
+    #################################################
+
+    rule bigr_copy:
+        output:
+            "reads/{sample}.{stream}.fq.gz"
+        message:
+            "Gathering {wildcards.sample} fastq file ({wildcards.stream})"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 1024, 2048),
+            time_min=lambda wildcards, attempt: attempt * 45
+        params:
+            input=lambda wildcards, output: fastq_links[output[0]]
+        log:
+            "logs/bigr_copy/{sample}.{stream}.log"
+        wrapper:
+            "/bio/BiGR/copy"
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
+* M boyba Diop
+
+* Marc Deloger
