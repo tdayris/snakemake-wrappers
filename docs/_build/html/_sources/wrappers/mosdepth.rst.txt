@@ -3,7 +3,7 @@
 MOSDEPTH
 ========
 
-fast BAM/CRAM depth calculation https://github.com/brentp/mosdepth
+fast BAM/CRAM depth calculation
 
 
 Example
@@ -15,77 +15,102 @@ This wrapper can be used in the following way:
 
     rule mosdepth:
         input:
-            bam = "aligned/{dataset}.bam",
-            bai = "aligned/{dataset}.bam.bai",
+            bam="aligned/{dataset}.bam",
+            bai="aligned/{dataset}.bam.bai",
         output:
             "mosdepth/{dataset}.mosdepth.global.dist.txt",
-            "mosdepth/{dataset}.per-base.bed.gz", # produced unless --no-per-base specified
-            summary = "mosdepth/{dataset}.mosdepth.summary.txt", # this named output is required for prefix parsing
+            "mosdepth/{dataset}.per-base.bed.gz",  # produced unless --no-per-base specified
+            summary="mosdepth/{dataset}.mosdepth.summary.txt",  # this named output is required for prefix parsing
         log:
-            "logs/mosdepth/{dataset}.log"
+            "logs/mosdepth/{dataset}.log",
         params:
-            extra = "--fast-mode",  # optional
-        threads:  # additional decompression threads through `--threads`
-            4     # This value - 1 will be sent to `--threads`
-        wrapper: "0.74.0-764-g3b0788731/bio/mosdepth"
+            extra="--fast-mode",  # optional
+        # additional decompression threads through `--threads`
+        threads: 4  # This value - 1 will be sent to `--threads`
+        wrapper:
+            "0.75.0-753-g336864c10/bio/mosdepth"
 
 
     rule mosdepth_bed:
         input:
-            bam = "aligned/{dataset}.bam",
-            bai = "aligned/{dataset}.bam.bai",
-            bed = "test.bed",
+            bam="aligned/{dataset}.bam",
+            bai="aligned/{dataset}.bam.bai",
+            bed="test.bed",
         output:
             "mosdepth_bed/{dataset}.mosdepth.global.dist.txt",
             "mosdepth_bed/{dataset}.mosdepth.region.dist.txt",
             "mosdepth_bed/{dataset}.regions.bed.gz",
-            summary = "mosdepth_bed/{dataset}.mosdepth.summary.txt", # this named output is required for prefix parsing
+            summary="mosdepth_bed/{dataset}.mosdepth.summary.txt",  # this named output is required for prefix parsing
         log:
-            "logs/mosdepth_bed/{dataset}.log"
+            "logs/mosdepth_bed/{dataset}.log",
         params:
-            extra = "--no-per-base --use-median",  # optional
-        threads:  # additional decompression threads through `--threads`
-            4     # This value - 1 will be sent to `--threads`
-        wrapper: "0.74.0-764-g3b0788731/bio/mosdepth"
+            extra="--no-per-base --use-median",  # optional
+        # additional decompression threads through `--threads`
+        threads: 4  # This value - 1 will be sent to `--threads`
+        wrapper:
+            "0.75.0-753-g336864c10/bio/mosdepth"
 
 
     rule mosdepth_by_threshold:
         input:
-            bam = "aligned/{dataset}.bam",
-            bai = "aligned/{dataset}.bam.bai",
+            bam="aligned/{dataset}.bam",
+            bai="aligned/{dataset}.bam.bai",
         output:
             "mosdepth_by_threshold/{dataset}.mosdepth.global.dist.txt",
             "mosdepth_by_threshold/{dataset}.mosdepth.region.dist.txt",
             "mosdepth_by_threshold/{dataset}.regions.bed.gz",
-            "mosdepth_by_threshold/{dataset}.thresholds.bed.gz", # needs to go with params.thresholds spec
-            summary = "mosdepth_by_threshold/{dataset}.mosdepth.summary.txt", # this named output is required for prefix parsing
+            "mosdepth_by_threshold/{dataset}.thresholds.bed.gz",  # needs to go with params.thresholds spec
+            summary="mosdepth_by_threshold/{dataset}.mosdepth.summary.txt",  # this named output is required for prefix parsing
         log:
-            "logs/mosdepth_by/{dataset}.log"
+            "logs/mosdepth_by/{dataset}.log",
         params:
-            by = "500",  # optional, window size,  specifies --by for mosdepth.region.dist.txt and regions.bed.gz
-            thresholds = "1,5,10,30", # optional, specifies --thresholds for thresholds.bed.gz
-        threads:  # additional decompression threads through `--threads`
-            4     # This value - 1 will be sent to `--threads`
-        wrapper: "0.74.0-764-g3b0788731/bio/mosdepth"
+            by="500",  # optional, window size,  specifies --by for mosdepth.region.dist.txt and regions.bed.gz
+            thresholds="1,5,10,30",  # optional, specifies --thresholds for thresholds.bed.gz
+        # additional decompression threads through `--threads`
+        threads: 4  # This value - 1 will be sent to `--threads`
+        wrapper:
+            "0.75.0-753-g336864c10/bio/mosdepth"
 
 
     rule mosdepth_quantize_precision:
         input:
-            bam = "aligned/{dataset}.bam",
-            bai = "aligned/{dataset}.bam.bai",
+            bam="aligned/{dataset}.bam",
+            bai="aligned/{dataset}.bam.bai",
         output:
             "mosdepth_quantize_precision/{dataset}.mosdepth.global.dist.txt",
-            "mosdepth_quantize_precision/{dataset}.quantized.bed.gz", # optional, needs to go with params.quantize spec
-            summary = "mosdepth_quantize_precision/{dataset}.mosdepth.summary.txt", # this named output is required for prefix parsing
+            "mosdepth_quantize_precision/{dataset}.quantized.bed.gz",  # optional, needs to go with params.quantize spec
+            summary="mosdepth_quantize_precision/{dataset}.mosdepth.summary.txt",  # this named output is required for prefix parsing
         log:
-            "logs/mosdepth_quantize_precision/{dataset}.log"
+            "logs/mosdepth_quantize_precision/{dataset}.log",
         params:
-            extra = "--no-per-base",  # optional
-            quantize = "0:1:5:150", # optional, specifies --quantize for quantized.bed.gz
-            precision = "5", # optional, set decimals of precision
-        threads:  # additional decompression threads through `--threads`
-            4     # This value - 1 will be sent to `--threads`
-        wrapper: "0.74.0-764-g3b0788731/bio/mosdepth"
+            extra="--no-per-base",  # optional
+            quantize="0:1:5:150",  # optional, specifies --quantize for quantized.bed.gz
+            precision="5",  # optional, set decimals of precision
+        # additional decompression threads through `--threads`
+        threads: 4  # This value - 1 will be sent to `--threads`
+        wrapper:
+            "0.75.0-753-g336864c10/bio/mosdepth"
+
+
+    rule mosdepth_cram:
+        input:
+            bam="aligned/{dataset}.cram",
+            bai="aligned/{dataset}.cram.crai",
+            bed="test.bed",
+            fasta="genome.fasta",
+        output:
+            "mosdepth_cram/{dataset}.mosdepth.global.dist.txt",
+            "mosdepth_cram/{dataset}.mosdepth.region.dist.txt",
+            "mosdepth_cram/{dataset}.regions.bed.gz",
+            summary="mosdepth_cram/{dataset}.mosdepth.summary.txt",  # this named output is required for prefix parsing
+        log:
+            "logs/mosdepth_cram/{dataset}.log",
+        params:
+            extra="--no-per-base --use-median",  # optional
+        # additional decompression threads through `--threads`
+        threads: 4  # This value - 1 will be sent to `--threads`
+        wrapper:
+            "0.75.0-753-g336864c10/bio/mosdepth"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -101,6 +126,28 @@ Software dependencies
 
 * ``mosdepth==0.3.1``
 
+Input/Output
+------------
+**Input:**
+
+* BAM/CRAM files
+* reference genome (optional)
+* BED file (optional)
+
+**Output:**
+
+* Several coverage summary files.
+
+
+
+Notes
+-----
+
+* The `by` param allows to specify (integer) window-sizes (incompatible with input BED).
+* The `threshold` param allows to, for or each interval in `--by`, write number of bases covered by at least threshold bases. Specify multiple integer values separated by ','.
+* The `precision` param allows to specify output floating point precision.
+* The `extra` param allows for additional program arguments.
+* For more information see, https://github.com/brentp/mosdepth
 
 
 
@@ -207,6 +254,11 @@ Code
         precision = f"MOSDEPTH_PRECISION={precision}"
 
 
+    fasta = snakemake.input.get("fasta", "")
+    if fasta:
+        fasta = f"--fasta {fasta}"
+
+
     # mosdepth takes additional threads through its option --threads
     # One thread for mosdepth
     # Other threads are *additional* decompression threads passed to the '--threads' argument
@@ -218,5 +270,5 @@ Code
 
 
     shell(
-        "({precision} mosdepth {threads} {by} {quantize} {thresholds} {extra} {prefix} {snakemake.input.bam}) {log}"
+        "({precision} mosdepth {threads} {fasta} {by} {quantize} {thresholds} {extra} {prefix} {snakemake.input.bam}) {log}"
     )

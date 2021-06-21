@@ -1,7 +1,7 @@
-.. _`salmon_quant (under development)`:
+.. _`salmon_quant`:
 
-SALMON_QUANT (UNDER DEVELOPMENT)
-================================
+SALMON_QUANT
+============
 
 Perform trimming and quantification on RNASeq
 

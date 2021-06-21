@@ -15,13 +15,19 @@ This wrapper can be used in the following way:
 
     rule bcftools_concat:
         input:
-            calls=["a.bcf", "b.bcf"]
+            calls=["a.bcf", "b.bcf"],
         output:
-            "all.bcf"
+            "all.bcf",
+        log:
+            "logs/all.log",
         params:
-            ""  # optional parameters for bcftools concat (except -o)
+            uncompressed_bcf=False,
+            extra="",  # optional parameters for bcftools concat (except -o)
+        threads: 4
+        resources:
+            mem_mb=10,
         wrapper:
-            "0.74.0-764-g3b0788731/bio/bcftools/concat"
+            "0.75.0-753-g336864c10/bio/bcftools/concat"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -36,7 +42,26 @@ Software dependencies
 ---------------------
 
 * ``bcftools=1.12``
+* ``snakemake-wrapper-utils==0.2.0``
 
+Input/Output
+------------
+**Input:**
+
+* vcf files
+
+**Output:**
+
+* Concatenated VCF/BCF file
+
+
+
+Notes
+-----
+
+* The `uncompressed_bcf` param allows to specify that a BCF output should be uncompressed (ignored otherwise).
+* The `extra` param alllows for additional program arguments (not `--threads, `-O/--output-type`, `-m/--max-mem`, or `-T/--temp-dir`).
+* For more information see, https://samtools.github.io/bcftools/bcftools.html
 
 
 
@@ -44,6 +69,7 @@ Authors
 -------
 
 * Johannes Köster
+* Filipe G. Vieira
 
 
 Code
@@ -57,12 +83,17 @@ Code
     __license__ = "MIT"
 
 
+    from os import path
     from snakemake.shell import shell
+    from snakemake_wrapper_utils.bcftools import get_bcftools_opts
 
+
+    bcftools_opts = get_bcftools_opts(snakemake, parse_memory=False)
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
+
     shell(
-        "bcftools concat {snakemake.params} -o {snakemake.output[0]} "
-        "{snakemake.input.calls} --threads {snakemake.threads} "
+        "bcftools concat {snakemake.params.extra} {bcftools_opts} -o {snakemake.output[0]} "
+        "{snakemake.input.calls} "
         "{log}"
     )
