@@ -1,7 +1,7 @@
-.. _`bcl2fastq`:
+.. _`bcl2fastq (under development)`:
 
-BCL2FASTQ
-=========
+BCL2FASTQ (UNDER DEVELOPMENT)
+=============================
 
 Demultiplex BCL files into Gzipped Fastq.
 
