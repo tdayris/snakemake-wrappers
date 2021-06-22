@@ -15,6 +15,10 @@ SNAKEFILE="${PIPELINE_PATH}/Snakefile"
 CONFIG_PATH="config.hg38.yaml"
 if [ "${1}" = "hg19" ]; then
   CONFIG_PATH="config.hg19.yaml"
+elif [[ "${1}" = "hg19nochr" ]]; then
+  CONFIG_PATH="config.hg19.nochr.yaml"
+elif [[ "${1}" = "hg38nochr" ]]; then
+  CONFIG_PATH="config.hg38.nochr.yaml"
 fi
 
 if [ ! -d "calls" ]; then
