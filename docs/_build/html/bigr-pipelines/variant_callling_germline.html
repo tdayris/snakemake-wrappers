@@ -1,0 +1,743 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT) &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)" href="variant_calling_germline_wes.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Snakemake Wrappers
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                heads/Unofficial
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Wrappers, Meta-Wrappers and Pipelines</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../pipelines.html">BiGR Pipelines</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="WES_germline.html">WES_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCL2FASTQ (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dge_deseq2.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline_wes.html">VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#used-meta-wrappers">Used meta-wrappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#used-wrappers">Used wrappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snakefile">Snakefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Snakemake Wrappers</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../pipelines.html">BiGR Pipelines</a> &raquo;</li>
+        
+      <li>VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/bigr-pipelines/variant_callling_germline.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="variant-calling-germline-under-development">
+<span id="id1"></span><h1>VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)<a class="headerlink" href="#variant-calling-germline-under-development" title="Permalink to this headline">¶</a></h1>
+<p>Perform Variant calling on Germline</p>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>In order to run the pipeline, use the following commands</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Go to your working directory</span>
+
+<span class="nb">cd</span> /path/to/my/working/directory
+
+<span class="c1"># Build a design file (see below)</span>
+
+<span class="c1"># Copy/paste the following line for **HG19**</span>
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_germline/run.sh
+
+<span class="c1"># Copy/paste the following line for **HG38**</span>
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_germline/run.sh hg38
+</pre></div>
+</div>
+</div>
+<div class="section" id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>VCF files</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>Annotated VCF file</p></li>
+</ul>
+</div>
+<div class="section" id="used-meta-wrappers">
+<h2>Used meta-wrappers<a class="headerlink" href="#used-meta-wrappers" title="Permalink to this headline">¶</a></h2>
+<p>The following individual meta-wrappers are used in this pipeline:</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">meta/bio/bwa_fixmate</span></p></li>
+<li><p><span class="xref std std-ref">meta/bio/gatk_bqsr</span></p></li>
+<li><p><span class="xref std std-ref">meta/bio/varscan2_calling</span></p></li>
+<li><p><span class="xref std std-ref">bigr_pipelines/snpeff_snpsift</span></p></li>
+</ul>
+<p>Please refer to each meta-wrapper in above list for additional configuration parameters and information about the executed code.</p>
+</div>
+<div class="section" id="used-wrappers">
+<h2>Used wrappers<a class="headerlink" href="#used-wrappers" title="Permalink to this headline">¶</a></h2>
+<p>The following individual wrappers are used in this pipeline:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../wrappers/BiGR/copy.html#bio-bigr-copy"><span class="std std-ref">IGR_COPY</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/fastp.html#bio-fastp"><span class="std std-ref">FASTP</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/compress/pbgzip.html#bio-compress-pbgzip"><span class="std std-ref">COMPRESS_PBGZIP</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/tabix.html#bio-tabix"><span class="std std-ref">TABIX</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/multiqc.html#bio-multiqc"><span class="std std-ref">MULTIQC</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/picard/collectalignmentsummarymetrics.html#bio-picard-collectalignmentsummarymetrics"><span class="std std-ref">PICARD COLLECTALIGNMENTSUMMARYMETRICS</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/fastq_screen.html#bio-fastq-screen"><span class="std std-ref">FASTQ_SCREEN</span></a></p></li>
+</ul>
+<p>Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.</p>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<p>The only difference with a classic WES pipeline is the absence of duplicates removal.</p>
+<p>Prerequisites:</p>
+<ul class="simple">
+<li><p>A TSV formatted design file, <em>named ‘design.tsv’</em> with the following columns:</p></li>
+</ul>
+<table class="colwidths-given docutils align-default" id="id2">
+<caption><span class="caption-text">Desgin file format</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sample_id</p></th>
+<th class="head"><p>Upstream_fastq</p></th>
+<th class="head"><p>Downstream_fastq</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Name of the Sample1</p></td>
+<td><p>Path to upstream fastq file</p></td>
+<td><p>Path to downstream fastq file</p></td>
+</tr>
+<tr class="row-odd"><td><p>Name of the Sample2</p></td>
+<td><p>Path to upstream fastq file</p></td>
+<td><p>Path to downstream fastq file</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="snakefile">
+<h2>Snakefile<a class="headerlink" href="#snakefile" title="Permalink to this headline">¶</a></h2>
+<p>The pipeline contains the following steps:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">file_manager</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">files_linker</span> <span class="kn">import</span> <span class="n">link_fq</span>
+<span class="kn">from</span> <span class="nn">write_yaml</span> <span class="kn">import</span> <span class="n">read_yaml</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">messages</span> <span class="kn">import</span> <span class="n">CustomFormatter</span>
+<span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">min_version</span>
+<span class="n">min_version</span><span class="p">(</span><span class="s2">&quot;6.0&quot;</span><span class="p">)</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;snakemake.variant_calling_ampliseq.log&quot;</span><span class="p">,</span>
+    <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+<span class="p">)</span>
+
+<span class="n">container</span><span class="p">:</span> <span class="s2">&quot;docker://continuumio/miniconda3:4.4.10&quot;</span>
+<span class="n">localrules</span><span class="p">:</span> <span class="n">bigr_copy</span>
+
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">bwa_mem</span> <span class="o">&gt;</span> <span class="n">bwa_fixmate_meta_bwa_mem</span>
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">mutect2_germline</span> <span class="o">&gt;</span> <span class="n">gatk_mutect2_germline_mutect2_germline</span>
+
+
+<span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/config.hg38.yaml&quot;</span><span class="p">)</span>
+<span class="n">configfile</span><span class="p">:</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
+<span class="n">design</span> <span class="o">=</span> <span class="n">get_design</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">search_fastq_pairs</span><span class="p">)</span>
+
+
+<span class="n">wildcard_constraints</span><span class="p">:</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]),</span>
+    <span class="n">stream</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;1|2|R1|R2&quot;</span>
+
+
+<span class="n">fastq_links</span> <span class="o">=</span> <span class="n">link_fq</span><span class="p">(</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">,</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">Upstream_file</span><span class="p">,</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">Downstream_file</span>
+<span class="p">)</span>
+
+<span class="n">rule</span> <span class="nb">all</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift/dbnsfp/</span><span class="si">{sample}</span><span class="s2">.vcf.gz</span><span class="si">{index}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;.tbi&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">=</span><span class="s2">&quot;multiqc/variant_calling_ampliseq.html&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Finishing the Ampliseq variant calling&quot;</span>
+
+
+<span class="c1">#################</span>
+<span class="c1">### Gather QC ###</span>
+<span class="c1">#################</span>
+
+<span class="n">rule</span> <span class="n">multiqc</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">html</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">json</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">picard</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;picard/alignment_summary/</span><span class="si">{sample}</span><span class="s2">.summary.txt&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">fastq_screen</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">picards_metrics</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;picard/markduplicates/metrics/</span><span class="si">{sample}</span><span class="s2">.picard.metrics.txt&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">report</span><span class="p">(</span>
+            <span class="s2">&quot;multiqc/variant_calling_ampliseq.html&quot;</span><span class="p">,</span>
+            <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;../common/reports/multiqc.rst&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;Quality Controls&quot;</span>
+        <span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Aggregating quality reports from SnpEff&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1536</span><span class="p">,</span> <span class="mi">10240</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/multiqc.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;/bio/multiqc&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">alignment_summary</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">,</span>
+        <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">],</span>
+        <span class="n">ref_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+        <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;picard/alignment_summary/</span><span class="si">{sample}</span><span class="s2">.summary.txt&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Collecting alignment metrics on GATK recalibrated </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/picard/alignment_summary/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s2">&quot;VALIDATION_STRINGENCY=LENIENT &quot;</span>
+        <span class="s2">&quot;METRIC_ACCUMULATION_LEVEL=null &quot;</span>
+        <span class="s2">&quot;METRIC_ACCUMULATION_LEVEL=SAMPLE&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;/bio/picard/collectalignmentsummarymetrics&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">fastq_screen</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fq.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">txt</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.txt&quot;</span><span class="p">),</span>
+        <span class="n">png</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.png&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Assessing quality of </span><span class="si">{wildcards.sample}</span><span class="s2">, </span><span class="si">{wildcards.stream}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">8192</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">50</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">fastq_screen_config</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fastq_screen&quot;</span><span class="p">],</span>
+        <span class="n">subset</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
+        <span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;bowtie2&#39;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/fastqc/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;/bio/fastq_screen&quot;</span>
+
+
+<span class="c1">#################################</span>
+<span class="c1">### FINAL VCF FILE INDEXATION ###</span>
+<span class="c1">#################################</span>
+
+<span class="n">module</span> <span class="n">compress_index_vcf_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/compress_index_vcf/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">compress_index_vcf_meta</span> <span class="k">as</span> <span class="n">compress_index_vcf_</span><span class="o">*</span>
+
+<span class="c1">######################</span>
+<span class="c1">### VCF annotation ###</span>
+<span class="c1">######################</span>
+
+
+<span class="n">module</span> <span class="n">snpeff_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/snpeff_annotate/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">snpeff</span> <span class="kn">from</span> <span class="nn">snpeff_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">calls</span><span class="o">=</span><span class="s2">&quot;meta_caller/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">calls_index</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;meta_caller/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">),</span>
+        <span class="n">db</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;snpeff&quot;</span><span class="p">]</span>
+
+
+<span class="n">module</span> <span class="n">snpsift</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/snpsift/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">snpsift</span> <span class="k">as</span> <span class="n">snpsift_</span><span class="o">*</span>
+
+
+
+<span class="c1">#####################################</span>
+<span class="c1">### Merge variant calling results ###</span>
+<span class="c1">#####################################</span>
+
+<span class="n">module</span> <span class="n">metacaller_germline_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/meta_caller_germline/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span> <span class="s2">&quot;bed&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;capture_kit_bed&quot;</span><span class="p">]}</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">metacaller_germline_meta</span> <span class="k">as</span> <span class="o">*</span>
+
+
+<span class="c1">############################################################################</span>
+<span class="c1">### Correcting Mutect2 :                                                 ###</span>
+<span class="c1">### AS_FilterStatus: Number=1 and not Number=A which violates VCF format ###</span>
+<span class="c1">### AD becomes ADM: AD is reserved for Allele Depth, Mutect2 stores      ###</span>
+<span class="c1">###                 multiple information under &quot;AD&quot; field.               ###</span>
+<span class="c1">############################################################################</span>
+
+<span class="n">rule</span> <span class="n">correct_mutect2_vcf</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;mutect2/filter_reheaded/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;mutect2/corrected/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Renaming reserved AD field and fixing AS_FilterStrand format error&quot;</span>
+        <span class="s2">&quot; on </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">3</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/mutect2/correct_fields/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">rename_ad</span><span class="o">=</span><span class="s2">&quot;&#39;s/=AD;/=ADM;/g&#39;&quot;</span><span class="p">,</span>
+        <span class="n">rename_ad_format</span><span class="o">=</span><span class="s2">&quot;&#39;s/:AD:/:ADM:/g&#39;&quot;</span><span class="p">,</span>
+        <span class="n">fix_as_filterstatus</span><span class="o">=</span><span class="s2">&quot;&#39;s/ID=AS_FilterStatus,Number=A/ID=AS_FilterStatus,Number=1/g&#39;&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;(gunzip -c </span><span class="si">{input}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot;sed </span><span class="si">{params.rename_ad}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot;sed </span><span class="si">{params.rename_ad_format}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot;sed </span><span class="si">{params.fix_as_filterstatus}</span><span class="s2">) &quot;</span>
+        <span class="s2">&quot;&gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
+<span class="c1">###############################</span>
+<span class="c1">### Variant calling Mutect2 ###</span>
+<span class="c1">###############################</span>
+
+
+<span class="n">module</span> <span class="n">gatk_mutect2_germline_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/mutect2_germline/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span> <span class="s2">&quot;known&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;af_only&quot;</span><span class="p">],</span> <span class="s2">&quot;bed&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;capture_kit_bed&quot;</span><span class="p">],</span> <span class="s2">&quot;dbsnp&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">]}</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">gatk_mutect2_germline_meta</span> <span class="k">as</span> <span class="n">gatk_mutect2_germline_</span><span class="o">*</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">mutect2_germline</span> <span class="kn">from</span> <span class="nn">gatk_mutect2_germline_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">fasta</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span>
+        <span class="n">fasta_index</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">]),</span>
+        <span class="n">fasta_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">]),</span>
+        <span class="nb">map</span><span class="o">=</span><span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">map_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">),</span>
+        <span class="n">germline</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;af_only&quot;</span><span class="p">],</span>
+        <span class="n">germline_tbi</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;af_only&quot;</span><span class="p">]),</span>
+        <span class="n">intervals</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;capture_kit_bed&quot;</span><span class="p">]</span>
+
+<span class="c1">################################</span>
+<span class="c1">### Variant Calling Varscan2 ###</span>
+<span class="c1">################################</span>
+
+<span class="n">module</span> <span class="n">varscan2_germline_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/varscan2_germline/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span> <span class="s2">&quot;bed&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;capture_kit_bed&quot;</span><span class="p">]}</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">varscan2_germline_meta</span> <span class="k">as</span> <span class="o">*</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">samtools_mpilup</span> <span class="kn">from</span> <span class="nn">varscan2_germline_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;gatk/recal_bam/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">reference_genome</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">],</span>
+        <span class="n">reference_genome_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+
+
+<span class="c1">##############################</span>
+<span class="c1">### GATK BAM RECALIBRATION ###</span>
+<span class="c1">##############################</span>
+
+<span class="n">module</span> <span class="n">gatk_bqsr_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/gatk_bqsr/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;threads&quot;</span><span class="p">],</span> <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span> <span class="s2">&quot;dbsnp&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">]}</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">gatk_apply_baserecalibrator</span> <span class="kn">from</span> <span class="nn">gatk_bqsr_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">),</span>
+        <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">],</span>
+        <span class="n">ref_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+        <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+        <span class="n">recal_table</span><span class="o">=</span><span class="s2">&quot;gatk/recal_data_table/</span><span class="si">{sample}</span><span class="s2">.grp&quot;</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">gatk_compute_baserecalibration_table</span> <span class="kn">from</span> <span class="nn">gatk_bqsr_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">),</span>
+        <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">],</span>
+        <span class="n">ref_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+        <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+        <span class="n">known</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;dbsnp&#39;</span><span class="p">],</span>
+        <span class="n">known_idx</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;dbsnp&#39;</span><span class="p">])</span>
+
+
+<span class="c1">#####################</span>
+<span class="c1">### Deduplicating ###</span>
+<span class="c1">#####################</span>
+
+<span class="n">rule</span> <span class="n">picard_markduplicates</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">),</span>
+        <span class="n">metrics</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/metrics/</span><span class="si">{sample}</span><span class="s2">.picard.metrics.txt&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Removing duplicates on </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5120</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s2">&quot;--ASSUME_SORT_ORDER coordinate --REMOVE_DUPLICATES true&quot;</span>
+
+
+<span class="c1">###################</span>
+<span class="c1">### BWA MAPPING ###</span>
+<span class="c1">###################</span>
+
+<span class="n">module</span> <span class="n">bwa_fixmate_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/bwa_fixmate/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;threads&quot;</span><span class="p">],</span> <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">]}</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">bwa_fixmate_meta</span> <span class="k">as</span> <span class="n">bwa_fixmate_meta_</span><span class="o">*</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">bwa_mem</span> <span class="kn">from</span> <span class="nn">bwa_fixmate_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">reads</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq&quot;</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
+            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">),</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">multiext</span><span class="p">(</span>
+            <span class="s2">&quot;bwa_mem2/index/genome&quot;</span><span class="p">,</span> <span class="s2">&quot;.0123&quot;</span><span class="p">,</span> <span class="s2">&quot;.amb&quot;</span><span class="p">,</span> <span class="s2">&quot;.ann&quot;</span><span class="p">,</span> <span class="s2">&quot;.pac&quot;</span>
+        <span class="p">)</span>
+
+
+<span class="c1">############################</span>
+<span class="c1">### FASTP FASTQ CLEANING ###</span>
+<span class="c1">############################</span>
+
+<span class="n">rule</span> <span class="n">fastp_clean</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">sample</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fq.gz&quot;</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
+            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">),</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">trimmed</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq&quot;</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
+            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">=</span><span class="s2">&quot;fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
+        <span class="n">json</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Cleaning </span><span class="si">{wildcards.sample}</span><span class="s2"> with Fastp&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">15360</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">adapters</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fastp_adapters&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fastp_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/fastp/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;/bio/fastp&quot;</span>
+
+
+<span class="c1">#################################################</span>
+<span class="c1">### Gather files from iRODS or mounting point ###</span>
+<span class="c1">#################################################</span>
+
+<span class="n">rule</span> <span class="n">bigr_copy</span><span class="p">:</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fq.gz&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Gathering </span><span class="si">{wildcards.sample}</span><span class="s2"> fastq file (</span><span class="si">{wildcards.stream}</span><span class="s2">)&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">2048</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="nb">input</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="n">fastq_links</span><span class="p">[</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bigr_copy/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;/bio/BiGR/copy&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Thibault Dayris</p></li>
+<li><p>M boyba Diop</p></li>
+<li><p>Marc Deloger</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="variant_calling_germline_wes.html" class="btn btn-neutral float-left" title="VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2016, The Snakemake team.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

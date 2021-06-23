@@ -1,7 +1,7 @@
-.. _`Variant_Calling_Ampliseq (under development)`:
+.. _`Variant_Calling_Ampliseq`:
 
-VARIANT_CALLING_AMPLISEQ (UNDER DEVELOPMENT)
-============================================
+VARIANT_CALLING_AMPLISEQ
+========================
 
 Perform Variant calling on Ampliseq
 
@@ -23,8 +23,6 @@ In order to run the pipeline, use the following commands
   bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/run.sh
 
   # Copy/paste the following line for **HG38**
-
-  {'\# WARNING': 'HG38 remains not tested (possible wrong capture kit)'}
 
   bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/run.sh hg38
 

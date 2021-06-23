@@ -105,6 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../adapterremoval.html">ADAPTERREMOVAL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../arriba.html">ARRIBA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../art.html">ART</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../assembly-stats.html">ASSEMBLY-STATS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bamtools.html">BAMTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bbtools.html">BBTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bcftools.html">BCFTOOLS</a></li>
@@ -167,6 +168,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../jannovar.html">JANNOVAR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../kallisto.html">KALLISTO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../last.html">LAST</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../liftoff.html">LIFTOFF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../lofreq.html">LOFREQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../macs2.html">MACS2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../maftools.html">MAFTOOLS</a></li>
@@ -176,6 +178,8 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">MINIMAP2</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
 </ul>
@@ -207,12 +211,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../prosolo.html">PROSOLO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ptrimmer.html">PTRIMMER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pyfastaq.html">PYFASTAQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../qualimap.html">QUALIMAP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../rasusa.html">RASUSA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../razers3.html">RAZERS3</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../rbt.html">RBT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../rebaler.html">REBALER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference.html">REFERENCE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../refgenie.html">REFGENIE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rsem.html">RSEM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../rubic.html">RUBIC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../salmon.html">SALMON</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sambamba.html">SAMBAMBA</a></li>
@@ -328,11 +334,11 @@
             
   <div class="section" id="minimap2">
 <span id="bio-minimap2-aligner"></span><h1>MINIMAP2<a class="headerlink" href="#minimap2" title="Permalink to this headline">¶</a></h1>
-<p>A versatile pairwise aligner for genomic and spliced nucleotide sequences <a class="reference external" href="https://lh3.github.io/minimap2">https://lh3.github.io/minimap2</a></p>
+<p>A versatile pairwise aligner for genomic and spliced nucleotide sequences.</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">minimap2</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">minimap2_paf</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">target</span><span class="o">=</span><span class="s2">&quot;target/</span><span class="si">{input1}</span><span class="s2">.mmi&quot;</span><span class="p">,</span> <span class="c1"># can be either genome index or genome fasta</span>
         <span class="n">query</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;query/reads1.fasta&quot;</span><span class="p">,</span> <span class="s2">&quot;query/reads2.fasta&quot;</span><span class="p">]</span>
@@ -341,10 +347,44 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/minimap2/</span><span class="si">{input1}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;-x map-pb&quot;</span>  <span class="c1"># optional</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;-x map-pb&quot;</span><span class="p">,</span>           <span class="c1"># optional</span>
+        <span class="n">sorting</span><span class="o">=</span><span class="s2">&quot;coordinate&quot;</span><span class="p">,</span>           <span class="c1"># optional: Enable sorting. Possible values: &#39;none&#39;, &#39;queryname&#39; or &#39;coordinate&#39;</span>
+        <span class="n">sort_extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>                <span class="c1"># optional: extra arguments for samtools/picard</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">3</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.74.0-764-g3b0788731/bio/minimap2/aligner&quot;</span>
+        <span class="s2">&quot;0.75.0-757-g5432694f9/bio/minimap2/aligner&quot;</span>
+
+<span class="n">rule</span> <span class="n">minimap2_sam</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">target</span><span class="o">=</span><span class="s2">&quot;target/</span><span class="si">{input1}</span><span class="s2">.mmi&quot;</span><span class="p">,</span> <span class="c1"># can be either genome index or genome fasta</span>
+        <span class="n">query</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;query/reads1.fasta&quot;</span><span class="p">,</span> <span class="s2">&quot;query/reads2.fasta&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;aligned/</span><span class="si">{input1}</span><span class="s2">_aln.sam&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/minimap2/</span><span class="si">{input1}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;-x map-pb&quot;</span><span class="p">,</span>           <span class="c1"># optional</span>
+        <span class="n">sorting</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>                 <span class="c1"># optional: Enable sorting. Possible values: &#39;none&#39;, &#39;queryname&#39; or &#39;coordinate&#39;</span>
+        <span class="n">sort_extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>                <span class="c1"># optional: extra arguments for samtools/picard</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">3</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.75.0-757-g5432694f9/bio/minimap2/aligner&quot;</span>
+
+<span class="n">rule</span> <span class="n">minimap2_bam</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">target</span><span class="o">=</span><span class="s2">&quot;target/</span><span class="si">{input1}</span><span class="s2">.mmi&quot;</span><span class="p">,</span> <span class="c1"># can be either genome index or genome fasta</span>
+        <span class="n">query</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;query/reads1.fasta&quot;</span><span class="p">,</span> <span class="s2">&quot;query/reads2.fasta&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;aligned/</span><span class="si">{input1}</span><span class="s2">_aln.bam&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/minimap2/</span><span class="si">{input1}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;-x map-pb&quot;</span><span class="p">,</span>           <span class="c1"># optional</span>
+        <span class="n">sorting</span><span class="o">=</span><span class="s2">&quot;coordinate&quot;</span><span class="p">,</span>           <span class="c1"># optional: Enable sorting. Possible values: &#39;none&#39;, &#39;queryname&#39; or &#39;coordinate&#39;</span>
+        <span class="n">sort_extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>                <span class="c1"># optional: extra arguments for samtools/picard</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">3</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.75.0-757-g5432694f9/bio/minimap2/aligner&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -358,6 +398,28 @@ When running with</p>
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">minimap2==2.17</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">samtools==1.12</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>FASTQ file(s)</p></li>
+<li><p>reference genome</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>SAM/BAM/CRAM file</p></li>
+</ul>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The <cite>extra</cite> param allows for additional arguments for minimap2.</p></li>
+<li><p>The <cite>sort</cite> param allows to enable sorting (if output not PAF), and can be either ‘none’, ‘queryname’ or ‘coordinate’.</p></li>
+<li><p>The <cite>sort_extra</cite> allows for extra arguments for samtools/picard</p></li>
+<li><p>For more inforamtion see, <a class="reference external" href="https://lh3.github.io/minimap2">https://lh3.github.io/minimap2</a></p></li>
 </ul>
 </div>
 <div class="section" id="authors">
@@ -365,6 +427,7 @@ When running with</p>
 <ul class="simple">
 <li><p>Tom Poorten</p></li>
 <li><p>Michael Hall</p></li>
+<li><p>Filipe G. Vieira</p></li>
 </ul>
 </div>
 <div class="section" id="code">
@@ -374,16 +437,52 @@ When running with</p>
 <span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;tom.poorten@gmail.com&quot;</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span>
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 
-<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">inputQuery</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
 
+<span class="c1"># Extract output format</span>
+<span class="n">out_name</span><span class="p">,</span> <span class="n">out_ext</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">out_ext</span> <span class="o">=</span> <span class="n">out_ext</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+<span class="c1"># Extract arguments.</span>
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">sort</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sorting&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">)</span>
+<span class="n">sort_extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sort_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">pipe_cmd</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="n">out_ext</span> <span class="o">!=</span> <span class="s2">&quot;PAF&quot;</span><span class="p">:</span>
+    <span class="c1"># Add option for SAM output</span>
+    <span class="n">extra</span> <span class="o">+=</span> <span class="s2">&quot; -a&quot;</span>
+
+    <span class="c1"># Determine which pipe command to use for converting to bam or sorting.</span>
+    <span class="k">if</span> <span class="n">sort</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">out_ext</span> <span class="o">!=</span> <span class="s2">&quot;SAM&quot;</span><span class="p">:</span>
+            <span class="c1"># Simply convert to output format using samtools view.</span>
+            <span class="n">pipe_cmd</span> <span class="o">=</span> <span class="s2">&quot;| samtools view -h --output-fmt </span><span class="si">{}</span><span class="s2"> -&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_ext</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">sort</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;coordinate&quot;</span><span class="p">,</span> <span class="s2">&quot;queryname&quot;</span><span class="p">]:</span>
+
+        <span class="c1"># Add name flag if needed.</span>
+        <span class="k">if</span> <span class="n">sort</span> <span class="o">==</span> <span class="s2">&quot;queryname&quot;</span><span class="p">:</span>
+            <span class="n">sort_extra</span> <span class="o">+=</span> <span class="s2">&quot; -n&quot;</span>
+
+        <span class="c1"># Sort alignments.</span>
+        <span class="n">pipe_cmd</span> <span class="o">=</span> <span class="s2">&quot;| samtools sort </span><span class="si">{}</span><span class="s2"> --output-fmt </span><span class="si">{}</span><span class="s2"> -&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sort_extra</span><span class="p">,</span> <span class="n">out_ext</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected value for params.sort (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sort</span><span class="p">))</span>
+
+
 <span class="n">shell</span><span class="p">(</span>
-    <span class="s2">&quot;(minimap2 -t </span><span class="si">{snakemake.threads}</span><span class="s2"> </span><span class="si">{extra}</span><span class="s2"> -o </span><span class="si">{snakemake.output[0]}</span><span class="s2"> &quot;</span>
-    <span class="s2">&quot;</span><span class="si">{snakemake.input.target}</span><span class="s2"> </span><span class="si">{inputQuery}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;(minimap2 -t </span><span class="si">{snakemake.threads}</span><span class="s2"> </span><span class="si">{extra}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;</span><span class="si">{snakemake.input.target}</span><span class="s2"> </span><span class="si">{inputQuery}</span><span class="s2"> </span><span class="si">{pipe_cmd}</span><span class="s2"> &gt; </span><span class="si">{snakemake.output[0]}</span><span class="s2">) </span><span class="si">{log}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>

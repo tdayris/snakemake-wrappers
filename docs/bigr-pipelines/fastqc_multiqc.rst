@@ -1,7 +1,7 @@
-.. _`FastQC_MultiQC (under development)`:
+.. _`FastQC_MultiQC`:
 
-FASTQC_MULTIQC (UNDER DEVELOPMENT)
-==================================
+FASTQC_MULTIQC
+==============
 
 Simply run FastQC and MultiQC on available Fastq files
 

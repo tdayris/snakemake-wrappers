@@ -1,7 +1,7 @@
-.. _`salmon_quant (under development)`:
+.. _`salmon_quant`:
 
-SALMON_QUANT (UNDER DEVELOPMENT)
-================================
+SALMON_QUANT
+============
 
 Perform trimming and quantification on RNASeq
 
@@ -122,10 +122,6 @@ The pipeline contains the following steps:
         filename="snakemake.dge_deseq2.log",
         filemode="w",
         level=logging.DEBUG
-    )
-    logging.warning(
-        "This pipeline is under active development. It does not work "
-        "and should not be trusted."
     )
 
     default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/dge_deseq2/config.hg38.yaml")

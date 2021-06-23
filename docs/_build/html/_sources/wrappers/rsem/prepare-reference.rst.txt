@@ -1,0 +1,116 @@
+.. _`bio/rsem/prepare-reference`:
+
+RSEM PREPARE REFERENCE
+======================
+
+Run rsem-prepare-reference to create index files for downstream analysis with rsem.
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule prepare_reference:
+        input:
+            # reference FASTA with either the entire genome or transcript sequences
+            reference_genome="genome.fasta",
+        output:
+            # one of the index files created and used by RSEM (required)
+            seq="index/reference.seq",
+            # RSEM produces a number of other files which may optionally be specified as output; these may be provided so that snakemake is aware of them, but the wrapper doesn't do anything with this information other than to verify that the file path prefixes match that of output.seq.
+            # for example,
+            grp="index/reference.grp",
+            ti="index/reference.ti",
+        params:
+            # optional additional parameters, for example,
+            #extra="--gtf annotations.gtf",
+            # if building the index against a reference transcript set
+            extra="",
+        log:
+            "logs/rsem/prepare-reference.log",
+        wrapper:
+            "0.75.0-757-g5432694f9/bio/rsem/prepare-reference"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``rsem==1.3.3``
+
+Input/Output
+------------
+**Input:**
+
+* reference genome
+* additional optional arguments
+
+**Output:**
+
+* index files for downstream use with rsem
+
+
+
+Notes
+-----
+
+* For more information, see https://github.com/deweylab/RSEM.
+
+
+
+Authors
+-------
+
+* Brett Copeland
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Brett Copeland"
+    __copyright__ = "Copyright 2021, Brett Copeland"
+    __email__ = "brcopeland@ucsd.edu"
+    __license__ = "MIT"
+
+
+    import os
+
+    from snakemake.shell import shell
+
+    # the reference_name argument is inferred by stripping the .seq suffix from
+    # the output.seq value
+    output_directory = os.path.dirname(os.path.abspath(snakemake.output.seq))
+    seq_file = os.path.basename(snakemake.output.seq)
+    if seq_file.endswith(".seq"):
+        reference_name = os.path.join(output_directory, seq_file[:-4])
+    else:
+        raise Exception("output.seq has an invalid file suffix (must be .seq)")
+
+    for output_variable, output_path in snakemake.output.items():
+        if not os.path.abspath(output_path).startswith(reference_name):
+            raise Exception(
+                "the path for {} is inconsistent with that of output.seq".format(
+                    output_variable
+                )
+            )
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    shell(
+        "rsem-prepare-reference --num-threads {snakemake.threads} {extra} "
+        "{snakemake.input.reference_genome} {reference_name} "
+        "{log}"
+    )

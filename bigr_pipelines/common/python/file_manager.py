@@ -22,6 +22,10 @@ FilePathType = Union[str, Path]
 
 
 def remove_suffixes(word: str, suffixes: list[str]) -> str:
+    """
+    From a given word (usually a path) remove the provided suffixe
+    (usually an extension)
+    """
     for suffix in suffixes:
         if word.endswith(suffix):
             return word[:-len(suffix)]
@@ -29,30 +33,56 @@ def remove_suffixes(word: str, suffixes: list[str]) -> str:
 
 
 def get_fasta_index_from_genome_path(genome_path: str) -> str:
+    """
+    From a fasta path, return it's fai without checking for existence (faster)
+    """
     return genome_path + ".fai"
 
 
 def get_fai(genome_path: str) -> str:
-
+    """
+    From a fasta path, return it's fai without checking for existence (faster)
+    """
     return get_fasta_index_from_genome_path(genome_path)
 
 def get_fasta_dict_from_genome_path(genome_path: str) -> str:
+    """
+    From a fasta path, return it's dictionnary without checking for
+    existence (faster)
+    """
     return ".".join(genome_path.split(".")[:-1]) + ".dict"
 
 
 def get_dict(genome_path: str) -> str:
+    """
+    From a fasta path, return it's dictionnary without checking for
+    existence (faster)
+    """
     return get_fasta_dict_from_genome_path(genome_path)
 
 
 def get_vcf_tbi_from_vcf_path(vcf_path: str) -> str:
+    """
+    From a vcf path, return it's tbi index without checking for
+    existence (faster)
+    """
     return vcf_path + ".tbi"
 
 
 def get_tbi(vcf_path: str) -> str:
+    """
+    From a vcf path, return it's tbi index without checking for
+    existence (faster)
+    """
     return get_vcf_tbi_from_vcf_path(vcf_path)
 
 
 def search_files(dirpath: FilePathType, ext: Optional[str] = None) -> list[str]:
+    """
+    Within a given directory, search all files. If an extension is provided,
+    return only the ones with matching suffixe. If a path leads to a directory,
+    this function is called recursively.
+    """
     logging.info("Searching in: {} for files ending with {}".format(dirpath, ext))
     if isinstance(dirpath, str):
         dirpath = Path(dirpath)
@@ -70,6 +100,10 @@ def search_files(dirpath: FilePathType, ext: Optional[str] = None) -> list[str]:
 
 
 def search_vcf_files(dirpath: FilePathType) -> dict[str, str]:
+    """
+    Within a given directory, search all vcf files. If a path leads to a
+    directory, the subfunction is called recursively.
+    """
     suffixes = ("vcf", "vcf.gz", "bcf")
     return {
         remove_suffixes(basename(vcf), suffixes): vcf
@@ -78,10 +112,18 @@ def search_vcf_files(dirpath: FilePathType) -> dict[str, str]:
 
 
 def search_vcf(dirpath: FilePathType) -> dict[str, str]:
+    """
+    Within a given directory, search all vcf files. If a path leads to a
+    directory, the subfunction is called recursively.
+    """
     return search_vcf_files(dirpath)
 
 
 def search_fastq_files(dirpath: FilePathType) -> dict[str, str]:
+    """
+    Within a given directory, search all fastq files. If a path leads to a
+    directory, the subfunction is called recursively.
+    """
     suffixes = (".fastq", ".fq", ".fastq.gz", ".fq.gz")
     return {
         remove_suffixes(basename(fastq), suffixes): fastq
@@ -90,6 +132,12 @@ def search_fastq_files(dirpath: FilePathType) -> dict[str, str]:
 
 
 def search_fastq_somatic(dirpath: FilePathType) -> dict[str, str]:
+    """
+    Within a given directory, search all vcf files. If a path leads to a
+    directory, the subfunction is called recursively.
+
+    It returns fastq files four by four, according to alphanumerical order.
+    """
     suffixes = ["fastq", "fq", "fastq.gz", "fq.gz"]
     return {
         remove_suffixes(basename(t1), suffixes): {
@@ -101,7 +149,34 @@ def search_fastq_somatic(dirpath: FilePathType) -> dict[str, str]:
     }
 
 
+def search_fastq_trio(dirpath: FilePathType) -> dict[str, str]:
+    """
+    Within a given directory, search all vcf files. If a path leads to a
+    directory, the subfunction is called recursively.
+
+    It returns fastq files six by six, according to alphanumerical order.
+    """
+    suffixes = ["fastq", "fq", "fastq.gz", "fq.gz"]
+    fqiter = zip(*[iter(search_fastq_files(dirpath))]*6)
+    return {
+        remove_suffixes(basename(t1), suffixes): {
+            "Tumor_upstream_file": t1,
+            "Tumor_downstream_file": t2,
+            "Father_upstream_file": f1,
+            "Father_downstream_file": f2,
+            "Mother_upstream_file": m1,
+            "Mother_downstream_file": m2,
+        } for n1, n2, f1, f2, m1, m2 in fqiter
+    }
+
+
 def search_fastq_pairs(dirpath: FilePathType) -> dict[str, dict[str, str]]:
+    """
+    Within a given directory, search all vcf files. If a path leads to a
+    directory, the subfunction is called recursively.
+
+    It returns fastq files as pairs, according to alphanumerical order.
+    """
     suffixes = (".fastq", ".fq", ".fastq.gz", ".fq.gz")
     return {
         remove_suffixes(basename(r1), suffixes): {
@@ -111,6 +186,10 @@ def search_fastq_pairs(dirpath: FilePathType) -> dict[str, dict[str, str]]:
 
 
 def search_mapping(dirpath: FilePathType) -> dict[str, str]:
+    """
+    Within a given directory, search all bam files. If a path leads to a
+    directory, the subfunction is called recursively.
+    """
     suffixes = ("sam", "bam", "cram")
     return {
         remove_suffixes(basename(mapping), suffixes): mapping
@@ -119,18 +198,33 @@ def search_mapping(dirpath: FilePathType) -> dict[str, str]:
 
 
 def search_bam(dirpath: FilePathType) -> dict[str, str]:
+    """
+    Within a given directory, search all bam files. If a path leads to a
+    directory, the subfunction is called recursively.
+    """
     return search_mapping(dirpath)
 
 
 def search_fasta(dirpath: FilePathType) -> list[str]:
+    """
+    Within a given directory, search all fasta files. If a path leads to a
+    directory, the subfunction is called recursively.
+    """
     return search_files(dirpath, ext=("fa", "fasta", "fa.gz", "fasta.gz"))
 
 
 def search_fa(dirpath: FilePathType) -> list[str]:
+    """
+    Within a given directory, search all fasta files. If a path leads to a
+    directory, the subfunction is called recursively.
+    """
     return search_fasta(dirpath)
 
 
 def read_design(design_path: FilePathType) -> pandas.DataFrame:
+    """
+    Load provided design file as a pandas DataFrame.
+    """
     return pandas.read_csv(design_path, sep="\t", header=0)
 
 
@@ -138,6 +232,10 @@ def build_design(
         dirpath: FilePathType,
         search_func: Callable[FilePathType, dict[str, dict[str, str]]]) \
         -> pandas.DataFrame:
+    """
+    Search for files with the provided function within the given directory,
+    then return a design as a pandas DataFrame.
+    """
     design = (pandas.DataFrame.from_dict(search_func(dirpath), orient="index")
                               .reset_index()
                               .rename(columns={"index": "Sample_id"}))
@@ -150,6 +248,12 @@ def get_design(
         dirpath: FilePathType,
         search_func: Callable[FilePathType, dict[str, dict[str, str]]]) \
         -> pandas.DataFrame:
+    """
+    From a given path, search for a file named 'design.tsv'. If this file is
+    missing, then this function searches for files with the given extension
+    within the provided directory, then builds, saves and returns a pandas
+    DataFrame corresponding to that design.
+    """
     design = None
     if (design_path := Path("design.tsv")).exists():
         logging.info("Design file available: %s", str(design_path.absolute()))
@@ -161,6 +265,10 @@ def get_design(
 
 
 def get_config(default_config: dict[str, Any]) -> str:
+    """
+    From a given path, seach for a function named "config.yaml". If this file
+    is missing, this function saves a copy of the default configuration.
+    """
     if (config_path := Path("config.yaml")).exists():
         logging.info("Config file available: %s", str(config_path.absolute()))
     else:
@@ -179,4 +287,7 @@ def design_config(
         dirpath: FilePathType,
         search_func: Callable[FilePathType, dict[str, dict[str, str]]]) \
         -> list[Union[pandas.DataFrame, str]]:
+    """
+    Shortcut to build/load both design and config at once.
+    """
     return [get_design(dirpath, search_func), get_config(default_config)]

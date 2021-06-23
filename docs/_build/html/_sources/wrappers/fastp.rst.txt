@@ -18,6 +18,7 @@ This wrapper can be used in the following way:
             sample=["reads/se/{sample}.fastq"]
         output:
             trimmed="trimmed/se/{sample}.fastq",
+            failed="trimmed/se/{sample}.failed.fastq",
             html="report/se/{sample}.html",
             json="report/se/{sample}.json"
         log:
@@ -27,7 +28,7 @@ This wrapper can be used in the following way:
             extra=""
         threads: 1
         wrapper:
-            "0.74.0-764-g3b0788731/bio/fastp"
+            "0.75.0-757-g5432694f9/bio/fastp"
 
 
     rule fastp_pe:
@@ -35,16 +36,23 @@ This wrapper can be used in the following way:
             sample=["reads/pe/{sample}.1.fastq", "reads/pe/{sample}.2.fastq"]
         output:
             trimmed=["trimmed/pe/{sample}.1.fastq", "trimmed/pe/{sample}.2.fastq"],
+            # Unpaired reads separately
+            unpaired1="trimmed/pe/{sample}.u1.fastq",
+            unpaired2="trimmed/pe/{sample}.u2.fastq",
+            # or in a single file
+    #        unpaired="trimmed/pe/{sample}.singletons.fastq",
+            merged="trimmed/pe/{sample}.merged.fastq",
+            failed="trimmed/pe/{sample}.failed.fastq",
             html="report/pe/{sample}.html",
             json="report/pe/{sample}.json"
         log:
             "logs/fastp/pe/{sample}.log"
         params:
             adapters="--adapter_sequence ACGGCTAGCTA --adapter_sequence_r2 AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC",
-            extra=""
+            extra="--merge"
         threads: 2
         wrapper:
-            "0.74.0-764-g3b0788731/bio/fastp"
+            "0.75.0-757-g5432694f9/bio/fastp"
 
     rule fastp_pe_wo_trimming:
         input:
@@ -58,7 +66,7 @@ This wrapper can be used in the following way:
             extra=""
         threads: 2
         wrapper:
-            "0.74.0-764-g3b0788731/bio/fastp"
+            "0.75.0-757-g5432694f9/bio/fastp"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -74,6 +82,29 @@ Software dependencies
 
 * ``fastp=0.20``
 
+Input/Output
+------------
+**Input:**
+
+* fastq file(s)
+
+**Output:**
+
+* trimmed fastq file(s)
+* unpaired reads (optional; eihter in a single file or separate)
+* merged reads (optional)
+* failed reads (optional)
+* json file containing trimming statistics
+* html file containing trimming statistics
+
+
+
+Notes
+-----
+
+* The `adapters` param allows to specify adapter sequences
+* The `extra` param allows for additional program arguments.
+* For more inforamtion see, https://github.com/OpenGene/fastp
 
 
 
@@ -81,6 +112,7 @@ Authors
 -------
 
 * Sebastian Kurscheid (sebastian.kurscheid@unibas.ch)
+* Filipe G. Vieira
 
 
 Code
@@ -94,32 +126,69 @@ Code
     __license__ = "MIT"
 
     from snakemake.shell import shell
+    import re
 
     extra = snakemake.params.get("extra", "")
     adapters = snakemake.params.get("adapters", "")
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
+
+    # Assert input
     n = len(snakemake.input.sample)
     assert (
         n == 1 or n == 2
     ), "input->sample must have 1 (single-end) or 2 (paired-end) elements."
 
+
+    # Input files
     if n == 1:
         reads = "--in1 {}".format(snakemake.input.sample)
     else:
         reads = "--in1 {} --in2 {}".format(*snakemake.input.sample)
 
+
+    # Output files
     trimmed_paths = snakemake.output.get("trimmed", None)
-    if trimmed_paths is not None:
+    if trimmed_paths:
         if n == 1:
             trimmed = "--out1 {}".format(snakemake.output.trimmed)
         else:
             trimmed = "--out1 {} --out2 {}".format(*snakemake.output.trimmed)
+
+            # Output unpaired files
+            unpaired = snakemake.output.get("unpaired", None)
+            if unpaired:
+                trimmed += f" --unpaired1 {unpaired} --unpaired2 {unpaired}"
+            else:
+                unpaired1 = snakemake.output.get("unpaired1", None)
+                if unpaired1:
+                    trimmed += f" --unpaired1 {unpaired1}"
+                unpaired2 = snakemake.output.get("unpaired2", None)
+                if unpaired2:
+                    trimmed += f" --unpaired2 {unpaired2}"
+
+            # Output merged PE reads
+            merged = snakemake.output.get("merged", None)
+            if merged:
+                if not re.search(r"--merge\b", extra):
+                    raise ValueError(
+                        "output.merged specified but '--merge' option missing from params.extra"
+                    )
+                trimmed += f" --merged_out {merged}"
     else:
         trimmed = ""
 
+
+    # Output failed reads
+    failed = snakemake.output.get("failed", None)
+    if failed:
+        trimmed += f" --failed_out {failed}"
+
+
+    # Stats
     html = "--html {}".format(snakemake.output.html)
     json = "--json {}".format(snakemake.output.json)
+
 
     shell(
         "(fastp --thread {snakemake.threads} "

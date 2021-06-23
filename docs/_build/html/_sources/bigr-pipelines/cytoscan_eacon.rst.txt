@@ -1,7 +1,7 @@
-.. _`EaCoN_Cytoscan (under development)`:
+.. _`EaCoN_Cytoscan`:
 
-EACON_CYTOSCAN (UNDER DEVELOPMENT)
-==================================
+EACON_CYTOSCAN
+==============
 
 Analyse Cytoscans with EaCoN on Flamingo
 
@@ -210,7 +210,7 @@ The pipeline contains the following steps:
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/rcnorm_0.1.5.tar.gz"
             ],
             git_packages = [
-                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.74.0-764-g3b0788731.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.75.0-757-g5432694f9.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_Chromosomes.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.cytoscan.2.4.0.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.oncoscan.2.4.0.tar.gz"

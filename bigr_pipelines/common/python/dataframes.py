@@ -86,5 +86,12 @@ def yield_samples(complete_design: pandas.DataFrame,
         for l1, l2 in itertools.combinations(levels, 2):
             yield complete_design[complete_design[col].isin([l1, l2])].index.tolist()
 
-def relation_condition_sample(complete_design: pandas.DataFrame, factor: str) -> dict[str, str]:
-    return {sample: cond for sample, cond in zip(complete_design.index.tolist(), complete_design[factor].tolist())}
+def relation_condition_sample(complete_design: pandas.DataFrame,
+                              factor: str) -> dict[str, str]:
+    """
+    From a design dataframe and a factor name, return the list of samples
+    involved.
+    """
+    return dict(
+        zip(complete_design.index.tolist(), complete_design[factor].tolist())
+    )
