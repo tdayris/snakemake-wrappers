@@ -1,0 +1,170 @@
+#!/usr/bin/R
+
+# Load libraries
+base::library(package="dplyr", quietly=TRUE);
+base::library(package="tidyr", quietly=TRUE);
+base::library(package="tibble", quietly=TRUE);
+base::library(package="readr", quietly=TRUE);
+base::library(package="ggplot2", quietly=TRUE);
+base::library(package="immunedeconv", quietly=TRUE);
+base::library(package="RColorBrewer", quietly=TRUE);
+library("randomcoloR");
+base::message("Libraries loaded");
+
+# Load dataset
+tpm <- utils::read.table(
+  file = snakemake@input[["expr_mat"]],
+  header = TRUE,
+  sep = "\t",
+  stringsAsFactors = FALSE
+);
+
+gene_col <- "GENE";
+if ("gene_col" %in% base::names(snakemake@params)) {
+  gene_col <- base::as.character(x = snakemake@params[["gene_col"]]);
+}
+
+extra <- "method = 'xcell', tumor = TRUE, column = 'gene_symbol'";
+if ("extra" %in% base::names(snakemake@params)) {
+  extra <- base::as.character(x = snakemake@params[["extra"]]);
+}
+
+colors <- grDevices::colors();
+dotx <- 1024;
+doty <- 2048;
+
+# Build a color palette out of cold and warm colors
+cool <- rainbow(
+  20,
+  start=rgb2hsv(col2rgb('cyan'))[1],
+  end=rgb2hsv(col2rgb('deeppink'))[1]
+);
+warm <- rainbow(
+  19,
+  start=rgb2hsv(col2rgb('red'))[1],
+  end=rgb2hsv(col2rgb('yellow'))[1]
+);
+colors <- c(rev(cool), rev(warm));
+
+cmd <- base::paste0(
+  "immunedeconv::deconvolute(",
+  "gene_expression = tpm, ",
+  extra,
+  ")"
+);
+
+rownames(tpm) <- tpm[, gene_col];
+tpm[, gene_col] <- NULL;
+print(tpm %>% head);
+print(cmd)
+base::message("Datasets and configuration loaded");
+
+# Deconvolution
+res_deconv <- base::eval(
+  base::parse(
+    text = cmd
+  )
+);
+print(res_deconv %>% head);
+base::message("Deconvolution performed");
+
+
+# Save results
+if ("rds" %in% base::names(snakemake@output)) {
+  base::saveRDS(
+    obj = res_deconv,
+    file = snakemake@output[["rds"]]
+  );
+  base::message("RDS object saved as ", snakemake@output[["rds"]]);
+}
+
+if ("tsv" %in% base::names(snakemake@output)) {
+  utils::write.table(
+    x = res_deconv,
+    file = snakemake@output[["tsv"]],
+    sep = "\t",
+    row.names = FALSE,
+    quote = FALSE
+  );
+  base::message("TSV table saved as ", snakemake@output[["tsv"]]);
+}
+
+# Plot graphs
+if ("histogram" %in% base::names(snakemake@output)) {
+  png(
+    filename = snakemake@output[["histogram"]],
+    width = dotx,
+    height = doty,
+    units = "px",
+    type = "cairo"
+  );
+
+  print(res_deconv %>%
+    gather(sample, fraction, -cell_type) %>%
+    ggplot(aes(x=sample, y=fraction, fill=cell_type)) +
+      geom_bar(stat='identity') +
+      coord_flip() +
+      scale_fill_manual(values = colors) +
+      scale_x_discrete(limits = rev(levels(res_deconv))));
+
+  dev.off();
+  base::message("Histogram saved as ", snakemake@output[["histogram"]]);
+}
+
+
+if ("dotplot" %in% base::names(snakemake@output)) {
+  png(
+    filename = snakemake@output[["dotplot"]],
+    width = dotx,
+    height = doty * 4,
+    units = "px",
+    type = "cairo"
+  );
+
+  print(res_deconv %>%
+    gather(sample, score, -cell_type) %>%
+    ggplot(aes(x=sample, y=score)) +
+      geom_point(size=4) +
+      facet_wrap(~cell_type, scales="free_x", ncol=3) +
+      coord_flip() +
+      theme_bw() +
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)));
+
+  dev.off();
+  base::message("Dotplots saved as ", snakemake@output[["dotplot"]]);
+}
+
+if ("plotdir" %in% base::names(snakemake@output)) {
+  plotdir = base::as.character(x = snakemake@output[["plotdir"]]);
+  if (! dir.exists(snakemake@output[["plotdir"]])) {
+    base::dir.create(plotdir);
+    base::message("Creating ", plotdir);
+  }
+  for (celltype in base::unlist(res_deconv["cell_type"])) {
+    png_name <- base::paste(
+      base::gsub(" ", "_", celltype), "dotplot", "png", sep="."
+    );
+    png_path <- base::file.path(plotdir, png_name);
+    base::message("Saving ", celltype, " dotplot, as: ", png_path);
+
+    png(
+      filename = png_path,
+      width = dotx,
+      height = doty,
+      units = "px",
+      type = "cairo"
+    );
+
+    print(res_deconv %>%
+      filter(cell_type==celltype) %>%
+      gather(sample, score, -cell_type) %>%
+      ggplot(aes(x=sample, y=score)) +
+        geom_point(size=4) +
+        coord_flip() +
+        theme_bw() +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    );
+
+    dev.off();
+  }
+}
