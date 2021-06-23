@@ -117,7 +117,7 @@ rule target:
 
 rule general_pca:
     input:
-        counts="pseudo_mapping/aggregation/TPM.genes.tsv"
+        counts="salmon/pseudo_mapping/aggregation/TPM.genes.tsv"
     output:
         png=expand(
             "figures/pca/general.pca.{factor}.{axes}.png",
@@ -140,6 +140,28 @@ rule general_pca:
         prefix=lambda wildcards:"figures/pca/general.pca.{factor}"
     wrapper:
         "/bio/seaborn/pca"
+
+
+rule pandas_merge_salmon_tr:
+    input:
+        quant = expand(
+            "salmon/pseudo_mapping/{sample}/quant.sf",
+            sample=design["Sample_id"]
+        ),
+        tx2gene = "tx2gene.tsv"
+    output:
+        tsv = "table_tr_pos.tsv"
+    message:
+        "Testing pandas merge salmon"
+    params:
+        header = True,
+        position = True,
+        gencode = False,
+        
+    log:
+        "logs/pandas_merge_salmon.log"
+    wrapper:
+        "/bio/pandas/salmon"
 
 
 ##############################
