@@ -1,0 +1,234 @@
+.. _`bio/immunedeconv/mcpcounter`:
+
+MCPCOUNTER
+==========
+
+Use mcpcounter to deconvolute gene expression onto cell types
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_mcpcounter:
+        input:
+            quant="quantification.tsv"
+        output:
+            histogram="celltypes.hist.png",
+            dotplot="celltypes.dotplot.png",
+            tsv="celltypes.tsv",
+            rds="celltypes.RDS"
+        wrapper:
+            "0.75.0-772-g3f7df6e90/bio/immunedeconv/mcpcounter"
+
+Note that input, output and log file paths can be chosen freely.
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``conda-forge::r-dplyr==1.0.7``
+* ``conda-forge::r-ggplot2==3.3.4``
+* ``conda-forge::r-tidyr==1.1.3``
+* ``conda-forge::r-tibble==3.1.2``
+* ``bioconda::r-immunedeconv==2.0.3``
+* ``conda-forge::r-readr==1.4.0``
+* ``conda-forge::r-rcolorbrewer==1.1_2``
+* ``conda-forge::r-randomcolor==1.1.0``
+
+Input/Output
+------------
+**Input:**
+
+* Quantification table
+
+**Output:**
+
+* TSV and PNG formatted results
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # Load libraries
+    base::library(package="dplyr", quietly=TRUE);
+    base::library(package="tidyr", quietly=TRUE);
+    base::library(package="tibble", quietly=TRUE);
+    base::library(package="readr", quietly=TRUE);
+    base::library(package="ggplot2", quietly=TRUE);
+    base::library(package="immunedeconv", quietly=TRUE);
+    base::library(package="RColorBrewer", quietly=TRUE);
+    library("randomcoloR");
+    base::message("Libraries loaded");
+
+    # Load dataset
+    tpm <- utils::read.table(
+      file = snakemake@input[["expr_mat"]],
+      header = TRUE,
+      sep = "\t",
+      stringsAsFactors = FALSE
+    );
+
+    gene_col <- "GENE";
+    if ("gene_col" %in% base::names(snakemake@params)) {
+      gene_col <- base::as.character(x = snakemake@params[["gene_col"]]);
+    }
+
+    extra <- "method = 'mcpcounter', tumor = TRUE, column = 'gene_symbol'";
+    if ("extra" %in% base::names(snakemake@params)) {
+      extra <- base::as.character(x = snakemake@params[["extra"]]);
+    }
+
+    colors <- grDevices::colors();
+    dotx <- 1024;
+    doty <- 768;
+
+    # Build a color palette out of cold and warm colors
+    colors <- rainbow(
+      14,
+      start=rgb2hsv(col2rgb('cyan'))[1],
+      end=rgb2hsv(col2rgb('blue'))[1]
+    );;
+
+    cmd <- base::paste0(
+      "immunedeconv::deconvolute(",
+      "gene_expression = tpm, ",
+      extra,
+      ")"
+    );
+
+    rownames(tpm) <- tpm[, gene_col];
+    tpm[, gene_col] <- NULL;
+    print(tpm %>% head);
+    print(cmd)
+    base::message("Datasets and configuration loaded");
+
+    # Deconvolution
+    res_deconv <- base::eval(
+      base::parse(
+        text = cmd
+      )
+    );
+    print(res_deconv %>% head);
+    base::message("Deconvolution performed");
+
+
+    # Save results
+    if ("rds" %in% base::names(snakemake@output)) {
+      base::saveRDS(
+        obj = res_deconv,
+        file = snakemake@output[["rds"]]
+      );
+      base::message("RDS object saved as ", snakemake@output[["rds"]]);
+    }
+
+    if ("tsv" %in% base::names(snakemake@output)) {
+      utils::write.table(
+        x = res_deconv,
+        file = snakemake@output[["tsv"]],
+        sep = "\t",
+        row.names = FALSE,
+        quote = FALSE
+      );
+      base::message("TSV table saved as ", snakemake@output[["tsv"]]);
+    }
+
+    # Plot graphs
+    if ("histogram" %in% base::names(snakemake@output)) {
+      png(
+        filename = snakemake@output[["histogram"]],
+        width = dotx,
+        height = doty,
+        units = "px",
+        type = "cairo"
+      );
+
+      print(res_deconv %>%
+        gather(sample, fraction, -cell_type) %>%
+        ggplot(aes(x=sample, y=fraction, fill=cell_type)) +
+          geom_bar(stat='identity') +
+          coord_flip() +
+          scale_fill_manual(values = colors) +
+          scale_x_discrete(limits = rev(levels(res_deconv))));
+
+      dev.off();
+      base::message("Histogram saved as ", snakemake@output[["histogram"]]);
+    }
+
+
+    if ("dotplot" %in% base::names(snakemake@output)) {
+      png(
+        filename = snakemake@output[["dotplot"]],
+        width = dotx,
+        height = doty * 4,
+        units = "px",
+        type = "cairo"
+      );
+
+      print(res_deconv %>%
+        gather(sample, score, -cell_type) %>%
+        ggplot(aes(x=sample, y=score)) +
+          geom_point(size=4) +
+          facet_wrap(~cell_type, scales="free_x", ncol=3) +
+          coord_flip() +
+          theme_bw() +
+          theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)));
+
+      dev.off();
+      base::message("Dotplots saved as ", snakemake@output[["dotplot"]]);
+    }
+
+    if ("plotdir" %in% base::names(snakemake@output)) {
+      plotdir = base::as.character(x = snakemake@output[["plotdir"]]);
+      if (! dir.exists(snakemake@output[["plotdir"]])) {
+        dir.create(plotdir);
+      }
+      for (celltype in base::unlist(res_deconv["cell_type"])) {
+        png_name <- base::paste(
+          base::gsub(" ", "_", celltype), "dotplot", "png", sep="."
+        );
+        png_path <- base::file.path(plotdir, png_name);
+        base::message("Saving ", celltype, " dotplot, as: ", png_path);
+
+        png(
+          filename = png_path,
+          width = dotx,
+          height = doty,
+          units = "px",
+          type = "cairo"
+        );
+
+        print(res_deconv %>%
+          filter(cell_type==celltype) %>%
+          gather(sample, score, -cell_type) %>%
+          ggplot(aes(x=sample, y=score)) +
+            geom_point(size=4) +
+            coord_flip() +
+            theme_bw() +
+            theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+        );
+
+        dev.off();
+      }
+    }

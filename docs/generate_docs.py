@@ -33,7 +33,8 @@ BLACKLIST = {
 PIPELINE_BLACKLIST = {
     "common",
     "README.md",
-    "salmon_tximport_deseq2"
+    "salmon_tximport_deseq2",
+    "Makefile"
 }
 TAG = subprocess.check_output(["git", "describe", "--tags"]).decode().strip()
 

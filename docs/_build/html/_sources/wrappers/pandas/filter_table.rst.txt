@@ -24,7 +24,7 @@ This wrapper can be used in the following way:
         log:
             "filter.log"
         wrapper:
-            "0.75.0-757-g5432694f9/bio/pandas/filter_table"
+            "0.75.0-772-g3f7df6e90/bio/pandas/filter_table"
 
 Note that input, output and log file paths can be chosen freely.
 When running with
@@ -62,6 +62,13 @@ Parameters:
 * keep_column (List[str]): a list of column name to keep. Leave empty to keep all columns
 * keep_line (List[str]): a list of lines to keep. Leave empty to keep all lines
 * filters (List[Union[str, int, float]]): a list of filters to apply and the column to which apply this filter
+* drop_line (List[str]): a list of lines to drop. Leave empty to ignore.
+* drop_column (List[str]): a list of column name to drop. Leave empty to ignore.
+* drop_null_lines (bool): set to true to drop lines full of zeros.
+* drop_na_lines (bool): set to true to drop lines full of NAs.
+* dropna (bool): drop line with NA in any column.
+* drop_duplicated_lines (bool): search for duplicated lines and drop them. This is done AFTER all other filters.
+* new_index_col (str): set a column as first column in output table
 
 
 
@@ -98,20 +105,32 @@ Code
 
     def filter_dataframe(dataframe: pandas.DataFrame,
                          column: Union[str, int],
-                         operator: str,
+                         local_operator: str,
                          value: Union[int, float]):
         """
         Filter a dataframe according to the column, value and boolean
         operator
         """
-        operator = ops[operator]
-        return dataframe[operator(dataframe[column], value)]
+        local_operator = ops[local_operator]
+        return dataframe[local_operator(dataframe[column], value)]
+
+
+    def filter_full_lines(dataframe: pandas.DataFrame,
+                          local_operator: str,
+                          value: Union[int, float]):
+        """
+        Apply filters on whole lines
+        """
+        local_operator = ops[local_operator]
+        return data = data.loc[~(local_operator(data, value).all(axis=1)]
+
 
     logging.basicConfig(
         filename=snakemake.log[0],
         filemode="w",
         level=logging.DEBUG
     )
+
 
     ops = {
         ">": operator.gt,
@@ -122,8 +141,10 @@ Code
         "!=": operator.ne
     }
 
+
     if (sep := snakemake.params.get("separator", "\t")) != "\t":
         sep = snakemake.params["separator"]
+
 
     data = pandas.read_csv(
         snakemake.input["table"],
@@ -131,24 +152,67 @@ Code
         header=0
     )
 
+
     if (cols := snakemake.params.get("keep_column", None)) is not None:
         logging.debug(f"The following columns are kept: {cols}")
         data = data[cols]
 
+
+    if (not_cols := snakemake.params.get("drop_column", None)) is not None:
+        logging.debug(f"The following columns are dropped out: {not_cols}")
+        data = data[list(set(data.columns.tolist()) - set(not_cols))]
+
+
     if (line := snakemake.params.get("keep_line", None)) is not None:
-        logging.debug(f"The following columns are kept: {line}")
-        data = data[line]
+        logging.debug(f"The following lines are kept: {line}")
+        data = data[data.index.isin(line)]
+
+
+    if (not_line := snakemake.params.get("drop_line", None)) is not None:
+        logging.debug(f"The following lines are droped out {not_line}")
+        data = data[not data.index.isin(not_line)]
+
 
     if (filters := snakemake.params.get("filters", None)) is not None:
         logging.debug(f"The table will be filtered according to: {filters}")
         for filter in filters:
             data = filter_dataframe(data.copy, *filter)
 
-    if (drop_any_na := snakemake.params.get("dropna", False)) is True:
-        logging.debug("Dropping NAs")
+
+    if (filters := snakemake.params.get("full_line_filters", None)) is not None:
+        logging.debug(f"Applying the following filter on whole lines: {filters})
+        for filter in filters:
+            data = filter_full_lines(data.dopy, *filter)
+
+
+    if snakemake.params.get("dropna", False) is True:
+        logging.debug("Dropping lines with NAs")
         data.dropna(axis=0, how="any", inplace=True)
 
+
+    if snakemake.params.get("drop_null_lines", False) is True:
+        logging.debug("Dropping lines full of zeros")
+        data = data.loc[~(data==0).all(axis=1)]
+
+
+    if snakemake.params.get("drop_na_lines", False) is True:
+        logging.debug("Dropping lines full of NAs")
+        data.dropna(axis=0, how="all", inplace=True)
+
+
+    if snakemake.params.get("drop_duplicated_lines", False) is True:
+        logging.debug("Dropping duplicated lines")
+        data.drop_duplicates(inplace=True)
+
+
+    if (new_index := snakemake.params.get("new_index_col", None)) is not None:
+        logging.debug("Setting {nex_index} as first column")
+        index_values = data.pop(new_index)
+        data.insert(new_index, 0, index_values, allow_duplicates = False)
+
+
     logging.debug(f"Head of the final DataFrame:\n{data.head()}")
+
 
     data.to_csv(
         snakemake.output["table"],

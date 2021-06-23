@@ -201,7 +201,66 @@ The pipeline contains the following steps:
                 "deseq2/{comparison}/wald.{comparison}.RDS",
                 comparison=output_prefixes
             ),
-            pcas=expected_pcas
+            pcas=expected_pcas,
+            general_pcas=expand(
+                "figures/pca/general.pca.{factor}.{axes}.png",
+                factor=design.columns.tolist(),
+                axes=["PC1_PC2", "PC2_PC1"]
+            )
+
+
+    #######################################
+    ### General PCA over all the cohort ###
+    #######################################
+
+
+    rule general_pca:
+        input:
+            counts="salmon/pseudo_mapping/aggregation/TPM.genes.tsv"
+        output:
+            png=expand(
+                "figures/pca/general.pca.{factor}.{axes}.png",
+                axes=["PC1_PC2", "PC2_PC1"],
+                allow_missing=True
+            )
+        message:
+            "Plotting general PCA over {wildcards.factor}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 5
+        log:
+            "logs/seaborn/pca/general.{factor}.png"
+        params:
+            axes=[1, 2],
+            conditions=lambda wildcards: dict(
+                zip(design.index.tolist(), design["factor"].tolist())
+            ),
+            prefix=lambda wildcards:"figures/pca/general.pca.{factor}"
+        wrapper:
+            "/bio/seaborn/pca"
+
+
+    rule pandas_merge_salmon_tr:
+        input:
+            quant = expand(
+                "salmon/pseudo_mapping/{sample}/quant.sf",
+                sample=design["Sample_id"]
+            ),
+            tx2gene = "tx2gene.tsv"
+        output:
+            tsv = "table_tr_pos.tsv"
+        message:
+            "Testing pandas merge salmon"
+        params:
+            header = True,
+            position = True,
+            gencode = False,
+
+        log:
+            "logs/pandas_merge_salmon.log"
+        wrapper:
+            "/bio/pandas/salmon"
 
 
     ##############################

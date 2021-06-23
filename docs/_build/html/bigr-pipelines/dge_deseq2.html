@@ -102,6 +102,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../pipelines.html">BiGR Pipelines</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="WES_germline.html">WES_GERMLINE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCL2FASTQ (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="celltype_deconvolution_rnaseq.html">CELLTYPE_DECONVOLUTION_RNASEQ (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">SALMON_QUANT</a><ul>
@@ -367,7 +368,66 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
             <span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/wald.</span><span class="si">{comparison}</span><span class="s2">.RDS&quot;</span><span class="p">,</span>
             <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span>
         <span class="p">),</span>
-        <span class="n">pcas</span><span class="o">=</span><span class="n">expected_pcas</span>
+        <span class="n">pcas</span><span class="o">=</span><span class="n">expected_pcas</span><span class="p">,</span>
+        <span class="n">general_pcas</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{factor}</span><span class="s2">.</span><span class="si">{axes}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+            <span class="n">factor</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PC1_PC2&quot;</span><span class="p">,</span> <span class="s2">&quot;PC2_PC1&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+
+<span class="c1">#######################################</span>
+<span class="c1">### General PCA over all the cohort ###</span>
+<span class="c1">#######################################</span>
+
+
+<span class="n">rule</span> <span class="n">general_pca</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">counts</span><span class="o">=</span><span class="s2">&quot;salmon/pseudo_mapping/aggregation/TPM.genes.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">png</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{factor}</span><span class="s2">.</span><span class="si">{axes}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+            <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PC1_PC2&quot;</span><span class="p">,</span> <span class="s2">&quot;PC2_PC1&quot;</span><span class="p">],</span>
+            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Plotting general PCA over </span><span class="si">{wildcards.factor}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/seaborn/pca/general.</span><span class="si">{factor}</span><span class="s2">.png&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="n">conditions</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">design</span><span class="p">[</span><span class="s2">&quot;factor&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="p">),</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span><span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{factor}</span><span class="s2">&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;/bio/seaborn/pca&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">pandas_merge_salmon_tr</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">quant</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">tx2gene</span> <span class="o">=</span> <span class="s2">&quot;tx2gene.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;table_tr_pos.tsv&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Testing pandas merge salmon&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">gencode</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/pandas_merge_salmon.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;/bio/pandas/salmon&quot;</span>
 
 
 <span class="c1">##############################</span>

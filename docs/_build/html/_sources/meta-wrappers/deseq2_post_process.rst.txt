@@ -212,7 +212,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     rule pca_explorer_distro_expr:
         input:
-            dst = "deseq2/{comparison}/wald.{comparison}.tsv"
+            dst = "deseq2/{comparison}/wald.{comparison}.RDS"
         output:
             png = "figures/{comparison}/distro_expr/distro_expr.{comparison}.png"
         message:

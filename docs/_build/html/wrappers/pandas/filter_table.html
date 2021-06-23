@@ -163,6 +163,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../homer.html">HOMER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../iRODS.html">IRODS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../igv-reports.html">IGV-REPORTS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../immunedeconv.html">IMMUNEDECONV</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../infernal.html">INFERNAL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../isoformSwitchAnalyseR.html">ISOFORMSWITCHANALYSER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jannovar.html">JANNOVAR</a></li>
@@ -357,7 +358,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;filter.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.75.0-757-g5432694f9/bio/pandas/filter_table&quot;</span>
+        <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/pandas/filter_table&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.
@@ -393,6 +394,13 @@ When running with</p>
 <li><p>keep_column (List[str]): a list of column name to keep. Leave empty to keep all columns</p></li>
 <li><p>keep_line (List[str]): a list of lines to keep. Leave empty to keep all lines</p></li>
 <li><p>filters (List[Union[str, int, float]]): a list of filters to apply and the column to which apply this filter</p></li>
+<li><p>drop_line (List[str]): a list of lines to drop. Leave empty to ignore.</p></li>
+<li><p>drop_column (List[str]): a list of column name to drop. Leave empty to ignore.</p></li>
+<li><p>drop_null_lines (bool): set to true to drop lines full of zeros.</p></li>
+<li><p>drop_na_lines (bool): set to true to drop lines full of NAs.</p></li>
+<li><p>dropna (bool): drop line with NA in any column.</p></li>
+<li><p>drop_duplicated_lines (bool): search for duplicated lines and drop them. This is done AFTER all other filters.</p></li>
+<li><p>new_index_col (str): set a column as first column in output table</p></li>
 </ul>
 </div>
 <div class="section" id="authors">
@@ -425,20 +433,32 @@ When running with</p>
 
 <span class="k">def</span> <span class="nf">filter_dataframe</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
                      <span class="n">column</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
-                     <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                     <span class="n">local_operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                      <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Filter a dataframe according to the column, value and boolean</span>
 <span class="sd">    operator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">operator</span> <span class="o">=</span> <span class="n">ops</span><span class="p">[</span><span class="n">operator</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">operator</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">value</span><span class="p">)]</span>
+    <span class="n">local_operator</span> <span class="o">=</span> <span class="n">ops</span><span class="p">[</span><span class="n">local_operator</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">local_operator</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">value</span><span class="p">)]</span>
+
+
+<span class="k">def</span> <span class="nf">filter_full_lines</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                      <span class="n">local_operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                      <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply filters on whole lines</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">local_operator</span> <span class="o">=</span> <span class="n">ops</span><span class="p">[</span><span class="n">local_operator</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">local_operator</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+
 
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
     <span class="n">filename</span><span class="o">=</span><span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
     <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
     <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
 <span class="p">)</span>
+
 
 <span class="n">ops</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">,</span>
@@ -449,8 +469,10 @@ When running with</p>
     <span class="s2">&quot;!=&quot;</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">ne</span>
 <span class="p">}</span>
 
+
 <span class="k">if</span> <span class="p">(</span><span class="n">sep</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;separator&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">))</span> <span class="o">!=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">:</span>
     <span class="n">sep</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;separator&quot;</span><span class="p">]</span>
+
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
     <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">],</span>
@@ -458,24 +480,67 @@ When running with</p>
     <span class="n">header</span><span class="o">=</span><span class="mi">0</span>
 <span class="p">)</span>
 
+
 <span class="k">if</span> <span class="p">(</span><span class="n">cols</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;keep_column&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The following columns are kept: </span><span class="si">{</span><span class="n">cols</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
 
+
+<span class="k">if</span> <span class="p">(</span><span class="n">not_cols</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;drop_column&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The following columns are dropped out: </span><span class="si">{</span><span class="n">not_cols</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">not_cols</span><span class="p">))]</span>
+
+
 <span class="k">if</span> <span class="p">(</span><span class="n">line</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;keep_line&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The following columns are kept: </span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">line</span><span class="p">]</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The following lines are kept: </span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">line</span><span class="p">)]</span>
+
+
+<span class="k">if</span> <span class="p">(</span><span class="n">not_line</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;drop_line&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The following lines are droped out </span><span class="si">{</span><span class="n">not_line</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">not_line</span><span class="p">)]</span>
+
 
 <span class="k">if</span> <span class="p">(</span><span class="n">filters</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filters&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The table will be filtered according to: </span><span class="si">{</span><span class="n">filters</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">filter_dataframe</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">,</span> <span class="o">*</span><span class="nb">filter</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="p">(</span><span class="n">drop_any_na</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dropna&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Dropping NAs&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">filters</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;full_line_filters&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applying the following filter on whole lines: </span><span class="si">{</span><span class="n">filters</span><span class="si">}</span><span class="s2">)</span>
+    <span class="k">for</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">filter_full_lines</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dopy</span><span class="p">,</span> <span class="o">*</span><span class="nb">filter</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dropna&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Dropping lines with NAs&quot;</span><span class="p">)</span>
     <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;drop_null_lines&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Dropping lines full of zeros&quot;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">data</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+
+
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;drop_na_lines&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Dropping lines full of NAs&quot;</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;drop_duplicated_lines&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Dropping duplicated lines&quot;</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="p">(</span><span class="n">new_index</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;new_index_col&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting </span><span class="si">{nex_index}</span><span class="s2"> as first column&quot;</span><span class="p">)</span>
+    <span class="n">index_values</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">new_index</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">new_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">index_values</span><span class="p">,</span> <span class="n">allow_duplicates</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+
+
 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Head of the final DataFrame:</span><span class="se">\n</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
 
 <span class="n">data</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
     <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">],</span>
