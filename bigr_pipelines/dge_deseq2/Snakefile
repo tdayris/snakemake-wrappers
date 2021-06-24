@@ -117,7 +117,7 @@ rule target:
 
 rule general_pca:
     input:
-        counts="salmon/TPM.{content}.tsv"
+        counts="salmon/TPM.transcripts.tsv"
     output:
         png=expand(
             "figures/pca/general.pca.{factor}.{axes}.png",
@@ -157,6 +157,8 @@ rule pandas_merge_salmon_tr:
         header = True,
         position = True,
         gencode = False,
+        drop_na = True,
+        dro_null = True,
         genes = lambda wildcards: wildcards.content == "genes"
     log:
         "logs/pandas_merge_salmon/{content}.log"
