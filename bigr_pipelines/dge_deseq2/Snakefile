@@ -146,7 +146,7 @@ rule pandas_merge_salmon_tr:
     input:
         quant = expand(
             "salmon/pseudo_mapping/{sample}/quant.sf",
-            sample=design["Sample_id"]
+            sample=design.index.tolist()
         ),
         tx2gene = "tximport/transcripts2genes.tsv"
     output:
