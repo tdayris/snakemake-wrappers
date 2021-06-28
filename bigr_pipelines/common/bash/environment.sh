@@ -23,7 +23,7 @@ function profiles () {
 }
 
 # Add shortcut to conda environment, the main environment with resources to execute all pipelines
-declare -x CONDA_ENV_PATH="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/env2/"
+declare -x CONDA_ENV_PATH="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/env/"
 
 # Declare snakemake cache directory. Used to avoid indexation steps and redundant operations
 declare -x SNAKEMAKE_OUTPUT_CACHE="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/cache"
