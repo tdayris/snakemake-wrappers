@@ -11,26 +11,26 @@ declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/variant_calling_ampl
 export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 
 SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
-CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"
-if [ "${1}" = "hg38" ]; then
-  CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
-  message WARNING "HG38 has not been tested."
-fi
+CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
+SNAKE_ARGS=()
+
+while [ "$#" -gt 0 ]; do
+  case "${1}" in
+    hg19|HG19) CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"; shift;;
+    hg38|HG38) CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"; shift;;
+    *) SNAKE_ARGS+=("${1}"); shift;;
+  esac
+done
 message INFO "Environment loaded"
 
-if [ -f "config.yaml" ]; then
-  if [ ! -f "config_variant_calling_ampliseq.yaml" ]; then
-    cp -v "config.yaml" "config_variant_calling_ampliseq.yaml"
-  fi
-fi
 
-if [ ! -f "config_variant_calling_ampliseq.yaml" ]; then
+if [ ! -f "config.yaml" ]; then
   message INFO "Missing config file, falling back to default arguments"
-  cp "${CONFIG_PATH}" "config_variant_calling_ampliseq.yaml"
+  cp "${CONFIG_PATH}" "config.yaml"
 else
   message INFO "Config file already provided"
 fi
 
 # Run pipeline
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
-snakemake -s "${SNAKEFILE_PATH}" --configfile "config_variant_calling_ampliseq.yaml" --cache bwa_fixmate_meta_bwa_index bwa_index --profile "${SNAKEMAKE_PROFILE_PATH}" && message INFO "Variant calling successful" || error_handling "${LINENO}" 2 "Error while running variant calling pipeline"
+snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --cache bwa_fixmate_meta_bwa_index bwa_index --profile "${SNAKEMAKE_PROFILE_PATH}" "${SNAKE_ARGS[@]}" && message INFO "Variant calling successful" || error_handling "${LINENO}" 2 "Error while running variant calling pipeline"

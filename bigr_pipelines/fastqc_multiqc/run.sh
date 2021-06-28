@@ -6,11 +6,12 @@ source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/messages.sh"
 source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/environment.sh"
 
 PROFILE="slurm";
+SNAKE_ARGS=()
 
 while [ "$#" -gt 0 ]; do
   case "${1}" in
     -p|--profile) PROFILE="${2}"; shift 2;;
-    -*|*) error_handling ${LINENO} 1 "Unknown arguments ${1}"; exit 1;;
+    *) SNAKE_ARGS+=("${1}"); shift;;
   esac
 done
 

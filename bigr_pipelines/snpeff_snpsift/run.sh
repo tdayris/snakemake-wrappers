@@ -12,14 +12,19 @@ export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 message INFO "Environment loaded"
 
 SNAKEFILE="${PIPELINE_PATH}/Snakefile"
-CONFIG_PATH="config.hg38.yaml"
-if [ "${1}" = "hg19" ]; then
-  CONFIG_PATH="config.hg19.yaml"
-elif [[ "${1}" = "hg19nochr" ]]; then
-  CONFIG_PATH="config.hg19.nochr.yaml"
-elif [[ "${1}" = "hg38nochr" ]]; then
-  CONFIG_PATH="config.hg38.nochr.yaml"
-fi
+CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
+SNAKE_ARGS=()
+
+while [ "$#" -gt 0 ]; do
+  case "${1}" in
+    hg19|HG19) CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"; shift;;
+    hg38|HG38) CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"; shift;;
+    hg19nochr) CONFIG_PATH="${PIPELINE_PATH}/config.hg19.nochr.yaml"; shift;;
+    hg38nochr) CONFIG_PATH="${PIPELINE_PATH}/config.hg38.nochr.yaml"; shift;;
+    *) SNAKE_ARGS+=("${1}"); shift;;
+  esac
+done
+message INFO "Environment loaded"
 
 if [ ! -d "calls" ]; then
   error_handling "${LINENO}" 1 "VCF files must be in a directory called 'calls'"
@@ -27,4 +32,4 @@ fi
 
 # Run pipeline
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
-snakemake -s "${SNAKEFILE}" --profile "${SNAKEMAKE_PROFILE_PATH}" --configfile ${CONFIG_PATH} && message INFO "SnpEff/SnpSift successful" || error_handling "${LINENO}" 2 "Error while running SnpEff/SnpSift pipeline"
+snakemake -s "${SNAKEFILE}" --profile "${SNAKEMAKE_PROFILE_PATH}" --configfile ${CONFIG_PATH} "${SNAKE_ARGS[@]}" && message INFO "SnpEff/SnpSift successful" || error_handling "${LINENO}" 2 "Error while running SnpEff/SnpSift pipeline"
