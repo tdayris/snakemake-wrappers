@@ -99,7 +99,7 @@ rule bwa_mem:
         mem_mb=lambda wildcards, attempt: attempt * 6144 + 61440,
         time_min=lambda wildcards, attempt: attempt * 120
     params:
-        index="bwa_mem2/index/genome",
+        index=lambda wildcards, input: os.path.splitext(input["index"][0])[0],
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}\tPU:{sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
         sort="samtools",         # We chose Samtools to sort by queryname
         sort_order="queryname",  # Queryname sort is needed for a fixmate
@@ -129,7 +129,7 @@ rule bwa_index:
         mem_mb=lambda wildcards, attempt: attempt * 6144 + 66560,
         time_min=lambda wildcards, attempt: attempt * 120
     params:
-        prefix="bwa_mem2/index/genome"
+        prefix=lambda wildcards, output: os.path.splitext(output[0])[0]
     log:
         "logs/bwa_mem2/index/genome.log"
     wrapper:
