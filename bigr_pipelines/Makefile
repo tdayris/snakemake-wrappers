@@ -77,6 +77,22 @@ variant_calling_ampliseq_hg38:
 	cd -
 .PHONY: variant_calling_ampliseq_hg38
 
+
+### WES germline ###
+variant_calling_germline_hg19:
+	cd ${BASEDIR}/variant_calling_germline/test && \
+	${BASH} ${BASEDIR}/variant_calling_germline/run.sh hg19 && \
+	rm -r bwa_mem2/ fastp/ gatk/ logs/ meta_caller/ multiqc/ mutect2/ reads/ snpeff/ snpsift/ varscan2/ snakemake.variant_calling_germline.log .snakemake/ config_variant_calling_germline.yaml config.yaml design.tsv && \
+	cd -
+.PHONY: variant_calling_germline_hg19
+
+variant_calling_germline_hg38:
+	cd ${BASEDIR}/variant_calling_germline/test && \
+	${BASH} ${BASEDIR}/variant_calling_germline/run.sh hg38 && \
+	rm -r bwa_mem2/ fastp/ gatk/ logs/ meta_caller/ multiqc/ mutect2/ reads/ snpeff/ snpsift/ varscan2/ snakemake.variant_calling_germline.log .snakemake/ config_variant_calling_germline.yaml config.yaml design.tsv && \
+	cd -
+.PHONY: variant_calling_germline_hg38
+
 ### Fastqc_multiqc ###
 fastqc_multiqc:
 	cd ${BASEDIR}/fastqc_multiqc/test && \
