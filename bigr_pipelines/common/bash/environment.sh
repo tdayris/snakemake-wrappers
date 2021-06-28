@@ -14,7 +14,7 @@ function conda_activate () {
 function profiles () {
   local PROFILE_NAME="${1}"
   message INFO "Looking for profile named: ${PROFILE_NAME}"
-  case PROFILE_NAME in
+  case "${PROFILE_NAME}" in
     demux) echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/demux";;
     slurm) echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/slurm";;
     clinics) echo "${PIPELINE_PREFIX}/bigr_pipelines/common/profiles/clinics";;
