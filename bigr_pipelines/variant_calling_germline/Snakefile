@@ -2,14 +2,16 @@ import logging
 import os
 import pandas
 import sys
+from pathlib import Path
 
-sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
+worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+common = str(worflow_source_dir / "../common/python")
+sys.path.append(common)
 
 from file_manager import *
-from files_linker import link_fq
-from write_yaml import read_yaml
-from pathlib import Path
-from messages import CustomFormatter
+from files_linker import *
+from write_yaml import *
+from messages import *
 from snakemake.utils import min_version
 min_version("6.0")
 
@@ -26,7 +28,7 @@ ruleorder: bwa_mem > bwa_fixmate_meta_bwa_mem
 ruleorder: mutect2_germline > gatk_mutect2_germline_mutect2_germline
 
 
-default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/config.hg38.yaml")
+default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
 configfile: get_config(default_config)
 design = get_design(os.getcwd(), search_fastq_pairs)
 
