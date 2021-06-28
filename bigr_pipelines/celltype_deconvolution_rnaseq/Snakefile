@@ -31,7 +31,125 @@ fastq_links = link_fq(
 ruleorder: salmon_meta_salmon_quant_paired > salmon_quant_paired
 
 
+rule target:
+    input:
+        graphs = expand(
+            "{tool}/celltypes.{plot}.png",
+            tool=["cibersort_abs", "cibersort", "quantiseq", "xcell", "epic"],
+            plot=["hist", "dotplot"]
+        ),
+        text = expand(
+            "{tool}/celltypes.{ext}",
+            tool=["cibersort_abs", "cibersort", "quantiseq", "xcell", "epic"],
+            plot=["tsv", "rds"]
+        ),
+        plotdirs = expand(
+            "{tool}/celltypes.dotplots",
+            tool=["cibersort_abs", "cibersort", "quantiseq", "xcell", "epic"]
+        )
 
+#####################
+### Deconvolution ###
+#####################
+
+
+rule cibersort_abs:
+    input:
+        quant="immunedeconv/TPM.tsv"
+    output:
+        histogram="cibersort_abs/celltypes.hist.png",
+        dotplot="cibersort_abs/celltypes.dotplot.png",
+        tsv="cibersort_abs/celltypes.tsv",
+        rds="cibersort_abs/celltypes.RDS",
+        plotdir=directory("cibersort_abs/celltypes.dotplots")
+    message:
+        "Using Cibersort-absolute to deconvolute expression into cell types"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 2048,
+        time_min=lambda wildcards, attempt: attempt * 15
+    params:
+        cibersort_binary="/path/to/cibersort/non/free",
+        cibersort_mat="/path/to/celltypes.mat"
+    log:
+        "logs/immunedeconv/cibersort_abs.log"
+    wrapper:
+        "/bio/immunedeconv/cibersort-abs"
+
+
+use rule cibersort_abs as cibersort with:
+    output:
+        histogram="cibersort/celltypes.hist.png",
+        dotplot="cibersort/celltypes.dotplot.png",
+        tsv="cibersort/celltypes.tsv",
+        rds="cibersort/celltypes.RDS",
+        plotdir=directory("cibersort/celltypes.dotplots")
+    message:
+        "Using cibersort to deconvolute expression into cell types"
+    log:
+        "logs/immunedeconv/Cibersort.log"
+    wrapper:
+        "/bio/immunedeconv/cibersort"
+
+
+use rule cibersort_abs as mcpcounter with:
+    output:
+        histogram="mcpcounter/celltypes.hist.png",
+        dotplot="mcpcounter/celltypes.dotplot.png",
+        tsv="mcpcounter/celltypes.tsv",
+        rds="mcpcounter/celltypes.RDS",
+        plotdir=directory("mcpcounter/celltypes.dotplots")
+    message:
+        "Using MCP-Counter to deconvolute expression into cell types"
+    log:
+        "logs/immunedeconv/mcpcounter.log"
+    wrapper:
+        "/bio/immunedeconv/mcpcounter"
+
+
+use rule cibersort_abs as epic with:
+    output:
+        histogram="epic/celltypes.hist.png",
+        dotplot="epic/celltypes.dotplot.png",
+        tsv="epic/celltypes.tsv",
+        rds="epic/celltypes.RDS",
+        plotdir=directory("epic/celltypes.dotplots")
+    message:
+        "Using EPIC to deconvolute expression into cell types"
+    log:
+        "logs/immunedeconv/epic.log"
+    wrapper:
+        "/bio/immunedeconv/epic"
+
+
+use rule cibersort_abs as quantiseq with:
+    output:
+        histogram="quantiseq/celltypes.hist.png",
+        dotplot="quantiseq/celltypes.dotplot.png",
+        tsv="quantiseq/celltypes.tsv",
+        rds="quantiseq/celltypes.RDS",
+        plotdir=directory("quantiseq/celltypes.dotplots")
+    message:
+        "Using QuantiSeq to deconvolute expression into cell types"
+    log:
+        "logs/immunedeconv/quantiseq.log"
+    wrapper:
+        "/bio/immunedeconv/quantiseq"
+
+
+use rule cibersort_abs as xcell with:
+    output:
+        histogram="xcell/celltypes.hist.png",
+        dotplot="xcell/celltypes.dotplot.png",
+        tsv="xcell/celltypes.tsv",
+        rds="xcell/celltypes.RDS",
+        plotdir=directory("xcell/celltypes.dotplots")
+    message:
+        "Using xCell to deconvolute expression into cell types"
+    log:
+        "logs/immunedeconv/xcell.log"
+    wrapper:
+        "/bio/immunedeconv/xcell"
 
 
 #########################
@@ -40,9 +158,9 @@ ruleorder: salmon_meta_salmon_quant_paired > salmon_quant_paired
 
 rule gene_counts:
     input:
-        "pseudo_mapping/aggregate/TPM.genes.tsv"
+        table="salmon/TPM.genes.tsv"
     output:
-        "immunedeconv/TPM.tsv"
+        table="immunedeconv/TPM.tsv"
     message: "Cleaning salmon quantification file"
     threads: 1
     resources:
@@ -51,12 +169,34 @@ rule gene_counts:
     logs:
         "logs/pandas/cleaning.log"
     params:
-        drop_column=["Strand", "Start", "Stop", "target_id"],
+        drop_column=["Strand", "Start", "Stop"],
         drop_null_lines=True,
         drop_na_lines=True,
         drop_duplicated_lines=True
     wrapper:
         "bio/pandas/filter_table"
+
+
+rule pandas_merge_salmon_tr:
+    input:
+        quant = expand(
+            "salmon/pseudo_mapping/{sample}/quant.sf",
+            sample=design.index.tolist()
+        ),
+        tx2gene = "tximport/transcripts2genes.tsv"
+    output:
+        tsv = "salmon/TPM.{content}.tsv"
+    message:
+        "Testing pandas merge salmon"
+    params:
+        header = True,
+        position = True,
+        gencode = False,
+        genes = lambda wildcards: wildcards.content == "genes"
+    log:
+        "logs/pandas_merge_salmon/{content}.log"
+    wrapper:
+        "/bio/pandas/salmon"
 
 #############################
 ### Salmon quantification ###

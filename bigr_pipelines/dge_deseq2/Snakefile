@@ -210,7 +210,13 @@ use rule multiqc from deseq2_post_process with:
             f"fastp/json/pe/{sample}.fastp.json"
             for sample in samples_per_prefixes[wildcards.comparison]
         ],
-        config="multiqc/{comparison}/multiqc_config.yaml"
+        config="multiqc/{comparison}/multiqc_config.yaml",
+        fqscreen=lambda wildcards: [
+            "fastq_screen/{sample}.{stream}.fastq_screen.{ext}"
+            for stream in ["1", "2"]
+            for ext in ["txt", "png"]
+            for sample in samples_per_prefixes[wildcards.comparison]
+        ]
 
 
 ###########################
