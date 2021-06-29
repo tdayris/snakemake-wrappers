@@ -38,6 +38,10 @@ tumor = ""
 if "tumor" in snakemake.input.keys():
     tumor = "--input {}".format(snakemake.input["tumor"])
 
+pon = ""
+if "pon" in snakemake.input.keys():
+    pon = "--panel-of-normals {}".format(snakemake.input["pon"])
+
 extra = snakemake.params.get("extra", "")
 java_opts = get_java_opts(snakemake)
 
