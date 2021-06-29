@@ -1,0 +1,17 @@
+rule test_createsomaticpanelofnormals:
+    input:
+        gvcfs=["calls/a.g.vcf.gz", "calls/b.g.vcf.gz"],
+        ref="genome.fasta",
+        ref_dict="genome.dict",
+        ref_fai="genome.fasta.fai"
+    output:
+        gvcf="pon.g.vcf.gz",
+    log:
+        "logs/gatk/createsomaticpanelofnormals.log"
+    params:
+        extra="",  # optional
+        java_opts="",  # optional
+    resources:
+        mem_mb=1024
+    wrapper:
+        "master/bio/gatk/createsomaticpanelofnormals"
