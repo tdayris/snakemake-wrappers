@@ -19,16 +19,15 @@ else:
 
 samples = snakemake.input.get("samples", None)
 if samples is not None:
-    samples_cmd = "--samples " + samples
+    samples_cmd = f"--samples {samples}"
 else:
     samples_cmd = ""
 
 fai = snakemake.input.get("fai", None)
 if fai is not None:
-    fai_cmd = "--fai " + fai
+    fai_cmd = f"--fai {fai}"
 else:
     fai_cmd = ""
-
 
 extra = snakemake.params.get("extra", "")
 view_extra = snakemake.params.get("view_extra", "")
@@ -39,6 +38,9 @@ elif str(snakemake.output).endswith(".bcf"):
     view_extra += " --output-type b "
 elif str(snakemake.output).endswith(".vcf"):
     view_extra += " --output-type v "
+if "regions" in snakemake.input.keys():
+    view_extra += " --regions-file {}".format(snakemake.input["regions"])
+
 
 shell(
     "bcftools reheader "
