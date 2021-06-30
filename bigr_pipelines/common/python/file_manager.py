@@ -61,6 +61,20 @@ def get_dict(genome_path: str) -> str:
     return get_fasta_dict_from_genome_path(genome_path)
 
 
+def get_bam_index_from_bam_path(bam_path: str) -> str:
+    """
+    From a bam/sam path, return the BAI index
+    """
+    return f"{bam_path}.bai"
+
+
+def get_bai(bam_path: str) -> str:
+    """
+    From a bam/sam path, return the BAI index
+    """
+    return get_bam_index_from_bam_path(bam_path)
+
+
 def get_vcf_tbi_from_vcf_path(vcf_path: str) -> str:
     """
     From a vcf path, return it's tbi index without checking for
