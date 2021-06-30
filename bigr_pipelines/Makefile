@@ -88,6 +88,7 @@ variant_calling_germline_hg19:
 
 variant_calling_germline_hg38:
 	cd ${BASEDIR}/variant_calling_germline/test && \
+	${BASH} ${BASEDIR}/variant_calling_germline/run.sh hg38 --lint && \
 	${BASH} ${BASEDIR}/variant_calling_germline/run.sh hg38 && \
 	rm -r bwa_mem2/ fastp/ gatk/ logs/ meta_caller/ multiqc/ mutect2/ reads/ snpeff/ snpsift/ varscan2/ snakemake.variant_calling_germline.log .snakemake/ config_variant_calling_germline.yaml config.yaml design.tsv && \
 	cd -
@@ -96,6 +97,8 @@ variant_calling_germline_hg38:
 ### Fastqc_multiqc ###
 fastqc_multiqc:
 	cd ${BASEDIR}/fastqc_multiqc/test && \
-	${BASH} ${BASEDIR}/fastqc_multiqc/run.sh && \
+	${BASH} ${BASEDIR}/fastqc_multiqc/run.sh -p slurm --lint && \
+	${BASH} ${BASEDIR}/fastqc_multiqc/run.sh -p slurm && \
+	rm -r fastqc fastq_screen logs multiqc
 	cd -
 .PHONY: fastqc_multiqc
