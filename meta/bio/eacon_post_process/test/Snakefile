@@ -57,7 +57,7 @@ def get_gamma_files(config):
 
 rule eacon_genomic_instability:
     input:
-        **get_gamma_files(config=config)
+        directory("{sample}/ASCAT/ASCN/")
     output:
         "{sample}/{sample}_GIS_from_best_gamma.txt"
     threads: 1
@@ -67,11 +67,11 @@ rule eacon_genomic_instability:
     log:
         "logs/EaCoN/{sample}/genomic_instability.log"
     params:
-        indir = "{sample}",  # Required!
+        indir = lambda wildcards: wildcards.sample,  # Required!
         genome = config["params"]["genome"],
         segmenter = config["params"]["segmenter"]
     wrapper:
-        "/bio/eacon/instability"
+        "bio/eacon/instability"
 
 rule eacon_annotate:
     input:
@@ -106,7 +106,7 @@ rule eacon_annotate:
     log:
         "logs/EaCoN/{sample}/annotate.log"
     wrapper:
-        "/bio/eacon/annotate"
+        "bio/eacon/annotate"
 
 
 rule eacon_databases:
@@ -116,7 +116,7 @@ rule eacon_databases:
         "logs/EaCoN/databases.log"
     cache: True
     wrapper:
-        "/bio/eacon/databases"
+        "bio/eacon/databases"
 
 
 rule eacon_grd:
@@ -126,14 +126,14 @@ rule eacon_grd:
         "logs/EaCoN/grd.log"
     cache: True
     wrapper:
-        "/bio/eacon/databases"
+        "bio/eacon/databases"
 
 
 rule eacon_ascn:
     input:
         rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS"
     output:
-        **get_gamma_files(config=config)
+        directory("{sample}/ASCAT/ASCN/")
     threads: 1
     resources:
         time_min=lambda wildcards, attempt: attempt * 35,
@@ -143,7 +143,7 @@ rule eacon_ascn:
     params:
         extra = config["extra"]["EaCoN_ascn"]
     wrapper:
-        "/bio/eacon/ascn"
+        "bio/eacon/ascn"
 
 rule EaCoN_segment:
     input:
@@ -172,4 +172,4 @@ rule EaCoN_segment:
     params:
         extra = config["extra"]["EaCoN_segment"]
     wrapper:
-        "/bio/eacon/segment"
+        "bio/eacon/segment"

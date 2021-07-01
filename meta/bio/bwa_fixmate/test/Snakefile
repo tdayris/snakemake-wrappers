@@ -21,11 +21,12 @@ rule samtools_index:
     threads: 1
     resources:
         mem_mb=1536,
-        time_min=lambda wildcards, attempt: attempt * 45
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
     log:
         "logs/samtools/sort/{sample}.log"
     wrapper:
-        "/bio/samtools/index"
+        "bio/samtools/index"
 
 
 """
@@ -42,14 +43,15 @@ rule samtools_sort_coordinate:
     threads: config.get("threads", 20)
     resources:
         mem_mb=lambda wildcards, threads: threads * 1792,
-        time_min=lambda wildcards, attempt: attempt * 90
+        time_min=lambda wildcards, attempt: attempt * 90,
+        tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
     log:
         "logs/samtools/query_sort_{sample}.log"
     params:
         extra = "-m 1536M",
         tmp_dir = "samtools/fixmate/{sample}.tmp"
     wrapper:
-        "/bio/samtools/sort"
+        "bio/samtools/sort"
 
 
 """
@@ -69,13 +71,14 @@ rule samtools_fixmate:
         ),
         time_min = (
             lambda wildcards, attempt: min(attempt * 45, 180)
-        )
+        ),
+        tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
     params:
         config.get("fixmate_extra", "-cmr")
     log:
         "logs/samtools/fixmate/{sample}.log"
     wrapper:
-        "/bio/samtools/fixmate"
+        "bio/samtools/fixmate"
 
 
 """
@@ -97,7 +100,8 @@ rule bwa_mem:
     threads: config.get("threads", 20)
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 6144 + 61440,
-        time_min=lambda wildcards, attempt: attempt * 120
+        time_min=lambda wildcards, attempt: attempt * 120,
+        tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
     params:
         index=lambda wildcards, input: os.path.splitext(input["index"][0])[0],
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}\tPU:{sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
@@ -107,7 +111,7 @@ rule bwa_mem:
     log:
         "logs/bwa_mem2/mem/{sample}.log"
     wrapper:
-        "/bio/bwa-mem2/mem"
+        "bio/bwa-mem2/mem"
 
 
 """
@@ -127,10 +131,11 @@ rule bwa_index:
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 6144 + 66560,
-        time_min=lambda wildcards, attempt: attempt * 120
+        time_min=lambda wildcards, attempt: attempt * 120,
+        tmpdir=lambda wildcards: f"tmp/genome.tmp"
     params:
         prefix=lambda wildcards, output: os.path.splitext(output[0])[0]
     log:
         "logs/bwa_mem2/index/genome.log"
     wrapper:
-        "/bio/bwa-mem2/index"
+        "bio/bwa-mem2/index"
