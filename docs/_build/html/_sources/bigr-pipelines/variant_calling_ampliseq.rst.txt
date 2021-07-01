@@ -101,8 +101,6 @@ Please refer to each wrapper in above list for additional configuration paramete
 Notes
 -----
 
-The only difference with a classic WES pipeline is the absence of duplicates removal.
-
 Prerequisites:
 
 * A TSV formatted design file, *named 'design.tsv'* with the following columns:
@@ -139,14 +137,16 @@ The pipeline contains the following steps:
     import os
     import pandas
     import sys
+    from pathlib import Path
 
-    sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../common/python")
+    sys.path.append(common)
 
     from file_manager import *
-    from files_linker import link_fq
-    from write_yaml import read_yaml
-    from pathlib import Path
-    from messages import CustomFormatter
+    from files_linker import *
+    from write_yaml import *
+    from messages import *
     from snakemake.utils import min_version
     min_version("6.0")
 
@@ -161,7 +161,7 @@ The pipeline contains the following steps:
     ruleorder: bwa_mem > bwa_fixmate_meta_bwa_mem
 
 
-    default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/config.hg38.yaml")
+    default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
     configfile: get_config(default_config)
     design = get_design(os.getcwd(), search_fastq_pairs)
 

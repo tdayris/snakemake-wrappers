@@ -198,6 +198,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
@@ -345,10 +346,26 @@
   <div class="section" id="bcftools-filter">
 <span id="bio-bcftools-filter"></span><h1>BCFTOOLS FILTER<a class="headerlink" href="#bcftools-filter" title="Permalink to this headline">¶</a></h1>
 <p>filter vcf/bcf file.</p>
+<p><strong>URL</strong>:</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">bcf_filter_o_vcf</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">bcf_filter_sample</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.bcf&quot;</span><span class="p">,</span>  <span class="c1"># input bcf/vcf needs to be first input</span>
+        <span class="n">samples</span><span class="o">=</span><span class="s2">&quot;samples.txt&quot;</span><span class="p">,</span>  <span class="c1"># other inputs, e.g. sample files, are optional</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.filter_sample.vcf&quot;</span><span class="p">,</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;log/</span><span class="si">{prefix}</span><span class="s2">.filter_sample.vcf.log&quot;</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="nb">filter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">w</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;--exclude &#39;GT[@</span><span class="si">{</span><span class="nb">input</span><span class="o">.</span><span class="n">samples</span><span class="si">}</span><span class="s2">]=</span><span class="se">\&quot;</span><span class="s2">0/1</span><span class="se">\&quot;</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.76.0-805-g542e8c6a7/bio/bcftools/filter&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">bcf_filter_o_vcf</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.bcf&quot;</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span>
@@ -359,7 +376,7 @@
         <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;-i &#39;QUAL &gt; 5&#39;&quot;</span><span class="p">,</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/bcftools/filter&quot;</span>
+        <span class="s2">&quot;0.76.0-805-g542e8c6a7/bio/bcftools/filter&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">bcf_filter_o_vcf_gz</span><span class="p">:</span>
@@ -373,7 +390,7 @@
         <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;-i &#39;QUAL &gt; 5&#39;&quot;</span><span class="p">,</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/bcftools/filter&quot;</span>
+        <span class="s2">&quot;0.76.0-805-g542e8c6a7/bio/bcftools/filter&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">bcf_filter_o_bcf</span><span class="p">:</span>
@@ -387,7 +404,7 @@
         <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;-i &#39;QUAL &gt; 5&#39;&quot;</span><span class="p">,</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/bcftools/filter&quot;</span>
+        <span class="s2">&quot;0.76.0-805-g542e8c6a7/bio/bcftools/filter&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">bcf_filter_o_uncompressed_bcf</span><span class="p">:</span>
@@ -402,11 +419,11 @@
         <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;-i &#39;QUAL &gt; 5&#39;&quot;</span><span class="p">,</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/bcftools/filter&quot;</span>
+        <span class="s2">&quot;0.76.0-805-g542e8c6a7/bio/bcftools/filter&quot;</span>
 </pre></div>
 </div>
-<p>Note that input, output and log file paths can be chosen freely.
-When running with</p>
+<p>Note that input, output and log file paths can be chosen freely.</p>
+<p>When running with</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
 </pre></div>
 </div>
@@ -415,8 +432,8 @@ When running with</p>
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">bcftools==1.9</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">snakemake-wrapper-utils==0.2.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bcftools==1.12</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">snakemake-wrapper-utils==0.2</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="input-output">
@@ -459,9 +476,6 @@ When running with</p>
 
 <span class="n">bcftools_opts</span> <span class="o">=</span> <span class="n">get_bcftools_opts</span><span class="p">(</span><span class="n">snakemake</span><span class="p">)</span>
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Only one input file expected, got: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">)))</span>
 
 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Only one output file expected, got: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">)))</span>

@@ -13,6 +13,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    import sys
+    from pathlib import Path
+
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../../../../bigr_pipelines/common/python")
+    sys.path.append(common)
+
+    from file_manager import *
+
     default_config_mutect2_germline = {
         # Your genome sequence
         "genome": "reference/genome.fasta",
@@ -30,40 +39,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
     except NameError:
         config = default_config_mutect2_germline
 
-    def get_fai(genome_path: str) -> str:
-        return genome_path + ".fai"
-
-    def get_dict(genome_path: str) -> str:
-        return ".".join(genome_path.split(".")[:-1]) + ".dict"
-
-    def get_tbi(vcf_path: str) -> str:
-        return vcf_path + ".tbi"
-
-    def get_bai(bam_path: str) -> str:
-        return bam_path + ".bai"
-
-
-    ## Required modules :
-    ## This module includes fasta indexes and fasta dictionnaries
-    # module index_datasets:
-    #     snakefile: "../../index_datasets/test/Snakefile"
-    #     config: config
-    #
-    # use rule * from index_datasets as index_datasets_*
-    #
-    ## This module includes BWA mapping and Samtools corrections
-    # module bwa_fixmate:
-    #     snakefile: "../../bwa_fixmate/test/Snakefile"
-    #     config: config
-    #
-    # use rule * from bwa_fixmate as bwa_fixmate_*
-    #
-    ## This module includes VCF compression and indexation
-    # module compress_index_vcf:
-    #     snakefile: "../../compress_index_vcf/test/Snakefile"
-    #     config: config
-    #
-    # use rule * from compress_index_vcf as compress_index_vcf_*
 
     #####################
     ### Apply filters ###
@@ -89,11 +64,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             time_min=lambda wildcards, attempt: attempt * 45,
-            mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480)
+            mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
+            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
         params:
             extra=""
+        log:
+            "logs/mutect2/filter/{sample}.log"
         wrapper:
-            "/bio/gatk/filtermutectcalls"
+            "bio/gatk/filtermutectcalls"
 
 
     ################################
@@ -112,11 +90,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 15360),
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+        params:
+            extra=""
         log:
             "logs/gatk/learnreadorientationmodel/{sample}.log"
         wrapper:
-            "/bio/gatk/learnreadorientationmodel"
+            "bio/gatk/learnreadorientationmodel"
 
 
     ###########################################
@@ -132,19 +113,20 @@ This meta-wrapper can be used by integrating the following into your workflow:
             summary="gatk/getpileupsummaries/{sample}_getpileupsummaries.table"
         output:
             table=temp("summary/{sample}_calculate_contamination.table")
-        group:
-            "Contamination_Estimate"
         message:
             "Summarizing read support for known variant sites to further "
             "estimate contamination on {wildcards.sample}"
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
-            time_min=lambda wildcards, attempt: attempt * 35
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+        params:
+            extra=""
         log:
             "logs/gatk/CalculateContamination/{sample}.log"
         wrapper:
-            "/bio/gatk/calculatecontamination"
+            "bio/gatk/calculatecontamination"
 
 
     """
@@ -159,19 +141,20 @@ This meta-wrapper can be used by integrating the following into your workflow:
             variants_index=get_tbi(config["known"])
         output:
             table=temp("gatk/getpileupsummaries/{sample}_getpileupsummaries.table")
-        group:
-            "Contamination_Estimate"
         message:
             "Summarizing read support for known variant sites to further "
             "estimate contamination on {wildcards.sample}"
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
-            time_min=lambda wildcards, attempt: attempt * 35
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+        params:
+            extra=""
         log:
             "logs/gatk/GetPileupSummaries/{sample}.log"
         wrapper:
-            "/bio/gatk/getpileupsummaries"
+            "bio/gatk/getpileupsummaries"
 
 
     ######################
@@ -198,6 +181,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 4
         resources:
             time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp",
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480)
         params:
             extra=(
@@ -208,7 +192,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/gatk/mutect2/call/{sample}.log"
         wrapper:
-            "/bio/gatk/mutect"
+            "bio/gatk/mutect"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

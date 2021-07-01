@@ -128,6 +128,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="star_arriba.html">STAR-ARRIBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="star_mapping.html">STAR_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tximport_deseq2.html">TXIMPORT_DESEQ2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varscan2_calling.html">VARSCAN2_CALLING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varscan2_germline.html">VARSCAN2_GERMLINE</a></li>
@@ -213,13 +214,13 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">default_config</span><span class="o">=</span><span class="p">{</span>
     <span class="s2">&quot;samples&quot;</span><span class="p">:[</span><span class="s2">&quot;test&quot;</span><span class="p">],</span>
     <span class="s2">&quot;ref&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;cosmic&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/annotation&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dbsnp&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/annotation&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dbnsfp&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/annotaion&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;fasta&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/annotation&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;gmt&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/annotation&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;gwascat&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/annotation&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kaviar&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/annotation&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cosmic&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/annotation&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dbsnp&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/annotation&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dbnsfp&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/annotaion&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fasta&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/annotation&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gmt&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/annotation&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gwascat&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/annotation&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kaviar&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/annotation&quot;</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
@@ -250,12 +251,12 @@
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;tmp/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/snpsift/dbnsfp/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/snpsift/dbnsfp&quot;</span>
-
+        <span class="s2">&quot;bio/snpsift/dbnsfp&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">snpsift_gwascat</span><span class="p">:</span>
@@ -269,11 +270,12 @@
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;tmp/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/snpsift/gwascat/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/snpsift/gwascat&quot;</span>
+        <span class="s2">&quot;bio/snpsift/gwascat&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">snpsift_cosmic</span><span class="p">:</span>
@@ -287,11 +289,12 @@
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;tmp/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/snpsift/cosmic/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/snpsift/annotate&quot;</span>
+        <span class="s2">&quot;bio/snpsift/annotate&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">snpsift_dbsnp</span><span class="p">:</span>
@@ -308,9 +311,10 @@
         <span class="s2">&quot;logs/snpsift/dbsnp/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;tmp/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/snpsift/annotate&quot;</span>
+        <span class="s2">&quot;bio/snpsift/annotate&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">snpsift_kaviar</span><span class="p">:</span>
@@ -319,7 +323,6 @@
         <span class="n">database</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;kaviar&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">call</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/kaviar/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
-
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with Kaviar&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
@@ -327,9 +330,10 @@
         <span class="s2">&quot;logs/snpsift/kaviar/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;tmp/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/snpsift/annotate&quot;</span>
+        <span class="s2">&quot;bio/snpsift/annotate&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">snpsift_gmt</span><span class="p">:</span>
@@ -343,9 +347,12 @@
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;tmp/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/snpsift/gmt/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/snpsift/genesets&quot;</span>
+        <span class="s2">&quot;bio/snpsift/genesets&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">snpsift_vartype</span><span class="p">:</span>
@@ -359,11 +366,12 @@
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;tmp/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/snpsift/varType/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/snpsift/varType&quot;</span>
+        <span class="s2">&quot;bio/snpsift/varType&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

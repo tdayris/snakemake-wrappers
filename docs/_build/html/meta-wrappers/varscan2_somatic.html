@@ -123,6 +123,7 @@
 <li class="toctree-l2"><a class="reference internal" href="snpeff_annotate.html">SNPEFF_ANNOTATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpsift.html">SNPSIFT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="star_arriba.html">STAR-ARRIBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="star_mapping.html">STAR_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tximport_deseq2.html">TXIMPORT_DESEQ2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varscan2_calling.html">VARSCAN2_CALLING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varscan2_germline.html">VARSCAN2_GERMLINE</a></li>
@@ -321,19 +322,20 @@
 <span class="n">rule</span> <span class="n">samtools_mpilup</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">bam</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">&quot;gatk/recal_bam/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;gatk/recal_bam/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span>
+            <span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span>
         <span class="p">],</span>
         <span class="n">bam_index</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;gatk/recal_bam/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">),</span>
-            <span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;gatk/recal_bam/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">)</span>
+            <span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">),</span>
+            <span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">)</span>
         <span class="p">],</span>
         <span class="n">reference_genome</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span>
         <span class="n">reference_genome_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
         <span class="n">bed</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;bed&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span><span class="p">)</span>
-    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Building mpilup on </span><span class="si">{wildcards.sample}</span><span class="s2"> with samtools&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Building mpilup on </span><span class="si">{wildcards.sample}</span><span class="s2"> with samtools (tumor/normal)&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>

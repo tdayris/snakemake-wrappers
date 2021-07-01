@@ -33,7 +33,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/{tool}/{subcommand}/tabix/index/{sample}.log"
         wrapper:
-            "/bio/tabix"
+            "bio/tabix"
 
 
     """
@@ -57,7 +57,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/{tool}/{subcommand}/pbgzip/{sample}.log"
         wrapper:
-            "/bio/compress/pbgzip"
+            "bio/compress/pbgzip"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

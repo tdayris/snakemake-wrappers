@@ -13,7 +13,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
-    default_config_mutect2_germline = {
+    default_config_mutect2_somatic = {
         # Your genome sequence
         "genome": "reference/genome.fasta",
         # Path to a VCF containing AF fields
@@ -26,9 +26,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     try:
         if config == dict():
-            config = default_config_mutect2_germline
+            config = default_config_mutect2_somatic
     except NameError:
-        config = default_config_mutect2_germline
+        config = default_config_mutect2_somatic
 
 
     def get_fai(genome_path: str) -> str:
@@ -44,6 +44,36 @@ This meta-wrapper can be used by integrating the following into your workflow:
         return bam_path + ".bai"
 
 
+    ###########################
+    ### Filter Mutect calls ###
+    ###########################
+
+    rule gatk_filter_mutect_calls:
+        input:
+            vcf="mutect2/call/{sample}.vcf.gz",
+            ref=config["genome"],
+            ref_index=get_fai(config["genome"]),
+            ref_dict=get_dict(config["genome"]),
+            bam="samtools/sort/{sample}_{status}.bam",
+            bam_index=get_bai("samtools/sort/{sample}_{status}.bam"),
+            f1r2="mutect2/f1r2/{sample}.tar.gz",
+            contamination="summary/{sample}_calculate_contamination.table"
+        output:
+            vcf=temp("mutect2/filter/{sample}.vcf.gz")
+        message:
+            "Filtering GATK calls on {wildcards.sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
+            time_min=lambda wildcards, attempt: attempt * 35
+        params:
+            extra=""
+        log:
+            "logs/mutect2/filter/{sample}.log"
+        wrapper:
+            "/bio/gatk/filtermutectcalls"
+
+
     ###########################################
     ### Estimate cross-sample contamination ###
     ###########################################
@@ -54,8 +84,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule calculate_tumor_contamination:
         input:
-            summary="gatk/getpileupsummaries/tumor/{sample}_tumor_getpileupsummaries.table",
-            normal=="gatk/getpileupsummaries/normal/{sample}_normal_getpileupsummaries.table",
+            summary="gatk/getpileupsummaries/{sample}_tumor_getpileupsummaries.table",
+            normal="gatk/getpileupsummaries/{sample}_normal_getpileupsummaries.table",
         output:
             table=temp("summary/{sample}_calculate_contamination.table"),
             segmentation=temp("summary/{sample}_segments.table")
@@ -80,13 +110,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule get_pileup_summaries:
         input:
-            bam="samtools/sort/{status}/{sample}_{status}.bam",
-            bam_index=get_bai("samtools/sort/{status}/{sample}_{status}.bam"),
+            bam="samtools/sort/{sample}_{status}.bam",
+            bam_index=get_bai("samtools/sort/{sample}_{status}.bam"),
             intervals=config["bed"],
             variants=config["known"],
             variants_index=get_tbi(config["known"])
         output:
-            table=temp("gatk/getpileupsummaries/{status}/{sample}_{status}_getpileupsummaries.table")
+            table=temp(
+                "gatk/getpileupsummaries/{sample}_{status}_getpileupsummaries.table"
+            )
         group:
             "Contamination_Estimate"
         message:
@@ -114,16 +146,17 @@ This meta-wrapper can be used by integrating the following into your workflow:
             fasta=config["genome"],
             fasta_index=get_fai(config["genome"]),
             fasta_dict=get_dict(config["genome"]),
-            map="samtools/sort/normal/{sample}_normal.bam",
-            map_index=get_bai("samtools/sort/normal/{sample}_normal.bam"),
-            tumor="samtools/sort/tumor/{sample}_tumor.bam",
-            tumor_index=get_bai("samtools/sort/tumor/{sample}_tumor.bam"),
+            map="samtools/sort/{sample}_normal.bam",
+            map_index=get_bai("samtools/sort/{sample}_normal.bam"),
+            tumor="samtools/sort/{sample}_tumor.bam",
+            tumor_index=get_bai("samtools/sort/{sample}_tumor.bam"),
             germline=config["known"],
             germline_tbi=get_tbi(config["known"]),
             intervals=config["bed"]
         output:
             vcf=temp("mutect2/call/{sample}.vcf.gz"),
-            f1r2=temp("mutect2/f1r2/{sample}.tar.gz")
+            f1r2=temp("mutect2/f1r2/{sample}.tar.gz"),
+            bam=temp("mutect2/bam/{sample}.bam")
         message:
             "Calling variants on {wildcards.sample} with GATK Mutect2"
         threads: 4
@@ -141,6 +174,77 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/gatk/mutect2/call/{sample}.log"
         wrapper:
             "/bio/gatk/mutect"
+
+
+    ################################
+    ### Building Panel of Normal ###
+    ################################
+
+    rule gatk_crate_stomatic_pon:
+        input:
+
+
+
+    rule gatk_genomics_db_import:
+        input:
+            ref=config["genome"],
+            ref_index=get_fai(config["genome"]),
+            ref_dict=get_dict(config["genome"]),
+            bams=expand(
+                "samtools/sort/{sample}_normal.bam",
+                sample=config["sample_list"]
+            )
+            bams_index=expand(
+                get_bai("samtools/sort/{sample}_normal.bam"),
+                sample=config["sample_list"]
+            ),
+            gvcfs=expand(
+                "mutect2/pon_call/{sample}.vcf.gz",
+                sample=config["sample_list"]
+            ),
+            gvcfs_tbi=expand(
+                get_tbi("mutect2/pon_call/{sample}.vcf.gz"),
+                sample=config["sample_list"]
+            ),
+            intervals=config["bed"]
+        output:
+            genomicsdb=temp("gatk/genomicsdb/pon_db")
+        message: "Building PoN database"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
+            time_min=lambda wildcards, attempt: attempt * 35
+        params:
+            extra="",
+            db_action="create",
+            intervals=lambda wildcards, intput: input.intervals
+        log:
+            "logs/gatk/genomicsdbimport/pon.log"
+        wrapper:
+            "/bio/gatk/genomicsdbimport"
+
+
+    use rule gatk_mutect2_somatic as gatk_mutect2_germline_normal:
+        input:
+            fasta=config["genome"],
+            fasta_index=get_fai(config["genome"]),
+            fasta_dict=get_dict(config["genome"]),
+            map="samtools/sort/{sample}_normal.bam",
+            map_index=get_bai("samtools/sort/{sample}_normal.bam"),
+            germline=config["known"],
+            germline_tbi=get_tbi(config["known"]),
+            intervals=config["bed"]
+        output:
+            vcf=temp("mutect2/pon_call/{sample}.vcf.gz")
+            )
+        params:
+            extra=(
+                "--max-reads-per-alignment-start 0 "
+                "--normal Mutect2_{sample}_normal "
+                "--disable-read-filter MateOnSameContigOrNoMappedMateReadFilter "
+            )
+        log:
+            "logs/gatk/mutect2/pon_call/{sample}.log"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

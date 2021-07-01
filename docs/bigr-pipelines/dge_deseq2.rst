@@ -104,7 +104,9 @@ The pipeline contains the following steps:
 
     import sys
 
-    sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../common/python")
+    sys.path.append(common)
 
     from dataframes import *
     from file_manager import *
@@ -124,7 +126,7 @@ The pipeline contains the following steps:
         level=logging.DEBUG
     )
 
-    default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/dge_deseq2/config.hg38.yaml")
+    default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
     configfile: get_config(default_config)
     design = pandas.read_csv("design.tsv", sep="\t", header=0, index_col=0)
 
@@ -180,9 +182,9 @@ The pipeline contains the following steps:
 
     wildcard_constraints:
         comparison=r"|".join(output_prefixes),
-        factor=r"|".join([i[0] for i in comparison_levels]),
-        test=r"|".join([i[1] for i in comparison_levels]),
-        ref=r"|".join([i[2] for i in comparison_levels]),
+        factor=r"|".join(map(str, [i[0] for i in comparison_levels])),
+        test=r"|".join(map(str, [i[1] for i in comparison_levels])),
+        ref=r"|".join(map(str, [i[2] for i in comparison_levels])),
         axes=r"|".join(["ax_1_ax_2", "ax_2_ax_3", "ax_3_ax_4"]),
         elipse=r"|".join(["with_elipse", "without_elipse"])
 
@@ -204,7 +206,7 @@ The pipeline contains the following steps:
             pcas=expected_pcas,
             general_pcas=expand(
                 "figures/pca/general.pca.{factor}.{axes}.png",
-                factor=design.columns.tolist(),
+                factor=[i[0] for i in comparison_levels],
                 axes=["PC1_PC2", "PC2_PC1"]
             )
 
@@ -216,7 +218,7 @@ The pipeline contains the following steps:
 
     rule general_pca:
         input:
-            counts="salmon/pseudo_mapping/aggregation/TPM.genes.tsv"
+            counts="salmon/TPM.transcripts.tsv"
         output:
             png=expand(
                 "figures/pca/general.pca.{factor}.{axes}.png",
@@ -245,20 +247,22 @@ The pipeline contains the following steps:
         input:
             quant = expand(
                 "salmon/pseudo_mapping/{sample}/quant.sf",
-                sample=design["Sample_id"]
+                sample=design.index.tolist()
             ),
-            tx2gene = "tx2gene.tsv"
+            tx2gene = "tximport/transcripts2genes.tsv"
         output:
-            tsv = "table_tr_pos.tsv"
+            tsv = "salmon/TPM.{content}.tsv"
         message:
             "Testing pandas merge salmon"
         params:
             header = True,
             position = True,
             gencode = False,
-
+            drop_na = True,
+            dro_null = True,
+            genes = lambda wildcards: wildcards.content == "genes"
         log:
-            "logs/pandas_merge_salmon.log"
+            "logs/pandas_merge_salmon/{content}.log"
         wrapper:
             "/bio/pandas/salmon"
 
@@ -307,7 +311,13 @@ The pipeline contains the following steps:
                 f"fastp/json/pe/{sample}.fastp.json"
                 for sample in samples_per_prefixes[wildcards.comparison]
             ],
-            config="multiqc/{comparison}/multiqc_config.yaml"
+            config="multiqc/{comparison}/multiqc_config.yaml",
+            fqscreen=lambda wildcards: [
+                "fastq_screen/{sample}.{stream}.fastq_screen.{ext}"
+                for stream in ["1", "2"]
+                for ext in ["txt", "png"]
+                for sample in samples_per_prefixes[wildcards.comparison]
+            ]
 
 
     ###########################

@@ -123,19 +123,20 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule samtools_mpilup:
         input:
             bam=[
-                "gatk/recal_bam/{sample}_tumor.bam",
-                "gatk/recal_bam/{sample}_normal.bam"
+                "picard/markduplicates/mapping/{sample}_tumor.bam",
+                "picard/markduplicates/mapping/{sample}_normal.bam"
             ],
             bam_index=[
-                get_bai("gatk/recal_bam/{sample}_tumor.bam"),
-                get_bai("gatk/recal_bam/{sample}_normal.bam")
+                get_bai("picard/markduplicates/mapping/{sample}_tumor.bam"),
+                get_bai("picard/markduplicates/mapping/{sample}_normal.bam")
             ],
             reference_genome=config["genome"],
             reference_genome_idx=get_fai(config["genome"]),
             bed=config["bed"]
         output:
             temp("samtools/mpileup/{sample}.mpileup.gz")
-        message: "Building mpilup on {wildcards.sample} with samtools"
+        message:
+            "Building mpilup on {wildcards.sample} with samtools (tumor/normal)"
         threads: 2
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 4096, 20480),

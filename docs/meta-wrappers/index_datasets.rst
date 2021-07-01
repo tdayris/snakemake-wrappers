@@ -13,6 +13,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    import sys
+    from pathlib import Path
+
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../../../../bigr_pipelines/common/python")
+    sys.path.append(common)
+
+    from file_manager import *
+
     default_config_index_datasets = {
         "genome": "reference/genome.fasta"
     }
@@ -24,18 +33,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
         config = default_config_index_datasets
 
 
-
-    def get_fasta_index_from_genome_path(genome_path: str) -> str:
-        return genome_path + ".fai"
-
-
-    def get_dict_from_genome_path(genome_path: str) -> str:
-        return ".".join(genome_path.split(".")[:-1]) + ".dict"
-
     rule target:
         input:
-            get_dict_from_genome_path(config["genome"]),
-            get_fasta_index_from_genome_path(config["genome"])
+            get_dict(config["genome"]),
+            get_fai(config["genome"])
         message:
             "Finishing indexing meta-wrapper"
 
@@ -51,19 +52,20 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             config["genome"]
         output:
-            get_fasta_index_from_genome_path(config["genome"])
+            get_fai(config["genome"])
         message: "Indexing reference fasta with Samtools"
         cache: True
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 1024, 4098),
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir=lambda wildcards, input: f"tmp/genome_indexation.tmp"
         params:
             ""
         log:
             "logs/samtools/faidx/genome.log"
         wrapper:
-            "/bio/samtools/faidx"
+            "bio/samtools/faidx"
 
 
     """
@@ -77,19 +79,43 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             config["genome"]
         output:
-            get_dict_from_genome_path(config["genome"])
+            get_dict(config["genome"])
         message: "Creating sequence dictionnary over reference genome with Picard"
         cache: True
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 2048, 8192),
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir=lambda wildcards, input: f"tmp/genome_indexation.tmp"
         params:
             ""
         log:
             "logs/picard/create_sequence_dictionnary/genome.log"
         wrapper:
-            "/bio/picard/createsequencedictionary"
+            "bio/picard/createsequencedictionary"
+
+
+    """
+    This rule indexes a given bam file, using samtools index. Most of the time,
+    fasta indexes are not explicitely requested by softwares, but they will crash
+    if this index is missing.
+    """
+    rule samtools_index_bam:
+        input:
+            "{bam_path}.bam"
+        output:
+            "{bam_path}.bam.bai"
+        message:
+            "Indexing {bam_path} with Samtools index"
+        threads: 20
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 1024, 8192),
+            time_min=lambda wildcards, attempt: attempt * 30,
+            tmpdir=lambda wildcards: f"tmp/samtools_index.tmp"
+        log:
+            "samtools/{bam_path}/index.log"
+        wrapper:
+            "bio/samtools/index"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

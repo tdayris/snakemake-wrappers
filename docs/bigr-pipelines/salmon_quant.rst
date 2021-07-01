@@ -104,7 +104,9 @@ The pipeline contains the following steps:
 
     import sys
 
-    sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../common/python")
+    sys.path.append(common)
 
     from file_manager import *
     from files_linker import *
@@ -117,7 +119,7 @@ The pipeline contains the following steps:
         level=logging.DEBUG
     )
 
-    default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/config.hg38.yaml")
+    default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
     configfile: get_config(default_config)
     design = get_design(os.getcwd(), search_fastq_pairs)
 
@@ -177,7 +179,7 @@ The pipeline contains the following steps:
         log:
             "logs/multiqc.log"
         wrapper:
-            "/bio/multiqc"
+            "bio/multiqc"
 
 
     use rule * from salmon_meta as salmon_meta_*
@@ -224,7 +226,7 @@ The pipeline contains the following steps:
         log:
             "logs/fastp/{sample}.log"
         wrapper:
-            "/bio/fastp"
+            "bio/fastp"
 
 
     #################################################
@@ -245,7 +247,7 @@ The pipeline contains the following steps:
         log:
             "logs/bigr_copy/{sample}.{stream}.log"
         wrapper:
-            "/bio/BiGR/copy"
+            "bio/BiGR/copy"
 
 
 

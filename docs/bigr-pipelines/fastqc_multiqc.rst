@@ -102,19 +102,25 @@ The pipeline contains the following steps:
 
 .. code-block:: python
 
+    import logging
     import sys
+    from pathlib import Path
 
-    sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python")
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../common/python")
+    sys.path.append(common)
 
+    from dataframes import *
     from file_manager import *
     from files_linker import *
+    from graphics import *
     from write_yaml import *
-    from pathlib import Path
+    from messages import message
 
     from snakemake.utils import min_version
     min_version("6.0")
 
-    default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/config.yaml")
+    default_config = read_yaml(worflow_source_dir / "config.yaml")
     config_path = get_config(default_config)
     design = get_design(os.getcwd(), search_fastq_pairs)
 
@@ -159,9 +165,9 @@ The pipeline contains the following steps:
                 "fastq_screen/{sample}.{stream}.fastq_screen.png",
                 sample=design["Sample_id"],
                 stream=["1", "2"]
-            ),
+            )
         output:
-            "multiqc/multiqc.html"
+            directory("multiqc/")
         message:
             "Gathering all quality reports"
         threads: 1
@@ -173,7 +179,34 @@ The pipeline contains the following steps:
         log:
             "logs/multiqc.log"
         wrapper:
-            "/bio/multiqc"
+            "bio/multiqc"
+
+
+    use rule multiqc as irods_complient with:
+        input:
+            fqc_zip=expand(
+                "fastqc/{sample}_{stream}_fastqc.zip",
+                sample=design["Sample_id"],
+                stream=["1", "2"]
+            ),
+            fqc_html=expand(
+                "fastqc/{sample}.{stream}.html",
+                sample=design["Sample_id"],
+                stream=["1", "2"]
+            ),
+            txt=expand(
+                "fastq_screen/{sample}.{stream}.fastq_screen.txt",
+                sample=design["Sample_id"],
+                stream=["1", "2"]
+            ),
+            png=expand(
+                "fastq_screen/{sample}.{stream}.fastq_screen.png",
+                sample=design["Sample_id"],
+                stream=["1", "2"]
+            ),
+            bcl_json="Stat.json"
+        output:
+            directory("output/")
 
 
     #########################################
@@ -184,8 +217,8 @@ The pipeline contains the following steps:
         input:
             "reads/{sample}.{stream}.fq.gz"
         output:
-            html="fastqc/{sample}.{stream}.html",
-            zip="fastqc/{sample}_{stream}_fastqc.zip"
+            html=temp("fastqc/{sample}.{stream}.html"),
+            zip=temp("fastqc/{sample}_{stream}_fastqc.zip")
         message:
             "Assessing quality of {wildcards.sample}, ({wildcards.stream})"
         threads: 1
@@ -197,15 +230,15 @@ The pipeline contains the following steps:
         log:
             "logs/fastqc/{sample}.{stream}.log"
         wrapper:
-            "/bio/fastqc"
+            "bio/fastqc"
 
 
     rule fastq_screen:
         input:
             "reads/{sample}.{stream}.fq.gz"
         output:
-            txt="fastq_screen/{sample}.{stream}.fastq_screen.txt",
-            png="fastq_screen/{sample}.{stream}.fastq_screen.png"
+            txt=temp("fastq_screen/{sample}.{stream}.fastq_screen.txt"),
+            png=temp("fastq_screen/{sample}.{stream}.fastq_screen.png")
         message:
             "Assessing quality of {wildcards.sample}, stream {wildcards.stream}"
         threads: config.get("threads", 20)
@@ -219,7 +252,7 @@ The pipeline contains the following steps:
         log:
             "logs/fastq_screen/{sample}.{stream}.log"
         wrapper:
-            "/bio/fastq_screen"
+            "bio/fastq_screen"
 
 
     #################################################
@@ -240,7 +273,7 @@ The pipeline contains the following steps:
         log:
             "logs/bigr_copy/{sample}.log"
         wrapper:
-            "/bio/BiGR/copy"
+            "bio/BiGR/copy"
 
 
 

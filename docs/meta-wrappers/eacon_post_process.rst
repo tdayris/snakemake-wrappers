@@ -72,7 +72,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     rule eacon_genomic_instability:
         input:
-            **get_gamma_files(config=config)
+            directory("{sample}/ASCAT/ASCN/")
         output:
             "{sample}/{sample}_GIS_from_best_gamma.txt"
         threads: 1
@@ -82,11 +82,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/EaCoN/{sample}/genomic_instability.log"
         params:
-            indir = "{sample}",  # Required!
+            indir = lambda wildcards: wildcards.sample,  # Required!
             genome = config["params"]["genome"],
             segmenter = config["params"]["segmenter"]
         wrapper:
-            "/bio/eacon/instability"
+            "bio/eacon/instability"
 
     rule eacon_annotate:
         input:
@@ -121,7 +121,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/EaCoN/{sample}/annotate.log"
         wrapper:
-            "/bio/eacon/annotate"
+            "bio/eacon/annotate"
 
 
     rule eacon_databases:
@@ -131,7 +131,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/EaCoN/databases.log"
         cache: True
         wrapper:
-            "/bio/eacon/databases"
+            "bio/eacon/databases"
 
 
     rule eacon_grd:
@@ -141,14 +141,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/EaCoN/grd.log"
         cache: True
         wrapper:
-            "/bio/eacon/databases"
+            "bio/eacon/databases"
 
 
     rule eacon_ascn:
         input:
             rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS"
         output:
-            **get_gamma_files(config=config)
+            directory("{sample}/ASCAT/ASCN/")
         threads: 1
         resources:
             time_min=lambda wildcards, attempt: attempt * 35,
@@ -158,7 +158,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra = config["extra"]["EaCoN_ascn"]
         wrapper:
-            "/bio/eacon/ascn"
+            "bio/eacon/ascn"
 
     rule EaCoN_segment:
         input:
@@ -187,7 +187,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra = config["extra"]["EaCoN_segment"]
         wrapper:
-            "/bio/eacon/segment"
+            "bio/eacon/segment"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

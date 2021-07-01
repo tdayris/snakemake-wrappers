@@ -13,11 +13,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
-    def get_fai(genome_path: str) -> str:
-        return genome_path + ".fai"
+    import sys
+    from pathlib import Path
 
-    def get_tbi(vcf_path: str) -> str:
-        return vcf_path + ".tbi"
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../../../../bigr_pipelines/common/python")
+    sys.path.append(common)
+
+    from file_manager import *
 
     rule bcftools_merge:
         input:
@@ -37,13 +40,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 2
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
-            time_min=lambda wildcards, attempt: attempt * 30
+            time_min=lambda wildcards, attempt: attempt * 30,
+            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
         log:
             "logs/bcftools/merge/{sample}.log"
         params:
             "--merge none"
         wrapper:
-            "/bio/bcftools/merge"
+            "bio/bcftools/merge"
 
     ########################
     ### Renaming samples ###
@@ -65,11 +69,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 2
         resources:
             mem_mb=512,
-            time_min=10
+            time_min=10,
+            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
         log:
             "logs/{tool}/{subcommand}/rehead/{sample}.log"
         wrapper:
-            "/bio/bcftools/reheader"
+            "bio/bcftools/reheader"
 
 
     rule bcftools_name_correspondancy:
@@ -104,11 +109,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 512, 4096),
-            time_min=lambda wildcards, attempt: attempt * 5
+            time_min=lambda wildcards, attempt: attempt * 5,
+            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
         log:
             "logs/{tool}/{subcommand}/rehead/{sample}.sample_list.log"
         wrapper:
-            "/bio/bcftools/query"
+            "bio/bcftools/query"
 
 
     rule tool_name:

@@ -13,21 +13,20 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    import sys
+    from pathlib import Path
+
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../../../../bigr_pipelines/common/python")
+    sys.path.append(common)
+
+    from file_manager import *
+
     default_config_gatk_bqsr = {
         "threads": 20,
         "genome": "reference/genome.fasta",
         "dbsnp": "reference/dbsnp.vcf.gz"
     }
-
-    def get_fai(genome_path: str) -> str:
-        return genome_path + ".fai"
-
-    def get_dict(genome_path: str) -> str:
-        return ".".join(genome_path.split(".")[:-1]) + ".dict"
-
-
-    def get_tbi(db_path: str) -> str:
-        return db_path + ".tbi"
 
     try:
         if config == dict():
@@ -52,13 +51,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 4096, 20240),
-            time_min=lambda wildcards, attempt: attempt * 60
+            time_min=lambda wildcards, attempt: attempt * 60,
+            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
         log:
             "logs/gatk/applybqsr/{sample}.log"
         params:
             extra=""
         wrapper:
-            "/bio/gatk/applybqsr"
+            "bio/gatk/applybqsr"
 
 
     """
@@ -79,13 +79,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: config.get("threads", 20)
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 4048, 15360),
-            time_min=lambda wildcards, attempt: attempt * 120
+            time_min=lambda wildcards, attempt: attempt * 120,
+            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
         log:
             "logs/gatk3/compute_bqsr/{sample}.log"
         params:
             extra=""
         wrapper:
-            "/bio/gatk/baserecalibrator"
+            "bio/gatk/baserecalibrator"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

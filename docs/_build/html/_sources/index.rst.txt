@@ -55,11 +55,11 @@ For the above example, the explicit GitHub URL to specify would need to be the `
             "https://github.com/snakemake/snakemake-wrappers/raw/0.2.0/bio/samtools/sort"
 
 
-Contribute
-----------
+Contributing
+------------
 
 We invite anybody to contribute to the Snakemake Wrapper Repository.
-If you want to contribute we suggest the following procedure:
+If you want to contribute refer to the :ref:`contributing guide <contributing>`.
 
 #. Fork the repository: https://github.com/snakemake/snakemake-wrappers
 #. Clone your fork locally.
@@ -118,6 +118,7 @@ Then, enter the respective directory and build the docs::
 If it runs through, you can open the main page at ``docs/_build/html/index.html``
 in a web browser. If you want to start fresh, you can clean up the build
 with ``make clean``.
+=======
 
 .. toctree::
    :maxdepth: 4

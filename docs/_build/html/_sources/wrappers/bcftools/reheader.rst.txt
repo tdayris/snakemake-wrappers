@@ -5,6 +5,7 @@ BCFTOOLS REHEADER
 
 Change header or sample names of vcf/bcf file. For more information see `BCFtools documentation <https://www.htslib.org/doc/bcftools.html#reheader>`_.
 
+**URL**: 
 
 Example
 -------
@@ -26,9 +27,10 @@ This wrapper can be used in the following way:
             extra="",  # optional parameters for bcftools reheader
             view_extra="-O b"  # add output format for internal bcftools view call
         wrapper:
-            "0.75.0-772-g3f7df6e90/bio/bcftools/reheader"
+            "0.76.0-805-g542e8c6a7/bio/bcftools/reheader"
 
 Note that input, output and log file paths can be chosen freely.
+
 When running with
 
 .. code-block:: bash
@@ -45,10 +47,12 @@ Software dependencies
 
 
 
+
 Authors
 -------
 
 * Jan Forster
+* Thibault Dayris
 
 
 Code
@@ -77,16 +81,15 @@ Code
 
     samples = snakemake.input.get("samples", None)
     if samples is not None:
-        samples_cmd = "--samples " + samples
+        samples_cmd = f"--samples {samples}"
     else:
         samples_cmd = ""
 
     fai = snakemake.input.get("fai", None)
     if fai is not None:
-        fai_cmd = "--fai " + fai
+        fai_cmd = f"--fai {fai}"
     else:
         fai_cmd = ""
-
 
     extra = snakemake.params.get("extra", "")
     view_extra = snakemake.params.get("view_extra", "")
@@ -97,6 +100,9 @@ Code
         view_extra += " --output-type b "
     elif str(snakemake.output).endswith(".vcf"):
         view_extra += " --output-type v "
+    if "regions" in snakemake.input.keys():
+        view_extra += " --regions-file {}".format(snakemake.input["regions"])
+
 
     shell(
         "bcftools reheader "

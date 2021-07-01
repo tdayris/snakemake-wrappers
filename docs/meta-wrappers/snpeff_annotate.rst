@@ -28,13 +28,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 3
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
-            time_min=lambda wildcard, attempt: attempt * 90
+            time_min=lambda wildcard, attempt: attempt * 90,
+            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
         params:
             extra=config.get("snpeff_extra", "")
         log:
             "logs/snpeff/annotate/{sample}.log"
         wrapper:
-            "/bio/snpeff/annotate"
+            "bio/snpeff/annotate"
 
 
     """
@@ -50,13 +51,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-            time_min=lambda wildcard, attempt: attempt * 120
+            time_min=lambda wildcard, attempt: attempt * 120,
+            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
         params:
             reference="{reference}"
         log:
             "logs/snpeff/download/{reference}.log"
         wrapper:
-            "/bio/snpeff/download"
+            "bio/snpeff/download"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

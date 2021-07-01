@@ -210,6 +210,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             gtf=config["gtf"]
         output:
             tx2gene_small="tximport/tx2gene.tsv",
+            tx2gene_large="tximport/transcripts2genes.tsv",
             gene2gene_large="tximport/gene2gene.tsv"
         message: "Building transcripts/genes conversion table"
         cache: True
