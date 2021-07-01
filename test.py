@@ -131,6 +131,7 @@ def run(wrapper, cmd, check_log=None):
             os.chdir(origdir)
 
 
+
 @skip_if_not_modified
 def test_rbt_csvreport():
     run(
@@ -138,7 +139,7 @@ def test_rbt_csvreport():
         ["snakemake", "--cores", "1", "qc_data", "--use-conda", "-F"],
     )
 
-
+    
 @skip_if_not_modified
 def test_liftoff():
     run(
@@ -752,6 +753,21 @@ def test_shovill():
 
 
 @skip_if_not_modified
+def test_seqtk_mergepe():
+    run(
+        "bio/seqtk/mergepe",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "a.merged.fastq.gz",
+        ],
+    )
+
+
+@skip_if_not_modified
 def test_seqtk_subsample_se():
     run(
         "bio/seqtk/subsample/se",
@@ -804,6 +820,14 @@ def test_art_profiler_illumina():
             "--use-conda",
             "-F",
         ],
+    )
+
+
+@skip_if_not_modified
+def test_bcftools_filter_sample():
+    run(
+        "bio/bcftools/filter",
+        ["snakemake", "--cores", "1", "a.filter_sample.vcf", "--use-conda", "-F"],
     )
 
 
