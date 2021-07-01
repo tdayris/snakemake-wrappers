@@ -340,13 +340,15 @@ rule picard_markduplicates:
         "Removing duplicates on {wildcards.sample}"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 5120,
-        time_min=lambda wildcards, attempt: attempt * 20,
+        mem_mb=lambda wildcards, attempt: min(attempt * 5120, 10240),
+        time_min=lambda wildcards, attempt: attempt * 45,
         tmpdir=lambda wildcards, input: f"tmp/{wildcards.sample}.tmp"
     log:
         "logs/picard/markduplicates/{sample}.markdup.log"
     params:
         "--ASSUME_SORT_ORDER coordinate --REMOVE_DUPLICATES true"
+    wrapper:
+        "bio/picard/markduplicates"
 
 
 use rule samtools_index from bwa_meta as picard_index with:

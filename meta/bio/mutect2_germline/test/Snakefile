@@ -98,8 +98,6 @@ rule calculate_contamination:
         summary="gatk/getpileupsummaries/{sample}_getpileupsummaries.table"
     output:
         table=temp("summary/{sample}_calculate_contamination.table")
-    group:
-        "Contamination_Estimate"
     message:
         "Summarizing read support for known variant sites to further "
         "estimate contamination on {wildcards.sample}"
@@ -128,8 +126,6 @@ rule get_pileup_summaries:
         variants_index=get_tbi(config["known"])
     output:
         table=temp("gatk/getpileupsummaries/{sample}_getpileupsummaries.table")
-    group:
-        "Contamination_Estimate"
     message:
         "Summarizing read support for known variant sites to further "
         "estimate contamination on {wildcards.sample}"
