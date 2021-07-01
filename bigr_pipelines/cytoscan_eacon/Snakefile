@@ -48,8 +48,6 @@ module post_process_eacon:
     snakefile: "../../meta/bio/eacon_post_process/test/Snakefile"
     config: config
 
-ruleorder: eacon_annotate > post_process_eacon_annotate
-
 rule default_cytoscan_process_all:
     input:
         # EaCoN models
@@ -73,7 +71,7 @@ rule default_cytoscan_process_all:
         #)
 
 # Import all rules from the eacon_post_process meta wrapper
-use rule * from post_process_eacon as post_process_*
+use rule * from post_process_eacon as *
 
 use rule eacon_annotate from post_process_eacon with:
     input:
@@ -83,7 +81,7 @@ use rule eacon_annotate from post_process_eacon with:
 
 rule eacon_cytoscan_process:
     input:
-        install = 'install.ok',
+        #install = 'install.ok',
         cel = "{sample}.CEL",
     output:
         qc_txt = "{sample}/{sample}_2.4.0_{nar}.qc.txt".format(
@@ -114,7 +112,7 @@ rule eacon_cytoscan_process:
     log:
         "logs/EaCoN/{sample}/cytoscan_process.log"
     wrapper:
-        "/bio/eacon/cytoscan_process"
+        "bio/eacon/cytoscan_process"
 
 
 rule eacon_install:
@@ -138,7 +136,7 @@ rule eacon_install:
             "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.oncoscan.2.4.0.tar.gz"
         ]
     output:
-        temp(touch('install.ok'))
+        touch('install.ok')
     cache: True
     threads: 1
     resources:
@@ -147,4 +145,4 @@ rule eacon_install:
     log:
         "logs/EaCoN/install.log"
     wrapper:
-        "/bio/eacon/install_local"
+        "bio/eacon/install_local"
