@@ -44,7 +44,7 @@ rule samtools_faidx:
     resources:
         mem_mb=lambda wildcards, attempt: min(attempt * 1024, 4098),
         time_min=lambda wildcards, attempt: attempt * 45,
-        tmpdir=lambda wildcards, input: f"tmp/genome_indexation.tmp"
+        tmpdir="tmp"
     params:
         ""
     log:
@@ -71,7 +71,7 @@ rule picard_create_sequence_dictionnary:
     resources:
         mem_mb=lambda wildcards, attempt: min(attempt * 2048, 8192),
         time_min=lambda wildcards, attempt: attempt * 45,
-        tmpdir=lambda wildcards, input: f"tmp/genome_indexation.tmp"
+        tmpdir="tmp"
     params:
         ""
     log:
@@ -96,7 +96,7 @@ rule samtools_index_bam:
     resources:
         mem_mb=lambda wildcards, attempt: min(attempt * 1024, 8192),
         time_min=lambda wildcards, attempt: attempt * 30,
-        tmpdir=lambda wildcards: f"tmp/samtools_index.tmp"
+        tmpdir="tmp"
     log:
         "samtools/{bam_path}/index.log"
     wrapper:
