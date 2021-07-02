@@ -32,11 +32,11 @@ message CMD "conda_activate ${CONDA_ENV_PATH}"
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
 if [ "${SUMMARY}" != "" ]; then
   message CMD "snakemake -s ${PIPELINE_PATH} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --cache eacon_install post_process_eacon_databases eacon_databases ${SNAKE_ARGS[*]} --summary > ${SUMMARY}"
-  snakemake -s "${PIPELINE_PATH}" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" --cache eacon_install post_process_eacon_databases eacon_databases "${SNAKE_ARGS[@]}" --summary > "${SUMMARY}"
+  snakemake -s "${PIPELINE_PATH}" --cache eacon_install post_process_eacon_databases eacon_databases --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}"  "${SNAKE_ARGS[@]}" --summary > "${SUMMARY}"
 elif [ "${GRAPH}" != "" ]; then
   message CMD "snakemake -s ${PIPELINE_PATH} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --cache eacon_install post_process_eacon_databases eacon_databases ${SNAKE_ARGS[*]} --rulegraph | dot -Tpng > ${GRAPH}"
-  snakemake -s "${PIPELINE_PATH}" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" --cache eacon_install post_process_eacon_databases eacon_databases "${SNAKE_ARGS[@]}" --rulegraph | dot -Tpng > "${GRAPH}"
+  snakemake -s "${PIPELINE_PATH}" --cache eacon_install post_process_eacon_databases eacon_databases --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" --rulegraph | dot -Tpng > "${GRAPH}"
 else
   message CMD "snakemake -s ${PIPELINE_PATH} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --cache eacon_install post_process_eacon_databases eacon_databases ${SNAKE_ARGS[*]}"
-  snakemake -s "${PIPELINE_PATH}" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" --cache eacon_install post_process_eacon_databases eacon_databases "${SNAKE_ARGS[@]}" && message INFO "EaCoN successful" || error_handling "${LINENO}" 2 "Error while running Oncoscan pipeline"
+  snakemake -s "${PIPELINE_PATH}" --cache eacon_install post_process_eacon_databases eacon_databases --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" && message INFO "EaCoN successful" || error_handling "${LINENO}" 2 "Error while running Oncoscan pipeline"
 fi
