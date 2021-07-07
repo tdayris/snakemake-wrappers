@@ -124,7 +124,7 @@ if arg_dict["error"] is not None:
     os.makedirs(os.path.dirname(arg_dict["error"]), exist_ok=True)
 
 arg_dict["mail_type"] = "END,FAIL"
-arg_dict["mail_user"] = "bigr@gustaveroussy.fr"
+arg_dict["mail_user"] = "thibault.dayris@gustaveroussy.fr"
 
 opts = ""
 for k, v in arg_dict.items():
