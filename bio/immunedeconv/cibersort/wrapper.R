@@ -13,18 +13,18 @@ base::message("Libraries loaded");
 
 # Load dataset
 tpm <- utils::read.table(
-  file = snakemake@input[["expr_mat"]],
+  file = base::as.character(x=snakemake@input[["expr_mat"]]),
   header = TRUE,
   sep = "\t",
   stringsAsFactors = FALSE
 );
 
-gene_col <- "GENE";
+gene_col <- "Hugo_ID";
 if ("gene_col" %in% base::names(snakemake@params)) {
   gene_col <- base::as.character(x = snakemake@params[["gene_col"]]);
 }
 
-extra <- "method = 'cibersort', tumor = TRUE, column = 'gene_symbol'";
+extra <- "method = 'cibersort', tumor = TRUE, column = gene_symbol";
 if ("extra" %in% base::names(snakemake@params)) {
   extra <- base::as.character(x = snakemake@params[["extra"]]);
 }
