@@ -74,7 +74,7 @@ rule get_genome:
         "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
     cache: True  # save space and time with between workflow caching (see docs)
     wrapper:
-        "/bio/reference/ensembl-sequence"
+        "bio/reference/ensembl-sequence"
 
 
 rule get_annotation:
@@ -94,7 +94,7 @@ rule get_annotation:
         "logs/get_annotation/{build}.{release}.{organism}.log"
     cache: True  # save space and time with between workflow caching (see docs)
     wrapper:
-        "/bio/reference/ensembl-annotation"
+        "bio/reference/ensembl-annotation"
 
 
 rule samtools_faidx_reference:
@@ -111,7 +111,7 @@ rule samtools_faidx_reference:
     cache: True
     group: "index_fasta"
     wrapper:
-        "/bio/samtools/faidx"
+        "bio/samtools/faidx"
 
 
 rule create_dict:
@@ -130,7 +130,7 @@ rule create_dict:
         time_min=lambda wildcard, attempt: attempt * 120
     group: "index_fasta"
     wrapper:
-        "/bio/picard/createsequencedictionary"
+        "bio/picard/createsequencedictionary"
 
 
 rule get_variation_with_contig_lengths:
@@ -151,4 +151,4 @@ rule get_variation_with_contig_lengths:
     log:
         "logs/get_variation/{build}.{release}.{organism}.log"
     wrapper:
-        "/bio/reference/ensembl-variation"
+        "bio/reference/ensembl-variation"
