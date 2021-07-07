@@ -1,0 +1,31 @@
+rule test_cnv_facets_bam:
+    input:
+        tumor_bam="tumor.bam",
+        normal_bam="normal.bam",
+        vcf="dbsnp.vcf.gz",
+        vcf_index="dbsnp.vcf.gz.tbi"
+    output:
+        vcf="prefix.vcf.gz",
+        profile="prefix.cnv.png",
+        coverage="prefix.cov.pdf",
+        spider="prefix.spider.pdf",
+        pileup="prefix.csv.gz"
+    params:
+        extra=""
+    wrapper:
+        "master/bio/facets/cnv"
+
+
+rule test_cnv_facets_pileup:
+    input:
+        pileup="pileup.csv"
+    output:
+        vcf="prefix.vcf.gz",
+        profile="prefix.cnv.png",
+        coverage="prefix.cov.pdf",
+        spider="prefix.spider.pdf",
+        pileup="prefix.csv.gz"
+    params:
+        extra=""
+    wrapper:
+        "master/bio/facets/cnv"
