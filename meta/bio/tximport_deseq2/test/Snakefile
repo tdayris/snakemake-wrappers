@@ -65,7 +65,7 @@ rule rbt_csv_report:
         '--sort-order ascending '
         '--rows-per-page 50'
     wrapper:
-        "/bio/rbt/csvreport"
+        "bio/rbt/csvreport"
 
 
 rule deseq2_readable:
@@ -89,7 +89,7 @@ rule deseq2_readable:
     log:
         "logs/deseq2/readable/{comparison}.log"
     wrapper:
-        "/bio/pandas/deseq2_to_gseaapp"
+        "bio/pandas/deseq2_to_gseaapp"
 
 
 ##############
@@ -126,7 +126,7 @@ rule deseq2:
     log:
         "logs/deseq2/deseq/{comparison}.log"
     wrapper:
-        "/bio/deseq2/DESeq"
+        "bio/deseq2/DESeq"
 
 
 """
@@ -151,7 +151,7 @@ rule deseq2_dataset_from_tximport:
     log:
         "logs/deseq2/deseq2_dataset_from_tximport/{comparison}.log"
     wrapper:
-        "/bio/deseq2/DESeqDataSetFromTximport"
+        "bio/deseq2/DESeqDataSetFromTximport"
 
 
 ##########################
@@ -184,7 +184,7 @@ rule tximport:
     log:
         "logs/tximport/{comparison}.log"
     wrapper:
-        "/bio/tximport"
+        "bio/tximport"
 
 
 """
@@ -210,7 +210,7 @@ rule tx_to_gene:
     log:
         "logs/tximport/tx2gene.log"
     wrapper:
-        "/bio/gtf/tx2gene"
+        "bio/gtf/tx2gene"
 
 
 ######################
@@ -238,4 +238,4 @@ rule split_design:
         columns_to_aggregate=config["design"].get("aggregate_col"),
         columns_to_remove=config["design"].get("remove_col")
     wrapper:
-        "/bio/BiGR/split_design"
+        "bio/BiGR/split_design"
