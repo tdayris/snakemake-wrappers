@@ -1,4 +1,3 @@
-import logging
 import sys
 from pathlib import Path
 
@@ -16,15 +15,16 @@ from messages import message
 from snakemake.utils import min_version
 min_version("6.0")
 
-default_config = read_yaml(worflow_source_dir / "config.yaml")
-config_path = get_config(default_config)
-design = get_design(os.getcwd(), search_fastq_pairs)
-
 logging.basicConfig(
     filename="snakemake.fastqc_multiqc.log",
     filemode="w",
     level=logging.DEBUG
 )
+
+default_config = read_yaml(worflow_source_dir / "config.yaml")
+config_path = get_config(default_config)
+design = get_design(os.getcwd(), search_fastq_pairs)
+
 
 fastq_links = link_fq(
     design.Sample_id,
@@ -69,7 +69,7 @@ rule multiqc:
         "Gathering all quality reports in {output}"
     threads: 1
     resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 1024, 4096),
+        mem_mb=lambda wildcard, attempt: attempt * 2048,
         time_min=lambda wildcard, attempt: attempt * 50,
         tmpdir="tmp"
     params:
@@ -102,7 +102,7 @@ use rule multiqc as irods_complient with:
             sample=design["Sample_id"],
             stream=["1", "2"]
         ),
-        bcl_json="Stat.json"
+        bcl_json="Stats.json"
     output:
         "output/multiqc.html",
         directory("output/multiqc_data")
