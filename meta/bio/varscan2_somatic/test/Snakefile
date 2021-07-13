@@ -110,13 +110,15 @@ rule bcftools_concat:
         )
     output:
         temp("varscan2/concat/{sample}.vcf.gz")
+    message:
+        "Concatenating varscan calling for {wildcards.sample}"
     threads: 2
     resources:
         mem_mb=lambda wildcards, attempt: min(attempt * 1025, 4096),
         time_min=lambda wildcards, attempt: attempt * 45,
         tmpdir="tmp"
     params:
-        "--output-type z --remove-duplicates --allow-overlaps"
+        extra="--remove-duplicates --allow-overlaps"
     log:
         "logs/bcftools/concat/{sample}.log"
     wrapper:
@@ -130,8 +132,8 @@ rule varscan2_somatic:
     input:
         mpileup="samtools/mpileup/{sample}.mpileup.gz"
     output:
-        snp=temp("varscan2/somatic/{sample}.snp.vcf.gz"),
-        indel=temp("varscan2/somatic/{sample}.indel.vcf.gz")
+        snp=temp("varscan2/somatic/{sample}.snp.vcf"),
+        indel=temp("varscan2/somatic/{sample}.indel.vcf")
     message:
         "Calling variants on {wildcards.sample} with Varscan2 mpileup2cns"
     threads: 2
@@ -140,7 +142,7 @@ rule varscan2_somatic:
         time_min=lambda wildcards, attempt: attempt * 45,
         tmpdir="tmp"
     params:
-        extra="--somatic-p-value 0.05 --variants"
+        extra="--somatic-p-value 0.05 --variants --output-type g"
     log:
         "logs/varscan2/somatic/{sample}.call.log"
     wrapper:
