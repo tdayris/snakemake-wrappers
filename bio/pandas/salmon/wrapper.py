@@ -71,7 +71,7 @@ def read_salmon(path: str) -> pandas.DataFrame:
     This function reads a single salmon quant.sf or quant.genes.sf
     and returns it as a pandas DataFrame
     """
-    return pandas.read_csv(
+    df = pandas.read_csv(
         path,
         sep="\t",
         index_col=0,
@@ -85,6 +85,11 @@ def read_salmon(path: str) -> pandas.DataFrame:
         },
         na_values=""
     )
+
+    if snakemake.params.get("drop_patch", False) is True:
+        df.index = [i.split('.')[0] for i in df.index.tolist()]
+
+    return df
 
 
 logging.basicConfig(

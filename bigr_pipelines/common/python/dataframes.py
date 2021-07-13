@@ -29,9 +29,10 @@ def yield_comps(complete_design: pandas.DataFrame,
             complete_design["_".join(cols)] = (
                 complete_design[cols].astype(str)
                                      .apply("_".join, axis=1)
-                                     .str.replace(" ", "_")
                                      .str.strip()
+                                     .str.replace(" ", "_")
             )
+            print(complete_design["_".join(cols)])
     if remove is not None:
         complete_design.drop(remove, axis=1, inplace=True)
 
