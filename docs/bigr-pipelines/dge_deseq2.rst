@@ -1,7 +1,7 @@
-.. _`salmon_quant`:
+.. _`dge_deseq2`:
 
-SALMON_QUANT
-============
+DGE_DESEQ2
+==========
 
 Perform trimming and quantification on RNASeq
 
