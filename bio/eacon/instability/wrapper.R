@@ -102,6 +102,7 @@ LOKAL1 <- base::sum(foreach (k = unique(as.res$segments$chr), .combine = "c") %d
 })
 
 ## Generating output
+best.gamma = base::as.numeric(best.gamma);
 outdf <- data.frame(
   best.gamma = best.gamma,
   psi = gE[gE$gamma == best.gamma, "psi"],

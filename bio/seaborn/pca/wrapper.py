@@ -24,7 +24,7 @@ from os.path import basename, dirname, commonprefix
 from snakemake.utils import makedirs
 
 logging.basicConfig(
-    filename=snakemake.log[0],
+    # filename=snakemake.log[0],
     filemode="w",
     level=logging.DEBUG
 )
@@ -37,8 +37,13 @@ data = pandas.read_csv(
     index_col=0
 )
 data = data[list(data.select_dtypes(include=[numpy.number]).columns.values)]
+data.dropna(axis=1, how='all', inplace=True)
+logging.debug("Head of data counts:")
+logging.debug(data.head())
 
 condition_dict = snakemake.params.conditions
+logging.debug("List of conditions per sample:")
+logging.debug(condition_dict)
 
 # Perform PCA
 nbc = len(data.columns.tolist())
@@ -52,6 +57,7 @@ results = pandas.DataFrame(
     columns=[f"PC{i}" for i in range(1, nbc+1, 1)],
     index=data.columns.tolist()
 )
+logging.debug("PCA results")
 logging.debug(results)
 
 seaborn.set(style="darkgrid")

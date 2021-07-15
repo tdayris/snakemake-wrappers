@@ -37,7 +37,7 @@ def filter_full_lines(dataframe: pandas.DataFrame,
     Apply filters on whole lines
     """
     local_operator = ops[local_operator]
-    return data = data.loc[~(local_operator(data, value).all(axis=1)]
+    return data.loc[~local_operator(data, value).all(axis=1)]
 
 
 logging.basicConfig(
@@ -95,7 +95,7 @@ if (filters := snakemake.params.get("filters", None)) is not None:
 
 
 if (filters := snakemake.params.get("full_line_filters", None)) is not None:
-    logging.debug(f"Applying the following filter on whole lines: {filters})
+    logging.debug(f"Applying the following filter on whole lines: {filters}")
     for filter in filters:
         data = filter_full_lines(data.dopy, *filter)
 
@@ -129,8 +129,12 @@ if (new_index := snakemake.params.get("new_index_col", None)) is not None:
 logging.debug(f"Head of the final DataFrame:\n{data.head()}")
 
 
+if ("set_index" in snakemake.params.keys()):
+    (data.reset_index(inplace=True)
+         .set_index(snakemake.params["set_index"], inplace=True))
+
 data.to_csv(
     snakemake.output["table"],
     sep=sep,
-    index=False
+    index=snakemake.params.get("keep_index", False)
 )

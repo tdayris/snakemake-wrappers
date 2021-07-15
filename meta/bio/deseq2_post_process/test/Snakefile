@@ -18,27 +18,45 @@ except NameError:
     config = default_deseq2_post_process_config
 
 
+rule all:
+    input:
+        reports=expand(
+            "multiqc/{comparison}/MultiQC.{comparison}.html",
+            comparison=config["samples_per_prefixes"].keys()
+        )
+
+
 ########################
 ### Quality controls ###
 ########################
 
 rule multiqc:
     input:
-        salmon=lambda wildcards: [
-            f"salmon/pseudo_mapping/{sample}/quant.sf"
-            for sample in config["samples_per_prefixes"][wildcards.comparison]
-        ],
-        html=lambda wildcards: [
-            f"fastp/html/pe/{sample}.fastp.html"
-            for sample in config["samples_per_prefixes"][wildcards.comparison]
-        ],
-        json=lambda wildcards: [
-            f"fastp/json/pe/{sample}.fastp.json"
-            for sample in config["samples_per_prefixes"][wildcards.comparison]
-        ],
-        config="multiqc/{comparison}/multiqc_config.yaml"
+        salmon=lambda wildcards: expand(
+            "salmon/pseudo_mapping/{sample}/quant.sf",
+            sample=config["samples_per_prefixes"][wildcards.comparison]
+        ),
+        html=lambda wildcards: expand(
+            "fastp/html/pe/{sample}.fastp.html",
+            sample=config["samples_per_prefixes"][wildcards.comparison]
+        ),
+        json=lambda wildcards: expand(
+            "fastp/json/pe/{sample}.fastp.json",
+            sample=config["samples_per_prefixes"][wildcards.comparison]
+        ),
+        config="multiqc/{comparison}/multiqc_config.yaml",
+        plots = [
+            #temp("pairwise_scatterplot_mqc.png"),
+            #temp("clustermap_sample_mqc.png"),
+            "multiqc/{comparison}/pca_plot_mqc.png",
+            "multiqc/{comparison}/volcanoplot_mqc.png",
+            "multiqc/{comparison}/distro_expr_mqc.png",
+            "multiqc/{comparison}/ma_plot_mqc.png",
+            #temp("multiqc/{comparison}/clustermap_sample_mqc.png"),
+            #temp("pca_axes_correlation_mqc.png")
+        ]
     output:
-        "multiqc/{comparison}/MultiQC.{comparison}.html"
+        "results/{comparison}/MultiQC.{comparison}.html"
     message:
         "Aggregating quality reports from Fastp, Salmon, PCAExplorer"
     threads: 1
@@ -48,9 +66,9 @@ rule multiqc:
     log:
         "logs/multiqc/{comparison}.log"
     params:
-        "--config multiqc/{comparison}/multiqc_config.yaml"
+        lambda wildcards, input: f"--config {input.config}"
     wrapper:
-        "/bio/multiqc"
+        "bio/multiqc"
 
 
 rule multiqc_config:
@@ -101,7 +119,78 @@ rule multiqc_config:
             #{"Sequencing Setup": "2x125"}
         ]
     wrapper:
-        "/bio/BiGR/multiqc_rnaseq_report"
+        "bio/BiGR/multiqc_rnaseq_report"
+
+
+##################
+### TSV report ###
+##################
+
+rule csv_report:
+    input:
+        # TODO: Add correct deseq2path
+        "results/{comparison}/{comparison}_{subset}.tsv"
+    output:
+        report(
+            directory("results/{comparison}/{subset}_report"),
+            caption="../report/gseapp_fc_fc.rst",
+            category="9. GSEAapp Shiny",
+            subcategory="{comparison}"
+        )
+    message:
+        "Making {wildcards.comparison} DESeq2 results readable "
+        "(DESeq2 results {wildcards.subset})"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        extra=(
+            "--separator $'\t' --sort-column stat_change "
+            "--rows-per-page 50 --sort-order ascending"
+        )
+    log:
+        "logs/rbt/csv-report/{comparison}_{subset}.log"
+    wrapper:
+        "bio/rbt/csvreport"
+
+
+rule deseq2_to_gseaapp:
+    input:
+        tsv = "deseq2/{comparison}/wald.{comparison}.tsv",
+        gene2gene = "tximport/gene2gene.tsv"
+    output:
+        complete = report(
+            "results/{comparison}/{comparison}_complete.tsv",
+            caption="../report/gseapp_complete.rst",
+            category="6. DGE Tables",
+            subcategory="{comparison}"
+        ),
+        fc_fc = report(
+            "results/{comparison}/{comparison}_sorted_on_fold_change.tsv",
+            caption="../report/gseapp_fc_fc.rst",
+            category="9. GSEAapp Shiny",
+            subcategory="{comparison}"
+        ),
+        padj_fc = report(
+            "results/{comparison}/{comparison}_sorted_on_pval.tsv",
+            category="9. GSEAapp Shiny",
+            caption="../report/gseapp_padj_fc.rst",
+            subcategory="{comparison}"
+        )
+    message:
+        "Subsetting DESeq2 results for {wildcards.comparison}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: min(attempt * 2048, 10240),
+        time_min=lambda wildcards, attempt: min(attempt * 40, 200),
+        tmpdir="tmp"
+    log:
+        "logs/deseq2_to_gseaapp/{comparison}.log"
+    wrapper:
+        "bio/pandas/deseq2_to_gseaapp"
+
 
 ###############
 ### Seaborn ###
@@ -119,19 +208,16 @@ rule seaborn_clustermap:
         "Plotting clustered heatmap for {wildcards.comparison}"
     threads: 1
     resources:
-        mem_mb = (
-            lambda wildcards, attempt: min(attempt * 512, 1024)
-        ),
-        time_min = (
-            lambda wildcards, attempt: min(attempt * 10, 20)
-        )
+        mem_mb=lambda wildcards, attempt: min(attempt * 512, 1024),
+        time_min=lambda wildcards, attempt: min(attempt * 10, 20),
+        tmpdir="tmp"
     params:
         conditions=lambda wildcards: config["condition_dict"][wildcards.comparison],
         factor="{comparison}"
     log:
         "logs/seaborn/clustermap/{comparison}.log"
     wrapper:
-        "/bio/seaborn/clustermap"
+        "bio/seaborn/clustermap"
 
 #######################
 ### EnhancedVolcano ###
@@ -149,14 +235,15 @@ rule enhancedvolcano_volcanoplot:
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 2048,
-        time_min=lambda wildcards, attempt: attempt * 15
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
     params:
         alpha_threshold=config["thresholds"].get("alpha", 0.05),
         fc_threshold=config["thresholds"].get("fc", 0.6)
     log:
         "logs/enhanced_volcano/{comparison}.log"
     wrapper:
-        "/bio/enhancedVolcano/volcano-deseq2"
+        "bio/enhancedVolcano/volcano-deseq2"
 
 
 ####################
@@ -177,22 +264,21 @@ rule pcaexplorer_pca:
     threads:
         1
     resources:
-        mem_mb = (
-            lambda wildcards, attempt: min(attempt * 1024, 10240)
-        ),
-        time_min = (
-            lambda wildcards, attempt: min(attempt * 20, 200)
-        )
+        mem_mb=lambda wildcards, attempt: min(attempt * 1024, 10240),
+        time_min=lambda wildcards, attempt: min(attempt * 20, 200),
+        tmpdir="tmp"
     params:
-        extra = (
-            lambda wildcards: f"intgroup = c('{wildcards.factor}'), ntop = 100, pcX = {wildcards.a}, pcY = {wildcards.b}, ellipse = {'TRUE' if wildcards.elipse == 'with_elipse' else 'FALSE'}"
-        ),
+        extra=lambda wildcards: (
+            f"intgroup = c('{wildcards.factor}'), "
+            "ntop = 100, pcX = {wildcards.a}, "
+            "pcY = {wildcards.b}, ellipse = "
+            "{'TRUE' if wildcards.elipse == 'with_elipse' else 'FALSE'}"),
         w = 1024,
         h = 768
     log:
         "logs/pcaexplorer/PCA/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca_ingroup_{factor}_ax_{a}_{b}_{elipse}.log"
     wrapper:
-        "/bio/pcaExplorer/PCA"
+        "bio/pcaExplorer/PCA"
 
 
 rule pca_explorer_distro_expr:
@@ -213,7 +299,7 @@ rule pca_explorer_distro_expr:
     log:
         "logs/pcaexplorer/distro_expr/{comparison}.log"
     wrapper:
-        "/bio/pcaExplorer/distro_expr"
+        "bio/pcaExplorer/distro_expr"
 
 
 ##############
@@ -238,4 +324,4 @@ rule deseq2_maplot:
     log:
         "logs/deseq2/maplot/maplot.{comparison}.log"
     wrapper:
-        "/bio/deseq2/plotMA"
+        "bio/deseq2/plotMA"

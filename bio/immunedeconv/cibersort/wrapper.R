@@ -1,5 +1,16 @@
 #!/usr/bin/R
 
+# __author__ = "Thibault Dayris"
+# __copyright__ = "Copyright 2021, Thibault Dayris"
+# __email__ = "thibault.dayris@gustaveroussy.fr"
+# __license__ = "MIT"
+
+# Sink the stderr and stdout to the snakemake log file
+# https://stackoverflow.com/a/48173272
+log.file<-file(snakemake@log[[1]],open="wt");
+base::sink(log.file);
+base::sink(log.file,type="message");
+
 # Load libraries
 base::library(package="dplyr", quietly=TRUE);
 base::library(package="tidyr", quietly=TRUE);
@@ -13,18 +24,18 @@ base::message("Libraries loaded");
 
 # Load dataset
 tpm <- utils::read.table(
-  file = snakemake@input[["expr_mat"]],
+  file = base::as.character(x=snakemake@input[["expr_mat"]]),
   header = TRUE,
   sep = "\t",
   stringsAsFactors = FALSE
 );
 
-gene_col <- "GENE";
+gene_col <- "Hugo_ID";
 if ("gene_col" %in% base::names(snakemake@params)) {
   gene_col <- base::as.character(x = snakemake@params[["gene_col"]]);
 }
 
-extra <- "method = 'cibersort', tumor = TRUE, column = 'gene_symbol'";
+extra <- "method = 'cibersort', tumor = TRUE, column = gene_symbol";
 if ("extra" %in% base::names(snakemake@params)) {
   extra <- base::as.character(x = snakemake@params[["extra"]]);
 }
@@ -179,3 +190,8 @@ if ("plotdir" %in% base::names(snakemake@output)) {
     dev.off();
   }
 }
+
+# Proper syntax to close the connection for the log file
+# but could be optional for Snakemake wrapper
+base::sink(type="message");
+base::sink();

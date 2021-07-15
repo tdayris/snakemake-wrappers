@@ -51,11 +51,11 @@ module post_process_eacon:
 rule default_cytoscan_process_all:
     input:
         # EaCoN models
-        ascn = expand(
-            os.sep.join(["{sample}", config["params"]["segmenter"],
-                         "ASCN", "{sample}.gammaEval.png"]),
-            sample=config["samples"]
-        ),
+        # ascn = expand(
+        #     os.sep.join(["{sample}", config["params"]["segmenter"],
+        #                  "ASCN", "{sample}.gammaEval.png"]),
+        #     sample=config["samples"]
+        # ),
         # EaCoN annotate
         html = expand(
             os.path.sep.join([
@@ -65,10 +65,10 @@ rule default_cytoscan_process_all:
             sample=config["samples"]
         ),
         # EaCoN new instability scoring feature
-        #instability = expand(
-        #    "{sample}/{sample}_GIS_from_best_gamma.txt",
-        #    sample=config["samples"]
-        #)
+        instability = expand(
+           "{sample}/{sample}_GIS_from_best_gamma.txt",
+           sample=config["samples"]
+        )
 
 # Import all rules from the eacon_post_process meta wrapper
 use rule * from post_process_eacon as *

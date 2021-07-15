@@ -24,37 +24,56 @@ logging.basicConfig(
 container: "docker://continuumio/miniconda3:4.4.10"
 localrules: bigr_copy
 
-ruleorder: bwa_mem > bwa_fixmate_meta_bwa_mem
-ruleorder: mutect2_somatic > gatk_mutect2_somatic_mutect2_somatic
-
+ruleorder: samtools_index_bam > samtools_index
 
 default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
 configfile: get_config(default_config)
 design = get_design(os.getcwd(), search_fastq_pairs)
-
+# design = design.head(2).tail(1)
+design.dropna(inplace=True)
+print(design)
 
 wildcard_constraints:
     sample = r"|".join(design["Sample_id"]),
     stream = r"1|2|R1|R2",
-    status = r"normal|tumor"
+    status = r"normal|tumor",
+    content = r"snp|indel"
 
 
-fastq_links = link_fq(
-    design.Sample_id,
-    design.Upstream_file,
-    design.Downstream_file
+fastq_links = link_fq_somatic(
+    sample_names=design.Sample_id,
+    n1_paths=design.Upstream_file_normal,
+    t1_paths=design.Upstream_file,
+    n2_paths=design.Downstrea_file_normal,
+    t2_paths=design.Downstream_file,
 )
+
 
 rule all:
     input:
-        calls=expand(
-            "snpsift/dbnsfp/{sample}.vcf.gz{index}",
+        # calls=expand(
+        #     "snpsift/dbnsfp/{sample}.vcf.gz{index}",
+        #     sample=design["Sample_id"].tolist(),
+        #     index=["", ".tbi"]
+        # ),
+        # html="multiqc/variant_calling_somatic.html",
+        mapped=expand(
+            "picard/markduplicates/{sample}_{status}.bam{ext}",
             sample=design["Sample_id"].tolist(),
-            index=["", ".tbi"]
+            status=["normal", "tumor"],
+            ext=["", ".bai"]
         ),
-        html="multiqc/variant_calling_ampliseq.html"
+        # mutect2=expand(
+        #     "mutect2/filter/{sample}.vcf.gz",
+        #     sample=design["Sample_id"].tolist()
+        # ),
+        varscan2=expand(
+            "varscan2/concat/{sample}.vcf.gz",
+            sample=design["Sample_id"].tolist()
+        ),
+        qc="multiqc/variant_calling_somatic.html"
     message:
-        "Finishing the Ampliseq variant calling"
+        "Finishing the WES Somatic Variant Calling"
 
 
 #################
@@ -64,30 +83,35 @@ rule all:
 rule multiqc:
     input:
         html=expand(
-            "fastp/html/pe/{sample}.fastp.html",
-            sample=design["Sample_id"]
+            "fastp/html/pe/{sample}_{status}.fastp.html",
+            sample=design["Sample_id"],
+            status=["normal", "tumor"]
         ),
         json=expand(
-            "fastp/json/pe/{sample}.fastp.json",
-            sample=design["Sample_id"]
+            "fastp/json/pe/{sample}_{status}.fastp.json",
+            sample=design["Sample_id"],
+            status=["normal", "tumor"]
         ),
-        picard=expand(
-            "picard/alignment_summary/{sample}.summary.txt",
-            sample=design["Sample_id"]
+        picard_metrics=expand(
+            "picard/metrics/{sample}_{status}.picard.metrics.txt",
+            sample=design["Sample_id"],
+            status=["normal", "tumor"]
         ),
         fastq_screen=expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+            "fastq_screen/{sample}.{stream}.{status}.fastq_screen.{ext}",
             sample=design["Sample_id"],
             stream=["1", "2"],
-            ext=["txt", "png"]
+            ext=["txt", "png"],
+            status=["normal", "tumor"]
         ),
-        picards_metrics=expand(
-            "picard/markduplicates/metrics/{sample}.picard.metrics.txt",
-            sample=design["Sample_id"]
+        picard_summary=expand(
+            "picard/alignment_summary/{sample}_{status}.summary.txt",
+            sample=design["Sample_id"],
+            status=["normal", "tumor"]
         )
     output:
         report(
-            "multiqc/variant_calling_ampliseq.html",
+            "multiqc/variant_calling_somatic.html",
             caption="../common/reports/multiqc.rst",
             category="Quality Controls"
         )
@@ -96,58 +120,98 @@ rule multiqc:
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
-        time_min=lambda wildcards, attempt: attempt * 35
+        time_min=lambda wildcards, attempt: attempt * 35,
+        tmpdir="tmp"
     log:
         "logs/multiqc.log"
     wrapper:
-        "/bio/multiqc"
+        "bio/multiqc"
 
 
 rule alignment_summary:
     input:
-        bam="samtools/sort/{sample}.bam",
-        bam_index="samtools/sort/{sample}.bam.bai",
+        bam="samtools/sort/{sample}_{status}.bam",
+        bam_index=get_bai("samtools/sort/{sample}_{status}.bam"),
         ref=config['ref']['fasta'],
         ref_idx=get_fai(config['ref']['fasta']),
         ref_dict=get_dict(config['ref']['fasta']),
     output:
-        temp("picard/alignment_summary/{sample}.summary.txt")
+        temp("picard/alignment_summary/{sample}_{status}.summary.txt")
     message:
         "Collecting alignment metrics on GATK recalibrated {wildcards.sample}"
+        " (considering {wildcards.status})"
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1020,
-        time_min=lambda wildcards, attempt: attempt * 45
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
     log:
-        "logs/picard/alignment_summary/{sample}.log"
+        "logs/picard/alignment_summary/{sample}_{status}.log"
     params:
         "VALIDATION_STRINGENCY=LENIENT "
         "METRIC_ACCUMULATION_LEVEL=null "
         "METRIC_ACCUMULATION_LEVEL=SAMPLE"
     wrapper:
-        "/bio/picard/collectalignmentsummarymetrics"
+        "bio/picard/collectalignmentsummarymetrics"
 
 
 rule fastq_screen:
     input:
-        "reads/{sample}.{stream}.fq.gz"
+        "reads/{status}/{sample}.{stream}.fq.gz"
     output:
-        txt=temp("fastq_screen/{sample}.{stream}.fastq_screen.txt"),
-        png=temp("fastq_screen/{sample}.{stream}.fastq_screen.png")
+        txt=temp("fastq_screen/{sample}.{stream}.{status}.fastq_screen.txt"),
+        png=temp("fastq_screen/{sample}.{stream}.{status}.fastq_screen.png")
     message:
         "Assessing quality of {wildcards.sample}, {wildcards.stream}"
+        " (considering {wildcards.status})"
     threads: config.get("threads", 20)
     resources:
         mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
-        time_min=lambda wildcard, attempt: attempt * 50
+        time_min=lambda wildcard, attempt: attempt * 50,
+        tmpdir="tmp"
     params:
         fastq_screen_config=config["fastq_screen"],
         subset=100000,
         aligner='bowtie2'
     log:
-        "logs/fastqc/{sample}.{stream}.log"
+        "logs/fastqc/{sample}.{stream}.{status}.log"
     wrapper:
-        "/bio/fastq_screen"
+        "bio/fastq_screen"
+
+
+##################
+### CNV Facets ###
+##################
+
+
+rule cnv_facets:
+    input:
+        tumor_bam="picard/markduplicates/{sample}_tumor.bam",
+        tumor_bai=get_bai("picard/markduplicates/{sample}_tumor.bam"),
+        normal_bam="picard/markduplicates/{sample}_normal.bam",
+        normal_bai=get_bai("picard/markduplicates/{sample}_normal.bam"),
+        vcf=config["ref"]["dbsnp"],
+        vcf_index=get_tbi(config["ref"]["dbsnp"]),
+        bed=config["ref"]["capture_kit_bed"]
+    output:
+        vcf="facets/{sample}/{sample}.vcf.gz",
+        profile="facets/{sample}/{sample}.cnv.png",
+        coverage="facets/{sample}/{sample}.cov.pdf",
+        spider="facets/{sample}/{sample}.spider.pdf",
+        pileup="facets/{sample}/{sample}.csv.gz"
+    message:
+        "Searching for CNV in {wildcards.sample} with Facets"
+    threads: 20
+    resources:
+      mem_mb=lambda wildcards, attempt: attempt * 8192,
+      time_min=lambda wildcards, attempt: attempt * 30,
+      tmpdir="tmp"
+    params:
+        extra="--snp-count-orphans"
+    log:
+        "logs/facets/cnv/{sample}.log"
+    wrapper:
+        "master/bio/facets/cnv"
 
 
 #################################
@@ -158,7 +222,32 @@ module compress_index_vcf_meta:
     snakefile: "../../meta/bio/compress_index_vcf/test/Snakefile"
     config: config
 
-use rule * from compress_index_vcf_meta as compress_index_vcf_*
+use rule * from compress_index_vcf_meta
+
+
+use rule tabix_index from compress_index_vcf_meta as snp_indel_tabix_index with:
+    input:
+        "{tool}/{subcommand}/{sample}.{content}.vcf.gz"
+    output:
+        "{tool}/{subcommand}/{sample}.{content}.vcf.gz.tbi"
+    message:
+        "Indexing {wildcards.sample} (from somatic varscan "
+        "{wildcards.content}) with tabix."
+    log:
+        "logs/{tool}/{subcommand}/tabix/index/{sample}.{content}.log"
+
+
+use rule pbgzip_compress from compress_index_vcf_meta as si_pbgzip with:
+    input:
+        "{tool}/{subcommand}/{sample}.{content}.vcf"
+    output:
+        "{tool}/{subcommand}/{sample}.{content}.vcf.gz"
+    message:
+        "Compressnig {wildcards.sample} (from somatic varscan "
+        "{wildcards.content}) with pbgzip."
+    log:
+        "logs/{tool}/{subcommand}/pgbzip/varcsanc2/{sample}.{content}.log"
+
 
 ######################
 ### VCF annotation ###
@@ -180,20 +269,20 @@ module snpsift:
     snakefile: "../../meta/bio/snpsift/test/Snakefile"
     config: config
 
-use rule * from snpsift as snpsift_*
 
+use rule * from snpsift as *
 
 
 #####################################
 ### Merge variant calling results ###
 #####################################
 
-module metacaller_somatic_meta:
-    snakefile: "../../meta/bio/meta_caller_somatic/test/Snakefile"
-    config: {"genome": config["ref"]["fasta"], "bed": config["ref"]["capture_kit_bed"]}
-
-
-use rule * from metacaller_somatic_meta as *
+# module metacaller_somatic_meta:
+#     snakefile: "../../meta/bio/meta_caller_somatic/test/Snakefile"
+#     config: {"genome": config["ref"]["fasta"], "bed": config["ref"]["capture_kit_bed"]}
+#
+#
+# use rule * from metacaller_somatic_meta as *
 
 
 ############################################################################
@@ -214,7 +303,8 @@ rule correct_mutect2_vcf:
     threads: 3
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 256,
-        time_min=lambda wildcards, attempt: attempt * 20
+        time_min=lambda wildcards, attempt: attempt * 20,
+        tmpdir="tmp"
     log:
         "logs/mutect2/correct_fields/{sample}.log"
     params:
@@ -232,51 +322,60 @@ rule correct_mutect2_vcf:
 ### Variant calling Mutect2 ###
 ###############################
 
+gatk_mutect2_somatic_config = {
+    "genome": config["ref"]["fasta"],
+    "known": config["ref"]["af_only"],
+    "bed": config["ref"]["capture_kit_bed"],
+    "dbsnp": config["ref"]["dbsnp"],
+    "sample_list": design["Sample_id"].to_list()
+}
+
 
 module gatk_mutect2_somatic_meta:
     snakefile: "../../meta/bio/mutect2_somatic/test/Snakefile"
-    config: {"genome": config["ref"]["fasta"], "known": config["ref"]["af_only"], "bed": config["ref"]["capture_kit_bed"], "dbsnp": config["ref"]["dbsnp"]}
+    config: gatk_mutect2_somatic_config
 
-use rule * from gatk_mutect2_somatic_meta as gatk_mutect2_somatic_*
 
-use rule mutect2_somatic from gatk_mutect2_somatic_meta with:
-    input:
-        fasta=config["ref"]["fasta"],
-        fasta_index=get_fai(config["ref"]["fasta"]),
-        fasta_dict=get_dict(config["ref"]["fasta"]),
-        map="picard/markduplicates/mapping/{sample}.bam",
-        map_index=get_bai("picard/markduplicates/mapping/{sample}.bam"),
-        somatic=config["ref"]["af_only"],
-        somatic_tbi=get_tbi(config["ref"]["af_only"]),
-        intervals=config["ref"]["capture_kit_bed"]
+use rule * from gatk_mutect2_somatic_meta
+
+
+
 
 ################################
 ### Variant Calling Varscan2 ###
 ################################
 
+varscan2_somatic_config = {
+    "genome": config["ref"]["fasta"],
+    "bed": config["ref"]["capture_kit_bed"]
+}
+
 module varscan2_somatic_meta:
     snakefile: "../../meta/bio/varscan2_somatic/test/Snakefile"
-    config: {
-        "genome": config["ref"]["fasta"],
-        "bed": config["ref"]["capture_kit_bed"]
-    }
+    config: varscan2_somatic_config
 
-use rule * from varscan2_somatic_meta as *
+use rule * from varscan2_somatic_meta
 
 
 ##############################
 ### GATK BAM RECALIBRATION ###
 ##############################
 
+gatk_bqsr_config = {
+    "threads": config["threads"],
+    "genome": config["ref"]["fasta"],
+    "dbsnp": config["ref"]["dbsnp"]
+}
+
 module gatk_bqsr_meta:
     snakefile: "../../meta/bio/gatk_bqsr/test/Snakefile"
-    config: {"threads": config["threads"], "genome": config["ref"]["fasta"], "dbsnp": config["ref"]["dbsnp"]}
+    config: gatk_bqsr_config
 
 
 use rule gatk_apply_baserecalibrator from gatk_bqsr_meta with:
     input:
-        bam="picard/markduplicates/mapping/{sample}_{status}.bam",
-        bam_index=get_bai("picard/markduplicates/mapping/{sample}_{status}.bam"),
+        bam="picard/markduplicates/{sample}_{status}.bam",
+        bam_index=get_bai("picard/markduplicates/{sample}_{status}.bam"),
         ref=config['ref']['fasta'],
         ref_idx=get_fai(config['ref']['fasta']),
         ref_dict=get_dict(config['ref']['fasta']),
@@ -291,8 +390,8 @@ use rule gatk_apply_baserecalibrator from gatk_bqsr_meta with:
 
 use rule gatk_compute_baserecalibration_table from gatk_bqsr_meta with:
     input:
-        bam="picard/markduplicates/mapping/{sample}_{status}.bam",
-        bam_index=get_bai("picard/markduplicates/mapping/{sample}_{status}.bam"),
+        bam="picard/markduplicates/{sample}_{status}.bam",
+        bam_index=get_bai("picard/markduplicates/{sample}_{status}.bam"),
         ref=config['ref']['fasta'],
         ref_idx=get_fai(config['ref']['fasta']),
         ref_dict=get_dict(config['ref']['fasta']),
@@ -316,20 +415,23 @@ rule picard_markduplicates:
         bam="samtools/sort/{sample}_{status}.bam",
         bai=get_bai("samtools/sort/{sample}_{status}.bam")
     output:
-        bam=temp("picard/markduplicates/mapping/{sample}_{status}.bam"),
+        bam=temp("picard/markduplicates/{sample}_{status}.bam"),
         metrics=temp(
-            "picard/markduplicates/metrics/{sample}_{status}.picard.metrics.txt"
+            "picard/metrics/{sample}_{status}.picard.metrics.txt"
         )
     message:
-        "Removing duplicates on {wildcards.sample}"
+        "Removing duplicates on {wildcards.sample} ({wildcards.status})"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 5120,
-        time_min=lambda wildcards, attempt: attempt * 20
+        mem_mb=lambda wildcards, attempt: attempt * 10240,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
     log:
-        "logs/picard/markduplicates/{sample}.log"
+        "logs/picard/markduplicates/{sample}_{status}.log"
     params:
         "--ASSUME_SORT_ORDER coordinate --REMOVE_DUPLICATES true"
+    wrapper:
+        "bio/picard/markduplicates"
 
 
 ###################
@@ -344,9 +446,10 @@ module bwa_fixmate_meta:
 use rule samtools_index from bwa_fixmate_meta with:
     input:
         "samtools/sort/{sample}_{status}.bam"
-    ouptut:
+    output:
         temp("samtools/sort/{sample}_{status}.bam.bai")
-    message: "Indexing mapped reads of {wildcards.status} {wildcards.sample}"
+    message:
+        "Indexing mapped reads of {wildcards.status} {wildcards.sample}"
     log:
         "logs/samtools/sort/{sample}.{status}.log"
 
@@ -355,8 +458,7 @@ use rule samtools_sort_coordinate from bwa_fixmate_meta with:
     input:
         "samtools/fixmate/{sample}_{status}.bam"
     output:
-        temp("samtools/sort/{sample}_{status}.bam"),
-        tmp_dir = temp(directory("samtools/fixmate/{sample}_{status}.tmp"))
+        temp("samtools/sort/{sample}_{status}.bam")
     message:
         "Sorting {wildcards.status} {wildcards.sample} reads by query "
         "name for fixing mates"
@@ -388,9 +490,15 @@ use rule bwa_mem from bwa_fixmate_meta with:
         )
     output:
         temp("bwa_mem2/mem/{sample}_{status}.bam")
-    message: "Mapping {wildcards.status} {wildcards.sample} with BWA"
+    message:
+        "Mapping {wildcards.status} {wildcards.sample} with BWA"
     log:
         "logs/bwa_mem2/mem/{sample}.{status}.log"
+
+
+use rule bwa_index from bwa_fixmate_meta with:
+    input:
+        config["ref"]["fasta"]
 
 
 ############################
@@ -416,14 +524,15 @@ rule fastp_clean:
     threads: 1
     resources:
         mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
-        time_min=lambda wildcard, attempt: attempt * 45
+        time_min=lambda wildcard, attempt: attempt * 45,
+        tmpdir="tmp"
     params:
         adapters=config.get("fastp_adapters", None),
         extra=config.get("fastp_extra", "")
     log:
         "logs/fastp/{sample}.{status}.log"
     wrapper:
-        "/bio/fastp"
+        "bio/fastp"
 
 
 #################################################
@@ -432,17 +541,44 @@ rule fastp_clean:
 
 rule bigr_copy:
     output:
-        "reads/{sample}_{status}.{stream}.fq.gz"
+        "reads/{status}/{sample}.{stream}.fq.gz"
     message:
         "Gathering {wildcards.status} {wildcards.sample} fastq files "
         "({wildcards.stream})"
     threads: 1
     resources:
         mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-        time_min=lambda wildcard, attempt: attempt * 45
+        time_min=lambda wildcard, attempt: attempt * 45,
+        tmpdir="tmp"
     params:
-        input=lambda wildcards, output: fastq_links[output[0]]
+        input=lambda w, output: fastq_links[w.status][output[0]]
     log:
         "logs/bigr_copy/{status}/{sample}.{stream}.log"
     wrapper:
-        "/bio/BiGR/copy"
+        "bio/BiGR/copy"
+
+
+###########################
+### Datasets indexation ###
+###########################
+
+index_datasets_config = {
+    "genome": config["ref"]["fasta"]
+}
+
+module index_datasets:
+    snakefile: "../../meta/bio/index_datasets/test/Snakefile"
+    config: index_datasets_config
+
+use rule * from index_datasets
+
+use rule samtools_bam_index from index_datasets with:
+    input:
+        "{command}/{subsommand}/{sample}_{status}.bam"
+    output:
+        get_bai("{command}/{subsommand}/{sample}_{status}.bam")
+    message:
+        "Indexing bam from {wildcards.command} ({wildcards.subcommand}) "
+        "with samtools for {wildcards.sample} ({wildcards.status})"
+    log:
+        "logs/samtools/sort/{command}_{subsommand}/{sample}_{status}.log"
