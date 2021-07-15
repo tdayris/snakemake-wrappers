@@ -286,11 +286,11 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/cytoscan_eacon/run.
 <span class="n">rule</span> <span class="n">default_cytoscan_process_all</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="c1"># EaCoN models</span>
-        <span class="n">ascn</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;segmenter&quot;</span><span class="p">],</span>
-                         <span class="s2">&quot;ASCN&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">.gammaEval.png&quot;</span><span class="p">]),</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">]</span>
-        <span class="p">),</span>
+        <span class="c1"># ascn = expand(</span>
+        <span class="c1">#     os.sep.join([&quot;{sample}&quot;, config[&quot;params&quot;][&quot;segmenter&quot;],</span>
+        <span class="c1">#                  &quot;ASCN&quot;, &quot;{sample}.gammaEval.png&quot;]),</span>
+        <span class="c1">#     sample=config[&quot;samples&quot;]</span>
+        <span class="c1"># ),</span>
         <span class="c1"># EaCoN annotate</span>
         <span class="n">html</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
@@ -300,10 +300,10 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/cytoscan_eacon/run.
             <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">]</span>
         <span class="p">),</span>
         <span class="c1"># EaCoN new instability scoring feature</span>
-        <span class="c1">#instability = expand(</span>
-        <span class="c1">#    &quot;{sample}/{sample}_GIS_from_best_gamma.txt&quot;,</span>
-        <span class="c1">#    sample=config[&quot;samples&quot;]</span>
-        <span class="c1">#)</span>
+        <span class="n">instability</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
+           <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">_GIS_from_best_gamma.txt&quot;</span><span class="p">,</span>
+           <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
 
 <span class="c1"># Import all rules from the eacon_post_process meta wrapper</span>
 <span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">post_process_eacon</span> <span class="k">as</span> <span class="o">*</span>
@@ -365,7 +365,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/cytoscan_eacon/run.
             <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/rcnorm_0.1.5.tar.gz&quot;</span>
         <span class="p">],</span>
         <span class="n">git_packages</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.76.0-806-g3fcaad6db.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.76.0-829-g4bdef82c8.tar.gz&quot;</span><span class="p">,</span>
             <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_Chromosomes.tar.gz&quot;</span><span class="p">,</span>
             <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.cytoscan.2.4.0.tar.gz&quot;</span><span class="p">,</span>
             <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.oncoscan.2.4.0.tar.gz&quot;</span>

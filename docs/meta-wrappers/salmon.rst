@@ -17,8 +17,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
     min_version("6.0")
 
     default_salmon_config = {
-        "genome": "/path/to/sequence.fasta",
-        "transcriptome": "/path/to/transcriptome.fasta"
+        "genome": "path/to/sequence.fasta",
+        "transcriptome": "path/to/transcriptome.fasta"
     }
 
     """
@@ -41,14 +41,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=lambda wildcards, attempt: attempt * 60,
             mem_mb=lambda wildcards, attempt: (
                 attempt * 5120 + 25600
-            )
+            ),
+            tmpdir="tmp"
         params:
             libType = config.get("salmon_libtype", "A"),
             extra = config.get("salmon_quant_extra", "--numBootstraps 100 --validateMappings --gcBias --seqBias --posBias")
         log:
             "logs/salmon/quant/{sample}.log"
         wrapper:
-            "/bio/salmon/quant"
+            "bio/salmon/quant"
 
 
     """
@@ -72,13 +73,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
             ),
             mem_mb=lambda wildcards, attempt, input: (
                 attempt * (25600 if "decoys" in input.keys() else 10240)
-            )
+            ),
+            tmpdir="tmp"
         params:
             extra=config.get("salmon_index_extra", "--keepDuplicates --gencode")
         log:
             "logs/salmon/index.log"
         wrapper:
-            "/bio/salmon/index"
+            "bio/salmon/index"
 
 
     """
@@ -99,11 +101,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 2
         resources:
             time_min=lambda wildcards, attempt: min(attempt * 20, 30),
-            mem_mb=lambda wildcards, attempt: attempt * 512
+            mem_mb=lambda wildcards, attempt: attempt * 512,
+            tmpdir="tmp"
         log:
             "logs/salmon/decoys.log"
         wrapper:
-            "/bio/salmon/generate_decoy"
+            "bio/salmon/generate_decoy"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

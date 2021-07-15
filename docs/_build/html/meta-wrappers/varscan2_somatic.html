@@ -210,37 +210,28 @@
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This meta-wrapper can be used by integrating the following into your workflow:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">default_config_varscan2_somatic</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">worflow_source_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">get_sources</span><span class="p">())))</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">common</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;../../../../bigr_pipelines/common/python&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">common</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">file_manager</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">default_config_varscan2_somatic</span> <span class="o">=</span> <span class="p">{</span>
     <span class="c1"># Your genome sequence</span>
     <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="s2">&quot;reference/genome.fasta&quot;</span><span class="p">,</span>
     <span class="c1"># Path to a BED containing the kit&#39;s catpured regions</span>
     <span class="s2">&quot;bed&quot;</span><span class="p">:</span> <span class="s2">&quot;reference/regions.bed&quot;</span>
 <span class="p">}</span>
 
-<span class="k">def</span> <span class="nf">get_fai</span><span class="p">(</span><span class="n">genome_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">genome_path</span> <span class="o">+</span> <span class="s2">&quot;.fai&quot;</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">config</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">():</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">default_config_varscan2_somatic</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">default_config_varscan2_somatic</span>
 
-<span class="k">def</span> <span class="nf">get_bai</span><span class="p">(</span><span class="n">bam_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">bam_path</span> <span class="o">+</span> <span class="s2">&quot;bai&quot;</span>
-
-<span class="k">def</span> <span class="nf">get_mpileup_input</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    If user provides a bed file in the config, then it should be used as a</span>
-<span class="sd">    region file through samtools mpileup.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;bed&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="n">bam</span><span class="o">=</span><span class="p">[</span>
-                <span class="s2">&quot;gatk/recal_bam/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;gatk/recal_bam/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span>
-            <span class="p">]</span>
-            <span class="n">bam_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,),</span>
-            <span class="n">reference_genome</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span>
-            <span class="n">reference_genome_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">])</span>
-        <span class="p">}</span>
-    <span class="k">return</span> <span class="p">{</span>
-
-    <span class="p">}</span>
 
 <span class="c1">## Required modules :</span>
 <span class="c1">## This module includes fasta indexes and fasta dictionnaries</span>
@@ -264,6 +255,54 @@
 <span class="c1">#</span>
 <span class="c1"># use rule * from bwa_fixmate as bwa_fixmate_*</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule renames samples for further merges</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">bcftools_reheader</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;varscan2/concat/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">vcf_tbi</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;varscan2/concat/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">),</span>
+        <span class="c1">#samples=&quot;varscan2/mpileup2cns/{sample}.sample.list&quot;,</span>
+        <span class="n">fasta</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span>
+        <span class="n">fai</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
+        <span class="n">regions</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;bed&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/reheaded/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Reheading </span><span class="si">{wildcards.sample}</span><span class="s2"> with fasta index and new sample names&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">25</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bcftools/reheader/varscan2/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">view_extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/bcftools/reheader&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule provides a list of sample names (here, only one) for Varscan2</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">varscan2_sample_list</span><span class="p">:</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/mpileup2cns/</span><span class="si">{sample}</span><span class="s2">.sample.list&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Building sample list for Varscan2 mpileup2cns&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="mi">2</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s1">&#39;&quot;varscan2_</span><span class="si">{sample}</span><span class="s1">_tumor</span><span class="se">\n</span><span class="s1">varscan2_</span><span class="si">{sample}</span><span class="s1">_normal&quot;&#39;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/varscan2/samples/</span><span class="si">{sample}</span><span class="s2">.list.log&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;echo -e </span><span class="si">{params}</span><span class="s2"> &gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule concats snp and indel callings from Varscan2 in order to produce a</span>
@@ -272,22 +311,30 @@
 <span class="n">rule</span> <span class="n">bcftools_concat</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;vascan2/somatic/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{content}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;varscan2/somatic/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{content}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;snp&quot;</span><span class="p">,</span> <span class="s2">&quot;indel&quot;</span><span class="p">],</span>
+            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">),</span>
+        <span class="n">calls_index</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;varscan2/somatic/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{content}</span><span class="s2">.vcf.gz.tbi&quot;</span><span class="p">,</span>
             <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;snp&quot;</span><span class="p">,</span> <span class="s2">&quot;indel&quot;</span><span class="p">],</span>
             <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;vascan2/concat/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/concat/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Concatenating varscan calling for </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1025</span><span class="p">,</span> <span class="mi">4096</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="s2">&quot;--output-type z --remove-duplicates --allow-overlaps&quot;</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--remove-duplicates --allow-overlaps&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/varscan/pileup2indel/concat/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+        <span class="s2">&quot;logs/bcftools/concat/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/bcftools/concat&quot;</span>
+        <span class="s2">&quot;bio/bcftools/concat&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -295,22 +342,23 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">varscan2_somatic</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">mpileup</span><span class="o">=</span><span class="s2">&quot;samtools/mupleup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span>
+        <span class="n">mpileup</span><span class="o">=</span><span class="s2">&quot;samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">snp</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;vascan2/somatic/</span><span class="si">{sample}</span><span class="s2">.snp.vcf.gz&quot;</span><span class="p">)</span>
-        <span class="n">indel</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/somatic/</span><span class="si">{sample}</span><span class="s2">.indel.vcf.gz&quot;</span><span class="p">)</span>
+        <span class="n">snp</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/somatic/</span><span class="si">{sample}</span><span class="s2">.snp.vcf&quot;</span><span class="p">),</span>
+        <span class="n">indel</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;varscan2/somatic/</span><span class="si">{sample}</span><span class="s2">.indel.vcf&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Calling variants on </span><span class="si">{wildcards.sample}</span><span class="s2"> with Varscan2 mpileup2cns&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">8192</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--p-value 0.05 --variants&quot;</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--somatic-p-value 0.05 --variants --output-type g&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/varscan2/mpileup2cns/</span><span class="si">{sample}</span><span class="s2">.call.log&quot;</span>
+        <span class="s2">&quot;logs/varscan2/somatic/</span><span class="si">{sample}</span><span class="s2">.call.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/varscan/somatic&quot;</span>
+        <span class="s2">&quot;bio/varscan/somatic&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -320,12 +368,12 @@
 <span class="n">rule</span> <span class="n">samtools_mpilup</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">bam</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span>
+            <span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span>
         <span class="p">],</span>
         <span class="n">bam_index</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">),</span>
-            <span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/mapping/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">)</span>
+            <span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">),</span>
+            <span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">)</span>
         <span class="p">],</span>
         <span class="n">reference_genome</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span>
         <span class="n">reference_genome_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
@@ -337,13 +385,14 @@
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">120</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">120</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--count-orphans --no-BAQ&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/samtools/mpileup&quot;</span>
+        <span class="s2">&quot;bio/samtools/mpileup&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

@@ -120,7 +120,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             "-m none --force-samples --missing-to-ref --no-index"
         wrapper:
-            "/bio/bcftools/merge"
+            "bio/bcftools/merge"
 
 
     rule rehead_before_merge:
@@ -142,7 +142,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/{tool}/{subcommand}/rehead/{sample}.log"
         wrapper:
-            "/bio/bcftools/reheader"
+            "bio/bcftools/reheader"
 
 
     rule bcftools_name_correspondancy:
@@ -181,7 +181,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/{tool}/{subcommand}/rehead/{sample}.sample_list.log"
         wrapper:
-            "/bio/bcftools/query"
+            "bio/bcftools/query"
 
 
     rule tool_name:
@@ -220,7 +220,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/{tool}/{subcommand}/pbgzip/{sample}.log"
         wrapper:
-            "/bio/compress/pbgzip"
+            "bio/compress/pbgzip"
 
 
     ########################
@@ -277,7 +277,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/gatk/mutect/{sample}.log"
         wrapper:
-             "/bio/gatk/mutect"
+             "bio/gatk/mutect"
 
 
     #######################
@@ -328,7 +328,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/strelka/{sample}.log"
         wrapper:
-            "/bio/strelka/germline"
+            "bio/strelka/germline"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

@@ -38,13 +38,57 @@ Input/Output
 * VCF files
   
  
+  
+* Cosmic database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)
+  
+ 
+  
+* dbSNP database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)
+  
+ 
+  
+* MSigDB database formatted as GMT (already provided for IGR Flamingo users)
+  
+ 
+  
+* GWASCatalog database formatted as TSV (already provided for IGR Flamingo users)
+  
+ 
+  
+* Kaviar database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)
+  
+ 
+  
+* SnpEff database downloaded with SnpEff itself (already provided for IGR Flamingo users)
+  
+ 
+  
+* CaptureKit genomic intervals formatted as BED (already provided for IGR Flamingo users)
+  
+ 
+  
+* Known variants from dbSNP, with only AF within the INFO field for GATK (already provided for IGR Flamingo users)
+  
+ 
+  
+* dbNSFP database formatted as TSV (already provided for IGR Flamingo users)
+  
+ 
+  
+* FastQ Screen databases (already provided for IGR Flamingo users)
+  
+ 
 
 
 **Output:**
 
  
   
-* Annotated VCF file
+* Annotated VCF files
+  
+ 
+  
+* MultiQC report
   
  
 
@@ -237,7 +281,7 @@ The pipeline contains the following steps:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
             time_min=lambda wildcards, attempt: attempt * 35,
-            tmpdir=lambda wildcards, input: f"tmp/multiqc.tmp"
+            tmpdir="tmp"
         log:
             "logs/multiqc.log"
         wrapper:
@@ -259,7 +303,7 @@ The pipeline contains the following steps:
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020,
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards, input: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/picard/alignment_summary/{sample}.log"
         params:
@@ -282,9 +326,7 @@ The pipeline contains the following steps:
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
             time_min=lambda wildcard, attempt: attempt * 50,
-            tmpdir=lambda wildcards, input: "tmp/{}.{}.tmp".format(
-              wildcards.sample, wildcards.stream
-            )
+            tmpdir="tmp"
         params:
             fastq_screen_config=config["fastq_screen"],
             subset=100000,
@@ -359,7 +401,7 @@ The pipeline contains the following steps:
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 256,
             time_min=lambda wildcards, attempt: attempt * 20,
-            tmpdir=lambda wildcards, input: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/mutect2/correct_fields/{sample}.log"
         params:
@@ -477,7 +519,7 @@ The pipeline contains the following steps:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 5120, 10240),
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards, input: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/picard/markduplicates/{sample}.markdup.log"
         params:
@@ -568,7 +610,7 @@ The pipeline contains the following steps:
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
             time_min=lambda wildcard, attempt: attempt * 45,
-            tmpdir=lambda wildcards, input: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         params:
             adapters=config.get("fastp_adapters", None),
             extra=config.get("fastp_extra", "")
@@ -591,9 +633,6 @@ The pipeline contains the following steps:
         resources:
           mem_mb=lambda wildcards, attempt: min(attempt * 1024, 2048),
           time_min=lambda wildcards, attempt: attempt * 45,
-          tmpdir=lambda wildcards, input: "tmp/{}.{}.tmp".format(
-            wildcards.sample, wildcards.stream
-          )
         params:
             input=lambda wildcards, output: fastq_links[output[0]]
         log:

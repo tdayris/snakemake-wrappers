@@ -52,7 +52,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards: f"tmp/vascan2/cns/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         params:
             extra="--p-value 0.05 --variants"
         log:
@@ -99,7 +99,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 4096, 20480),
             time_min=lambda wildcards, attempt: attempt * 120,
-            tmpdir=lambda wildcards: f"tmp/samtools/mpileup/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/samtools/mpileup/{sample}.log"
         params:

@@ -29,7 +29,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
             time_min=lambda wildcard, attempt: attempt * 90,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         params:
             extra=config.get("snpeff_extra", "")
         log:
@@ -52,7 +52,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
             time_min=lambda wildcard, attempt: attempt * 120,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         params:
             reference="{reference}"
         log:

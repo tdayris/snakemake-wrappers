@@ -65,7 +65,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             time_min=lambda wildcards, attempt: attempt * 45,
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         params:
             extra=""
         log:
@@ -91,7 +91,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 15360),
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         params:
             extra=""
         log:
@@ -120,7 +120,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
             time_min=lambda wildcards, attempt: attempt * 35,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         params:
             extra=""
         log:
@@ -148,7 +148,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
             time_min=lambda wildcards, attempt: attempt * 35,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         params:
             extra=""
         log:
@@ -181,7 +181,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 4
         resources:
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp",
+            tmpdir="tmp",
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480)
         params:
             extra=(

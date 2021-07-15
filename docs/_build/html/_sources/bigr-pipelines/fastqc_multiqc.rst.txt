@@ -32,6 +32,10 @@ Input/Output
 * Fastq files
   
  
+  
+* FastQ-Screen databases (already provided for IGR Flamingo users)
+  
+ 
 
 
 **Output:**
@@ -102,7 +106,6 @@ The pipeline contains the following steps:
 
 .. code-block:: python
 
-    import logging
     import sys
     from pathlib import Path
 
@@ -120,15 +123,16 @@ The pipeline contains the following steps:
     from snakemake.utils import min_version
     min_version("6.0")
 
-    default_config = read_yaml(worflow_source_dir / "config.yaml")
-    config_path = get_config(default_config)
-    design = get_design(os.getcwd(), search_fastq_pairs)
-
     logging.basicConfig(
         filename="snakemake.fastqc_multiqc.log",
         filemode="w",
         level=logging.DEBUG
     )
+
+    default_config = read_yaml(worflow_source_dir / "config.yaml")
+    config_path = get_config(default_config)
+    design = get_design(os.getcwd(), search_fastq_pairs)
+
 
     fastq_links = link_fq(
         design.Sample_id,
@@ -167,13 +171,15 @@ The pipeline contains the following steps:
                 stream=["1", "2"]
             )
         output:
-            directory("multiqc/")
+            "multiqc/multiqc.html",
+            directory("multiqc/multiqc_data")
         message:
-            "Gathering all quality reports"
+            "Gathering all quality reports in {output}"
         threads: 1
         resources:
-            mem_mb=lambda wildcard, attempt: min(attempt * 1024, 4096),
-            time_min=lambda wildcard, attempt: attempt * 50
+            mem_mb=lambda wildcard, attempt: attempt * 2048,
+            time_min=lambda wildcard, attempt: attempt * 50,
+            tmpdir="tmp"
         params:
             ""
         log:
@@ -204,9 +210,10 @@ The pipeline contains the following steps:
                 sample=design["Sample_id"],
                 stream=["1", "2"]
             ),
-            bcl_json="Stat.json"
+            bcl_json="Stats.json"
         output:
-            directory("output/")
+            "output/multiqc.html",
+            directory("output/multiqc_data")
 
 
     #########################################
@@ -224,7 +231,8 @@ The pipeline contains the following steps:
         threads: 1
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 1024, 4096),
-            time_min=lambda wildcard, attempt: attempt * 50
+            time_min=lambda wildcard, attempt: attempt * 50,
+            tmpdir="tmp"
         params:
             ""
         log:
@@ -244,7 +252,8 @@ The pipeline contains the following steps:
         threads: config.get("threads", 20)
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
-            time_min=lambda wildcard, attempt: attempt * 50
+            time_min=lambda wildcard, attempt: attempt * 50,
+            tmpdir="tmp"
         params:
             fastq_screen_config=config["fastq_screen"],
             subset=100000,
@@ -267,7 +276,8 @@ The pipeline contains the following steps:
         threads: 1
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-            time_min=lambda wildcard, attempt: attempt * 45
+            time_min=lambda wildcard, attempt: attempt * 45,
+            tmpdir="tmp"
         params:
             input=lambda wildcards, output: fastq_links[output[0]]
         log:

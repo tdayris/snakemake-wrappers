@@ -37,7 +37,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=1536,
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/samtools/sort/{sample}.log"
         wrapper:
@@ -59,7 +59,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, threads: threads * 1792,
             time_min=lambda wildcards, attempt: attempt * 90,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/samtools/query_sort_{sample}.log"
         params:
@@ -87,7 +87,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min = (
                 lambda wildcards, attempt: min(attempt * 45, 180)
             ),
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         params:
             config.get("fixmate_extra", "-cmr")
         log:
@@ -116,7 +116,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 6144 + 61440,
             time_min=lambda wildcards, attempt: attempt * 120,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         params:
             index=lambda wildcards, input: os.path.splitext(input["index"][0])[0],
             extra=r"-R '@RG\tID:{sample}\tSM:{sample}\tPU:{sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
@@ -147,7 +147,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 6144 + 66560,
             time_min=lambda wildcards, attempt: attempt * 120,
-            tmpdir=lambda wildcards: f"tmp/genome.tmp"
+            tmpdir="tmp"
         params:
             prefix=lambda wildcards, output: os.path.splitext(output[0])[0]
         log:

@@ -52,7 +52,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 4096, 20240),
             time_min=lambda wildcards, attempt: attempt * 60,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/gatk/applybqsr/{sample}.log"
         params:
@@ -80,7 +80,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 4048, 15360),
             time_min=lambda wildcards, attempt: attempt * 120,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/gatk3/compute_bqsr/{sample}.log"
         params:

@@ -72,7 +72,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     rule eacon_genomic_instability:
         input:
-            directory("{sample}/ASCAT/ASCN/")
+            "{sample}/ASCAT/ASCN/"
         output:
             "{sample}/{sample}_GIS_from_best_gamma.txt"
         threads: 1

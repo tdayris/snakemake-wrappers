@@ -41,7 +41,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
             time_min=lambda wildcards, attempt: attempt * 30,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/bcftools/merge/{sample}.log"
         params:
@@ -70,7 +70,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=512,
             time_min=10,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/{tool}/{subcommand}/rehead/{sample}.log"
         wrapper:
@@ -110,7 +110,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 512, 4096),
             time_min=lambda wildcards, attempt: attempt * 5,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/{tool}/{subcommand}/rehead/{sample}.sample_list.log"
         wrapper:

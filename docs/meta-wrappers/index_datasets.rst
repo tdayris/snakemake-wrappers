@@ -59,7 +59,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 1024, 4098),
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards, input: f"tmp/genome_indexation.tmp"
+            tmpdir="tmp"
         params:
             ""
         log:
@@ -86,7 +86,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 2048, 8192),
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards, input: f"tmp/genome_indexation.tmp"
+            tmpdir="tmp"
         params:
             ""
         log:
@@ -106,12 +106,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         output:
             "{bam_path}.bam.bai"
         message:
-            "Indexing {bam_path} with Samtools index"
+            "Indexing {wildcards.bam_path}.bam with Samtools index"
         threads: 20
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 1024, 8192),
             time_min=lambda wildcards, attempt: attempt * 30,
-            tmpdir=lambda wildcards: f"tmp/samtools_index.tmp"
+            tmpdir="tmp"
         log:
             "samtools/{bam_path}/index.log"
         wrapper:

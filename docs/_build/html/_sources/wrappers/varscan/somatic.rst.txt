@@ -37,7 +37,7 @@ This wrapper can be used in the following way:
         params:
             extra = ""
         wrapper:
-            "0.76.0-806-g3fcaad6db/bio/varscan/somatic"
+            "0.76.0-829-g4bdef82c8/bio/varscan/somatic"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -120,6 +120,9 @@ Code
         in_pileup = " {snakemake.input.normal_pileup}" " {snakemakeinput.tumor_pileup} "
     else:
         raise KeyError("Could not find either a mpileup, or a pair of pileup files")
+
+    if str(snakemake.output["snp"]).endswith(("vcf", "vcf.gz")):
+        extra += " --output-vcf 1 "
 
     shell(
         "varscan somatic"  # Tool and its subcommand

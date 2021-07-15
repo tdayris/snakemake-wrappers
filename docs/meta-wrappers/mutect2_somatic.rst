@@ -13,6 +13,16 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    from typing import Union
+    import sys
+    from pathlib import Path
+
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../../../../bigr_pipelines/common/python")
+    sys.path.append(common)
+
+    from file_manager import *
+
     default_config_mutect2_somatic = {
         # Your genome sequence
         "genome": "reference/genome.fasta",
@@ -21,7 +31,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
         # Path to a BED containing the kit's catpured regions
         "bed": "reference/regions.bed",
         # Path to dbSNP vcf, its tbi should be aside.
-        "dbsnp": "reference/dbsnp.vcf.gz"
+        "dbsnp": "reference/dbsnp.vcf.gz",
+        # List of samples
+        "sample_list": ["S1", "S2"]
     }
 
     try:
@@ -30,18 +42,28 @@ This meta-wrapper can be used by integrating the following into your workflow:
     except NameError:
         config = default_config_mutect2_somatic
 
+    def mutect2_input(config: dict[str, Union[list[str], str]]) -> dict[str, str]:
+        """
+        PoN should be used if and only if more than 40 normal samples are
+        provided.
+        """
+        input_dict = dict(
+            fasta=config["genome"],
+            fasta_index=get_fai(config["genome"]),
+            fasta_dict=get_dict(config["genome"]),
+            map="picard/markduplicates/{sample}_normal.bam",
+            map_index=get_bai("picard/markduplicates/{sample}_normal.bam"),
+            tumor="picard/markduplicates/{sample}_tumor.bam",
+            tumor_index=get_bai("picard/markduplicates/{sample}_tumor.bam"),
+            germline=config["known"],
+            germline_tbi=get_tbi(config["known"]),
+            intervals=config["bed"]
+        )
+        if len(config["sample_list"]) >= 40:
+            input_dict["pon"] = "gatk/pon/PoN.g.vcf.gz"
+            input_dict["pon_index"] = get_tbi("gatk/pon/PoN.g.vcf.gz")
 
-    def get_fai(genome_path: str) -> str:
-        return genome_path + ".fai"
-
-    def get_dict(genome_path: str) -> str:
-        return ".".join(genome_path.split(".")[:-1]) + ".dict"
-
-    def get_tbi(vcf_path: str) -> str:
-        return vcf_path + ".tbi"
-
-    def get_bai(bam_path: str) -> str:
-        return bam_path + ".bai"
+        return input_dict
 
 
     ###########################
@@ -54,8 +76,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             ref=config["genome"],
             ref_index=get_fai(config["genome"]),
             ref_dict=get_dict(config["genome"]),
-            bam="samtools/sort/{sample}_{status}.bam",
-            bam_index=get_bai("samtools/sort/{sample}_{status}.bam"),
+            bam="picard/markduplicates/{sample}_tumor.bam",
+            bam_index=get_bai("picard/markduplicates/{sample}_tumor.bam"),
             f1r2="mutect2/f1r2/{sample}.tar.gz",
             contamination="summary/{sample}_calculate_contamination.table"
         output:
@@ -65,13 +87,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
-            time_min=lambda wildcards, attempt: attempt * 35
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir="tmp"
         params:
             extra=""
         log:
             "logs/mutect2/filter/{sample}.log"
         wrapper:
-            "/bio/gatk/filtermutectcalls"
+            "bio/gatk/filtermutectcalls"
 
 
     ###########################################
@@ -93,16 +116,18 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "Contamination_Estimate"
         message:
             "Summarizing read support for known variant sites to further "
-            "estimate contamination on {wildcards.sample}"
-            " (on tumor only)"
+            "estimate contamination on {wildcards.sample} (on tumor only)"
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
-            time_min=lambda wildcards, attempt: attempt * 35
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir="tmp"
+        params:
+            extra=""
         log:
             "logs/gatk/CalculateContamination/{sample}.log"
         wrapper:
-            "/bio/gatk/calculatecontamination"
+            "bio/gatk/calculatecontamination"
 
 
     """
@@ -110,8 +135,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule get_pileup_summaries:
         input:
-            bam="samtools/sort/{sample}_{status}.bam",
-            bam_index=get_bai("samtools/sort/{sample}_{status}.bam"),
+            bam="picard/markduplicates/{sample}_{status}.bam",
+            bam_index=get_bai("picard/markduplicates/{sample}_{status}.bam"),
             intervals=config["bed"],
             variants=config["known"],
             variants_index=get_tbi(config["known"])
@@ -123,16 +148,18 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "Contamination_Estimate"
         message:
             "Summarizing read support for known variant sites to further "
-            "estimate contamination on {wildcards.sample}"
-            " ({wildcards.status})"
+            "estimate contamination on {wildcards.sample} ({wildcards.status})"
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
-            time_min=lambda wildcards, attempt: attempt * 35
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir="tmp"
+        params:
+            extra=""
         log:
             "logs/gatk/GetPileupSummaries/{sample}.{status}.log"
         wrapper:
-            "/bio/gatk/getpileupsummaries"
+            "bio/gatk/getpileupsummaries"
 
 
     ######################
@@ -143,16 +170,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule mutect2_somatic:
         input:
-            fasta=config["genome"],
-            fasta_index=get_fai(config["genome"]),
-            fasta_dict=get_dict(config["genome"]),
-            map="samtools/sort/{sample}_normal.bam",
-            map_index=get_bai("samtools/sort/{sample}_normal.bam"),
-            tumor="samtools/sort/{sample}_tumor.bam",
-            tumor_index=get_bai("samtools/sort/{sample}_tumor.bam"),
-            germline=config["known"],
-            germline_tbi=get_tbi(config["known"]),
-            intervals=config["bed"]
+            **mutect2_input(config)
         output:
             vcf=temp("mutect2/call/{sample}.vcf.gz"),
             f1r2=temp("mutect2/f1r2/{sample}.tar.gz"),
@@ -162,18 +180,22 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 4
         resources:
             time_min=lambda wildcards, attempt: attempt * 45,
-            mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480)
+            mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
+            tmpdir="tmp"
         params:
-            extra=(
+            extra=lambda wildcards, output: (
                 "--max-reads-per-alignment-start 0 "
-                "--tumor-sample Mutect2_{sample}_tumor "
-                "--normal Mutect2_{sample}_normal "
                 "--disable-read-filter MateOnSameContigOrNoMappedMateReadFilter "
+                "--tumor-sample Mutect2_{}_tumor "
+                "--normal Mutect2_{}_normal ".format(
+                    wildcards.sample,
+                    wildcards.sample
+                )
             )
         log:
             "logs/gatk/mutect2/call/{sample}.log"
         wrapper:
-            "/bio/gatk/mutect"
+            "bio/gatk/mutect"
 
 
     ################################
@@ -182,7 +204,42 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     rule gatk_crate_stomatic_pon:
         input:
-
+            ref=config["genome"],
+            ref_index=get_fai(config["genome"]),
+            ref_dict=get_dict(config["genome"]),
+            bams=expand(
+                "picard/markduplicates/{sample}_normal.bam",
+                sample=config["sample_list"]
+            ),
+            bams_index=expand(
+                get_bai("picard/markduplicates/{sample}_normal.bam"),
+                sample=config["sample_list"]
+            ),
+            gvcfs=expand(
+                "mutect2/pon_call/{sample}.vcf.gz",
+                sample=config["sample_list"]
+            ),
+            gvcfs_tbi=expand(
+                get_tbi("mutect2/pon_call/{sample}.vcf.gz"),
+                sample=config["sample_list"]
+            ),
+            intervals=config["bed"]
+        output:
+            gvcf=temp("gatk/pon/PoN.g.vcf.gz"),
+            gatk_tmp=temp(directory("gatk/temp/PoN/"))
+        message:
+            "Building PoN over Mutect2 normal germline callings"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * (1024 * 5),
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        log:
+            "logs/gatk/pon/pon.gvcf.log"
+        params:
+            extra=""
+        wrapper:
+            "bio/gatk/createsomaticpanelofnormals"
 
 
     rule gatk_genomics_db_import:
@@ -191,11 +248,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             ref_index=get_fai(config["genome"]),
             ref_dict=get_dict(config["genome"]),
             bams=expand(
-                "samtools/sort/{sample}_normal.bam",
+                "picard/markduplicates/{sample}_normal.bam",
                 sample=config["sample_list"]
-            )
+            ),
             bams_index=expand(
-                get_bai("samtools/sort/{sample}_normal.bam"),
+                get_bai("picard/markduplicates/{sample}_normal.bam"),
                 sample=config["sample_list"]
             ),
             gvcfs=expand(
@@ -221,22 +278,29 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/gatk/genomicsdbimport/pon.log"
         wrapper:
-            "/bio/gatk/genomicsdbimport"
+            "bio/gatk/genomicsdbimport"
 
 
-    use rule gatk_mutect2_somatic as gatk_mutect2_germline_normal:
+    rule gatk_mutect2_germline_normal:
         input:
             fasta=config["genome"],
             fasta_index=get_fai(config["genome"]),
             fasta_dict=get_dict(config["genome"]),
-            map="samtools/sort/{sample}_normal.bam",
-            map_index=get_bai("samtools/sort/{sample}_normal.bam"),
+            map="picard/markduplicates/{sample}_normal.bam",
+            map_index=get_bai("picard/markduplicates/{sample}_normal.bam"),
             germline=config["known"],
             germline_tbi=get_tbi(config["known"]),
             intervals=config["bed"]
         output:
             vcf=temp("mutect2/pon_call/{sample}.vcf.gz")
-            )
+        message:
+            "Calling germline variants on {wildcards.sample} with GATK Mutect2,"
+            "on normal sample only: it will be used for PoN"
+        threads: 4
+        resources:
+            time_min=lambda wildcards, attempt: attempt * 45,
+            mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
+            tmpdir="tmp"
         params:
             extra=(
                 "--max-reads-per-alignment-start 0 "
@@ -245,6 +309,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             )
         log:
             "logs/gatk/mutect2/pon_call/{sample}.log"
+        wrapper:
+            "bio/gatk/mutect"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

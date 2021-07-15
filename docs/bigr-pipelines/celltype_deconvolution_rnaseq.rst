@@ -38,6 +38,18 @@ Input/Output
 * Fastq files
   
  
+  
+* Fasta-formatted Genome sequence
+  
+ 
+  
+* Fasta-formatted transcriptome sequence
+  
+ 
+  
+* GTF formatted genome annotation
+  
+ 
 
 
 **Output:**
@@ -127,13 +139,14 @@ The pipeline contains the following steps:
     configfile: get_config(default_config)
     design = get_design(os.getcwd(), search_fastq_pairs)
 
+    if "Sample_id" in design.columns.tolist():
+        design.set_index("Sample_id", inplace=True)
+
     fastq_links = link_fq(
-        design.Sample_id,
+        design.index,
         design.Upstream_file,
         design.Downstream_file
     )
-
-    ruleorder: salmon_meta_salmon_quant_paired > salmon_quant_paired
 
 
     rule target:
@@ -146,7 +159,7 @@ The pipeline contains the following steps:
             text = expand(
                 "{tool}/celltypes.{ext}",
                 tool=["cibersort_abs", "cibersort", "quantiseq", "xcell", "epic"],
-                plot=["tsv", "rds"]
+                ext=["tsv", "RDS"]
             ),
             plotdirs = expand(
                 "{tool}/celltypes.dotplots",
@@ -160,7 +173,7 @@ The pipeline contains the following steps:
 
     rule cibersort_abs:
         input:
-            quant="immunedeconv/TPM.tsv"
+            expr_mat="immunedeconv/TPM.tsv"
         output:
             histogram="cibersort_abs/celltypes.hist.png",
             dotplot="cibersort_abs/celltypes.dotplot.png",
@@ -172,89 +185,128 @@ The pipeline contains the following steps:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 2048,
-            time_min=lambda wildcards, attempt: attempt * 15
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmp="tmp"
         params:
             cibersort_binary="/path/to/cibersort/non/free",
             cibersort_mat="/path/to/celltypes.mat"
         log:
             "logs/immunedeconv/cibersort_abs.log"
         wrapper:
-            "/bio/immunedeconv/cibersort-abs"
+            "bio/immunedeconv/cibersort-abs"
 
 
-    use rule cibersort_abs as cibersort with:
+    rule cibersort:
+        input:
+            expr_mat="immunedeconv/TPM.tsv"
         output:
             histogram="cibersort/celltypes.hist.png",
             dotplot="cibersort/celltypes.dotplot.png",
             tsv="cibersort/celltypes.tsv",
             rds="cibersort/celltypes.RDS",
             plotdir=directory("cibersort/celltypes.dotplots")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmp="tmp"
         message:
             "Using cibersort to deconvolute expression into cell types"
         log:
             "logs/immunedeconv/Cibersort.log"
+        params:
+            cibersort_binary="/path/to/cibersort/non/free",
+            cibersort_mat="/path/to/celltypes.mat"
         wrapper:
-            "/bio/immunedeconv/cibersort"
+            "bio/immunedeconv/cibersort"
 
 
-    use rule cibersort_abs as mcpcounter with:
+    rule mcpcounter:
+        input:
+            expr_mat="immunedeconv/TPM.tsv"
         output:
             histogram="mcpcounter/celltypes.hist.png",
             dotplot="mcpcounter/celltypes.dotplot.png",
             tsv="mcpcounter/celltypes.tsv",
             rds="mcpcounter/celltypes.RDS",
             plotdir=directory("mcpcounter/celltypes.dotplots")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmp="tmp"
         message:
             "Using MCP-Counter to deconvolute expression into cell types"
         log:
             "logs/immunedeconv/mcpcounter.log"
         wrapper:
-            "/bio/immunedeconv/mcpcounter"
+            "bio/immunedeconv/mcpcounter"
 
 
-    use rule cibersort_abs as epic with:
+    rule epic:
+        input:
+            expr_mat="immunedeconv/TPM.tsv"
         output:
             histogram="epic/celltypes.hist.png",
             dotplot="epic/celltypes.dotplot.png",
             tsv="epic/celltypes.tsv",
             rds="epic/celltypes.RDS",
             plotdir=directory("epic/celltypes.dotplots")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmp="tmp"
         message:
             "Using EPIC to deconvolute expression into cell types"
         log:
             "logs/immunedeconv/epic.log"
         wrapper:
-            "/bio/immunedeconv/epic"
+            "bio/immunedeconv/epic"
 
 
-    use rule cibersort_abs as quantiseq with:
+    rule quantiseq:
+        input:
+            expr_mat="immunedeconv/TPM.tsv"
         output:
             histogram="quantiseq/celltypes.hist.png",
             dotplot="quantiseq/celltypes.dotplot.png",
             tsv="quantiseq/celltypes.tsv",
             rds="quantiseq/celltypes.RDS",
             plotdir=directory("quantiseq/celltypes.dotplots")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmp="tmp"
         message:
             "Using QuantiSeq to deconvolute expression into cell types"
         log:
             "logs/immunedeconv/quantiseq.log"
         wrapper:
-            "/bio/immunedeconv/quantiseq"
+            "bio/immunedeconv/quantiseq"
 
 
-    use rule cibersort_abs as xcell with:
+    rule xcell:
+        input:
+            expr_mat="immunedeconv/TPM.tsv"
         output:
             histogram="xcell/celltypes.hist.png",
             dotplot="xcell/celltypes.dotplot.png",
             tsv="xcell/celltypes.tsv",
             rds="xcell/celltypes.RDS",
             plotdir=directory("xcell/celltypes.dotplots")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmp="tmp"
         message:
             "Using xCell to deconvolute expression into cell types"
         log:
             "logs/immunedeconv/xcell.log"
         wrapper:
-            "/bio/immunedeconv/xcell"
+            "bio/immunedeconv/xcell"
 
 
     #########################
@@ -270,14 +322,17 @@ The pipeline contains the following steps:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 2048,
-            time_min=lambda wildcards, attempt: attempt * 5
-        logs:
+            time_min=lambda wildcards, attempt: attempt * 5,
+            tmp="tmp"
+        log:
             "logs/pandas/cleaning.log"
         params:
             drop_column=["Strand", "Start", "Stop"],
             drop_null_lines=True,
             drop_na_lines=True,
-            drop_duplicated_lines=True
+            drop_duplicated_lines=True,
+            keep_index=True,
+            set_index=""
         wrapper:
             "bio/pandas/filter_table"
 
@@ -288,20 +343,50 @@ The pipeline contains the following steps:
                 "salmon/pseudo_mapping/{sample}/quant.sf",
                 sample=design.index.tolist()
             ),
-            tx2gene = "tximport/transcripts2genes.tsv"
+            tx2gene = lambda wildcards: "salmon/gene2gene_with_chr.tsv" if wildcards.content == "genes" else "salmon/tx2gene_with_positions.tsv"
         output:
             tsv = "salmon/TPM.{content}.tsv"
         message:
-            "Testing pandas merge salmon"
+            "Merging salmon counts, according to {wildcards.content}"
+        threads:
+            1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 10,
+            tmp="tmp"
         params:
             header = True,
             position = True,
-            gencode = False,
-            genes = lambda wildcards: wildcards.content == "genes"
+            gencode = True,
+            drop_patch = True,
+            genes = lambda wildcards: str(wildcards.content).lower() == "genes"
         log:
             "logs/pandas_merge_salmon/{content}.log"
         wrapper:
-            "/bio/pandas/salmon"
+            "bio/pandas/salmon"
+
+
+    rule tx_to_gene:
+        input:
+            gtf = config["ref"]["gtf"]
+        output:
+            tx2gene = temp("salmon/tx2gene.tsv"),
+            tx2gene_large = temp("salmon/tx2gene_with_positions.tsv"),
+            gene2gene = temp("salmon/gene2gene.tsv"),
+            gene2gene_large = temp("salmon/gene2gene_with_chr.tsv")
+        message:
+            "Extracting transcript to gene correspondancy for further use"
+        # cache: True
+        threads:
+            1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 3072, 4096),
+            time_min=lambda wildcards, attempt: min(attempt * 10, 15),
+            tmp="tmp"
+        log:
+            "logs/tx_to_gene.log"
+        wrapper:
+            "bio/gtf/tx2gene"
 
     #############################
     ### Salmon quantification ###
@@ -326,15 +411,15 @@ The pipeline contains the following steps:
         input:
             salmon=expand(
                 "salmon/pseudo_mapping/{sample}/quant.sf",
-                sample=design["Sample_id"]
+                sample=design.index
             ),
             html=expand(
                 "fastp/html/pe/{sample}.fastp.html",
-                sample=design["Sample_id"]
+                sample=design.index
             ),
             json=expand(
                 "fastp/json/pe/{sample}.fastp.json",
-                sample=design["Sample_id"]
+                sample=design.index
             )
         output:
             report(
@@ -347,14 +432,15 @@ The pipeline contains the following steps:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
-            time_min=lambda wildcards, attempt: attempt * 35
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmp="tmp"
         log:
             "logs/multiqc.log"
         wrapper:
-            "/bio/multiqc"
+            "bio/multiqc"
 
 
-    use rule * from salmon_meta as salmon_meta_*
+    use rule * from salmon_meta as *
 
 
     use rule salmon_quant_paired from salmon_meta with:
@@ -391,14 +477,15 @@ The pipeline contains the following steps:
         threads: 1
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
-            time_min=lambda wildcard, attempt: attempt * 45
+            time_min=lambda wildcard, attempt: attempt * 45,
+            tmp="tmp"
         params:
             adapters=config["params"].get("fastp_adapters", None),
             extra=config["params"].get("fastp_extra", "")
         log:
             "logs/fastp/{sample}.log"
         wrapper:
-            "/bio/fastp"
+            "bio/fastp"
 
 
     #################################################
@@ -413,13 +500,14 @@ The pipeline contains the following steps:
         threads: 1
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-            time_min=lambda wildcard, attempt: attempt * 45
+            time_min=lambda wildcard, attempt: attempt * 45,
+            tmp="tmp"
         params:
             input=lambda wildcards, output: fastq_links[output[0]]
         log:
             "logs/bigr_copy/{sample}.{stream}.log"
         wrapper:
-            "/bio/BiGR/copy"
+            "bio/BiGR/copy"
 
 
 

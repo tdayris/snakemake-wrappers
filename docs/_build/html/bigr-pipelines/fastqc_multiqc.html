@@ -215,6 +215,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/run.
 <p><strong>Input:</strong></p>
 <ul class="simple">
 <li><p>Fastq files</p></li>
+<li><p>FastQ-Screen databases (already provided for IGR Flamingo users)</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
@@ -264,8 +265,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/run.
 <div class="section" id="snakefile">
 <h2>Snakefile<a class="headerlink" href="#snakefile" title="Permalink to this headline">¶</a></h2>
 <p>The pipeline contains the following steps:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="n">worflow_source_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">get_sources</span><span class="p">())))</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
@@ -282,15 +282,16 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/run.
 <span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">min_version</span>
 <span class="n">min_version</span><span class="p">(</span><span class="s2">&quot;6.0&quot;</span><span class="p">)</span>
 
-<span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
-<span class="n">config_path</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
-<span class="n">design</span> <span class="o">=</span> <span class="n">get_design</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">search_fastq_pairs</span><span class="p">)</span>
-
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
     <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;snakemake.fastqc_multiqc.log&quot;</span><span class="p">,</span>
     <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
     <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
 <span class="p">)</span>
+
+<span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
+<span class="n">config_path</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
+<span class="n">design</span> <span class="o">=</span> <span class="n">get_design</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">search_fastq_pairs</span><span class="p">)</span>
+
 
 <span class="n">fastq_links</span> <span class="o">=</span> <span class="n">link_fq</span><span class="p">(</span>
     <span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">,</span>
@@ -329,13 +330,15 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/run.
             <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">]</span>
         <span class="p">)</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;multiqc/&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;multiqc/multiqc.html&quot;</span><span class="p">,</span>
+        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;multiqc/multiqc_data&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
-        <span class="s2">&quot;Gathering all quality reports&quot;</span>
+        <span class="s2">&quot;Gathering all quality reports in </span><span class="si">{output}</span><span class="s2">&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">4096</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">50</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="s2">&quot;&quot;</span>
     <span class="n">log</span><span class="p">:</span>
@@ -366,9 +369,10 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/run.
             <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
             <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">]</span>
         <span class="p">),</span>
-        <span class="n">bcl_json</span><span class="o">=</span><span class="s2">&quot;Stat.json&quot;</span>
+        <span class="n">bcl_json</span><span class="o">=</span><span class="s2">&quot;Stats.json&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;output/&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;output/multiqc.html&quot;</span><span class="p">,</span>
+        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;output/multiqc_data&quot;</span><span class="p">)</span>
 
 
 <span class="c1">#########################################</span>
@@ -386,7 +390,8 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/run.
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">4096</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">50</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="s2">&quot;&quot;</span>
     <span class="n">log</span><span class="p">:</span>
@@ -406,7 +411,8 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/run.
     <span class="n">threads</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">8192</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">50</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">fastq_screen_config</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fastq_screen&quot;</span><span class="p">],</span>
         <span class="n">subset</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
@@ -429,7 +435,8 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/run.
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">2048</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="nb">input</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="n">fastq_links</span><span class="p">[</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
     <span class="n">log</span><span class="p">:</span>

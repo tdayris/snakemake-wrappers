@@ -38,6 +38,18 @@ Input/Output
 * Fastq files
   
  
+  
+* Fasta-formatted Genome sequence
+  
+ 
+  
+* Fasta-formatted transcriptome sequence
+  
+ 
+  
+* GTF formatted genome annotation
+  
+ 
 
 
 **Output:**
@@ -48,7 +60,7 @@ Input/Output
   
  
   
-* Quality controls
+* MultiQC report handling Quality controls
   
  
   

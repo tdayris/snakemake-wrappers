@@ -51,7 +51,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/view/{sample}.log"
         wrapper:
-            "/bio/samtools/view"
+            "bio/samtools/view"
 
 
     ###################
@@ -91,7 +91,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/star/align/{sample}.log"
         wrapper:
-            "/bio/star/align"
+            "bio/star/align"
 
 
     rule star_index:
@@ -112,7 +112,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/star/index.log"
         wrapper:
-            "/bio/star/index"
+            "bio/star/index"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

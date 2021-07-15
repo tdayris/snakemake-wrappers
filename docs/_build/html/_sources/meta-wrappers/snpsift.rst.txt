@@ -54,7 +54,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/snpsift/dbnsfp/{sample}.log"
         wrapper:
@@ -73,7 +73,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/snpsift/gwascat/{sample}.log"
         wrapper:
@@ -92,7 +92,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/snpsift/cosmic/{sample}.log"
         wrapper:
@@ -114,7 +114,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         wrapper:
             "bio/snpsift/annotate"
 
@@ -133,7 +133,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         wrapper:
             "bio/snpsift/annotate"
 
@@ -150,7 +150,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/snpsift/gmt/{sample}.log"
         wrapper:
@@ -169,7 +169,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
             time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir=lambda wildcards: f"tmp/{wildcards.sample}.tmp"
+            tmpdir="tmp"
         log:
             "logs/snpsift/varType/{sample}.log"
         wrapper:

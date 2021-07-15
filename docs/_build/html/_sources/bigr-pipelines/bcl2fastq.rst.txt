@@ -262,7 +262,7 @@ The pipeline contains the following steps:
             no_lane_splitting=config.get("no_lane_splitting", False),
             barcode_mismatches=config.get("barcode_mismatches", None)
         wrapper:
-            "/bio/bcl2fastq"
+            "bio/bcl2fastq"
 
 
 

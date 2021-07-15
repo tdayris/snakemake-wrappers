@@ -222,10 +222,21 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ger
 <p><strong>Input:</strong></p>
 <ul class="simple">
 <li><p>VCF files</p></li>
+<li><p>Cosmic database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)</p></li>
+<li><p>dbSNP database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)</p></li>
+<li><p>MSigDB database formatted as GMT (already provided for IGR Flamingo users)</p></li>
+<li><p>GWASCatalog database formatted as TSV (already provided for IGR Flamingo users)</p></li>
+<li><p>Kaviar database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)</p></li>
+<li><p>SnpEff database downloaded with SnpEff itself (already provided for IGR Flamingo users)</p></li>
+<li><p>CaptureKit genomic intervals formatted as BED (already provided for IGR Flamingo users)</p></li>
+<li><p>Known variants from dbSNP, with only AF within the INFO field for GATK (already provided for IGR Flamingo users)</p></li>
+<li><p>dbNSFP database formatted as TSV (already provided for IGR Flamingo users)</p></li>
+<li><p>FastQ Screen databases (already provided for IGR Flamingo users)</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
-<li><p>Annotated VCF file</p></li>
+<li><p>Annotated VCF files</p></li>
+<li><p>MultiQC report</p></li>
 </ul>
 </div>
 <div class="section" id="used-meta-wrappers">
@@ -395,7 +406,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ger
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1536</span><span class="p">,</span> <span class="mi">10240</span><span class="p">),</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span><span class="p">,</span>
-        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;tmp/multiqc.tmp&quot;</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/multiqc.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
@@ -417,7 +428,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ger
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
-        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;tmp/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/picard/alignment_summary/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
@@ -440,9 +451,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ger
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">8192</span><span class="p">),</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">50</span><span class="p">,</span>
-        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="s2">&quot;tmp/</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">.tmp&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-          <span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span> <span class="n">wildcards</span><span class="o">.</span><span class="n">stream</span>
-        <span class="p">)</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">fastq_screen_config</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fastq_screen&quot;</span><span class="p">],</span>
         <span class="n">subset</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
@@ -517,7 +526,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ger
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">256</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span><span class="p">,</span>
-        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;tmp/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/mutect2/correct_fields/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
@@ -635,7 +644,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ger
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">5120</span><span class="p">,</span> <span class="mi">10240</span><span class="p">),</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
-        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;tmp/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">.markdup.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
@@ -726,7 +735,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ger
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">15360</span><span class="p">),</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
-        <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;tmp/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">adapters</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fastp_adapters&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fastp_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -749,9 +758,6 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ger
     <span class="n">resources</span><span class="p">:</span>
       <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">2048</span><span class="p">),</span>
       <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
-      <span class="n">tmpdir</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="s2">&quot;tmp/</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">.tmp&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span> <span class="n">wildcards</span><span class="o">.</span><span class="n">stream</span>
-      <span class="p">)</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="nb">input</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="n">fastq_links</span><span class="p">[</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
     <span class="n">log</span><span class="p">:</span>

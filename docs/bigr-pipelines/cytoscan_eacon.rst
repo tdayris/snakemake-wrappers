@@ -129,11 +129,11 @@ The pipeline contains the following steps:
     rule default_cytoscan_process_all:
         input:
             # EaCoN models
-            ascn = expand(
-                os.sep.join(["{sample}", config["params"]["segmenter"],
-                             "ASCN", "{sample}.gammaEval.png"]),
-                sample=config["samples"]
-            ),
+            # ascn = expand(
+            #     os.sep.join(["{sample}", config["params"]["segmenter"],
+            #                  "ASCN", "{sample}.gammaEval.png"]),
+            #     sample=config["samples"]
+            # ),
             # EaCoN annotate
             html = expand(
                 os.path.sep.join([
@@ -143,10 +143,10 @@ The pipeline contains the following steps:
                 sample=config["samples"]
             ),
             # EaCoN new instability scoring feature
-            #instability = expand(
-            #    "{sample}/{sample}_GIS_from_best_gamma.txt",
-            #    sample=config["samples"]
-            #)
+            instability = expand(
+               "{sample}/{sample}_GIS_from_best_gamma.txt",
+               sample=config["samples"]
+            )
 
     # Import all rules from the eacon_post_process meta wrapper
     use rule * from post_process_eacon as *
@@ -208,7 +208,7 @@ The pipeline contains the following steps:
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/rcnorm_0.1.5.tar.gz"
             ],
             git_packages = [
-                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.76.0-806-g3fcaad6db.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.76.0-829-g4bdef82c8.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_Chromosomes.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.cytoscan.2.4.0.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.oncoscan.2.4.0.tar.gz"

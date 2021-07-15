@@ -25,7 +25,7 @@ This wrapper can be used in the following way:
         log:
             "filter.log"
         wrapper:
-            "0.76.0-806-g3fcaad6db/bio/pandas/filter_table"
+            "0.76.0-829-g4bdef82c8/bio/pandas/filter_table"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -125,7 +125,7 @@ Code
         Apply filters on whole lines
         """
         local_operator = ops[local_operator]
-        return data = data.loc[~(local_operator(data, value).all(axis=1)]
+        return data.loc[~local_operator(data, value).all(axis=1)]
 
 
     logging.basicConfig(
@@ -183,7 +183,7 @@ Code
 
 
     if (filters := snakemake.params.get("full_line_filters", None)) is not None:
-        logging.debug(f"Applying the following filter on whole lines: {filters})
+        logging.debug(f"Applying the following filter on whole lines: {filters}")
         for filter in filters:
             data = filter_full_lines(data.dopy, *filter)
 
@@ -217,8 +217,12 @@ Code
     logging.debug(f"Head of the final DataFrame:\n{data.head()}")
 
 
+    if ("set_index" in snakemake.params.keys()):
+        (data.reset_index(inplace=True)
+             .set_index(snakemake.params["set_index"], inplace=True))
+
     data.to_csv(
         snakemake.output["table"],
         sep=sep,
-        index=False
+        index=snakemake.params.get("keep_index", False)
     )

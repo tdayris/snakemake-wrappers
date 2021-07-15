@@ -229,27 +229,45 @@
     <span class="n">config</span> <span class="o">=</span> <span class="n">default_deseq2_post_process_config</span>
 
 
+<span class="n">rule</span> <span class="nb">all</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">reports</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.</span><span class="si">{comparison}</span><span class="s2">.html&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples_per_prefixes&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">)</span>
+
+
 <span class="c1">########################</span>
 <span class="c1">### Quality controls ###</span>
 <span class="c1">########################</span>
 
 <span class="n">rule</span> <span class="n">multiqc</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">salmon</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{</span><span class="n">sample</span><span class="si">}</span><span class="s2">/quant.sf&quot;</span>
-            <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples_per_prefixes&quot;</span><span class="p">][</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
-        <span class="p">],</span>
-        <span class="n">html</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;fastp/html/pe/</span><span class="si">{</span><span class="n">sample</span><span class="si">}</span><span class="s2">.fastp.html&quot;</span>
-            <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples_per_prefixes&quot;</span><span class="p">][</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
-        <span class="p">],</span>
-        <span class="n">json</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;fastp/json/pe/</span><span class="si">{</span><span class="n">sample</span><span class="si">}</span><span class="s2">.fastp.json&quot;</span>
-            <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples_per_prefixes&quot;</span><span class="p">][</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
-        <span class="p">],</span>
-        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/multiqc_config.yaml&quot;</span>
+        <span class="n">salmon</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples_per_prefixes&quot;</span><span class="p">][</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples_per_prefixes&quot;</span><span class="p">][</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">json</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples_per_prefixes&quot;</span><span class="p">][</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/multiqc_config.yaml&quot;</span><span class="p">,</span>
+        <span class="n">plots</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="c1">#temp(&quot;pairwise_scatterplot_mqc.png&quot;),</span>
+            <span class="c1">#temp(&quot;clustermap_sample_mqc.png&quot;),</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/pca_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/volcanoplot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_expr_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/ma_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="c1">#temp(&quot;multiqc/{comparison}/clustermap_sample_mqc.png&quot;),</span>
+            <span class="c1">#temp(&quot;pca_axes_correlation_mqc.png&quot;)</span>
+        <span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.</span><span class="si">{comparison}</span><span class="s2">.html&quot;</span>
+        <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.</span><span class="si">{comparison}</span><span class="s2">.html&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Aggregating quality reports from Fastp, Salmon, PCAExplorer&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
@@ -259,9 +277,9 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/multiqc/</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="s2">&quot;--config multiqc/</span><span class="si">{comparison}</span><span class="s2">/multiqc_config.yaml&quot;</span>
+        <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;--config </span><span class="si">{</span><span class="nb">input</span><span class="o">.</span><span class="n">config</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/multiqc&quot;</span>
+        <span class="s2">&quot;bio/multiqc&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">multiqc_config</span><span class="p">:</span>
@@ -312,7 +330,78 @@
             <span class="c1">#{&quot;Sequencing Setup&quot;: &quot;2x125&quot;}</span>
         <span class="p">]</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/BiGR/multiqc_rnaseq_report&quot;</span>
+        <span class="s2">&quot;bio/BiGR/multiqc_rnaseq_report&quot;</span>
+
+
+<span class="c1">##################</span>
+<span class="c1">### TSV report ###</span>
+<span class="c1">##################</span>
+
+<span class="n">rule</span> <span class="n">csv_report</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="c1"># TODO: Add correct deseq2path</span>
+        <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{comparison}</span><span class="s2">_</span><span class="si">{subset}</span><span class="s2">.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">report</span><span class="p">(</span>
+            <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{subset}</span><span class="s2">_report&quot;</span><span class="p">),</span>
+            <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;../report/gseapp_fc_fc.rst&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;9. GSEAapp Shiny&quot;</span><span class="p">,</span>
+            <span class="n">subcategory</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{comparison}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Making </span><span class="si">{wildcards.comparison}</span><span class="s2"> DESeq2 results readable &quot;</span>
+        <span class="s2">&quot;(DESeq2 results </span><span class="si">{wildcards.subset}</span><span class="s2">)&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;--separator $&#39;</span><span class="se">\t</span><span class="s2">&#39; --sort-column stat_change &quot;</span>
+            <span class="s2">&quot;--rows-per-page 50 --sort-order ascending&quot;</span>
+        <span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/rbt/csv-report/</span><span class="si">{comparison}</span><span class="s2">_</span><span class="si">{subset}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/rbt/csvreport&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">deseq2_to_gseaapp</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/wald.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+        <span class="n">gene2gene</span> <span class="o">=</span> <span class="s2">&quot;tximport/gene2gene.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">complete</span> <span class="o">=</span> <span class="n">report</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{comparison}</span><span class="s2">_complete.tsv&quot;</span><span class="p">,</span>
+            <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;../report/gseapp_complete.rst&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;6. DGE Tables&quot;</span><span class="p">,</span>
+            <span class="n">subcategory</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{comparison}</span><span class="s2">&quot;</span>
+        <span class="p">),</span>
+        <span class="n">fc_fc</span> <span class="o">=</span> <span class="n">report</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{comparison}</span><span class="s2">_sorted_on_fold_change.tsv&quot;</span><span class="p">,</span>
+            <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;../report/gseapp_fc_fc.rst&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;9. GSEAapp Shiny&quot;</span><span class="p">,</span>
+            <span class="n">subcategory</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{comparison}</span><span class="s2">&quot;</span>
+        <span class="p">),</span>
+        <span class="n">padj_fc</span> <span class="o">=</span> <span class="n">report</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{comparison}</span><span class="s2">_sorted_on_pval.tsv&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;9. GSEAapp Shiny&quot;</span><span class="p">,</span>
+            <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;../report/gseapp_padj_fc.rst&quot;</span><span class="p">,</span>
+            <span class="n">subcategory</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{comparison}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Subsetting DESeq2 results for </span><span class="si">{wildcards.comparison}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span> <span class="mi">10240</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/deseq2_to_gseaapp/</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/pandas/deseq2_to_gseaapp&quot;</span>
+
 
 <span class="c1">###############</span>
 <span class="c1">### Seaborn ###</span>
@@ -330,19 +419,16 @@
         <span class="s2">&quot;Plotting clustered heatmap for </span><span class="si">{wildcards.comparison}</span><span class="s2">&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
-        <span class="p">),</span>
-        <span class="n">time_min</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">1024</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">conditions</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;condition_dict&quot;</span><span class="p">][</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
         <span class="n">factor</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{comparison}</span><span class="s2">&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/seaborn/clustermap/</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/seaborn/clustermap&quot;</span>
+        <span class="s2">&quot;bio/seaborn/clustermap&quot;</span>
 
 <span class="c1">#######################</span>
 <span class="c1">### EnhancedVolcano ###</span>
@@ -360,14 +446,15 @@
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">alpha_threshold</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;thresholds&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span>
         <span class="n">fc_threshold</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;thresholds&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fc&quot;</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/enhanced_volcano/</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/enhancedVolcano/volcano-deseq2&quot;</span>
+        <span class="s2">&quot;bio/enhancedVolcano/volcano-deseq2&quot;</span>
 
 
 <span class="c1">####################</span>
@@ -388,22 +475,21 @@
     <span class="n">threads</span><span class="p">:</span>
         <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">10240</span><span class="p">)</span>
-        <span class="p">),</span>
-        <span class="n">time_min</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">10240</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;intgroup = c(&#39;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">factor</span><span class="si">}</span><span class="s2">&#39;), ntop = 100, pcX = </span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">a</span><span class="si">}</span><span class="s2">, pcY = </span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">b</span><span class="si">}</span><span class="s2">, ellipse = </span><span class="si">{</span><span class="s1">&#39;TRUE&#39;</span> <span class="k">if</span> <span class="n">wildcards</span><span class="o">.</span><span class="n">elipse</span> <span class="o">==</span> <span class="s1">&#39;with_elipse&#39;</span> <span class="k">else</span> <span class="s1">&#39;FALSE&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">),</span>
+        <span class="n">extra</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;intgroup = c(&#39;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">factor</span><span class="si">}</span><span class="s2">&#39;), &quot;</span>
+            <span class="s2">&quot;ntop = 100, pcX = </span><span class="si">{wildcards.a}</span><span class="s2">, &quot;</span>
+            <span class="s2">&quot;pcY = </span><span class="si">{wildcards.b}</span><span class="s2">, ellipse = &quot;</span>
+            <span class="s2">&quot;{&#39;TRUE&#39; if wildcards.elipse == &#39;with_elipse&#39; else &#39;FALSE&#39;}&quot;</span><span class="p">),</span>
         <span class="n">w</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span>
         <span class="n">h</span> <span class="o">=</span> <span class="mi">768</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/pcaexplorer/PCA/DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">/pca_ingroup_</span><span class="si">{factor}</span><span class="s2">_ax_</span><span class="si">{a}</span><span class="s2">_</span><span class="si">{b}</span><span class="s2">_</span><span class="si">{elipse}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/pcaExplorer/PCA&quot;</span>
+        <span class="s2">&quot;bio/pcaExplorer/PCA&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">pca_explorer_distro_expr</span><span class="p">:</span>
@@ -424,7 +510,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/pcaexplorer/distro_expr/</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/pcaExplorer/distro_expr&quot;</span>
+        <span class="s2">&quot;bio/pcaExplorer/distro_expr&quot;</span>
 
 
 <span class="c1">##############</span>
@@ -449,7 +535,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deseq2/maplot/maplot.</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/deseq2/plotMA&quot;</span>
+        <span class="s2">&quot;bio/deseq2/plotMA&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

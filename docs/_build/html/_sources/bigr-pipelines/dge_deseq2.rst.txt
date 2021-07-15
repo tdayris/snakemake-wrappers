@@ -38,6 +38,18 @@ Input/Output
 * Fastq files
   
  
+  
+* Fasta-formatted Genome sequence
+  
+ 
+  
+* Fasta-formatted transcriptome sequence
+  
+ 
+  
+* GTF formatted genome annotation
+  
+ 
 
 
 **Output:**
@@ -128,7 +140,36 @@ The pipeline contains the following steps:
 
     default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
     configfile: get_config(default_config)
-    design = pandas.read_csv("design.tsv", sep="\t", header=0, index_col=0)
+
+    try:
+        design = pandas.read_csv("design.tsv", sep="\t", header=0, index_col=0)
+    except FileNotFoundError:
+        logging.error(
+            """A design file is required for this pipeline. It is a TSV with
+            the following columns:
+
+            1. Sample_id (case matters): Name of your sample, unique and composed
+               with a least 1 letter (no sample should have numerical names only,
+               it would make R fail while parsing sample names with DESeq2)
+            2. Upstream_file (case matters): Path to the file, it can be
+               an absolute path, a relative path, or a iRODS url.
+            3. Downstream_file (case matters): Path to the file, it can be
+               an absolute path, a relative path, or a iRODS url.
+            4. XXXX: A name of your choice, unique and understandable. It will be
+               used as comparison name within DESeq2 and graphs. It contains levels
+               for each single sample. Do not use only integers or floats for your
+               level name: R and DESeq2 behaves stangely with them.
+            5. YYYY: A name of your choice, unique and understandable. It will be
+               used as comparison name within DESeq2 and graphs. It contains levels
+               for each single sample. Do not use only integers or floats for your
+               level name: R and DESeq2 behaves stangely with them.
+            Etc, etc. You can have any other condition name. Name them as you want,
+            these names must be unique and understandable. It will be used as
+            comparison name within DESeq2 and graphs. It contains levels for each
+            single sample. Do not use only integers or floats for your level name:
+            R and DESeq2 behaves stangely with them.
+            """
+        )
 
     fastq_links = link_fq(
         design.index,
@@ -136,12 +177,9 @@ The pipeline contains the following steps:
         design.Downstream_file
     )
 
-    ruleorder: salmon_meta_salmon_quant_paired > salmon_quant_paired
-    ruleorder: deseq2_post_process_multiqc > multiqc
-
     # A list that holds all comparisons expected for this snakemake pipeline
     comparison_levels = list(yield_comps(
-        complete_design=design.copy(),
+        complete_design=design,
         aggregate=config["design"].get("aggregate_col"),
         remove=config["design"].get("remove_col")
     ))
@@ -196,7 +234,7 @@ The pipeline contains the following steps:
     rule target:
         input:
             multiqc=expand(
-                "multiqc/{comparison}/MultiQC.{comparison}.html",
+                "reports/{comparison}/MultiQC.{comparison}.html",
                 comparison=output_prefixes
             ),
             deseq2_wald=expand(
@@ -205,7 +243,7 @@ The pipeline contains the following steps:
             ),
             pcas=expected_pcas,
             general_pcas=expand(
-                "figures/pca/general.pca.{factor}.{axes}.png",
+                "figures/pca/general.pca.{factor}_{axes}.png",
                 factor=[i[0] for i in comparison_levels],
                 axes=["PC1_PC2", "PC2_PC1"]
             )
@@ -218,10 +256,10 @@ The pipeline contains the following steps:
 
     rule general_pca:
         input:
-            counts="salmon/TPM.transcripts.tsv"
+            counts="salmon/TPM.genes.tsv"
         output:
             png=expand(
-                "figures/pca/general.pca.{factor}.{axes}.png",
+                "figures/pca/general.pca.{factor}_{axes}.png",
                 axes=["PC1_PC2", "PC2_PC1"],
                 allow_missing=True
             )
@@ -236,11 +274,11 @@ The pipeline contains the following steps:
         params:
             axes=[1, 2],
             conditions=lambda wildcards: dict(
-                zip(design.index.tolist(), design["factor"].tolist())
+                zip(design.index.tolist(), design[wildcards.factor].tolist())
             ),
-            prefix=lambda wildcards:"figures/pca/general.pca.{factor}"
+            prefix=lambda wildcards: f"figures/pca/general.pca.{wildcards.factor}"
         wrapper:
-            "/bio/seaborn/pca"
+            "bio/seaborn/pca"
 
 
     rule pandas_merge_salmon_tr:
@@ -257,14 +295,14 @@ The pipeline contains the following steps:
         params:
             header = True,
             position = True,
-            gencode = False,
+            gencode = True,
             drop_na = True,
             dro_null = True,
             genes = lambda wildcards: wildcards.content == "genes"
         log:
             "logs/pandas_merge_salmon/{content}.log"
         wrapper:
-            "/bio/pandas/salmon"
+            "bio/pandas/salmon"
 
 
     ##############################
@@ -284,39 +322,48 @@ The pipeline contains the following steps:
         config: deseq2_post_process_config
 
 
-    use rule * from deseq2_post_process as deseq2_post_process_*
-
+    use rule * from deseq2_post_process as *
 
     use rule multiqc from deseq2_post_process with:
         input:
-            txt=expand(
+            txt=lambda wildcards: expand(
                 "fastq_screen/{sample}.{stream}.fastq_screen.txt",
-                sample=design.index,
+                sample=samples_per_prefixes[wildcards.comparison],
                 stream=["1", "2"]
             ),
-            png=expand(
+            png=lambda wildcards: expand(
                 "fastq_screen/{sample}.{stream}.fastq_screen.png",
-                sample=design.index,
+                sample=samples_per_prefixes[wildcards.comparison],
                 stream=["1", "2"]
             ),
-            salmon=lambda wildcards: [
-                f"salmon/pseudo_mapping/{sample}/quant.sf"
-                for sample in samples_per_prefixes[wildcards.comparison]
-            ],
-            html=lambda wildcards: [
-                f"fastp/html/pe/{sample}.fastp.html"
-                for sample in samples_per_prefixes[wildcards.comparison]
-            ],
-            json=lambda wildcards: [
-                f"fastp/json/pe/{sample}.fastp.json"
-                for sample in samples_per_prefixes[wildcards.comparison]
-            ],
+            salmon=lambda wildcards: expand(
+                "salmon/pseudo_mapping/{sample}/quant.sf",
+                sample=samples_per_prefixes[wildcards.comparison]
+            ),
+            html=lambda wildcards: expand(
+                "fastp/html/pe/{sample}.fastp.html",
+                sample=samples_per_prefixes[wildcards.comparison]
+            ),
+            json=lambda wildcards: expand(
+                "fastp/json/pe/{sample}.fastp.json",
+                sample=samples_per_prefixes[wildcards.comparison]
+            ),
             config="multiqc/{comparison}/multiqc_config.yaml",
-            fqscreen=lambda wildcards: [
-                "fastq_screen/{sample}.{stream}.fastq_screen.{ext}"
-                for stream in ["1", "2"]
-                for ext in ["txt", "png"]
-                for sample in samples_per_prefixes[wildcards.comparison]
+            fqscreen=lambda wildcards: expand(
+                "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+                stream=["1", "2"],
+                ext=["txt", "png"],
+                sample=samples_per_prefixes[wildcards.comparison]
+            ),
+            additional_plots = [
+                #temp("pairwise_scatterplot_mqc.png"),
+                #temp("clustermap_sample_mqc.png"),
+                "multiqc/{comparison}/pca_plot_mqc.png",
+                "multiqc/{comparison}/volcanoplot_mqc.png",
+                "multiqc/{comparison}/distro_expr_mqc.png",
+                "multiqc/{comparison}/ma_plot_mqc.png",
+                #temp("multiqc/{comparison}/clustermap_sample_mqc.png"),
+                #temp("pca_axes_correlation_mqc.png")
             ]
 
 
@@ -360,7 +407,7 @@ The pipeline contains the following steps:
         config: salmon_config
 
 
-    use rule * from salmon_meta as salmon_meta_*
+    use rule * from salmon_meta as *
 
 
     use rule salmon_quant_paired from salmon_meta with:
@@ -398,7 +445,7 @@ The pipeline contains the following steps:
         log:
             "logs/fastq_screen/{sample}.{stream}.log"
         wrapper:
-            "/bio/fastq_screen"
+            "bio/fastq_screen"
 
 
     ############################
@@ -431,7 +478,7 @@ The pipeline contains the following steps:
         log:
             "logs/fastp/{sample}.log"
         wrapper:
-            "/bio/fastp"
+            "bio/fastp"
 
 
     #################################################
@@ -452,7 +499,7 @@ The pipeline contains the following steps:
         log:
             "logs/bigr_copy/{sample}.{stream}.log"
         wrapper:
-            "/bio/BiGR/copy"
+            "bio/BiGR/copy"
 
 
 

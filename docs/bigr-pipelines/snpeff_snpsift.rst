@@ -209,7 +209,7 @@ The pipeline contains the following steps:
             ],
             extra="-s '\t' -e '.'"
         wrapper:
-            "/bio/snpsift/extractfields"
+            "bio/snpsift/extractfields"
 
 
     ###############
@@ -241,7 +241,7 @@ The pipeline contains the following steps:
         log:
             "logs/multiqc.log"
         wrapper:
-            "/bio/multiqc"
+            "bio/multiqc"
 
 
     #################################
@@ -264,7 +264,7 @@ The pipeline contains the following steps:
         log:
             "logs/{tools}/{subcommand}/tabix/{sample}.log"
         wrapper:
-            "/bio/tabix"
+            "bio/tabix"
 
 
     rule compress_pbgzip:
@@ -283,7 +283,7 @@ The pipeline contains the following steps:
         log:
             "logs/{tools}/{subcommand}/pbgzip/{sample}.log"
         wrapper:
-            "/bio/compress/pbgzip"
+            "bio/compress/pbgzip"
 
 
     ######################

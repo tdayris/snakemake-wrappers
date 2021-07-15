@@ -220,6 +220,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 <p><strong>Input:</strong></p>
 <ul class="simple">
 <li><p>Fastq files</p></li>
+<li><p>Fasta-formatted Genome sequence</p></li>
+<li><p>Fasta-formatted transcriptome sequence</p></li>
+<li><p>GTF formatted genome annotation</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
@@ -293,13 +296,14 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 <span class="n">configfile</span><span class="p">:</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
 <span class="n">design</span> <span class="o">=</span> <span class="n">get_design</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">search_fastq_pairs</span><span class="p">)</span>
 
+<span class="k">if</span> <span class="s2">&quot;Sample_id&quot;</span> <span class="ow">in</span> <span class="n">design</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
 <span class="n">fastq_links</span> <span class="o">=</span> <span class="n">link_fq</span><span class="p">(</span>
-    <span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">,</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
     <span class="n">design</span><span class="o">.</span><span class="n">Upstream_file</span><span class="p">,</span>
     <span class="n">design</span><span class="o">.</span><span class="n">Downstream_file</span>
 <span class="p">)</span>
-
-<span class="n">ruleorder</span><span class="p">:</span> <span class="n">salmon_meta_salmon_quant_paired</span> <span class="o">&gt;</span> <span class="n">salmon_quant_paired</span>
 
 
 <span class="n">rule</span> <span class="n">target</span><span class="p">:</span>
@@ -312,7 +316,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
         <span class="n">text</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/celltypes.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">tool</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cibersort_abs&quot;</span><span class="p">,</span> <span class="s2">&quot;cibersort&quot;</span><span class="p">,</span> <span class="s2">&quot;quantiseq&quot;</span><span class="p">,</span> <span class="s2">&quot;xcell&quot;</span><span class="p">,</span> <span class="s2">&quot;epic&quot;</span><span class="p">],</span>
-            <span class="n">plot</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;tsv&quot;</span><span class="p">,</span> <span class="s2">&quot;rds&quot;</span><span class="p">]</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;tsv&quot;</span><span class="p">,</span> <span class="s2">&quot;RDS&quot;</span><span class="p">]</span>
         <span class="p">),</span>
         <span class="n">plotdirs</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/celltypes.dotplots&quot;</span><span class="p">,</span>
@@ -326,7 +330,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 
 <span class="n">rule</span> <span class="n">cibersort_abs</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">quant</span><span class="o">=</span><span class="s2">&quot;immunedeconv/TPM.tsv&quot;</span>
+        <span class="n">expr_mat</span><span class="o">=</span><span class="s2">&quot;immunedeconv/TPM.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">histogram</span><span class="o">=</span><span class="s2">&quot;cibersort_abs/celltypes.hist.png&quot;</span><span class="p">,</span>
         <span class="n">dotplot</span><span class="o">=</span><span class="s2">&quot;cibersort_abs/celltypes.dotplot.png&quot;</span><span class="p">,</span>
@@ -338,89 +342,128 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">cibersort_binary</span><span class="o">=</span><span class="s2">&quot;/path/to/cibersort/non/free&quot;</span><span class="p">,</span>
         <span class="n">cibersort_mat</span><span class="o">=</span><span class="s2">&quot;/path/to/celltypes.mat&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/immunedeconv/cibersort_abs.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/immunedeconv/cibersort-abs&quot;</span>
+        <span class="s2">&quot;bio/immunedeconv/cibersort-abs&quot;</span>
 
 
-<span class="n">use</span> <span class="n">rule</span> <span class="n">cibersort_abs</span> <span class="k">as</span> <span class="n">cibersort</span> <span class="k">with</span><span class="p">:</span>
+<span class="n">rule</span> <span class="n">cibersort</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expr_mat</span><span class="o">=</span><span class="s2">&quot;immunedeconv/TPM.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">histogram</span><span class="o">=</span><span class="s2">&quot;cibersort/celltypes.hist.png&quot;</span><span class="p">,</span>
         <span class="n">dotplot</span><span class="o">=</span><span class="s2">&quot;cibersort/celltypes.dotplot.png&quot;</span><span class="p">,</span>
         <span class="n">tsv</span><span class="o">=</span><span class="s2">&quot;cibersort/celltypes.tsv&quot;</span><span class="p">,</span>
         <span class="n">rds</span><span class="o">=</span><span class="s2">&quot;cibersort/celltypes.RDS&quot;</span><span class="p">,</span>
         <span class="n">plotdir</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;cibersort/celltypes.dotplots&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Using cibersort to deconvolute expression into cell types&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/immunedeconv/Cibersort.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">cibersort_binary</span><span class="o">=</span><span class="s2">&quot;/path/to/cibersort/non/free&quot;</span><span class="p">,</span>
+        <span class="n">cibersort_mat</span><span class="o">=</span><span class="s2">&quot;/path/to/celltypes.mat&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/immunedeconv/cibersort&quot;</span>
+        <span class="s2">&quot;bio/immunedeconv/cibersort&quot;</span>
 
 
-<span class="n">use</span> <span class="n">rule</span> <span class="n">cibersort_abs</span> <span class="k">as</span> <span class="n">mcpcounter</span> <span class="k">with</span><span class="p">:</span>
+<span class="n">rule</span> <span class="n">mcpcounter</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expr_mat</span><span class="o">=</span><span class="s2">&quot;immunedeconv/TPM.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">histogram</span><span class="o">=</span><span class="s2">&quot;mcpcounter/celltypes.hist.png&quot;</span><span class="p">,</span>
         <span class="n">dotplot</span><span class="o">=</span><span class="s2">&quot;mcpcounter/celltypes.dotplot.png&quot;</span><span class="p">,</span>
         <span class="n">tsv</span><span class="o">=</span><span class="s2">&quot;mcpcounter/celltypes.tsv&quot;</span><span class="p">,</span>
         <span class="n">rds</span><span class="o">=</span><span class="s2">&quot;mcpcounter/celltypes.RDS&quot;</span><span class="p">,</span>
         <span class="n">plotdir</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;mcpcounter/celltypes.dotplots&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Using MCP-Counter to deconvolute expression into cell types&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/immunedeconv/mcpcounter.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/immunedeconv/mcpcounter&quot;</span>
+        <span class="s2">&quot;bio/immunedeconv/mcpcounter&quot;</span>
 
 
-<span class="n">use</span> <span class="n">rule</span> <span class="n">cibersort_abs</span> <span class="k">as</span> <span class="n">epic</span> <span class="k">with</span><span class="p">:</span>
+<span class="n">rule</span> <span class="n">epic</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expr_mat</span><span class="o">=</span><span class="s2">&quot;immunedeconv/TPM.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">histogram</span><span class="o">=</span><span class="s2">&quot;epic/celltypes.hist.png&quot;</span><span class="p">,</span>
         <span class="n">dotplot</span><span class="o">=</span><span class="s2">&quot;epic/celltypes.dotplot.png&quot;</span><span class="p">,</span>
         <span class="n">tsv</span><span class="o">=</span><span class="s2">&quot;epic/celltypes.tsv&quot;</span><span class="p">,</span>
         <span class="n">rds</span><span class="o">=</span><span class="s2">&quot;epic/celltypes.RDS&quot;</span><span class="p">,</span>
         <span class="n">plotdir</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;epic/celltypes.dotplots&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Using EPIC to deconvolute expression into cell types&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/immunedeconv/epic.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/immunedeconv/epic&quot;</span>
+        <span class="s2">&quot;bio/immunedeconv/epic&quot;</span>
 
 
-<span class="n">use</span> <span class="n">rule</span> <span class="n">cibersort_abs</span> <span class="k">as</span> <span class="n">quantiseq</span> <span class="k">with</span><span class="p">:</span>
+<span class="n">rule</span> <span class="n">quantiseq</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expr_mat</span><span class="o">=</span><span class="s2">&quot;immunedeconv/TPM.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">histogram</span><span class="o">=</span><span class="s2">&quot;quantiseq/celltypes.hist.png&quot;</span><span class="p">,</span>
         <span class="n">dotplot</span><span class="o">=</span><span class="s2">&quot;quantiseq/celltypes.dotplot.png&quot;</span><span class="p">,</span>
         <span class="n">tsv</span><span class="o">=</span><span class="s2">&quot;quantiseq/celltypes.tsv&quot;</span><span class="p">,</span>
         <span class="n">rds</span><span class="o">=</span><span class="s2">&quot;quantiseq/celltypes.RDS&quot;</span><span class="p">,</span>
         <span class="n">plotdir</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;quantiseq/celltypes.dotplots&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Using QuantiSeq to deconvolute expression into cell types&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/immunedeconv/quantiseq.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/immunedeconv/quantiseq&quot;</span>
+        <span class="s2">&quot;bio/immunedeconv/quantiseq&quot;</span>
 
 
-<span class="n">use</span> <span class="n">rule</span> <span class="n">cibersort_abs</span> <span class="k">as</span> <span class="n">xcell</span> <span class="k">with</span><span class="p">:</span>
+<span class="n">rule</span> <span class="n">xcell</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expr_mat</span><span class="o">=</span><span class="s2">&quot;immunedeconv/TPM.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">histogram</span><span class="o">=</span><span class="s2">&quot;xcell/celltypes.hist.png&quot;</span><span class="p">,</span>
         <span class="n">dotplot</span><span class="o">=</span><span class="s2">&quot;xcell/celltypes.dotplot.png&quot;</span><span class="p">,</span>
         <span class="n">tsv</span><span class="o">=</span><span class="s2">&quot;xcell/celltypes.tsv&quot;</span><span class="p">,</span>
         <span class="n">rds</span><span class="o">=</span><span class="s2">&quot;xcell/celltypes.RDS&quot;</span><span class="p">,</span>
         <span class="n">plotdir</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;xcell/celltypes.dotplots&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Using xCell to deconvolute expression into cell types&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/immunedeconv/xcell.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/immunedeconv/xcell&quot;</span>
+        <span class="s2">&quot;bio/immunedeconv/xcell&quot;</span>
 
 
 <span class="c1">#########################</span>
@@ -436,14 +479,17 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5</span>
-    <span class="n">logs</span><span class="p">:</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/pandas/cleaning.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">drop_column</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Strand&quot;</span><span class="p">,</span> <span class="s2">&quot;Start&quot;</span><span class="p">,</span> <span class="s2">&quot;Stop&quot;</span><span class="p">],</span>
         <span class="n">drop_null_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">drop_na_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">drop_duplicated_lines</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">drop_duplicated_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">keep_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">set_index</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/pandas/filter_table&quot;</span>
 
@@ -454,20 +500,50 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
             <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="p">),</span>
-        <span class="n">tx2gene</span> <span class="o">=</span> <span class="s2">&quot;tximport/transcripts2genes.tsv&quot;</span>
+        <span class="n">tx2gene</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="s2">&quot;salmon/gene2gene_with_chr.tsv&quot;</span> <span class="k">if</span> <span class="n">wildcards</span><span class="o">.</span><span class="n">content</span> <span class="o">==</span> <span class="s2">&quot;genes&quot;</span> <span class="k">else</span> <span class="s2">&quot;salmon/tx2gene_with_positions.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;salmon/TPM.</span><span class="si">{content}</span><span class="s2">.tsv&quot;</span>
     <span class="n">message</span><span class="p">:</span>
-        <span class="s2">&quot;Testing pandas merge salmon&quot;</span>
+        <span class="s2">&quot;Merging salmon counts, according to </span><span class="si">{wildcards.content}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span>
+        <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">header</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">position</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">gencode</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">genes</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">wildcards</span><span class="o">.</span><span class="n">content</span> <span class="o">==</span> <span class="s2">&quot;genes&quot;</span>
+        <span class="n">gencode</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">drop_patch</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">wildcards</span><span class="o">.</span><span class="n">content</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;genes&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/pandas_merge_salmon/</span><span class="si">{content}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/pandas/salmon&quot;</span>
+        <span class="s2">&quot;bio/pandas/salmon&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">tx_to_gene</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">gtf</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;gtf&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">tx2gene</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;salmon/tx2gene.tsv&quot;</span><span class="p">),</span>
+        <span class="n">tx2gene_large</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;salmon/tx2gene_with_positions.tsv&quot;</span><span class="p">),</span>
+        <span class="n">gene2gene</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;salmon/gene2gene.tsv&quot;</span><span class="p">),</span>
+        <span class="n">gene2gene_large</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;salmon/gene2gene_with_chr.tsv&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Extracting transcript to gene correspondancy for further use&quot;</span>
+    <span class="c1"># cache: True</span>
+    <span class="n">threads</span><span class="p">:</span>
+        <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">3072</span><span class="p">,</span> <span class="mi">4096</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span>
+        <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/tx_to_gene.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/gtf/tx2gene&quot;</span>
 
 <span class="c1">#############################</span>
 <span class="c1">### Salmon quantification ###</span>
@@ -492,15 +568,15 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">salmon</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">index</span>
         <span class="p">),</span>
         <span class="n">html</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">index</span>
         <span class="p">),</span>
         <span class="n">json</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">index</span>
         <span class="p">)</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">report</span><span class="p">(</span>
@@ -513,14 +589,15 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1536</span><span class="p">,</span> <span class="mi">10240</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/multiqc.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/multiqc&quot;</span>
+        <span class="s2">&quot;bio/multiqc&quot;</span>
 
 
-<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">salmon_meta</span> <span class="k">as</span> <span class="n">salmon_meta_</span><span class="o">*</span>
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">salmon_meta</span> <span class="k">as</span> <span class="o">*</span>
 
 
 <span class="n">use</span> <span class="n">rule</span> <span class="n">salmon_quant_paired</span> <span class="kn">from</span> <span class="nn">salmon_meta</span> <span class="k">with</span><span class="p">:</span>
@@ -557,14 +634,15 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">15360</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">adapters</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fastp_adapters&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fastp_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/fastp/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/fastp&quot;</span>
+        <span class="s2">&quot;bio/fastp&quot;</span>
 
 
 <span class="c1">#################################################</span>
@@ -579,13 +657,14 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">2048</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="nb">input</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="n">fastq_links</span><span class="p">[</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bigr_copy/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/BiGR/copy&quot;</span>
+        <span class="s2">&quot;bio/BiGR/copy&quot;</span>
 </pre></div>
 </div>
 </div>

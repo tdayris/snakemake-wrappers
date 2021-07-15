@@ -222,10 +222,21 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
 <p><strong>Input:</strong></p>
 <ul class="simple">
 <li><p>VCF files</p></li>
+<li><p>Cosmic database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)</p></li>
+<li><p>dbSNP database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)</p></li>
+<li><p>MSigDB database formatted as GMT (already provided for IGR Flamingo users)</p></li>
+<li><p>GWASCatalog database formatted as TSV (already provided for IGR Flamingo users)</p></li>
+<li><p>Kaviar database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)</p></li>
+<li><p>SnpEff database downloaded with SnpEff itself (already provided for IGR Flamingo users)</p></li>
+<li><p>CaptureKit genomic intervals formatted as BED (already provided for IGR Flamingo users)</p></li>
+<li><p>Known variants from dbSNP, with only AF within the INFO field for GATK (already provided for IGR Flamingo users)</p></li>
+<li><p>dbNSFP database formatted as TSV (already provided for IGR Flamingo users)</p></li>
+<li><p>FastQ Screen databases (already provided for IGR Flamingo users)</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
-<li><p>Annotated VCF file</p></li>
+<li><p>Annotated VCF files</p></li>
+<li><p>MultiQC Report</p></li>
 </ul>
 </div>
 <div class="section" id="used-meta-wrappers">
@@ -386,7 +397,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/multiqc.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/multiqc&quot;</span>
+        <span class="s2">&quot;bio/multiqc&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">alignment_summary</span><span class="p">:</span>
@@ -411,7 +422,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
         <span class="s2">&quot;METRIC_ACCUMULATION_LEVEL=null &quot;</span>
         <span class="s2">&quot;METRIC_ACCUMULATION_LEVEL=SAMPLE&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/picard/collectalignmentsummarymetrics&quot;</span>
+        <span class="s2">&quot;bio/picard/collectalignmentsummarymetrics&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">fastq_screen</span><span class="p">:</span>
@@ -433,7 +444,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/fastqc/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/fastq_screen&quot;</span>
+        <span class="s2">&quot;bio/fastq_screen&quot;</span>
 
 
 <span class="c1">#################################</span>
@@ -624,7 +635,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/fastp/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/fastp&quot;</span>
+        <span class="s2">&quot;bio/fastp&quot;</span>
 
 
 <span class="c1">#################################################</span>
@@ -645,7 +656,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bigr_copy/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/BiGR/copy&quot;</span>
+        <span class="s2">&quot;bio/BiGR/copy&quot;</span>
 </pre></div>
 </div>
 </div>
