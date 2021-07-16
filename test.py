@@ -131,7 +131,6 @@ def run(wrapper, cmd, check_log=None):
             os.chdir(origdir)
 
 
-
 @skip_if_not_modified
 def test_rbt_csvreport():
     run(
@@ -139,7 +138,7 @@ def test_rbt_csvreport():
         ["snakemake", "--cores", "1", "qc_data", "--use-conda", "-F"],
     )
 
-    
+
 @skip_if_not_modified
 def test_liftoff():
     run(
@@ -2175,6 +2174,14 @@ def test_optitype():
     run(
         "bio/optitype",
         ["snakemake", "--cores", "1", "--use-conda", "-F", "optitype/a_result.tsv"],
+    )
+
+
+@skip_if_not_modified
+def test_pandora_index():
+    run(
+        "bio/pandora/index",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "rpsL/prg.fa.k15.w14.idx"],
     )
 
 
