@@ -226,6 +226,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pandas.html">PANDAS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pandora.html">PANDORA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pbmm2.html">PBMM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pcaExplorer.html">PCAEXPLORER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pear.html">PEAR</a></li>
@@ -379,13 +380,13 @@
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--remove-sequencing-duplicates&quot;</span><span class="p">,</span>  <span class="c1"># optional</span>
         <span class="n">java_opts</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="c1"># optional</span>
         <span class="c1">#spark_runner=&quot;&quot;,  # optional, local by default</span>
-        <span class="c1">#spark_0.76.0-830-g11cd3a609=&quot;&quot;,  # optional</span>
+        <span class="c1">#spark_0.77.0-833-gbae3237d5=&quot;&quot;,  # optional</span>
         <span class="c1">#spark_extra=&quot;&quot;, # optional</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="mi">1024</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">8</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.76.0-830-g11cd3a609/bio/gatk/markduplicatesspark&quot;</span>
+        <span class="s2">&quot;0.77.0-833-gbae3237d5/bio/gatk/markduplicatesspark&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -398,7 +399,7 @@
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">gatk4==4.2.0.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gatk4=4.2</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">snakemake-wrapper-utils==0.1.3</span></code></p></li>
 </ul>
 </div>
@@ -437,6 +438,7 @@
 <span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2021, Filipe G. Vieira&quot;</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
+<span class="kn">import</span> <span class="nn">tempfile</span>
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 <span class="kn">from</span> <span class="nn">snakemake_wrapper_utils.java</span> <span class="kn">import</span> <span class="n">get_java_opts</span>
@@ -449,6 +451,8 @@
 <span class="n">spark_extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spark_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">java_opts</span> <span class="o">=</span> <span class="n">get_java_opts</span><span class="p">(</span><span class="n">snakemake</span><span class="p">)</span>
 
+<span class="n">tmpdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
+
 <span class="n">metrics</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metrics&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">metrics</span><span class="p">:</span>
     <span class="n">metrics</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;--metrics-file </span><span class="si">{</span><span class="n">metrics</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -459,6 +463,7 @@
     <span class="s2">&quot;gatk --java-options &#39;</span><span class="si">{java_opts}</span><span class="s2">&#39; MarkDuplicatesSpark &quot;</span>
     <span class="s2">&quot;</span><span class="si">{extra}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;--input </span><span class="si">{snakemake.input}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;--tmp-dir </span><span class="si">{tmpdir}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;--output </span><span class="si">{snakemake.output.bam}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;</span><span class="si">{metrics}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;-- --spark-runner </span><span class="si">{spark_runner}</span><span class="s2"> --spark-master </span><span class="si">{spark_master}</span><span class="s2"> </span><span class="si">{spark_extra}</span><span class="s2"> &quot;</span>

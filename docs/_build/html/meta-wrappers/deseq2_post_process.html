@@ -209,7 +209,13 @@
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This meta-wrapper can be used by integrating the following into your workflow:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">default_deseq2_post_process_config</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">meta_source_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">get_sources</span><span class="p">())))</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">reports_source_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">meta_source_dir</span><span class="si">}</span><span class="s2">/../../bigr_pipelines/common/reports&quot;</span><span class="p">,</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">meta_source_dir</span><span class="p">)</span>
+
+<span class="n">default_deseq2_post_process_config</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;condition_dict&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;DGE&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;S1&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;S3&quot;</span><span class="p">:</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;S4&quot;</span><span class="p">:</span> <span class="s2">&quot;B&quot;</span><span class="p">}},</span>
     <span class="s2">&quot;samples_per_prefixes&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;DGE&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;S1&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">,</span> <span class="s2">&quot;S3&quot;</span><span class="p">,</span> <span class="s2">&quot;S4&quot;</span><span class="p">]}</span>
 <span class="p">}</span>
@@ -267,7 +273,11 @@
             <span class="c1">#temp(&quot;pca_axes_correlation_mqc.png&quot;)</span>
         <span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.</span><span class="si">{comparison}</span><span class="s2">.html&quot;</span>
+        <span class="n">report</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.</span><span class="si">{comparison}</span><span class="s2">.html&quot;</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;9. DGE Reports&quot;</span>
+            <span class="n">caption</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reports_source_dir</span><span class="si">}</span><span class="s2">/mulitqc_dge.rst&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Aggregating quality reports from Fastp, Salmon, PCAExplorer&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>

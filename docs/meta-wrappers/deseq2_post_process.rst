@@ -13,6 +13,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    from pathlib import Path
+
+    meta_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    reports_source_dir = f"{meta_source_dir}/../../bigr_pipelines/common/reports",
+    print(meta_source_dir)
+
     default_deseq2_post_process_config = {
         "condition_dict": {"DGE": {"S1": "A", "S2": "A", "S3": "B", "S4": "B"}},
         "samples_per_prefixes": {"DGE": ["S1", "S2", "S3", "S4"]}
@@ -71,7 +77,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 #temp("pca_axes_correlation_mqc.png")
             ]
         output:
-            "results/{comparison}/MultiQC.{comparison}.html"
+            report(
+                "results/{comparison}/MultiQC.{comparison}.html"
+                category="9. DGE Reports"
+                caption=f"{reports_source_dir}/mulitqc_dge.rst",
+            )
         message:
             "Aggregating quality reports from Fastp, Salmon, PCAExplorer"
         threads: 1
