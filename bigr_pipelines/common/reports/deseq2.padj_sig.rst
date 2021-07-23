@@ -17,7 +17,7 @@ This table contains the results of the differential gene expression made with DE
 +----------------+-----------------------------+
 | Stop           | The gene end position       |
 +----------------+-----------------------------+
-| Stran          | The gene strand             |
+| Strand         | The gene strand             |
 +----------------+-----------------------------+
 | cluster        | Up/Down regulation status   |
 +----------------+-----------------------------+

@@ -1,0 +1,1 @@
+This table contains the list of samples used while analysing `{{snakemake.wildcards.comparison}}`, with their factor and level names.

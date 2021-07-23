@@ -1,4 +1,4 @@
-This is the result of the abundance estimation of sample {{ snakemake.wildcards.sample }}.
+This is the result of the abundance estimation of sample `{{ snakemake.wildcards.sample }}`.
 
 It contains five columns:
 
