@@ -52,14 +52,6 @@ logging.debug(conditions.head())
 
 # Remove possible text annotations and validate
 data = data[list(data.select_dtypes(include=[numpy.number]).columns.values)]
-nbs = len(data.columns.tolist())
-nbc = len(conditions.index.tolist())
-if nbs != nbc:
-    message = (
-        f"Expected same number of samples and conditions, got {nbs} != {nbc}"
-    )
-    logging.error(message)
-    raise ValueError(message)
 
 # Create custom colormap for heatmap values
 cmap = seaborn.diverging_palette(
@@ -67,6 +59,7 @@ cmap = seaborn.diverging_palette(
     h_pos=10,
     as_cmap=True
 )
+logging.info("Color palette built")
 
 # Create a categorical palette for samples identification
 cond_set = set(conditions[cond_id])
@@ -78,7 +71,7 @@ sample_colors = {
     sample: cond_colors[cond]
     for sample, cond in zip(conditions.index, conditions[cond_id])
 }
-
+logging.info("Color palette assigned to samples")
 
 # Sorry for that part, yet I could not manage to find any
 # other way to perform quicker multi-level indexing
@@ -93,39 +86,45 @@ data = pandas.merge(
 data = (data.reset_index()
             .set_index([cond_id, "index"])
             .T)
+logging.info("Multi level indexing build")
 
 condition_colors = (pandas.Series(data.columns.get_level_values(cond_id),
                                   index=data.columns)
                           .map(cond_colors))
+logging.info("Sample/Color mapped")
 
 # Build graph
 ax = seaborn.clustermap(
     data,
     cmap=cmap,
-    row_colors=(
+    col_colors=(
         condition_colors
-        if snakemake.params.get("row_condition_color", True) is True
+        if snakemake.params.get("col_condition_color", True) is True
         else None
     ),
+    method="average",
+    metric="euclidean",
+    zscore=0,
     row_cluster=(snakemake.params.get("row_cluster", True) is True),
     col_cluster=(snakemake.params.get("col_cluster", True) is True),
     linewidths=0.5,
     figsize=(
-        (15 if len(data.columns.tolist()) <= 50 else 30),
-        (15 if len(data.index.tolist()) < 50 else 30)
+        min(15, int(len(data.columns.tolist())/50) * 10),
+        min(15, int(len(data.index.tolist())/50) * 10)
     ),
-    robust=(snakemake.params.get("robust", True) is True)
+    robust=(snakemake.params.get("robust", False) is True)
 )
+logging.info("clustermap built")
 
 # Rotate sample id to make them readable
 matplotlib.pyplot.setp(
     ax.ax_heatmap.yaxis.get_majorticklabels(),
-    rotation=snakemake.params.get("ylabel_rotation", 90)
+    rotation=snakemake.params.get("ylabel_rotation", 0)
 )
 
 matplotlib.pyplot.setp(
     ax.ax_heatmap.xaxis.get_majorticklabels(),
-    rotation=snakemake.params.get("xlabel_rotation", 0)
+    rotation=snakemake.params.get("xlabel_rotation", 90)
 )
 
 # Save result

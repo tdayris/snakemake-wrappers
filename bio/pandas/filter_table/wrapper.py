@@ -118,6 +118,13 @@ if snakemake.params.get("drop_na_lines", False) is True:
 if snakemake.params.get("drop_duplicated_lines", False) is True:
     logging.debug("Dropping duplicated lines")
     data.drop_duplicates(inplace=True)
+    
+
+if (dedup_cols := snakemake.params.get("drop_duplicates_on", None)) is not None:
+    logging.debug(
+        "Dropping duplicates on the following column(s): %s", str(dedup_cols)
+    )
+    data.drop_duplicates(subset=dedup_cols, keep="first" inplace=True)
 
 
 if (new_index := snakemake.params.get("new_index_col", None)) is not None:
