@@ -37,6 +37,17 @@ section_dict = {
         ),
         "plot_name": "clustermap_sample_mqc.png"
     },
+    "clustermap_genes": {
+        "section": "clustermap_genes",
+        "title": "Heatmap of samples clustered over genes",
+        "description": (
+            "Per genes clustered heatmap. This plot has been build based on "
+            "filtered normalized counts from DESeq2.<br><br>Colors run from red"
+            " (identical) to blue (different). Samples are named using the "
+            "following scheme: condition - sample_id "
+        ),
+        "plot_name": "clustermap_gene_mqc.png"
+    },
     "pca_axes_correlation": {
         "section": "pca_axes_correlation",
         "title": "PCA Axe correlations",
@@ -110,6 +121,15 @@ section_dict = {
             "centered around zero"
         ),
         "plot_name": "ma_plot_mqc.png"
+    },
+    "consensus_cluster_plus": {
+        "section": "consensus_cluster_plus",
+        "title": "Consensus Clustering",
+        "description": (
+            "This graph has been done on DESeq2 normalized counts..<br><br> "
+            "This helps to highlight possible confounding effects. We expect our sample to be well separated over the factor of interest"
+        ),
+        "plot_name": "consensus_cluster_plus.png"
     }
 }
 
