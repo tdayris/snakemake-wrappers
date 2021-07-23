@@ -75,7 +75,8 @@ rule multiqc_config:
     input:
          #pairwise_scatterplot = "image.png",
          #clustermap_sample = "image.png",
-         #clustermap_sample = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap/ClusteredHeatmap.samples.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png",
+         clustermap_genes = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap/ClusteredHeatmap.genes.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png",
+         clustermap_sample = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap/ClusteredHeatmap.samples.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png",
          pca_plot = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca/pca_{factor}_ax_1_ax_2_with_elipse.png",
          volcanoplot = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/volcano/Volcano.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png",
          distro_expr = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/distro_expr/distro_expr.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png",
@@ -85,7 +86,8 @@ rule multiqc_config:
         multiqc_config = "multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/multiqc_config.yaml",
         plots = [
             #temp("pairwise_scatterplot_mqc.png"),
-            #temp("clustermap_sample_mqc.png"),
+            temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap_genes_mqc.png"),
+            temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap_sample_mqc.png"),
             temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca_plot_mqc.png"),
             temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/volcanoplot_mqc.png"),
             temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/distro_expr_mqc.png"),
@@ -126,17 +128,36 @@ rule multiqc_config:
 ### TSV report ###
 ##################
 
-rule csv_report:
+rule zip_csv_report:
     input:
-        # TODO: Add correct deseq2path
-        "results/{comparison}/{comparison}_{subset}.tsv"
+        "rbt/csv-report/{comparison}/html_table_deseq2_{subset}"
     output:
         report(
-            directory("results/{comparison}/{subset}_report"),
+            "results/{comparison}/html_table_deseq2_{subset}.tar.bz2",
             caption="../report/gseapp_fc_fc.rst",
             category="9. GSEAapp Shiny",
             subcategory="{comparison}"
         )
+    message:
+        "Compressing {wildcards.comparison} html "
+        "deseq2 {wildcards.subset} table"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 40,
+        tmpdir="tmp"
+    log:
+        "logs/rbt/csv-report/compress/{comparison}_{subset}.log"
+    params:
+        "-cvjf"
+    shell:
+        "tar {params} {output} {input}"
+
+rule csv_report:
+    input:
+        "results/{comparison}/{comparison}_{subset}.tsv"
+    output:
+        temp(directory("rbt/csv-report/{comparison}/html_table_deseq2_{subset}"))
     message:
         "Making {wildcards.comparison} DESeq2 results readable "
         "(DESeq2 results {wildcards.subset})"
@@ -146,10 +167,7 @@ rule csv_report:
         time_min=lambda wildcards, attempt: attempt * 15,
         tmpdir="tmp"
     params:
-        extra=(
-            "--separator $'\t' --sort-column stat_change "
-            "--rows-per-page 50 --sort-order ascending"
-        )
+        extra="--separator $'\\t' --rows-per-page 50 --sort-order ascending"
     log:
         "logs/rbt/csv-report/{comparison}_{subset}.log"
     wrapper:
@@ -197,15 +215,40 @@ rule deseq2_to_gseaapp:
 ###############
 
 """
+This rule creates a gene-clustered heatmap
+"""
+rule seaborn_clustermap_gene:
+    input:
+        counts = "deseq2/{comparison}/filtered_dst.{comparison}.tsv"
+    output:
+        png = "figures/{comparison}/clustermap/ClusteredHeatmap.genes.{comparison}.png"
+    message:
+        "Plotting gene-clustered heatmap for {wildcards.comparison}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 4096,
+        time_min=lambda wildcards, attempt: min(attempt * 10, 20),
+        tmpdir="tmp"
+    params:
+        conditions=lambda wildcards: config["condition_dict"][wildcards.comparison],
+        factor="{comparison}",
+        row_condition_color=False
+    log:
+        "logs/seaborn/clustermap/{comparison}.genes.log"
+    wrapper:
+        "bio/seaborn/clustermap_genes"
+
+
+"""
 This rule creates a sample-clustered heatmap
 """
-rule seaborn_clustermap:
+rule seaborn_clustermap_sample:
     input:
-        counts = "deseq2/{comparison}/wald.{comparison}.tsv"
+        counts = "deseq2/{comparison}/dst.{comparison}.tsv"
     output:
         png = "figures/{comparison}/clustermap/ClusteredHeatmap.samples.{comparison}.png"
     message:
-        "Plotting clustered heatmap for {wildcards.comparison}"
+        "Plotting sample-clustered heatmap for {wildcards.comparison}"
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: min(attempt * 512, 1024),
@@ -215,9 +258,33 @@ rule seaborn_clustermap:
         conditions=lambda wildcards: config["condition_dict"][wildcards.comparison],
         factor="{comparison}"
     log:
-        "logs/seaborn/clustermap/{comparison}.log"
+        "logs/seaborn/clustermap/{comparison}.sample.log"
     wrapper:
         "bio/seaborn/clustermap"
+
+rule test_pandas_deseq2_merge:
+    input:
+        wald_tsv = "deseq2/{comparison}/wald.{comparison}.tsv",
+        dst_tsv = "deseq2/{comparison}/dst.{comparison}.tsv",
+        gene2gene = "tximport/gene2gene.tsv"
+    output:
+        filtered_counts="deseq2/{comparison}/filtered_dst.{comparison}.tsv",
+        filtered_deseq2="deseq2/{comparison}/filtered_deseq2.{comparison}.tsv",
+        merged_table="deseq2/{comparison}/merged_deseq2_counts.{comparison}.tsv"
+    message:
+        "Merging counts and DESeq2 results for {wildcards.comparison}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 6,
+        time_min=lambda wildcards, attempt: min(attempt * 10, 20),
+        tmpdir="tmp"
+    params:
+        alpha_threshold=0.05,
+        fold_change=0.001
+    log:
+        "logs/pandas/merged_deseq2_counts/{comparison}.log"
+    wrapper:
+        "bio/pandas/deseq2_merge"
 
 #######################
 ### EnhancedVolcano ###
@@ -246,6 +313,126 @@ rule enhancedvolcano_volcanoplot:
         "bio/enhancedVolcano/volcano-deseq2"
 
 
+############################
+### Consensus Clustering ###
+############################
+
+rule consensus_cluster_plus:
+    input:
+        expr_mat = "deseq2/{comparison}/dst.{comparison}.tsv"
+    output:
+        res_dir=directory("consensusclusterplus/{comparison}")
+    message:
+        "Clustering samples in {wildcards.comparison}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/consensus_cluster_plus/{comparison}.log"
+    params:
+        extra=lambda wildcards: f"clusterAlg='km', title='{wildcards.comparison}', distance='euclidean'"
+    wrapper:
+        "bio/consensusclusterplus"
+
+
+#######################################
+### General PCA over all the cohort ###
+#######################################
+
+"""
+This rule plots a PCA on a given TSV count file
+"""
+rule general_pca:
+    input:
+        counts="salmon/TMP.genes.nochr.tsv"
+    output:
+        png=expand(
+            "figures/pca/general.pca.{factor}_{axes}.png",
+            axes=["PC1_PC2", "PC2_PC1"],
+            allow_missing=True
+        )
+    message:
+        "Plotting general PCA over {wildcards.factor}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 4096,
+        time_min=lambda wildcards, attempt: attempt * 5,
+        tmpdir="tmp"
+    log:
+        "logs/seaborn/pca/general.{factor}.png"
+    params:
+        axes=[1, 2],
+        conditions=lambda wildcards: dict(zip(
+            config["design"].index.tolist(),
+            config["design"][wildcards.factor].tolist()
+        )),
+        prefix=lambda wildcards: f"figures/pca/general.pca.{wildcards.factor}"
+    wrapper:
+        "bio/seaborn/pca"
+
+
+"""
+This rule removes unnecessary columns for further seaborn PCA
+"""
+rule filter_merged_counts:
+    input:
+        table="salmon/TPM.genes.tsv"
+    output:
+        table=temp("salmon/TMP.genes.nochr.tsv")
+    message:
+        "Removing gene annotations"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 4096,
+        time_min=lambda wildcards, attempt: attempt * 5,
+        tmpdir="tmp"
+    group:
+        "salmon_merge"
+    log:
+        "logs/seaborn/pca/filter.log"
+    params:
+        drop_column=["Chromosomes", "Start", "End", "Hugo_id"]
+    wrapper:
+        "bio/pandas/filter_table"
+
+
+"""
+This rule merges salmon counts into a single TSV table
+"""
+rule pandas_merge_salmon_tr:
+    input:
+        quant = expand(
+            "salmon/pseudo_mapping/{sample}/quant.sf",
+            sample=config["design"].index.tolist()
+        ),
+        tx2gene = "tximport/transcripts2genes.tsv"
+    output:
+        tsv = "salmon/TPM.{content}.tsv"
+    message:
+        "Merging salmon individual counts on {wildcards.content} "
+        "for further general PCA"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 3072,
+        time_min=lambda wildcards, attempt: attempt * 5,
+        tmpdir="tmp"
+    group:
+        "salmon_merge"
+    params:
+        header = True,
+        position = True,
+        gencode = True,
+        drop_na = True,
+        dro_null = True,
+        genes = lambda wildcards: wildcards.content == "genes"
+    log:
+        "logs/pandas_merge_salmon/{content}.log"
+    wrapper:
+        "bio/pandas/salmon"
+
+
 ####################
 ### PCA Explorer ###
 ####################
@@ -269,10 +456,7 @@ rule pcaexplorer_pca:
         tmpdir="tmp"
     params:
         extra=lambda wildcards: (
-            f"intgroup = c('{wildcards.factor}'), "
-            "ntop = 100, pcX = {wildcards.a}, "
-            "pcY = {wildcards.b}, ellipse = "
-            "{'TRUE' if wildcards.elipse == 'with_elipse' else 'FALSE'}"),
+            f"intgroup = c('{wildcards.factor}'), ntop = 100, pcX = {wildcards.a}, pcY = {wildcards.b}, ellipse = {'TRUE' if wildcards.elipse == 'with_elipse' else 'FALSE'}"),
         w = 1024,
         h = 768
     log:
@@ -281,6 +465,9 @@ rule pcaexplorer_pca:
         "bio/pcaExplorer/PCA"
 
 
+"""
+This rule plots the distribution of the expression of Salmon counts
+"""
 rule pca_explorer_distro_expr:
     input:
         dst = "deseq2/{comparison}/wald.{comparison}.RDS"
@@ -305,7 +492,9 @@ rule pca_explorer_distro_expr:
 ##############
 ### DESeq2 ###
 ##############
-
+"""
+This rule creates a MA-Plot
+"""
 rule deseq2_maplot:
     input:
         res = "deseq2/{comparison}/wald.{comparison}.tsv"
