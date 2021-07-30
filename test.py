@@ -132,6 +132,13 @@ def run(wrapper, cmd, check_log=None):
 
 
 @skip_if_not_modified
+def test_seaborn_kmeans():
+    run(
+        "bio/seaborn/kmeans",
+        ["snakemake", "--cores", "1", "kmeans/unclusterized.scatter.png", "--use-conda", "-F"],
+    )
+
+@skip_if_not_modified
 def test_rbt_csvreport():
     run(
         "bio/rbt/csvreport",

@@ -89,7 +89,7 @@ for ax1, ax2 in itertools.permutations(axes, 2):
     )
 
     matplotlib.pyplot.title(
-        f"{name_ax1} ({skvar_ax1:.2f}) and {name_ax2} (skvar_ax2:.2f)"
+        f"{name_ax1} ({skvar_ax1:.2f}) and {name_ax2} {skvar_ax2:.2f}"
     )
 
     if snakemake.params.get("samples_names", False) is True:
