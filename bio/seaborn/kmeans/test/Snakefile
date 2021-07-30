@@ -1,0 +1,22 @@
+rule test_kmeans:
+    input:
+        counts = "table.tsv"
+    output:
+        distance_scatter = "kmeans/unclusterized.scatter.png",
+        distance_heatmap = "kmeans/unclusterized.heatmap.png",
+        distance_tsv = "kmeans/distance_matrix.tsv",
+        kmeans = expand(
+            "kmeans/KMeams.cluster.{cluster}.{ext}",
+            cluster=map(str, range(2, 6)),
+            ext=["scatter.png", "distance_matrix.tsv"]
+        ),
+        elbow = "kmeans/elbow.png"
+    threads: 4
+    params:
+        max_cluster=5,  # Maximum number of cluster tested
+        read_csv=dict(
+            header=0,
+            index_col=0
+        )
+    wrapper:
+        "master/bio/seaborn/kmeans"

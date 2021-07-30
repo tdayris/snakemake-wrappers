@@ -81,7 +81,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/pca.log"
         wrapper:
-            "/bio/bioinfokit/pca"
+            "bio/bioinfokit/pca"
 
 
     """
@@ -119,7 +119,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bioinfokit/volcanoplot.log"
         wrapper:
-            "/bio/bioinfokit/volcanoplot"
+            "bio/bioinfokit/volcanoplot"
 
     """
     This rule creates a sample clustered heatmap from the filtered-counts table
@@ -149,7 +149,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bioinfokit/sample_heatmap.png"
         wrapper:
-            "/bio/bioinfokit/heatmap"
+            "bio/bioinfokit/heatmap"
 
 
     """
@@ -182,7 +182,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bioinfokit/maplot.png"
         wrapper:
-            "/bio/bioinfokit/maplot"
+            "bio/bioinfokit/maplot"
 
 
     """
@@ -208,7 +208,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/filter.log"
         wrapper:
-            "/bio/pandas/deseq2_merge"
+            "bio/pandas/deseq2_merge"
 
 
 
@@ -233,7 +233,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport/tx2gene.log"
         wrapper:
-            "/bio/gtf/tx2gene"
+            "bio/gtf/tx2gene"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

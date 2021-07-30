@@ -68,7 +68,7 @@ fastq_links = link_fq(
 
 # A list that holds all comparisons expected for this snakemake pipeline
 comparison_levels = list(yield_comps(
-    complete_design=design.copy(),
+    complete_design=design,
     aggregate=config["design"].get("aggregate_col"),
     remove=config["design"].get("remove_col")
 ))
@@ -123,7 +123,7 @@ wildcard_constraints:
 rule target:
     input:
         multiqc=expand(
-            "multiqc/{comparison}/MultiQC.{comparison}.html",
+            "reports/{comparison}/MultiQC.{comparison}.html",
             comparison=output_prefixes
         ),
         deseq2_wald=expand(
@@ -132,7 +132,7 @@ rule target:
         ),
         pcas=expected_pcas,
         general_pcas=expand(
-            "figures/pca/general.pca.{factor}.{axes}.png",
+            "figures/pca/general.pca.{factor}_{axes}.png",
             factor=[i[0] for i in comparison_levels],
             axes=["PC1_PC2", "PC2_PC1"]
         )
@@ -148,7 +148,7 @@ rule general_pca:
         counts="salmon/TPM.genes.tsv"
     output:
         png=expand(
-            "figures/pca/general.pca.{factor}.{axes}.png",
+            "figures/pca/general.pca.{factor}_{axes}.png",
             axes=["PC1_PC2", "PC2_PC1"],
             allow_missing=True
         )
@@ -184,7 +184,7 @@ rule pandas_merge_salmon_tr:
     params:
         header = True,
         position = True,
-        gencode = False,
+        gencode = True,
         drop_na = True,
         dro_null = True,
         genes = lambda wildcards: wildcards.content == "genes"
@@ -243,7 +243,17 @@ use rule multiqc from deseq2_post_process with:
             stream=["1", "2"],
             ext=["txt", "png"],
             sample=samples_per_prefixes[wildcards.comparison]
-        )
+        ),
+        additional_plots = [
+            #temp("pairwise_scatterplot_mqc.png"),
+            #temp("clustermap_sample_mqc.png"),
+            "multiqc/{comparison}/pca_plot_mqc.png",
+            "multiqc/{comparison}/volcanoplot_mqc.png",
+            "multiqc/{comparison}/distro_expr_mqc.png",
+            "multiqc/{comparison}/ma_plot_mqc.png",
+            #temp("multiqc/{comparison}/clustermap_sample_mqc.png"),
+            #temp("pca_axes_correlation_mqc.png")
+        ]
 
 
 ###########################

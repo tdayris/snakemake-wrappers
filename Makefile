@@ -21,6 +21,8 @@ html:
 	conda activate snakemake && \
 	cd docs && \
 	rm -rf wrappers/* && \
+	rm -rf meta-wrappers/* && \
+	rm -rf bigr_pipelines/* && \
 	make clean && \
 	make html && \
 	cd - && \

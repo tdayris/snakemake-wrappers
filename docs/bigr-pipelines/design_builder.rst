@@ -123,7 +123,7 @@ The pipeline contains the following steps:
         log:
             "logs/irods/search_samples.log"
         wrapper:
-            "/bio/iRODS/search_samples"
+            "bio/iRODS/search_samples"
 
 
 

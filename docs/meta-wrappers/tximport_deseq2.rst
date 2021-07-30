@@ -80,7 +80,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             '--sort-order ascending '
             '--rows-per-page 50'
         wrapper:
-            "/bio/rbt/csvreport"
+            "bio/rbt/csvreport"
 
 
     rule deseq2_readable:
@@ -104,7 +104,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/readable/{comparison}.log"
         wrapper:
-            "/bio/pandas/deseq2_to_gseaapp"
+            "bio/pandas/deseq2_to_gseaapp"
 
 
     ##############
@@ -141,7 +141,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/deseq/{comparison}.log"
         wrapper:
-            "/bio/deseq2/DESeq"
+            "bio/deseq2/DESeq"
 
 
     """
@@ -166,7 +166,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/deseq2/deseq2_dataset_from_tximport/{comparison}.log"
         wrapper:
-            "/bio/deseq2/DESeqDataSetFromTximport"
+            "bio/deseq2/DESeqDataSetFromTximport"
 
 
     ##########################
@@ -199,7 +199,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport/{comparison}.log"
         wrapper:
-            "/bio/tximport"
+            "bio/tximport"
 
 
     """
@@ -210,6 +210,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             gtf=config["gtf"]
         output:
             tx2gene_small="tximport/tx2gene.tsv",
+            tx2gene_large="tximport/transcripts2genes.tsv",
             gene2gene_large="tximport/gene2gene.tsv"
         message: "Building transcripts/genes conversion table"
         cache: True
@@ -224,7 +225,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/tximport/tx2gene.log"
         wrapper:
-            "/bio/gtf/tx2gene"
+            "bio/gtf/tx2gene"
 
 
     ######################
@@ -252,7 +253,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             columns_to_aggregate=config["design"].get("aggregate_col"),
             columns_to_remove=config["design"].get("remove_col")
         wrapper:
-            "/bio/BiGR/split_design"
+            "bio/BiGR/split_design"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

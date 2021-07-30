@@ -215,7 +215,9 @@ rule gene_counts:
         drop_column=["Strand", "Start", "Stop"],
         drop_null_lines=True,
         drop_na_lines=True,
-        drop_duplicated_lines=True
+        drop_duplicated_lines=True,
+        keep_index=True,
+        set_index=""
     wrapper:
         "bio/pandas/filter_table"
 
@@ -226,11 +228,11 @@ rule pandas_merge_salmon_tr:
             "salmon/pseudo_mapping/{sample}/quant.sf",
             sample=design.index.tolist()
         ),
-        tx2gene = "salmon/tx2gene_with_positions.tsv"
+        tx2gene = lambda wildcards: "salmon/gene2gene_with_chr.tsv" if wildcards.content == "genes" else "salmon/tx2gene_with_positions.tsv"
     output:
         tsv = "salmon/TPM.{content}.tsv"
     message:
-        "Testing pandas merge salmon"
+        "Merging salmon counts, according to {wildcards.content}"
     threads:
         1
     resources:
@@ -240,8 +242,9 @@ rule pandas_merge_salmon_tr:
     params:
         header = True,
         position = True,
-        gencode = False,
-        genes = lambda wildcards: wildcards.content == "genes"
+        gencode = True,
+        drop_patch = True,
+        genes = lambda wildcards: str(wildcards.content).lower() == "genes"
     log:
         "logs/pandas_merge_salmon/{content}.log"
     wrapper:
@@ -252,17 +255,17 @@ rule tx_to_gene:
     input:
         gtf = config["ref"]["gtf"]
     output:
-        #tx2gene = "tx2gene.tsv",
+        tx2gene = temp("salmon/tx2gene.tsv"),
         tx2gene_large = temp("salmon/tx2gene_with_positions.tsv"),
-        #gene2gene = "gene2gene.tsv",
-        #gene2gene_large = "gene2gene_with_chr.tsv"
+        gene2gene = temp("salmon/gene2gene.tsv"),
+        gene2gene_large = temp("salmon/gene2gene_with_chr.tsv")
     message:
         "Extracting transcript to gene correspondancy for further use"
-    cache: True
+    # cache: True
     threads:
         1
     resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 2048, 4096),
+        mem_mb=lambda wildcards, attempt: min(attempt * 3072, 4096),
         time_min=lambda wildcards, attempt: min(attempt * 10, 15),
         tmp="tmp"
     log:

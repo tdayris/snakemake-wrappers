@@ -39,6 +39,9 @@ elif all(pileup in snakemake.input.keys() for pileup in pileup_pair):
 else:
     raise KeyError("Could not find either a mpileup, or a pair of pileup files")
 
+if str(snakemake.output["snp"]).endswith(("vcf", "vcf.gz")):
+    extra += " --output-vcf 1 "
+
 shell(
     "varscan somatic"  # Tool and its subcommand
     " {in_pileup}"  # Path to input file(s)

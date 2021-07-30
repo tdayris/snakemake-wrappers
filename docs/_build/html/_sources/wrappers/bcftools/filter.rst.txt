@@ -5,6 +5,7 @@ BCFTOOLS FILTER
 
 filter vcf/bcf file.
 
+**URL**: 
 
 Example
 -------
@@ -12,6 +13,21 @@ Example
 This wrapper can be used in the following way:
 
 .. code-block:: python
+
+    rule bcf_filter_sample:
+        input:
+            "{prefix}.bcf",  # input bcf/vcf needs to be first input
+            samples="samples.txt",  # other inputs, e.g. sample files, are optional
+        output:
+            "{prefix}.filter_sample.vcf",
+        log:
+            "log/{prefix}.filter_sample.vcf.log",
+        params:
+            filter=lambda w, input: f"--exclude 'GT[@{input.samples}]=\"0/1\"'",
+            extra="",
+        wrapper:
+            "0.77.0-833-gbae3237d5/bio/bcftools/filter"
+
 
     rule bcf_filter_o_vcf:
         input:
@@ -24,7 +40,7 @@ This wrapper can be used in the following way:
             filter="-i 'QUAL > 5'",
             extra="",
         wrapper:
-            "0.75.0-772-g3f7df6e90/bio/bcftools/filter"
+            "0.77.0-833-gbae3237d5/bio/bcftools/filter"
 
 
     rule bcf_filter_o_vcf_gz:
@@ -38,7 +54,7 @@ This wrapper can be used in the following way:
             filter="-i 'QUAL > 5'",
             extra="",
         wrapper:
-            "0.75.0-772-g3f7df6e90/bio/bcftools/filter"
+            "0.77.0-833-gbae3237d5/bio/bcftools/filter"
 
 
     rule bcf_filter_o_bcf:
@@ -52,7 +68,7 @@ This wrapper can be used in the following way:
             filter="-i 'QUAL > 5'",
             extra="",
         wrapper:
-            "0.75.0-772-g3f7df6e90/bio/bcftools/filter"
+            "0.77.0-833-gbae3237d5/bio/bcftools/filter"
 
 
     rule bcf_filter_o_uncompressed_bcf:
@@ -67,9 +83,10 @@ This wrapper can be used in the following way:
             filter="-i 'QUAL > 5'",
             extra="",
         wrapper:
-            "0.75.0-772-g3f7df6e90/bio/bcftools/filter"
+            "0.77.0-833-gbae3237d5/bio/bcftools/filter"
 
 Note that input, output and log file paths can be chosen freely.
+
 When running with
 
 .. code-block:: bash
@@ -81,8 +98,8 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``bcftools==1.9``
-* ``snakemake-wrapper-utils==0.2.0``
+* ``bcftools==1.12``
+* ``snakemake-wrapper-utils==0.2``
 
 Input/Output
 ------------
@@ -93,6 +110,7 @@ Input/Output
 **Output:**
 
 * Filtered VCF/BCF file
+
 
 
 
@@ -129,9 +147,6 @@ Code
 
     bcftools_opts = get_bcftools_opts(snakemake)
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
-    if len(snakemake.input) > 1:
-        raise Exception("Only one input file expected, got: " + str(len(snakemake.input)))
 
     if len(snakemake.output) > 1:
         raise Exception("Only one output file expected, got: " + str(len(snakemake.output)))

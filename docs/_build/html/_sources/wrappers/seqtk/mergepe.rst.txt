@@ -1,0 +1,101 @@
+.. _`bio/seqtk/mergepe`:
+
+SEQTK MERGEPE
+=============
+
+Interleave two paired-end FASTA/Q files
+
+**URL**: https://github.com/lh3/seqtk
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule seqtk_mergepe:
+        input:
+            r1="{sample}.1.fastq.gz",
+            r2="{sample}.2.fastq.gz",
+        output:
+            merged="{sample}.merged.fastq.gz",
+        params:
+            compress_lvl=9,
+        log:
+            "logs/seqtk_mergepe/{sample}.log",
+        threads: 2
+        wrapper:
+            "0.77.0-833-gbae3237d5/bio/seqtk/mergepe"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``seqtk=1.3``
+* ``pigz=2.3``
+
+Input/Output
+------------
+**Input:**
+
+* paired fastq files - can be compressed in gzip format (``*.gz``).
+
+**Output:**
+
+* a single, interleaved FASTA/Q file. By default, the output will be compressed, use the param ``compress_lvl`` to change this.
+
+
+
+
+Params
+------
+
+* ``compress_lvl``: Regulate the speed of compression using the specified digit, where 1 indicates the fastest compression method (less compression) and 9 indicates the slowest compression method (best compression). 0 is no compression. 11 gives a few percent better compression at a severe cost in execution time, using the zopfli algorithm. The default is 6.
+
+
+
+
+
+Notes
+-----
+
+Multiple threads can be used during compression of the output file with ``pigz``.
+
+
+Authors
+-------
+
+* Michael Hall
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for interleaving reads from paired FASTA/Q files using seqtk."""
+
+    __author__ = "Michael Hall"
+    __copyright__ = "Copyright 2021, Michael Hall"
+    __email__ = "michael@mbh.sh"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True, append=False)
+    compress_lvl = int(snakemake.params.get("compress_lvl", 6))
+
+    shell(
+        "(seqtk mergepe {snakemake.input} "
+        "| pigz -{compress_lvl} -c -p {snakemake.threads}) > {snakemake.output} {log}"
+    )

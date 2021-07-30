@@ -5,6 +5,7 @@ PANDAS MERGE
 
 Merge salmon quant.sf files
 
+**URL**: 
 
 Example
 -------
@@ -27,9 +28,10 @@ This wrapper can be used in the following way:
         log:
             "logs/pandas_merge_salmon.log"
         wrapper:
-            "0.75.0-772-g3f7df6e90/bio/pandas/salmon"
+            "0.77.0-833-gbae3237d5/bio/pandas/salmon"
 
 Note that input, output and log file paths can be chosen freely.
+
 When running with
 
 .. code-block:: bash
@@ -54,6 +56,7 @@ Input/Output
 **Output:**
 
 * A TSV-formatted text file with all TPM or RawCounts
+
 
 
 
@@ -158,7 +161,7 @@ Code
         This function reads a single salmon quant.sf or quant.genes.sf
         and returns it as a pandas DataFrame
         """
-        return pandas.read_csv(
+        df = pandas.read_csv(
             path,
             sep="\t",
             index_col=0,
@@ -172,6 +175,11 @@ Code
             },
             na_values=""
         )
+
+        if snakemake.params.get("drop_patch", False) is True:
+            df.index = [i.split('.')[0] for i in df.index.tolist()]
+
+        return df
 
 
     logging.basicConfig(

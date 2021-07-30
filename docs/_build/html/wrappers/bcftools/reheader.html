@@ -160,6 +160,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../epic.html">EPIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../facets.html">FACETS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastp.html">FASTP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastqc.html">FASTQC</a></li>
@@ -196,6 +197,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
@@ -206,6 +208,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pandas.html">PANDAS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pandora.html">PANDORA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pbmm2.html">PBMM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pcaExplorer.html">PCAEXPLORER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pear.html">PEAR</a></li>
@@ -343,6 +346,7 @@
   <div class="section" id="bcftools-reheader">
 <span id="bio-bcftools-reheader"></span><h1>BCFTOOLS REHEADER<a class="headerlink" href="#bcftools-reheader" title="Permalink to this headline">¶</a></h1>
 <p>Change header or sample names of vcf/bcf file. For more information see <a class="reference external" href="https://www.htslib.org/doc/bcftools.html#reheader">BCFtools documentation</a>.</p>
+<p><strong>URL</strong>:</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -359,11 +363,11 @@
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># optional parameters for bcftools reheader</span>
         <span class="n">view_extra</span><span class="o">=</span><span class="s2">&quot;-O b&quot;</span>  <span class="c1"># add output format for internal bcftools view call</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/bcftools/reheader&quot;</span>
+        <span class="s2">&quot;0.77.0-833-gbae3237d5/bio/bcftools/reheader&quot;</span>
 </pre></div>
 </div>
-<p>Note that input, output and log file paths can be chosen freely.
-When running with</p>
+<p>Note that input, output and log file paths can be chosen freely.</p>
+<p>When running with</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
 </pre></div>
 </div>
@@ -372,13 +376,14 @@ When running with</p>
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">bcftools=1.12</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bcftools==1.12</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Jan Forster</p></li>
+<li><p>Thibault Dayris</p></li>
 </ul>
 </div>
 <div class="section" id="code">
@@ -404,16 +409,15 @@ When running with</p>
 
 <span class="n">samples</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">samples_cmd</span> <span class="o">=</span> <span class="s2">&quot;--samples &quot;</span> <span class="o">+</span> <span class="n">samples</span>
+    <span class="n">samples_cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;--samples </span><span class="si">{</span><span class="n">samples</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">samples_cmd</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="n">fai</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fai&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">fai</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">fai_cmd</span> <span class="o">=</span> <span class="s2">&quot;--fai &quot;</span> <span class="o">+</span> <span class="n">fai</span>
+    <span class="n">fai_cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;--fai </span><span class="si">{</span><span class="n">fai</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">fai_cmd</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-
 
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">view_extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;view_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -424,6 +428,9 @@ When running with</p>
     <span class="n">view_extra</span> <span class="o">+=</span> <span class="s2">&quot; --output-type b &quot;</span>
 <span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.vcf&quot;</span><span class="p">):</span>
     <span class="n">view_extra</span> <span class="o">+=</span> <span class="s2">&quot; --output-type v &quot;</span>
+<span class="k">if</span> <span class="s2">&quot;regions&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">view_extra</span> <span class="o">+=</span> <span class="s2">&quot; --regions-file </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;regions&quot;</span><span class="p">])</span>
+
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;bcftools reheader &quot;</span>

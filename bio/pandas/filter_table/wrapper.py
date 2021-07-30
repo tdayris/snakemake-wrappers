@@ -129,8 +129,12 @@ if (new_index := snakemake.params.get("new_index_col", None)) is not None:
 logging.debug(f"Head of the final DataFrame:\n{data.head()}")
 
 
+if ("set_index" in snakemake.params.keys()):
+    (data.reset_index(inplace=True)
+         .set_index(snakemake.params["set_index"], inplace=True))
+
 data.to_csv(
     snakemake.output["table"],
     sep=sep,
-    index=False
+    index=snakemake.params.get("keep_index", False)
 )

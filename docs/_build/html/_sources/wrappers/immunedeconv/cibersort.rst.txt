@@ -5,6 +5,7 @@ CIBERSORT
 
 Use Cibersort to deconvolute gene expression onto cell types
 
+**URL**: 
 
 Example
 -------
@@ -25,9 +26,10 @@ This wrapper can be used in the following way:
             cibersort_binary="/path/to/cibersort/non/free",
             cibersort_mat="/path/to/celltypes.mat"
         wrapper:
-            "0.75.0-772-g3f7df6e90/bio/immunedeconv/cibersort"
+            "0.77.0-833-gbae3237d5/bio/immunedeconv/cibersort"
 
 Note that input, output and log file paths can be chosen freely.
+
 When running with
 
 .. code-block:: bash
@@ -44,9 +46,9 @@ Software dependencies
 * ``conda-forge::r-tidyr==1.1.3``
 * ``conda-forge::r-tibble==3.1.2``
 * ``bioconda::r-immunedeconv==2.0.3``
-* ``conda-forge::r-readr==1.4.0``
+* ``conda-forge::r-readr-r41h03ef668_0==1.4.0``
 * ``conda-forge::r-rcolorbrewer==1.1_2``
-* ``conda-forge::r-randomcolor==1.1.0``
+* ``conda-forge::r-randomcolor==1.1.0.1``
 
 Input/Output
 ------------
@@ -59,6 +61,7 @@ Input/Output
 **Output:**
 
 * TSV and PNG formatted results
+
 
 
 
@@ -76,6 +79,17 @@ Code
 
     #!/usr/bin/R
 
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2021, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt");
+    base::sink(log.file);
+    base::sink(log.file,type="message");
+
     # Load libraries
     base::library(package="dplyr", quietly=TRUE);
     base::library(package="tidyr", quietly=TRUE);
@@ -89,18 +103,18 @@ Code
 
     # Load dataset
     tpm <- utils::read.table(
-      file = snakemake@input[["expr_mat"]],
+      file = base::as.character(x=snakemake@input[["expr_mat"]]),
       header = TRUE,
       sep = "\t",
       stringsAsFactors = FALSE
     );
 
-    gene_col <- "GENE";
+    gene_col <- "Hugo_ID";
     if ("gene_col" %in% base::names(snakemake@params)) {
       gene_col <- base::as.character(x = snakemake@params[["gene_col"]]);
     }
 
-    extra <- "method = 'cibersort', tumor = TRUE, column = 'gene_symbol'";
+    extra <- "method = 'cibersort', tumor = TRUE, column = gene_symbol";
     if ("extra" %in% base::names(snakemake@params)) {
       extra <- base::as.character(x = snakemake@params[["extra"]]);
     }
@@ -255,3 +269,8 @@ Code
         dev.off();
       }
     }
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    base::sink(type="message");
+    base::sink();

@@ -141,6 +141,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../epic.html">EPIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../facets.html">FACETS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastp.html">FASTP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastqc.html">FASTQC</a></li>
@@ -166,6 +167,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cleansam.html">GATK CLEANSAM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="colectsequencingartifacts.html">GATK COLLECTSEQUENCINGARTIFACTMETRICS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="combinegvcfs.html">GATK COMBINEGVCFS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="createsomaticpanelofnormals.html">GATK CREATESOMATICPANELOFNORMALS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="estimatelibrarycomplexity.html">GATK ESTIMATELIBRARYCOMPLEXITY</a></li>
 <li class="toctree-l3"><a class="reference internal" href="filtermutectcalls.html">GATK FILTERMUTECTCALLS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="genomicsdbimport.html">GATK GENOMICSDBIMPORT</a></li>
@@ -213,6 +215,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
@@ -223,6 +226,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pandas.html">PANDAS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pandora.html">PANDORA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pbmm2.html">PBMM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pcaExplorer.html">PCAEXPLORER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pear.html">PEAR</a></li>
@@ -360,6 +364,7 @@
   <div class="section" id="gatk-applybqsrspark">
 <span id="bio-gatk-applybqsrspark"></span><h1>GATK APPLYBQSRSPARK<a class="headerlink" href="#gatk-applybqsrspark" title="Permalink to this headline">¶</a></h1>
 <p>ApplyBQSRSpark: Apply base quality score recalibration on Spark; uses output of the BaseRecalibrator tool.</p>
+<p><strong>URL</strong>:</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -377,16 +382,16 @@
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># optional</span>
         <span class="n">java_opts</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="c1"># optional</span>
         <span class="c1">#spark_runner=&quot;&quot;,  # optional, local by default</span>
-        <span class="c1">#spark_0.75.0-772-g3f7df6e90=&quot;&quot;,  # optional</span>
+        <span class="c1">#spark_0.77.0-833-gbae3237d5=&quot;&quot;,  # optional</span>
         <span class="c1">#spark_extra=&quot;&quot;, # optional</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="mi">1024</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/gatk/applybqsrspark&quot;</span>
+        <span class="s2">&quot;0.77.0-833-gbae3237d5/bio/gatk/applybqsrspark&quot;</span>
 </pre></div>
 </div>
-<p>Note that input, output and log file paths can be chosen freely.
-When running with</p>
+<p>Note that input, output and log file paths can be chosen freely.</p>
+<p>When running with</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
 </pre></div>
 </div>
@@ -436,6 +441,7 @@ When running with</p>
 <span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2021, Filipe G. Vieira&quot;</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
 
+<span class="kn">import</span> <span class="nn">tempfile</span>
 
 <span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
 <span class="kn">from</span> <span class="nn">snakemake_wrapper_utils.java</span> <span class="kn">import</span> <span class="n">get_java_opts</span>
@@ -448,12 +454,15 @@ When running with</p>
 <span class="n">spark_extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spark_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">java_opts</span> <span class="o">=</span> <span class="n">get_java_opts</span><span class="p">(</span><span class="n">snakemake</span><span class="p">)</span>
 
+<span class="n">tmpdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
+
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
     <span class="s2">&quot;gatk --java-options &#39;</span><span class="si">{java_opts}</span><span class="s2">&#39; ApplyBQSRSpark </span><span class="si">{extra}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;--reference </span><span class="si">{snakemake.input.ref}</span><span class="s2"> --input </span><span class="si">{snakemake.input.bam}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;--bqsr-recal-file </span><span class="si">{snakemake.input.recal_table}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;--tmp-dir </span><span class="si">{tmpdir}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;--output </span><span class="si">{snakemake.output.bam}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;-- --spark-runner </span><span class="si">{spark_runner}</span><span class="s2"> --spark-master </span><span class="si">{spark_master}</span><span class="s2"> </span><span class="si">{spark_extra}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;</span><span class="si">{log}</span><span class="s2">&quot;</span>

@@ -13,6 +13,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    import sys
+    from pathlib import Path
+
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../../../../bigr_pipelines/common/python")
+    sys.path.append(common)
+
+    from file_manager import *
+
     default_config_varscan2_somatic = {
         # Your genome sequence
         "genome": "reference/genome.fasta",
@@ -20,30 +29,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         "bed": "reference/regions.bed"
     }
 
-    def get_fai(genome_path: str) -> str:
-        return genome_path + ".fai"
+    try:
+        if config == dict():
+            config = default_config_varscan2_somatic
+    except NameError:
+        config = default_config_varscan2_somatic
 
-    def get_bai(bam_path: str) -> str:
-        return bam_path + "bai"
-
-    def get_mpileup_input(config: dict[str, str]) -> dict[str, str]:
-        """
-        If user provides a bed file in the config, then it should be used as a
-        region file through samtools mpileup.
-        """
-        if config["bed"] is None:
-            return {
-                bam=[
-                    "gatk/recal_bam/{sample}_tumor.bam",
-                    "gatk/recal_bam/{sample}_normal.bam"
-                ]
-                bam_index=get_bai("samtools/sort/{sample}.bam",),
-                reference_genome=config["genome"],
-                reference_genome_idx=get_fai(config["genome"])
-            }
-        return {
-
-        }
 
     ## Required modules :
     ## This module includes fasta indexes and fasta dictionnaries
@@ -67,6 +58,54 @@ This meta-wrapper can be used by integrating the following into your workflow:
     #
     # use rule * from bwa_fixmate as bwa_fixmate_*
 
+    """
+    This rule renames samples for further merges
+    """
+    rule bcftools_reheader:
+        input:
+            vcf="varscan2/concat/{sample}.vcf.gz",
+            vcf_tbi=get_tbi("varscan2/concat/{sample}.vcf.gz"),
+            #samples="varscan2/mpileup2cns/{sample}.sample.list",
+            fasta=config["genome"],
+            fai=get_fai(config["genome"]),
+            regions=config["bed"]
+        output:
+            temp("varscan2/reheaded/{sample}.vcf.gz")
+        message:
+            "Reheading {wildcards.sample} with fasta index and new sample names"
+        threads: 2
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+            time_min=lambda wildcards, attempt: attempt * 25,
+            tmpdir="tmp"
+        log:
+            "logs/bcftools/reheader/varscan2/{sample}.log"
+        params:
+            extra="",
+            view_extra=""
+        wrapper:
+            "bio/bcftools/reheader"
+
+
+    """
+    This rule provides a list of sample names (here, only one) for Varscan2
+    """
+    rule varscan2_sample_list:
+        output:
+            temp("varscan2/mpileup2cns/{sample}.sample.list")
+        message:
+            "Building sample list for Varscan2 mpileup2cns"
+        threads: 1
+        resources:
+            mem_mb=128,
+            time_min=2
+        params:
+            '"varscan2_{sample}_tumor\nvarscan2_{sample}_normal"'
+        log:
+            "logs/varscan2/samples/{sample}.list.log"
+        shell:
+            "echo -e {params} > {output} 2> {log}"
+
 
     """
     This rule concats snp and indel callings from Varscan2 in order to produce a
@@ -75,22 +114,30 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule bcftools_concat:
         input:
             calls=expand(
-                "vascan2/somatic/{sample}.{content}.vcf",
+                "varscan2/somatic/{sample}.{content}.vcf.gz",
+                content=["snp", "indel"],
+                allow_missing=True
+            ),
+            calls_index=expand(
+                "varscan2/somatic/{sample}.{content}.vcf.gz.tbi",
                 content=["snp", "indel"],
                 allow_missing=True
             )
         output:
-            temp("vascan2/concat/{sample}.vcf.gz")
+            temp("varscan2/concat/{sample}.vcf.gz")
+        message:
+            "Concatenating varscan calling for {wildcards.sample}"
         threads: 2
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 1025, 4096),
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
         params:
-            "--output-type z --remove-duplicates --allow-overlaps"
+            extra="--remove-duplicates --allow-overlaps"
         log:
-            "logs/varscan/pileup2indel/concat/{sample}.log"
+            "logs/bcftools/concat/{sample}.log"
         wrapper:
-            "/bio/bcftools/concat"
+            "bio/bcftools/concat"
 
 
     """
@@ -98,22 +145,23 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule varscan2_somatic:
         input:
-            mpileup="samtools/mupleup/{sample}.mpileup.gz"
+            mpileup="samtools/mpileup/{sample}.mpileup.gz"
         output:
-            snp=temp("vascan2/somatic/{sample}.snp.vcf.gz")
-            indel=temp("varscan2/somatic/{sample}.indel.vcf.gz")
+            snp=temp("varscan2/somatic/{sample}.snp.vcf"),
+            indel=temp("varscan2/somatic/{sample}.indel.vcf")
         message:
             "Calling variants on {wildcards.sample} with Varscan2 mpileup2cns"
         threads: 2
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
         params:
-            extra="--p-value 0.05 --variants"
+            extra="--somatic-p-value 0.05 --variants --output-type g"
         log:
-            "logs/varscan2/mpileup2cns/{sample}.call.log"
+            "logs/varscan2/somatic/{sample}.call.log"
         wrapper:
-            "/bio/varscan/somatic"
+            "bio/varscan/somatic"
 
 
     """
@@ -123,29 +171,31 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule samtools_mpilup:
         input:
             bam=[
-                "gatk/recal_bam/{sample}_tumor.bam",
-                "gatk/recal_bam/{sample}_normal.bam"
+                "picard/markduplicates/{sample}_tumor.bam",
+                "picard/markduplicates/{sample}_normal.bam"
             ],
             bam_index=[
-                get_bai("gatk/recal_bam/{sample}_tumor.bam"),
-                get_bai("gatk/recal_bam/{sample}_normal.bam")
+                get_bai("picard/markduplicates/{sample}_tumor.bam"),
+                get_bai("picard/markduplicates/{sample}_normal.bam")
             ],
             reference_genome=config["genome"],
             reference_genome_idx=get_fai(config["genome"]),
             bed=config["bed"]
         output:
             temp("samtools/mpileup/{sample}.mpileup.gz")
-        message: "Building mpilup on {wildcards.sample} with samtools"
+        message:
+            "Building mpilup on {wildcards.sample} with samtools (tumor/normal)"
         threads: 2
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 4096, 20480),
-            time_min=lambda wildcards, attempt: attempt * 120
+            time_min=lambda wildcards, attempt: attempt * 120,
+            tmpdir="tmp"
         log:
             "logs/samtools/mpileup/{sample}.log"
         params:
             extra="--count-orphans --no-BAQ"
         wrapper:
-            "/bio/samtools/mpileup"
+            "bio/samtools/mpileup"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

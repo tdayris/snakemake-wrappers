@@ -126,16 +126,14 @@ The pipeline contains the following steps:
         snakefile: "../../meta/bio/eacon_post_process/test/Snakefile"
         config: config
 
-    ruleorder: eacon_annotate > post_process_eacon_annotate
-
     rule default_cytoscan_process_all:
         input:
             # EaCoN models
-            ascn = expand(
-                os.sep.join(["{sample}", config["params"]["segmenter"],
-                             "ASCN", "{sample}.gammaEval.png"]),
-                sample=config["samples"]
-            ),
+            # ascn = expand(
+            #     os.sep.join(["{sample}", config["params"]["segmenter"],
+            #                  "ASCN", "{sample}.gammaEval.png"]),
+            #     sample=config["samples"]
+            # ),
             # EaCoN annotate
             html = expand(
                 os.path.sep.join([
@@ -145,13 +143,13 @@ The pipeline contains the following steps:
                 sample=config["samples"]
             ),
             # EaCoN new instability scoring feature
-            #instability = expand(
-            #    "{sample}/{sample}_GIS_from_best_gamma.txt",
-            #    sample=config["samples"]
-            #)
+            instability = expand(
+               "{sample}/{sample}_GIS_from_best_gamma.txt",
+               sample=config["samples"]
+            )
 
     # Import all rules from the eacon_post_process meta wrapper
-    use rule * from post_process_eacon as post_process_*
+    use rule * from post_process_eacon as *
 
     use rule eacon_annotate from post_process_eacon with:
         input:
@@ -161,7 +159,7 @@ The pipeline contains the following steps:
 
     rule eacon_cytoscan_process:
         input:
-            install = 'install.ok',
+            #install = 'install.ok',
             cel = "{sample}.CEL",
         output:
             qc_txt = "{sample}/{sample}_2.4.0_{nar}.qc.txt".format(
@@ -192,7 +190,7 @@ The pipeline contains the following steps:
         log:
             "logs/EaCoN/{sample}/cytoscan_process.log"
         wrapper:
-            "/bio/eacon/cytoscan_process"
+            "bio/eacon/cytoscan_process"
 
 
     rule eacon_install:
@@ -210,13 +208,13 @@ The pipeline contains the following steps:
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/rcnorm_0.1.5.tar.gz"
             ],
             git_packages = [
-                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.75.0-772-g3f7df6e90.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.77.0-833-gbae3237d5.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_Chromosomes.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.cytoscan.2.4.0.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.oncoscan.2.4.0.tar.gz"
             ]
         output:
-            temp(touch('install.ok'))
+            touch('install.ok')
         cache: True
         threads: 1
         resources:
@@ -225,7 +223,7 @@ The pipeline contains the following steps:
         log:
             "logs/EaCoN/install.log"
         wrapper:
-            "/bio/eacon/install_local"
+            "bio/eacon/install_local"
 
 
 
