@@ -3,7 +3,86 @@
 BLAST BLASTN
 ============
 
-``Blastn`` performs a sequence similarity search of nucleotide query sequences against a nucleotide database. For more information please see `BLAST documentation <https://www.ncbi.nlm.nih.gov/books/NBK279690/>`_.
+``Blastn`` performs a sequence similarity search of nucleotide query sequences against a nucleotide database.
+
+
+**URL**: https://www.ncbi.nlm.nih.gov/books/NBK279690/
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule blast_nucleotide:
+        input:
+            query = "{sample}.fasta",
+            blastdb=multiext("blastdb/blastdb",
+                ".ndb",
+                ".nhr",
+                ".nin",
+                ".not",
+                ".nsq",
+                ".ntf",
+                ".nto"
+            )
+        output:
+            "{sample}.blast.txt"
+        log:
+            "logs/{sample}.blast.log"
+        threads:
+            2
+        params:
+            # Usable options and specifiers for the different output formats are listed here:
+            # https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/blast/blastn.html.
+            format="6 qseqid sseqid evalue",
+            extra=""
+        wrapper:
+            "0.77.0-1034-gee6c61611/bio/blast/blastn"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``blast==2.11``
+
+Input/Output
+------------
+**Input:**
+
+* ``query``: FASTA file OR
+* ``query``: bare sequence file (`more information <https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=BlastHelp>`_) OR
+* ``query``: identifiers (`more information <https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=BlastHelp>`_)
+* ``blastdb``: Path to local blast database
+
+**Output:**
+
+* depending on the formatting option, different output files can be generated (see tables above)
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+* ``format``: Optional output format, see notes below
+
+
+
+
+Notes
+-----
 
 Different `formatting output options <https://www.ncbi.nlm.nih.gov/books/NBK279676/>`_ and `formatting specifiers <http://www.metagenomics.wiki/tools/blast/blastn-output-format-6>`_ (see tables below) can be selected via the 'format' parameter as shown in example Snakemake rule below.
 
@@ -159,71 +238,6 @@ Specifiers for formatting option 6,7 and 10:
   +-------------+-----------------------------------------------------------------------------+
   | qcovus      | Query Coverage Per Unique Subject (blastn only)                             |
   +-------------+-----------------------------------------------------------------------------+
-
-
-**URL**: 
-
-Example
--------
-
-This wrapper can be used in the following way:
-
-.. code-block:: python
-
-    rule blast_nucleotide:
-        input:
-            query = "{sample}.fasta",
-            blastdb=multiext("blastdb/blastdb",
-                ".ndb",
-                ".nhr",
-                ".nin",
-                ".not",
-                ".nsq",
-                ".ntf",
-                ".nto"
-            )
-        output:
-            "{sample}.blast.txt"
-        log:
-            "logs/{sample}.blast.log"
-        threads:
-            2
-        params:
-            # Usable options and specifiers for the different output formats are listed here:
-            # https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/blast/blastn.html.
-            format="6 qseqid sseqid evalue",
-            extra=""
-        wrapper:
-            "0.77.0-840-gff109e8d3/bio/blast/blastn"
-
-Note that input, output and log file paths can be chosen freely.
-
-When running with
-
-.. code-block:: bash
-
-    snakemake --use-conda
-
-the software dependencies will be automatically deployed into an isolated environment before execution.
-
-Software dependencies
----------------------
-
-* ``blast==2.11``
-
-Input/Output
-------------
-**Input:**
-
-* FASTA file OR
-* bare sequence file (`more information <https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=BlastHelp>`_) OR
-* identifiers (`more information <https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=BlastHelp>`_)
-
-**Output:**
-
-* depending on the formatting option, different output files can be generated (see tables above)
-
-
 
 
 

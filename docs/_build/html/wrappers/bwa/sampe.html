@@ -127,6 +127,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">BWA SAMPE</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#params">Params</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
 </ul>
@@ -342,7 +345,7 @@
   <div class="section" id="bwa-sampe">
 <span id="bio-bwa-sampe"></span><h1>BWA SAMPE<a class="headerlink" href="#bwa-sampe" title="Permalink to this headline">¶</a></h1>
 <p>Map paired-end reads with bwa sampe. For more information about BWA see <a class="reference external" href="http://bio-bwa.sourceforge.net/bwa.shtml">BWA documentation</a>.</p>
-<p><strong>URL</strong>:</p>
+<p><strong>URL</strong>: <a class="reference external" href="http://bio-bwa.sourceforge.net/bwa.shtml">http://bio-bwa.sourceforge.net/bwa.shtml</a></p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -361,7 +364,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bwa_sampe/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/bwa/sampe&quot;</span>
+        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/bwa/sampe&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -378,6 +381,32 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">samtools==1.9</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">picard==2.20.1</span></code></p></li>
 </ul>
+</div>
+<div class="section" id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sai</span></code>: Path to sai file from bwa aln</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fastq</span></code>: Path to fastq file</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>sam/bam file</p></li>
+</ul>
+</div>
+<div class="section" id="params">
+<h2>Params<a class="headerlink" href="#params" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">index</span></code>: Path to genome index</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">extra</span></code>: Optional parameters for bwa sampe</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sort</span></code>: Either “none”, “samtools”, or “picard”.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sort_order</span></code>: Either “coordinate” or “queryname”</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sort_extra</span></code>: Extra parameters for samtools or picard</p></li>
+</ul>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<p>This wrapper uses two threads if sort parameter is not None.</p>
 </div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>

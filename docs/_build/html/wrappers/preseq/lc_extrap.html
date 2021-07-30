@@ -203,6 +203,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#params">Params</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
 </ul>
@@ -336,8 +337,8 @@
             
   <div class="section" id="preseq-lc-extrap">
 <span id="bio-preseq-lc-extrap"></span><h1>PRESEQ LC_EXTRAP<a class="headerlink" href="#preseq-lc-extrap" title="Permalink to this headline">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">preseq</span></code> estimates the library complexity of existing sequencing data to then estimate the yield of future experiments based on their design. For usage information, please see <code class="docutils literal notranslate"><span class="pre">preseq</span></code>’s command line help (this seems more up to date than the available <a class="reference external" href="http://smithlabresearch.org/wp-content/uploads/manual.pdf">documentation from 2014</a> ). For more information about <code class="docutils literal notranslate"><span class="pre">preseq</span></code>, also see the <a class="reference external" href="https://github.com/smithlabcode/preseq">source code</a>.</p>
-<p><strong>URL</strong>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">preseq</span></code> estimates the library complexity of existing sequencing data to then estimate the yield of future experiments based on their design. For usage information, please see <code class="docutils literal notranslate"><span class="pre">preseq</span></code>’s command line help (this seems more up to date than the available <a class="reference external" href="http://smithlabresearch.org/wp-content/uploads/manual.pdf">documentation from 2014</a> ).</p>
+<p><strong>URL</strong>: <a class="reference external" href="https://github.com/smithlabcode/preseq">https://github.com/smithlabcode/preseq</a></p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -351,7 +352,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_bam/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/preseq/lc_extrap&quot;</span>
+        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/preseq/lc_extrap&quot;</span>
 
 <span class="n">rule</span> <span class="n">preseq_lc_extrap_bed</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
@@ -363,7 +364,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/test_bed/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/preseq/lc_extrap&quot;</span>
+        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/preseq/lc_extrap&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -383,12 +384,19 @@
 <h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
 <p><strong>Input:</strong></p>
 <ul class="simple">
-<li><p>bed files containing duplicates and sorted by chromosome, start position, strand position and finally strand OR</p></li>
+<li><p>bed/bam files containing duplicates and sorted by chromosome, start position, strand position and finally strand OR</p></li>
 <li><p>bam files containing duplicates and sorted by using bamtools or samtools sort.</p></li>
+<li><p>Only the first element of the input list is used in this wrapper</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
-<li><p>lc_extrap (.lc_extrap)</p></li>
+<li><p>lc_extrap (.lc_extrap) This must be the first element of the output list</p></li>
+</ul>
+</div>
+<div class="section" id="params">
+<h2>Params<a class="headerlink" href="#params" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Optional</span> <span class="pre">parameters</span></code>:</p></li>
 </ul>
 </div>
 <div class="section" id="authors">

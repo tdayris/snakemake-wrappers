@@ -6,7 +6,7 @@ GATK MARKDUPLICATESSPARK
 Spark implementation of Picard MarkDuplicates that allows the tool to be run in parallel on multiple cores on a local machine or multiple machines on a Spark cluster while still matching the output of the non-Spark Picard version of the tool. Since the tool requires holding all of the readnames in memory while it groups read information, machine configuration and starting sort-order impact tool performance.
 
 
-**URL**: 
+**URL**: https://gatk.broadinstitute.org/hc/en-us/articles/360050814112-MarkDuplicatesSpark
 
 Example
 -------
@@ -27,13 +27,13 @@ This wrapper can be used in the following way:
             extra="--remove-sequencing-duplicates",  # optional
             java_opts="", # optional
             #spark_runner="",  # optional, local by default
-            #spark_0.77.0-840-gff109e8d3="",  # optional
+            #spark_0.77.0-1034-gee6c61611="",  # optional
             #spark_extra="", # optional
         resources:
             mem_mb=1024
         threads: 8
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/gatk/markduplicatesspark"
+            "0.77.0-1034-gee6c61611/bio/gatk/markduplicatesspark"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -55,25 +55,29 @@ Input/Output
 ------------
 **Input:**
 
-* bam file
-* reference file
+* Path to bam file, this must be the only input element in the input file list
 
 **Output:**
 
-* bam file with marked or removed duplicates
+* ``bam``: Path to bam file with marked or removed duplicates
+* ``metrics``: Optional metrics file
 
 
 
+Params
+------
 
-Notes
------
+* ``extra``: The `extra` param allows for additional program arguments for markduplicatesspark.
 
-* The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
-* The `extra` param allows for additional program arguments for markduplicatesspark.
-* The `spark_runner` param = "LOCAL"|"SPARK"|"GCS" allows to set the spark_runner. Set the parameter to "LOCAL" or don't set it at all to run on local machine.
-* The `spark_master` param allows to set the URL of the Spark Master to submit the job. Set to "local[number_of_cores]" for local execution. Don't set it at all for local execution with number of cores determined by snakemake.
-* The `spark_extra` param allows for additional spark arguments.
-* For more information see, https://gatk.broadinstitute.org/hc/en-us/articles/360050814112-MarkDuplicatesSpark
+* ``java_opts``: The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
+
+* ``spark_runner``: The `spark_runner` param = "LOCAL"|"SPARK"|"GCS" allows to set the spark_runner. Set the parameter to "LOCAL" or don't set it at all to run on local machine.
+
+* ``spark_master``: The `spark_master` param allows to set the URL of the Spark Master to submit the job. Set to "local[number_of_cores]" for local execution. Don't set it at all for local execution with number of cores determined by snakemake.
+
+* ``spark_extra``: The `spark_extra` param allows for additional spark arguments.
+
+
 
 
 

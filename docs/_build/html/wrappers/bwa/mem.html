@@ -126,6 +126,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#params">Params</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
@@ -344,7 +345,7 @@
   <div class="section" id="bwa-mem">
 <span id="bio-bwa-mem"></span><h1>BWA MEM<a class="headerlink" href="#bwa-mem" title="Permalink to this headline">¶</a></h1>
 <p>Map reads using bwa mem, with optional sorting using samtools or picard.</p>
-<p><strong>URL</strong>:</p>
+<p><strong>URL</strong>: <a class="reference external" href="http://bio-bwa.sourceforge.net/bwa.shtml">http://bio-bwa.sourceforge.net/bwa.shtml</a></p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -364,7 +365,7 @@
         <span class="n">tmp_dir</span><span class="o">=</span><span class="s2">&quot;/tmp/&quot;</span><span class="p">,</span>  <span class="c1"># Path to temp dir. (optional)</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">8</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/bwa/mem&quot;</span>
+        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/bwa/mem&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -386,23 +387,26 @@
 <h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
 <p><strong>Input:</strong></p>
 <ul class="simple">
-<li><p>FASTQ file(s)</p></li>
-<li><p>reference genome</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reads</span></code>: FASTQ file(s)</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
 <li><p>SAM/BAM/CRAM file</p></li>
 </ul>
 </div>
+<div class="section" id="params">
+<h2>Params<a class="headerlink" href="#params" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">index</span></code>: Path to the bwa index</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">extra</span></code>: The <cite>extra</cite> param allows for additional arguments for bwa-mem.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sorting</span></code>: The <cite>sorting</cite> param allows to enable sorting, and can be either ‘none’, ‘samtools’ or ‘picard’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sort_extra</span></code>: The <cite>sort_extra</cite> allows for extra arguments for samtools/picard</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp_dir</span></code>: The <cite>tmp_dir</cite> param allows to define path to the temp dir. One can use <a class="reference external" href="https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html?highlight=tmpdir#standard-resources">tmpdir resources</a> instead.</p></li>
+</ul>
+</div>
 <div class="section" id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>The <cite>extra</cite> param allows for additional arguments for bwa-mem.</p></li>
-<li><p>The <cite>sorting</cite> param allows to enable sorting, and can be either ‘none’, ‘samtools’ or ‘picard’.</p></li>
-<li><p>The <cite>sort_extra</cite> allows for extra arguments for samtools/picard</p></li>
-<li><p>The <cite>tmp_dir</cite> param allows to define path to the temp dir.</p></li>
-<li><p>For more inforamtion see, <a class="reference external" href="http://bio-bwa.sourceforge.net/bwa.shtml">http://bio-bwa.sourceforge.net/bwa.shtml</a></p></li>
-</ul>
+<p>Warning, this wrapper uses a number of threads equal to one plus the number of threads written in the Snakefile: sort + bwa mem</p>
 </div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>

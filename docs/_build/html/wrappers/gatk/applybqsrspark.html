@@ -155,7 +155,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#params">Params</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
 </ul>
@@ -364,7 +364,7 @@
   <div class="section" id="gatk-applybqsrspark">
 <span id="bio-gatk-applybqsrspark"></span><h1>GATK APPLYBQSRSPARK<a class="headerlink" href="#gatk-applybqsrspark" title="Permalink to this headline">¶</a></h1>
 <p>ApplyBQSRSpark: Apply base quality score recalibration on Spark; uses output of the BaseRecalibrator tool.</p>
-<p><strong>URL</strong>:</p>
+<p><strong>URL</strong>: <a class="reference external" href="https://gatk.broadinstitute.org/hc/en-us/articles/360057440431-ApplyBQSRSpark-BETA">https://gatk.broadinstitute.org/hc/en-us/articles/360057440431-ApplyBQSRSpark-BETA</a>-</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -382,12 +382,12 @@
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># optional</span>
         <span class="n">java_opts</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="c1"># optional</span>
         <span class="c1">#spark_runner=&quot;&quot;,  # optional, local by default</span>
-        <span class="c1">#spark_0.77.0-840-gff109e8d3=&quot;&quot;,  # optional</span>
+        <span class="c1">#spark_0.77.0-1034-gee6c61611=&quot;&quot;,  # optional</span>
         <span class="c1">#spark_extra=&quot;&quot;, # optional</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="mi">1024</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/gatk/applybqsrspark&quot;</span>
+        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/gatk/applybqsrspark&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -409,24 +409,23 @@
 <h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
 <p><strong>Input:</strong></p>
 <ul class="simple">
-<li><p>bam file</p></li>
-<li><p>fasta reference</p></li>
-<li><p>recalibration table for the bam</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bam</span></code>: Path to bam file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ref</span></code>: Path to fasta-formatted reference genome</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">recal_table</span></code>: Path to recalibration table for the bam</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
-<li><p>recalibrated bam file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bam</span></code>: recalibrated bam file</p></li>
 </ul>
 </div>
-<div class="section" id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="params">
+<h2>Params<a class="headerlink" href="#params" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>The <cite>java_opts</cite> param allows for additional arguments to be passed to the java compiler, e.g. “-XX:ParallelGCThreads=10” (not for <cite>-XmX</cite> or <cite>-Djava.io.tmpdir</cite>, since they are handled automatically).</p></li>
-<li><p>The <cite>extra</cite> param allows for additional program arguments for <cite>applybqsrspark</cite>.</p></li>
-<li><p>The <cite>spark_runner</cite> param = “LOCAL”|”SPARK”|”GCS” allows to set the spark_runner. Set the parameter to “LOCAL” or don’t set it at all to run on local machine.</p></li>
-<li><p>The <cite>spark_master</cite> param allows to set the URL of the Spark Master to submit the job. Set to “local[number_of_cores]” for local execution. Don’t set it at all for local execution with number of cores determined by snakemake.</p></li>
-<li><p>The <cite>spark_extra</cite> param allows for additional spark arguments.</p></li>
-<li><p>For more information see, <a class="reference external" href="https://gatk.broadinstitute.org/hc/en-us/articles/360057440431-ApplyBQSRSpark-BETA">https://gatk.broadinstitute.org/hc/en-us/articles/360057440431-ApplyBQSRSpark-BETA</a>-</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">extra</span></code>: The <cite>extra</cite> param allows for additional program arguments for <cite>applybqsrspark</cite>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">java_opts</span></code>: The <cite>java_opts</cite> param allows for additional arguments to be passed to the java compiler, e.g. “-XX:ParallelGCThreads=10” (not for <cite>-XmX</cite> or <cite>-Djava.io.tmpdir</cite>, since they are handled automatically).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spark_runner</span></code>: The <cite>spark_runner</cite> param = “LOCAL”|”SPARK”|”GCS” allows to set the spark_runner. Set the parameter to “LOCAL” or don’t set it at all to run on local machine.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spark_master</span></code>: The <cite>spark_master</cite> param allows to set the URL of the Spark Master to submit the job. Set to “local[number_of_cores]” for local execution. Don’t set it at all for local execution with number of cores determined by snakemake.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spark_extra</span></code>: The <cite>spark_extra</cite> param allows for additional spark arguments.</p></li>
 </ul>
 </div>
 <div class="section" id="authors">

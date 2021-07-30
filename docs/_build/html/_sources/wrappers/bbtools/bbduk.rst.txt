@@ -6,7 +6,7 @@ BBDUK
 Run BBDuk.
 
 
-**URL**: 
+**URL**: https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/
 
 Example
 -------
@@ -30,7 +30,7 @@ This wrapper can be used in the following way:
             extra = lambda w, input: "ref={},adapters,artifacts ktrim=r k=23 mink=11 hdist=1 tpe tbo trimpolygright=10 minlen=25 maxns=30 entropy=0.5 entropywindow=50 entropyk=5".format(input.adapters),
         threads: 7
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/bbtools/bbduk"
+            "0.77.0-1034-gee6c61611/bio/bbtools/bbduk"
 
 
     rule bbduk_pe:
@@ -48,7 +48,7 @@ This wrapper can be used in the following way:
             extra = lambda w, input: "ref={},adapters,artifacts ktrim=r k=23 mink=11 hdist=1 tpe tbo trimpolygright=10 minlen=25 maxns=30 entropy=0.5 entropywindow=50 entropyk=5".format(input.adapters),
         threads: 7
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/bbtools/bbduk"
+            "0.77.0-1034-gee6c61611/bio/bbtools/bbduk"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -70,16 +70,23 @@ Input/Output
 ------------
 **Input:**
 
-* raw fastq file with R1 reads
-* raw fastq file with R2 reads (optional)
+* ``sample``: list of paths. Raw fastq file with R1 reads, raw fastq file with R2 reads (PE only, optional)
 
 **Output:**
 
-* trimmed fastq file with R1 reads
-* trimmed fastq file with R2 reads (optional)
-* fastq file with singleton reads (optional)
-* fastq file with discarded reads (optional)
-* stats file (optonal)
+* ``trimmed``: trimmed fastq file with R1 reads, trimmed fastq file with R2 reads (PE only, optional)
+* ``singleton``: fastq file with singleton reads (optional)
+* ``discarded``: fastq file with discarded reads (optional)
+* ``stats``: stats file (optonal)
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+* ``adapters``: Literal adapters sequences
 
 
 
