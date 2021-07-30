@@ -6,6 +6,7 @@ GATK APPLYBQSRSPARK
 ApplyBQSRSpark: Apply base quality score recalibration on Spark; uses output of the BaseRecalibrator tool.
 
 
+**URL**: 
 
 Example
 -------
@@ -28,14 +29,15 @@ This wrapper can be used in the following way:
             extra="",  # optional
             java_opts="", # optional
             #spark_runner="",  # optional, local by default
-            #spark_0.75.0-772-g3f7df6e90="",  # optional
+            #spark_0.77.0-840-gff109e8d3="",  # optional
             #spark_extra="", # optional
         resources:
             mem_mb=1024
         wrapper:
-            "0.75.0-772-g3f7df6e90/bio/gatk/applybqsrspark"
+            "0.77.0-840-gff109e8d3/bio/gatk/applybqsrspark"
 
 Note that input, output and log file paths can be chosen freely.
+
 When running with
 
 .. code-block:: bash
@@ -62,6 +64,7 @@ Input/Output
 **Output:**
 
 * recalibrated bam file
+
 
 
 
@@ -92,6 +95,7 @@ Code
     __copyright__ = "Copyright 2021, Filipe G. Vieira"
     __license__ = "MIT"
 
+    import tempfile
 
     from snakemake.shell import shell
     from snakemake_wrapper_utils.java import get_java_opts
@@ -104,12 +108,15 @@ Code
     spark_extra = snakemake.params.get("spark_extra", "")
     java_opts = get_java_opts(snakemake)
 
+    tmpdir = tempfile.gettempdir()
+
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
     shell(
         "gatk --java-options '{java_opts}' ApplyBQSRSpark {extra} "
         "--reference {snakemake.input.ref} --input {snakemake.input.bam} "
         "--bqsr-recal-file {snakemake.input.recal_table} "
+        "--tmp-dir {tmpdir} "
         "--output {snakemake.output.bam} "
         "-- --spark-runner {spark_runner} --spark-master {spark_master} {spark_extra} "
         "{log}"

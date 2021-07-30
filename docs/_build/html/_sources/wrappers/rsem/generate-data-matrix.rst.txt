@@ -1,0 +1,95 @@
+.. _`bio/rsem/generate-data-matrix`:
+
+RSEM GENERATE DATA MATRIX
+=========================
+
+Run rsem-generate-data-matrix to combine a set of single-sample rsem results into a single matrix.
+
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule rsem_generate_data_matrix:
+        input:
+            # one or more expression files created by rsem-calculate-expression
+            ["a.genes.results", "b.genes.results"],
+        output:
+            # a tsv containing each sample in the input as a column
+            "genes.results",
+        params:
+            # optional additional parameters
+            extra="",
+        log:
+            "logs/rsem/generate_data_matrix.log",
+        wrapper:
+            "0.77.0-840-gff109e8d3/bio/rsem/generate-data-matrix"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``rsem==1.3.3``
+
+Input/Output
+------------
+**Input:**
+
+* a list of rsem results files
+
+**Output:**
+
+* Quantification results summarized by allele/gene/isoform per sample
+
+
+
+
+Notes
+-----
+
+* For more information, see https://github.com/deweylab/RSEM.
+
+
+
+Authors
+-------
+
+* Brett Copeland
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Brett Copeland"
+    __copyright__ = "Copyright 2021, Brett Copeland"
+    __email__ = "brcopeland@ucsd.edu"
+    __license__ = "MIT"
+
+
+    import os
+
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+    shell(
+        "rsem-generate-data-matrix {extra} "
+        "{snakemake.input} > {snakemake.output} "
+        "{log}"
+    )

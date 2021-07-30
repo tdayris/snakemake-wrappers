@@ -128,19 +128,19 @@ The pipeline contains the following steps:
 
 
     def get_prefix(fastq_list: list[str]) -> list[str]:
-        yield from [fastq_file_prefix(fq) for fq in fastq_list]
+        yield from [fastq_replace_suffix(fq) for fq in fastq_list]
 
 
     def get_md5(fastq_list: list[str]) -> list[str]:
-        yield from [fastq_file_prefix(fq, ".fastq.gz.md5") for fq in fastq_list]
+        yield from [fastq_replace_suffix(fq, ".fastq.gz.md5") for fq in fastq_list]
 
 
     def get_fastqc_html(fastq_list: list[str]) -> list[str]:
-        yield from [fastq_file_prefix(fq, "_fastqc.html") for fq in fastq_list]
+        yield from [fastq_replace_suffix(fq, "_fastqc.html") for fq in fastq_list]
 
 
     def get_fastqc_zip(fastq_list: list[str]) -> list[str]:
-        yield from [fastq_file_prefix(fq, "_fastqc.zip") for fq in fastq_list]
+        yield from [fastq_replace_suffix(fq, "_fastqc.zip") for fq in fastq_list]
 
 
     workdir: config["run_dir"]
@@ -262,7 +262,7 @@ The pipeline contains the following steps:
             no_lane_splitting=config.get("no_lane_splitting", False),
             barcode_mismatches=config.get("barcode_mismatches", None)
         wrapper:
-            "/bio/bcl2fastq"
+            "bio/bcl2fastq"
 
 
 

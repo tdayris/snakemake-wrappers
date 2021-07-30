@@ -38,6 +38,18 @@ Input/Output
 * Fastq files
   
  
+  
+* Fasta-formatted Genome sequence
+  
+ 
+  
+* Fasta-formatted transcriptome sequence
+  
+ 
+  
+* GTF formatted genome annotation
+  
+ 
 
 
 **Output:**
@@ -108,7 +120,9 @@ The pipeline contains the following steps:
 
     import sys
 
-    sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../common/python")
+    sys.path.append(common)
 
     from file_manager import *
     from files_linker import *
@@ -121,20 +135,178 @@ The pipeline contains the following steps:
         level=logging.DEBUG
     )
 
-    default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/celltype_deconvolution_rnaseq/config.hg38.yaml")
+    default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
     configfile: get_config(default_config)
     design = get_design(os.getcwd(), search_fastq_pairs)
 
+    if "Sample_id" in design.columns.tolist():
+        design.set_index("Sample_id", inplace=True)
+
     fastq_links = link_fq(
-        design.Sample_id,
+        design.index,
         design.Upstream_file,
         design.Downstream_file
     )
 
-    ruleorder: salmon_meta_salmon_quant_paired > salmon_quant_paired
+
+    rule target:
+        input:
+            graphs = expand(
+                "{tool}/celltypes.{plot}.png",
+                tool=["cibersort_abs", "cibersort", "quantiseq", "xcell", "epic"],
+                plot=["hist", "dotplot"]
+            ),
+            text = expand(
+                "{tool}/celltypes.{ext}",
+                tool=["cibersort_abs", "cibersort", "quantiseq", "xcell", "epic"],
+                ext=["tsv", "RDS"]
+            ),
+            plotdirs = expand(
+                "{tool}/celltypes.dotplots",
+                tool=["cibersort_abs", "cibersort", "quantiseq", "xcell", "epic"]
+            )
+
+    #####################
+    ### Deconvolution ###
+    #####################
 
 
+    rule cibersort_abs:
+        input:
+            expr_mat="immunedeconv/TPM.tsv"
+        output:
+            histogram="cibersort_abs/celltypes.hist.png",
+            dotplot="cibersort_abs/celltypes.dotplot.png",
+            tsv="cibersort_abs/celltypes.tsv",
+            rds="cibersort_abs/celltypes.RDS",
+            plotdir=directory("cibersort_abs/celltypes.dotplots")
+        message:
+            "Using Cibersort-absolute to deconvolute expression into cell types"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmp="tmp"
+        params:
+            cibersort_binary="/path/to/cibersort/non/free",
+            cibersort_mat="/path/to/celltypes.mat"
+        log:
+            "logs/immunedeconv/cibersort_abs.log"
+        wrapper:
+            "bio/immunedeconv/cibersort-abs"
 
+
+    rule cibersort:
+        input:
+            expr_mat="immunedeconv/TPM.tsv"
+        output:
+            histogram="cibersort/celltypes.hist.png",
+            dotplot="cibersort/celltypes.dotplot.png",
+            tsv="cibersort/celltypes.tsv",
+            rds="cibersort/celltypes.RDS",
+            plotdir=directory("cibersort/celltypes.dotplots")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmp="tmp"
+        message:
+            "Using cibersort to deconvolute expression into cell types"
+        log:
+            "logs/immunedeconv/Cibersort.log"
+        params:
+            cibersort_binary="/path/to/cibersort/non/free",
+            cibersort_mat="/path/to/celltypes.mat"
+        wrapper:
+            "bio/immunedeconv/cibersort"
+
+
+    rule mcpcounter:
+        input:
+            expr_mat="immunedeconv/TPM.tsv"
+        output:
+            histogram="mcpcounter/celltypes.hist.png",
+            dotplot="mcpcounter/celltypes.dotplot.png",
+            tsv="mcpcounter/celltypes.tsv",
+            rds="mcpcounter/celltypes.RDS",
+            plotdir=directory("mcpcounter/celltypes.dotplots")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmp="tmp"
+        message:
+            "Using MCP-Counter to deconvolute expression into cell types"
+        log:
+            "logs/immunedeconv/mcpcounter.log"
+        wrapper:
+            "bio/immunedeconv/mcpcounter"
+
+
+    rule epic:
+        input:
+            expr_mat="immunedeconv/TPM.tsv"
+        output:
+            histogram="epic/celltypes.hist.png",
+            dotplot="epic/celltypes.dotplot.png",
+            tsv="epic/celltypes.tsv",
+            rds="epic/celltypes.RDS",
+            plotdir=directory("epic/celltypes.dotplots")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmp="tmp"
+        message:
+            "Using EPIC to deconvolute expression into cell types"
+        log:
+            "logs/immunedeconv/epic.log"
+        wrapper:
+            "bio/immunedeconv/epic"
+
+
+    rule quantiseq:
+        input:
+            expr_mat="immunedeconv/TPM.tsv"
+        output:
+            histogram="quantiseq/celltypes.hist.png",
+            dotplot="quantiseq/celltypes.dotplot.png",
+            tsv="quantiseq/celltypes.tsv",
+            rds="quantiseq/celltypes.RDS",
+            plotdir=directory("quantiseq/celltypes.dotplots")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmp="tmp"
+        message:
+            "Using QuantiSeq to deconvolute expression into cell types"
+        log:
+            "logs/immunedeconv/quantiseq.log"
+        wrapper:
+            "bio/immunedeconv/quantiseq"
+
+
+    rule xcell:
+        input:
+            expr_mat="immunedeconv/TPM.tsv"
+        output:
+            histogram="xcell/celltypes.hist.png",
+            dotplot="xcell/celltypes.dotplot.png",
+            tsv="xcell/celltypes.tsv",
+            rds="xcell/celltypes.RDS",
+            plotdir=directory("xcell/celltypes.dotplots")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmp="tmp"
+        message:
+            "Using xCell to deconvolute expression into cell types"
+        log:
+            "logs/immunedeconv/xcell.log"
+        wrapper:
+            "bio/immunedeconv/xcell"
 
 
     #########################
@@ -143,23 +315,78 @@ The pipeline contains the following steps:
 
     rule gene_counts:
         input:
-            "pseudo_mapping/aggregate/TPM.genes.tsv"
+            table="salmon/TPM.genes.tsv"
         output:
-            "immunedeconv/TPM.tsv"
+            table="immunedeconv/TPM.tsv"
         message: "Cleaning salmon quantification file"
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 2048,
-            time_min=lambda wildcards, attempt: attempt * 5
-        logs:
+            time_min=lambda wildcards, attempt: attempt * 5,
+            tmp="tmp"
+        log:
             "logs/pandas/cleaning.log"
         params:
-            drop_column=["Strand", "Start", "Stop", "target_id"],
+            drop_column=["Strand", "Start", "Stop"],
             drop_null_lines=True,
             drop_na_lines=True,
-            drop_duplicated_lines=True
+            drop_duplicated_lines=True,
+            keep_index=True,
+            set_index=""
         wrapper:
             "bio/pandas/filter_table"
+
+
+    rule pandas_merge_salmon_tr:
+        input:
+            quant = expand(
+                "salmon/pseudo_mapping/{sample}/quant.sf",
+                sample=design.index.tolist()
+            ),
+            tx2gene = lambda wildcards: "salmon/gene2gene_with_chr.tsv" if wildcards.content == "genes" else "salmon/tx2gene_with_positions.tsv"
+        output:
+            tsv = "salmon/TPM.{content}.tsv"
+        message:
+            "Merging salmon counts, according to {wildcards.content}"
+        threads:
+            1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 10,
+            tmp="tmp"
+        params:
+            header = True,
+            position = True,
+            gencode = True,
+            drop_patch = True,
+            genes = lambda wildcards: str(wildcards.content).lower() == "genes"
+        log:
+            "logs/pandas_merge_salmon/{content}.log"
+        wrapper:
+            "bio/pandas/salmon"
+
+
+    rule tx_to_gene:
+        input:
+            gtf = config["ref"]["gtf"]
+        output:
+            tx2gene = temp("salmon/tx2gene.tsv"),
+            tx2gene_large = temp("salmon/tx2gene_with_positions.tsv"),
+            gene2gene = temp("salmon/gene2gene.tsv"),
+            gene2gene_large = temp("salmon/gene2gene_with_chr.tsv")
+        message:
+            "Extracting transcript to gene correspondancy for further use"
+        # cache: True
+        threads:
+            1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 3072, 4096),
+            time_min=lambda wildcards, attempt: min(attempt * 10, 15),
+            tmp="tmp"
+        log:
+            "logs/tx_to_gene.log"
+        wrapper:
+            "bio/gtf/tx2gene"
 
     #############################
     ### Salmon quantification ###
@@ -184,15 +411,15 @@ The pipeline contains the following steps:
         input:
             salmon=expand(
                 "salmon/pseudo_mapping/{sample}/quant.sf",
-                sample=design["Sample_id"]
+                sample=design.index
             ),
             html=expand(
                 "fastp/html/pe/{sample}.fastp.html",
-                sample=design["Sample_id"]
+                sample=design.index
             ),
             json=expand(
                 "fastp/json/pe/{sample}.fastp.json",
-                sample=design["Sample_id"]
+                sample=design.index
             )
         output:
             report(
@@ -205,14 +432,15 @@ The pipeline contains the following steps:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
-            time_min=lambda wildcards, attempt: attempt * 35
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmp="tmp"
         log:
             "logs/multiqc.log"
         wrapper:
-            "/bio/multiqc"
+            "bio/multiqc"
 
 
-    use rule * from salmon_meta as salmon_meta_*
+    use rule * from salmon_meta as *
 
 
     use rule salmon_quant_paired from salmon_meta with:
@@ -249,14 +477,15 @@ The pipeline contains the following steps:
         threads: 1
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
-            time_min=lambda wildcard, attempt: attempt * 45
+            time_min=lambda wildcard, attempt: attempt * 45,
+            tmp="tmp"
         params:
             adapters=config["params"].get("fastp_adapters", None),
             extra=config["params"].get("fastp_extra", "")
         log:
             "logs/fastp/{sample}.log"
         wrapper:
-            "/bio/fastp"
+            "bio/fastp"
 
 
     #################################################
@@ -271,13 +500,14 @@ The pipeline contains the following steps:
         threads: 1
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-            time_min=lambda wildcard, attempt: attempt * 45
+            time_min=lambda wildcard, attempt: attempt * 45,
+            tmp="tmp"
         params:
             input=lambda wildcards, output: fastq_links[output[0]]
         log:
             "logs/bigr_copy/{sample}.{stream}.log"
         wrapper:
-            "/bio/BiGR/copy"
+            "bio/BiGR/copy"
 
 
 

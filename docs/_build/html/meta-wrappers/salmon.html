@@ -102,8 +102,6 @@
 <li class="toctree-l2"><a class="reference internal" href="bioinfokit.html">DESEQ2_POST_PROCESS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
-<li class="toctree-l2"><a class="reference internal" href="clean_ngs.html">CLEAN_NGS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cluster_profiler.html">CLUSTER_PROFILER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compress_index_vcf.html">COMPRESS_INDEX_VCF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_pe.html">DADA2-PE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_se.html">DADA2-SE</a></li>
@@ -128,6 +126,7 @@
 <li class="toctree-l2"><a class="reference internal" href="snpeff_annotate.html">SNPEFF_ANNOTATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpsift.html">SNPSIFT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="star_arriba.html">STAR-ARRIBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="star_mapping.html">STAR_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tximport_deseq2.html">TXIMPORT_DESEQ2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varscan2_calling.html">VARSCAN2_CALLING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varscan2_germline.html">VARSCAN2_GERMLINE</a></li>
@@ -214,8 +213,8 @@
 <span class="n">min_version</span><span class="p">(</span><span class="s2">&quot;6.0&quot;</span><span class="p">)</span>
 
 <span class="n">default_salmon_config</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/sequence.fasta&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;transcriptome&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/transcriptome.fasta&quot;</span>
+    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/sequence.fasta&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;transcriptome&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/transcriptome.fasta&quot;</span>
 <span class="p">}</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -238,14 +237,15 @@
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="p">(</span>
             <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5120</span> <span class="o">+</span> <span class="mi">25600</span>
-        <span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">libType</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;salmon_libtype&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">),</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;salmon_quant_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;--numBootstraps 100 --validateMappings --gcBias --seqBias --posBias&quot;</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/salmon/quant/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/salmon/quant&quot;</span>
+        <span class="s2">&quot;bio/salmon/quant&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -269,13 +269,14 @@
         <span class="p">),</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="p">(</span>
             <span class="n">attempt</span> <span class="o">*</span> <span class="p">(</span><span class="mi">25600</span> <span class="k">if</span> <span class="s2">&quot;decoys&quot;</span> <span class="ow">in</span> <span class="nb">input</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="mi">10240</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;salmon_index_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;--keepDuplicates --gencode&quot;</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/salmon/index.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/salmon/index&quot;</span>
+        <span class="s2">&quot;bio/salmon/index&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -296,11 +297,12 @@
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/salmon/decoys.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/salmon/generate_decoy&quot;</span>
+        <span class="s2">&quot;bio/salmon/generate_decoy&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

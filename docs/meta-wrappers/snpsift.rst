@@ -16,13 +16,13 @@ This meta-wrapper can be used by integrating the following into your workflow:
     default_config={
         "samples":["test"],
         "ref": {
-            "cosmic": "/path/to/annotation",
-            "dbsnp": "/path/to/annotation",
-            "dbnsfp": "/path/to/annotaion",
-            "fasta": "/path/to/annotation",
-            "gmt": "/path/to/annotation",
-            "gwascat": "/path/to/annotation",
-            "kaviar": "/path/to/annotation",
+            "cosmic": "path/to/annotation",
+            "dbsnp": "path/to/annotation",
+            "dbnsfp": "path/to/annotaion",
+            "fasta": "path/to/annotation",
+            "gmt": "path/to/annotation",
+            "gwascat": "path/to/annotation",
+            "kaviar": "path/to/annotation",
         }
     }
 
@@ -53,12 +53,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
         log:
             "logs/snpsift/dbnsfp/{sample}.log"
         wrapper:
-            "/bio/snpsift/dbnsfp"
-
+            "bio/snpsift/dbnsfp"
 
 
     rule snpsift_gwascat:
@@ -72,11 +72,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
         log:
             "logs/snpsift/gwascat/{sample}.log"
         wrapper:
-            "/bio/snpsift/gwascat"
+            "bio/snpsift/gwascat"
 
 
     rule snpsift_cosmic:
@@ -90,11 +91,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
         log:
             "logs/snpsift/cosmic/{sample}.log"
         wrapper:
-            "/bio/snpsift/annotate"
+            "bio/snpsift/annotate"
 
 
     rule snpsift_dbsnp:
@@ -111,9 +113,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/snpsift/dbsnp/{sample}.log"
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
         wrapper:
-            "/bio/snpsift/annotate"
+            "bio/snpsift/annotate"
 
 
     rule snpsift_kaviar:
@@ -122,7 +125,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
             database=config["ref"]["kaviar"]
         output:
             call=temp("snpsift/kaviar/{sample}.vcf")
-
         message:
             "Annotating {wildcards.sample} with Kaviar"
         threads: 1
@@ -130,9 +132,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/snpsift/kaviar/{sample}.log"
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
         wrapper:
-            "/bio/snpsift/annotate"
+            "bio/snpsift/annotate"
 
 
     rule snpsift_gmt:
@@ -146,9 +149,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        log:
+            "logs/snpsift/gmt/{sample}.log"
         wrapper:
-            "/bio/snpsift/genesets"
+            "bio/snpsift/genesets"
 
 
     rule snpsift_vartype:
@@ -162,11 +168,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
         log:
             "logs/snpsift/varType/{sample}.log"
         wrapper:
-            "/bio/snpsift/varType"
+            "bio/snpsift/varType"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

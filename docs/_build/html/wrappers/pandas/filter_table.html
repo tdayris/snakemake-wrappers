@@ -141,6 +141,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../epic.html">EPIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../facets.html">FACETS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastp.html">FASTP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastqc.html">FASTQC</a></li>
@@ -177,6 +178,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
@@ -207,6 +209,7 @@
 <li class="toctree-l3"><a class="reference internal" href="variant_density.html">VARIANT DENSITY</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../pandora.html">PANDORA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pbmm2.html">PBMM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pcaExplorer.html">PCAEXPLORER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pear.html">PEAR</a></li>
@@ -344,6 +347,7 @@
   <div class="section" id="filter-table">
 <span id="bio-pandas-filter-table"></span><h1>FILTER TABLE<a class="headerlink" href="#filter-table" title="Permalink to this headline">¶</a></h1>
 <p>Filter your TSV file with pandas</p>
+<p><strong>URL</strong>:</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -358,11 +362,11 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;filter.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/pandas/filter_table&quot;</span>
+        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/pandas/filter_table&quot;</span>
 </pre></div>
 </div>
-<p>Note that input, output and log file paths can be chosen freely.
-When running with</p>
+<p>Note that input, output and log file paths can be chosen freely.</p>
+<p>When running with</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
 </pre></div>
 </div>
@@ -450,7 +454,7 @@ When running with</p>
 <span class="sd">    Apply filters on whole lines</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">local_operator</span> <span class="o">=</span> <span class="n">ops</span><span class="p">[</span><span class="n">local_operator</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">local_operator</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">local_operator</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
 
 
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
@@ -508,7 +512,7 @@ When running with</p>
 
 
 <span class="k">if</span> <span class="p">(</span><span class="n">filters</span> <span class="o">:=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;full_line_filters&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applying the following filter on whole lines: </span><span class="si">{</span><span class="n">filters</span><span class="si">}</span><span class="s2">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applying the following filter on whole lines: </span><span class="si">{</span><span class="n">filters</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">filter_full_lines</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dopy</span><span class="p">,</span> <span class="o">*</span><span class="nb">filter</span><span class="p">)</span>
 
@@ -542,10 +546,14 @@ When running with</p>
 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Head of the final DataFrame:</span><span class="se">\n</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
+<span class="k">if</span> <span class="p">(</span><span class="s2">&quot;set_index&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+    <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+         <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;set_index&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
 <span class="n">data</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
     <span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;table&quot;</span><span class="p">],</span>
     <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">,</span>
-    <span class="n">index</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;keep_index&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>

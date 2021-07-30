@@ -121,7 +121,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/EaCoN/{sample}/cytoscan_process.log"
         wrapper:
-            "/bio/eacon/cytoscan_process"
+            "bio/eacon/cytoscan_process"
 
 
     rule eacon_install:
@@ -144,7 +144,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/EaCoN/install.log"
         wrapper:
-            "/bio/eacon/install"
+            "bio/eacon/install"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

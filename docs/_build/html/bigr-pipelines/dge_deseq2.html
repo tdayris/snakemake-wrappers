@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>SALMON_QUANT &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+  <title>DGE_DESEQ2 &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
   
 
   
@@ -105,7 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="celltype_deconvolution_rnaseq.html">CELLTYPE_DECONVOLUTION_RNASEQ (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">SALMON_QUANT</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">DGE_DESEQ2</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
@@ -118,7 +118,9 @@
 <li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_calling_germline_wes.html">VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_somatic.html">VARIANT_CALLING_SOMATIC (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_callling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
 </ul>
 </li>
@@ -172,7 +174,7 @@
         
           <li><a href="../pipelines.html">BiGR Pipelines</a> &raquo;</li>
         
-      <li>SALMON_QUANT</li>
+      <li>DGE_DESEQ2</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -191,8 +193,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="salmon-quant">
-<span id="id1"></span><h1>SALMON_QUANT<a class="headerlink" href="#salmon-quant" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="dge-deseq2">
+<span id="id1"></span><h1>DGE_DESEQ2<a class="headerlink" href="#dge-deseq2" title="Permalink to this headline">¶</a></h1>
 <p>Perform trimming and quantification on RNASeq</p>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
@@ -218,6 +220,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 <p><strong>Input:</strong></p>
 <ul class="simple">
 <li><p>Fastq files</p></li>
+<li><p>Fasta-formatted Genome sequence</p></li>
+<li><p>Fasta-formatted transcriptome sequence</p></li>
+<li><p>GTF formatted genome annotation</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
@@ -271,7 +276,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 
 <span class="kn">import</span> <span class="nn">sys</span>
 
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/&quot;</span><span class="p">)</span>
+<span class="n">worflow_source_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">get_sources</span><span class="p">())))</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">common</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;../common/python&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">common</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">dataframes</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">file_manager</span> <span class="kn">import</span> <span class="o">*</span>
@@ -291,9 +298,38 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
 <span class="p">)</span>
 
-<span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/dge_deseq2/config.hg38.yaml&quot;</span><span class="p">)</span>
+<span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;config.hg38.yaml&quot;</span><span class="p">)</span>
 <span class="n">configfile</span><span class="p">:</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
-<span class="n">design</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;design.tsv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">design</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;design.tsv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+        <span class="sd">&quot;&quot;&quot;A design file is required for this pipeline. It is a TSV with</span>
+<span class="sd">        the following columns:</span>
+
+<span class="sd">        1. Sample_id (case matters): Name of your sample, unique and composed</span>
+<span class="sd">           with a least 1 letter (no sample should have numerical names only,</span>
+<span class="sd">           it would make R fail while parsing sample names with DESeq2)</span>
+<span class="sd">        2. Upstream_file (case matters): Path to the file, it can be</span>
+<span class="sd">           an absolute path, a relative path, or a iRODS url.</span>
+<span class="sd">        3. Downstream_file (case matters): Path to the file, it can be</span>
+<span class="sd">           an absolute path, a relative path, or a iRODS url.</span>
+<span class="sd">        4. XXXX: A name of your choice, unique and understandable. It will be</span>
+<span class="sd">           used as comparison name within DESeq2 and graphs. It contains levels</span>
+<span class="sd">           for each single sample. Do not use only integers or floats for your</span>
+<span class="sd">           level name: R and DESeq2 behaves stangely with them.</span>
+<span class="sd">        5. YYYY: A name of your choice, unique and understandable. It will be</span>
+<span class="sd">           used as comparison name within DESeq2 and graphs. It contains levels</span>
+<span class="sd">           for each single sample. Do not use only integers or floats for your</span>
+<span class="sd">           level name: R and DESeq2 behaves stangely with them.</span>
+<span class="sd">        Etc, etc. You can have any other condition name. Name them as you want,</span>
+<span class="sd">        these names must be unique and understandable. It will be used as</span>
+<span class="sd">        comparison name within DESeq2 and graphs. It contains levels for each</span>
+<span class="sd">        single sample. Do not use only integers or floats for your level name:</span>
+<span class="sd">        R and DESeq2 behaves stangely with them.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="p">)</span>
 
 <span class="n">fastq_links</span> <span class="o">=</span> <span class="n">link_fq</span><span class="p">(</span>
     <span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
@@ -301,12 +337,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">design</span><span class="o">.</span><span class="n">Downstream_file</span>
 <span class="p">)</span>
 
-<span class="n">ruleorder</span><span class="p">:</span> <span class="n">salmon_meta_salmon_quant_paired</span> <span class="o">&gt;</span> <span class="n">salmon_quant_paired</span>
-<span class="n">ruleorder</span><span class="p">:</span> <span class="n">deseq2_post_process_multiqc</span> <span class="o">&gt;</span> <span class="n">multiqc</span>
-
 <span class="c1"># A list that holds all comparisons expected for this snakemake pipeline</span>
 <span class="n">comparison_levels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">yield_comps</span><span class="p">(</span>
-    <span class="n">complete_design</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+    <span class="n">complete_design</span><span class="o">=</span><span class="n">design</span><span class="p">,</span>
     <span class="n">aggregate</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;design&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;aggregate_col&quot;</span><span class="p">),</span>
     <span class="n">remove</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;design&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;remove_col&quot;</span><span class="p">)</span>
 <span class="p">))</span>
@@ -347,9 +380,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 
 <span class="n">wildcard_constraints</span><span class="p">:</span>
     <span class="n">comparison</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_prefixes</span><span class="p">),</span>
-    <span class="n">factor</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comparison_levels</span><span class="p">]),</span>
-    <span class="n">test</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comparison_levels</span><span class="p">]),</span>
-    <span class="n">ref</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comparison_levels</span><span class="p">]),</span>
+    <span class="n">factor</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comparison_levels</span><span class="p">])),</span>
+    <span class="n">test</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comparison_levels</span><span class="p">])),</span>
+    <span class="n">ref</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comparison_levels</span><span class="p">])),</span>
     <span class="n">axes</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;ax_1_ax_2&quot;</span><span class="p">,</span> <span class="s2">&quot;ax_2_ax_3&quot;</span><span class="p">,</span> <span class="s2">&quot;ax_3_ax_4&quot;</span><span class="p">]),</span>
     <span class="n">elipse</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;with_elipse&quot;</span><span class="p">,</span> <span class="s2">&quot;without_elipse&quot;</span><span class="p">])</span>
 
@@ -361,7 +394,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 <span class="n">rule</span> <span class="n">target</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">multiqc</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.</span><span class="si">{comparison}</span><span class="s2">.html&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;reports/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.</span><span class="si">{comparison}</span><span class="s2">.html&quot;</span><span class="p">,</span>
             <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span>
         <span class="p">),</span>
         <span class="n">deseq2_wald</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
@@ -370,8 +403,8 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
         <span class="p">),</span>
         <span class="n">pcas</span><span class="o">=</span><span class="n">expected_pcas</span><span class="p">,</span>
         <span class="n">general_pcas</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{factor}</span><span class="s2">.</span><span class="si">{axes}</span><span class="s2">.png&quot;</span><span class="p">,</span>
-            <span class="n">factor</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{factor}</span><span class="s2">_</span><span class="si">{axes}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+            <span class="n">factor</span><span class="o">=</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comparison_levels</span><span class="p">],</span>
             <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PC1_PC2&quot;</span><span class="p">,</span> <span class="s2">&quot;PC2_PC1&quot;</span><span class="p">]</span>
         <span class="p">)</span>
 
@@ -383,10 +416,10 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 
 <span class="n">rule</span> <span class="n">general_pca</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">counts</span><span class="o">=</span><span class="s2">&quot;salmon/pseudo_mapping/aggregation/TPM.genes.tsv&quot;</span>
+        <span class="n">counts</span><span class="o">=</span><span class="s2">&quot;salmon/TPM.genes.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">png</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{factor}</span><span class="s2">.</span><span class="si">{axes}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{factor}</span><span class="s2">_</span><span class="si">{axes}</span><span class="s2">.png&quot;</span><span class="p">,</span>
             <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PC1_PC2&quot;</span><span class="p">,</span> <span class="s2">&quot;PC2_PC1&quot;</span><span class="p">],</span>
             <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
@@ -401,33 +434,35 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">params</span><span class="p">:</span>
         <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
         <span class="n">conditions</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="nb">zip</span><span class="p">(</span><span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">design</span><span class="p">[</span><span class="s2">&quot;factor&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">design</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">factor</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
         <span class="p">),</span>
-        <span class="n">prefix</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span><span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{factor}</span><span class="s2">&quot;</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/seaborn/pca&quot;</span>
+        <span class="s2">&quot;bio/seaborn/pca&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">pandas_merge_salmon_tr</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">quant</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="p">),</span>
-        <span class="n">tx2gene</span> <span class="o">=</span> <span class="s2">&quot;tx2gene.tsv&quot;</span>
+        <span class="n">tx2gene</span> <span class="o">=</span> <span class="s2">&quot;tximport/transcripts2genes.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;table_tr_pos.tsv&quot;</span>
+        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;salmon/TPM.</span><span class="si">{content}</span><span class="s2">.tsv&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Testing pandas merge salmon&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">header</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">position</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">gencode</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-
+        <span class="n">gencode</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">drop_na</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">dro_null</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">wildcards</span><span class="o">.</span><span class="n">content</span> <span class="o">==</span> <span class="s2">&quot;genes&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/pandas_merge_salmon.log&quot;</span>
+        <span class="s2">&quot;logs/pandas_merge_salmon/</span><span class="si">{content}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/pandas/salmon&quot;</span>
+        <span class="s2">&quot;bio/pandas/salmon&quot;</span>
 
 
 <span class="c1">##############################</span>
@@ -447,34 +482,49 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">config</span><span class="p">:</span> <span class="n">deseq2_post_process_config</span>
 
 
-<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">deseq2_post_process</span> <span class="k">as</span> <span class="n">deseq2_post_process_</span><span class="o">*</span>
-
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">deseq2_post_process</span> <span class="k">as</span> <span class="o">*</span>
 
 <span class="n">use</span> <span class="n">rule</span> <span class="n">multiqc</span> <span class="kn">from</span> <span class="nn">deseq2_post_process</span> <span class="k">with</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">txt</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+        <span class="n">txt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.txt&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
             <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">]</span>
         <span class="p">),</span>
-        <span class="n">png</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+        <span class="n">png</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.png&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
             <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">]</span>
         <span class="p">),</span>
-        <span class="n">salmon</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{</span><span class="n">sample</span><span class="si">}</span><span class="s2">/quant.sf&quot;</span>
-            <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
-        <span class="p">],</span>
-        <span class="n">html</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;fastp/html/pe/</span><span class="si">{</span><span class="n">sample</span><span class="si">}</span><span class="s2">.fastp.html&quot;</span>
-            <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
-        <span class="p">],</span>
-        <span class="n">json</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;fastp/json/pe/</span><span class="si">{</span><span class="n">sample</span><span class="si">}</span><span class="s2">.fastp.json&quot;</span>
-            <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
-        <span class="p">],</span>
-        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/multiqc_config.yaml&quot;</span>
+        <span class="n">salmon</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">json</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/multiqc_config.yaml&quot;</span><span class="p">,</span>
+        <span class="n">fqscreen</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">],</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">additional_plots</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="c1">#temp(&quot;pairwise_scatterplot_mqc.png&quot;),</span>
+            <span class="c1">#temp(&quot;clustermap_sample_mqc.png&quot;),</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/pca_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/volcanoplot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_expr_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/ma_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="c1">#temp(&quot;multiqc/{comparison}/clustermap_sample_mqc.png&quot;),</span>
+            <span class="c1">#temp(&quot;pca_axes_correlation_mqc.png&quot;)</span>
+        <span class="p">]</span>
 
 
 <span class="c1">###########################</span>
@@ -517,7 +567,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">config</span><span class="p">:</span> <span class="n">salmon_config</span>
 
 
-<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">salmon_meta</span> <span class="k">as</span> <span class="n">salmon_meta_</span><span class="o">*</span>
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">salmon_meta</span> <span class="k">as</span> <span class="o">*</span>
 
 
 <span class="n">use</span> <span class="n">rule</span> <span class="n">salmon_quant_paired</span> <span class="kn">from</span> <span class="nn">salmon_meta</span> <span class="k">with</span><span class="p">:</span>
@@ -555,7 +605,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/fastq_screen&quot;</span>
+        <span class="s2">&quot;bio/fastq_screen&quot;</span>
 
 
 <span class="c1">############################</span>
@@ -588,7 +638,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/fastp/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/fastp&quot;</span>
+        <span class="s2">&quot;bio/fastp&quot;</span>
 
 
 <span class="c1">#################################################</span>
@@ -609,7 +659,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bigr_copy/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/BiGR/copy&quot;</span>
+        <span class="s2">&quot;bio/BiGR/copy&quot;</span>
 </pre></div>
 </div>
 </div>

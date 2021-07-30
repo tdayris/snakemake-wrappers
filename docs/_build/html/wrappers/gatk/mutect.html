@@ -141,6 +141,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../epic.html">EPIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../facets.html">FACETS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastp.html">FASTP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastqc.html">FASTQC</a></li>
@@ -158,6 +159,7 @@
 <li class="toctree-l3"><a class="reference internal" href="cleansam.html">GATK CLEANSAM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="colectsequencingartifacts.html">GATK COLLECTSEQUENCINGARTIFACTMETRICS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="combinegvcfs.html">GATK COMBINEGVCFS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="createsomaticpanelofnormals.html">GATK CREATESOMATICPANELOFNORMALS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="estimatelibrarycomplexity.html">GATK ESTIMATELIBRARYCOMPLEXITY</a></li>
 <li class="toctree-l3"><a class="reference internal" href="filtermutectcalls.html">GATK FILTERMUTECTCALLS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="genomicsdbimport.html">GATK GENOMICSDBIMPORT</a></li>
@@ -212,6 +214,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
@@ -222,6 +225,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pandas.html">PANDAS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pandora.html">PANDORA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pbmm2.html">PBMM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pcaExplorer.html">PCAEXPLORER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pear.html">PEAR</a></li>
@@ -359,6 +363,7 @@
   <div class="section" id="gatk-mutect2">
 <span id="bio-gatk-mutect"></span><h1>GATK MUTECT2<a class="headerlink" href="#gatk-mutect2" title="Permalink to this headline">¶</a></h1>
 <p>Call somatic SNVs and indels via local assembly of haplotypes</p>
+<p><strong>URL</strong>:</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -381,7 +386,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/mutect_</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-         <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/gatk/mutect&quot;</span>
+         <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/gatk/mutect&quot;</span>
 
 <span class="n">rule</span> <span class="n">mutect2_bam</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
@@ -403,11 +408,11 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/mutect_</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-         <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/gatk/mutect&quot;</span>
+         <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/gatk/mutect&quot;</span>
 </pre></div>
 </div>
-<p>Note that input, output and log file paths can be chosen freely.
-When running with</p>
+<p>Note that input, output and log file paths can be chosen freely.</p>
+<p>When running with</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
 </pre></div>
 </div>
@@ -479,6 +484,10 @@ When running with</p>
 <span class="n">tumor</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 <span class="k">if</span> <span class="s2">&quot;tumor&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
     <span class="n">tumor</span> <span class="o">=</span> <span class="s2">&quot;--input </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;tumor&quot;</span><span class="p">])</span>
+
+<span class="n">pon</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="s2">&quot;pon&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">pon</span> <span class="o">=</span> <span class="s2">&quot;--panel-of-normals </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;pon&quot;</span><span class="p">])</span>
 
 <span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">java_opts</span> <span class="o">=</span> <span class="n">get_java_opts</span><span class="p">(</span><span class="n">snakemake</span><span class="p">)</span>

@@ -36,11 +36,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=1536,
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
         log:
             "logs/samtools/sort/{sample}.log"
         wrapper:
-            "/bio/samtools/index"
+            "bio/samtools/index"
 
 
     """
@@ -57,14 +58,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: config.get("threads", 20)
         resources:
             mem_mb=lambda wildcards, threads: threads * 1792,
-            time_min=lambda wildcards, attempt: attempt * 90
+            time_min=lambda wildcards, attempt: attempt * 90,
+            tmpdir="tmp"
         log:
             "logs/samtools/query_sort_{sample}.log"
         params:
             extra = "-m 1536M",
             tmp_dir = "samtools/fixmate/{sample}.tmp"
         wrapper:
-            "/bio/samtools/sort"
+            "bio/samtools/sort"
 
 
     """
@@ -84,13 +86,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
             ),
             time_min = (
                 lambda wildcards, attempt: min(attempt * 45, 180)
-            )
+            ),
+            tmpdir="tmp"
         params:
             config.get("fixmate_extra", "-cmr")
         log:
             "logs/samtools/fixmate/{sample}.log"
         wrapper:
-            "/bio/samtools/fixmate"
+            "bio/samtools/fixmate"
 
 
     """
@@ -112,9 +115,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: config.get("threads", 20)
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 6144 + 61440,
-            time_min=lambda wildcards, attempt: attempt * 120
+            time_min=lambda wildcards, attempt: attempt * 120,
+            tmpdir="tmp"
         params:
-            index="bwa_mem2/index/genome",
+            index=lambda wildcards, input: os.path.splitext(input["index"][0])[0],
             extra=r"-R '@RG\tID:{sample}\tSM:{sample}\tPU:{sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
             sort="samtools",         # We chose Samtools to sort by queryname
             sort_order="queryname",  # Queryname sort is needed for a fixmate
@@ -122,7 +126,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/bwa_mem2/mem/{sample}.log"
         wrapper:
-            "/bio/bwa-mem2/mem"
+            "bio/bwa-mem2/mem"
 
 
     """
@@ -142,13 +146,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 6144 + 66560,
-            time_min=lambda wildcards, attempt: attempt * 120
+            time_min=lambda wildcards, attempt: attempt * 120,
+            tmpdir="tmp"
         params:
-            prefix="bwa_mem2/index/genome"
+            prefix=lambda wildcards, output: os.path.splitext(output[0])[0]
         log:
             "logs/bwa_mem2/index/genome.log"
         wrapper:
-            "/bio/bwa-mem2/index"
+            "bio/bwa-mem2/index"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

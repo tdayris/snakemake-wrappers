@@ -132,11 +132,11 @@ The pipeline contains the following steps:
     rule default_oncoscan_process_all:
         input:
             # EaCoN models
-            ascn = expand(
-                os.sep.join(["{sample}", config["params"]["segmenter"],
-                             "ASCN", "{sample}.gammaEval.png"]),
-                sample=config["samples"]
-            ),
+            #ascn = expand(
+            #    os.sep.join(["{sample}", config["params"]["segmenter"],
+            #                 "ASCN", "{sample}.gammaEval.png"]),
+            #    sample=config["samples"]
+            #),
             # EaCoN annotate
             html = expand(
                 os.path.sep.join([
@@ -164,7 +164,7 @@ The pipeline contains the following steps:
 
     rule eacon_oncoscan_process:
         input:
-            install = 'install.ok',
+            #install = 'install.ok',
             ATChannelCel = "{sample}_A.CEL",
             GCChannelCel = "{sample}_C.CEL"
         output:
@@ -197,7 +197,7 @@ The pipeline contains the following steps:
         log:
             "logs/EaCoN/{sample}/oncoscan_process.log"
         wrapper:
-            "/bio/eacon/oncoscan_process"
+            "bio/eacon/oncoscan_process"
 
 
     rule eacon_install:
@@ -215,7 +215,7 @@ The pipeline contains the following steps:
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/rcnorm_0.1.5.tar.gz"
             ],
             git_packages = [
-                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.75.0-772-g3f7df6e90.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.77.0-840-gff109e8d3.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_Chromosomes.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.cytoscan.2.4.0.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.oncoscan.2.4.0.tar.gz"
@@ -230,7 +230,7 @@ The pipeline contains the following steps:
         log:
             "logs/EaCoN/install.log"
         wrapper:
-            "/bio/eacon/install_local"
+            "bio/eacon/install_local"
 
 
 

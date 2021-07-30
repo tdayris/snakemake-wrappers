@@ -38,13 +38,57 @@ Input/Output
 * VCF files
   
  
+  
+* Cosmic database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)
+  
+ 
+  
+* dbSNP database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)
+  
+ 
+  
+* MSigDB database formatted as GMT (already provided for IGR Flamingo users)
+  
+ 
+  
+* GWASCatalog database formatted as TSV (already provided for IGR Flamingo users)
+  
+ 
+  
+* Kaviar database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)
+  
+ 
+  
+* SnpEff database downloaded with SnpEff itself (already provided for IGR Flamingo users)
+  
+ 
+  
+* CaptureKit genomic intervals formatted as BED (already provided for IGR Flamingo users)
+  
+ 
+  
+* Known variants from dbSNP, with only AF within the INFO field for GATK (already provided for IGR Flamingo users)
+  
+ 
+  
+* dbNSFP database formatted as TSV (already provided for IGR Flamingo users)
+  
+ 
+  
+* FastQ Screen databases (already provided for IGR Flamingo users)
+  
+ 
 
 
 **Output:**
 
  
   
-* Annotated VCF file
+* Annotated VCF files
+  
+ 
+  
+* MultiQC Report
   
  
 
@@ -101,8 +145,6 @@ Please refer to each wrapper in above list for additional configuration paramete
 Notes
 -----
 
-The only difference with a classic WES pipeline is the absence of duplicates removal.
-
 Prerequisites:
 
 * A TSV formatted design file, *named 'design.tsv'* with the following columns:
@@ -139,14 +181,16 @@ The pipeline contains the following steps:
     import os
     import pandas
     import sys
+    from pathlib import Path
 
-    sys.path.append("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/python/")
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../common/python")
+    sys.path.append(common)
 
     from file_manager import *
-    from files_linker import link_fq
-    from write_yaml import read_yaml
-    from pathlib import Path
-    from messages import CustomFormatter
+    from files_linker import *
+    from write_yaml import *
+    from messages import *
     from snakemake.utils import min_version
     min_version("6.0")
 
@@ -161,7 +205,7 @@ The pipeline contains the following steps:
     ruleorder: bwa_mem > bwa_fixmate_meta_bwa_mem
 
 
-    default_config = read_yaml("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/config.hg38.yaml")
+    default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
     configfile: get_config(default_config)
     design = get_design(os.getcwd(), search_fastq_pairs)
 
@@ -228,7 +272,7 @@ The pipeline contains the following steps:
         log:
             "logs/multiqc.log"
         wrapper:
-            "/bio/multiqc"
+            "bio/multiqc"
 
 
     rule alignment_summary:
@@ -253,7 +297,7 @@ The pipeline contains the following steps:
             "METRIC_ACCUMULATION_LEVEL=null "
             "METRIC_ACCUMULATION_LEVEL=SAMPLE"
         wrapper:
-            "/bio/picard/collectalignmentsummarymetrics"
+            "bio/picard/collectalignmentsummarymetrics"
 
 
     rule fastq_screen:
@@ -275,7 +319,7 @@ The pipeline contains the following steps:
         log:
             "logs/fastqc/{sample}.{stream}.log"
         wrapper:
-            "/bio/fastq_screen"
+            "bio/fastq_screen"
 
 
     #################################
@@ -466,7 +510,7 @@ The pipeline contains the following steps:
         log:
             "logs/fastp/{sample}.log"
         wrapper:
-            "/bio/fastp"
+            "bio/fastp"
 
 
     #################################################
@@ -487,7 +531,7 @@ The pipeline contains the following steps:
         log:
             "logs/bigr_copy/{sample}.{stream}.log"
         wrapper:
-            "/bio/BiGR/copy"
+            "bio/BiGR/copy"
 
 
 

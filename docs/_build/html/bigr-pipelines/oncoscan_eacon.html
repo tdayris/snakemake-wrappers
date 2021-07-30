@@ -105,7 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="celltype_deconvolution_rnaseq.html">CELLTYPE_DECONVOLUTION_RNASEQ (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dge_deseq2.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dge_deseq2.html">DGE_DESEQ2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">EACON_ONCOSCAN</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
@@ -118,7 +118,9 @@
 <li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_calling_germline_wes.html">VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_somatic.html">VARIANT_CALLING_SOMATIC (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_callling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
 </ul>
 </li>
@@ -287,11 +289,11 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/run.
 <span class="n">rule</span> <span class="n">default_oncoscan_process_all</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="c1"># EaCoN models</span>
-        <span class="n">ascn</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;segmenter&quot;</span><span class="p">],</span>
-                         <span class="s2">&quot;ASCN&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">.gammaEval.png&quot;</span><span class="p">]),</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">]</span>
-        <span class="p">),</span>
+        <span class="c1">#ascn = expand(</span>
+        <span class="c1">#    os.sep.join([&quot;{sample}&quot;, config[&quot;params&quot;][&quot;segmenter&quot;],</span>
+        <span class="c1">#                 &quot;ASCN&quot;, &quot;{sample}.gammaEval.png&quot;]),</span>
+        <span class="c1">#    sample=config[&quot;samples&quot;]</span>
+        <span class="c1">#),</span>
         <span class="c1"># EaCoN annotate</span>
         <span class="n">html</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
@@ -319,7 +321,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/run.
 
 <span class="n">rule</span> <span class="n">eacon_oncoscan_process</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">install</span> <span class="o">=</span> <span class="s1">&#39;install.ok&#39;</span><span class="p">,</span>
+        <span class="c1">#install = &#39;install.ok&#39;,</span>
         <span class="n">ATChannelCel</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">_A.CEL&quot;</span><span class="p">,</span>
         <span class="n">GCChannelCel</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">_C.CEL&quot;</span>
     <span class="n">output</span><span class="p">:</span>
@@ -352,7 +354,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/run.
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/EaCoN/</span><span class="si">{sample}</span><span class="s2">/oncoscan_process.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/eacon/oncoscan_process&quot;</span>
+        <span class="s2">&quot;bio/eacon/oncoscan_process&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">eacon_install</span><span class="p">:</span>
@@ -370,7 +372,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/run.
             <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/rcnorm_0.1.5.tar.gz&quot;</span>
         <span class="p">],</span>
         <span class="n">git_packages</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.75.0-772-g3f7df6e90.tar.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.77.0-840-gff109e8d3.tar.gz&quot;</span><span class="p">,</span>
             <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_Chromosomes.tar.gz&quot;</span><span class="p">,</span>
             <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.cytoscan.2.4.0.tar.gz&quot;</span><span class="p">,</span>
             <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.oncoscan.2.4.0.tar.gz&quot;</span>
@@ -385,7 +387,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/run.
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/EaCoN/install.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;/bio/eacon/install_local&quot;</span>
+        <span class="s2">&quot;bio/eacon/install_local&quot;</span>
 </pre></div>
 </div>
 </div>

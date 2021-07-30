@@ -141,6 +141,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../epic.html">EPIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../facets.html">FACETS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastp.html">FASTP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastqc.html">FASTQC</a></li>
@@ -192,6 +193,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
@@ -202,6 +204,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pandas.html">PANDAS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pandora.html">PANDORA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pbmm2.html">PBMM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pcaExplorer.html">PCAEXPLORER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pear.html">PEAR</a></li>
@@ -339,6 +342,7 @@
   <div class="section" id="cibersort">
 <span id="bio-immunedeconv-cibersort"></span><h1>CIBERSORT<a class="headerlink" href="#cibersort" title="Permalink to this headline">¶</a></h1>
 <p>Use Cibersort to deconvolute gene expression onto cell types</p>
+<p><strong>URL</strong>:</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -354,11 +358,11 @@
         <span class="n">cibersort_binary</span><span class="o">=</span><span class="s2">&quot;/path/to/cibersort/non/free&quot;</span><span class="p">,</span>
         <span class="n">cibersort_mat</span><span class="o">=</span><span class="s2">&quot;/path/to/celltypes.mat&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/immunedeconv/cibersort&quot;</span>
+        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/immunedeconv/cibersort&quot;</span>
 </pre></div>
 </div>
-<p>Note that input, output and log file paths can be chosen freely.
-When running with</p>
+<p>Note that input, output and log file paths can be chosen freely.</p>
+<p>When running with</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
 </pre></div>
 </div>
@@ -372,9 +376,9 @@ When running with</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">conda-forge::r-tidyr==1.1.3</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">conda-forge::r-tibble==3.1.2</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">bioconda::r-immunedeconv==2.0.3</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge::r-readr==1.4.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge::r-readr-r41h03ef668_0==1.4.0</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">conda-forge::r-rcolorbrewer==1.1_2</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge::r-randomcolor==1.1.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge::r-randomcolor==1.1.0.1</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="input-output">
@@ -400,6 +404,17 @@ When running with</p>
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="c1">#!/usr/bin/R</span>
 
+<span class="c1"># __author__ = &quot;Thibault Dayris&quot;</span>
+<span class="c1"># __copyright__ = &quot;Copyright 2021, Thibault Dayris&quot;</span>
+<span class="c1"># __email__ = &quot;thibault.dayris@gustaveroussy.fr&quot;</span>
+<span class="c1"># __license__ = &quot;MIT&quot;</span>
+
+<span class="c1"># Sink the stderr and stdout to the snakemake log file</span>
+<span class="c1"># https://stackoverflow.com/a/48173272</span>
+<span class="n">log.file</span><span class="o">&lt;-</span><span class="nf">file</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">log</span><span class="p">[[</span><span class="m">1</span><span class="p">]],</span><span class="n">open</span><span class="o">=</span><span class="s">&quot;wt&quot;</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">log.file</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">log.file</span><span class="p">,</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;message&quot;</span><span class="p">);</span>
+
 <span class="c1"># Load libraries</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="s">&quot;dplyr&quot;</span><span class="p">,</span> <span class="n">quietly</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">);</span>
 <span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="s">&quot;tidyr&quot;</span><span class="p">,</span> <span class="n">quietly</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">);</span>
@@ -413,18 +428,18 @@ When running with</p>
 
 <span class="c1"># Load dataset</span>
 <span class="n">tpm</span> <span class="o">&lt;-</span> <span class="n">utils</span><span class="o">::</span><span class="nf">read.table</span><span class="p">(</span>
-  <span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;expr_mat&quot;</span><span class="p">]],</span>
+  <span class="n">file</span> <span class="o">=</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;expr_mat&quot;</span><span class="p">]]),</span>
   <span class="n">header</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span>
   <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;\t&quot;</span><span class="p">,</span>
   <span class="n">stringsAsFactors</span> <span class="o">=</span> <span class="kc">FALSE</span>
 <span class="p">);</span>
 
-<span class="n">gene_col</span> <span class="o">&lt;-</span> <span class="s">&quot;GENE&quot;</span><span class="p">;</span>
+<span class="n">gene_col</span> <span class="o">&lt;-</span> <span class="s">&quot;Hugo_ID&quot;</span><span class="p">;</span>
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;gene_col&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
   <span class="n">gene_col</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;gene_col&quot;</span><span class="p">]]);</span>
 <span class="p">}</span>
 
-<span class="n">extra</span> <span class="o">&lt;-</span> <span class="s">&quot;method = &#39;cibersort&#39;, tumor = TRUE, column = &#39;gene_symbol&#39;&quot;</span><span class="p">;</span>
+<span class="n">extra</span> <span class="o">&lt;-</span> <span class="s">&quot;method = &#39;cibersort&#39;, tumor = TRUE, column = gene_symbol&quot;</span><span class="p">;</span>
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;extra&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
   <span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;extra&quot;</span><span class="p">]]);</span>
 <span class="p">}</span>
@@ -579,6 +594,11 @@ When running with</p>
     <span class="nf">dev.off</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
+
+<span class="c1"># Proper syntax to close the connection for the log file</span>
+<span class="c1"># but could be optional for Snakemake wrapper</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;message&quot;</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>

@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="SEQTK-SUBSAMPLE-SE" href="se.html" />
-    <link rel="prev" title="SEQTK" href="../../seqtk.html" /> 
+    <link rel="prev" title="SEQTK MERGEPE" href="../mergepe.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -141,6 +141,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../epic.html">EPIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../facets.html">FACETS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../fastp.html">FASTP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../fastq_screen.html">FASTQ_SCREEN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../fastqc.html">FASTQC</a></li>
@@ -177,6 +178,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../mlst.html">MLST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../multiqc.html">MULTIQC</a></li>
@@ -187,6 +189,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../optitype.html">OPTITYPE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../paladin.html">PALADIN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../pandas.html">PANDAS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pandora.html">PANDORA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../pbmm2.html">PBMM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../pcaExplorer.html">PCAEXPLORER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../pear.html">PEAR</a></li>
@@ -215,10 +218,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../seaborn.html">SEABORN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../sed.html">SED</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../seqtk.html">SEQTK</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../mergepe.html">SEQTK MERGEPE</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">SEQTK-SUBSAMPLE-PE</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#params">Params</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
 </ul>
@@ -335,6 +340,7 @@
   <div class="section" id="seqtk-subsample-pe">
 <span id="bio-seqtk-subsample-pe"></span><h1>SEQTK-SUBSAMPLE-PE<a class="headerlink" href="#seqtk-subsample-pe" title="Permalink to this headline">¶</a></h1>
 <p>Subsample reads from paired FASTQ files</p>
+<p><strong>URL</strong>:</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -353,11 +359,11 @@
     <span class="n">threads</span><span class="p">:</span>
         <span class="mi">1</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/seqtk/subsample/pe&quot;</span>
+        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/seqtk/subsample/pe&quot;</span>
 </pre></div>
 </div>
-<p>Note that input, output and log file paths can be chosen freely.
-When running with</p>
+<p>Note that input, output and log file paths can be chosen freely.</p>
+<p>When running with</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
 </pre></div>
 </div>
@@ -379,6 +385,13 @@ When running with</p>
 <p><strong>Output:</strong></p>
 <ul class="simple">
 <li><p>subsampled paired fastq files (gzip compressed)</p></li>
+</ul>
+</div>
+<div class="section" id="params">
+<h2>Params<a class="headerlink" href="#params" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n</span></code>: number of reads after subsampling</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">seed</span></code>: seed to initialize a pseudorandom number generator</p></li>
 </ul>
 </div>
 <div class="section" id="authors">
@@ -432,7 +445,7 @@ When running with</p>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="se.html" class="btn btn-neutral float-right" title="SEQTK-SUBSAMPLE-SE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="../../seqtk.html" class="btn btn-neutral float-left" title="SEQTK" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../mergepe.html" class="btn btn-neutral float-left" title="SEQTK MERGEPE" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

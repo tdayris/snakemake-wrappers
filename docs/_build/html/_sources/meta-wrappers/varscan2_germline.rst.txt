@@ -13,6 +13,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 .. code-block:: python
 
+    import sys
+    from pathlib import Path
+
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../../../../bigr_pipelines/common/python")
+    sys.path.append(common)
+
+    from file_manager import *
+
     default_config_varscan2_germline = {
         # Your genome sequence
         "genome": "reference/genome.fasta",
@@ -26,19 +35,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
     except NameError:
         config = default_config_varscan2_germline
 
-    def get_fai(genome_path: str) -> str:
-        return genome_path + ".fai"
-
-    def get_bai(bam_path: str) -> str:
-        return bam_path + ".bai"
-
-    # # This module includes VCF compression and indexation
-    # module compress_index_vcf:
-    #     snakefile: "../../compress_index_vcf/test/Snakefile"
-    #     config: config
-    #
-    # use rule * from compress_index_vcf as compress_index_vcf_*
-
 
     """
     This rule calls snp/indel variants with Varscan2. Results are set to unzipped
@@ -51,17 +47,18 @@ This meta-wrapper can be used by integrating the following into your workflow:
             sample_list="varscan2/mpileup2cns/{sample}.sample.list"
         output:
             temp("varscan2/mpileup2cns/{sample}.vcf")
-        message: "Calling SNP on {wildcards.sample} with Varscan2"
+        message: "Calling SNP/Indel on {wildcards.sample} with Varscan2"
         threads: 2
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
         params:
             extra="--p-value 0.05 --variants"
         log:
             "logs/varscan/pileup2snp/call/{sample}.log"
         wrapper:
-            "/bio/varscan/mpileup2cns"
+            "bio/varscan/mpileup2cns"
 
 
     """
@@ -101,13 +98,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 2
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 4096, 20480),
-            time_min=lambda wildcards, attempt: attempt * 120
+            time_min=lambda wildcards, attempt: attempt * 120,
+            tmpdir="tmp"
         log:
             "logs/samtools/mpileup/{sample}.log"
         params:
             extra="--count-orphans --no-BAQ"
         wrapper:
-            "/bio/samtools/mpileup"
+            "bio/samtools/mpileup"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

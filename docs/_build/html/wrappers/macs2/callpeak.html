@@ -141,6 +141,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../epic.html">EPIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../facets.html">FACETS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastp.html">FASTP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fastqc.html">FASTQC</a></li>
@@ -187,6 +188,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mosdepth.html">MOSDEPTH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
@@ -197,6 +199,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pandas.html">PANDAS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pandora.html">PANDORA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pbmm2.html">PBMM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pcaExplorer.html">PCAEXPLORER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pear.html">PEAR</a></li>
@@ -362,12 +365,12 @@
 <p>location from the control sample</p>
 </td>
 <td><p>bedGraph</p></td>
-<td><p>–bdg or -B</p></td>
+<td><p>--bdg or -B</p></td>
 </tr>
 <tr class="row-even"><td><p>NAME_treat_pileup.bdg</p></td>
 <td><p>pileup signals from treatment sample</p></td>
 <td><p>bedGraph</p></td>
-<td><p>–bdg or -B</p></td>
+<td><p>--bdg or -B</p></td>
 </tr>
 <tr class="row-odd"><td><p>NAME_peaks.broadPeak</p></td>
 <td><p>similar to _peaks.narrowPeak file,</p>
@@ -375,30 +378,31 @@
 <p>summits</p>
 </td>
 <td><p>BED 6+3</p></td>
-<td><p>–broad</p></td>
+<td><p>--broad</p></td>
 </tr>
 <tr class="row-even"><td><p>NAME_peaks.gappedPeak</p></td>
 <td><p>contains the broad region and narrow</p>
 <p>peaks</p>
 </td>
 <td><p>BED 12+3</p></td>
-<td><p>–broad</p></td>
+<td><p>--broad</p></td>
 </tr>
 <tr class="row-odd"><td><p>NAME_peaks.narrowPeak</p></td>
 <td><p>contains the peak locations, peak</p>
 <p>summit, p-value and q-value</p>
 </td>
 <td><p>BED 6+4</p></td>
-<td><p>if not set –broad</p></td>
+<td><p>if not set --broad</p></td>
 </tr>
 <tr class="row-even"><td><p>NAME_summits.bed</p></td>
 <td><p>peak summits locations for every peak</p></td>
 <td><p>BED</p></td>
-<td><p>if not set –broad</p></td>
+<td><p>if not set --broad</p></td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
+<p><strong>URL</strong>:</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -421,7 +425,7 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="s2">&quot;-f BAM -g hs --nomodel&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/macs2/callpeak&quot;</span>
+        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/macs2/callpeak&quot;</span>
 
 <span class="n">rule</span> <span class="n">callpeak_options</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
@@ -446,11 +450,11 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="s2">&quot;-f BAM -g hs --broad-cutoff 0.1 --nomodel&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.75.0-772-g3f7df6e90/bio/macs2/callpeak&quot;</span>
+        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/macs2/callpeak&quot;</span>
 </pre></div>
 </div>
-<p>Note that input, output and log file paths can be chosen freely.
-When running with</p>
+<p>Note that input, output and log file paths can be chosen freely.</p>
+<p>When running with</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
 </pre></div>
 </div>

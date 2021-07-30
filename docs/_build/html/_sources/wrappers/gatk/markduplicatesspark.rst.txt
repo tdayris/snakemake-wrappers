@@ -6,6 +6,7 @@ GATK MARKDUPLICATESSPARK
 Spark implementation of Picard MarkDuplicates that allows the tool to be run in parallel on multiple cores on a local machine or multiple machines on a Spark cluster while still matching the output of the non-Spark Picard version of the tool. Since the tool requires holding all of the readnames in memory while it groups read information, machine configuration and starting sort-order impact tool performance.
 
 
+**URL**: 
 
 Example
 -------
@@ -26,15 +27,16 @@ This wrapper can be used in the following way:
             extra="--remove-sequencing-duplicates",  # optional
             java_opts="", # optional
             #spark_runner="",  # optional, local by default
-            #spark_0.75.0-772-g3f7df6e90="",  # optional
+            #spark_0.77.0-840-gff109e8d3="",  # optional
             #spark_extra="", # optional
         resources:
             mem_mb=1024
         threads: 8
         wrapper:
-            "0.75.0-772-g3f7df6e90/bio/gatk/markduplicatesspark"
+            "0.77.0-840-gff109e8d3/bio/gatk/markduplicatesspark"
 
 Note that input, output and log file paths can be chosen freely.
+
 When running with
 
 .. code-block:: bash
@@ -46,7 +48,7 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``gatk4==4.2.0.0``
+* ``gatk4=4.2``
 * ``snakemake-wrapper-utils==0.1.3``
 
 Input/Output
@@ -59,6 +61,7 @@ Input/Output
 **Output:**
 
 * bam file with marked or removed duplicates
+
 
 
 
@@ -89,6 +92,7 @@ Code
     __copyright__ = "Copyright 2021, Filipe G. Vieira"
     __license__ = "MIT"
 
+    import tempfile
 
     from snakemake.shell import shell
     from snakemake_wrapper_utils.java import get_java_opts
@@ -101,6 +105,8 @@ Code
     spark_extra = snakemake.params.get("spark_extra", "")
     java_opts = get_java_opts(snakemake)
 
+    tmpdir = tempfile.gettempdir()
+
     metrics = snakemake.output.get("metrics", "")
     if metrics:
         metrics = f"--metrics-file {metrics}"
@@ -111,6 +117,7 @@ Code
         "gatk --java-options '{java_opts}' MarkDuplicatesSpark "
         "{extra} "
         "--input {snakemake.input} "
+        "--tmp-dir {tmpdir} "
         "--output {snakemake.output.bam} "
         "{metrics} "
         "-- --spark-runner {spark_runner} --spark-master {spark_master} {spark_extra} "
