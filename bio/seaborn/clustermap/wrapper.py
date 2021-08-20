@@ -118,6 +118,8 @@ ax = seaborn.clustermap(
         if snakemake.params.get("col_condition_color", True) is True
         else None
     ),
+    method="average",
+    metric="euclidean",
     row_cluster=(snakemake.params.get("row_cluster", True) is True),
     col_cluster=(snakemake.params.get("col_cluster", True) is True),
     linewidths=0.5,
@@ -133,12 +135,12 @@ logging.info("Seaborn object build, modifying axes names")
 # Rotate sample id to make them readable
 matplotlib.pyplot.setp(
     ax.ax_heatmap.yaxis.get_majorticklabels(),
-    rotation=snakemake.params.get("ylabel_rotation", 90)
+    rotation=snakemake.params.get("ylabel_rotation", 0)
 )
 
 matplotlib.pyplot.setp(
     ax.ax_heatmap.xaxis.get_majorticklabels(),
-    rotation=snakemake.params.get("xlabel_rotation", 0)
+    rotation=snakemake.params.get("xlabel_rotation", 90)
 )
 
 # Save result
