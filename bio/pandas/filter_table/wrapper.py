@@ -124,7 +124,7 @@ if (dedup_cols := snakemake.params.get("drop_duplicates_on", None)) is not None:
     logging.debug(
         "Dropping duplicates on the following column(s): %s", str(dedup_cols)
     )
-    data.drop_duplicates(subset=dedup_cols, keep="first" inplace=True)
+    data.drop_duplicates(subset=dedup_cols, keep="first", inplace=True)
 
 
 if (new_index := snakemake.params.get("new_index_col", None)) is not None:
