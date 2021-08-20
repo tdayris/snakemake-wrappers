@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import pandas
@@ -63,10 +64,10 @@ rule all:
             status=["normal", "tumor"],
             ext=["", ".bai"]
         ),
-        # mutect2=expand(
-        #     "mutect2/filter/{sample}.vcf.gz",
-        #     sample=design["Sample_id"].tolist()
-        # ),
+        mutect2=expand(
+            "mutect2/filter/{sample}.vcf.gz",
+            sample=design["Sample_id"].tolist()
+        ),
         varscan2=expand(
             "varscan2/concat/{sample}.vcf.gz",
             sample=design["Sample_id"].tolist()
@@ -434,6 +435,39 @@ rule picard_markduplicates:
         "bio/picard/markduplicates"
 
 
+# rule picard_add_replace_group:
+#     input:
+#         "samtools/sort/{sample}_{status}.bam"
+#     output:
+#         temp("picard/groups/{sample}_{status}.bam")
+#     message:
+#         "Replacing groups within {wildcards.sample} with Picard"
+#         " ({wildcards.status})"
+#     threads: 1
+#     resources:
+#         mem_mb = (
+#             lambda wildcards, attempt: min(attempt * 2048 + 2048, 8192)
+#         ),
+#         time_min = (
+#             lambda wildcards, attempt: min(attempt * 60, 120)
+#         )
+#     log:
+#         "logs/picard/groups/{sample}_{status}.log"
+#     params:
+#         lambda wildcards: " ".join([
+#         "RGLB=standard",
+#         "RGPL=illumina",
+#         "RGPU={wildcards.sample}_{wildcards.status}",
+#         "RGSM={wildcards.sample}_{wildcards.status}",
+#         "RGCN=InstitutGustaveRoussy",
+#         "RGDS=WES",
+#         "SORT_ORDER=coordinate",
+#         "RGDT={}".format(str(datetime.date.today()))
+#     ])
+#     wrapper:
+#         "bio/picard/addorreplacereadgroups"
+
+
 ###################
 ### BWA MAPPING ###
 ###################
@@ -492,6 +526,12 @@ use rule bwa_mem from bwa_fixmate_meta with:
         temp("bwa_mem2/mem/{sample}_{status}.bam")
     message:
         "Mapping {wildcards.status} {wildcards.sample} with BWA"
+    params:
+        index=lambda wildcards, input: os.path.splitext(input["index"][0])[0],
+        extra=r"-R '@RG\tID:{sample}_{status}\tSM:{sample}_{status}\tPU:{sample}_{status}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
+        sort="samtools",         # We chose Samtools to sort by queryname
+        sort_order="queryname",  # Queryname sort is needed for a fixmate
+        sort_extra="-m 1536M"     # We extand the sort buffer memory
     log:
         "logs/bwa_mem2/mem/{sample}.{status}.log"
 
