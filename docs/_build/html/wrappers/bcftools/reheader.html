@@ -120,6 +120,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">BCFTOOLS REHEADER</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#params">Params</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
 </ul>
@@ -345,8 +348,8 @@
             
   <div class="section" id="bcftools-reheader">
 <span id="bio-bcftools-reheader"></span><h1>BCFTOOLS REHEADER<a class="headerlink" href="#bcftools-reheader" title="Permalink to this headline">¶</a></h1>
-<p>Change header or sample names of vcf/bcf file. For more information see <a class="reference external" href="https://www.htslib.org/doc/bcftools.html#reheader">BCFtools documentation</a>.</p>
-<p><strong>URL</strong>:</p>
+<p>Change header or sample names of vcf/bcf file.</p>
+<p><strong>URL</strong>: <a class="reference external" href="https://samtools.github.io/bcftools/bcftools.html#mpileup">https://samtools.github.io/bcftools/bcftools.html#mpileup</a></p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -363,7 +366,7 @@
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># optional parameters for bcftools reheader</span>
         <span class="n">view_extra</span><span class="o">=</span><span class="s2">&quot;-O b&quot;</span>  <span class="c1"># add output format for internal bcftools view call</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/bcftools/reheader&quot;</span>
+        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/bcftools/reheader&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -379,11 +382,34 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">bcftools==1.12</span></code></p></li>
 </ul>
 </div>
+<div class="section" id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">vcf</span></code>: Path to vcf file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">header</span></code>: Path to the new header (optional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">samples</span></code>: Path to the sample file (optional)</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>reheaded vcf, must be the only output file</p></li>
+</ul>
+</div>
+<div class="section" id="params">
+<h2>Params<a class="headerlink" href="#params" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">extra</span></code>: bcftools reheader optional parameters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">view_extra</span></code>: bcftools view optional parameters</p></li>
+</ul>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<p>This wrapper requires at least two threads: one for bcftools reheader, one for bcftools view.</p>
+</div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Jan Forster</p></li>
-<li><p>Thibault Dayris</p></li>
 </ul>
 </div>
 <div class="section" id="code">

@@ -6,7 +6,7 @@ PICARD MARKDUPLICATESWITHMATECIGAR
 Mark PCR and optical duplicates with picard tools, taking into account the CIGAR of the mate.
 
 
-**URL**: 
+**URL**: https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicatesWithMateCigar
 
 Example
 -------
@@ -28,7 +28,7 @@ This wrapper can be used in the following way:
         resources:
             mem_mb=1024
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/picard/markduplicateswithmatecigar"
+            "0.77.0-1034-gee6c61611/bio/picard/markduplicateswithmatecigar"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -50,11 +50,21 @@ Input/Output
 ------------
 **Input:**
 
-* bam file
+* bam file. This must be the only element of the input file list
 
 **Output:**
 
-* bam file with marked or removed duplicates
+* ``bam``: bam file with marked or removed duplicates
+* ``metrics``: Path to metrics file
+
+
+
+Params
+------
+
+* ``extra``: The `extra` param allows for additional program arguments.
+
+* ``java_opts``: The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-XX:ParallelGCThreads=10" (not for `-XmX` or `-Djava.io.tmpdir`, since they are handled automatically).
 
 
 
@@ -62,9 +72,7 @@ Input/Output
 Notes
 -----
 
-* The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-XX:ParallelGCThreads=10" (not for `-XmX` or `-Djava.io.tmpdir`, since they are handled automatically).
-* The `extra` param allows for additional program arguments.
-* For more information see, https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicatesWithMateCigar
+This tool/wrapper does not handle multithreading
 
 
 

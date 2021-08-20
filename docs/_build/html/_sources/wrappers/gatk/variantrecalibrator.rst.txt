@@ -6,7 +6,7 @@ GATK VARIANTRECALIBRATOR
 Run gatk VariantRecalibrator.
 
 
-**URL**: 
+**URL**: https://gatk.broadinstitute.org/hc/en-us/articles/360036351392-VariantRecalibrator
 
 Example
 -------
@@ -62,7 +62,7 @@ This wrapper can be used in the following way:
         resources:
             mem_mb=1024
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/gatk/haplotypecaller"
+            "0.77.0-1034-gee6c61611/bio/gatk/haplotypecaller"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -84,22 +84,30 @@ Input/Output
 ------------
 **Input:**
 
-* VCF file
+* ``vcf``: Path to VCF file
+* ``ref``: Path to reference genome
 
 **Output:**
 
-* .recal file
-* .tranches file
+* ``vcf``: Path to .recal file
+* ``tranches``: Path to .tranches file
 
 
 
+Params
+------
 
-Notes
------
+* ``annotation``: The names of the annotations in INFO fields which should used for calculations
 
-* The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
-* The `extra` param allows for additional program arguments.
-* For more information see, https://software.broadinstitute.org/gatk/documentation/article?id=11050
+* ``mode``: Recalibration mode to employ. One of ``SNP``, ``INDEL``, or ``BOTH``.
+
+* ``resources``: A list of sites for which to apply a prior probability of being correct
+
+* ``extra``: The `extra` param allows for additional program arguments.
+
+* ``java_opts``: The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
+
+
 
 
 

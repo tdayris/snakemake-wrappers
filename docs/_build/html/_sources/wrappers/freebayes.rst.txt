@@ -5,7 +5,7 @@ FREEBAYES
 
 Call small genomic variants with freebayes.
 
-**URL**: 
+**URL**: https://github.com/freebayes/freebayes
 
 Example
 -------
@@ -34,7 +34,7 @@ This wrapper can be used in the following way:
             normalize=False,  # flag to use bcftools norm to normalize indels
         threads: 2
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/freebayes"
+            "0.77.0-1034-gee6c61611/bio/freebayes"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -59,12 +59,26 @@ Input/Output
 ------------
 **Input:**
 
-* SAM/BAM/CRAM file(s)
-* reference genome
+* ``samples``: SAM/BAM/CRAM file(s)
+* ``ref``: reference genome
+* ``regions``: Optional BED regions
 
 **Output:**
 
-* VCF/VCF.gz/BCF file
+* VCF/VCF.gz/BCF file, this must be the first file in the output file list
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+* ``chunkzise``: The `chunkzise` param allows setting reference genome chunk size for parallelization (default 100000)
+
+* ``uncompressed_bcf``: The `uncompressed_bcf` param allows for uncompressed BCF output.
+
+* ``normalize``: The `normalize` param allows to use `bcftools norm` to normalize indels.
 
 
 
@@ -72,11 +86,13 @@ Input/Output
 Notes
 -----
 
-* The `extra` param allows for additional arguments for freebayes.
-* The `uncompressed_bcf`param allows for uncompressed BCF output.
-* The `normalize` param allows to use `bcftools norm` to normalize indels.
-* The `chunkzise` param allows setting reference genome chunk size for parallelization (default: 100000)
-* For more inforamtion see, https://github.com/freebayes/freebayes
+If a region bed is provided in input, this wrapper uses more threads than the number of threads declared in the snakefile.
+
+For X threads expected:
+
+* X is used in freebayes
+* 1 in bedtools intersect
+* 2 in piped sed commands
 
 
 

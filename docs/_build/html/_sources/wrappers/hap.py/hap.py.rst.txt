@@ -3,9 +3,9 @@
 HAP.PY
 ======
 
-Comparison of vcf files and calculating performance metrics following GA4GH defined best practices for benchmarking small variant call sets (Krusche, P. et al. 2019, https://doi.org/10.1038/s41587-019-0054-x). Part of the hap.py suite by Illumina (see https://github.com/Illumina/hap.py/blob/master/doc/normalisation.md).
+Comparison of vcf files and calculating performance metrics following GA4GH defined best practices for benchmarking small variant call sets
 
-**URL**: 
+**URL**: https://github.com/Illumina/hap.py/
 
 Example
 -------
@@ -35,7 +35,7 @@ This wrapper can be used in the following way:
             extra="--verbose"
         log: "happy.log"
         threads: 2
-        wrapper: "0.77.0-840-gff109e8d3/bio/hap.py/hap.py"
+        wrapper: "0.77.0-1034-gee6c61611/bio/hap.py/hap.py"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -53,7 +53,39 @@ Software dependencies
 * ``hap.py==0.3.14``
 * ``rtg-tools==3.10.1``
 
+Input/Output
+------------
+**Input:**
 
+* ``truth_regions``: Path to VCF containing high confidence variants
+* ``strats``: Path to BED stratification file, see `official documentation on stratification <https://github.com/Illumina/hap.py/blob/master/doc/happy.md#stratification-via-bed-regions>`_ for more information.
+* ``genome``: Path to reference genome
+* ``query``: Path to the VCF that is to be compared and annotated.
+
+**Output:**
+
+* Multiple filtered files. See `the output file list <https://github.com/Illumina/hap.py/blob/master/doc/happy.md#full-list-of-output-columns>`_ on the official documentation.
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+* ``engine``: One of ``xcmp`` (default), ``Rtgtools vcfeval``, ``scmp-distancebased``, or ``scmp-somatic``.
+
+* ``prefix``: Output prefix
+
+
+
+
+Notes
+-----
+
+Krusche, P. et al. 2019, https://doi.org/10.1038/s41587-019-0054-x.
+
+Part of the `hap.py suite by Illumina <https://github.com/Illumina/hap.py/blob/master/doc/normalisation.md>`_.
 
 
 

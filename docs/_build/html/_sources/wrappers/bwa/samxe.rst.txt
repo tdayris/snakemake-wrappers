@@ -3,9 +3,9 @@
 BWA SAM(SE/PE)
 ==============
 
-Map paired-end reads with either bwa samse or sampe. For more information about BWA see `BWA documentation <http://bio-bwa.sourceforge.net/bwa.shtml>`_.
+Map paired-end reads with either bwa samse or sampe.
 
-**URL**: 
+**URL**: http://bio-bwa.sourceforge.net/bwa.shtml
 
 Example
 -------
@@ -27,7 +27,7 @@ This wrapper can be used in the following way:
         log:
             "logs/bwa_sam_pe/{sample}.log"
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/bwa/samxe"
+            "0.77.0-1034-gee6c61611/bio/bwa/samxe"
 
     rule bwa_sam_se:
         input:
@@ -42,7 +42,7 @@ This wrapper can be used in the following way:
         log:
             "logs/bwa_sam_se/{sample}.log"
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/bwa/samxe"
+            "0.77.0-1034-gee6c61611/bio/bwa/samxe"
 
     rule bwa_bam_pe:
         input:
@@ -57,7 +57,7 @@ This wrapper can be used in the following way:
         log:
             "logs/bwa_bam_pe/{sample}.log"
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/bwa/samxe"
+            "0.77.0-1034-gee6c61611/bio/bwa/samxe"
 
     rule bwa_bam_se:
         input:
@@ -72,7 +72,7 @@ This wrapper can be used in the following way:
         log:
             "logs/bwa_bam_se/{sample}.log"
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/bwa/samxe"
+            "0.77.0-1034-gee6c61611/bio/bwa/samxe"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -91,7 +91,39 @@ Software dependencies
 * ``samtools==1.9``
 * ``picard==2.20.1``
 
+Input/Output
+------------
+**Input:**
 
+* ``sai``: Path to sai file from bwa aln
+* ``fastq``: List of path to fastq files
+
+**Output:**
+
+* SAM/BAM file
+
+
+
+Params
+------
+
+* ``index``: Path to indexed genome sequence
+
+* ``extra``: Optional parameters for bwa samse/sampe
+
+* ``sort``: Either "none", "samtools", or "picard".
+
+* ``sort_order``: Either "coordinate" or "queryname"
+
+* ``sort_extra``: Extra parameters for samtools or picard
+
+
+
+
+Notes
+-----
+
+This wrapper uses two threads if sort parameter is not None.
 
 
 

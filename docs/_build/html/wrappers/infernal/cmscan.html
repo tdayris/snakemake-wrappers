@@ -171,6 +171,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#params">Params</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
 </ul>
@@ -337,8 +339,8 @@
             
   <div class="section" id="infernal-cmscan">
 <span id="bio-infernal-cmscan"></span><h1>INFERNAL CMSCAN<a class="headerlink" href="#infernal-cmscan" title="Permalink to this headline">¶</a></h1>
-<p>cmscan is used to search sequences against collections of covariance models that have been prepared with cmpress. The output format is designed to be human-            readable, but is often so voluminous that reading it is impractical, and parsing it is a pain. The –tblout option saves output in a simple tabular  format that is concise and easier to parse. The -o option allows redirecting the main output, including throwing it away in /dev/null. Infernal (‘INFERence of RNA ALignment’) is for searching DNA sequence databases for RNA structure and sequence similarities. It is an implementation of a special case of profile stochastic context-free grammars called covariance models (CMs). A CM is like a sequence profile, but it scores a combination of sequence consensus and RNA secondary structure consensus, so in many cases, it is more capable of identifying RNA homologs that conserve their secondary structure more than their primary sequence.</p>
-<p><strong>URL</strong>:</p>
+<p>cmscan is used to search sequences against collections of covariance models that have been prepared with cmpress.</p>
+<p><strong>URL</strong>: <a class="reference external" href="http://eddylab.org/software/infernal/">http://eddylab.org/software/infernal/</a></p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -356,7 +358,7 @@
         <span class="c1">#score_threshold=50, # Instead of thresholding per-CM output on E-value, report target sequences with a bit score of &gt;= &lt;x&gt;.</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/infernal/cmscan&quot;</span>
+        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/infernal/cmscan&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -376,13 +378,27 @@
 <h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
 <p><strong>Input:</strong></p>
 <ul class="simple">
-<li><p>sequence file</p></li>
-<li><p>RNA covariance models (CMs)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fasta</span></code>: Path to sequence file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">profile</span></code>: RNA covariance models (CMs)</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
-<li><p>rna alignments</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">outfile</span></code>: Path to output rna alignments</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tblout</span></code>: Path to parseable table of hits to file</p></li>
 </ul>
+</div>
+<div class="section" id="params">
+<h2>Params<a class="headerlink" href="#params" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">evalue_threshold</span></code>: report &lt;= this evalue threshold in output</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">score_threshold</span></code>: report &gt;= this score threshold in output</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">extra</span></code>: Optional parameters</p></li>
+</ul>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<p>The output format is designed to be human-            readable, but is often so voluminous that reading it is impractical, and parsing it is a pain. The –tblout option saves output in a simple tabular  format that is concise and easier to parse. The -o option allows redirecting the main output, including throwing it away in /dev/null. Infernal (‘INFERence of RNA ALignment’) is for searching DNA sequence databases for RNA structure and sequence similarities. It is an implementation of a special case of profile stochastic context-free grammars called covariance models (CMs). A CM is like a sequence profile, but it scores a combination of sequence consensus and RNA secondary structure consensus, so in many cases, it is more capable of identifying RNA homologs that conserve their secondary structure more than their primary sequence.</p>
+<p>“<a class="reference external" href="http://eddylab.org/publications.html#Nawrocki13c">E. P. Nawrocki and S. R. Eddy, Infernal 1.1 100-fold faster RNA homology searches, Bioinformatics 29:2933-2935 (2013)</a>”</p>
 </div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>

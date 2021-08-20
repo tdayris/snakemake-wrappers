@@ -5,7 +5,7 @@ BWA MEM
 
 Map reads using bwa mem, with optional sorting using samtools or picard.
 
-**URL**: 
+**URL**: http://bio-bwa.sourceforge.net/bwa.shtml
 
 Example
 -------
@@ -30,7 +30,7 @@ This wrapper can be used in the following way:
             tmp_dir="/tmp/",  # Path to temp dir. (optional)
         threads: 8
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/bwa/mem"
+            "0.77.0-1034-gee6c61611/bio/bwa/mem"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -53,8 +53,7 @@ Input/Output
 ------------
 **Input:**
 
-* FASTQ file(s)
-* reference genome
+* ``reads``: FASTQ file(s)
 
 **Output:**
 
@@ -62,15 +61,26 @@ Input/Output
 
 
 
+Params
+------
+
+* ``index``: Path to the bwa index
+
+* ``extra``: The `extra` param allows for additional arguments for bwa-mem.
+
+* ``sorting``: The `sorting` param allows to enable sorting, and can be either 'none', 'samtools' or 'picard'.
+
+* ``sort_extra``: The `sort_extra` allows for extra arguments for samtools/picard
+
+* ``tmp_dir``: The `tmp_dir` param allows to define path to the temp dir. One can use `tmpdir resources <https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html?highlight=tmpdir#standard-resources>`_ instead.
+
+
+
 
 Notes
 -----
 
-* The `extra` param allows for additional arguments for bwa-mem.
-* The `sorting` param allows to enable sorting, and can be either 'none', 'samtools' or 'picard'.
-* The `sort_extra` allows for extra arguments for samtools/picard
-* The `tmp_dir` param allows to define path to the temp dir.
-* For more inforamtion see, http://bio-bwa.sourceforge.net/bwa.shtml
+Warning, this wrapper uses a number of threads equal to one plus the number of threads written in the Snakefile: sort + bwa mem
 
 
 

@@ -3,7 +3,108 @@
 MACS2 CALLPEAK
 ==============
 
-``MACS2 callpeak`` model-based analysis tool for ChIP-sequencing that calls peaks from alignment results. For usage information about ``MACS2 callpeak``, please see the `documentation <https://github.com/macs3-project/MACS/blob/master/README.md>`_ and the command line help. For more information about ``MACS2``, also see the `source code <https://github.com/macs3-project/MACS>`_ and `published article <https://genomebiology.biomedcentral.com/articles/10.1186/gb-2008-9-9-r137>`_. Depending on the selected extension(s), the option(s) will be set automatically (please see table below). Please note that there are extensions, that are incompatible with each other, because they require the --broad option either to be enabled or disabled.
+``MACS2 callpeak`` model-based analysis tool for ChIP-sequencing that calls peaks from alignment results.
+
+
+**URL**: https://github.com/macs3-project/MACS/blob/master/README.md
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule callpeak:
+        input:
+            treatment="samples/a.bam",   # required: treatment sample(s)
+            control="samples/b.bam"      # optional: control sample(s)
+        output:
+            # all output-files must share the same basename and only differ by it's extension
+            # Usable extensions (and which tools they implicitly call) are listed here:
+            #         https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/macs2/callpeak.html.
+            multiext("callpeak/basename",
+                     "_peaks.xls",   ### required
+                     ### optional output files
+                     "_peaks.narrowPeak",
+                     "_summits.bed"
+                     )
+        log:
+            "logs/macs2/callpeak.log"
+        params:
+            "-f BAM -g hs --nomodel"
+        wrapper:
+            "0.77.0-1034-gee6c61611/bio/macs2/callpeak"
+
+    rule callpeak_options:
+        input:
+            treatment="samples/a.bam",   # required: treatment sample(s)
+            control="samples/b.bam"      # optional: control sample(s)
+        output:
+            # all output-files must share the same basename and only differ by it's extension
+            # Usable extensions (and which tools they implicitly call) are listed here:
+            #         https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/macs2/callpeak.html.
+            multiext("callpeak_options/basename",
+                     "_peaks.xls",   ### required
+                     ### optional output files
+                     # these output extensions internally set the --bdg or -B option:
+                     "_treat_pileup.bdg",
+                     "_control_lambda.bdg",
+                     # these output extensions internally set the --broad option:
+                     "_peaks.broadPeak",
+                     "_peaks.gappedPeak"
+                     )
+        log:
+            "logs/macs2/callpeak.log"
+        params:
+            "-f BAM -g hs --broad-cutoff 0.1 --nomodel"
+        wrapper:
+            "0.77.0-1034-gee6c61611/bio/macs2/callpeak"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``macs2>=2.2``
+
+Input/Output
+------------
+**Input:**
+
+* ``control``: Path to input peaks (Optional)
+* ``treatment``: SAM, BAM, BED, ELAND, ELANDMULTI, ELANDEXPORT, BOWTIE, BAMPE or BEDPE files
+
+**Output:**
+
+* tabular file in excel format (.xls) AND
+* different optional metrics in bedGraph or BED formats
+
+
+
+Params
+------
+
+* ``Optional parameters. This must b the only element in the param section of the snakemake rule``: 
+
+
+
+
+Notes
+-----
+
+For usage information about ``MACS2 callpeak``, please see the `documentation <https://github.com/macs3-project/MACS/blob/master/README.md>`_ and the command line help.
+For more information about ``MACS2``, also see the `source code <https://github.com/macs3-project/MACS>`_ and `published article <https://genomebiology.biomedcentral.com/articles/10.1186/gb-2008-9-9-r137>`_.
+Depending on the selected extension(s), the option(s) will be set automatically (please see table below).
+Please note that there are extensions, that are incompatible with each other, because they require the --broad option either to be enabled or disabled.
 
 
   +--------------------------------+----------------------------------------+----------+--------------------+
@@ -37,90 +138,6 @@ MACS2 CALLPEAK
   +--------------------------------+----------------------------------------+----------+--------------------+
   | NAME_summits.bed               | peak summits locations for every peak  | BED      | if not set -\-broad|
   +--------------------------------+----------------------------------------+----------+--------------------+
-
-
-**URL**: 
-
-Example
--------
-
-This wrapper can be used in the following way:
-
-.. code-block:: python
-
-    rule callpeak:
-        input:
-            treatment="samples/a.bam",   # required: treatment sample(s)
-            control="samples/b.bam"      # optional: control sample(s)
-        output:
-            # all output-files must share the same basename and only differ by it's extension
-            # Usable extensions (and which tools they implicitly call) are listed here:
-            #         https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/macs2/callpeak.html.
-            multiext("callpeak/basename",
-                     "_peaks.xls",   ### required
-                     ### optional output files
-                     "_peaks.narrowPeak",
-                     "_summits.bed"
-                     )
-        log:
-            "logs/macs2/callpeak.log"
-        params:
-            "-f BAM -g hs --nomodel"
-        wrapper:
-            "0.77.0-840-gff109e8d3/bio/macs2/callpeak"
-
-    rule callpeak_options:
-        input:
-            treatment="samples/a.bam",   # required: treatment sample(s)
-            control="samples/b.bam"      # optional: control sample(s)
-        output:
-            # all output-files must share the same basename and only differ by it's extension
-            # Usable extensions (and which tools they implicitly call) are listed here:
-            #         https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/macs2/callpeak.html.
-            multiext("callpeak_options/basename",
-                     "_peaks.xls",   ### required
-                     ### optional output files
-                     # these output extensions internally set the --bdg or -B option:
-                     "_treat_pileup.bdg",
-                     "_control_lambda.bdg",
-                     # these output extensions internally set the --broad option:
-                     "_peaks.broadPeak",
-                     "_peaks.gappedPeak"
-                     )
-        log:
-            "logs/macs2/callpeak.log"
-        params:
-            "-f BAM -g hs --broad-cutoff 0.1 --nomodel"
-        wrapper:
-            "0.77.0-840-gff109e8d3/bio/macs2/callpeak"
-
-Note that input, output and log file paths can be chosen freely.
-
-When running with
-
-.. code-block:: bash
-
-    snakemake --use-conda
-
-the software dependencies will be automatically deployed into an isolated environment before execution.
-
-Software dependencies
----------------------
-
-* ``macs2>=2.2``
-
-Input/Output
-------------
-**Input:**
-
-* SAM, BAM, BED, ELAND, ELANDMULTI, ELANDEXPORT, BOWTIE, BAMPE or BEDPE files
-
-**Output:**
-
-* tabular file in excel format (.xls) AND
-* different optional metrics in bedGraph or BED formats
-
-
 
 
 

@@ -6,7 +6,7 @@ GATK BASERECALIBRATORSPARK
 Run gatk BaseRecalibratorSpark.
 
 
-**URL**: 
+**URL**: https://gatk.broadinstitute.org/hc/en-us/articles/360036897372-BaseRecalibratorSpark-BETA-
 
 Example
 -------
@@ -29,13 +29,13 @@ This wrapper can be used in the following way:
             extra="",  # optional
             java_opts="", # optional
             #spark_runner="",  # optional, local by default
-            #spark_0.77.0-840-gff109e8d3="",  # optional
+            #spark_0.77.0-1034-gee6c61611="",  # optional
             #spark_extra="", # optional
         resources:
             mem_mb=1024
         threads: 8
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/gatk/baserecalibratorspark"
+            "0.77.0-1034-gee6c61611/bio/gatk/baserecalibratorspark"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -58,26 +58,30 @@ Input/Output
 ------------
 **Input:**
 
-* bam file
-* fasta reference
-* vcf.gz of known variants
+* ``bam``: Path to bam file
+* ``ref``: Path to  fasta reference
+* ``known``: Path to vcf.gz of known variants
 
 **Output:**
 
-* recalibration table for the bam
+* ``recal_table``: Path to recalibration table for the bam
 
 
 
+Params
+------
 
-Notes
------
+* ``java_opts``: The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-XX:ParallelGCThreads=10" (not for `-XmX` or `-Djava.io.tmpdir`, since they are handled automatically).
 
-* The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-XX:ParallelGCThreads=10" (not for `-XmX` or `-Djava.io.tmpdir`, since they are handled automatically).
-* The `extra` param allows for additional program arguments for `baserecalibratorspark`.
-* The `spark_runner` param = "LOCAL"|"SPARK"|"GCS" allows to set the spark_runner. Set the parameter to "LOCAL" or don't set it at all to run on local machine.
-* The `spark_master` param allows to set the URL of the Spark Master to submit the job. Set to "local[number_of_cores]" for local execution. Don't set it at all for local execution with number of cores determined by snakemake.
-* The `spark_extra` param allows for additional spark arguments.
-* For more information see, https://gatk.broadinstitute.org/hc/en-us/articles/360036897372-BaseRecalibratorSpark-BETA-
+* ``extra``: The `extra` param allows for additional program arguments for `baserecalibratorspark`.
+
+* ``spark_runner``: The `spark_runner` param = "LOCAL"|"SPARK"|"GCS" allows to set the spark_runner. Set the parameter to "LOCAL" or don't set it at all to run on local machine.
+
+* ``spark_master``: The `spark_master` param allows to set the URL of the Spark Master to submit the job. Set to "local[number_of_cores]" for local execution. Don't set it at all for local execution with number of cores determined by snakemake.
+
+* ``spark_extra``: The `spark_extra` param allows for additional spark arguments.
+
+
 
 
 

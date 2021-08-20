@@ -3,10 +3,10 @@
 DEEPVARIANT
 ===========
 
-Call genetic variants using deep neural network. Copyright 2017 Google LLC. BSD 3-Clause "New" or "Revised" https://github.com/google/deepvariant
+Call genetic variants using deep neural network. Copyright 2017 Google LLC. BSD 3-Clause "New" or "Revised"
 
 
-**URL**: 
+**URL**: https://github.com/google/deepvariant
 
 Example
 -------
@@ -29,7 +29,7 @@ This wrapper can be used in the following way:
         log:
             "logs/deepvariant/{sample}/stdout.log"
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/deepvariant"
+            "0.77.0-1034-gee6c61611/bio/deepvariant"
 
 
     rule deepvariant_gvcf:
@@ -46,7 +46,7 @@ This wrapper can be used in the following way:
         log:
             "logs/deepvariant/{sample}/stdout.log"
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/deepvariant"
+            "0.77.0-1034-gee6c61611/bio/deepvariant"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -67,13 +67,24 @@ Input/Output
 ------------
 **Input:**
 
-* fasta
-* bam
+* ``ref``: Path to genome sequence (fasta)
+* ``bam``: Path to bam file
 
 **Output:**
 
-* vcf
 * visual report html
+* ``vcf``: vcf
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+* ``sample_name``: Optional sample name
+
+* ``model``: One of ``WGS``, ``WES``, ``PACBIO``, or ``HYBRID_PACBIO_ILLUMINA``
 
 
 
@@ -81,7 +92,6 @@ Input/Output
 Notes
 -----
 
-* The `extra` param alllows for additional program arguments.
 * This snakemake wrapper uses bioconda deepvariant package. Copyright 2018 Brad Chapman.
 
 

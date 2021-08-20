@@ -126,6 +126,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">BWA MEM SAMBLASTER</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#params">Params</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
 </ul>
@@ -338,7 +341,7 @@
   <div class="section" id="bwa-mem-samblaster">
 <span id="bio-bwa-mem2-mem-samblaster"></span><h1>BWA MEM SAMBLASTER<a class="headerlink" href="#bwa-mem-samblaster" title="Permalink to this headline">¶</a></h1>
 <p>Map reads using bwa-mem2, mark duplicates by samblaster and sort and index by sambamba.</p>
-<p><strong>URL</strong>:</p>
+<p><strong>URL</strong>: <a class="reference external" href="https://github.com/bwa-mem2/bwa-mem2">https://github.com/bwa-mem2/bwa-mem2</a></p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -356,7 +359,7 @@
         <span class="n">sort_extra</span><span class="o">=</span><span class="s2">&quot;-q&quot;</span> <span class="c1"># Extra args for sambamba.</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">8</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/bwa-mem2/mem-samblaster&quot;</span>
+        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/bwa-mem2/mem-samblaster&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -372,6 +375,37 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">bwa-mem2==2.2.1</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">sambamba==0.7.1</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">samblaster==0.1.24</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reads</span></code>: List of paths to fastq files. R1 is mandatory, and an optional R2 is required for paired end</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>SAM/BAM file</p></li>
+</ul>
+</div>
+<div class="section" id="params">
+<h2>Params<a class="headerlink" href="#params" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">index</span></code>: Path to indexed genome</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">extra</span></code>: Optional parameters for bwa mem</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sort</span></code>: Either “none”, “samtools”, or “picard”.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sort_order</span></code>: Either “coordinate” or “queryname”</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sort_extra</span></code>: Extra parameters for samtools or picard</p></li>
+</ul>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<p>This wrapper uses more threads than the number reserved in the snakemake rule. For X reserved threads, 3X+1 threads are used:</p>
+<ul class="simple">
+<li><p>X in BWA mem,</p></li>
+<li><p>X more in sambamba view,</p></li>
+<li><p>X more in sambamba sort.</p></li>
+<li><p>1 more in samblaster</p></li>
 </ul>
 </div>
 <div class="section" id="authors">

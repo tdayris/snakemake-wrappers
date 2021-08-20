@@ -394,7 +394,7 @@ The pipeline contains the following steps:
         log:
             "logs/facets/cnv/{sample}.log"
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/facets/cnv"
+            "0.77.0-1034-gee6c61611/bio/facets/cnv"
 
 
     #################################

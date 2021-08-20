@@ -5,7 +5,7 @@ GATK MUTECT2
 
 Call somatic SNVs and indels via local assembly of haplotypes
 
-**URL**: 
+**URL**: https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2
 
 Example
 -------
@@ -33,7 +33,7 @@ This wrapper can be used in the following way:
         log:
             "logs/mutect_{sample}.log"
         wrapper:
-             "0.77.0-840-gff109e8d3/bio/gatk/mutect"
+             "0.77.0-1034-gee6c61611/bio/gatk/mutect"
 
     rule mutect2_bam:
         input:
@@ -55,7 +55,7 @@ This wrapper can be used in the following way:
         log:
             "logs/mutect_{sample}.log"
         wrapper:
-             "0.77.0-840-gff109e8d3/bio/gatk/mutect"
+             "0.77.0-1034-gee6c61611/bio/gatk/mutect"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -77,12 +77,22 @@ Input/Output
 ------------
 **Input:**
 
-* Mapped reads (SAM/BAM/CRAM)
-* Reference Fasta file
+* ``map``: Mapped reads (SAM/BAM/CRAM)
+* ``fasta``: Reference Fasta file
 
 **Output:**
 
-* Variant file
+* ``vcf``: Variant file
+* ``bam``: Optional output bam file
+
+
+
+Params
+------
+
+* ``extra``: The `extra` param allows for additional program arguments.
+
+* ``java_opts``: The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-XX:ParallelGCThreads=10" (not for `-XmX` or `-Djava.io.tmpdir`, since they are handled automatically).
 
 
 

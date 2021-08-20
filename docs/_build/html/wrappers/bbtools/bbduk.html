@@ -112,6 +112,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#params">Params</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
@@ -338,7 +339,7 @@
   <div class="section" id="bbduk">
 <span id="bio-bbtools-bbduk"></span><h1>BBDUK<a class="headerlink" href="#bbduk" title="Permalink to this headline">¶</a></h1>
 <p>Run BBDuk.</p>
-<p><strong>URL</strong>:</p>
+<p><strong>URL</strong>: <a class="reference external" href="https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/">https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/</a></p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
@@ -357,7 +358,7 @@
         <span class="n">extra</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">w</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="s2">&quot;ref=</span><span class="si">{}</span><span class="s2">,adapters,artifacts ktrim=r k=23 mink=11 hdist=1 tpe tbo trimpolygright=10 minlen=25 maxns=30 entropy=0.5 entropywindow=50 entropyk=5&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">adapters</span><span class="p">),</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">7</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/bbtools/bbduk&quot;</span>
+        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/bbtools/bbduk&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">bbduk_pe</span><span class="p">:</span>
@@ -375,7 +376,7 @@
         <span class="n">extra</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">w</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="s2">&quot;ref=</span><span class="si">{}</span><span class="s2">,adapters,artifacts ktrim=r k=23 mink=11 hdist=1 tpe tbo trimpolygright=10 minlen=25 maxns=30 entropy=0.5 entropywindow=50 entropyk=5&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">adapters</span><span class="p">),</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">7</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-840-gff109e8d3/bio/bbtools/bbduk&quot;</span>
+        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/bbtools/bbduk&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -396,16 +397,21 @@
 <h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
 <p><strong>Input:</strong></p>
 <ul class="simple">
-<li><p>raw fastq file with R1 reads</p></li>
-<li><p>raw fastq file with R2 reads (optional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample</span></code>: list of paths. Raw fastq file with R1 reads, raw fastq file with R2 reads (PE only, optional)</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
-<li><p>trimmed fastq file with R1 reads</p></li>
-<li><p>trimmed fastq file with R2 reads (optional)</p></li>
-<li><p>fastq file with singleton reads (optional)</p></li>
-<li><p>fastq file with discarded reads (optional)</p></li>
-<li><p>stats file (optonal)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trimmed</span></code>: trimmed fastq file with R1 reads, trimmed fastq file with R2 reads (PE only, optional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">singleton</span></code>: fastq file with singleton reads (optional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">discarded</span></code>: fastq file with discarded reads (optional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stats</span></code>: stats file (optonal)</p></li>
+</ul>
+</div>
+<div class="section" id="params">
+<h2>Params<a class="headerlink" href="#params" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">extra</span></code>: Optional parameters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">adapters</span></code>: Literal adapters sequences</p></li>
 </ul>
 </div>
 <div class="section" id="notes">

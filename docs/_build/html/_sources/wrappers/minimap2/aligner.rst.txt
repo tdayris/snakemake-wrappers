@@ -5,7 +5,7 @@ MINIMAP2
 
 A versatile pairwise aligner for genomic and spliced nucleotide sequences.
 
-**URL**: 
+**URL**: https://lh3.github.io/minimap2
 
 Example
 -------
@@ -28,7 +28,7 @@ This wrapper can be used in the following way:
             sort_extra=""                # optional: extra arguments for samtools/picard
         threads: 3
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/minimap2/aligner"
+            "0.77.0-1034-gee6c61611/bio/minimap2/aligner"
 
     rule minimap2_sam:
         input:
@@ -44,7 +44,7 @@ This wrapper can be used in the following way:
             sort_extra=""                # optional: extra arguments for samtools/picard
         threads: 3
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/minimap2/aligner"
+            "0.77.0-1034-gee6c61611/bio/minimap2/aligner"
 
     rule minimap2_bam:
         input:
@@ -60,7 +60,7 @@ This wrapper can be used in the following way:
             sort_extra=""                # optional: extra arguments for samtools/picard
         threads: 3
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/minimap2/aligner"
+            "0.77.0-1034-gee6c61611/bio/minimap2/aligner"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -82,12 +82,23 @@ Input/Output
 ------------
 **Input:**
 
-* FASTQ file(s)
-* reference genome
+* ``query``: FASTQ file(s)
+* ``targt``: reference genome
 
 **Output:**
 
-* SAM/BAM/CRAM file
+* SAM/BAM/CRAM file. This must be the first output element in the output file list
+
+
+
+Params
+------
+
+* ``extra``: The `extra` param allows for additional arguments for minimap2.
+
+* ``sort``: The `sort` param allows to enable sorting (if output not PAF), and can be either 'none', 'queryname' or 'coordinate'.
+
+* ``sort_extra``: The `sort_extra` allows for extra arguments for samtools/picard
 
 
 
@@ -95,10 +106,7 @@ Input/Output
 Notes
 -----
 
-* The `extra` param allows for additional arguments for minimap2.
-* The `sort` param allows to enable sorting (if output not PAF), and can be either 'none', 'queryname' or 'coordinate'.
-* The `sort_extra` allows for extra arguments for samtools/picard
-* For more inforamtion see, https://lh3.github.io/minimap2
+Warning, this threads will use more threads than the number reserved in the Snakefile as soon as ``sort`` parameter is not none. In that case, for X reserved threads, X+1 will be used.
 
 
 

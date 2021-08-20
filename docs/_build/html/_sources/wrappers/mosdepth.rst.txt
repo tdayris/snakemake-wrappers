@@ -5,7 +5,7 @@ MOSDEPTH
 
 fast BAM/CRAM depth calculation
 
-**URL**: 
+**URL**: https://github.com/brentp/mosdepth
 
 Example
 -------
@@ -29,7 +29,7 @@ This wrapper can be used in the following way:
         # additional decompression threads through `--threads`
         threads: 4  # This value - 1 will be sent to `--threads`
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/mosdepth"
+            "0.77.0-1034-gee6c61611/bio/mosdepth"
 
 
     rule mosdepth_bed:
@@ -49,7 +49,7 @@ This wrapper can be used in the following way:
         # additional decompression threads through `--threads`
         threads: 4  # This value - 1 will be sent to `--threads`
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/mosdepth"
+            "0.77.0-1034-gee6c61611/bio/mosdepth"
 
 
     rule mosdepth_by_threshold:
@@ -70,7 +70,7 @@ This wrapper can be used in the following way:
         # additional decompression threads through `--threads`
         threads: 4  # This value - 1 will be sent to `--threads`
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/mosdepth"
+            "0.77.0-1034-gee6c61611/bio/mosdepth"
 
 
     rule mosdepth_quantize_precision:
@@ -90,7 +90,7 @@ This wrapper can be used in the following way:
         # additional decompression threads through `--threads`
         threads: 4  # This value - 1 will be sent to `--threads`
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/mosdepth"
+            "0.77.0-1034-gee6c61611/bio/mosdepth"
 
 
     rule mosdepth_cram:
@@ -111,7 +111,7 @@ This wrapper can be used in the following way:
         # additional decompression threads through `--threads`
         threads: 4  # This value - 1 will be sent to `--threads`
         wrapper:
-            "0.77.0-840-gff109e8d3/bio/mosdepth"
+            "0.77.0-1034-gee6c61611/bio/mosdepth"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -132,25 +132,30 @@ Input/Output
 ------------
 **Input:**
 
-* BAM/CRAM files
-* reference genome (optional)
-* BED file (optional)
+* ``bam``: BAM/CRAM files
+* ``fasta``: reference genome (optional)
+* ``bed``: BED file (optional)
 
 **Output:**
 
-* Several coverage summary files.
+* Several coverage summary files. Order does not matter.
 
 
 
+Params
+------
 
-Notes
------
+* ``by``: The `by` param allows to specify (integer) window-sizes (incompatible with input BED).
 
-* The `by` param allows to specify (integer) window-sizes (incompatible with input BED).
-* The `threshold` param allows to, for or each interval in `--by`, write number of bases covered by at least threshold bases. Specify multiple integer values separated by ','.
-* The `precision` param allows to specify output floating point precision.
-* The `extra` param allows for additional program arguments.
-* For more information see, https://github.com/brentp/mosdepth
+* ``threshold``: The `threshold` param allows to, for or each interval in `--by`, write number of bases covered by at least threshold bases. Specify multiple integer values separated by ','.
+
+* ``precision``: The `precision` param allows to specify output floating point precision.
+
+* ``extra``: The `extra` param allows for additional program arguments.
+
+* ``quantize``: write quantized output
+
+
 
 
 

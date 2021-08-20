@@ -6,7 +6,7 @@ HISAT2 ALIGN
 Map reads with hisat2.
 
 
-**URL**: 
+**URL**: https://daehwankimlab.github.io/hisat2/
 
 Example
 -------
@@ -27,7 +27,7 @@ This wrapper can be used in the following way:
           idx="index/",
         threads: 2
         wrapper:
-          "0.77.0-840-gff109e8d3/bio/hisat2/align"
+          "0.77.0-1034-gee6c61611/bio/hisat2/align"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -53,7 +53,7 @@ Input/Output
 
 **Output:**
 
-* bam file with mapped reads
+* bam file with mapped reads. This must be the first output element in the output file list.
 
 
 
@@ -79,6 +79,8 @@ Notes
   may differ depending on the reference sequence size. This is also why
   the index is supplied in the `params` directive instead of the `input`
   directive.
+
+Warning, this pipeline uses more threads than the number set in the snakemake rule. For X threads written, X+1 are used: X for hisat2, 1 for samtools view.
 
 
 
