@@ -63,10 +63,15 @@ rule all:
             status=["normal", "tumor"],
             ext=["", ".bai"]
         ),
-        # mutect2=expand(
-        #     "mutect2/filter/{sample}.vcf.gz",
-        #     sample=design["Sample_id"].tolist()
-        # ),
+        mutect2=expand(
+            "mutect2/filter/{sample}.vcf.gz",
+            sample=design["Sample_id"].tolist()
+        ),
+        facets=expand(
+            "facets/{sample}/{sample}.{ext}",
+            sample=design["Sample_id"].tolist(),
+            ext=["vcf.gz", "cnv.png", "cov.pdf", "spider.pdf", "csv.gz"]
+        ),
         varscan2=expand(
             "varscan2/concat/{sample}.vcf.gz",
             sample=design["Sample_id"].tolist()
