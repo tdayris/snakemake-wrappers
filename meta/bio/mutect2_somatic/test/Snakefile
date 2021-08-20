@@ -164,7 +164,7 @@ rule mutect2_somatic:
         "Calling variants on {wildcards.sample} with GATK Mutect2"
     threads: 4
     resources:
-        time_min=lambda wildcards, attempt: attempt * 45,
+        time_min=lambda wildcards, attempt: attempt * 300,
         mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
         tmpdir="tmp"
     params:
@@ -283,7 +283,7 @@ rule gatk_mutect2_germline_normal:
         "on normal sample only: it will be used for PoN"
     threads: 4
     resources:
-        time_min=lambda wildcards, attempt: attempt * 45,
+        time_min=lambda wildcards, attempt: attempt * 300,
         mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
         tmpdir="tmp"
     params:
