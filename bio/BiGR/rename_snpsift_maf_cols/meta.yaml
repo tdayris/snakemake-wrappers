@@ -1,14 +1,17 @@
 ---
 name: rename_snpsift_maf_cols
 description: |
-Columns from snpsift are usually named in a non-human readable manner.
+  Columns from snpsift are usually named in a non-human readable manner.
 authors:
   - Thibault Dayris
 input:
   - tsv: TSV formatted calls
-  - vcf: Optional VCF-formatted cols to write down columns significations
 output:
   - tsv: TSV formatted calls, with renamed columns
-  - txt: Text file with description of all columns content (if VCF was provided)
+params:
+  - add_cols: Boolean. Add (default) optional columns, or don't.
+  - ncbi_build: The NCBI build version of the genome. Required if and only if add_cols is True.
+  - center: Sequencing center. Required if and only if add_cols is True.
+  - caller: Used variant caller. One of `Mutect2`. Required if and only if add_cols is True.
 notes: |
   Further columns descriptions may be added.
