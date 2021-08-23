@@ -33,7 +33,8 @@ section_dict = {
             "Per sample clustered heatmap. This plot has been build based on "
             "normalized counts from DESeq2.<br><br>Colors run from red "
             "(identical) to blue (different). Samples are named using the "
-            "following scheme: condition - sample_id"
+            "following scheme: condition - sample_id (powered by in-house "
+            "python scripts: pandas, seaborn and scipy)"
         ),
         "plot_name": "clustermap_sample_mqc.png"
     },
@@ -44,7 +45,8 @@ section_dict = {
             "Per genes clustered heatmap. This plot has been build based on "
             "filtered normalized counts from DESeq2.<br><br>Colors run from red"
             " (identical) to blue (different). Samples are named using the "
-            "following scheme: condition - sample_id "
+            "following scheme: condition - sample_id. (powered by in-house "
+            "python scripts: pandas, seaborn and scipy)"
         ),
         "plot_name": "clustermap_gene_mqc.png"
     },
@@ -56,7 +58,7 @@ section_dict = {
             "the first axe of the PCA. This may help to understand why a DGE "
             "returns odd results, or which factor masks another.<br><br>"
             "This does not foresee anything for the upcomming differential "
-            "analysis."
+            "analysis. (powered by pcaExplorer)"
         ),
         "plot_name": "pca_axes_correlation_mqc.png"
     },
@@ -70,7 +72,7 @@ section_dict = {
             "against each other. <br><br>A value of 0.95 and above shows high "
             "similarities like ones observed in cell lines. A value between "
             "0.95 and 0.80 shows average similarities. A lesser value shows "
-            "noticable dissimilarities."
+            "noticable dissimilarities. (powered by pcaExplorer)"
         ),
         "plot_name": "pairwise_scatterplot_mqc.png"
     },
@@ -82,7 +84,7 @@ section_dict = {
             "samples similarities and divergences.<br><br> Each point represents "
             "a sample. Two points that are close from each others, are similar to "
             "each others. Two points, that are apart from each others, are "
-            "different."
+            "different. (powered by pcaExplorer)"
         ),
         "plot_name": "pca_plot_mqc.png"
     },
@@ -96,7 +98,7 @@ section_dict = {
             "is the confidence we have in the fact that it is differentially "
             "expressed according to our factor of interest. The more apart a "
             "point is from the center of the graph, the more differentially "
-            "expressed it is."
+            "expressed it is. (powered by EnhancedVolcano)"
         ),
         "plot_name": "volcanoplot_mqc.png"
     },
@@ -108,6 +110,7 @@ section_dict = {
             "control performed over a differential gene analysis. <br><br> We "
             "expect all samples to have similar distribution, otherwise, it would"
             " sign a possible error before the end of the normalization process."
+            " (powered by pcaExplorer)"
         ),
         "plot_name": "distro_expr_mqc.png"
     },
@@ -118,7 +121,7 @@ section_dict = {
             "The MAplot compares M (log(ratio)) to A (mean average).<br><br> "
             "This helps to highlight possible normalisation issues. We expect no"
             " direct link between these two values; the graph should remain "
-            "centered around zero"
+            "centered around zero. (powered by DESeq2)"
         ),
         "plot_name": "ma_plot_mqc.png"
     },
@@ -127,9 +130,47 @@ section_dict = {
         "title": "Consensus Clustering",
         "description": (
             "This graph has been done on DESeq2 normalized counts..<br><br> "
-            "This helps to highlight possible confounding effects. We expect our sample to be well separated over the factor of interest"
+            "This helps to highlight possible confounding effects. We expect our sample to be well separated over the factor of interest. (powered by "
+            "'consensus cluster plus')"
         ),
         "plot_name": "consensus_cluster_plus.png"
+    }
+    "titv_plot": {
+        "section": "titv_plot",
+        "title": "Transition over Transversions",
+        "description": (
+            "This graph shows both the Transition/Transversion ratios and "
+            "the contributions of 6 mutational conversion classes in each "
+            "sample. (powered by MafTools)"
+        ),
+        "plot_name": "titv_plot.png"
+    },
+    "maf_summary": {
+        "section": "maf_summary",
+        "title": "Summary of the MAF content",
+        "description": (
+            "Six graphs are available:<br><br> (1) Variant classification "
+            "shows the absolute number of variants in each classes. <br>(2) "
+            "Variant type shows the main types of variants and their abolute "
+            "number in the maf file. <br>(3) SNV class shows the Ti/Tv mutation "
+            "classes among the whole maf file. <br>(4) Variant per sample shows the"
+            " number of variants in each sample (the colors are the same as "
+            "within the (1)'Variant classification' graph. <br>(5) this graph "
+            "highlights the dispersion of the absolute counts observed in (1)"
+            "'Variant_Classification' graph, across the whole cohort. Finally"
+            "<br>(6) Top X mutated genes, shows the top X genes with the highest "
+            "number of mutations in the whole cohort."
+        ),
+        "plot_name": "mafsummary.png"
+    },
+    "oncoplot": {
+        "section": "oncoplot",
+        "title": "Oncoplot",
+        "description": (
+            "This graph is an oncoplot of the genes given in Y. The samples "
+            "are on the X axis."
+        ),
+        "plot_name": "oncoplot.png"
     }
 }
 
