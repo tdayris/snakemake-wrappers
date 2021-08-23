@@ -360,6 +360,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 
 <span class="n">samples_per_prefixes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">output_prefixes</span><span class="p">,</span> <span class="n">samples_iterator</span><span class="p">))</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">samples_per_prefixes</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">samples_per_prefixes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
 <span class="n">expected_pcas</span> <span class="o">=</span> <span class="p">[</span>
     <span class="sa">f</span><span class="s2">&quot;figures/DGE_considering_factor_</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">_comparing_test_</span><span class="si">{</span><span class="n">test</span><span class="si">}</span><span class="s2">_vs_ref_</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2">/pca/pca_</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">axes</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">elipse</span><span class="si">}</span><span class="s2">.png&quot;</span>
@@ -394,8 +395,18 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 <span class="n">rule</span> <span class="n">target</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">multiqc</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;reports/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.</span><span class="si">{comparison}</span><span class="s2">.html&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.</span><span class="si">{comparison}</span><span class="s2">.html&quot;</span><span class="p">,</span>
             <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span>
+        <span class="p">),</span>
+        <span class="n">gseaapp</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{comparison}</span><span class="s2">_</span><span class="si">{subset}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span><span class="p">,</span>
+            <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span> <span class="s2">&quot;sorted_on_fold_change&quot;</span><span class="p">,</span> <span class="s2">&quot;sorted_on_pval&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">csv_report</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/html_table_deseq2_</span><span class="si">{subset}</span><span class="s2">.tar.bz2&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span><span class="p">,</span>
+            <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span> <span class="s2">&quot;sorted_on_fold_change&quot;</span><span class="p">,</span> <span class="s2">&quot;sorted_on_pval&quot;</span><span class="p">]</span>
         <span class="p">),</span>
         <span class="n">deseq2_wald</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/wald.</span><span class="si">{comparison}</span><span class="s2">.RDS&quot;</span><span class="p">,</span>
@@ -406,63 +417,11 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
             <span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{factor}</span><span class="s2">_</span><span class="si">{axes}</span><span class="s2">.png&quot;</span><span class="p">,</span>
             <span class="n">factor</span><span class="o">=</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comparison_levels</span><span class="p">],</span>
             <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PC1_PC2&quot;</span><span class="p">,</span> <span class="s2">&quot;PC2_PC1&quot;</span><span class="p">]</span>
-        <span class="p">)</span>
-
-
-<span class="c1">#######################################</span>
-<span class="c1">### General PCA over all the cohort ###</span>
-<span class="c1">#######################################</span>
-
-
-<span class="n">rule</span> <span class="n">general_pca</span><span class="p">:</span>
-    <span class="nb">input</span><span class="p">:</span>
-        <span class="n">counts</span><span class="o">=</span><span class="s2">&quot;salmon/TPM.genes.tsv&quot;</span>
-    <span class="n">output</span><span class="p">:</span>
-        <span class="n">png</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{factor}</span><span class="s2">_</span><span class="si">{axes}</span><span class="s2">.png&quot;</span><span class="p">,</span>
-            <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PC1_PC2&quot;</span><span class="p">,</span> <span class="s2">&quot;PC2_PC1&quot;</span><span class="p">],</span>
-            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">)</span>
-    <span class="n">message</span><span class="p">:</span>
-        <span class="s2">&quot;Plotting general PCA over </span><span class="si">{wildcards.factor}</span><span class="s2">&quot;</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
-    <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5</span>
-    <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/seaborn/pca/general.</span><span class="si">{factor}</span><span class="s2">.png&quot;</span>
-    <span class="n">params</span><span class="p">:</span>
-        <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-        <span class="n">conditions</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="nb">zip</span><span class="p">(</span><span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">design</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">factor</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
         <span class="p">),</span>
-        <span class="n">prefix</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;bio/seaborn/pca&quot;</span>
-
-
-<span class="n">rule</span> <span class="n">pandas_merge_salmon_tr</span><span class="p">:</span>
-    <span class="nb">input</span><span class="p">:</span>
-        <span class="n">quant</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="p">),</span>
-        <span class="n">tx2gene</span> <span class="o">=</span> <span class="s2">&quot;tximport/transcripts2genes.tsv&quot;</span>
-    <span class="n">output</span><span class="p">:</span>
-        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;salmon/TPM.</span><span class="si">{content}</span><span class="s2">.tsv&quot;</span>
-    <span class="n">message</span><span class="p">:</span>
-        <span class="s2">&quot;Testing pandas merge salmon&quot;</span>
-    <span class="n">params</span><span class="p">:</span>
-        <span class="n">header</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">position</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">gencode</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">drop_na</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">dro_null</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">genes</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">wildcards</span><span class="o">.</span><span class="n">content</span> <span class="o">==</span> <span class="s2">&quot;genes&quot;</span>
-    <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/pandas_merge_salmon/</span><span class="si">{content}</span><span class="s2">.log&quot;</span>
-    <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;bio/pandas/salmon&quot;</span>
+        <span class="c1">#consensus=expand(</span>
+        <span class="c1">#    &quot;consensusclusterplus/{comparison}&quot;,</span>
+        <span class="c1">#    comparison=output_prefixes</span>
+        <span class="c1">#)</span>
 
 
 <span class="c1">##############################</span>
@@ -473,6 +432,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 <span class="n">deseq2_post_process_config</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;condition_dict&quot;</span><span class="p">:</span> <span class="n">condition_dict</span><span class="p">,</span>
     <span class="s2">&quot;samples_per_prefixes&quot;</span><span class="p">:</span> <span class="n">samples_per_prefixes</span><span class="p">,</span>
+    <span class="s2">&quot;design&quot;</span><span class="p">:</span> <span class="n">design</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
     <span class="s2">&quot;thresholds&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;thresholds&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 
@@ -518,6 +478,8 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
         <span class="n">additional_plots</span> <span class="o">=</span> <span class="p">[</span>
             <span class="c1">#temp(&quot;pairwise_scatterplot_mqc.png&quot;),</span>
             <span class="c1">#temp(&quot;clustermap_sample_mqc.png&quot;),</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/clustermap_sample_mqc.png&quot;</span><span class="p">,</span>
+            <span class="c1">#&quot;multiqc/{comparison}/clustermap_genes_mqc.png&quot;,</span>
             <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/pca_plot_mqc.png&quot;</span><span class="p">,</span>
             <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/volcanoplot_mqc.png&quot;</span><span class="p">,</span>
             <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_expr_mqc.png&quot;</span><span class="p">,</span>

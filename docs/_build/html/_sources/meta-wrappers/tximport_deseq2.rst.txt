@@ -39,6 +39,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
         config["comparison_levels"]
     ))
 
+    batch_effect = any(
+        level[0] == "BatchEffect" for level in config["comparison_levels"]
+    )
+
 
     ###############
     ### Reports ###
@@ -160,7 +164,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcards, attempt: min(attempt * 3072, 20480),
             time_min=lambda wildcards, attempt: attempt * 45
         params:
-            design=lambda wildcards: f"~{contrasts[wildcards.comparison][0]}",
+            design=lambda wildcards: (
+                f"~{contrasts[wildcards.comparison][0]}"
+                if (batch_effect is False) or wildcards.comparison == "BatchEffect"
+                else f"~BatchEffect+{contrasts[wildcards.comparison][0]}"
+            ),
             levels=lambda wildcards: contrasts[wildcards.comparison][1:],
             factor=lambda wildcards: contrasts[wildcards.comparison][0]
         log:

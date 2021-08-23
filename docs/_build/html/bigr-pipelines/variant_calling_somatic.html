@@ -303,7 +303,8 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
 <div class="section" id="snakefile">
 <h2>Snakefile<a class="headerlink" href="#snakefile" title="Permalink to this headline">¶</a></h2>
 <p>The pipeline contains the following steps:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -368,12 +369,17 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
             <span class="n">status</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;normal&quot;</span><span class="p">,</span> <span class="s2">&quot;tumor&quot;</span><span class="p">],</span>
             <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;.bai&quot;</span><span class="p">]</span>
         <span class="p">),</span>
-        <span class="c1"># mutect2=expand(</span>
-        <span class="c1">#     &quot;mutect2/filter/{sample}.vcf.gz&quot;,</span>
-        <span class="c1">#     sample=design[&quot;Sample_id&quot;].tolist()</span>
-        <span class="c1"># ),</span>
+        <span class="n">mutect2</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;mutect2/filter/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="p">),</span>
+        <span class="n">facets</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;facets/</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;vcf.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;cnv.png&quot;</span><span class="p">,</span> <span class="s2">&quot;cov.pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;spider.pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;csv.gz&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
         <span class="n">varscan2</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;varscan2/concat/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;varscan2/snp/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="p">),</span>
         <span class="n">qc</span><span class="o">=</span><span class="s2">&quot;multiqc/variant_calling_somatic.html&quot;</span>
@@ -516,7 +522,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/facets/cnv/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/facets/cnv&quot;</span>
+        <span class="s2">&quot;0.77.0-1060-g71ce65ad6/bio/facets/cnv&quot;</span>
 
 
 <span class="c1">#################################</span>
@@ -739,6 +745,39 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
         <span class="s2">&quot;bio/picard/markduplicates&quot;</span>
 
 
+<span class="c1"># rule picard_add_replace_group:</span>
+<span class="c1">#     input:</span>
+<span class="c1">#         &quot;samtools/sort/{sample}_{status}.bam&quot;</span>
+<span class="c1">#     output:</span>
+<span class="c1">#         temp(&quot;picard/groups/{sample}_{status}.bam&quot;)</span>
+<span class="c1">#     message:</span>
+<span class="c1">#         &quot;Replacing groups within {wildcards.sample} with Picard&quot;</span>
+<span class="c1">#         &quot; ({wildcards.status})&quot;</span>
+<span class="c1">#     threads: 1</span>
+<span class="c1">#     resources:</span>
+<span class="c1">#         mem_mb = (</span>
+<span class="c1">#             lambda wildcards, attempt: min(attempt * 2048 + 2048, 8192)</span>
+<span class="c1">#         ),</span>
+<span class="c1">#         time_min = (</span>
+<span class="c1">#             lambda wildcards, attempt: min(attempt * 60, 120)</span>
+<span class="c1">#         )</span>
+<span class="c1">#     log:</span>
+<span class="c1">#         &quot;logs/picard/groups/{sample}_{status}.log&quot;</span>
+<span class="c1">#     params:</span>
+<span class="c1">#         lambda wildcards: &quot; &quot;.join([</span>
+<span class="c1">#         &quot;RGLB=standard&quot;,</span>
+<span class="c1">#         &quot;RGPL=illumina&quot;,</span>
+<span class="c1">#         &quot;RGPU={wildcards.sample}_{wildcards.status}&quot;,</span>
+<span class="c1">#         &quot;RGSM={wildcards.sample}_{wildcards.status}&quot;,</span>
+<span class="c1">#         &quot;RGCN=InstitutGustaveRoussy&quot;,</span>
+<span class="c1">#         &quot;RGDS=WES&quot;,</span>
+<span class="c1">#         &quot;SORT_ORDER=coordinate&quot;,</span>
+<span class="c1">#         &quot;RGDT={}&quot;.format(str(datetime.date.today()))</span>
+<span class="c1">#     ])</span>
+<span class="c1">#     wrapper:</span>
+<span class="c1">#         &quot;bio/picard/addorreplacereadgroups&quot;</span>
+
+
 <span class="c1">###################</span>
 <span class="c1">### BWA MAPPING ###</span>
 <span class="c1">###################</span>
@@ -797,6 +836,12 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
         <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bwa_mem2/mem/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Mapping </span><span class="si">{wildcards.status}</span><span class="s2"> </span><span class="si">{wildcards.sample}</span><span class="s2"> with BWA&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">index</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">extra</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;-R &#39;@RG\tID:</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">\tSM:</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">\tPU:</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2&#39; -M -A 2 -E 1&quot;</span><span class="p">,</span>
+        <span class="n">sort</span><span class="o">=</span><span class="s2">&quot;samtools&quot;</span><span class="p">,</span>         <span class="c1"># We chose Samtools to sort by queryname</span>
+        <span class="n">sort_order</span><span class="o">=</span><span class="s2">&quot;queryname&quot;</span><span class="p">,</span>  <span class="c1"># Queryname sort is needed for a fixmate</span>
+        <span class="n">sort_extra</span><span class="o">=</span><span class="s2">&quot;-m 1536M&quot;</span>     <span class="c1"># We extand the sort buffer memory</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bwa_mem2/mem/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
 

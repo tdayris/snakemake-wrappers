@@ -59,9 +59,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
             germline_tbi=get_tbi(config["known"]),
             intervals=config["bed"]
         )
-        if len(config["sample_list"]) >= 40:
-            input_dict["pon"] = "gatk/pon/PoN.g.vcf.gz"
-            input_dict["pon_index"] = get_tbi("gatk/pon/PoN.g.vcf.gz")
+        # if len(config["sample_list"]) >= 40:
+        #     input_dict["pon"] = "gatk/pon/PoN.g.vcf.gz"
+        #     input_dict["pon_index"] = get_tbi("gatk/pon/PoN.g.vcf.gz")
 
         return input_dict
 
@@ -78,7 +78,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             ref_dict=get_dict(config["genome"]),
             bam="picard/markduplicates/{sample}_tumor.bam",
             bam_index=get_bai("picard/markduplicates/{sample}_tumor.bam"),
-            f1r2="mutect2/f1r2/{sample}.tar.gz",
+            #f1r2="mutect2/f1r2/{sample}.tar.gz",
             contamination="summary/{sample}_calculate_contamination.table"
         output:
             vcf=temp("mutect2/filter/{sample}.vcf.gz")
@@ -179,18 +179,18 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "Calling variants on {wildcards.sample} with GATK Mutect2"
         threads: 4
         resources:
-            time_min=lambda wildcards, attempt: attempt * 45,
+            time_min=lambda wildcards, attempt: attempt * 300,
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
             tmpdir="tmp"
         params:
             extra=lambda wildcards, output: (
                 "--max-reads-per-alignment-start 0 "
                 "--disable-read-filter MateOnSameContigOrNoMappedMateReadFilter "
-                "--tumor-sample Mutect2_{}_tumor "
-                "--normal Mutect2_{}_normal ".format(
-                    wildcards.sample,
-                    wildcards.sample
-                )
+                #"--tumor-sample Mutect2_{}_tumor "
+                #"--normal-sample Mutect2_{}_normal ".format(
+                #    wildcards.sample,
+                #    wildcards.sample
+                #)
             )
         log:
             "logs/gatk/mutect2/call/{sample}.log"
@@ -298,7 +298,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "on normal sample only: it will be used for PoN"
         threads: 4
         resources:
-            time_min=lambda wildcards, attempt: attempt * 45,
+            time_min=lambda wildcards, attempt: attempt * 300,
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
             tmpdir="tmp"
         params:

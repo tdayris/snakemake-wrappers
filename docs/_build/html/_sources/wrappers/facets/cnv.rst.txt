@@ -29,7 +29,7 @@ This wrapper can be used in the following way:
         params:
             extra=""
         wrapper:
-            "0.77.0-1034-gee6c61611/bio/facets/cnv"
+            "0.77.0-1060-g71ce65ad6/bio/facets/cnv"
 
 
     rule test_cnv_facets_pileup:
@@ -44,7 +44,7 @@ This wrapper can be used in the following way:
         params:
             extra=""
         wrapper:
-            "0.77.0-1034-gee6c61611/bio/facets/cnv"
+            "0.77.0-1060-g71ce65ad6/bio/facets/cnv"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -60,6 +60,7 @@ Software dependencies
 ---------------------
 
 * ``bioconda::cnv_facets==0.16.0``
+* ``bioconda::samtools==1.9``
 
 Input/Output
 ------------
@@ -106,9 +107,13 @@ Code
     from snakemake.shell import shell
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
-    extra = params.get("extra", "")
+    extra = snakemake.params.get("extra", "")
     if "bed" in snakemake.input:
         extra += " --targets {input.bed}"
+    
+    vcf = ""
+    if "vcf" in snakemake.input.keys():
+        vcf = f"--snp-vcf {snakemake.input.vcf} "
 
     prefix = snakemake.output["vcf"][:-len(".vcf.gz")]
 
@@ -122,19 +127,21 @@ Code
     if all(i in snakemake.input.keys() for i in ["tumor_bam", "normal_bam", "vcf"]):
         shell(
             "cnv_facets.R "
-            "--snp-tumour {input.tumor_bam} "
-            "--snp-normal {input.normal_bam} "
-            "--snp-vcf {input.vcf} "
+            "--snp-tumour {snakemake.input.tumor_bam} "
+            "--snp-normal {snakemake.input.normal_bam} "
+            "{vcf} "
             "--out {prefix} "
-            "--snp-nprocs {threads} "
+            "--snp-nprocs {snakemake.threads} "
             "{extra} "
             "{log}"
         )
     elif "pileup" in snakemake.input.keys():
         shell(
             "cnv_facets.R "
-            "--pileup {input.pileup} "
-            "--out {output.prefix} "
+            "--pileup {snakemake.input.pileup} "
+            "--out {snakemake.output.prefix} "
+            "--snp-nprocs {snakemake.threads} "
+            "{vcf} "
             "{extra} "
             "{log}"
         )

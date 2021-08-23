@@ -181,6 +181,7 @@ The pipeline contains the following steps:
 
 .. code-block:: python
 
+    import datetime
     import logging
     import os
     import pandas
@@ -246,12 +247,17 @@ The pipeline contains the following steps:
                 status=["normal", "tumor"],
                 ext=["", ".bai"]
             ),
-            # mutect2=expand(
-            #     "mutect2/filter/{sample}.vcf.gz",
-            #     sample=design["Sample_id"].tolist()
-            # ),
+            mutect2=expand(
+                "mutect2/filter/{sample}.vcf.gz",
+                sample=design["Sample_id"].tolist()
+            ),
+            facets=expand(
+                "facets/{sample}/{sample}.{ext}",
+                sample=design["Sample_id"].tolist(),
+                ext=["vcf.gz", "cnv.png", "cov.pdf", "spider.pdf", "csv.gz"]
+            ),
             varscan2=expand(
-                "varscan2/concat/{sample}.vcf.gz",
+                "varscan2/snp/{sample}.vcf.gz",
                 sample=design["Sample_id"].tolist()
             ),
             qc="multiqc/variant_calling_somatic.html"
@@ -394,7 +400,7 @@ The pipeline contains the following steps:
         log:
             "logs/facets/cnv/{sample}.log"
         wrapper:
-            "0.77.0-1034-gee6c61611/bio/facets/cnv"
+            "0.77.0-1060-g71ce65ad6/bio/facets/cnv"
 
 
     #################################
@@ -617,6 +623,39 @@ The pipeline contains the following steps:
             "bio/picard/markduplicates"
 
 
+    # rule picard_add_replace_group:
+    #     input:
+    #         "samtools/sort/{sample}_{status}.bam"
+    #     output:
+    #         temp("picard/groups/{sample}_{status}.bam")
+    #     message:
+    #         "Replacing groups within {wildcards.sample} with Picard"
+    #         " ({wildcards.status})"
+    #     threads: 1
+    #     resources:
+    #         mem_mb = (
+    #             lambda wildcards, attempt: min(attempt * 2048 + 2048, 8192)
+    #         ),
+    #         time_min = (
+    #             lambda wildcards, attempt: min(attempt * 60, 120)
+    #         )
+    #     log:
+    #         "logs/picard/groups/{sample}_{status}.log"
+    #     params:
+    #         lambda wildcards: " ".join([
+    #         "RGLB=standard",
+    #         "RGPL=illumina",
+    #         "RGPU={wildcards.sample}_{wildcards.status}",
+    #         "RGSM={wildcards.sample}_{wildcards.status}",
+    #         "RGCN=InstitutGustaveRoussy",
+    #         "RGDS=WES",
+    #         "SORT_ORDER=coordinate",
+    #         "RGDT={}".format(str(datetime.date.today()))
+    #     ])
+    #     wrapper:
+    #         "bio/picard/addorreplacereadgroups"
+
+
     ###################
     ### BWA MAPPING ###
     ###################
@@ -675,6 +714,12 @@ The pipeline contains the following steps:
             temp("bwa_mem2/mem/{sample}_{status}.bam")
         message:
             "Mapping {wildcards.status} {wildcards.sample} with BWA"
+        params:
+            index=lambda wildcards, input: os.path.splitext(input["index"][0])[0],
+            extra=r"-R '@RG\tID:{sample}_{status}\tSM:{sample}_{status}\tPU:{sample}_{status}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
+            sort="samtools",         # We chose Samtools to sort by queryname
+            sort_order="queryname",  # Queryname sort is needed for a fixmate
+            sort_extra="-m 1536M"     # We extand the sort buffer memory
         log:
             "logs/bwa_mem2/mem/{sample}.{status}.log"
 

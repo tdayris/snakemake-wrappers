@@ -236,6 +236,10 @@
     <span class="n">config</span><span class="p">[</span><span class="s2">&quot;comparison_levels&quot;</span><span class="p">]</span>
 <span class="p">))</span>
 
+<span class="n">batch_effect</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
+    <span class="n">level</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;BatchEffect&quot;</span> <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;comparison_levels&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+
 
 <span class="c1">###############</span>
 <span class="c1">### Reports ###</span>
@@ -357,7 +361,11 @@
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">3072</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">design</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;~</span><span class="si">{</span><span class="n">contrasts</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">design</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;~</span><span class="si">{</span><span class="n">contrasts</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">batch_effect</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span> <span class="o">==</span> <span class="s2">&quot;BatchEffect&quot;</span>
+            <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;~BatchEffect+</span><span class="si">{</span><span class="n">contrasts</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">),</span>
         <span class="n">levels</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">contrasts</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">][</span><span class="mi">1</span><span class="p">:],</span>
         <span class="n">factor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">contrasts</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">log</span><span class="p">:</span>
