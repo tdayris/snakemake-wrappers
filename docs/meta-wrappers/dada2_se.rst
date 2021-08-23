@@ -38,7 +38,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/dada2/quality-profile/{sample}.{orientation}-quality-profile-se.log"
         wrapper:
-            "0.77.0-1060-g71ce65ad6/bio/dada2/quality-profile"
+            "0.77.0-1061-gc0678288b/bio/dada2/quality-profile"
 
     rule dada2_filter_trim_se:
         input:
@@ -56,7 +56,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/dada2/filter-trim-se/{sample}.log"
         threads: 1 # set desired number of threads here
         wrapper:
-            "0.77.0-1060-g71ce65ad6/bio/dada2/filter-trim"
+            "0.77.0-1061-gc0678288b/bio/dada2/filter-trim"
 
     rule dada2_learn_errors:
         input:
@@ -71,7 +71,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/dada2/learn-errors/learn-errors_{orientation}.log"
         threads: 1 # set desired number of threads here
         wrapper:
-            "0.77.0-1060-g71ce65ad6/bio/dada2/learn-errors"
+            "0.77.0-1061-gc0678288b/bio/dada2/learn-errors"
 
     rule dada2_dereplicate_fastq:
         input:
@@ -83,7 +83,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/dada2/dereplicate-fastq/{fastq}.log"
         wrapper:
-            "0.77.0-1060-g71ce65ad6/bio/dada2/dereplicate-fastq"
+            "0.77.0-1061-gc0678288b/bio/dada2/dereplicate-fastq"
 
     rule dada2_sample_inference:
         input:
@@ -96,7 +96,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/dada2/sample-inference/{sample}.{orientation}.log"
         threads: 1 # set desired number of threads here
         wrapper:
-            "0.77.0-1060-g71ce65ad6/bio/dada2/sample-inference"
+            "0.77.0-1061-gc0678288b/bio/dada2/sample-inference"
 
     rule dada2_make_table_se:
         input:
@@ -110,7 +110,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/dada2/make-table/make-table-se.log"
         threads: 1 # set desired number of threads here
         wrapper:
-            "0.77.0-1060-g71ce65ad6/bio/dada2/make-table"
+            "0.77.0-1061-gc0678288b/bio/dada2/make-table"
 
     rule dada2_remove_chimeras:
         input:
@@ -121,7 +121,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/dada2/remove-chimeras/remove-chimeras.log"
         threads: 1 # set desired number of threads here
         wrapper:
-            "0.77.0-1060-g71ce65ad6/bio/dada2/remove-chimeras"
+            "0.77.0-1061-gc0678288b/bio/dada2/remove-chimeras"
 
     rule dada2_collapse_nomismatch:
         input:
@@ -132,7 +132,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/dada2/collapse-nomismatch/collapse-nomismatch.log"
         threads: 1 # set desired number of threads here
         wrapper:
-            "0.77.0-1060-g71ce65ad6/bio/dada2/collapse-nomismatch"
+            "0.77.0-1061-gc0678288b/bio/dada2/collapse-nomismatch"
 
     rule dada2_assign_taxonomy:
         input:
@@ -144,7 +144,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/dada2/assign-taxonomy/assign-taxonomy.log"
         threads: 1 # set desired number of threads here
         wrapper:
-            "0.77.0-1060-g71ce65ad6/bio/dada2/assign-taxonomy"
+            "0.77.0-1061-gc0678288b/bio/dada2/assign-taxonomy"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
