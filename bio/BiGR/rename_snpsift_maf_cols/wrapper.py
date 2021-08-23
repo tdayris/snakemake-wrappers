@@ -1,0 +1,176 @@
+#!/usr/bin/python3.8
+# -*- coding: utf-8 -*-
+
+"""
+Rename splitted vcf columns
+"""
+
+import pandas
+import logging
+
+logging.basicConfig(
+    filename=snakemake.log[0],
+    filemode="w",
+    level=logging.DEBUG
+)
+
+def get_variant_type(ref: str, alt: str) -> str:
+    """
+    Return variant type given the reference and the alternative alleles
+    """
+    if ref == ".": # Nothing in REF, added in ALT
+        return "INS"
+    if alt == ".":
+        return "DEL" # Something in REF, nothing in ALT
+
+    if len(ref) == 1:
+        if len(alt) == 1:
+            return "SNP" # REF and ALT only have one nucleotide
+        return "ONP" # REF had less nucleotides than ALT
+
+    if len(ref) == 2:
+        if len(alt) == 2:
+            return "DNP" # REF and ALT have two nucleotides
+        return "ONP" # REF has two nucleotides, ALT have unknown
+
+    if len(ref) == 3:
+        if len(alt) == 3:
+            return "TNP" # REF and ALT have three nucleotides
+        return "ONP" # REF has three nucleotides, ALT have unknown
+    return "ONP" # More than 3 nucleotides in ref, unknown in ALT
+
+
+headers_mutect2 = {
+    "CHROM": "Chromosome",
+    "POS": "Start_Position",
+    "ID": "Variant_ID",
+    "REF": "Reference_Allele",
+    "ALT": "Tumor_Seq_Allele1",
+    "FILTER": "Filter",
+    "FORMAT:AD": "Allelic_depths",
+    "FORMAT:AF": "Allele_fractions",
+    "FORMAT:DP": "Pileup_Read_Depth",
+    "FORMAT:F1R2": "F1R2_orientation",
+    "FORMAT:F2R1": "F2R1_orientation",
+    "FORMAT:GQ": "Genotype_quality",
+    "FORMAT:GT": "Genotype",
+    "FORMAT:PGT": "Physical_phasing_haplotype",
+    "FORMAT:PID": "Physical_phasing_ID",
+    "FORMAT:PL": "Normalized_Phred_scaled_likelihoods",
+    "FORMAT:PS": "Phasing_set",
+    "FORMAT:SB": "Strand_bias_Fisher_component",
+    "AS_SB_TABLE": "Allele_specific_Strand_bias",
+    "AS_UNIQ_ALT_READ_COUNT": "Unique_alt_variant_count",
+    "CONTQ": "Phred_scaled_qualities_non_contamination",
+    "DP": "Mutect2_Read_depth",
+    "ECNT": "Events_in_haplotype",
+    "GERMQ": "Phred_scaled_quality_non_germline",
+    "MBQ": "Median_base_quality",
+    "MFRL": "Median_fragment_length",
+    "MMQ": "Median_mapping_quality",
+    "MPOS": "Median_distance_to_end_read",
+    "NALOD": "Negative_log_10_odds_of_artifact",
+    "NCount": "Pileup_N_base_depth",
+    "NLOD": "Normal_log_10_likelihood_ploïdy",
+    "OCM": "Non_matching_original_alignment",
+    "PON": "Panel_of_Normal",
+    "POPAF": "negative_log_10_population_allele_frequencies",
+    "ROQ": "Phred_scaled_qualities_not_orientation_bias",
+    "RPA": "Number_tandem_repetition",
+    "RU": "Repeat_unit",
+    "SEQQ": "Phred_scaled_quality_not_sequencing_error",
+    "STR": "Is_short_tandem_repeat",
+    "STRANDQ": "Phred_scaled_quality_not_strand_bias",
+    "STRQ": "Phred_scaled_quality_not_tandem_polymerase_error",
+    "TLOD": "Log_10_likelihood_variant_exists",
+    "ANN[*].ALLELE": "SnpEff_Genotype",
+    "ANN[*].EFFECT": "Variant_Classification",
+    "ANN[*].IMPACT": "IMPACT",
+    "ANN[*].GENE": "Hugo_Symbol",
+    "ANN[*].GENEID": "Gene",
+    "ANN[*].FEATURE": "Feature",
+    "ANN[*].FEATUREID": "Transcript_ID",
+    "ANN[*].BIOTYPE": "BIOTYPE",
+    "ANN[*].RANK": "Exon_Intron_rank",
+    "ANN[*].HGVS_C": "HGVSc",
+    "ANN[*].HGVS_P": "HGVSp",
+    "ANN[*].CDNA_POS": "cDNA_position",
+    "ANN[*].CDNA_LENANN[*].CDS_POS": "CDS_position",
+    "ANN[*].CDS_LEN": "CDS_length",
+    "ANN[*].AA_POS": "Protein_position",
+    "ANN[*].AA_LEN": "Protein_length",
+    "ANN[*].DISTANCE": "DISTANCE",
+    "ANN[*].ERRORS": "Errors",
+    "LOF": "Loss_of_Function",
+    "NMD": "Nonsense_mediated_decay"
+}
+
+# Gather parameters
+add_cols = snakemake.params.get("add_cols", True)
+ncbi_build = snakemake.params.get("ncbi_build", "GRCh38")
+center = snakemake.params.get("center", "GustaveRoussy")
+caller = snakemake.params.get("caller", "mutect2")
+logging.info("Parameters retrieved")
+
+# Load user's data
+variants = pandas.read_csv(
+    snakemake.input["tsv"],
+    sep="\t",
+    header=0,
+    index_col=None
+)
+logging.info("Variants loaded in memory")
+
+# Replace header names
+new_header = []
+translation_table = (
+    headers_mutect2
+    if caller.lower() == "mutect2"
+    else None
+)
+
+for colname in variants.columns.tolist():
+    new_colname = translation_table.get(colname)
+    new_header.append(new_colname if new_colname is not None else colname)
+variants.columns = new_header
+logging.info("New header defined")
+
+# Add new columns on demand
+if add_cols is True:
+    if "Center" not in variants.columns:
+        logging.debug("Adding Sequencing Center information")
+        variants["Center"] = [
+            center for _ in variants["Hugo_Symbol"]
+        ]
+
+    if "NCBI_Build" not in variants.columns:
+        logging.debug("Adding NCBI build information")
+        variants["NCBI_Build"] = [
+            ncbi_build for _ in variants["Hugo_Symbol"]
+        ]
+
+    if "End_Position" not in variants.columns:
+        logging.debug("Adding End position")
+        variants["End_Position"] = [
+            start - (len(ref) - 1)
+            for start, ref in zip(
+                variants["Start_Position"], variants["Reference_Allele"]
+            )
+        ]
+
+    if "Variant_Type" not in variants.columns:
+        logging.debug("Adding variant type")
+        variants["Variant_Type"] = [
+            get_variant_type(ref, alt)
+            for ref, alt
+            in zip(variants["Reference_Allele"], variants["Tumor_Seq_Allele1"])
+        ]
+
+    if "SYMBOL" not in variants.columns:
+        logging.debug("Adding gene symbols")
+        variants["SYMBOL"] = [i for i in variants["Hugo_Symbol"]]
+    if "HGNC_ID" not in variants.columns:
+        logging.debug("Adding hugo symbols")
+        variants["HGNC_ID"] = [i for i in variants["Hugo_Symbol"]]
+
+variants.to_csv(snakemake.output["tsv"], sep="\t", index=False)
