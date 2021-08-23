@@ -132,6 +132,13 @@ def run(wrapper, cmd, check_log=None):
 
 
 @skip_if_not_modified
+def test_split_vcf_features():
+    run(
+        "bio/BiGR/split_vcf_features",
+        ["snakemake", "--cores", "1", "mouse.split.vcf", "--use-conda", "-F"],
+    )
+
+@skip_if_not_modified
 def test_seaborn_kmeans():
     run(
         "bio/seaborn/kmeans",
