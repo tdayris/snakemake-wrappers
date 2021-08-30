@@ -1,0 +1,120 @@
+import sys
+from pathlib import Path
+
+worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+common = str(worflow_source_dir / "../../../../bigr_pipelines/common/python")
+sys.path.append(common)
+
+from file_manager import *
+
+default_config_vcf_post_process = {
+    "ncbi_build": "GRCh38",
+    "center": "GustaveRoussy",
+    "annotation_tag": "ANN=",
+    "sample_list": list()
+}
+
+try:
+    if config == dict():
+        config = default_config_vcf_post_process
+except NameError:
+    config = default_config_vcf_post_process
+
+
+
+"""
+Big concatenation for maftools
+"""
+rule concat_all_mafs:
+    input:
+        expand(
+            "maf/maftools/{sample}.maf",
+            sample=config["sample_list"]
+        )
+    output:
+        "maf/maftools/complete.maf"
+    message:
+        "Merging separates maf files in a single cohort maf"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/maftools/concat.log"
+    shell:
+        "cat {input} > {output} 2> {log}"
+
+
+"""
+Assure MAFtools compatibility and human readability
+"""
+rule rename_snpsift_maf_cols:
+    input:
+        tsv="maf/extracted/{sample}.tsv"
+    output:
+        tsv="maf/maftools/{sample}.maf"
+    message:
+        "Renaming columns to fit MAFtools requirement in {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/maftools/rename/{sample}.log"
+    params:
+        add_cols=True,
+        ncbi_build=config.get("NBCI_build", "GRCh38"),
+        center=config.get("center", "GustaveRoussy"),
+        Tumor_Sample_Barcode=lambda wildcards: f"{wildcards.sample}_tumor",
+        Matched_Norm_Sample_Barcode==lambda wildcards: f"{wildcards.sample}_normal"
+    wrapper:
+        "bio/BiGR/rename_snpsift_maf_cols"
+
+
+"""
+Extracting all INFO/FORMAT data, the list is built from vcf header
+"""
+rule extract_all_fields:
+    input:
+        call="maf/splitted/{sample}.vcf"
+    output:
+        tsv=temp("maf/extracted/{sample}.tsv")
+    message:
+        "Extracting variant annotations for {wildcards.sample}"
+    threads: 2
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/snpsift/extract_all_fields/{sample}.log"
+    params:
+        annotation_tag=config.get(annotation_tag, "ANN=")
+    wrapper:
+        "bio/BiGR/split_vcf_features"
+
+
+"""
+Split annotation since it may lead to errors in MAFtools and/or in a result
+file more difficult to read by a human.
+"""
+rule split_vcf_features:
+    input:
+        call="snpsift/dbnsfp/{sample}.vcf"
+    output:
+        call=temp("maf/splitted/{sample}.vcf")
+    message:
+        "Splitting variant annotations for {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/split_vcf_features/{sample}.log"
+    params:
+        annotation_tag="ANN="
+    wrapper:
+        "bio/BiGR/split_vcf_features"
