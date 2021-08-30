@@ -286,7 +286,8 @@
     <span class="nb">input</span><span class="p">:</span>
          <span class="c1">#pairwise_scatterplot = &quot;image.png&quot;,</span>
          <span class="c1">#clustermap_sample = &quot;image.png&quot;,</span>
-         <span class="c1">#clustermap_sample = &quot;figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap/ClusteredHeatmap.samples.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png&quot;,</span>
+         <span class="c1">#clustermap_genes = &quot;figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap/ClusteredHeatmap.genes.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png&quot;,</span>
+         <span class="n">clustermap_sample</span> <span class="o">=</span> <span class="s2">&quot;figures/DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">/clustermap/ClusteredHeatmap.samples.DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">.png&quot;</span><span class="p">,</span>
          <span class="n">pca_plot</span> <span class="o">=</span> <span class="s2">&quot;figures/DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">/pca/pca_</span><span class="si">{factor}</span><span class="s2">_ax_1_ax_2_with_elipse.png&quot;</span><span class="p">,</span>
          <span class="n">volcanoplot</span> <span class="o">=</span> <span class="s2">&quot;figures/DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">/volcano/Volcano.DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">.png&quot;</span><span class="p">,</span>
          <span class="n">distro_expr</span> <span class="o">=</span> <span class="s2">&quot;figures/DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">/distro_expr/distro_expr.DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">.png&quot;</span><span class="p">,</span>
@@ -296,7 +297,8 @@
         <span class="n">multiqc_config</span> <span class="o">=</span> <span class="s2">&quot;multiqc/DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">/multiqc_config.yaml&quot;</span><span class="p">,</span>
         <span class="n">plots</span> <span class="o">=</span> <span class="p">[</span>
             <span class="c1">#temp(&quot;pairwise_scatterplot_mqc.png&quot;),</span>
-            <span class="c1">#temp(&quot;clustermap_sample_mqc.png&quot;),</span>
+            <span class="c1">#temp(&quot;multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap_genes_mqc.png&quot;),</span>
+            <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;multiqc/DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">/clustermap_sample_mqc.png&quot;</span><span class="p">),</span>
             <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;multiqc/DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">/pca_plot_mqc.png&quot;</span><span class="p">),</span>
             <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;multiqc/DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">/volcanoplot_mqc.png&quot;</span><span class="p">),</span>
             <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;multiqc/DGE_considering_factor_</span><span class="si">{factor}</span><span class="s2">_comparing_test_</span><span class="si">{test}</span><span class="s2">_vs_ref_</span><span class="si">{ref}</span><span class="s2">/distro_expr_mqc.png&quot;</span><span class="p">),</span>
@@ -337,17 +339,36 @@
 <span class="c1">### TSV report ###</span>
 <span class="c1">##################</span>
 
-<span class="n">rule</span> <span class="n">csv_report</span><span class="p">:</span>
+<span class="n">rule</span> <span class="n">zip_csv_report</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="c1"># TODO: Add correct deseq2path</span>
-        <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{comparison}</span><span class="s2">_</span><span class="si">{subset}</span><span class="s2">.tsv&quot;</span>
+        <span class="s2">&quot;rbt/csv-report/</span><span class="si">{comparison}</span><span class="s2">/html_table_deseq2_</span><span class="si">{subset}</span><span class="s2">&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">report</span><span class="p">(</span>
-            <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{subset}</span><span class="s2">_report&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/html_table_deseq2_</span><span class="si">{subset}</span><span class="s2">.tar.bz2&quot;</span><span class="p">,</span>
             <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;../report/gseapp_fc_fc.rst&quot;</span><span class="p">,</span>
             <span class="n">category</span><span class="o">=</span><span class="s2">&quot;9. GSEAapp Shiny&quot;</span><span class="p">,</span>
             <span class="n">subcategory</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{comparison}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Compressing </span><span class="si">{wildcards.comparison}</span><span class="s2"> html &quot;</span>
+        <span class="s2">&quot;deseq2 </span><span class="si">{wildcards.subset}</span><span class="s2"> table&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">40</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/rbt/csv-report/compress/</span><span class="si">{comparison}</span><span class="s2">_</span><span class="si">{subset}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s2">&quot;-cvjf&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;tar </span><span class="si">{params}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2"> </span><span class="si">{input}</span><span class="s2">&quot;</span>
+
+<span class="n">rule</span> <span class="n">csv_report</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{comparison}</span><span class="s2">_</span><span class="si">{subset}</span><span class="s2">.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;rbt/csv-report/</span><span class="si">{comparison}</span><span class="s2">/html_table_deseq2_</span><span class="si">{subset}</span><span class="s2">&quot;</span><span class="p">))</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Making </span><span class="si">{wildcards.comparison}</span><span class="s2"> DESeq2 results readable &quot;</span>
         <span class="s2">&quot;(DESeq2 results </span><span class="si">{wildcards.subset}</span><span class="s2">)&quot;</span>
@@ -357,10 +378,7 @@
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span><span class="o">=</span><span class="p">(</span>
-            <span class="s2">&quot;--separator $&#39;</span><span class="se">\t</span><span class="s2">&#39; --sort-column stat_change &quot;</span>
-            <span class="s2">&quot;--rows-per-page 50 --sort-order ascending&quot;</span>
-        <span class="p">)</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--separator $&#39;</span><span class="se">\\</span><span class="s2">t&#39; --rows-per-page 50 --sort-order ascending&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/rbt/csv-report/</span><span class="si">{comparison}</span><span class="s2">_</span><span class="si">{subset}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
@@ -408,15 +426,40 @@
 <span class="c1">###############</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule creates a gene-clustered heatmap</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">seaborn_clustermap_gene</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/filtered_dst.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">png</span> <span class="o">=</span> <span class="s2">&quot;figures/</span><span class="si">{comparison}</span><span class="s2">/clustermap/ClusteredHeatmap.genes.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Plotting gene-clustered heatmap for </span><span class="si">{wildcards.comparison}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">conditions</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;condition_dict&quot;</span><span class="p">][</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
+        <span class="n">factor</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{comparison}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">row_condition_color</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/seaborn/clustermap/</span><span class="si">{comparison}</span><span class="s2">.genes.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/seaborn/clustermap_genes&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule creates a sample-clustered heatmap</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">rule</span> <span class="n">seaborn_clustermap</span><span class="p">:</span>
+<span class="n">rule</span> <span class="n">seaborn_clustermap_sample</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">counts</span> <span class="o">=</span> <span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/wald.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/dst.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">png</span> <span class="o">=</span> <span class="s2">&quot;figures/</span><span class="si">{comparison}</span><span class="s2">/clustermap/ClusteredHeatmap.samples.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span>
     <span class="n">message</span><span class="p">:</span>
-        <span class="s2">&quot;Plotting clustered heatmap for </span><span class="si">{wildcards.comparison}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Plotting sample-clustered heatmap for </span><span class="si">{wildcards.comparison}</span><span class="s2">&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">1024</span><span class="p">),</span>
@@ -426,9 +469,33 @@
         <span class="n">conditions</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;condition_dict&quot;</span><span class="p">][</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
         <span class="n">factor</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{comparison}</span><span class="s2">&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/seaborn/clustermap/</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span>
+        <span class="s2">&quot;logs/seaborn/clustermap/</span><span class="si">{comparison}</span><span class="s2">.sample.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/seaborn/clustermap&quot;</span>
+
+<span class="n">rule</span> <span class="n">test_pandas_deseq2_merge</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">wald_tsv</span> <span class="o">=</span> <span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/wald.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+        <span class="n">dst_tsv</span> <span class="o">=</span> <span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/dst.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+        <span class="n">gene2gene</span> <span class="o">=</span> <span class="s2">&quot;tximport/gene2gene.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">filtered_counts</span><span class="o">=</span><span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/filtered_dst.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+        <span class="n">filtered_deseq2</span><span class="o">=</span><span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/filtered_deseq2.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+        <span class="n">merged_table</span><span class="o">=</span><span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/merged_deseq2_counts.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Merging counts and DESeq2 results for </span><span class="si">{wildcards.comparison}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">alpha_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+        <span class="n">fold_change</span><span class="o">=</span><span class="mf">0.001</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/pandas/merged_deseq2_counts/</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/pandas/deseq2_merge&quot;</span>
 
 <span class="c1">#######################</span>
 <span class="c1">### EnhancedVolcano ###</span>
@@ -457,6 +524,126 @@
         <span class="s2">&quot;bio/enhancedVolcano/volcano-deseq2&quot;</span>
 
 
+<span class="c1">############################</span>
+<span class="c1">### Consensus Clustering ###</span>
+<span class="c1">############################</span>
+
+<span class="n">rule</span> <span class="n">consensus_cluster_plus</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expr_mat</span> <span class="o">=</span> <span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/dst.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">res_dir</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;consensusclusterplus/</span><span class="si">{comparison}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Clustering samples in </span><span class="si">{wildcards.comparison}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/consensus_cluster_plus/</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;clusterAlg=&#39;km&#39;, title=&#39;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="si">}</span><span class="s2">&#39;, distance=&#39;euclidean&#39;&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/consensusclusterplus&quot;</span>
+
+
+<span class="c1">#######################################</span>
+<span class="c1">### General PCA over all the cohort ###</span>
+<span class="c1">#######################################</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule plots a PCA on a given TSV count file</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">general_pca</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">counts</span><span class="o">=</span><span class="s2">&quot;salmon/TMP.genes.nochr.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">png</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{factor}</span><span class="s2">_</span><span class="si">{axes}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+            <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PC1_PC2&quot;</span><span class="p">,</span> <span class="s2">&quot;PC2_PC1&quot;</span><span class="p">],</span>
+            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Plotting general PCA over </span><span class="si">{wildcards.factor}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/seaborn/pca/general.</span><span class="si">{factor}</span><span class="s2">.png&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="n">conditions</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span>
+            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;design&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;design&quot;</span><span class="p">][</span><span class="n">wildcards</span><span class="o">.</span><span class="n">factor</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="p">)),</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;figures/pca/general.pca.</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/seaborn/pca&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule removes unnecessary columns for further seaborn PCA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">filter_merged_counts</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">table</span><span class="o">=</span><span class="s2">&quot;salmon/TPM.genes.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">table</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;salmon/TMP.genes.nochr.tsv&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Removing gene annotations&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;salmon_merge&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/seaborn/pca/filter.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">drop_column</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Chromosomes&quot;</span><span class="p">,</span> <span class="s2">&quot;Start&quot;</span><span class="p">,</span> <span class="s2">&quot;End&quot;</span><span class="p">,</span> <span class="s2">&quot;Hugo_id&quot;</span><span class="p">]</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/pandas/filter_table&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule merges salmon counts into a single TSV table</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">pandas_merge_salmon_tr</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">quant</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;design&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="p">),</span>
+        <span class="n">tx2gene</span> <span class="o">=</span> <span class="s2">&quot;tximport/transcripts2genes.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;salmon/TPM.</span><span class="si">{content}</span><span class="s2">.tsv&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Merging salmon individual counts on </span><span class="si">{wildcards.content}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;for further general PCA&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">3072</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;salmon_merge&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">gencode</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">drop_na</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">dro_null</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">wildcards</span><span class="o">.</span><span class="n">content</span> <span class="o">==</span> <span class="s2">&quot;genes&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/pandas_merge_salmon/</span><span class="si">{content}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/pandas/salmon&quot;</span>
+
+
 <span class="c1">####################</span>
 <span class="c1">### PCA Explorer ###</span>
 <span class="c1">####################</span>
@@ -480,10 +667,7 @@
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;intgroup = c(&#39;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">factor</span><span class="si">}</span><span class="s2">&#39;), &quot;</span>
-            <span class="s2">&quot;ntop = 100, pcX = </span><span class="si">{wildcards.a}</span><span class="s2">, &quot;</span>
-            <span class="s2">&quot;pcY = </span><span class="si">{wildcards.b}</span><span class="s2">, ellipse = &quot;</span>
-            <span class="s2">&quot;{&#39;TRUE&#39; if wildcards.elipse == &#39;with_elipse&#39; else &#39;FALSE&#39;}&quot;</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;intgroup = c(&#39;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">factor</span><span class="si">}</span><span class="s2">&#39;), ntop = 100, pcX = </span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">a</span><span class="si">}</span><span class="s2">, pcY = </span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">b</span><span class="si">}</span><span class="s2">, ellipse = </span><span class="si">{</span><span class="s1">&#39;TRUE&#39;</span> <span class="k">if</span> <span class="n">wildcards</span><span class="o">.</span><span class="n">elipse</span> <span class="o">==</span> <span class="s1">&#39;with_elipse&#39;</span> <span class="k">else</span> <span class="s1">&#39;FALSE&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
         <span class="n">w</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span>
         <span class="n">h</span> <span class="o">=</span> <span class="mi">768</span>
     <span class="n">log</span><span class="p">:</span>
@@ -492,6 +676,9 @@
         <span class="s2">&quot;bio/pcaExplorer/PCA&quot;</span>
 
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule plots the distribution of the expression of Salmon counts</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">pca_explorer_distro_expr</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">dst</span> <span class="o">=</span> <span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/wald.</span><span class="si">{comparison}</span><span class="s2">.RDS&quot;</span>
@@ -516,7 +703,9 @@
 <span class="c1">##############</span>
 <span class="c1">### DESeq2 ###</span>
 <span class="c1">##############</span>
-
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This rule creates a MA-Plot</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">deseq2_maplot</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/wald.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span>

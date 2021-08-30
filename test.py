@@ -132,6 +132,14 @@ def run(wrapper, cmd, check_log=None):
 
 
 @skip_if_not_modified
+def test_rename_snpsift_maf_cols():
+    run(
+        "bio/BiGR/rename_snpsift_maf_cols",
+        ["snakemake", "--cores", "1", "mouse.renamed.tsv", "--use-conda", "-F"],
+    )
+
+
+@skip_if_not_modified
 def test_split_vcf_features():
     run(
         "bio/BiGR/split_vcf_features",

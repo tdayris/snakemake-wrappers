@@ -90,6 +90,34 @@ rule all:
         "Finishing the WES Somatic Variant Calling"
 
 
+
+##################
+### VCF to MAF ###
+##################
+
+vcf_post_process_config = {
+
+}
+
+module vcf_post_process:
+    snakefile: "../../meta/bio/vcf_post_process/test/Snakefile"
+    config: vcf_post_process_config
+
+use rule * from vcf_post_process
+
+
+use rule tabix_index from compress_index_vcf_meta as snp_indel_tabix_index with:
+    input:
+        "{tool}/{subcommand}/{sample}.{content}.vcf.gz"
+    output:
+        "{tool}/{subcommand}/{sample}.{content}.vcf.gz.tbi"
+    message:
+        "Indexing {wildcards.sample} (from somatic varscan "
+        "{wildcards.content}) with tabix."
+    log:
+        "logs/{tool}/{subcommand}/tabix/index/{sample}.{content}.log"
+
+
 #################
 ### Gather QC ###
 #################

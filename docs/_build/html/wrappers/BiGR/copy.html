@@ -103,6 +103,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#params">Params</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
@@ -110,7 +111,9 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="drop_duplicates_md5.html">DROP_MD5_DUPLICATES</a></li>
 <li class="toctree-l3"><a class="reference internal" href="multiqc_rnaseq_report.html">MULTIQC_RNASEQ_REPORT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rename_snpsift_maf_cols.html">RENAME_SNPSIFT_MAF_COLS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="split_design.html">SPLIT_DESIGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="split_vcf_features.html">SPLIT VCF FEATURES</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rsamtools.html">RSAMTOOLS</a></li>
@@ -142,6 +145,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../compress.html">COMPRESS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../concatenate_fastq.html">CONCATENATE FASTQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../consensusclusterplus.html">CONSENSUSCLUSTERPLUS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cpat.html">CPAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
@@ -351,7 +355,7 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="nb">input</span><span class="o">=</span><span class="s2">&quot;src/file.txt&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/BiGR/copy&quot;</span>
+        <span class="s2">&quot;0.77.0-1061-gc0678288b/bio/BiGR/copy&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">test_bigr_copy_duo</span><span class="p">:</span>
@@ -361,7 +365,7 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="nb">input</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;src/file1.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;src/file2.txt&quot;</span><span class="p">]</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/BiGR/copy&quot;</span>
+        <span class="s2">&quot;0.77.0-1061-gc0678288b/bio/BiGR/copy&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">test_bigr_copy_concat</span><span class="p">:</span>
@@ -370,7 +374,7 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="nb">input</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;src/file1.txt,src/file2.txt&quot;</span><span class="p">]</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/BiGR/copy&quot;</span>
+        <span class="s2">&quot;0.77.0-1061-gc0678288b/bio/BiGR/copy&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">test_bigr_copy_to_dir</span><span class="p">:</span>
@@ -379,7 +383,7 @@
     <span class="n">params</span><span class="p">:</span>
         <span class="nb">input</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;src/file1.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;src/file2.txt&quot;</span><span class="p">]</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/BiGR/copy&quot;</span>
+        <span class="s2">&quot;0.77.0-1061-gc0678288b/bio/BiGR/copy&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -400,11 +404,18 @@
 <h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
 <p><strong>Input:</strong></p>
 <ul class="simple">
-<li><p>Optional source path to the copied file</p></li>
+<li><p>Optional source path(s) to the copied file(s)</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
-<li><p>Destination path of the copied file</p></li>
+<li><p>Destination path(s) of the copied file(s)</p></li>
+</ul>
+</div>
+<div class="section" id="params">
+<h2>Params<a class="headerlink" href="#params" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">extra</span></code>: Optional parameters for bash <cite>cp</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">extra_irods</span></code>: Optional parameters for irods <cite>iget</cite></p></li>
 </ul>
 </div>
 <div class="section" id="notes">

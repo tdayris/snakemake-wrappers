@@ -128,6 +128,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../compress.html">COMPRESS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../concatenate_fastq.html">CONCATENATE FASTQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../consensusclusterplus.html">CONSENSUSCLUSTERPLUS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cpat.html">CPAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
@@ -363,7 +364,7 @@
         <span class="n">conditions</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="s2">&quot;CondA&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="s2">&quot;CondB&quot;</span><span class="p">},</span>
         <span class="n">factor</span> <span class="o">=</span> <span class="s2">&quot;Condition_Test&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/seaborn/clustermap_genes&quot;</span>
+        <span class="s2">&quot;0.77.0-1061-gc0678288b/bio/seaborn/clustermap_genes&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -475,14 +476,6 @@
 
 <span class="c1"># Remove possible text annotations and validate</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">number</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span>
-<span class="n">nbs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-<span class="n">nbc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditions</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-<span class="k">if</span> <span class="n">nbs</span> <span class="o">!=</span> <span class="n">nbc</span><span class="p">:</span>
-    <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;Expected same number of samples and conditions, got </span><span class="si">{</span><span class="n">nbs</span><span class="si">}</span><span class="s2"> != </span><span class="si">{</span><span class="n">nbc</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="p">)</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 
 <span class="c1"># Create custom colormap for heatmap values</span>
 <span class="n">cmap</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">diverging_palette</span><span class="p">(</span>
@@ -490,6 +483,7 @@
     <span class="n">h_pos</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">as_cmap</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Color palette built&quot;</span><span class="p">)</span>
 
 <span class="c1"># Create a categorical palette for samples identification</span>
 <span class="n">cond_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">conditions</span><span class="p">[</span><span class="n">cond_id</span><span class="p">])</span>
@@ -501,7 +495,7 @@
     <span class="n">sample</span><span class="p">:</span> <span class="n">cond_colors</span><span class="p">[</span><span class="n">cond</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">sample</span><span class="p">,</span> <span class="n">cond</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">conditions</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">conditions</span><span class="p">[</span><span class="n">cond_id</span><span class="p">])</span>
 <span class="p">}</span>
-
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Color palette assigned to samples&quot;</span><span class="p">)</span>
 
 <span class="c1"># Sorry for that part, yet I could not manage to find any</span>
 <span class="c1"># other way to perform quicker multi-level indexing</span>
@@ -516,39 +510,45 @@
 <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
             <span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">cond_id</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">])</span>
             <span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Multi level indexing build&quot;</span><span class="p">)</span>
 
 <span class="n">condition_colors</span> <span class="o">=</span> <span class="p">(</span><span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">cond_id</span><span class="p">),</span>
                                   <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
                           <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">cond_colors</span><span class="p">))</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Sample/Color mapped&quot;</span><span class="p">)</span>
 
 <span class="c1"># Build graph</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">clustermap</span><span class="p">(</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
-    <span class="n">row_colors</span><span class="o">=</span><span class="p">(</span>
+    <span class="n">col_colors</span><span class="o">=</span><span class="p">(</span>
         <span class="n">condition_colors</span>
-        <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;row_condition_color&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;col_condition_color&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
         <span class="k">else</span> <span class="kc">None</span>
     <span class="p">),</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;average&quot;</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span>
+    <span class="n">zscore</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">row_cluster</span><span class="o">=</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;row_cluster&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">),</span>
     <span class="n">col_cluster</span><span class="o">=</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;col_cluster&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">),</span>
     <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span>
-        <span class="p">(</span><span class="mi">15</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="mi">50</span> <span class="k">else</span> <span class="mi">30</span><span class="p">),</span>
-        <span class="p">(</span><span class="mi">15</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">50</span> <span class="k">else</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="nb">min</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span><span class="o">/</span><span class="mi">50</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="nb">min</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span><span class="o">/</span><span class="mi">50</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
     <span class="p">),</span>
-    <span class="n">robust</span><span class="o">=</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;robust&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">robust</span><span class="o">=</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;robust&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span>
 <span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;clustermap built&quot;</span><span class="p">)</span>
 
 <span class="c1"># Rotate sample id to make them readable</span>
 <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">ax_heatmap</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">get_majorticklabels</span><span class="p">(),</span>
-    <span class="n">rotation</span><span class="o">=</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ylabel_rotation&quot;</span><span class="p">,</span> <span class="mi">90</span><span class="p">)</span>
+    <span class="n">rotation</span><span class="o">=</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ylabel_rotation&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="p">)</span>
 
 <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">ax_heatmap</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">get_majorticklabels</span><span class="p">(),</span>
-    <span class="n">rotation</span><span class="o">=</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;xlabel_rotation&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">rotation</span><span class="o">=</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;xlabel_rotation&quot;</span><span class="p">,</span> <span class="mi">90</span><span class="p">)</span>
 <span class="p">)</span>
 
 <span class="c1"># Save result</span>

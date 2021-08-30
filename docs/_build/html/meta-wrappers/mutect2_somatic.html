@@ -256,9 +256,9 @@
         <span class="n">germline_tbi</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;known&quot;</span><span class="p">]),</span>
         <span class="n">intervals</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;bed&quot;</span><span class="p">]</span>
     <span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_list&quot;</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mi">40</span><span class="p">:</span>
-        <span class="n">input_dict</span><span class="p">[</span><span class="s2">&quot;pon&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;gatk/pon/PoN.g.vcf.gz&quot;</span>
-        <span class="n">input_dict</span><span class="p">[</span><span class="s2">&quot;pon_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;gatk/pon/PoN.g.vcf.gz&quot;</span><span class="p">)</span>
+    <span class="c1"># if len(config[&quot;sample_list&quot;]) &gt;= 40:</span>
+    <span class="c1">#     input_dict[&quot;pon&quot;] = &quot;gatk/pon/PoN.g.vcf.gz&quot;</span>
+    <span class="c1">#     input_dict[&quot;pon_index&quot;] = get_tbi(&quot;gatk/pon/PoN.g.vcf.gz&quot;)</span>
 
     <span class="k">return</span> <span class="n">input_dict</span>
 
@@ -275,7 +275,7 @@
         <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
         <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">,</span>
         <span class="n">bam_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">),</span>
-        <span class="n">f1r2</span><span class="o">=</span><span class="s2">&quot;mutect2/f1r2/</span><span class="si">{sample}</span><span class="s2">.tar.gz&quot;</span><span class="p">,</span>
+        <span class="c1">#f1r2=&quot;mutect2/f1r2/{sample}.tar.gz&quot;,</span>
         <span class="n">contamination</span><span class="o">=</span><span class="s2">&quot;summary/</span><span class="si">{sample}</span><span class="s2">_calculate_contamination.table&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">vcf</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;mutect2/filter/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
@@ -376,18 +376,18 @@
         <span class="s2">&quot;Calling variants on </span><span class="si">{wildcards.sample}</span><span class="s2"> with GATK Mutect2&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">300</span><span class="p">,</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">8192</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">extra</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="p">(</span>
             <span class="s2">&quot;--max-reads-per-alignment-start 0 &quot;</span>
             <span class="s2">&quot;--disable-read-filter MateOnSameContigOrNoMappedMateReadFilter &quot;</span>
-            <span class="s2">&quot;--tumor-sample Mutect2_</span><span class="si">{}</span><span class="s2">_tumor &quot;</span>
-            <span class="s2">&quot;--normal Mutect2_</span><span class="si">{}</span><span class="s2">_normal &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span>
-                <span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span>
-            <span class="p">)</span>
+            <span class="c1">#&quot;--tumor-sample Mutect2_{}_tumor &quot;</span>
+            <span class="c1">#&quot;--normal-sample Mutect2_{}_normal &quot;.format(</span>
+            <span class="c1">#    wildcards.sample,</span>
+            <span class="c1">#    wildcards.sample</span>
+            <span class="c1">#)</span>
         <span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/gatk/mutect2/call/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
@@ -495,7 +495,7 @@
         <span class="s2">&quot;on normal sample only: it will be used for PoN&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">300</span><span class="p">,</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">8192</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>

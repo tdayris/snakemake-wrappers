@@ -200,6 +200,7 @@ The pipeline contains the following steps:
 
     samples_per_prefixes = dict(zip(output_prefixes, samples_iterator))
     logging.debug(samples_per_prefixes)
+    print(samples_per_prefixes.keys())
 
     expected_pcas = [
         f"figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca/pca_{factor}_{axes}_{elipse}.png"
@@ -234,8 +235,18 @@ The pipeline contains the following steps:
     rule target:
         input:
             multiqc=expand(
-                "reports/{comparison}/MultiQC.{comparison}.html",
+                "results/{comparison}/MultiQC.{comparison}.html",
                 comparison=output_prefixes
+            ),
+            gseaapp=expand(
+                "results/{comparison}/{comparison}_{subset}.tsv",
+                comparison=output_prefixes,
+                subset=["complete", "sorted_on_fold_change", "sorted_on_pval"]
+            ),
+            csv_report=expand(
+                "results/{comparison}/html_table_deseq2_{subset}.tar.bz2",
+                comparison=output_prefixes,
+                subset=["complete", "sorted_on_fold_change", "sorted_on_pval"]
             ),
             deseq2_wald=expand(
                 "deseq2/{comparison}/wald.{comparison}.RDS",
@@ -246,63 +257,11 @@ The pipeline contains the following steps:
                 "figures/pca/general.pca.{factor}_{axes}.png",
                 factor=[i[0] for i in comparison_levels],
                 axes=["PC1_PC2", "PC2_PC1"]
-            )
-
-
-    #######################################
-    ### General PCA over all the cohort ###
-    #######################################
-
-
-    rule general_pca:
-        input:
-            counts="salmon/TPM.genes.tsv"
-        output:
-            png=expand(
-                "figures/pca/general.pca.{factor}_{axes}.png",
-                axes=["PC1_PC2", "PC2_PC1"],
-                allow_missing=True
-            )
-        message:
-            "Plotting general PCA over {wildcards.factor}"
-        threads: 1
-        resources:
-            mem_mb=lambda wildcards, attempt: attempt * 2048,
-            time_min=lambda wildcards, attempt: attempt * 5
-        log:
-            "logs/seaborn/pca/general.{factor}.png"
-        params:
-            axes=[1, 2],
-            conditions=lambda wildcards: dict(
-                zip(design.index.tolist(), design[wildcards.factor].tolist())
             ),
-            prefix=lambda wildcards: f"figures/pca/general.pca.{wildcards.factor}"
-        wrapper:
-            "bio/seaborn/pca"
-
-
-    rule pandas_merge_salmon_tr:
-        input:
-            quant = expand(
-                "salmon/pseudo_mapping/{sample}/quant.sf",
-                sample=design.index.tolist()
-            ),
-            tx2gene = "tximport/transcripts2genes.tsv"
-        output:
-            tsv = "salmon/TPM.{content}.tsv"
-        message:
-            "Testing pandas merge salmon"
-        params:
-            header = True,
-            position = True,
-            gencode = True,
-            drop_na = True,
-            dro_null = True,
-            genes = lambda wildcards: wildcards.content == "genes"
-        log:
-            "logs/pandas_merge_salmon/{content}.log"
-        wrapper:
-            "bio/pandas/salmon"
+            #consensus=expand(
+            #    "consensusclusterplus/{comparison}",
+            #    comparison=output_prefixes
+            #)
 
 
     ##############################
@@ -313,6 +272,7 @@ The pipeline contains the following steps:
     deseq2_post_process_config = {
         "condition_dict": condition_dict,
         "samples_per_prefixes": samples_per_prefixes,
+        "design": design.copy(),
         "thresholds": config["thresholds"]
     }
 
@@ -358,6 +318,8 @@ The pipeline contains the following steps:
             additional_plots = [
                 #temp("pairwise_scatterplot_mqc.png"),
                 #temp("clustermap_sample_mqc.png"),
+                "multiqc/{comparison}/clustermap_sample_mqc.png",
+                #"multiqc/{comparison}/clustermap_genes_mqc.png",
                 "multiqc/{comparison}/pca_plot_mqc.png",
                 "multiqc/{comparison}/volcanoplot_mqc.png",
                 "multiqc/{comparison}/distro_expr_mqc.png",

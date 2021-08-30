@@ -36,7 +36,7 @@ This wrapper can be used in the following way:
         log:
             "logs/seaborn_clustermap.log"
         wrapper:
-            "0.77.0-1034-gee6c61611/bio/seaborn/clustermap"
+            "0.77.0-1061-gc0678288b/bio/seaborn/clustermap"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -224,6 +224,8 @@ Code
             if snakemake.params.get("col_condition_color", True) is True
             else None
         ),
+        method="average",
+        metric="euclidean",
         row_cluster=(snakemake.params.get("row_cluster", True) is True),
         col_cluster=(snakemake.params.get("col_cluster", True) is True),
         linewidths=0.5,
@@ -239,12 +241,12 @@ Code
     # Rotate sample id to make them readable
     matplotlib.pyplot.setp(
         ax.ax_heatmap.yaxis.get_majorticklabels(),
-        rotation=snakemake.params.get("ylabel_rotation", 90)
+        rotation=snakemake.params.get("ylabel_rotation", 0)
     )
 
     matplotlib.pyplot.setp(
         ax.ax_heatmap.xaxis.get_majorticklabels(),
-        rotation=snakemake.params.get("xlabel_rotation", 0)
+        rotation=snakemake.params.get("xlabel_rotation", 90)
     )
 
     # Save result

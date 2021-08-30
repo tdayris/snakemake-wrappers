@@ -45,7 +45,7 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="SPLIT_DESIGN" href="split_design.html" />
+    <link rel="next" title="RENAME_SNPSIFT_MAF_COLS" href="rename_snpsift_maf_cols.html" />
     <link rel="prev" title="DROP_MD5_DUPLICATES" href="drop_duplicates_md5.html" /> 
 </head>
 
@@ -104,11 +104,15 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">MULTIQC_RNASEQ_REPORT</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#params">Params</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="rename_snpsift_maf_cols.html">RENAME_SNPSIFT_MAF_COLS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="split_design.html">SPLIT_DESIGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="split_vcf_features.html">SPLIT VCF FEATURES</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rsamtools.html">RSAMTOOLS</a></li>
@@ -140,6 +144,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../compress.html">COMPRESS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../concatenate_fastq.html">CONCATENATE FASTQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../consensusclusterplus.html">CONSENSUSCLUSTERPLUS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cpat.html">CPAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
@@ -377,7 +382,7 @@
             <span class="p">{</span><span class="s2">&quot;Sequencing Setup&quot;</span><span class="p">:</span> <span class="s2">&quot;2x125&quot;</span><span class="p">}</span>
         <span class="p">]</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1034-gee6c61611/bio/BiGR/multiqc_rnaseq_report&quot;</span>
+        <span class="s2">&quot;0.77.0-1061-gc0678288b/bio/BiGR/multiqc_rnaseq_report&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -390,8 +395,47 @@
 <div class="section" id="software-dependencies">
 <h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">bioconda:multiqc=1.9</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge:python=3.8.2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconda::multiqc==1.9</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge::python==3.9.5</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conda-forge::pandas==1.2.5</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">clustermap_sample</span></code>: Optional clustered heatmap of all samples</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clustermap_genes</span></code>: Optional clustered heatmap of DEG</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pca_axes_correlation</span></code>: Optional barplot of the correlation between samples and experimental design factors.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pairwise_scatterplot</span></code>: Optional pairwise scatterplot</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pca_plot</span></code>: Optional PCA</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">volcanoplot</span></code>: Optional volcano plot</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">distro_expr</span></code>: Optional distribution of genes expression per sample</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ma_plot</span></code>: Optional MA-Plot</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">consensus_cluster_plus</span></code>: Optional consensus_cluster_plus result</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">titv_plot</span></code>: Optional Ti/Tv plot from maftools</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">maf_summary</span></code>: Optional maf summary</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">oncoplot</span></code>: Optional oncoplot</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">multiqc_config</span></code>: Path to a yaml file that holds MultiQC config</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">plots</span></code>: A list of graphs depending on the input files</p></li>
+</ul>
+</div>
+<div class="section" id="params">
+<h2>Params<a class="headerlink" href="#params" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">title</span></code>: Optional report title</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">subtitle</span></code>: Optional report subtitle</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">intro_text</span></code>: Optional intro text,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">report_comment</span></code>: Optional comment,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">show_analysis_paths</span></code>: Boolean. Display (default) or hide results paths on the computing machine.,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">show_analysis_time</span></code>: Boolean. Display (default) or hide computation times.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">custom_logo</span></code>: Optional path to a PNG logo,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">custom_logo_url</span></code>: Optional path to a web page,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">custom_logo_title</span></code>: Optional text as a replacement of the logo.,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">report_header_info</span></code>: [{‘Contact E-mail’: ‘An optional email address’}, {‘Application Type’: ‘Optional type of analysis’}, {‘Project Type’: ‘Optional kind of analysed project’}, {‘Sequencing Platform’: ‘Optional info towards the sequencing platform’}, {‘Sequencing Setup’: ‘Optional info about the sequencing kit/method’}]</p></li>
 </ul>
 </div>
 <div class="section" id="authors">
@@ -437,9 +481,22 @@
             <span class="s2">&quot;Per sample clustered heatmap. This plot has been build based on &quot;</span>
             <span class="s2">&quot;normalized counts from DESeq2.&lt;br&gt;&lt;br&gt;Colors run from red &quot;</span>
             <span class="s2">&quot;(identical) to blue (different). Samples are named using the &quot;</span>
-            <span class="s2">&quot;following scheme: condition - sample_id&quot;</span>
+            <span class="s2">&quot;following scheme: condition - sample_id (powered by in-house &quot;</span>
+            <span class="s2">&quot;python scripts: pandas, seaborn and scipy)&quot;</span>
         <span class="p">),</span>
         <span class="s2">&quot;plot_name&quot;</span><span class="p">:</span> <span class="s2">&quot;clustermap_sample_mqc.png&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;clustermap_genes&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;section&quot;</span><span class="p">:</span> <span class="s2">&quot;clustermap_genes&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Heatmap of samples clustered over genes&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;Per genes clustered heatmap. This plot has been build based on &quot;</span>
+            <span class="s2">&quot;filtered normalized counts from DESeq2.&lt;br&gt;&lt;br&gt;Colors run from red&quot;</span>
+            <span class="s2">&quot; (identical) to blue (different). Samples are named using the &quot;</span>
+            <span class="s2">&quot;following scheme: condition - sample_id. (powered by in-house &quot;</span>
+            <span class="s2">&quot;python scripts: pandas, seaborn and scipy)&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;plot_name&quot;</span><span class="p">:</span> <span class="s2">&quot;clustermap_gene_mqc.png&quot;</span>
     <span class="p">},</span>
     <span class="s2">&quot;pca_axes_correlation&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;section&quot;</span><span class="p">:</span> <span class="s2">&quot;pca_axes_correlation&quot;</span><span class="p">,</span>
@@ -449,7 +506,7 @@
             <span class="s2">&quot;the first axe of the PCA. This may help to understand why a DGE &quot;</span>
             <span class="s2">&quot;returns odd results, or which factor masks another.&lt;br&gt;&lt;br&gt;&quot;</span>
             <span class="s2">&quot;This does not foresee anything for the upcomming differential &quot;</span>
-            <span class="s2">&quot;analysis.&quot;</span>
+            <span class="s2">&quot;analysis. (powered by pcaExplorer)&quot;</span>
         <span class="p">),</span>
         <span class="s2">&quot;plot_name&quot;</span><span class="p">:</span> <span class="s2">&quot;pca_axes_correlation_mqc.png&quot;</span>
     <span class="p">},</span>
@@ -463,7 +520,7 @@
             <span class="s2">&quot;against each other. &lt;br&gt;&lt;br&gt;A value of 0.95 and above shows high &quot;</span>
             <span class="s2">&quot;similarities like ones observed in cell lines. A value between &quot;</span>
             <span class="s2">&quot;0.95 and 0.80 shows average similarities. A lesser value shows &quot;</span>
-            <span class="s2">&quot;noticable dissimilarities.&quot;</span>
+            <span class="s2">&quot;noticable dissimilarities. (powered by pcaExplorer)&quot;</span>
         <span class="p">),</span>
         <span class="s2">&quot;plot_name&quot;</span><span class="p">:</span> <span class="s2">&quot;pairwise_scatterplot_mqc.png&quot;</span>
     <span class="p">},</span>
@@ -475,7 +532,7 @@
             <span class="s2">&quot;samples similarities and divergences.&lt;br&gt;&lt;br&gt; Each point represents &quot;</span>
             <span class="s2">&quot;a sample. Two points that are close from each others, are similar to &quot;</span>
             <span class="s2">&quot;each others. Two points, that are apart from each others, are &quot;</span>
-            <span class="s2">&quot;different.&quot;</span>
+            <span class="s2">&quot;different. (powered by pcaExplorer)&quot;</span>
         <span class="p">),</span>
         <span class="s2">&quot;plot_name&quot;</span><span class="p">:</span> <span class="s2">&quot;pca_plot_mqc.png&quot;</span>
     <span class="p">},</span>
@@ -489,7 +546,7 @@
             <span class="s2">&quot;is the confidence we have in the fact that it is differentially &quot;</span>
             <span class="s2">&quot;expressed according to our factor of interest. The more apart a &quot;</span>
             <span class="s2">&quot;point is from the center of the graph, the more differentially &quot;</span>
-            <span class="s2">&quot;expressed it is.&quot;</span>
+            <span class="s2">&quot;expressed it is. (powered by EnhancedVolcano)&quot;</span>
         <span class="p">),</span>
         <span class="s2">&quot;plot_name&quot;</span><span class="p">:</span> <span class="s2">&quot;volcanoplot_mqc.png&quot;</span>
     <span class="p">},</span>
@@ -501,6 +558,7 @@
             <span class="s2">&quot;control performed over a differential gene analysis. &lt;br&gt;&lt;br&gt; We &quot;</span>
             <span class="s2">&quot;expect all samples to have similar distribution, otherwise, it would&quot;</span>
             <span class="s2">&quot; sign a possible error before the end of the normalization process.&quot;</span>
+            <span class="s2">&quot; (powered by pcaExplorer)&quot;</span>
         <span class="p">),</span>
         <span class="s2">&quot;plot_name&quot;</span><span class="p">:</span> <span class="s2">&quot;distro_expr_mqc.png&quot;</span>
     <span class="p">},</span>
@@ -511,9 +569,56 @@
             <span class="s2">&quot;The MAplot compares M (log(ratio)) to A (mean average).&lt;br&gt;&lt;br&gt; &quot;</span>
             <span class="s2">&quot;This helps to highlight possible normalisation issues. We expect no&quot;</span>
             <span class="s2">&quot; direct link between these two values; the graph should remain &quot;</span>
-            <span class="s2">&quot;centered around zero&quot;</span>
+            <span class="s2">&quot;centered around zero. (powered by DESeq2)&quot;</span>
         <span class="p">),</span>
         <span class="s2">&quot;plot_name&quot;</span><span class="p">:</span> <span class="s2">&quot;ma_plot_mqc.png&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;consensus_cluster_plus&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;section&quot;</span><span class="p">:</span> <span class="s2">&quot;consensus_cluster_plus&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Consensus Clustering&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;This graph has been done on DESeq2 normalized counts..&lt;br&gt;&lt;br&gt; &quot;</span>
+            <span class="s2">&quot;This helps to highlight possible confounding effects. We expect our sample to be well separated over the factor of interest. (powered by &quot;</span>
+            <span class="s2">&quot;&#39;consensus cluster plus&#39;)&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;plot_name&quot;</span><span class="p">:</span> <span class="s2">&quot;consensus_cluster_plus.png&quot;</span>
+    <span class="p">}</span>
+    <span class="s2">&quot;titv_plot&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;section&quot;</span><span class="p">:</span> <span class="s2">&quot;titv_plot&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Transition over Transversions&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;This graph shows both the Transition/Transversion ratios and &quot;</span>
+            <span class="s2">&quot;the contributions of 6 mutational conversion classes in each &quot;</span>
+            <span class="s2">&quot;sample. (powered by MafTools)&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;plot_name&quot;</span><span class="p">:</span> <span class="s2">&quot;titv_plot.png&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;maf_summary&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;section&quot;</span><span class="p">:</span> <span class="s2">&quot;maf_summary&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Summary of the MAF content&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;Six graphs are available:&lt;br&gt;&lt;br&gt; (1) Variant classification &quot;</span>
+            <span class="s2">&quot;shows the absolute number of variants in each classes. &lt;br&gt;(2) &quot;</span>
+            <span class="s2">&quot;Variant type shows the main types of variants and their abolute &quot;</span>
+            <span class="s2">&quot;number in the maf file. &lt;br&gt;(3) SNV class shows the Ti/Tv mutation &quot;</span>
+            <span class="s2">&quot;classes among the whole maf file. &lt;br&gt;(4) Variant per sample shows the&quot;</span>
+            <span class="s2">&quot; number of variants in each sample (the colors are the same as &quot;</span>
+            <span class="s2">&quot;within the (1)&#39;Variant classification&#39; graph. &lt;br&gt;(5) this graph &quot;</span>
+            <span class="s2">&quot;highlights the dispersion of the absolute counts observed in (1)&quot;</span>
+            <span class="s2">&quot;&#39;Variant_Classification&#39; graph, across the whole cohort. Finally&quot;</span>
+            <span class="s2">&quot;&lt;br&gt;(6) Top X mutated genes, shows the top X genes with the highest &quot;</span>
+            <span class="s2">&quot;number of mutations in the whole cohort.&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;plot_name&quot;</span><span class="p">:</span> <span class="s2">&quot;mafsummary.png&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;oncoplot&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;section&quot;</span><span class="p">:</span> <span class="s2">&quot;oncoplot&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Oncoplot&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;This graph is an oncoplot of the genes given in Y. The samples &quot;</span>
+            <span class="s2">&quot;are on the X axis.&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;plot_name&quot;</span><span class="p">:</span> <span class="s2">&quot;oncoplot.png&quot;</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
@@ -558,7 +663,7 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="split_design.html" class="btn btn-neutral float-right" title="SPLIT_DESIGN" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rename_snpsift_maf_cols.html" class="btn btn-neutral float-right" title="RENAME_SNPSIFT_MAF_COLS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="drop_duplicates_md5.html" class="btn btn-neutral float-left" title="DROP_MD5_DUPLICATES" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
