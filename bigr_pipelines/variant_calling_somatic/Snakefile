@@ -64,14 +64,14 @@ rule all:
             status=["normal", "tumor"],
             ext=["", ".bai"]
         ),
-        mutect2=expand(
-            "mutect2/corrected/{sample}.vcf.gz",
-            sample=design["Sample_id"].tolist()
-        ),
-        mutect2_tbi=expand(
-            "mutect2/corrected/{sample}.vcf.gz.tbi",
-            sample=design["Sample_id"].tolist()
-        ),
+        # mutect2=expand(
+        #     "mutect2/corrected/{sample}.vcf.gz",
+        #     sample=design["Sample_id"].tolist()
+        # ),
+        # mutect2_tbi=expand(
+        #     "mutect2/corrected/{sample}.vcf.gz.tbi",
+        #     sample=design["Sample_id"].tolist()
+        # ),
         facets=expand(
             "facets/{sample}/{sample}.{ext}",
             sample=design["Sample_id"].tolist(),
@@ -96,7 +96,10 @@ rule all:
 ##################
 
 vcf_post_process_config = {
-
+    "ncbi_build": config["params"].get("ncbi_build", "GRCh38"),
+    "center": config["params"].get("center", "GustaveRoussy"),
+    "annotation_tag": "ANN=",
+    "sample_list": design["Sample_id"].tolist()
 }
 
 module vcf_post_process:
@@ -104,18 +107,6 @@ module vcf_post_process:
     config: vcf_post_process_config
 
 use rule * from vcf_post_process
-
-
-use rule tabix_index from compress_index_vcf_meta as snp_indel_tabix_index with:
-    input:
-        "{tool}/{subcommand}/{sample}.{content}.vcf.gz"
-    output:
-        "{tool}/{subcommand}/{sample}.{content}.vcf.gz.tbi"
-    message:
-        "Indexing {wildcards.sample} (from somatic varscan "
-        "{wildcards.content}) with tabix."
-    log:
-        "logs/{tool}/{subcommand}/tabix/index/{sample}.{content}.log"
 
 
 #################
