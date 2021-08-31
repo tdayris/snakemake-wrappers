@@ -68,7 +68,7 @@ rule rename_snpsift_maf_cols:
         ncbi_build=config.get("NBCI_build", "GRCh38"),
         center=config.get("center", "GustaveRoussy"),
         Tumor_Sample_Barcode=lambda wildcards: f"{wildcards.sample}_tumor",
-        Matched_Norm_Sample_Barcode==lambda wildcards: f"{wildcards.sample}_normal"
+        Matched_Norm_Sample_Barcode=lambda wildcards: f"{wildcards.sample}_normal"
     wrapper:
         "bio/BiGR/rename_snpsift_maf_cols"
 
@@ -91,7 +91,7 @@ rule extract_all_fields:
     log:
         "logs/snpsift/extract_all_fields/{sample}.log"
     params:
-        annotation_tag=config.get(annotation_tag, "ANN=")
+        annotation_tag=config.get("annotation_tag", "ANN=")
     wrapper:
         "bio/BiGR/split_vcf_features"
 
