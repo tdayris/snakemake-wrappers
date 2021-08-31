@@ -134,7 +134,7 @@ section_dict = {
             "'consensus cluster plus')"
         ),
         "plot_name": "consensus_cluster_plus.png"
-    }
+    },
     "titv_plot": {
         "section": "titv_plot",
         "title": "Transition over Transversions",
