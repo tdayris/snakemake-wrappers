@@ -64,6 +64,9 @@ else:
         # default basename
         basename = basename_without_ext(snakemake.input.fq_1) + "_bismark_bt2"
 
+# multithreading
+cmdline_args.append(f"--parallel {snakemake.threads}")
+
 # log
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 cmdline_args.append("{log}")
