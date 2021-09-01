@@ -1,17 +1,24 @@
 default_config_bismark = {
-    "genome": "/path/to/fasta.fa"
+    "genome": "/path/to/fasta.fa",
+    "paired": True
 }
 
+try:
+    if config == dict():
+        config = default_config_bismark
+except NameError:
+    config = default_config_bismark
 
-rule bismark_reports:
+
+rule bismark_reports_pe:
     input:
-        alignment_report="bismark/bams/{sample}_report.txt",
-        nucleotide_report="bismark/bams/{sample}.nucleotide_stats.txt",
+        alignment_report="bismark/bams/{sample}_PE_report.txt",
+        nucleotide_report="bismark/bams/{sample}.PE.nucleotide_stats.txt",
         dedup_report="bismark/deduplicated/{sample}.deduplication_report.txt",
-        mbias_report="bismark/meth/{sample}.M-bias.txt",
-        splitting_report="bismark/meth/{sample}_splitting_report.txt"
+        mbias_report="bismark/meth/{sample}.PE.M-bias.txt",
+        splitting_report="bismark/meth/{sample}_PE_splitting_report.txt"
     output:
-        html="bismark/report/{sample}.html"
+        html="bismark/report/{sample}.PE.html"
     message:
         "Building HTML report for {wildcards.sample}"
     threads: 1
@@ -27,14 +34,25 @@ rule bismark_reports:
         "bio/bismark/bismark2report"
 
 
-rule bismark_methylation_extractor:
+use rule bismark_reports_pe as bismark_reports_se with:
     input:
-        "bismark/deduplicated/{sample}.bam"
+        alignment_report="bismark/bams/{sample}_SE_report.txt",
+        nucleotide_report="bismark/bams/{sample}.SE.nucleotide_stats.txt",
+        dedup_report="bismark/deduplicated/{sample}.SE.deduplication_report.txt",
+        mbias_report="bismark/meth/{sample}.SE.M-bias.txt",
+        splitting_report="bismark/meth/{sample}_SE_splitting_report.txt"
+    output:
+        html="bismark/report/{sample}.SE.html"
+
+
+rule bismark_methylation_extractor_pe:
+    input:
+        "bismark/deduplicated/{sample}.PE.bam"
     output:
         mbias_r1="bismark/meth/{sample}.M-bias_R1.png",
         mbias_r2="bismark/meth/{sample}.M-bias_R2.png",
-        mbias_report="bismark/meth/{sample}.M-bias.txt",
-        splitting_report="bismark/meth/{sample}_splitting_report.txt",
+        mbias_report="bismark/meth/{sample}.PE.M-bias.txt",
+        splitting_report="bismark/meth/{sample}_PE_splitting_report.txt",
         methylome_CpG_cov="bismark/meth_cpg/{sample}.bismark.cov.gz",
         methylome_CpG_mlevel_bedGraph="bismark/meth_cpg/{sample}.bedGraph.gz",
         read_base_meth_state_cpg="bismark/meth/CpG_context_{sample}.txt.gz",
@@ -55,14 +73,29 @@ rule bismark_methylation_extractor:
         "bio/bismark/bismark_methylation_extractor"
 
 
-rule bismark_deduplicate:
+use rule bismark_methylation_extractor_pe as bismark_methylation_extractor_se with:
     input:
-        "bismark/bams/{sample}.bam",
+        "bismark/deduplicated/{sample}.SE.bam"
     output:
-        bam=temp("bismark/deduplicated/{sample}.bam"),
-        report="bismark/deduplicated/{sample}.deduplication_report.txt",
+        mbias_r1="bismark/meth/{sample}.M-bias_R1.png",
+        mbias_r2="bismark/meth/{sample}.M-bias_R2.png",
+        mbias_report="bismark/meth/{sample}.SE.M-bias.txt",
+        splitting_report="bismark/meth/{sample}_SE_splitting_report.txt",
+        methylome_CpG_cov="bismark/meth_cpg/{sample}.bismark.cov.gz",
+        methylome_CpG_mlevel_bedGraph="bismark/meth_cpg/{sample}.bedGraph.gz",
+        read_base_meth_state_cpg="bismark/meth/CpG_context_{sample}.txt.gz",
+        read_base_meth_state_chg="bismark/meth/CHG_context_{sample}.txt.gz",
+        read_base_meth_state_chh="bismark/meth/CHH_context_{sample}.txt.gz"
+
+
+rule bismark_deduplicate_pe:
+    input:
+        "bismark/bams/{sample}.PE.bam",
+    output:
+        bam=temp("bismark/deduplicated/{sample}.PE.bam"),
+        report="bismark/deduplicated/{sample}.PE.deduplication_report.txt"
     message:
-        "Deduplicating {wildcards.sample} mapping"
+        "Deduplicating {wildcards.sample} pair-ended mapping"
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -76,7 +109,17 @@ rule bismark_deduplicate:
         "bio/bismark/deduplicate_bismark"
 
 
-rule bismark_mapping:
+use rule bismark_deduplicate_pe as bismark_deduplicate_se with:
+    input:
+        "bismark/bams/{sample}.SE.bam"
+    output:
+        bam=temp("bismark/deduplicated/{sample}.SE.bam"),
+        report="bismark/deduplicated/{sample}.SE.deduplication_report.txt"
+    message:
+        "Deduplicating {wildcards.sample} single-ended mapping"
+
+
+rule bismark_mapping_pair:
     input:
         genome=config["genome"],
         fq_1="reads/{sample}.1.fq.gz",
@@ -84,15 +127,15 @@ rule bismark_mapping:
         bismark_indexes_dir="biskmark/index/Bisulfite_Genome",
         genomic_freq="biskmark/index/genomic_nucleotide_frequencies.txt"
     output:
-        bam=temp("bismark/bams/{sample}.bam"),
-        report="bismark/bams/{sample}_report.txt",
-        nucleotide_stats=temp("bismark/bams/{sample}.nucleotide_stats.txt"),
+        bam=temp("bismark/bams/{sample}.PE.bam"),
+        report="bismark/bams/{sample}_PE_report.txt",
+        nucleotide_stats=temp("bismark/bams/{sample}.PE.nucleotide_stats.txt"),
         bam_unmapped_1=temp("bismark/bams/{sample}_unmapped_reads_1.fq.gz"),
         bam_unmapped_2=temp("bismark/bams/{sample}_unmapped_reads_2.fq.gz"),
         ambiguous_1=temp("bismark/bams/{sample}_ambiguous_reads_1.fq.gz"),
         ambiguous_2=temp("bismark/bams/{sample}_ambiguous_reads_2.fq.gz")
     message:
-        "Mapping {wildcards.sample} with Bismark"
+        "Mapping pair-ended {wildcards.sample} with Bismark"
     threads: 20
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -101,27 +144,64 @@ rule bismark_mapping:
     log:
         "logs/bismark/mapping/{sample}.log"
     params:
-        extra=lambda s: f"--fastq --bam --gzip --phred33-quals --ambiguous --unmapped --nucleotide_coverage --rg_tag '@RG\tID:{w.sample}\tSM:{w.sample}\tPU:{w.sample}\tPL:ILLUMINA\tCN:IGR\tDS:MiraSeq\tPG:BOWTIE2'",
+        extra=lambda w: f"--fastq --bam --gzip --phred33-quals --ambiguous --unmapped --nucleotide_coverage --rg_tag '@RG\tID:{w.sample}\tSM:{w.sample}\tPU:{w.sample}\tPL:ILLUMINA\tCN:IGR\tDS:MiraSeq\tPG:BOWTIE2'",
         basename="{sample}"
     wrapper:
         "bio/bismark/bismark"
 
 
+use rule bismark_mapping_pair as bismark_mapping_single with:
+    input:
+        genome=config["genome"],
+        fq_1="reads/{sample}.fq.gz",
+        bismark_indexes_dir="biskmark/index/Bisulfite_Genome",
+        genomic_freq="biskmark/index/genomic_nucleotide_frequencies.txt"
+    output:
+        bam=temp("bismark/bams/{sample}.SE.bam"),
+        report="bismark/bams/{sample}_SE_report.txt",
+        nucleotide_stats=temp("bismark/bams/{sample}.SE.nucleotide_stats.txt"),
+        bam_unmapped_1=temp("bismark/bams/{sample}_unmapped_reads_1.fq.gz"),
+        ambiguous_1=temp("bismark/bams/{sample}_ambiguous_reads_1.fq.gz")
+    message:
+        "Mapping single-ended {wildcards.sample} with Bismark"
+
+
+
 rule bismark_genome_preparation:
     input:
-        config["genome"]
+        "biskmark/index/sequence.fasta"
     output:
         temp(directory("biskmark/index/Bisulfite_Genome")),
         temp("biskmark/index/genomic_nucleotide_frequencies.txt")
     message: "Indexing genome with Bismark"
     threads: 20
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 15,
         time_min=lambda wildcards, attempt: attempt * 15,
         tmpdir="tmp"
     log:
         "logs/bismark/genome_preparation.log"
     params:
-        "--genomic_composition"
+        extra="--genomic_composition"
     wrapper:
         "bio/bismark/bismark_genome_preparation"
+
+
+rule link_genome:
+    input:
+        config["genome"]
+    output:
+        "biskmark/index/sequence.fasta"
+    message:
+        "Linking fasta genome for bismark"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/bismark/genome_linking.log"
+    params:
+        "-sfr"
+    shell:
+        "ln {params} {input} {output} > {log} 2>&1"
