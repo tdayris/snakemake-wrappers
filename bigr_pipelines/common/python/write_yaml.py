@@ -20,7 +20,6 @@ def write_yaml(output_yaml: Union[str, Path], data: dict[str, Any]) -> None:
     """
     Save given dictionnary as Yaml-formatted text file
     """
-    print(data)
     if isinstance(output_yaml, str):
         write_yaml_from_str(output_yaml, data)
     else:

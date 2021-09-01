@@ -22,7 +22,7 @@ def link_fq(
     """
     if r2_paths is None:
         return {
-            r1: f"reads/{sample}.fq.gz"
+            f"reads/{sample}.fq.gz": r1
             for sample, r1 in zip(sample_names, r1_paths)
         }
 

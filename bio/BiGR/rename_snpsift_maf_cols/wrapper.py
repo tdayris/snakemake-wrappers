@@ -44,7 +44,7 @@ headers = {
     "CHROM": "Chromosome",
     "POS": "Start_Position",
     "ID": "Variant_ID",
-    "REF": "Reference_Allele",
+    "REF3": "Reference_Allele",
     "ALT": "Tumor_Seq_Allele1",
     "FILTER": "Filter",
     "FORMAT:AD": "Allelic_depths",
@@ -105,7 +105,7 @@ headers = {
     "NMD": "Nonsense_mediated_decay",
     "VARTYPE": "Variant_types",
     "SNP": "Is_SNP",
-    "MNP:" "Is_MNP",
+    "MNP": "Is_MNP",
     "INS": "Is_INS",
     "DEL": "Is_DEL",
     "MIXED": "Is_MIXED_Polymorphisms",
@@ -160,7 +160,7 @@ headers = {
     "G5": "MAF_Over_5pct",
     "OM": "Has_OMIM_OMIA",
     "PMC": "Pubmed",
-    "SSR": "Suspect_reason_code" # 0 - unspecified, 1 - Paralog, 2 - byEST, 4 - oldAlign, 8 - Para_EST, 16 - 1kg_failed, 1024 - other"
+    "SSR": "Suspect_reason_code", # 0 - unspecified, 1 - Paralog, 2 - byEST, 4 - oldAlign, 8 - Para_EST, 16 - 1kg_failed, 1024 - other"
     "RSPOS": "Position_dbSNP",
     "HD": "High_density_genotyping_kit_dbGaP",
     "PM": "Variant_Precious",
@@ -384,11 +384,15 @@ new_header = []
 # )
 translation_table = headers
 
-for colname in variants.columns.tolist():
-    new_colname = translation_table.get(colname)
-    new_header.append(new_colname if new_colname is not None else colname)
+for idx, colname in enumerate(variants.columns.tolist()):
+    new_colname = translation_table.get(colname, colname)
+    if idx == 3 and colname == "REF":
+        new_header.append("Reference_Allele")
+    else:
+        new_header.append(new_colname if new_colname is not None else colname)
 variants.columns = new_header
 logging.info("New header defined")
+logging.debug(variants.columns.tolist())
 
 # Add new columns on demand
 if add_cols is True:
@@ -411,6 +415,7 @@ if add_cols is True:
 
     if "Variant_Type" not in variants.columns:
         logging.debug("Adding variant type")
+        logging.debug(variants.head())
         variants["Variant_Type"] = [
             get_variant_type(ref, alt)
             for ref, alt
@@ -456,7 +461,7 @@ if add_cols is True:
     if "vcf_region" not in variants.columns:
         logging.debug("Adding VCF regions")
         variants["vcf_region"] = [
-            ":".join([chr, pos, id, ref, alt])
+            ":".join(map(str, [chr, pos, id, ref, alt]))
             for chr, pos, id, ref, alt in zip(
                 variants["Chromosome"],
                 variants["Start_Position"],
@@ -470,9 +475,14 @@ if add_cols is True:
         logging.debug("Translating Variant_Origin")
         translation = {
             "0": "unspecified",
+            "0.0": "unspecified",
+            "nan": "unspecified",
             "1": "germline",
+            "1.0": "germline",
             "2": "somatic",
-            "3": "both_germline_somatic"
+            "2.0": "somatic",
+            "3": "both_germline_somatic",
+            "3.0": "both_germline_somatic"
         }
 
         variants["Variant_Origin_Readable"] = [
@@ -487,7 +497,15 @@ if add_cols is True:
             "4": "oldAlign",
             "8": "Para_EST",
             "16": "1kg_failed",
-            "1024" "other"
+            "1024": "other",
+            "0.0": "unspecified",
+            "1.0": "Paralog",
+            "2.0": "byEST",
+            "4.0": "oldAlign",
+            "8.0": "Para_EST",
+            "16.0": "1kg_failed",
+            "1024.0": "other",
+            "nan": "unspecified"
         }
 
         variants["Suspect_reason_code_Readable"] = [

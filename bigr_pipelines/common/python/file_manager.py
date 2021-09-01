@@ -145,6 +145,18 @@ def search_fastq_files(dirpath: FilePathType) -> dict[str, str]:
     }
 
 
+def search_fastq_files_dict(dirpath: FilePathType) -> dict[str, dict[str, str]]:
+    """
+    Within a given directory, search all fastq files. If a path leads to a
+    directory, the subfunction is called recursively.
+    """
+    suffixes = (".fastq", ".fq", ".fastq.gz", ".fq.gz")
+    return {
+        remove_suffixes(basename(fastq), suffixes): {"Upstream_file": fastq}
+        for fastq in sorted(search_files(dirpath, ext=suffixes))
+    }
+
+
 def search_fastq_somatic(dirpath: FilePathType) -> dict[str, str]:
     """
     Within a given directory, search all vcf files. If a path leads to a

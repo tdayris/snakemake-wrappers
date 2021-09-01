@@ -11,7 +11,8 @@ default_config_vcf_post_process = {
     "ncbi_build": "GRCh38",
     "center": "GustaveRoussy",
     "annotation_tag": "ANN=",
-    "sample_list": list()
+    "sample_list": list(),
+    "genome": "/path/to/ref.fasta"
 }
 
 try:
@@ -68,7 +69,7 @@ rule rename_snpsift_maf_cols:
         ncbi_build=config.get("NBCI_build", "GRCh38"),
         center=config.get("center", "GustaveRoussy"),
         Tumor_Sample_Barcode=lambda wildcards: f"{wildcards.sample}_tumor",
-        Matched_Norm_Sample_Barcode==lambda wildcards: f"{wildcards.sample}_normal"
+        Matched_Norm_Sample_Barcode=lambda wildcards: f"{wildcards.sample}_normal"
     wrapper:
         "bio/BiGR/rename_snpsift_maf_cols"
 
@@ -85,15 +86,15 @@ rule extract_all_fields:
         "Extracting variant annotations for {wildcards.sample}"
     threads: 2
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 10240,
+        time_min=lambda wildcards, attempt: attempt * 25,
         tmpdir="tmp"
     log:
         "logs/snpsift/extract_all_fields/{sample}.log"
     params:
-        annotation_tag=config.get(annotation_tag, "ANN=")
+        annotation_tag=config.get("annotation_tag", "ANN=")
     wrapper:
-        "bio/BiGR/split_vcf_features"
+        "bio/snpsift/extractAllFields"
 
 
 """
@@ -102,7 +103,7 @@ file more difficult to read by a human.
 """
 rule split_vcf_features:
     input:
-        call="snpsift/dbnsfp/{sample}.vcf"
+        call="gatk/variant_filtration/{sample}.vcf"
     output:
         call=temp("maf/splitted/{sample}.vcf")
     message:
@@ -118,3 +119,60 @@ rule split_vcf_features:
         annotation_tag="ANN="
     wrapper:
         "bio/BiGR/split_vcf_features"
+
+
+"""
+Add filter tags
+"""
+rule gatk_variant_filtration:
+    input:
+        vcf="snpsift/annotate_corrected/{sample}.vcf.gz",
+        vcf_tbi=get_tbi("snpsift/annotate_corrected/{sample}.vcf.gz"),
+        ref=config["genome"]
+    output:
+        vcf="gatk/variant_filtration/{sample}.vcf"
+    message:
+        "Filtering VCF for {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 10240,
+        time_min=lambda wildcards, attempt: attempt * 25,
+        tmpdir="tmp"
+    log:
+        "logs/gatk/variant_filtration/{sample}.log"
+    params:
+        filters={
+            "Depth60X": "DP > 59",
+            "VAF10pct": "AF >= 0.1",
+            "GeneralPopulation": "dbNSFP_ExAC_Adj_AF <= 0.001",
+            "VAF5pct": "AF >= 0.05",
+        }
+    wrapper:
+        "bio/gatk/variantfiltration"
+
+
+rule fix_SnpSift_Annotate:
+    input:
+        call="snpsift/dbnsfp/{sample}.vcf.gz",
+        tbi=get_tbi("snpsift/dbnsfp/{sample}.vcf.gz")
+    output:
+        call=temp("snpsift/annotate_corrected/{sample}.vcf")
+    message:
+        "Correcting annotation type error in {wildcards.sample}"
+    threads: 4
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        remove_ends="'s/END=\([0-9]\+,\?\)\+//g'",
+        remove_empty="'s/;;/;/g'",
+        remove_eofield="'s/;\t/\t/g'"
+    log:
+        "logs/snpsift/annotate_corrected/{sample}.log"
+    shell:
+        "gunzip -c {input.call} | "
+        "sed {params.remove_ends} | "
+        "sed {params.remove_empty} | "
+        "sed {params.remove_eofield} "
+        "> {output.call} 2> {log}"
