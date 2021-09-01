@@ -52,6 +52,11 @@ fastq_links = link_fq_somatic(
 
 rule all:
     input:
+        maf="maf/maftools/complete.maf",
+        mafs=expand(
+            "maf/maftools/{sample}.maf",
+            sample=design["Sample_id"].tolist()
+        ),
         calls=expand(
             "snpsift/dbnsfp/{sample}.vcf.gz{index}",
             sample=design["Sample_id"].tolist(),
@@ -99,7 +104,8 @@ vcf_post_process_config = {
     "ncbi_build": config["params"].get("ncbi_build", "GRCh38"),
     "center": config["params"].get("center", "GustaveRoussy"),
     "annotation_tag": "ANN=",
-    "sample_list": design["Sample_id"].tolist()
+    "sample_list": design["Sample_id"].tolist(),
+    "genome": config["ref"]["fasta"]
 }
 
 module vcf_post_process:
