@@ -5,12 +5,31 @@ __license__ = "MIT"
 
 
 import os
+import tempfile
+
 from snakemake.shell import shell
 
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
+mapin = snakemake.input["mapping"]
+mapout = snakemake.output["mapping"]
+tempdir = tempfile.mkdtemp()
+if "tmpdir" in snakemake.resources.keys():
+    tempdir = snakemake.resources["tmpdir"]
+    
+memory = "--memory-limit "
+if "mem_mb" in snakemake.resources:
+    memory += str(int(snakemake.resources["mem_mb"] / snakemake.threads))
+else:
+    memry += "2GB"
+
+
 shell(
-    "sambamba sort {snakemake.params} -t {snakemake.threads} "
-    "-o {snakemake.output[0]} {snakemake.input[0]} "
+    "sambamba sort "
+    "{snakemake.params} "
+    "--tmpdir {tempdir} "
+    "--nthreads {snakemake.threads} "
+    "--out {mapout} "
+    "{mapin} "
     "{log}"
 )
