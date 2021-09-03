@@ -30,12 +30,12 @@ else:
 
 
 # Each (un)compression step raises the threads requirements
-# if snakemake.threads < min_threads:
-#     raise ValueError(
-#         "At least {} threads required, {} provided".format(
-#             min_threads, snakemake.threads
-#         )
-#     )
+if snakemake.threads < min_threads:
+    raise ValueError(
+        "At least {} threads required, {} provided".format(
+             min_threads, snakemake.threads
+        )
+    )
 
 fields = ["'CHROM'", "'POS'", "'ID'", "'REF'", "'ALT'", "'FILTER'"]
 help = [

@@ -92,7 +92,8 @@ rule extract_all_fields:
     log:
         "logs/snpsift/extract_all_fields/{sample}.log"
     params:
-        annotation_tag=config.get("annotation_tag", "ANN=")
+        annotation_tag=config.get("annotation_tag", "ANN="),
+        ignore_format=True
     wrapper:
         "bio/snpsift/extractAllFields"
 
@@ -103,7 +104,7 @@ file more difficult to read by a human.
 """
 rule split_vcf_features:
     input:
-        call="gatk/variant_filtration/{sample}.vcf"
+        call="snpsift/format2info/{sample}.vcf"
     output:
         call=temp("maf/splitted/{sample}.vcf")
     message:
@@ -122,6 +123,28 @@ rule split_vcf_features:
 
 
 """
+Copy format information
+"""
+rule format_to_info:
+    input:
+        call = "gatk/variant_filtration/{sample}.vcf"
+    output:
+        call = temp("snpsift/format2info/{sample}.vcf")
+    message:
+        "Moving format fields to info for {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 2048,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
+    log:
+        "logs/vcf_format_to_info/{sample}.log"
+    wrapper:
+        "bio/BiGR/vcf_format_to_info"
+
+
+
+"""
 Add filter tags
 """
 rule gatk_variant_filtration:
@@ -130,7 +153,7 @@ rule gatk_variant_filtration:
         vcf_tbi=get_tbi("snpsift/annotate_corrected/{sample}.vcf.gz"),
         ref=config["genome"]
     output:
-        vcf="gatk/variant_filtration/{sample}.vcf"
+        vcf=temp("gatk/variant_filtration/{sample}.vcf")
     message:
         "Filtering VCF for {wildcards.sample}"
     threads: 1
@@ -144,7 +167,7 @@ rule gatk_variant_filtration:
         filters={
             "Depth60X": "DP > 59",
             "VAF10pct": "AF >= 0.1",
-            "GeneralPopulation": "dbNSFP_ExAC_Adj_AF <= 0.001",
+            "GeneralPopulation": "dbNSFP_ExAC_Adj_AF >= 0.001",
             "VAF5pct": "AF >= 0.05",
         }
     wrapper:
