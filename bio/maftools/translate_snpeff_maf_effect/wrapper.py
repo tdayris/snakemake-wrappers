@@ -92,8 +92,11 @@ translation_dict = {
     "gene_variant": "Missense_Mutation",
     "chromosome": "Synonymous_Variant",
     "Variant_Classification": "Variant_Classification",
-    "protein_protein_contact": "Missense_Mutation",
-    'splice_region_variant&intron_variant': "Splice_Site"
+    "protein_protein_contact": "Synonymous_Variant",
+    'splice_region_variant&intron_variant': "Splice_Site",
+    'splice_acceptor_variant&splice_region_variant&intron_variant&non_coding_transcript_exon_variant': "Splice_Site",
+    'stop_gained&splice_region_variant': "Nonsense_Mutation",
+    "frameshift_variant&splice_region_variant": "Frame_Shift_Ins"
 }
 
 logging.debug("Reading MAF file")
