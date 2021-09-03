@@ -30,14 +30,14 @@ else:
 
 
 # Each (un)compression step raises the threads requirements
-if snakemake.threads < min_threads:
-    raise ValueError(
-        "At least {} threads required, {} provided".format(
-            min_threads, snakemake.threads
-        )
-    )
+# if snakemake.threads < min_threads:
+#     raise ValueError(
+#         "At least {} threads required, {} provided".format(
+#             min_threads, snakemake.threads
+#         )
+#     )
 
-fields = ["CHROM", "POS", "ID", "REF", "ALT", "FILTER"]
+fields = ["'CHROM'", "'POS'", "'ID'", "'REF'", "'ALT'", "'FILTER'"]
 help = [
     "CHROM: Chromosome name",
     "POS: Position over the chromosome",
@@ -51,60 +51,60 @@ with open(snakemake.input.call, "r") as vcf_stream:
             break
 
         htype, hcontent = re.findall(regex_general, line)[0]
-        if htype.lower() ==  "format":
+        if htype.lower() ==  "format" and snakemake.params.get("ignore_format", False) is True:
             hid, hinfo = re.findall(regex_id, line)[0]
-            fields.append("{}:{}".format(htype, hid))
+            fields.append("'{}[{}]'".format(htype, hid))
         elif htype.lower() == "info":
             hid, hinfo = re.findall(regex_id, line)[0]
             if hid.lower() == "ann":
                 fields += [
-                    "ANN[*].ALLELE",
-                    "ANN[*].EFFECT",
-                    "ANN[*].IMPACT",
-                    "ANN[*].GENE",
-                    "ANN[*].GENEID",
-                    "ANN[*].FEATURE",
-                    "ANN[*].FEATUREID",
-                    "ANN[*].BIOTYPE",
-                    "ANN[*].RANK",
-                    "ANN[*].HGVS_C",
-                    "ANN[*].HGVS_P",
-                    "ANN[*].CDNA_POS",
-                    "ANN[*].CDNA_LEN",
-                    "ANN[*].CDS_POS",
-                    "ANN[*].CDS_LEN",
-                    "ANN[*].AA_POS",
-                    "ANN[*].AA_LEN",
-                    "ANN[*].DISTANCE",
-                    "ANN[*].ERRORS"
+                    "'ANN[*].ALLELE'",
+                    "'ANN[*].EFFECT'",
+                    "'ANN[*].IMPACT'",
+                    "'ANN[*].GENE'",
+                    "'ANN[*].GENEID'",
+                    "'ANN[*].FEATURE'",
+                    "'ANN[*].FEATUREID'",
+                    "'ANN[*].BIOTYPE'",
+                    "'ANN[*].RANK'",
+                    "'ANN[*].HGVS_C'",
+                    "'ANN[*].HGVS_P'",
+                    "'ANN[*].CDNA_POS'",
+                    "'ANN[*].CDNA_LEN'",
+                    "'ANN[*].CDS_POS'",
+                    "'ANN[*].CDS_LEN'",
+                    "'ANN[*].AA_POS'",
+                    "'ANN[*].AA_LEN'",
+                    "'ANN[*].DISTANCE'",
+                    "'ANN[*].ERRORS'"
                 ]
-            elif hid == "ref":
+            elif hid.lower() == "ref":
                 fields += [
-                    "EFF[*].EFFECT",
-                    "EFF[*].IMPACT",
-                    "EFF[*].FUNCLASS",
-                    "EFF[*].CODON",
-                    "EFF[*].AA",
-                    "EFF[*].AA_LEN",
-                    "EFF[*].GENE",
-                    "EFF[*].BIOTYPE",
-                    "EFF[*].CODING",
-                    "EFF[*].TRID",
-                    "EFF[*].RANK"
+                    "'EFF[*].EFFECT'",
+                    "'EFF[*].IMPACT'",
+                    "'EFF[*].FUNCLASS'",
+                    "'EFF[*].CODON'",
+                    "'EFF[*].AA'",
+                    "'EFF[*].AA_LEN'",
+                    "'EFF[*].GENE'",
+                    "'EFF[*].BIOTYPE'",
+                    "'EFF[*].CODING'",
+                    "'EFF[*].TRID'",
+                    "'EFF[*].RANK'"
                 ]
-            elif hid == "lof":
+            elif hid.lower() == "lof":
                 fields += [
-                    "LOF[*].GENE"
-                    "LOF[*].GENEID"
-                    "LOF[*].NUMTR"
-                    "LOF[*].PERC"
+                    "'LOF[*].GENE'",
+                    "'LOF[*].GENEID'",
+                    "'LOF[*].NUMTR'",
+                    "'LOF[*].PERC'"
                 ]
-            elif hid == "nmd":
+            elif hid.lower() == "nmd":
                 fields += [
-                    "NMD[*].GENE"
-                    "NMD[*].GENEID"
-                    "NMD[*].NUMTR"
-                    "NMD[*].PERC"
+                    "'NMD[*].GENE'",
+                    "'NMD[*].GENEID'",
+                    "'NMD[*].NUMTR'",
+                    "'NMD[*].PERC'"
                 ]
             else:
                 fields.append(hid)

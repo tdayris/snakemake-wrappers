@@ -3950,10 +3950,24 @@ def test_snpsift_genesets():
     )
 
 @skip_if_not_modified
+def test_snpsift_extractallfields():
+    run(
+        "bio/snpsift/extractAllFields",
+        ["snakemake", "--cores", "2", "extracted/out.tsv", "--use-conda", "-F"],
+    )
+
+@skip_if_not_modified
 def test_snpsift_extractfields():
     run(
         "bio/snpsift/extractfields",
-        ["snakemake", "--cores", "1", "extracted/out.tsv", "--use-conda", "-F"],
+        ["snakemake", "--cores", "2", "extracted/out.tsv", "--use-conda", "-F"],
+    )
+
+@skip_if_not_modified
+def test_bigr_vcf_format_to_info():
+    run(
+        "bio/BiGR/vcf_format_to_info",
+        ["snakemake", "--cores", "1", "out.vcf", "--use-conda", "-F"],
     )
 
 
