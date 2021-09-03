@@ -44,6 +44,7 @@ help = [
     "ID: Variant identifier"
 ]
 with open(snakemake.input.call, "r") as vcf_stream:
+    ignore_format = snakemake.params.get("ignore_format", False) is True
     regex_general = r'##(\w+)=(.+$)'
     regex_id = r"<ID=([^,]+),(.*)>"
     for line in vcf_stream:
@@ -51,7 +52,9 @@ with open(snakemake.input.call, "r") as vcf_stream:
             break
 
         htype, hcontent = re.findall(regex_general, line)[0]
-        if htype.lower() ==  "format" and snakemake.params.get("ignore_format", False) is True:
+        if htype.lower() ==  "format":
+            if ignore_format:
+                continue
             hid, hinfo = re.findall(regex_id, line)[0]
             fields.append("'{}[{}]'".format(htype, hid))
         elif htype.lower() == "info":
