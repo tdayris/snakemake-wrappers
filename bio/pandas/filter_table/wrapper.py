@@ -48,12 +48,12 @@ logging.basicConfig(
 
 
 ops = {
-    ">": operator.gt,
-    ">=": operator.ge,
-    "==": operator.eq,
-    "<": operator.lt,
-    "<=": operator.le,
-    "!=": operator.ne
+    ">": pandas.Series.gt,
+    ">=": pandas.Series.ge,
+    "==": pandas.Series.eq,
+    "<": pandas.Series.lt,
+    "<=": pandas.Series.le,
+    "!=": pandas.Series.ne
 }
 
 
@@ -91,13 +91,13 @@ if (not_line := snakemake.params.get("drop_line", None)) is not None:
 if (filters := snakemake.params.get("filters", None)) is not None:
     logging.debug(f"The table will be filtered according to: {filters}")
     for filter in filters:
-        data = filter_dataframe(data.copy, *filter)
+        data = filter_dataframe(data, *filter)
 
 
 if (filters := snakemake.params.get("full_line_filters", None)) is not None:
     logging.debug(f"Applying the following filter on whole lines: {filters}")
     for filter in filters:
-        data = filter_full_lines(data.dopy, *filter)
+        data = filter_full_lines(data, *filter)
 
 
 if snakemake.params.get("dropna", False) is True:
@@ -118,7 +118,7 @@ if snakemake.params.get("drop_na_lines", False) is True:
 if snakemake.params.get("drop_duplicated_lines", False) is True:
     logging.debug("Dropping duplicated lines")
     data.drop_duplicates(inplace=True)
-    
+
 
 if (dedup_cols := snakemake.params.get("drop_duplicates_on", None)) is not None:
     logging.debug(
