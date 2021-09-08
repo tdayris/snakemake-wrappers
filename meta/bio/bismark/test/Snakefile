@@ -136,16 +136,16 @@ rule bismark_mapping_pair:
         ambiguous_2=temp("bismark/bams/{sample}_ambiguous_reads_2.fq.gz")
     message:
         "Mapping pair-ended {wildcards.sample} with Bismark"
-    threads: 20
+    threads: 8
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 120,
+        time_min=lambda wildcards, attempt: attempt * 60 * 3,
         tmpdir="tmp"
     log:
         "logs/bismark/mapping/{sample}.log"
     params:
-        extra=lambda w: f"--fastq --bam --gzip --phred33-quals --ambiguous --unmapped --nucleotide_coverage --rg_tag '@RG\tID:{w.sample}\tSM:{w.sample}\tPU:{w.sample}\tPL:ILLUMINA\tCN:IGR\tDS:MiraSeq\tPG:BOWTIE2'",
-        basename="{sample}"
+        extra=lambda w: f"--fastq --bam --gzip --phred33-quals --ambiguous --unmapped --nucleotide_coverage ", # --rg_tag '@RG\\tID:{w.sample}\\tSM:{w.sample}\\tPU:{w.sample}\\tPL:ILLUMINA\\tCN:IGR\\tDS:MiraSeq\\tPG:BOWTIE2'",
+        #basename="{sample}"
     wrapper:
         "bio/bismark/bismark"
 
@@ -153,15 +153,15 @@ rule bismark_mapping_pair:
 use rule bismark_mapping_pair as bismark_mapping_single with:
     input:
         genome=config["genome"],
-        fq_1="reads/{sample}.fq.gz",
+        fq="reads/{sample}.fq.gz",
         bismark_indexes_dir="biskmark/index/Bisulfite_Genome",
         genomic_freq="biskmark/index/genomic_nucleotide_frequencies.txt"
     output:
         bam=temp("bismark/bams/{sample}.SE.bam"),
         report="bismark/bams/{sample}_SE_report.txt",
         nucleotide_stats=temp("bismark/bams/{sample}.SE.nucleotide_stats.txt"),
-        bam_unmapped_1=temp("bismark/bams/{sample}_unmapped_reads_1.fq.gz"),
-        ambiguous_1=temp("bismark/bams/{sample}_ambiguous_reads_1.fq.gz")
+        #bam_unmapped_1=temp("bismark/bams/{sample}_unmapped_reads_1.fq.gz"),
+        #ambiguous_1=temp("bismark/bams/{sample}_ambiguous_reads_1.fq.gz")
     message:
         "Mapping single-ended {wildcards.sample} with Bismark"
 
@@ -176,7 +176,7 @@ rule bismark_genome_preparation:
     message: "Indexing genome with Bismark"
     threads: 7
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 20,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 40,
         time_min=lambda wildcards, attempt: attempt * 60,
         tmpdir="tmp"
     log:
