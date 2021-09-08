@@ -59,7 +59,7 @@ rule rename_snpsift_maf_cols:
         "Renaming columns to fit MAFtools requirement in {wildcards.sample}"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
         time_min=lambda wildcards, attempt: attempt * 15,
         tmpdir="tmp"
     log:
@@ -165,10 +165,10 @@ rule gatk_variant_filtration:
         "logs/gatk/variant_filtration/{sample}.log"
     params:
         filters={
-            "Depth60X": "DP > 59",
-            "VAF10pct": "AF >= 0.1",
-            "GeneralPopulation": "dbNSFP_ExAC_Adj_AF >= 0.001",
-            "VAF5pct": "AF >= 0.05",
+            "DepthBelow60X": "DP > 59",
+            "VAFAbove10pct": "AF >= 0.1",
+            "GeneralPopulationBelow1pml": "dbNSFP_ExAC_Adj_AF >= 0.001",
+            "VAFAbove5pct": "AF >= 0.05",
         }
     wrapper:
         "bio/gatk/variantfiltration"
