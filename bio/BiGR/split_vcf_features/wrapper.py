@@ -5,6 +5,7 @@
 split ANN field in the INFO column in a VCF file
 """
 
+import datetime
 import logging
 
 logging.basicConfig(
@@ -15,13 +16,23 @@ logging.basicConfig(
 
 annotation_tag = snakemake.params.get("annotation_tag", "ANN=")
 
+version = 1.0
+name = "split_vcf_features"
+url = f"github.com/tdayris/snakemake-wrappers/tree/Unofficial/bio/BiGR/{name}/wrapper.py"
+header = f"""##BiGRCommandLine=<ID={name},CommandLine="{url}",Version={version},Date={datetime.date.today()}>\n"""
+
 with open(snakemake.input["call"], "r") as input_vcf, \
      open(snakemake.output["call"], "w") as splitted_vcf:
 
     # Copy headers without any modification
     for nb, line in enumerate(input_vcf):
         logging.debug(f"Line:\n{line}")
+        if line.startswith("##"):
+            splitted_vcf.write(line)
+            continue
+
         if line.startswith("#"):
+            splitted_vcf.write(header)
             splitted_vcf.write(line)
             continue
 
