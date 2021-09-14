@@ -9,7 +9,7 @@ import datetime
 import logging
 
 def create_header(sample_name, field_name):
-    return f"""##INFO<ID=FORMAT_{sample_name}_{field_name},Number=.,Type=String,Description="Copy of the value of the field {field_name} of the FORMAT for thr sample {sample_name}">"""
+    return f"""##INFO<ID=FORMAT_{sample_name}_{field_name},Number=.,Type=String,Description="Copy of the value of the field {field_name} from FORMAT concerning sample/tool {sample_name}">"""
 
 colnames = None
 version = 1.0
