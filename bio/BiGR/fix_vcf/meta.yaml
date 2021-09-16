@@ -1,0 +1,17 @@
+---
+name: fix vcf
+description: Fixes format issues like empty fields for GATK compliance
+authors:
+  - Thibault Dayris
+input:
+  - vcf: Path to a VCF file
+output:
+  - vcf: Path to the corrected VCF file
+params:
+  - delete_empty_fields: Remove trailing ";" and double ";;" in the info field (default True)
+  - remove_non_conventional_chromosomes: Remove chromosomes not present in the provided list (default are human chromosomes, including MT, X and Y).
+  - rename_sample: Rename a sample in the VCf header
+notes: |
+  Warning: If duplicate keys exists, they will all be renamed (ex INFO and FORMAT fields duplicated).
+
+  This wrapper takes non-gzipped VCF files

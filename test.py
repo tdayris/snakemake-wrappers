@@ -130,6 +130,13 @@ def run(wrapper, cmd, check_log=None):
             # go back to original directory
             os.chdir(origdir)
 
+@skip_if_not_modified
+def test_bigr_fix_vcf():
+    run(
+        "bio/BiGR/fix_vcf",
+        ["snakemake", "--cores", "1", "out.vcf", "--use-conda", "-F"]
+    )
+
 
 @skip_if_not_modified
 def test_variant_occurence_annotate():

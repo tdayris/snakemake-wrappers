@@ -60,7 +60,8 @@ version = 1.0
 name = "VariantOccurence/Annotate"
 url = f"github.com/tdayris/snakemake-wrappers/tree/Unofficial/bio/variantoccurence/{name}/wrapper.py"
 header = f"""##BiGRCommandLine=<ID={name},CommandLine="{url}",Version={version},Date={datetime.date.today()}>\n"""
-print("helloworld")
+header += """##INFO=<ID=VarOcc,Number=1,Type=Integer,Description="Number of sample havin the variant among the provided cohort">\n"""
+
 occ_dict = build_occurence_dict(snakemake.input["occurence"])
 for incall, outcall in zip(snakemake.input["calls"], snakemake.output["calls"]):
     annotate_vcf(incall, outcall, occ_dict)
