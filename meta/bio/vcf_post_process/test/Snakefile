@@ -12,7 +12,9 @@ default_config_vcf_post_process = {
     "center": "GustaveRoussy",
     "annotation_tag": "ANN=",
     "sample_list": list(),
-    "genome": "/path/to/ref.fasta"
+    "genome": "/path/to/ref.fasta",
+    "known": "/path/to/dbsnp",
+    "gatk_filters": {}
 }
 
 try:
@@ -21,6 +23,32 @@ try:
 except NameError:
     config = default_config_vcf_post_process
 
+"""
+Compress and index final VCF files
+"""
+rule gath_final_vcf:
+    input:
+        expand(
+            "maf/canonical/{sample}.vcf.gz",
+            sample=config["sample_list"]
+        ),
+        expand(
+            "maf/canonical/{sample}.vcf.gz.tbi",
+            sample=config["sample_list"]
+        )
+    output:
+        "final.vcf.list"
+    message:
+        "Aquiring list of final VCF files"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 128,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/somatic/list.log"
+    shell:
+        "echo {input} > {output} 2> {log}"
 
 
 """
@@ -62,6 +90,8 @@ rule rename_snpsift_maf_cols:
         mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
         time_min=lambda wildcards, attempt: attempt * 15,
         tmpdir="tmp"
+    group:
+        "vcf_to_maf"
     log:
         "logs/maftools/rename/{sample}.log"
     params:
@@ -74,12 +104,14 @@ rule rename_snpsift_maf_cols:
         "bio/BiGR/rename_snpsift_maf_cols"
 
 
+
+
 """
 Extracting all INFO/FORMAT data, the list is built from vcf header
 """
 rule extract_all_fields:
     input:
-        call="maf/splitted/{sample}.vcf"
+        call="maf/canonical/{sample}.vcf"
     output:
         tsv=temp("maf/extracted/{sample}.tsv")
     message:
@@ -89,6 +121,8 @@ rule extract_all_fields:
         mem_mb=lambda wildcards, attempt: attempt * 10240,
         time_min=lambda wildcards, attempt: attempt * 25,
         tmpdir="tmp"
+    group:
+        "vcf_to_maf"
     log:
         "logs/snpsift/extract_all_fields/{sample}.log"
     params:
@@ -96,6 +130,56 @@ rule extract_all_fields:
         ignore_format=True
     wrapper:
         "bio/snpsift/extractAllFields"
+        
+"""
+Remove non-canonical chromosomes, and empty info fields
+"""
+rule fix_vcf:
+    input:
+        vcf="maf/monoallelic/{sample}.vcf"
+    output:
+        vcf=temp("maf/canonical/{sample}.vcf")
+    message:
+        "Cleaning {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    group:
+        "GLeaves"
+    log:
+        "logs/fix_vcf/{sample}.log"
+    params:
+        annotation_tag="ANN="
+    wrapper:
+        "bio/BiGR/fix_vcf"
+    
+
+
+"""
+Deal with multiallelic sites since GLeaves does not
+"""
+rule split_vcf_multiallelic:
+    input:
+        vcf="maf/splitted/{sample}.vcf"
+    output:
+        vcf=temp("maf/monoallelic/{sample}.vcf")
+    message:
+        "Splitting multiallelic sites for {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    group:
+        "GLeaves"
+    log:
+        "logs/split_vcf_multiallelic/{sample}.log"
+    params:
+        annotation_tag="ANN="
+    wrapper:
+        "bio/BiGR/split_vcf_multiallelic"
 
 
 """
@@ -114,6 +198,8 @@ rule split_vcf_features:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
         time_min=lambda wildcards, attempt: attempt * 15,
         tmpdir="tmp"
+    group:
+        "GLeaves"
     log:
         "logs/split_vcf_features/{sample}.log"
     params:
@@ -137,11 +223,45 @@ rule format_to_info:
         mem_mb=lambda wildcards, attempt: attempt * 2048,
         time_min=lambda wildcards, attempt: attempt * 45,
         tmpdir="tmp"
+    group:
+        "GLeaves"
     log:
         "logs/vcf_format_to_info/{sample}.log"
     wrapper:
         "bio/BiGR/vcf_format_to_info"
 
+
+"""
+Variant calling quality control
+"""
+rule gatk_variant_evaluation:
+    input:
+        vcf="gatk/variant_filtration/{sample}.vcf.gz",
+        vcf_tbi=get_tbi("gatk/variant_filtration/{sample}.vcf.gz"),
+        bam="picard/markduplicates/{sample}_tumor.bam",
+        bai=get_bai("picard/markduplicates/{sample}_tumor.bam"),
+        ref=config["genome"],
+        fai=get_fai(config["genome"]),
+        dict=get_dict(config["genome"]),
+        known=config["known"],
+        known_tbi=get_tbi(config["known"])
+    output:
+        directory("gatk_variant_evaluation/{sample}")
+    message:
+        "Evaluating variant calling of {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    group:
+        "GATK_Stats"
+    log:
+        "logs/gatk/varianteval/{sample}.log"
+    params:
+        extra=""
+    wrapper:
+        "bio/gatk/varianteval"
 
 
 """
@@ -161,20 +281,26 @@ rule gatk_variant_filtration:
         mem_mb=lambda wildcards, attempt: attempt * 10240,
         time_min=lambda wildcards, attempt: attempt * 25,
         tmpdir="tmp"
+    group:
+        "GATK_Stats"
     log:
         "logs/gatk/variant_filtration/{sample}.log"
     params:
-        filters={
-            "DepthBelow60X": "DP > 59",
-            "VAFAbove10pct": "AF >= 0.1",
-            "GeneralPopulationBelow1pml": "dbNSFP_ExAC_Adj_AF >= 0.001",
-            "VAFAbove5pct": "AF >= 0.05",
-        }
+        filters=config.get("gatk_filters", {
+            "DepthBelow60X": "DP < 59",
+            "BelowQualByDepth": "QD <= 2.0",
+            "BelowBaseQuality": "QUAL < 30.0",
+            "AboveFisherStrandBias": "FS > 60.0",
+            "AboveStrandOddsRatio": "SOR > 3.0",
+            "BelowMappingQuality": "MQ < 35.0",
+            "BelowMQRankSum": "MQRankSum < -12.5",
+            "BelowReadPosRankSum": "ReadPosRankSum < -8.0"
+        })
     wrapper:
         "bio/gatk/variantfiltration"
 
 
-rule fix_SnpSift_Annotate:
+rule fix_annotation_for_gatk:
     input:
         call="snpsift/dbnsfp/{sample}.vcf.gz",
         tbi=get_tbi("snpsift/dbnsfp/{sample}.vcf.gz")
@@ -191,6 +317,8 @@ rule fix_SnpSift_Annotate:
         remove_ends="'s/END=\([0-9]\+,\?\)\+//g'",
         remove_empty="'s/;;/;/g'",
         remove_eofield="'s/;\t/\t/g'"
+    group:
+        "GATK_Stats"
     log:
         "logs/snpsift/annotate_corrected/{sample}.log"
     shell:

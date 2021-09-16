@@ -61,8 +61,8 @@ rule bismark_methylation_extractor_pe:
     message: "Extracting methylation on {wildcards.sample}"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        time_min=lambda wildcards, attempt: attempt * 35,
         tmpdir="tmp"
     log:
         "logs/bismark/meth/{sample}.log"
@@ -78,7 +78,6 @@ use rule bismark_methylation_extractor_pe as bismark_methylation_extractor_se wi
         "bismark/deduplicated/{sample}.SE.bam"
     output:
         mbias_r1="bismark/meth/{sample}.M-bias_R1.png",
-        mbias_r2="bismark/meth/{sample}.M-bias_R2.png",
         mbias_report="bismark/meth/{sample}.SE.M-bias.txt",
         splitting_report="bismark/meth/{sample}_SE_splitting_report.txt",
         methylome_CpG_cov="bismark/meth_cpg/{sample}.bismark.cov.gz",
@@ -98,8 +97,8 @@ rule bismark_deduplicate_pe:
         "Deduplicating {wildcards.sample} pair-ended mapping"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        time_min=lambda wildcards, attempt: attempt * 30,
         tmpdir="tmp"
     log:
         "logs/bismark/deduplicated/{sample}.log"
