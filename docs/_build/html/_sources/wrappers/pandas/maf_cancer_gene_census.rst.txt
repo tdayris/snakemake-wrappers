@@ -1,0 +1,169 @@
+.. _`bio/pandas/maf_cancer_gene_census`:
+
+CANCER GENE CENSUS
+==================
+
+Annotate maf files with Cancer Gene Sensus
+
+**URL**: https://cancer.sanger.ac.uk/census
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_maf_cancer_gene_census:
+        input:
+            maf="",
+            sanger=""
+        output:
+            maf=""
+        wrapper:
+            "bio/pandas/maf_cancer_gene_census"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``conda-forge:python=3.8.2``
+* ``conda-forge:pandas=1.0.1``
+* ``conda-forge:numpy=1.18.1``
+
+Input/Output
+------------
+**Input:**
+
+* ``maf``: Path to maf file
+* ``sanger``: Path to Cancer Gene Sensus file from sanger institute
+
+**Output:**
+
+* ``maf``: Path to annotated maf file
+
+
+
+
+Notes
+-----
+
+This will load the whole input maf file in memory
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3.8
+    # conding: utf-8
+
+    """
+    Annotate MAF file with Cancer sensus genes
+    """
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2021, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    import csv
+    import pandas
+    import numpy
+
+    def read_cancer_sensus(path: str) -> pandas.DataFrame:
+        """
+        Load official cancer gene sensus TSV/CSV in memory
+        """
+        # Detect delimiter with python
+        with open(path, "r") as table:
+            dialect = csv.Sniffer().sniff(table.readline())
+            logging.debug(f"Detected dialect: {dialect.delimiter}")
+
+        # Loading dataset
+        return pandas.read_csv(
+            path,
+            sep=dialect.delimiter,
+            index_col=None,
+            header=0,
+            dtype={
+                "Gene Symbol": str,
+                "Name": str,
+                "Entrez GeneId": int,
+                "Genome Location": str,
+                "Tier": int,
+                "Hallmark": str,
+                "Chr Band": numpy.float,
+                "Somatic": "category",
+                "Germline": "category",
+                "Tumour Types(Somatic)": str,
+                "Tumour Types(Germline)": str,
+                "Cancer Syndrome": str,
+                "Tissue Type": "category",
+                "Molecular Genetics": "category",
+                "Role in Cancer": "category",
+                "Mutation Types": "category",
+                "Translocation Partner": str,
+                "Other Germline Mut": str,
+                "Other Syndrome": str,
+                "Synonyms": str,
+
+            }
+        )
+
+
+    def read_maf(path: str) -> pandas.DataFrame:
+        return pandas.read_csv(
+            path,
+            sep=dialect.delimiter,
+            index_col=None,
+            header=0
+        )
+
+
+    # Loading input files
+    sanger = read_cancer_sensus(snakemake.input["sanger"])
+    logging.info("Sanger cancer gene sensus dataset loaded")
+    logging.debug(sanger.head())
+
+    maf = read_maf(snakemake.input["maf"])
+    logging.info("MAF file loaded")
+    logging.debug(maf.head())
+
+    # Merging on gene name
+    maf = pandas.merge(
+        left=maf,
+        right=sanger,
+        how="left",
+        left_on=snakemake.params.get("left_key", ""),
+        right_on=snakemake.params.get("right_key", ""),
+        suffixes=("", "_SangerCGC")
+    )
+    logging.info("Merge performed")
+    logging.debug(maf.head())
+
+    maf.to_csv(
+        snakemake.output["maf"],
+        sep="\t",
+        index=True,
+        header=True
+    )
+    logging.info("Process over")

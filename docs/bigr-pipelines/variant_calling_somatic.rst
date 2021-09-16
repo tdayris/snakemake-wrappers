@@ -235,34 +235,67 @@ The pipeline contains the following steps:
 
     rule all:
         input:
-            # calls=expand(
-            #     "snpsift/dbnsfp/{sample}.vcf.gz{index}",
-            #     sample=design["Sample_id"].tolist(),
-            #     index=["", ".tbi"]
-            # ),
-            # html="multiqc/variant_calling_somatic.html",
+            maf="maf/maftools/complete.maf",
+            mafs=expand(
+                "maf/maftools/{sample}.maf",
+                sample=design["Sample_id"].tolist()
+            ),
+            calls=expand(
+                "snpsift/dbnsfp/{sample}.vcf.gz{index}",
+                sample=design["Sample_id"].tolist(),
+                index=["", ".tbi"]
+            ),
+            #html="multiqc/variant_calling_somatic.html",
             mapped=expand(
                 "picard/markduplicates/{sample}_{status}.bam{ext}",
                 sample=design["Sample_id"].tolist(),
                 status=["normal", "tumor"],
                 ext=["", ".bai"]
             ),
-            mutect2=expand(
-                "mutect2/filter/{sample}.vcf.gz",
-                sample=design["Sample_id"].tolist()
-            ),
+            # mutect2=expand(
+            #     "mutect2/corrected/{sample}.vcf.gz",
+            #     sample=design["Sample_id"].tolist()
+            # ),
+            # mutect2_tbi=expand(
+            #     "mutect2/corrected/{sample}.vcf.gz.tbi",
+            #     sample=design["Sample_id"].tolist()
+            # ),
             facets=expand(
                 "facets/{sample}/{sample}.{ext}",
                 sample=design["Sample_id"].tolist(),
                 ext=["vcf.gz", "cnv.png", "cov.pdf", "spider.pdf", "csv.gz"]
             ),
             varscan2=expand(
-                "varscan2/snp/{sample}.vcf.gz",
+                "varscan2/somatic/{sample}.snp.vcf.gz",
+                sample=design["Sample_id"].tolist()
+            ),
+            varscan2_tbi=expand(
+                "varscan2/somatic/{sample}.snp.vcf.gz.tbi",
                 sample=design["Sample_id"].tolist()
             ),
             qc="multiqc/variant_calling_somatic.html"
         message:
             "Finishing the WES Somatic Variant Calling"
+
+
+
+    ##################
+    ### VCF to MAF ###
+    ##################
+
+    vcf_post_process_config = {
+        "ncbi_build": config["params"].get("ncbi_build", "GRCh38"),
+        "center": config["params"].get("center", "GustaveRoussy"),
+        "annotation_tag": "ANN=",
+        "sample_list": design["Sample_id"].tolist(),
+        "genome": config["ref"]["fasta"]
+    }
+
+    module vcf_post_process:
+        snakefile: "../../meta/bio/vcf_post_process/test/Snakefile"
+        config: vcf_post_process_config
+
+    use rule * from vcf_post_process
 
 
     #################
@@ -375,10 +408,11 @@ The pipeline contains the following steps:
 
     rule cnv_facets:
         input:
-            tumor_bam="picard/markduplicates/{sample}_tumor.bam",
-            tumor_bai=get_bai("picard/markduplicates/{sample}_tumor.bam"),
-            normal_bam="picard/markduplicates/{sample}_normal.bam",
-            normal_bai=get_bai("picard/markduplicates/{sample}_normal.bam"),
+            #tumor_bam="picard/markduplicates/{sample}_tumor.bam",
+            #tumor_bai=get_bai("picard/markduplicates/{sample}_tumor.bam"),
+            #normal_bam="picard/markduplicates/{sample}_normal.bam",
+            #normal_bai=get_bai("picard/markduplicates/{sample}_normal.bam"),
+            pileup="samtools/mpileup/{sample}.mpileup.gz",
             vcf=config["ref"]["dbsnp"],
             vcf_index=get_tbi(config["ref"]["dbsnp"]),
             bed=config["ref"]["capture_kit_bed"]
@@ -392,15 +426,18 @@ The pipeline contains the following steps:
             "Searching for CNV in {wildcards.sample} with Facets"
         threads: 20
         resources:
-          mem_mb=lambda wildcards, attempt: attempt * 8192,
-          time_min=lambda wildcards, attempt: attempt * 30,
-          tmpdir="tmp"
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 20,
+            time_min=lambda wildcards, attempt: attempt * 60,
+            tmpdir="tmp"
         params:
-            extra="--snp-count-orphans"
+            extra=config.get(
+                "facets_extra",
+                "--snp-count-orphans --gbuild hg38 --nbhd-snp 250"
+            )
         log:
             "logs/facets/cnv/{sample}.log"
         wrapper:
-            "0.77.0-1061-gc0678288b/bio/facets/cnv"
+            "bio/facets/cnv"
 
 
     #################################
@@ -449,8 +486,8 @@ The pipeline contains the following steps:
 
     use rule snpeff from snpeff_meta with:
         input:
-            calls="meta_caller/calls/{sample}.vcf.gz",
-            calls_index=get_tbi("meta_caller/calls/{sample}.vcf.gz"),
+            calls="mutect2/corrected/{sample}.vcf.gz",
+            calls_index=get_tbi("mutect2/corrected/{sample}.vcf.gz"),
             db=config["ref"]["snpeff"]
 
 
@@ -483,7 +520,7 @@ The pipeline contains the following steps:
 
     rule correct_mutect2_vcf:
         input:
-            "mutect2/filter_reheaded/{sample}.vcf.gz"
+            "mutect2/filter/{sample}.vcf.gz"
         output:
             temp("mutect2/corrected/{sample}.vcf")
         message:
@@ -497,7 +534,7 @@ The pipeline contains the following steps:
         log:
             "logs/mutect2/correct_fields/{sample}.log"
         params:
-            rename_ad="'s/=AD;/=ADM;/g'",
+            rename_ad="'s/=AD,/=ADM,/g'",
             rename_ad_format="'s/:AD:/:ADM:/g'",
             fix_as_filterstatus="'s/ID=AS_FilterStatus,Number=A/ID=AS_FilterStatus,Number=1/g'"
         shell:

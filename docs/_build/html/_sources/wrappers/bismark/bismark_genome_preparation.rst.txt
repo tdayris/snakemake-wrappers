@@ -26,7 +26,7 @@ This wrapper can be used in the following way:
         params:
             ""  # optional params string
         wrapper:
-            "0.77.0-1061-gc0678288b/bio/bismark/bismark_genome_preparation"
+            "0.77.0-1111-g021ee08d2/bio/bismark/bismark_genome_preparation"
 
     # Fo *.fa.gz file:
     rule bismark_genome_preparation_fa_gz:
@@ -39,7 +39,7 @@ This wrapper can be used in the following way:
         params:
             ""  # optional params string
         wrapper:
-            "0.77.0-1061-gc0678288b/bio/bismark/bismark_genome_preparation"
+            "0.77.0-1111-g021ee08d2/bio/bismark/bismark_genome_preparation"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -54,9 +54,9 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``bowtie2==2.4.2``
-* ``bismark==0.23.0``
-* ``samtools==1.9``
+* ``bowtie2==2.4.4``
+* ``bismark==0.23.1``
+* ``samtools==1.13``
 
 Input/Output
 ------------
@@ -107,4 +107,16 @@ Code
     params_extra = snakemake.params.get("extra", "")
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
-    shell("bismark_genome_preparation --verbose --bowtie2 {params_extra} {input_dir} {log}")
+    # From documentation:
+    # Remember that the indexing is run twice in parallel already
+    # so e.g. '--parallel 4' will use 8 threads in total.
+    parallel = f"--parallel {int(snakemake.threads / 2)}"
+
+    shell(
+        "bismark_genome_preparation "
+        "{parallel} "
+        "--verbose "
+        "--bowtie2 "
+        "{params_extra} "
+        "{input_dir} "
+        "{log}")

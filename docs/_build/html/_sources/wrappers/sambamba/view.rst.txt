@@ -25,7 +25,7 @@ This wrapper can be used in the following way:
             "logs/sambamba-view/{sample}.log"
         threads: 8
         wrapper:
-            "0.77.0-1061-gc0678288b/bio/sambamba/view"
+            "0.77.0-1111-g021ee08d2/bio/sambamba/view"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -77,15 +77,20 @@ Code
 
     from snakemake.shell import shell
 
-    in_file = snakemake.input[0]
+    in_file = snakemake.input["mapping"]
+
+    regions = snakemake.input.get("regions", "")
     extra = snakemake.params.get("extra", "")
-    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    if regions != "":
+        extra = "--regions {}".format(regions)
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
     if in_file.endswith(".sam") and ("-S" not in extra or "--sam-input" not in extra):
         extra += " --sam-input"
 
     shell(
-        "sambamba view {extra} -t {snakemake.threads} "
-        "{snakemake.input[0]} > {snakemake.output[0]} "
-        "{log}"
+        "sambamba view {extra} --nthreads {snakemake.threads} "
+        "{in_file} --output-filename {snakemake.output[0]} {log}"
     )

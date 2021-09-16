@@ -45,7 +45,7 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="RSAMTOOLS" href="../Rsamtools.html" />
+    <link rel="next" title="SPLIT VCF MULTIALLELIC" href="split_vcf_multiallelic.html" />
     <link rel="prev" title="SPLIT_DESIGN" href="split_design.html" /> 
 </head>
 
@@ -101,6 +101,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../BiGR.html">BIGR</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="copy.html">IGR_COPY</a></li>
 <li class="toctree-l3"><a class="reference internal" href="drop_duplicates_md5.html">DROP_MD5_DUPLICATES</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fix_vcf.html">FIX VCF</a></li>
 <li class="toctree-l3"><a class="reference internal" href="multiqc_rnaseq_report.html">MULTIQC_RNASEQ_REPORT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rename_snpsift_maf_cols.html">RENAME_SNPSIFT_MAF_COLS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="split_design.html">SPLIT_DESIGN</a></li>
@@ -114,6 +115,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="split_vcf_multiallelic.html">SPLIT VCF MULTIALLELIC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vcf_format_to_info.html">VCF_FORMAT_TO_INFO</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../Rsamtools.html">RSAMTOOLS</a></li>
@@ -261,6 +264,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../unicycler.html">UNICYCLER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../vardict.html">VARDICT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../variant_distribution.html">VARIANT_DISTRIBUTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../variantoccurence.html">VARIANTOCCURENCE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../varscan.html">VARSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../vembrane.html">VEMBRANE</a></li>
@@ -360,7 +364,7 @@ snpsifs extract fields, this leads to non-human readable outputs.</p>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/mouse.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1061-gc0678288b/bio/BiGR/split_vcf_features&quot;</span>
+        <span class="s2">&quot;0.77.0-1111-g021ee08d2/bio/BiGR/split_vcf_features&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -396,6 +400,7 @@ snpsifs extract fields, this leads to non-human readable outputs.</p>
 <div class="section" id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <p>No information is lost, it is moved.</p>
+<p>This wrapper takes non-gzipped VCF files</p>
 </div>
 <div class="section" id="authors">
 <h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
@@ -412,6 +417,7 @@ snpsifs extract fields, this leads to non-human readable outputs.</p>
 <span class="sd">split ANN field in the INFO column in a VCF file</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
@@ -422,13 +428,23 @@ snpsifs extract fields, this leads to non-human readable outputs.</p>
 
 <span class="n">annotation_tag</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;annotation_tag&quot;</span><span class="p">,</span> <span class="s2">&quot;ANN=&quot;</span><span class="p">)</span>
 
+<span class="n">version</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;split_vcf_features&quot;</span>
+<span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;github.com/tdayris/snakemake-wrappers/tree/Unofficial/bio/BiGR/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/wrapper.py&quot;</span>
+<span class="n">header</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;##BiGRCommandLine=&lt;ID=</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">,CommandLine=&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;,Version=</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">,Date=</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="si">}</span><span class="s2">&gt;</span><span class="se">\n</span><span class="s2">&quot;&quot;&quot;</span>
+
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;call&quot;</span><span class="p">],</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">input_vcf</span><span class="p">,</span> \
      <span class="nb">open</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;call&quot;</span><span class="p">],</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">splitted_vcf</span><span class="p">:</span>
 
     <span class="c1"># Copy headers without any modification</span>
     <span class="k">for</span> <span class="n">nb</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_vcf</span><span class="p">):</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Line:</span><span class="se">\n</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;##&quot;</span><span class="p">):</span>
+            <span class="n">splitted_vcf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">continue</span>
+
         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+            <span class="n">splitted_vcf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
             <span class="n">splitted_vcf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
             <span class="k">continue</span>
 
@@ -482,7 +498,7 @@ snpsifs extract fields, this leads to non-human readable outputs.</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../Rsamtools.html" class="btn btn-neutral float-right" title="RSAMTOOLS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="split_vcf_multiallelic.html" class="btn btn-neutral float-right" title="SPLIT VCF MULTIALLELIC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="split_design.html" class="btn btn-neutral float-left" title="SPLIT_DESIGN" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

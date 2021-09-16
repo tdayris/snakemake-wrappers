@@ -100,6 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="bioinfokit.html">DESEQ2_POST_PROCESS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bismark.html">BISKMARK</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compress_index_vcf.html">COMPRESS_INDEX_VCF</a></li>
@@ -113,6 +114,7 @@
 <li class="toctree-l2"><a class="reference internal" href="fastq_screen_indexer.html">FASTQ_SCREEN_INDEXER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gatk_bqsr.html">GATK_BQSR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="index_datasets.html">INDEX_DATASETS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="maftools.html">MAFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="meta_caller.html">META_CALLER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="meta_caller_germline.html">META_CALLER_GERMLINE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mutect2_germline.html">MUTECT2_GERMLINE</a></li>
@@ -132,6 +134,7 @@
 <li class="toctree-l2"><a class="reference internal" href="varscan2_calling.html">VARSCAN2_CALLING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varscan2_germline.html">VARSCAN2_GERMLINE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varscan2_somatic.html">VARSCAN2_SOMATIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcf_post_process.html">VCF_POST_PROCESS</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../pipelines.html">BiGR Pipelines</a></li>
@@ -230,7 +233,12 @@
     <span class="c1"># Path to dbSNP vcf, its tbi should be aside.</span>
     <span class="s2">&quot;dbsnp&quot;</span><span class="p">:</span> <span class="s2">&quot;reference/dbsnp.vcf.gz&quot;</span><span class="p">,</span>
     <span class="c1"># List of samples</span>
-    <span class="s2">&quot;sample_list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;S1&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">]</span>
+    <span class="s2">&quot;sample_list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;S1&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">],</span>
+    <span class="c1"># Extra parameters</span>
+    <span class="s2">&quot;gatk_crate_stomatic_pon_extra&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gatk_get_pileup_summaries_extra&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gatk_calculate_tumor_contamination_extra&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gatk_filter_mutect_calls_extra&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
 <span class="p">}</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -287,7 +295,7 @@
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gatk_filter_mutect_calls_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/mutect2/filter/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
@@ -320,7 +328,7 @@
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gatk_calculate_tumor_contamination_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/gatk/CalculateContamination/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
@@ -352,7 +360,7 @@
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gatk_get_pileup_summaries_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/gatk/GetPileupSummaries/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
@@ -376,7 +384,7 @@
         <span class="s2">&quot;Calling variants on </span><span class="si">{wildcards.sample}</span><span class="s2"> with GATK Mutect2&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">300</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">8192</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
@@ -434,7 +442,7 @@
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/gatk/pon/pon.gvcf.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gatk_crate_stomatic_pon_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/gatk/createsomaticpanelofnormals&quot;</span>
 

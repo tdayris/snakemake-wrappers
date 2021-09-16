@@ -33,7 +33,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
         # Path to dbSNP vcf, its tbi should be aside.
         "dbsnp": "reference/dbsnp.vcf.gz",
         # List of samples
-        "sample_list": ["S1", "S2"]
+        "sample_list": ["S1", "S2"],
+        # Extra parameters
+        "gatk_crate_stomatic_pon_extra": "",
+        "gatk_get_pileup_summaries_extra": "",
+        "gatk_calculate_tumor_contamination_extra": "",
+        "gatk_filter_mutect_calls_extra": ""
     }
 
     try:
@@ -90,7 +95,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=lambda wildcards, attempt: attempt * 35,
             tmpdir="tmp"
         params:
-            extra=""
+            extra=config.get("gatk_filter_mutect_calls_extra", "")
         log:
             "logs/mutect2/filter/{sample}.log"
         wrapper:
@@ -123,7 +128,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=lambda wildcards, attempt: attempt * 35,
             tmpdir="tmp"
         params:
-            extra=""
+            extra=config.get("gatk_calculate_tumor_contamination_extra", "")
         log:
             "logs/gatk/CalculateContamination/{sample}.log"
         wrapper:
@@ -155,7 +160,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=lambda wildcards, attempt: attempt * 35,
             tmpdir="tmp"
         params:
-            extra=""
+            extra=config.get("gatk_get_pileup_summaries_extra", "")
         log:
             "logs/gatk/GetPileupSummaries/{sample}.{status}.log"
         wrapper:
@@ -179,7 +184,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "Calling variants on {wildcards.sample} with GATK Mutect2"
         threads: 4
         resources:
-            time_min=lambda wildcards, attempt: attempt * 300,
+            time_min=lambda wildcards, attempt: attempt * 60 * 15,
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
             tmpdir="tmp"
         params:
@@ -237,7 +242,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/gatk/pon/pon.gvcf.log"
         params:
-            extra=""
+            extra=config.get("gatk_crate_stomatic_pon_extra", "")
         wrapper:
             "bio/gatk/createsomaticpanelofnormals"
 
