@@ -29,23 +29,40 @@ This meta-wrapper can be used by integrating the following into your workflow:
     ########################
     ### Quality controls ###
     ########################
-
-
     rule picard_metrics:
-
+        input:
+            ref=config["fasta"],
+            ref_dict=get_dict(config["fasta"]),
+            ref_fai=get_fai(config["fasta"]),
+            bam="bam/star/{sample}.bam"
+            bai=get_bai("bam/star/{sample}.bam")
+        output:
+            "picard/alignment_summary/{sample}.summary.txt"
+        message:
+            "Collecting alignment summary for {wildcards.sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        log:
+            "logs/picard/alignment_summary/{sample}.log"
+        wrapper:
+            "bio/picard/collectalignmentsummarymetrics"
 
 
     rule samtools_view:
         input:
             "star/{sample}/Aligned.out.sam"
         output:
-            "star/{sample}/Aligned.out.SortedByCooord.bam"
+            "bam/star/{sample}.bam"
         message:
             "Filtering, sorting and compressing {wildcards.sample}"
         threads: 10
         resources:
             mem_mb=lambda: wildcards, threads: threads * 720,
-            time_min=lambda: wildcards, attempt: attempt * 30
+            time_min=lambda: wildcards, attempt: attempt * 30,
+            tmpdir="tmp"
         params:
             extra="-bhq 10"
         log:
@@ -63,7 +80,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             fq1="reads/{sample}.1.fq.gz",
             fq2="reads/{sample}.2.fq.gz",
-            index="star_index"
+            index="star/index"
         output:
             pipe("star/{sample}/Aligned.out.sam"),
             tmp = temp(directory("star/tmp/{sample}.tmp"))
@@ -72,7 +89,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 20
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 5210 + 40960,
-            time_min=lambda wildcards, attempt: attempt * 60
+            time_min=lambda wildcards, attempt: attempt * 60,
+            tmpdir="tmp"
         params:
             extra = (
                 " --outFilterType BySJout "
@@ -105,7 +123,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 20
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 5120 + 40960,
-            time_min=lambda wildcards, attempt: attempt * 45
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
         params:
             extra="",
             sjdbOverhang="100"

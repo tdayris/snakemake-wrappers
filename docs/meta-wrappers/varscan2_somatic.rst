@@ -26,7 +26,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
         # Your genome sequence
         "genome": "reference/genome.fasta",
         # Path to a BED containing the kit's catpured regions
-        "bed": "reference/regions.bed"
+        "bed": "reference/regions.bed",
+        # Extra parameters
+        "mpileup_extra": "--count-orphans --no-BAQ",
+        "varscan_somatic_extra": "--somatic-p-value 0.1 --variants --output-type g",
+        "varscan_bcftools_concat_extra": "--remove-duplicates --allow-overlaps"
     }
 
     try:
@@ -133,7 +137,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=lambda wildcards, attempt: attempt * 45,
             tmpdir="tmp"
         params:
-            extra="--remove-duplicates --allow-overlaps"
+            extra=config.get(
+                "bcftools_concat_extra",
+                "--remove-duplicates --allow-overlaps"
+            )
         log:
             "logs/bcftools/concat/{sample}.log"
         wrapper:
@@ -157,7 +164,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=lambda wildcards, attempt: attempt * 45,
             tmpdir="tmp"
         params:
-            extra="--somatic-p-value 0.05 --variants --output-type g"
+            extra=config.get(
+                "varscan_somatic_extra",
+                "--somatic-p-value 0.2 --variants --output-type g"
+            )
         log:
             "logs/varscan2/somatic/{sample}.call.log"
         wrapper:
@@ -193,7 +203,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/samtools/mpileup/{sample}.log"
         params:
-            extra="--count-orphans --no-BAQ"
+            extra=config.get("mpileup_extra", "--count-orphans --no-BAQ")
         wrapper:
             "bio/samtools/mpileup"
 

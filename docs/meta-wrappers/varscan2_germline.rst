@@ -72,7 +72,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=128,
-            time_min=2
+            time_min=2,
+            tmpdir="tmp"
         params:
             '"varscan2_{sample}"'
         log:

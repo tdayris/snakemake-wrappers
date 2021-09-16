@@ -90,7 +90,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=128,
-            time_min=2
+            time_min=2,
+            tmpdir="tmp"
         log:
             "logs/{tool}/{subcommand}/rehead/{sample}.sample_list.renamed.log"
         shell:
@@ -125,7 +126,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=125,
-            time_min=2
+            time_min=2,
+            tmpdir="tmp"
         log:
             "logs/{tool}/{subcommand}/rehead/tool_name.log"
         params:

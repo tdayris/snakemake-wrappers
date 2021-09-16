@@ -52,7 +52,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "Annotating {wildcards.sample} with dbNSFP"
         threads: 1
         resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+            mem_mb=lambda wildcards, attempt: attempt * 15360 + 5125,
             time_min=lambda wildcards, attempt: attempt * 45,
             tmpdir="tmp"
         log:

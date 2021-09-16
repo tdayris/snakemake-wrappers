@@ -45,7 +45,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="EACON_ONCOSCAN" href="oncoscan_eacon.html" />
+    <link rel="next" title="MIRASEQ" href="miraseq.html" />
     <link rel="prev" title="DGE_DESEQ2" href="dge_deseq2.html" /> 
 </head>
 
@@ -115,6 +115,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT (UNDER DEVELOPMENT)</a></li>
@@ -340,12 +341,16 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/run.
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">50</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="s2">&quot;&quot;</span>
+        <span class="s2">&quot;--flat&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/multiqc.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/multiqc&quot;</span>
 
+
+<span class="c1">#######################################################</span>
+<span class="c1">### Adding specific actions for BiGR demultiplexing ###</span>
+<span class="c1">#######################################################</span>
 
 <span class="n">use</span> <span class="n">rule</span> <span class="n">multiqc</span> <span class="k">as</span> <span class="n">irods_complient</span> <span class="k">with</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
@@ -373,6 +378,24 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/run.
     <span class="n">output</span><span class="p">:</span>
         <span class="s2">&quot;output/multiqc.html&quot;</span><span class="p">,</span>
         <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;output/multiqc_data&quot;</span><span class="p">)</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;stats_inclusion&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">unzip_stats</span><span class="p">:</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;Stats.json&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/unzipping.log&quot;</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;stats_inclusion&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;unzip -n -d &quot;${{PWD}}&quot; input/*/archive/Stats.json.zip &gt; {log} 2&gt;&amp;1&quot;&quot;&quot;</span>
 
 
 <span class="c1">#########################################</span>
@@ -462,7 +485,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/run.
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="oncoscan_eacon.html" class="btn btn-neutral float-right" title="EACON_ONCOSCAN" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="miraseq.html" class="btn btn-neutral float-right" title="MIRASEQ" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="dge_deseq2.html" class="btn btn-neutral float-left" title="DGE_DESEQ2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

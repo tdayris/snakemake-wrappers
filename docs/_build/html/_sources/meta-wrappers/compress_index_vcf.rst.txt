@@ -27,7 +27,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 1024, 10240),
-            time_min=lambda wildcards, attempt: attempt * 60
+            time_min=lambda wildcards, attempt: attempt * 60,
+            tmpdir="tmp"
         params:
             "-p vcf"
         log:
@@ -51,7 +52,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             config.get("threads", 20)
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 1024, 10240),
-            time_min=lambda wildcards, attempt: attempt * 30
+            time_min=lambda wildcards, attempt: attempt * 30,
+            tmpdir="tmp"
         params:
             ""
         log:

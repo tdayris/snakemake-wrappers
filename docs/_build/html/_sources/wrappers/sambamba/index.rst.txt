@@ -25,7 +25,7 @@ This wrapper can be used in the following way:
             "logs/sambamba-index/{sample}.log"
         threads: 8
         wrapper:
-            "0.77.0-1061-gc0678288b/bio/sambamba/index"
+            "0.77.0-1111-g021ee08d2/bio/sambamba/index"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -78,8 +78,11 @@ Code
 
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
+    if snakemake.input[0].endswith(("fa", "fasta")):
+        extra += "--fasta-input"
+
     shell(
-        "sambamba index {snakemake.params.extra} -t {snakemake.threads} "
+        "sambamba index {snakemake.params.extra} --nthreads {snakemake.threads} "
         "{snakemake.input[0]} {snakemake.output[0]} "
         "{log}"
     )

@@ -1,0 +1,101 @@
+.. _`bio/variantoccurence/sample`:
+
+VARIANT OCCURENCE SAMPLE
+========================
+
+Find occurence of variants within a sample
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_variant_occurence_sample:
+        input:
+            calls=["in.vcf", "in2.vcf"]
+        output:
+            txt="occurence.txt"
+        threads: 7
+        wrapper:
+            "0.77.0-1111-g021ee08d2/bio/variantoccurence/sample"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bash==5.0.018``
+
+Input/Output
+------------
+**Input:**
+
+* ``calls``: A (list of) VCF-formatted file(s) to extract variants from
+
+**Output:**
+
+* ``txt``: A TSV-formatted text file containing chr, start, stop, ref, alt
+
+
+
+
+Notes
+-----
+
+Multiallelic sites *must* be splitted before this occurence analysis. They are
+treated as a single variant in this wrapper.
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper to extract variants and count occurences"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2021, Dayris Thibault"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    import os.path as op
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    if snakemake.threads != 7:
+        raise ValueError("7 threads are required for this wrapper.")
+
+    if all(i.endswith("vcf") for i in snakemake.input["calls"]):
+        reader = "cat"
+    elif all(i.endswith("vcf.gz") for i in snakemake.input["calls"]):
+        reader = "zcat"
+    else:
+        raise ValueError("All VCF should be bgzipped, or all VCF should be raw text")
+
+    shell(
+        """(echo -e "Occurence\tChromosome\tPosition\tID\tRef\tAlt"; """
+        """{reader} {snakemake.input.calls} | cut -f -5 | grep -vP "^#" | """
+        """sort | uniq -c | sed 's/\s\+/\t/g' | sed 's/^\s//g') """
+        """> {snakemake.output.txt} {log}"""
+    )

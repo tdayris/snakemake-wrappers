@@ -181,12 +181,16 @@ The pipeline contains the following steps:
             time_min=lambda wildcard, attempt: attempt * 50,
             tmpdir="tmp"
         params:
-            ""
+            "--flat"
         log:
             "logs/multiqc.log"
         wrapper:
             "bio/multiqc"
 
+
+    #######################################################
+    ### Adding specific actions for BiGR demultiplexing ###
+    #######################################################
 
     use rule multiqc as irods_complient with:
         input:
@@ -214,6 +218,24 @@ The pipeline contains the following steps:
         output:
             "output/multiqc.html",
             directory("output/multiqc_data")
+        group:
+            "stats_inclusion"
+
+
+    rule unzip_stats:
+        output:
+            temp("Stats.json")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        log:
+            "logs/unzipping.log"
+        group:
+            "stats_inclusion"
+        shell:
+            """unzip -n -d "${{PWD}}" input/*/archive/Stats.json.zip > {log} 2>&1"""
 
 
     #########################################

@@ -20,11 +20,11 @@ In order to run the pipeline, use the following commands
 
   # Copy/paste the following line for **HG19**
 
-  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/dge_deseq2/run.sh hg19
 
   # Copy/paste the following line for **HG38**
 
-  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh hg38
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/dge_deseq2/run.sh hg38
 
 
 Input/Output

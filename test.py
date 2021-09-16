@@ -130,6 +130,35 @@ def run(wrapper, cmd, check_log=None):
             # go back to original directory
             os.chdir(origdir)
 
+@skip_if_not_modified
+def test_bigr_fix_vcf():
+    run(
+        "bio/BiGR/fix_vcf",
+        ["snakemake", "--cores", "1", "out.vcf", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_variant_occurence_annotate():
+    run(
+        "bio/variantoccurence/annotate",
+        ["snakemake", "--cores", "1", "in.occ.vcf", "--use-conda", "-F"]
+    )
+
+@skip_if_not_modified
+def test_variant_occurence_sample():
+    run(
+        "bio/variantoccurence/sample",
+        ["snakemake", "--cores", "7", "occurence.txt", "--use-conda", "-F"]
+    )
+
+@skip_if_not_modified
+def test_bigr_split_vcf_multiallelic():
+    run(
+        "bio/BiGR/split_vcf_multiallelic",
+        ["snakemake", "--cores", "1", "out.vcf", "--use-conda", "-F"]
+    )
+
 
 @skip_if_not_modified
 def test_rename_snpsift_maf_cols():

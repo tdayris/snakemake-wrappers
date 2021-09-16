@@ -52,7 +52,7 @@ This wrapper can be used in the following way:
             extra=' --ambiguous --unmapped --nucleotide_coverage',
             basename='{sample}_{genome}'
         wrapper:
-            "0.77.0-1061-gc0678288b/bio/bismark/bismark"
+            "0.77.0-1111-g021ee08d2/bio/bismark/bismark"
 
     # Example: Single-ended reads
     rule bismark_se:
@@ -74,7 +74,7 @@ This wrapper can be used in the following way:
             extra=' --ambiguous --unmapped --nucleotide_coverage',
             basename='{sample}_{genome}'
         wrapper:
-            "0.77.0-1061-gc0678288b/bio/bismark/bismark"
+            "0.77.0-1111-g021ee08d2/bio/bismark/bismark"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -89,9 +89,9 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``bowtie2==2.4.2``
-* ``bismark==0.23.0``
-* ``samtools==1.9``
+* ``bowtie2==2.4.4``
+* ``bismark==0.23.1``
+* ``samtools==1.13``
 
 Input/Output
 ------------
@@ -196,6 +196,9 @@ Code
         if basename is None:
             # default basename
             basename = basename_without_ext(snakemake.input.fq_1) + "_bismark_bt2"
+
+    # multithreading
+    cmdline_args.append(f"--parallel {snakemake.threads}")
 
     # log
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
