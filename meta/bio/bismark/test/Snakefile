@@ -174,10 +174,10 @@ rule bismark_genome_preparation:
         temp(directory("biskmark/index/Bisulfite_Genome")),
         temp("biskmark/index/genomic_nucleotide_frequencies.txt")
     message: "Indexing genome with Bismark"
-    threads: 20
+    threads: 7
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 15,
-        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 20,
+        time_min=lambda wildcards, attempt: attempt * 60,
         tmpdir="tmp"
     log:
         "logs/bismark/genome_preparation.log"
@@ -196,8 +196,8 @@ rule link_genome:
         "Linking fasta genome for bismark"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 512,
+        time_min=lambda wildcards, attempt: attempt * 5,
         tmpdir="tmp"
     log:
         "logs/bismark/genome_linking.log"
