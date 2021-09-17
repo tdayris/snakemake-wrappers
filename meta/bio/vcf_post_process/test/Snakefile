@@ -14,7 +14,8 @@ default_config_vcf_post_process = {
     "sample_list": list(),
     "genome": "/path/to/ref.fasta",
     "known": "/path/to/dbsnp",
-    "gatk_filters": {}
+    "gatk_filters": {},
+    "chr": list(range(1, 23)) + ["X", "Y"]
 }
 
 try:
@@ -29,11 +30,11 @@ Compress and index final VCF files
 rule gath_final_vcf:
     input:
         expand(
-            "maf/canonical/{sample}.vcf.gz",
+            "maf/occurence_annotated/{sample}.vcf.gz",
             sample=config["sample_list"]
         ),
         expand(
-            "maf/canonical/{sample}.vcf.gz.tbi",
+            "maf/occurence_annotated/{sample}.vcf.gz.tbi",
             sample=config["sample_list"]
         )
     output:
@@ -111,7 +112,7 @@ Extracting all INFO/FORMAT data, the list is built from vcf header
 """
 rule extract_all_fields:
     input:
-        call="maf/canonical/{sample}.vcf"
+        call="maf/occurence_annotated/{sample}.vcf"
     output:
         tsv=temp("maf/extracted/{sample}.tsv")
     message:
@@ -130,7 +131,63 @@ rule extract_all_fields:
         ignore_format=True
     wrapper:
         "bio/snpsift/extractAllFields"
-        
+
+
+"""
+Count variant occurence
+"""
+rule variant_occurence_annotate:
+    input:
+        calls = "maf/canonical/{sample}.vcf",
+        occurence = "maf/occurences.txt"
+    output:
+        calls = "maf/occurence_annotated/{sample}.vcf"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/variant_occurence/uncompress/{sample}.log"
+    wrapper:
+        "bio/variantoccurence/annotate"
+
+
+rule concatenate_per_chr_information:
+    input:
+        expand("maf/{chr}/occurence.txt", chr=config["chr"])
+    output:
+        "maf/occurences.txt"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/variant_occurence/all.log"
+    shell:
+        "for i in {input}; do sed '1d' ${{i}}; done > {output} 2> {log}"
+
+
+rule variant_occurence_per_chr:
+    input:
+        calls=expand(
+            "maf/canonical/{sample}.vcf.gz",
+            sample=config["sample_list"]
+        )
+    output:
+        txt="maf/{chr}/occurence.txt"
+    threads: 7
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
+    log:
+        "logs/variant_occurence/{chr}.log"
+    wrapper:
+        "bio/variantoccurence/chromosomes"
+
+
 """
 Remove non-canonical chromosomes, and empty info fields
 """
@@ -154,7 +211,7 @@ rule fix_vcf:
         annotation_tag="ANN="
     wrapper:
         "bio/BiGR/fix_vcf"
-    
+
 
 
 """

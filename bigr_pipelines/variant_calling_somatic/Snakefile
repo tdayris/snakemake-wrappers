@@ -34,6 +34,9 @@ design = get_design(os.getcwd(), search_fastq_pairs)
 design.dropna(inplace=True)
 print(design)
 
+design.index = design["Sample_id"]
+design.drop(index="s070", inplace=True)
+
 wildcard_constraints:
     sample = r"|".join(design["Sample_id"]),
     stream = r"1|2|R1|R2",
@@ -107,7 +110,8 @@ vcf_post_process_config = {
     "annotation_tag": "ANN=",
     "sample_list": design["Sample_id"].tolist(),
     "genome": config["ref"]["fasta"],
-    "known": config["ref"]["dbsnp"]
+    "known": config["ref"]["dbsnp"],
+    "chr": config["params"]["chr"]
 }
 
 module vcf_post_process:
