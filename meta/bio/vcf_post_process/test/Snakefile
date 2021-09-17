@@ -14,7 +14,8 @@ default_config_vcf_post_process = {
     "sample_list": list(),
     "genome": "/path/to/ref.fasta",
     "known": "/path/to/dbsnp",
-    "gatk_filters": {}
+    "gatk_filters": {},
+    "chr": list()
 }
 
 try:
@@ -130,13 +131,13 @@ rule extract_all_fields:
         ignore_format=True
     wrapper:
         "bio/snpsift/extractAllFields"
-        
+
 """
 Remove non-canonical chromosomes, and empty info fields
 """
 rule fix_vcf:
     input:
-        vcf="maf/monoallelic/{sample}.vcf"
+        vcf="maf/splitted/{sample}.vcf"
     output:
         vcf=temp("maf/canonical/{sample}.vcf")
     message:
@@ -151,35 +152,10 @@ rule fix_vcf:
     log:
         "logs/fix_vcf/{sample}.log"
     params:
-        annotation_tag="ANN="
+        default_chr=
+        remove_non_conventional_chromosomes=True
     wrapper:
         "bio/BiGR/fix_vcf"
-    
-
-
-"""
-Deal with multiallelic sites since GLeaves does not
-"""
-rule split_vcf_multiallelic:
-    input:
-        vcf="maf/splitted/{sample}.vcf"
-    output:
-        vcf=temp("maf/monoallelic/{sample}.vcf")
-    message:
-        "Splitting multiallelic sites for {wildcards.sample}"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
-        tmpdir="tmp"
-    group:
-        "GLeaves"
-    log:
-        "logs/split_vcf_multiallelic/{sample}.log"
-    params:
-        annotation_tag="ANN="
-    wrapper:
-        "bio/BiGR/split_vcf_multiallelic"
 
 
 """
