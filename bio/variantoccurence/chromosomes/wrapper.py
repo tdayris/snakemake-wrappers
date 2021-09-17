@@ -29,6 +29,6 @@ shell(
     """(echo -e "Occurence\tChromosome\tPosition\tID\tRef\tAlt"; """
     """for CALL in {snakemake.input.calls} ; do """
     """{reader} ${{CALL}} | cut -f -5 | grep -P "^{chr}" | """
-    """ sort | uniq ; done | sort | uniq -c ) """
-    """> {snakemake.output.txt} {log}"""
+    """ sort | uniq ; done | sort | uniq -c | sed 's/\s\+/\t/g' | """
+    """ sed 's/^\s\+//g' ) > {snakemake.output.txt} {log}"""
 )
