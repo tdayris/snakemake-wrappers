@@ -19,12 +19,16 @@ if all(i.endswith("vcf") for i in snakemake.input["calls"]):
 elif all(i.endswith("vcf.gz") for i in snakemake.input["calls"]):
     reader = "zcat"
 else:
-    raise ValueError("All VCF should be bgzipped, or all VCF should be raw text")
+    raise ValueError(
+        "All VCF should be bgzipped, or all VCF should be raw text"
+    )
+
+chr = snakemake.wildcards["chr"]
 
 shell(
     """(echo -e "Occurence\tChromosome\tPosition\tID\tRef\tAlt"; """
     """for CALL in {snakemake.input.calls} ; do """
-    """{reader} ${{CALL}} | cut -f -5 | grep -vP "^#" | """
+    """{reader} ${{CALL}} | cut -f -5 | grep -P "^{chr}" | """
     """ sort | uniq ; done | sort | uniq -c ) """
     """> {snakemake.output.txt} {log}"""
 )
