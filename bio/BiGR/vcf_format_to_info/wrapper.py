@@ -15,7 +15,7 @@ colnames = None
 version = 1.0
 name = "vcf_format_to_info"
 url = f"github.com/tdayris/snakemake-wrappers/tree/Unofficial/bio/BiGR/{name}/wrapper.py"
-header = f"""##BiGRCommandLine=<ID={name},CommandLine="{url}",Version={version},Date={datetime.date.today()}>\n"""
+header = f'##BiGRCommandLine=<ID={name},CommandLine="{url}",Version={version},Date={datetime.date.today()}>\n'
 format_headers = []
 
 logging.info("Looking for all possible format fields among all samples")
@@ -34,7 +34,7 @@ with open(snakemake.input.call, "r") as instream:
             for format in formats.split(":"):
                 format_headers.append(create_header(sample, format))
 
-header += "\n".join(set(format_headers))
+header += "\n".join(set(format_headers)) + "\n"
 logging.debug(header)
 logging.info("Formats were built, now annotating VCF")
 

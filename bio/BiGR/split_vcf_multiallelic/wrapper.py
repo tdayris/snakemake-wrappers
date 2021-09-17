@@ -71,7 +71,8 @@ def split_info(info: str, allele_nb: int) -> list[str]:
             values = info_field
 
         # Remove empty fields
-        values = list(filter(lambda x: x != "", values.split(",")))
+        # values = list(filter(lambda x: x != "", values.split(",")))
+        values = [i for i in values.split(",") if i != ""]
         if len(values) == allele_nb:
             # The field has one value per allele
             for idx, value in enumerate(values):
@@ -92,7 +93,7 @@ colnames = None
 version = 1.0
 name = "split_vcf_multiallelic"
 url = f"github.com/tdayris/snakemake-wrappers/tree/Unofficial/bio/BiGR/{name}/wrapper.py"
-header = f"""##BiGRCommandLine=<ID={name},CommandLine="{url}",Version={version},Date={datetime.date.today()}>\n"""
+header = f'##BiGRCommandLine=<ID={name},CommandLine="{url}",Version="{version}",Date="{datetime.date.today()}">\n'
 
 with open(snakemake.input["vcf"]) as invcf, \
      open(snakemake.output["vcf"], 'w') as outvcf:
@@ -100,6 +101,7 @@ with open(snakemake.input["vcf"]) as invcf, \
         if line.startswith("##"):
             # Header content
             outvcf.write(line)
+            logging.info("Annotation field processed")
             continue
 
         elif line.startswith("#"):
@@ -107,13 +109,13 @@ with open(snakemake.input["vcf"]) as invcf, \
             colnames = line[1:-1].split("\t")
             outvcf.write(header)
             outvcf.write(line)
-            logging.INFO("Header processed")
+            logging.info("Header processed")
             continue
 
         # Case line is a variant
         variant = {
-            colname: content
-            for colname, content in zip(colnames, line[:-1].split("\t"))
+           colname: content
+           for colname, content in zip(colnames, line[:-1].split("\t"))
         }
 
         if "," in variant["ALT"]:
@@ -136,7 +138,7 @@ with open(snakemake.input["vcf"]) as invcf, \
                     alt,
                     variant["QUAL"],
                     variant["FILTER"],
-                    *info,
+                    ";".join(info),
                     variant["FORMAT"],
                     *format
                 ]) + "\n")

@@ -45,13 +45,16 @@ help = [
 ]
 with open(snakemake.input.call, "r") as vcf_stream:
     ignore_format = snakemake.params.get("ignore_format", False) is True
-    regex_general = r'##(\w+)=(.+$)'
+    regex_general = r'##([^=]+)=(.+$)'
     regex_id = r"<ID=([^,]+),(.*)>"
     for line in vcf_stream:
         if not line.startswith("##"):
             break
 
-        htype, hcontent = re.findall(regex_general, line)[0]
+        try:
+            htype, hcontent = re.findall(regex_general, line)[0]
+        except IndexError:
+            raise IndexError(line)
         if htype.lower() ==  "format":
             if ignore_format:
                 continue
