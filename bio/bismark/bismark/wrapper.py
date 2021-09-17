@@ -53,7 +53,7 @@ if single_end_mode:
     cmdline_args.append("--se {snakemake.input.fq:q}")
     mode_prefix = "se"
     if basename is None:
-        basename = basename_without_ext(snakemake.input.fq)
+        basename = basename_without_ext(snakemake.input.fq) + "_bismark_bt2"
 else:
     # for PE data, you should also specify read2 input by -I or --in2, and
     # specify read2 output by -O or --out2.

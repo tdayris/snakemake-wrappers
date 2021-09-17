@@ -44,6 +44,9 @@ else:
         design.Upstream_file
     )
 
+
+ruleorder: bismark_methylation_extractor_se_multisample > bismark_methylation_extractor_pe_multisample
+
 ##############
 ### Target ###
 ##############
@@ -54,7 +57,9 @@ rule target:
             "bismark/report/{sample}.SE.html",
             sample=design["Sample_id"].tolist()
         ),
-        multiqc="results/MiraSeq.html"
+        multiqc="results/MiraSeq.html",
+        multisample_cov="bismark_multisample/meth_cpg/multisample.bismark.cov.gz",
+        multisample_report='bismark_multisample/meth/multisample_SE_splitting_report.txt'
 
 
 ####################################
@@ -149,7 +154,8 @@ rule fastq_screen:
 
 bismark_config = {
     "genome": config["ref"]["genome"],
-    "paired": config["params"].get("Paired", True)
+    "paired": config["params"].get("Paired", True),
+    "samples": design["Sample_id"].tolist()
 }
 
 module bismark:
@@ -158,6 +164,14 @@ module bismark:
 
 
 use rule * from bismark as *
+
+
+module bismark_multisample:
+    snakefile: "../../meta/bio/bismark_multisample/test/Snakefile"
+    config: bismark_config
+    
+
+use rule * from bismark_multisample
 
 
 ############################

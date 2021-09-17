@@ -15,13 +15,13 @@ import logging
 import operator
 import pandas
 import numpy
-from typing import Union
+from typing import Optional, Union
 
 
 def filter_dataframe(dataframe: pandas.DataFrame,
                      column: Union[str, int],
                      local_operator: str,
-                     value: Union[int, float]):
+                     value: Union[int, float]) -> pandas.DataFrame:
     """
     Filter a dataframe according to the column, value and boolean
     operator
@@ -32,12 +32,51 @@ def filter_dataframe(dataframe: pandas.DataFrame,
 
 def filter_full_lines(dataframe: pandas.DataFrame,
                       local_operator: str,
-                      value: Union[int, float]):
+                      value: Union[int, float]) -> pandas.DataFrame:
     """
     Apply filters on whole lines
     """
     local_operator = ops[local_operator]
     return data.loc[~local_operator(data, value).all(axis=1)]
+
+
+def add_column(dataframe: pandas.DataFrame,
+               new_column: Union[str, int],
+               local_operator: str,
+               input_col: Union[str, int],
+               value: Optional[Union[str, int]] = None) -> pandas.DataFrame:
+    """
+    Create a new column based on information from the first one, and the
+    provided operator and value.
+    """
+    logging.debug("Operator was: %s", local_operator)
+    logging.debug("On: %s", str(input_col))
+    if local_operator in ["prefix", "suffix"]:
+        dataframe[input_col] = dataframe[input_col].astype(str)
+    local_operator = ops[local_operator]
+    if value is None:
+        dataframe[new_column] = local_operator(dataframe[input_col])
+    else:
+        logging.debug("Value is: %s", str(value))
+        dataframe[new_column] = local_operator(dataframe[input_col], value)
+    return dataframe
+
+
+def combine_columns(dataframe: pandas.DataFrame,
+                    new_column: Union[str, int],
+                    local_operator: str,
+                    left_input_col: Union[str, int],
+                    right_input_col: Union[str, int]) -> pandas.DataFrame:
+    """
+    Create a new column based on information from the first one, and the
+    provided operator, left and right columns.
+    """
+    local_operator = ops[local_operator]
+    dataframe[new_column] = local_operator(
+        dataframe[left_input_col],
+        dataframe[right_input_col]
+    )
+    return dataframe
 
 
 logging.basicConfig(
@@ -48,12 +87,22 @@ logging.basicConfig(
 
 
 ops = {
-    ">": operator.gt,
-    ">=": operator.ge,
-    "==": operator.eq,
-    "<": operator.lt,
-    "<=": operator.le,
-    "!=": operator.ne
+    ">": pandas.Series.gt,
+    ">=": pandas.Series.ge,
+    "==": pandas.Series.eq,
+    "<": pandas.Series.lt,
+    "<=": pandas.Series.le,
+    "!=": pandas.Series.ne,
+    "+": pandas.Series.add,
+    "-": pandas.Series.sub,
+    "/": pandas.Series.div,
+    "*": pandas.Series.mul,
+    "//": pandas.Series.floordiv,
+    "abs": pandas.Series.abs,
+    "prefix": pandas.Series.add_prefix,
+    "suffix": pandas.Series.add_suffix,
+    "as": pandas.Series.astype,
+    "=": pandas.Series.copy
 }
 
 
@@ -66,6 +115,23 @@ data = pandas.read_csv(
     sep=sep,
     header=0
 )
+
+
+if (new_cols := snakemake.params.get("new_cols", None)) is not None:
+    logging.debug("Creating the following new columns: %s", str(new_cols))
+    for new_col in new_cols:
+        data = add_column(data, *new_col)
+
+if (combine_cols := snakemake.params.get("combine_cols", None)) is not None:
+    logging.debug("Creating a the following new columns, as a combination of existing columns: %s", str(combine_cols))
+    for combine_col in combine_cols:
+        data = combine_column(data, *combine_col)
+
+
+if (prefixes := snakemake.params.get("prefixes", None)) is not None:
+    logging.debug("Adding the following prefixes %s", str(prefixes))
+    for col, prefix in prefixes:
+        data[col] = [f"{prefix}{val}" for val in data[col].astype(str)]
 
 
 if (cols := snakemake.params.get("keep_column", None)) is not None:
@@ -91,13 +157,13 @@ if (not_line := snakemake.params.get("drop_line", None)) is not None:
 if (filters := snakemake.params.get("filters", None)) is not None:
     logging.debug(f"The table will be filtered according to: {filters}")
     for filter in filters:
-        data = filter_dataframe(data.copy, *filter)
+        data = filter_dataframe(data, *filter)
 
 
 if (filters := snakemake.params.get("full_line_filters", None)) is not None:
     logging.debug(f"Applying the following filter on whole lines: {filters}")
     for filter in filters:
-        data = filter_full_lines(data.dopy, *filter)
+        data = filter_full_lines(data, *filter)
 
 
 if snakemake.params.get("dropna", False) is True:
@@ -118,7 +184,7 @@ if snakemake.params.get("drop_na_lines", False) is True:
 if snakemake.params.get("drop_duplicated_lines", False) is True:
     logging.debug("Dropping duplicated lines")
     data.drop_duplicates(inplace=True)
-    
+
 
 if (dedup_cols := snakemake.params.get("drop_duplicates_on", None)) is not None:
     logging.debug(

@@ -14,6 +14,7 @@ __license__ = "MIT"
 import csv
 import pandas
 import numpy
+import logging
 
 def read_cancer_sensus(path: str) -> pandas.DataFrame:
     """
@@ -29,37 +30,14 @@ def read_cancer_sensus(path: str) -> pandas.DataFrame:
         path,
         sep=dialect.delimiter,
         index_col=None,
-        header=0,
-        dtype={
-            "Gene Symbol": str,
-            "Name": str,
-            "Entrez GeneId": int,
-            "Genome Location": str,
-            "Tier": int,
-            "Hallmark": str,
-            "Chr Band": numpy.float,
-            "Somatic": "category",
-            "Germline": "category",
-            "Tumour Types(Somatic)": str,
-            "Tumour Types(Germline)": str,
-            "Cancer Syndrome": str,
-            "Tissue Type": "category",
-            "Molecular Genetics": "category",
-            "Role in Cancer": "category",
-            "Mutation Types": "category",
-            "Translocation Partner": str,
-            "Other Germline Mut": str,
-            "Other Syndrome": str,
-            "Synonyms": str,
-
-        }
+        header=0
     )
 
 
 def read_maf(path: str) -> pandas.DataFrame:
     return pandas.read_csv(
         path,
-        sep=dialect.delimiter,
+        sep="\t",
         index_col=None,
         header=0
     )
@@ -78,7 +56,7 @@ logging.debug(maf.head())
 maf = pandas.merge(
     left=maf,
     right=sanger,
-    how="left",
+    how=snakemake.params.get("how", "left"),
     left_on=snakemake.params.get("left_key", ""),
     right_on=snakemake.params.get("right_key", ""),
     suffixes=("", "_SangerCGC")

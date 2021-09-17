@@ -38,72 +38,103 @@ accepted_terms = [
     "3_prime_UTR_variant"
 ]
 
+def translate(snpeff_term: str) -> str:
+    """
+    Guess the best MAFTools term from SnpEff/SnpSift very
+    precise annotation
+    """
+    snpeff_term = snpeff_term.split("&")
 
-translation_dict = {
-    "chromosome_number_variation": "Synonymous_Variant",
-    "exon_loss_variant": "Splice_Site",
-    "frameshift_variant": "Missense_Mutation",
-    "stop_gained": "Nonsense_Mutation",
-    "stop_lost": "Missense_Mutation",
-    "start_lost": "Nonsense_Mutation",
-    "splice_acceptor_variant": "Splice_Site",
-    "splice_acceptor_variant&intron_variant": "Splice_Site",
-    "splice_region_variant&non_coding_transcript_exon_variant": "Splice_Site",
-    "splice_region_variant&synonymous_variant": "Splice_Site",
-    "splice_donor_variant&intron_variant": "Splice_Site",
-    "splice_donor_variant": "Splice_Site",
-    "structural_interaction_variant": "Missense_Mutation",
-    "rare_amino_acid_variant": "Missense_Mutation",
-    "missense_variant": "Missense_Mutation",
-    "missense_variant&splice_region_variant": "Splice_Site",
-    "disruptive_inframe_insertion": "Frame_Shift_Ins",
-    "conservative_inframe_insertion": "In_Frame_Ins",
-    "disruptive_inframe_deletion": "Frame_Shift_Del",
-    "conservative_inframe_deletion": "In_Frame_Del",
-    "5_prime_UTR_truncation+exon_loss_variant": "5_prime_UTR_variant",
-    "3_prime_UTR_truncation+exon_loss": "3_prime_UTR_variant",
-    "splice_branch_variant": "Splice_Site",
-    "splice_region_variant": "Splice_Site",
-    "stop_retained_variant": "Nonsense_Mutation",
-    "initiator_codon_variant": "Missense_Mutation",
-    "synonymous_variant": "Synonymous_Variant",
-    "initiator_codon_variant+non_canonical_start_codon": "Missense_Mutation",
-    'stop_retained_variant': "Nonsense_Mutation",
-    "coding_sequence_variant": "Missense_Mutation",
-    "5_prime_UTR_variant": "5_prime_UTR_variant",
-    "3_prime_UTR_variant": "3_prime_UTR_variant",
-    "5_prime_UTR_premature_start_codon_gain_variant": "5_prime_UTR_variant",
-    "upstream_gene_variant": "Synonymous_Variant",
-    "downstream_gene_variant": "Synonymous_Variant",
-    "TF_binding_site_variant": "Synonymous_Variant",
-    "regulatory_region_variant": "Missense_Mutation",
-    "miRNA": "Synonymous_Variant",
-    "custom": "Synonymous_Variant",
-    "sequence_feature": "Missense_Mutation",
-    "conserved_intron_variant": "Splice_Site",
-    "intron_variant": "Synonymous_Variant",
-    "intragenic_variant": "Synonymous_Variant",
-    "conserved_intergenic_variant": "Splice_Site",
-    "intergenic_region": "Synonymous_Variant",
-    "coding_sequence_variant": "Missense_Mutation",
-    "non_coding_exon_variant": "Synonymous_Variant",
-    "non_coding_transcript_exon_variant": "Synonymous_Variant",
-    "nc_transcript_variant": "Synonymous_Variant",
-    "gene_variant": "Missense_Mutation",
-    "chromosome": "Synonymous_Variant",
-    "Variant_Classification": "Variant_Classification",
-    "protein_protein_contact": "Synonymous_Variant",
-    'splice_region_variant&intron_variant': "Splice_Site",
-    'splice_acceptor_variant&splice_region_variant&intron_variant&non_coding_transcript_exon_variant': "Splice_Site",
-    'stop_gained&splice_region_variant': "Nonsense_Mutation",
-    "frameshift_variant&splice_region_variant": "Frame_Shift_Ins"
-}
+    nonsense = [
+        "stop_retained_variant",
+        "stop_lost",
+        "start_lost",
+        "stop_gained",
+        "stop_retained_variant",
+    ]
+    if any(i in nonsense for i in snpeff_term):
+        return "Nonsense_Mutation"
+
+    frame_ins = [
+        "inframe_insertion",
+    ]
+    if any(i in frame_ins for i in snpeff_term):
+        return "In_Frame_Ins"
+
+    frame_del = [
+        "inframe_deletion"
+    ]
+    if any(i in frame_del for i in snpeff_term):
+        return "In_Frame_Del"
+
+    frame_shift_ins = [
+        "duplication", # Duplication of a large chromosome segment (over 1% or 1,000,000 bases)
+        "disruptive_inframe_insertion",
+        "frameshift_variant",
+    ]
+    if any(i in frame_shift_ins for i in snpeff_term):
+        return "Frame_Shift_Ins"
+
+    frame_shift_del = [
+        "chromosome", # A large parte (over 1%) of the chromosome was deleted.
+        "disruptive_inframe_deletion",
+        "exon_loss_variant",
+        "feature_ablation",
+
+    ]
+    if any(i in frame_shift_del for i in snpeff_term):
+        return "Frame_Shift_Del"
+
+    splice = [
+        "splice_acceptor_variant",
+        "splice_donor_variant",
+        "splice_region_variant",
+        "exon_loss",
+        "exon_loss_variant",
+    ]
+    if any(i in splice for i in snpeff_term):
+        return "Splice_Site"
+
+    p5 = [
+        "5_prime_UTR_premature_start_codon_gain_variant",
+        "start_retained",
+        "5_prime_UTR_variant",
+        "5_prime_UTR_truncation"
+    ]
+    if any(i in p5 for i in snpeff_term):
+        return "5_prime_UTR_variant"
+
+    p3 = [
+        "3_prime_UTR_variant",
+        "3_prime_UTR_truncation"
+    ]
+    if any(i in p3 for i in snpeff_term):
+        return "3_prime_UTR_variant"
+
+    missense = [
+        "coding_sequence_variant",
+        "inversion", # Inversion of a large chromosome segment (over 1% or 1,000,000 bases).
+        "exon_variant",
+        "gene_variant",
+        "gene_fusion",
+        "bidirectional_gene_fusion",
+        "rearranged_at_DNA_level",
+        'missense_variant',
+        'initiator_codon_variant',
+        "structural_interaction_variant",
+        "rare_amino_acid_variant",
+        "transcript_variant",
+    ]
+    if any(i in missense for i in snpeff_term):
+        return "Missense_Mutation"
+    return "Synonymous_Variant"
+
 
 logging.debug("Reading MAF file")
 df = pandas.read_csv(snakemake.input["maf"], sep="\t", header=0, index_col=None)
 logging.debug("Maf file loaded")
 df["Variant_Classification"] = [
-    translation_dict[v] for v in df["Variant_Classification"]
+    translate(v) for v in df["Variant_Classification"]
 ]
 logging.debug("Variant_Classification translated")
 df.to_csv(snakemake.output["maf"], sep="\t", index=False)
