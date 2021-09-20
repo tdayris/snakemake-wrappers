@@ -8,6 +8,8 @@ default_config={
         "gmt": "path/to/annotation",
         "gwascat": "path/to/annotation",
         "kaviar": "path/to/annotation",
+        "gnomad": "path/to/gnomad",
+        "clinvar": "path/to/clinvar"
     }
 }
 
@@ -18,12 +20,61 @@ except NameError:
     config = default_config
 
 
-#rule all:
-#    input:
-#        expand(
-#            "snpsift/cosmic/{sample}.vcf",
-#            sample=config["samples"]
-#        )
+rule snpsift_gnomad:
+    input:
+        call = "snpsift/clinvar/{sample}.vcf"
+        database = config["gnomad"]
+    output:
+        call = temp("snpsift/gnomad/{sample}.vcf")
+    message:
+        "Annotating {wildcards.sample} with gnomAD"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
+    log:
+        "logs/snpsift/gnomad/{sample}.log"
+    wrapper:
+        "bio/snpsift/annotate"
+
+
+rule snpsift_clinvar:
+    input:
+        call = "snpsift/gwascat/{sample}.vcf"
+        database = config["clinvar"]
+    output:
+        call = temp("snpsift/clinvar/{sample}.vcf")
+    message:
+        "Annotating {wildcards.sample} with ClinVar"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
+    log:
+        "logs/snpsift/clinvar/{sample}.log"
+    wrapper:
+        "bio/snpsift/annotate"
+
+
+rule snpsift_gwascat:
+    input:
+        call = "snpsift/dbnsfp/{sample}.vcf",
+        gwascat = config["ref"]["gwascat"]
+    output:
+        call = temp("snpsift/gwascat/{sample}.vcf")
+    message:
+        "Annotating {wildcards.sample} with GWAS Catalog"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
+    log:
+        "logs/snpsift/gwascat/{sample}.log"
+    wrapper:
+        "bio/snpsift/gwascat"
 
 
 rule snpsift_dbnsfp:
@@ -44,25 +95,6 @@ rule snpsift_dbnsfp:
         "logs/snpsift/dbnsfp/{sample}.log"
     wrapper:
         "bio/snpsift/dbnsfp"
-
-
-rule snpsift_gwascat:
-    input:
-        call = "snpsift/cosmic/{sample}.vcf",
-        gwascat = config["ref"]["gwascat"]
-    output:
-        call = temp("snpsift/gwascat/{sample}.vcf")
-    message:
-        "Annotating {wildcards.sample} with GWAS Catalog"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-        time_min=lambda wildcards, attempt: attempt * 45,
-        tmpdir="tmp"
-    log:
-        "logs/snpsift/gwascat/{sample}.log"
-    wrapper:
-        "bio/snpsift/gwascat"
 
 
 rule snpsift_cosmic:

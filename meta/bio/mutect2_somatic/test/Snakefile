@@ -55,6 +55,29 @@ def mutect2_input(config: dict[str, Union[list[str], str]]) -> dict[str, str]:
 
     return input_dict
 
+##################################
+### Correct multiallelic sites ###
+##################################
+
+rule split_multiallelic:
+    input:
+        "mutect2/filter/{sample}.vcf.gz"
+    output:
+        temp("bcftools/mutect2/{sample}.vcf.gz")
+    message:
+        "Splitting Mutect2 multiallelic sites {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
+        time_min=lambda wildcards, attempt: attempt * 35,
+        tmpdir="tmp"
+    params:
+        "-m -both --check-ref w"
+    log:
+        "logs/bcftools/norm/mutect2/{sample}.log"
+    wrapper:
+        "bio/bcftools/norm"
+
 
 ###########################
 ### Filter Mutect calls ###
