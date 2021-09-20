@@ -22,8 +22,8 @@ except NameError:
 
 rule snpsift_gnomad:
     input:
-        call = "snpsift/clinvar/{sample}.vcf"
-        database = config["gnomad"]
+        call = "snpsift/clinvar/{sample}.vcf",
+        database = config["ref"]["gnomad"]
     output:
         call = temp("snpsift/gnomad/{sample}.vcf")
     message:
@@ -41,8 +41,8 @@ rule snpsift_gnomad:
 
 rule snpsift_clinvar:
     input:
-        call = "snpsift/gwascat/{sample}.vcf"
-        database = config["clinvar"]
+        call = "snpsift/gwascat/{sample}.vcf",
+        database = config["ref"]["clinvar"]
     output:
         call = temp("snpsift/clinvar/{sample}.vcf")
     message:
