@@ -26,6 +26,7 @@ container: "docker://continuumio/miniconda3:4.4.10"
 localrules: bigr_copy
 
 ruleorder: samtools_index_bam > samtools_index
+ruleorder: gatk_filter_mutect_calls > tabix_index
 
 default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
 configfile: get_config(default_config)
@@ -52,16 +53,18 @@ fastq_links = link_fq_somatic(
     t2_paths=design.Downstream_file,
 )
 
+ruleorder: fix_annotation_for_gatk > pbgzip_compress
+ruleorder: gatk_variant_filtration > pbgzip_compress
 
 rule all:
     input:
-        maf="maf/maftools/complete.maf",
+        maf="maf/complete.maf",
         mafs=expand(
             "maf/maftools/{sample}.maf",
             sample=design["Sample_id"].tolist()
         ),
         calls=expand(
-           "snpsift/gnomad/{sample}.vcf.gz{index}",
+           "maf/occurence_annotated/{sample}.vcf.gz{index}",
            sample=design["Sample_id"].tolist(),
            index=["", ".tbi"]
         ),
@@ -295,9 +298,14 @@ use rule pbgzip_compress from compress_index_vcf_meta as si_pbgzip with:
 ### VCF annotation ###
 ######################
 
+snpeff_snpsift_config = {
+    "ref": config["ref"],
+    **config["snpeff_snpsift"]
+}
+
 module snpeff_meta:
     snakefile: "../../meta/bio/snpeff_annotate/test/Snakefile"
-    config: config
+    config: snpeff_snpsift_config
 
 use rule snpeff from snpeff_meta with:
     input:
@@ -305,12 +313,12 @@ use rule snpeff from snpeff_meta with:
         calls_index=get_tbi("mutect2/corrected/{sample}.vcf.gz"),
         db=config["ref"]["snpeff"]
     params:
-        extra = "-lof"
+        extra = config["snpeff_snpsift"].get("snpeff_extra", "-lof -nodownload -noLog")
 
 
 module snpsift:
     snakefile: "../../meta/bio/snpsift/test/Snakefile"
-    config: config
+    config: snpeff_snpsift_config
 
 
 use rule * from snpsift as *
@@ -331,8 +339,6 @@ use rule * from snpsift as *
 ############################################################################
 ### Correcting Mutect2 :                                                 ###
 ### AS_FilterStatus: Number=1 and not Number=A which violates VCF format ###
-### AD becomes ADM: AD is reserved for Allele Depth, Mutect2 stores      ###
-###                 multiple information under "AD" field.               ###
 ############################################################################
 
 rule correct_mutect2_vcf:
@@ -341,7 +347,7 @@ rule correct_mutect2_vcf:
     output:
         temp("mutect2/corrected/{sample}.vcf")
     message:
-        "Renaming reserved AD field and fixing AS_FilterStrand format error"
+        "Fixing AS_FilterStrand format error"
         " on {wildcards.sample}"
     threads: 2
     resources:
