@@ -58,7 +58,12 @@ if (new_header := snakemake.params.get("new_header")) is not None:
     intermediar.append(
         f"'1 s/^.$/{new_header}/'"
     )
+    
 
+# Case of series of replacements
+if (replace_dict := snakemake.params.get("replace_dict")) is not None:
+    for replace, replacement in replace_dict.items():
+        intermediar.append(f"'s/{replace}/{replacement}/g'")
 
 # Case of line removal on several criteria
 if (remove_list := snakemake.params.get("remove_list")) is not None:
@@ -67,11 +72,6 @@ if (remove_list := snakemake.params.get("remove_list")) is not None:
 if (remove_lines := snakemake.params.get("remove_lines")) is not None:
     for line_to_remove in remove_lines:
         intermediar.append(f"'{line_to_remove}d'")
-
-# Case of series of replacements
-if (replace_dict := snakemake.params.get("replace_dict")) is not None:
-    for replace, replacement in replace_dict.items():
-        intermediar.append(f"'s/{replace}/{replacement}/g'")
 
 # Other cases
 if (regex := snakemake.params.get("regex")) is not None:
