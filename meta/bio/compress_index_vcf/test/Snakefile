@@ -34,7 +34,7 @@ rule pbgzip_compress:
         "Compressing {wildcards.sample} VCF file, "
         "(built with {wildcards.tool} {wildcards.subcommand})"
     threads:
-        config.get("threads", 20)
+        1
     resources:
         mem_mb=lambda wildcards, attempt: min(attempt * 1024, 10240),
         time_min=lambda wildcards, attempt: attempt * 30,
@@ -43,5 +43,7 @@ rule pbgzip_compress:
         ""
     log:
         "logs/{tool}/{subcommand}/pbgzip/{sample}.log"
+    # wrapper:
+    #     "bio/compress/pbgzip"
     wrapper:
-        "bio/compress/pbgzip"
+        "bio/bcftools/view"
