@@ -76,8 +76,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
         message: "Extracting methylation on {wildcards.sample}"
         threads: 1
         resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1024,
-            time_min=lambda wildcards, attempt: attempt * 15,
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+            time_min=lambda wildcards, attempt: attempt * 35,
             tmpdir="tmp"
         log:
             "logs/bismark/meth/{sample}.log"
@@ -93,7 +93,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "bismark/deduplicated/{sample}.SE.bam"
         output:
             mbias_r1="bismark/meth/{sample}.M-bias_R1.png",
-            mbias_r2="bismark/meth/{sample}.M-bias_R2.png",
             mbias_report="bismark/meth/{sample}.SE.M-bias.txt",
             splitting_report="bismark/meth/{sample}_SE_splitting_report.txt",
             methylome_CpG_cov="bismark/meth_cpg/{sample}.bismark.cov.gz",
@@ -113,8 +112,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "Deduplicating {wildcards.sample} pair-ended mapping"
         threads: 1
         resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1024,
-            time_min=lambda wildcards, attempt: attempt * 15,
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+            time_min=lambda wildcards, attempt: attempt * 30,
             tmpdir="tmp"
         log:
             "logs/bismark/deduplicated/{sample}.log"
@@ -151,16 +150,16 @@ This meta-wrapper can be used by integrating the following into your workflow:
             ambiguous_2=temp("bismark/bams/{sample}_ambiguous_reads_2.fq.gz")
         message:
             "Mapping pair-ended {wildcards.sample} with Bismark"
-        threads: 20
+        threads: 8
         resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1024,
-            time_min=lambda wildcards, attempt: attempt * 15,
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 120,
+            time_min=lambda wildcards, attempt: attempt * 60 * 3,
             tmpdir="tmp"
         log:
             "logs/bismark/mapping/{sample}.log"
         params:
-            extra=lambda w: f"--fastq --bam --gzip --phred33-quals --ambiguous --unmapped --nucleotide_coverage --rg_tag '@RG\tID:{w.sample}\tSM:{w.sample}\tPU:{w.sample}\tPL:ILLUMINA\tCN:IGR\tDS:MiraSeq\tPG:BOWTIE2'",
-            basename="{sample}"
+            extra=lambda w: f"--fastq --bam --gzip --phred33-quals --ambiguous --unmapped --nucleotide_coverage ", # --rg_tag '@RG\\tID:{w.sample}\\tSM:{w.sample}\\tPU:{w.sample}\\tPL:ILLUMINA\\tCN:IGR\\tDS:MiraSeq\\tPG:BOWTIE2'",
+            #basename="{sample}"
         wrapper:
             "bio/bismark/bismark"
 
@@ -168,15 +167,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
     use rule bismark_mapping_pair as bismark_mapping_single with:
         input:
             genome=config["genome"],
-            fq_1="reads/{sample}.fq.gz",
+            fq="reads/{sample}.fq.gz",
             bismark_indexes_dir="biskmark/index/Bisulfite_Genome",
             genomic_freq="biskmark/index/genomic_nucleotide_frequencies.txt"
         output:
             bam=temp("bismark/bams/{sample}.SE.bam"),
             report="bismark/bams/{sample}_SE_report.txt",
             nucleotide_stats=temp("bismark/bams/{sample}.SE.nucleotide_stats.txt"),
-            bam_unmapped_1=temp("bismark/bams/{sample}_unmapped_reads_1.fq.gz"),
-            ambiguous_1=temp("bismark/bams/{sample}_ambiguous_reads_1.fq.gz")
+            #bam_unmapped_1=temp("bismark/bams/{sample}_unmapped_reads_1.fq.gz"),
+            #ambiguous_1=temp("bismark/bams/{sample}_ambiguous_reads_1.fq.gz")
         message:
             "Mapping single-ended {wildcards.sample} with Bismark"
 
@@ -189,10 +188,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
             temp(directory("biskmark/index/Bisulfite_Genome")),
             temp("biskmark/index/genomic_nucleotide_frequencies.txt")
         message: "Indexing genome with Bismark"
-        threads: 20
+        threads: 7
         resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1024 * 15,
-            time_min=lambda wildcards, attempt: attempt * 15,
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 40,
+            time_min=lambda wildcards, attempt: attempt * 60,
             tmpdir="tmp"
         log:
             "logs/bismark/genome_preparation.log"
@@ -211,8 +210,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "Linking fasta genome for bismark"
         threads: 1
         resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1024,
-            time_min=lambda wildcards, attempt: attempt * 15,
+            mem_mb=lambda wildcards, attempt: attempt * 512,
+            time_min=lambda wildcards, attempt: attempt * 5,
             tmpdir="tmp"
         log:
             "logs/bismark/genome_linking.log"

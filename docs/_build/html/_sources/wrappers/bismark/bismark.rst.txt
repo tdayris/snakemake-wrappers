@@ -52,7 +52,7 @@ This wrapper can be used in the following way:
             extra=' --ambiguous --unmapped --nucleotide_coverage',
             basename='{sample}_{genome}'
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/bismark/bismark"
+            "0.79.0-1159-g7fe792175/bio/bismark/bismark"
 
     # Example: Single-ended reads
     rule bismark_se:
@@ -74,7 +74,7 @@ This wrapper can be used in the following way:
             extra=' --ambiguous --unmapped --nucleotide_coverage',
             basename='{sample}_{genome}'
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/bismark/bismark"
+            "0.79.0-1159-g7fe792175/bio/bismark/bismark"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -186,7 +186,7 @@ Code
         cmdline_args.append("--se {snakemake.input.fq:q}")
         mode_prefix = "se"
         if basename is None:
-            basename = basename_without_ext(snakemake.input.fq)
+            basename = basename_without_ext(snakemake.input.fq) + "_bismark_bt2"
     else:
         # for PE data, you should also specify read2 input by -I or --in2, and
         # specify read2 output by -O or --out2.
@@ -236,3 +236,8 @@ Code
     for (exp_path, actual_path) in expected_2_actual_paths:
         if exp_path and (exp_path != actual_path):
             shell("mv {actual_path:q} {exp_path:q} {log_append}")
+
+
+.. |nl| raw:: html
+
+   <br>

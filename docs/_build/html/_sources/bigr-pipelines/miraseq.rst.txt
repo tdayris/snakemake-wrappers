@@ -145,17 +145,22 @@ The pipeline contains the following steps:
             design.Upstream_file
         )
 
+
+    ruleorder: bismark_methylation_extractor_se_multisample > bismark_methylation_extractor_pe_multisample
+
     ##############
     ### Target ###
     ##############
 
     rule target:
         input:
-            bismark=expand(
-                "bismark/report/{sample}.SE.html",
-                sample=design["Sample_id"].tolist()
-            ),
-            multiqc="results/MiraSeq.html"
+            # bismark=expand(
+            #     "bismark/report/{sample}.SE.html",
+            #     sample=design["Sample_id"].tolist()
+            # ),
+            multiqc="results/MiraSeq.html",
+            #multisample_cov="bismark_multisample/meth_cpg/multisample.bismark.cov.gz",
+            #multisample_report='bismark_multisample/meth/multisample_SE_splitting_report.txt'
 
 
     ####################################
@@ -183,26 +188,51 @@ The pipeline contains the following steps:
                 sample=design["Sample_id"],
                 stream=["1", "2"]
             ),
-            bismark_alignment_report=expand(
-                "bismark/bams/{sample}_SE_report.txt",
-                sample=design["Sample_id"].tolist()
-            ),
-            bismark_nucleotide_report=expand(
-                "bismark/bams/{sample}.SE.nucleotide_stats.txt",
-                sample=design["Sample_id"].tolist()
-            ),
-            bismark_dedup_report=expand(
-                "bismark/deduplicated/{sample}.SE.deduplication_report.txt",
-                sample=design["Sample_id"].tolist()
-            ),
-            bismark_mbias_report=expand(
-                "bismark/meth/{sample}.SE.M-bias.txt",
-                sample=design["Sample_id"].tolist()
-            ),
-            bismark_splitting_report=expand(
-                "bismark/meth/{sample}_SE_splitting_report.txt",
-                sample=design["Sample_id"].tolist()
+            mapping_qc=expand(
+                "stats/{sample}{ext}",
+                sample=design["Sample_id"],
+                ext=[
+                    ".alignment_summary_metrics",
+                    #".insert_size_metrics",
+                    #".insert_size_histogram.pdf",
+                    ".quality_distribution_metrics",
+                    ".quality_distribution.pdf",
+                    #".quality_by_cycle_metrics",
+                    #".quality_by_cycle.pdf",
+                    #".base_distribution_by_cycle_metrics",
+                    #".base_distribution_by_cycle.pdf",
+                    ".gc_bias.detail_metrics",
+                    ".gc_bias.summary_metrics",
+                    ".gc_bias.pdf",
+                    #".rna_metrics",
+                    #".bait_bias_detail_metrics",
+                    #".bait_bias_summary_metrics",
+                    #".error_summary_metrics",
+                    #".pre_adapter_detail_metrics",
+                    #".pre_adapter_summary_metrics",
+                    #".quality_yield_metrics"
+                ]
             )
+            # bismark_alignment_report=expand(
+            #     "bismark/bams/{sample}_SE_report.txt",
+            #     sample=design["Sample_id"].tolist()
+            # ),
+            # bismark_nucleotide_report=expand(
+            #     "bismark/bams/{sample}.SE.nucleotide_stats.txt",
+            #     sample=design["Sample_id"].tolist()
+            # ),
+            # bismark_dedup_report=expand(
+            #     "bismark/deduplicated/{sample}.SE.deduplication_report.txt",
+            #     sample=design["Sample_id"].tolist()
+            # ),
+            # bismark_mbias_report=expand(
+            #     "bismark/meth/{sample}.SE.M-bias.txt",
+            #     sample=design["Sample_id"].tolist()
+            # ),
+            # bismark_splitting_report=expand(
+            #     "bismark/meth/{sample}_SE_splitting_report.txt",
+            #     sample=design["Sample_id"].tolist()
+            # )
         output:
             report(
                 "results/MiraSeq.html",
@@ -231,7 +261,7 @@ The pipeline contains the following steps:
             "Assessing quality of {wildcards.sample}"
         threads: config.get("threads", 20)
         resources:
-            mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
+            mem_mb=lambda wildcard, attempt: attempt * 1024 * 8,
             time_min=lambda wildcard, attempt: attempt * 50
         params:
             fastq_screen_config=config["fastq_screen"],
@@ -243,14 +273,15 @@ The pipeline contains the following steps:
             "bio/fastq_screen"
 
 
-    ###################
-    ### Methylation ###
-    ###################
+    #####################
+    ### Methylation ? ###
+    #####################
 
 
     bismark_config = {
         "genome": config["ref"]["genome"],
-        "paired": config["params"].get("Paired", True)
+        "paired": config["params"].get("Paired", True),
+        "samples": design["Sample_id"].tolist()
     }
 
     module bismark:
@@ -261,15 +292,87 @@ The pipeline contains the following steps:
     use rule * from bismark as *
 
 
+    module bismark_multisample:
+        snakefile: "../../meta/bio/bismark_multisample/test/Snakefile"
+        config: bismark_config
+
+
+    use rule * from bismark_multisample
+
+
+    ################
+    ###  Mapping ###
+    ################
+
+    rule collect_multiple_metrics:
+        input:
+             bam="samtools/sort/{sample}.bam",
+             bam_index="samtools/sort/{sample}.bam.bai",
+             ref=config["ref"]["genome"]
+        output:
+            multiext("stats/{sample}",
+                     ".alignment_summary_metrics",
+                     #".insert_size_metrics",
+                     #".insert_size_histogram.pdf",
+                     ".quality_distribution_metrics",
+                     ".quality_distribution.pdf",
+                     #".quality_by_cycle_metrics",
+                     #".quality_by_cycle.pdf",
+                     #".base_distribution_by_cycle_metrics",
+                     #".base_distribution_by_cycle.pdf",
+                     ".gc_bias.detail_metrics",
+                     ".gc_bias.summary_metrics",
+                     ".gc_bias.pdf",
+                     #".rna_metrics",
+                     #".bait_bias_detail_metrics",
+                     #".bait_bias_summary_metrics",
+                     #".error_summary_metrics",
+                     #".pre_adapter_detail_metrics",
+                     #".pre_adapter_summary_metrics",
+                     #".quality_yield_metrics"
+                     )
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 8,
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        log:
+            "logs/picard/multiple_metrics/{sample}.log"
+        params:
+            #"VALIDATION_STRINGENCY=LENIENT "
+            #"METRIC_ACCUMULATION_LEVEL=null "
+            #"METRIC_ACCUMULATION_LEVEL=SAMPLE "
+        wrapper:
+            "bio/picard/collectmultiplemetrics"
+
+    config_bwa_fixmate = {
+        "threads": 20,
+        "genome": config["ref"]["genome"]
+    }
+
+    module bwa_fixmate:
+        snakefile: "../../meta/bio/bwa_fixmate/test/Snakefile"
+        config: config_bwa_fixmate
+
+    use rule * from bwa_fixmate
+
+    use rule bwa_mem from bwa_fixmate with:
+        input:
+            reads = "fastp/trimmed/pe/{sample}.fastq",
+            index=multiext(
+                "bwa_mem2/index/genome", ".0123", ".amb", ".ann", ".pac"
+            )
+
+
     ############################
     ### FASTP FASTQ CLEANING ###
     ############################
 
     rule fastp_clean:
         input:
-            sample="reads/{sample}.fq.gz"
+            sample=["reads/{sample}.fq.gz"]
         output:
-            trimmed="fastp/trimmed/pe/{sample}.fastq",
+            trimmed=temp("fastp/trimmed/pe/{sample}.fastq"),
             html="fastp/html/pe/{sample}.fastp.html",
             json=temp("fastp/json/pe/{sample}.fastp.json")
         message: "Cleaning {wildcards.sample} with Fastp"

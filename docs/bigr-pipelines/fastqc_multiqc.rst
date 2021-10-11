@@ -235,7 +235,9 @@ The pipeline contains the following steps:
         group:
             "stats_inclusion"
         shell:
-            """unzip -n -d "${{PWD}}" input/*/archive/Stats.json.zip > {log} 2>&1"""
+            'unzip -n -d "${{PWD}}" '
+            'input/*/archive/*/unaligned/Stats/Stats.json.zip '
+            '> {log} 2>&1'
 
 
     #########################################

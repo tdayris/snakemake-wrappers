@@ -101,6 +101,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="bioinfokit.html">DESEQ2_POST_PROCESS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bismark.html">BISKMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bismark_multisample.html">BISKMARK_MULTISAMPLE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compress_index_vcf.html">COMPRESS_INDEX_VCF</a></li>
@@ -227,7 +228,10 @@
     <span class="s2">&quot;center&quot;</span><span class="p">:</span> <span class="s2">&quot;GustaveRoussy&quot;</span><span class="p">,</span>
     <span class="s2">&quot;annotation_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;ANN=&quot;</span><span class="p">,</span>
     <span class="s2">&quot;sample_list&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(),</span>
-    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/ref.fasta&quot;</span>
+    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/ref.fasta&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;known&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/dbsnp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gatk_filters&quot;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="s2">&quot;chr&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">23</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -236,6 +240,32 @@
 <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">default_config_vcf_post_process</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Compress and index final VCF files</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">gath_final_vcf</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;maf/occurence_annotated/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_list&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;maf/occurence_annotated/</span><span class="si">{sample}</span><span class="s2">.vcf.gz.tbi&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_list&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;final.vcf.list&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Aquiring list of final VCF files&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/somatic/list.log&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;echo </span><span class="si">{input}</span><span class="s2"> | sed &#39;s/\s\+/</span><span class="se">\\</span><span class="s2">n/g&#39; &gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -248,18 +278,24 @@
             <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_list&quot;</span><span class="p">]</span>
         <span class="p">)</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;maf/maftools/complete.maf&quot;</span>
+        <span class="s2">&quot;maf/complete.maf&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Merging separates maf files in a single cohort maf&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/maftools/concat.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">sed</span> <span class="o">=</span> <span class="s2">&quot;&#39;s/FORMAT_</span><span class="si">{}</span><span class="s2">_tumor_AF/Mutect2_Allele_Frequency/g&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_list&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
     <span class="n">shell</span><span class="p">:</span>
-        <span class="s2">&quot;cat </span><span class="si">{input}</span><span class="s2"> &gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;head -n 1 </span><span class="si">{input[0]}</span><span class="s2"> | sed </span><span class="si">{params.sed}</span><span class="s2"> &gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;for VCF in </span><span class="si">{input}</span><span class="s2">; do sed &#39;1d&#39; ${{VCF}}; done &quot;</span>
+        <span class="s2">&quot;&gt;&gt; </span><span class="si">{output}</span><span class="s2"> 2&gt;&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -274,9 +310,11 @@
         <span class="s2">&quot;Renaming columns to fit MAFtools requirement in </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;vcf_to_maf&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/maftools/rename/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
@@ -289,12 +327,14 @@
         <span class="s2">&quot;bio/BiGR/rename_snpsift_maf_cols&quot;</span>
 
 
+
+
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Extracting all INFO/FORMAT data, the list is built from vcf header</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">extract_all_fields</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;maf/splitted/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;maf/occurence_annotated/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">tsv</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;maf/extracted/</span><span class="si">{sample}</span><span class="s2">.tsv&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
@@ -304,12 +344,96 @@
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">10240</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">25</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;vcf_to_maf&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/snpsift/extract_all_fields/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">annotation_tag</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;annotation_tag&quot;</span><span class="p">,</span> <span class="s2">&quot;ANN=&quot;</span><span class="p">)</span>
+        <span class="n">annotation_tag</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;annotation_tag&quot;</span><span class="p">,</span> <span class="s2">&quot;ANN=&quot;</span><span class="p">),</span>
+        <span class="n">ignore_format</span><span class="o">=</span><span class="kc">True</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/snpsift/extractAllFields&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Count variant occurence</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">variant_occurence_annotate</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">calls</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;maf/canonical/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">],</span>
+        <span class="n">occurence</span> <span class="o">=</span> <span class="s2">&quot;maf/occurences.txt&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">calls</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;maf/occurence_annotated/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">]</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/variant_occurence/uncompress/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/variantoccurence/annotate&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">concatenate_per_chr_information</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;maf/</span><span class="si">{chr}</span><span class="s2">/occurence.txt&quot;</span><span class="p">,</span> <span class="nb">chr</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">])</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;maf/occurences.txt&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/variant_occurence/all.log&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;for i in </span><span class="si">{input}</span><span class="s2">; do sed &#39;1d&#39; ${{i}}; done &gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">variant_occurence_per_chr</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;maf/canonical/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_list&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;maf/</span><span class="si">{chr}</span><span class="s2">/occurence.txt&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">7</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/variant_occurence/</span><span class="si">{chr}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/variantoccurence/chromosomes&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Remove non-canonical chromosomes, and empty info fields</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">fix_vcf</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;maf/splitted/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;maf/canonical/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Cleaning </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;GLeaves&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/fix_vcf/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">default_chr</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">],</span>
+        <span class="n">remove_non_conventional_chromosomes</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/BiGR/fix_vcf&quot;</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -318,7 +442,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">split_vcf_features</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;gatk/variant_filtration/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/format2info/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">call</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;maf/splitted/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
@@ -328,6 +452,8 @@
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;GLeaves&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/split_vcf_features/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
@@ -337,7 +463,83 @@
 
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Add filter tags</span>
+<span class="sd">Copy format information, this is for end-users reading</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">format_to_info</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="s2">&quot;gatk/variant_filtration/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/format2info/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Moving format fields to info for </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;GLeaves&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/vcf_format_to_info/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/BiGR/vcf_format_to_info&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">unzip_variant_filtration</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;gatk/variant_filtration/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;gatk/variant_filtration/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s2">&quot;-c&quot;</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;GLeaves&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/gunzip/variant_filtration/</span><span class="si">{sample}</span><span class="s2">&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;gunzip </span><span class="si">{params}</span><span class="s2"> </span><span class="si">{input}</span><span class="s2"> &gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Variant calling quality control</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">gatk_variant_evaluation</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;gatk/variant_filtration/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">vcf_tbi</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;gatk/variant_filtration/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">),</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">,</span>
+        <span class="n">bai</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">),</span>
+        <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span>
+        <span class="n">fai</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
+        <span class="nb">dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
+        <span class="n">known</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;known&quot;</span><span class="p">],</span>
+        <span class="n">known_tbi</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;known&quot;</span><span class="p">])</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;gatk_variant_evaluation/</span><span class="si">{sample}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Evaluating variant calling of </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;GATK_Stats&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/gatk/varianteval/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/gatk/varianteval&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Add filter tags, these filters do not remove variants, only annotates</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">gatk_variant_filtration</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
@@ -345,7 +547,7 @@
         <span class="n">vcf_tbi</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;snpsift/annotate_corrected/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">),</span>
         <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;gatk/variant_filtration/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;gatk/variant_filtration/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Filtering VCF for </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
@@ -353,44 +555,54 @@
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">10240</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">25</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;GATK_Stats&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/gatk/variant_filtration/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">filters</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;Depth60X&quot;</span><span class="p">:</span> <span class="s2">&quot;DP &gt; 59&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;VAF10pct&quot;</span><span class="p">:</span> <span class="s2">&quot;AF &gt;= 0.1&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;GeneralPopulation&quot;</span><span class="p">:</span> <span class="s2">&quot;dbNSFP_ExAC_Adj_AF &lt;= 0.001&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;VAF5pct&quot;</span><span class="p">:</span> <span class="s2">&quot;AF &gt;= 0.05&quot;</span><span class="p">,</span>
-        <span class="p">}</span>
+        <span class="n">filters</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gatk_filters&quot;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s2">&quot;DepthBelow60X&quot;</span><span class="p">:</span> <span class="s2">&quot;DP &lt; 59&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BelowQualByDepth&quot;</span><span class="p">:</span> <span class="s2">&quot;QD &lt;= 2.0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BelowBaseQuality&quot;</span><span class="p">:</span> <span class="s2">&quot;QUAL &lt; 30.0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;AboveFisherStrandBias&quot;</span><span class="p">:</span> <span class="s2">&quot;FS &gt; 60.0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;AboveStrandOddsRatio&quot;</span><span class="p">:</span> <span class="s2">&quot;SOR &gt; 3.0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BelowMappingQuality&quot;</span><span class="p">:</span> <span class="s2">&quot;MQ &lt; 35.0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BelowMQRankSum&quot;</span><span class="p">:</span> <span class="s2">&quot;MQRankSum &lt; -12.5&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BelowReadPosRankSum&quot;</span><span class="p">:</span> <span class="s2">&quot;ReadPosRankSum &lt; -8.0&quot;</span>
+        <span class="p">})</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/gatk/variantfiltration&quot;</span>
 
 
-<span class="n">rule</span> <span class="n">fix_SnpSift_Annotate</span><span class="p">:</span>
+<span class="n">rule</span> <span class="n">fix_annotation_for_gatk</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/dbnsfp/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
-        <span class="n">tbi</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;snpsift/dbnsfp/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
+        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/clinvar/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">call</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/annotate_corrected/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Correcting annotation type error in </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">25</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">remove_ends</span><span class="o">=</span><span class="s2">&quot;&#39;s/END=\([0-9]\+,\?\)\+//g&#39;&quot;</span><span class="p">,</span>
-        <span class="n">remove_empty</span><span class="o">=</span><span class="s2">&quot;&#39;s/;;/;/g&#39;&quot;</span><span class="p">,</span>
-        <span class="n">remove_eofield</span><span class="o">=</span><span class="s2">&quot;&#39;s/;</span><span class="se">\t</span><span class="s2">/</span><span class="se">\t</span><span class="s2">/g&#39;&quot;</span>
+        <span class="n">remove_list</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">&quot;END=\([0-9]\+,\?\)\+&quot;</span>
+        <span class="p">],</span>
+        <span class="n">replace_dict</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;;;&quot;</span><span class="p">:</span> <span class="s2">&quot;;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;:ADM:&quot;</span><span class="p">:</span> <span class="s2">&quot;:AD:&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ID=ADM,&quot;</span><span class="p">:</span> <span class="s2">&quot;ID=AD,&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;FORMAT_</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_AF&quot;</span><span class="p">:</span> <span class="s2">&quot;Allele_Frequency&quot;</span>
+        <span class="p">}</span>
+    <span class="n">group</span><span class="p">:</span>
+        <span class="s2">&quot;GATK_Stats&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/snpsift/annotate_corrected/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
-    <span class="n">shell</span><span class="p">:</span>
-        <span class="s2">&quot;gunzip -c </span><span class="si">{input.call}</span><span class="s2"> | &quot;</span>
-        <span class="s2">&quot;sed </span><span class="si">{params.remove_ends}</span><span class="s2"> | &quot;</span>
-        <span class="s2">&quot;sed </span><span class="si">{params.remove_empty}</span><span class="s2"> | &quot;</span>
-        <span class="s2">&quot;sed </span><span class="si">{params.remove_eofield}</span><span class="s2"> &quot;</span>
-        <span class="s2">&quot;&gt; </span><span class="si">{output.call}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/sed&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

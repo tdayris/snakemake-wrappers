@@ -101,6 +101,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="bioinfokit.html">DESEQ2_POST_PROCESS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bismark.html">BISKMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bismark_multisample.html">BISKMARK_MULTISAMPLE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compress_index_vcf.html">COMPRESS_INDEX_VCF</a></li>
@@ -213,7 +214,6 @@
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This meta-wrapper can be used by integrating the following into your workflow:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">default_config</span><span class="o">=</span><span class="p">{</span>
-    <span class="s2">&quot;samples&quot;</span><span class="p">:[</span><span class="s2">&quot;test&quot;</span><span class="p">],</span>
     <span class="s2">&quot;ref&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;cosmic&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/annotation&quot;</span><span class="p">,</span>
         <span class="s2">&quot;dbsnp&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/annotation&quot;</span><span class="p">,</span>
@@ -222,7 +222,10 @@
         <span class="s2">&quot;gmt&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/annotation&quot;</span><span class="p">,</span>
         <span class="s2">&quot;gwascat&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/annotation&quot;</span><span class="p">,</span>
         <span class="s2">&quot;kaviar&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/annotation&quot;</span><span class="p">,</span>
-    <span class="p">}</span>
+        <span class="s2">&quot;gnomad&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/gnomad&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;clinvar&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/clinvar&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;ncbi_build&quot;</span><span class="p">:</span> <span class="s2">&quot;GRCh38&quot;</span><span class="p">}</span>
 <span class="p">}</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -232,12 +235,77 @@
     <span class="n">config</span> <span class="o">=</span> <span class="n">default_config</span>
 
 
-<span class="c1">#rule all:</span>
-<span class="c1">#    input:</span>
-<span class="c1">#        expand(</span>
-<span class="c1">#            &quot;snpsift/cosmic/{sample}.vcf&quot;,</span>
-<span class="c1">#            sample=config[&quot;samples&quot;]</span>
-<span class="c1">#        )</span>
+<span class="n">rule</span> <span class="n">snpsift_gnomad</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="s2">&quot;snpsift/clinvar/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+        <span class="n">database</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;gnomad&quot;</span><span class="p">],</span>
+        <span class="n">database_idx</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;gnomad&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.tbi&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/gnomad/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with gnomAD&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift_gnomad&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-name &#39;gnomad_&#39; -exists &#39;ExistsInGnomAD&#39; -tabix -noDownload -noLog&quot;</span>
+        <span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/snpsift/gnomad/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/snpsift/annotate&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">snpsift_clinvar</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="s2">&quot;snpsift/dbnsfp/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+        <span class="n">database</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;clinvar&quot;</span><span class="p">],</span>
+        <span class="n">database_idx</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;clinvar&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.tbi&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/clinvar/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with ClinVar&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift_clinvar&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-name &#39;clinvar_&#39; -exists &#39;ExistsInClinVar&#39; -tabix -noDownload -noLog&quot;</span>
+        <span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/snpsift/clinvar/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/snpsift/annotate&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">snpsift_gwascat</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="s2">&quot;snpsift/dbnsfp/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+        <span class="n">gwascat</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;gwascat&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/gwascat/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with GWAS Catalog&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift_gwascat&quot;</span><span class="p">,</span> <span class="s2">&quot;-noDownload -noLog&quot;</span>
+        <span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/snpsift/gwascat/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/snpsift/gwascat&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">snpsift_dbnsfp</span><span class="p">:</span>
@@ -251,38 +319,25 @@
         <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with dbNSFP&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15360</span> <span class="o">+</span> <span class="mi">5125</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">20480</span> <span class="o">+</span> <span class="mi">10240</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift_dbnsfp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-tabix -noDownload -noLog -n -f &#39;hg18_chr,hg18_pos(1-based)&#39;&quot;</span>
+        <span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/snpsift/dbnsfp/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/snpsift/dbnsfp&quot;</span>
 
 
-<span class="n">rule</span> <span class="n">snpsift_gwascat</span><span class="p">:</span>
-    <span class="nb">input</span><span class="p">:</span>
-        <span class="n">call</span> <span class="o">=</span> <span class="s2">&quot;snpsift/cosmic/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
-        <span class="n">gwascat</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;gwascat&quot;</span><span class="p">]</span>
-    <span class="n">output</span><span class="p">:</span>
-        <span class="n">call</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/gwascat/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
-    <span class="n">message</span><span class="p">:</span>
-        <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with GWAS Catalog&quot;</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
-    <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
-        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
-    <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/snpsift/gwascat/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
-    <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;bio/snpsift/gwascat&quot;</span>
-
-
 <span class="n">rule</span> <span class="n">snpsift_cosmic</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/dbsnp/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
-        <span class="n">database</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;cosmic&quot;</span><span class="p">]</span>
+        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/kaviar/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+        <span class="n">database</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;cosmic&quot;</span><span class="p">],</span>
+        <span class="n">database_idx</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;cosmic&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.tbi&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">call</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/cosmic/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
@@ -290,30 +345,15 @@
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">120</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift_cosmic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-name &#39;cosmic_&#39; -exists &#39;ExistsInCosmic&#39; -tabix -noDownload -noLog&quot;</span>
+        <span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/snpsift/cosmic/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
-    <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;bio/snpsift/annotate&quot;</span>
-
-
-<span class="n">rule</span> <span class="n">snpsift_dbsnp</span><span class="p">:</span>
-    <span class="nb">input</span><span class="p">:</span>
-        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/kaviar/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
-        <span class="n">database</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">]</span>
-    <span class="n">output</span><span class="p">:</span>
-        <span class="n">call</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/dbsnp/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
-
-    <span class="n">message</span><span class="p">:</span>
-        <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with dbSNP&quot;</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
-    <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/snpsift/dbsnp/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
-    <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
-        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/snpsift/annotate&quot;</span>
 
@@ -321,25 +361,31 @@
 <span class="n">rule</span> <span class="n">snpsift_kaviar</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/gmt/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
-        <span class="n">database</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;kaviar&quot;</span><span class="p">]</span>
+        <span class="n">database</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;kaviar&quot;</span><span class="p">],</span>
+        <span class="n">database_idx</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;kaviar&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.tbi&quot;</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">call</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/kaviar/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with Kaviar&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
-    <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/snpsift/kaviar/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/snpsift/kaviar/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift_kaviar&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-name &#39;Kaviar_&#39; -exists &#39;ExistsInKaviar&#39; -tabix -noDownload -noLog&quot;</span>
+        <span class="p">)</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/snpsift/annotate&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">snpsift_gmt</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">call</span> <span class="o">=</span> <span class="s2">&quot;snpsift/vartype/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="s2">&quot;snpsift/dbsnp/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
         <span class="n">gmt</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;gmt&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">call</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/gmt/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
@@ -354,6 +400,31 @@
         <span class="s2">&quot;logs/snpsift/gmt/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/snpsift/genesets&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">snpsift_dbsnp</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/vartype/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+        <span class="n">database</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">call</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/dbsnp/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with dbSNP&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/snpsift/dbsnp/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift_dbsnp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-name &#39;dbSNP_&#39; -exists &#39;ExistsInDBsnp&#39; -tabix -noDownload -noLog&quot;</span>
+        <span class="p">)</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/snpsift/annotate&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">snpsift_vartype</span><span class="p">:</span>

@@ -14,7 +14,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
 .. code-block:: python
 
     default_config_maftools = {
-        "genome": "GRCh38"
+        "genome": "GRCh38",
+        "estimate_extra": "nTry=3",
+
     }
 
 
@@ -38,7 +40,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             rds="maf/maftools_samples/{sample}/maf.RDS"
         output:
             tsv="maf/maftools_samples/{sample}/trinucleotide_matrix_GRCh27.tsv",
-            #png="maf/maftools_samples/{sample}/trinucleotide_signtures_hg19.tsv",
+            png="maf/maftools_samples/{sample}/trinucleotide_signtures_hg19.png",
             rds="maf/maftools_samples/{sample}/trinucleotide_matrix_GRCh27.RDS",
         message: "Computing trinucleotide matrices for {wildcards.sample}"
         threads: 1
@@ -62,7 +64,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             rds="maf/maftools_samples/{sample}/maf.RDS"
         output:
             tsv="maf/maftools_samples/{sample}/trinucleotide_matrix_hg38.tsv",
-            #png="maf/maftools_samples/{sample}/trinucleotide_signtures_hg38.tsv",
+            png="maf/maftools_samples/{sample}/trinucleotide_signtures_hg38.png",
             rds="maf/maftools_samples/{sample}/trinucleotide_matrix_hg38.RDS",
         message: "Computing trinucleotide matrices for {wildcards.sample}"
         threads: 1
@@ -87,6 +89,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
         output:
             rds="maf/maftools_samples/{sample}/maf.RDS",
             summary=temp("maf/maftools_samples/{sample}/maf_summary.txt")
+        message:
+            "Loading {wildcards.sample} into R with MAFtools"
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1024,

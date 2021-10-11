@@ -1,0 +1,110 @@
+.. _`bio/microphaser/normal`:
+
+MICROPHASER NORMAL
+==================
+
+Predict sample-specific normal peptides with integrated germline variants from NGS (whole exome/genome) data
+
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule microphaser_normal:
+        input:
+            bam="mapped/{sample}.sorted.bam",
+            index="mapped/{sample}.sorted.bam.bai",
+            ref="genome.fasta",
+            annotation="genome.gtf",
+            variants="calls/{sample}.bcf",
+        output:
+            # all peptides from the healthy proteome
+            peptides="out/{sample}.fasta",
+            tsv="out/{sample}.tsv",
+        log:
+            "logs/microphaser/somatic/{sample}.log",
+        params:
+            extra="--window-len 9",  # optional, desired peptide length in nucleotide bases, e.g. 27 (9 AA) for MHC-I ligands.
+        wrapper:
+            "0.79.0-1159-g7fe792175/bio/microphaser/normal"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``microphaser=0.3``
+
+Input/Output
+------------
+**Input:**
+
+* bam file
+* bcf file
+* fasta reference
+* gtf annotation file
+
+**Output:**
+
+* sample-specific peptide fasta (nucleotide sequences)
+
+
+
+
+Notes
+-----
+
+* For more information see, https://github.com/koesterlab/microphaser.
+
+
+
+Authors
+-------
+
+* Jan Forster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2021, Jan Forster"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell(
+        "microphaser normal {snakemake.input.bam} "
+        "{extra} "
+        "--ref {snakemake.input.ref} "
+        "--variants {snakemake.input.variants} "
+        "--tsv {snakemake.output.tsv} "
+        "> {snakemake.output.peptides} "
+        "< {snakemake.input.annotation} "
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

@@ -1,0 +1,111 @@
+.. _`bio/variantoccurence/chromosomes`:
+
+OCCURENCE PER CHROMOSOME
+========================
+
+This wrapper performs the same analysis as the per-sample variant occurence, but works for a given chromosome.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_variant_occurence_sample:
+        input:
+            calls=["in.vcf", "in2.vcf"]
+        output:
+            txt="occurence.{chr}.txt"
+        threads: 7
+        wrapper:
+            "0.79.0-1159-g7fe792175/bio/variantoccurence/sample"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bash==5.0.018``
+
+Input/Output
+------------
+**Input:**
+
+* ``calls``: List of VCF formatted variant calling
+
+**Output:**
+
+* ``txt``: Variant occurence for the given chromosome
+
+
+
+
+Notes
+-----
+
+Multiallelic sites *must* be splitted before this occurence analysis. They are
+treated as a single variant in this wrapper.
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper to extract variants and count occurences"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2021, Dayris Thibault"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    import os.path as op
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    if snakemake.threads != 7:
+        raise ValueError("7 threads are required for this wrapper.")
+
+    if all(i.endswith("vcf") for i in snakemake.input["calls"]):
+        reader = "cat"
+    elif all(i.endswith("vcf.gz") for i in snakemake.input["calls"]):
+        reader = "zcat"
+    else:
+        raise ValueError(
+            "All VCF should be bgzipped, or all VCF should be raw text"
+        )
+
+    chr = snakemake.wildcards["chr"]
+
+    shell(
+        """(echo -e "Occurence\tChromosome\tPosition\tID\tRef\tAlt"; """
+        """for CALL in {snakemake.input.calls} ; do """
+        """{reader} ${{CALL}} | cut -f -5 | grep -P "^{chr}" | """
+        """ sort | uniq ; done | sort | uniq -c | sed 's/\s\+/\t/g' | """
+        """ sed 's/^\s\+//g' ) > {snakemake.output.txt} {log}"""
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

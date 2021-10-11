@@ -31,7 +31,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=lambda wildcard, attempt: attempt * 90,
             tmpdir="tmp"
         params:
-            extra=config.get("snpeff_extra", "")
+            extra=config.get("snpeff_extra", "-nodownload -noLog")
         log:
             "logs/snpeff/annotate/{sample}.log"
         wrapper:

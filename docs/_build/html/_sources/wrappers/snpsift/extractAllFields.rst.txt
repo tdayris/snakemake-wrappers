@@ -26,7 +26,7 @@ This wrapper can be used in the following way:
         resources:
             mem_mb=1024
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/snpsift/extractAllFields"
+            "0.79.0-1159-g7fe792175/bio/snpsift/extractAllFields"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -78,6 +78,12 @@ Code
     __license__ = "MIT"
 
     import re
+    import logging
+
+    logging.basicConfig(
+        filemode="w",
+        level=logging.DEBUG
+    )
 
     from snakemake.shell import shell
     from snakemake_wrapper_utils.java import get_java_opts
@@ -102,12 +108,12 @@ Code
 
 
     # Each (un)compression step raises the threads requirements
-    # if snakemake.threads < min_threads:
-    #     raise ValueError(
-    #         "At least {} threads required, {} provided".format(
-    #             min_threads, snakemake.threads
-    #         )
-    #     )
+    if snakemake.threads < min_threads:
+        raise ValueError(
+            "At least {} threads required, {} provided".format(
+                 min_threads, snakemake.threads
+            )
+        )
 
     fields = ["'CHROM'", "'POS'", "'ID'", "'REF'", "'ALT'", "'FILTER'"]
     help = [
@@ -116,19 +122,29 @@ Code
         "ID: Variant identifier"
     ]
     with open(snakemake.input.call, "r") as vcf_stream:
-        ignore_format = snakemake.params.get("ignore_format", False)
-        regex_general = r'##(\w+)=(.+$)'
+        ignore_format = snakemake.params.get("ignore_format", False) is True
+        regex_general = r'##([^=]+)=(.+$)'
         regex_id = r"<ID=([^,]+),(.*)>"
         for line in vcf_stream:
+            logging.debug("")
+            logging.debug(line[:-1])
             if not line.startswith("##"):
+                logging.warning("Breaking!")
                 break
 
-            htype, hcontent = re.findall(regex_general, line)[0]
-            if htype.lower() ==  "format" and ignore_format:
+            try:
+                htype, hcontent = re.findall(regex_general, line)[0]
+            except IndexError:
+                raise IndexError(line)
+            if htype.lower() ==  "format":
+                logging.debug("FORMAT")
+                if ignore_format:
+                    continue
                 hid, hinfo = re.findall(regex_id, line)[0]
                 fields.append("'{}[{}]'".format(htype, hid))
             elif htype.lower() == "info":
                 hid, hinfo = re.findall(regex_id, line)[0]
+                logging.debug("INFO: %s\t%s", hid, hinfo)
                 if hid.lower() == "ann":
                     fields += [
                         "'ANN[*].ALLELE'",
@@ -180,6 +196,7 @@ Code
                         "'NMD[*].PERC'"
                     ]
                 else:
+                    logging.debug("Adding unknown info: '%s'", hid)
                     fields.append(hid)
 
 
@@ -195,3 +212,8 @@ Code
         " > {snakemake.output.tsv}"  # Path to output file
         " {log}"  # Logging behaviour
     )
+
+
+.. |nl| raw:: html
+
+   <br>

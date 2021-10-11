@@ -21,7 +21,7 @@ This wrapper can be used in the following way:
             txt="occurence.txt"
         threads: 7
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/variantoccurence/sample"
+            "0.79.0-1159-g7fe792175/bio/variantoccurence/sample"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -95,7 +95,13 @@ Code
 
     shell(
         """(echo -e "Occurence\tChromosome\tPosition\tID\tRef\tAlt"; """
-        """{reader} {snakemake.input.calls} | cut -f -5 | grep -vP "^#" | """
-        """sort | uniq -c | sed 's/\s\+/\t/g' | sed 's/^\s//g') """
+        """for CALL in {snakemake.input.calls} ; do """
+        """{reader} ${{CALL}} | cut -f -5 | grep -vP "^#" | """
+        """ sort | uniq ; done | sort | uniq -c ) """
         """> {snakemake.output.txt} {log}"""
     )
+
+
+.. |nl| raw:: html
+
+   <br>

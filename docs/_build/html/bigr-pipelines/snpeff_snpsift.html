@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="VARIANT_CALLING_AMPLISEQ" href="variant_calling_ampliseq.html" />
-    <link rel="prev" title="SALMON_QUANT" href="salmon_quant.html" /> 
+    <link rel="prev" title="SAREK ENHANCED" href="sarek_enhanced.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -110,6 +110,7 @@
 <li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sarek_enhanced.html">SAREK ENHANCED</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">SNPEFF_SNPSIFT (UNDER DEVELOPMENT)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
@@ -207,7 +208,7 @@
 
 <span class="c1"># Copy/paste the following line for **HG38**</span>
 
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh hg38
 
 <span class="c1"># Copy/paste the following line for **HG19**</span>
 
@@ -219,11 +220,11 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.
 <h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h2>
 <p><strong>Input:</strong></p>
 <ul class="simple">
-<li><p>VCF files</p></li>
+<li><p>VCF files (searched in current working directory)</p></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul class="simple">
-<li><p>Annotated VCF file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">snpsift</span></code>: Annotated VCF file</p></li>
 </ul>
 </div>
 <div class="section" id="used-meta-wrappers">
@@ -279,10 +280,17 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.
     <span class="n">sample</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">samples_list</span><span class="p">)</span>
 
 
+<span class="n">last_vcf</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;snpsift/gnomad/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;NBCI_build&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;mm10&quot;</span>
+    <span class="k">else</span> <span class="s2">&quot;snpsift/dbsnp/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+<span class="p">)</span>
+
+
 <span class="n">rule</span> <span class="nb">all</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;snpsift/dbnsfp/</span><span class="si">{sample}</span><span class="s2">.vcf.gz</span><span class="si">{index}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">samples_list</span><span class="p">,</span>
             <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;.tbi&quot;</span><span class="p">]</span>
         <span class="p">),</span>
@@ -294,14 +302,34 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Finishing the annotation pipeline&quot;</span>
 
+<span class="c1">#################################</span>
+<span class="c1">### FINAL VCF FILE INDEXATION ###</span>
+<span class="c1">#################################</span>
+
+<span class="n">module</span> <span class="n">compress_index_vcf_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/compress_index_vcf/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">pbgzip_compress</span> <span class="kn">from</span> <span class="nn">compress_index_vcf_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">protected</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">tabix_index</span> <span class="kn">from</span> <span class="nn">compress_index_vcf_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">protected</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.vcf.gz.tbi&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+
+
 <span class="c1">#####################</span>
 <span class="c1">### Export to TSV ###</span>
 <span class="c1">#####################</span>
 
 <span class="n">rule</span> <span class="n">extractfields</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/cosmic/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
-        <span class="n">call_index</span><span class="o">=</span><span class="s2">&quot;snpsift/cosmic/</span><span class="si">{sample}</span><span class="s2">.vcf.gz.tbi&quot;</span>
+        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">call_index</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">tsv</span><span class="o">=</span><span class="n">protected</span><span class="p">(</span><span class="s2">&quot;snpsift/extractFields/</span><span class="si">{sample}</span><span class="s2">.tsv&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
@@ -311,60 +339,71 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">15360</span><span class="p">),</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/snpsift/extractFields/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+        <span class="s2">&quot;logs/snpsift/extractAllFields/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">&quot;CHROM&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;POS&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ID&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;REF&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ALT&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ANN[*].GENE&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ANN[*].GENEID&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ANN[*].HGVS_C&quot;</span><span class="p">,</span> <span class="c1"># (alias HGVS_DNA, CODON): Variant in HGVS (DNA) notation</span>
-            <span class="s2">&quot;ANN[*].HGVS_P&quot;</span><span class="p">,</span> <span class="c1"># (alias HGVS, HGVS_PROT, AA): Variant in HGVS (protein) notation</span>
-            <span class="s2">&quot;STRAND&quot;</span><span class="p">,</span> <span class="c1"># &quot;Gene strand&quot;</span>
-            <span class="s2">&quot;ANN[*].FEATURE&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ANN[*].FEATUREID&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ANN[*].BIOTYPE&quot;</span><span class="p">,</span> <span class="c1"># Biotype, as described by the annotations (e.g. &#39;protein_coding&#39;)</span>
-            <span class="s2">&quot;ANN[*].IMPACT&quot;</span><span class="p">,</span> <span class="c1"># { HIGH, MODERATE, LOW, MODIFIER }</span>
-            <span class="s2">&quot;ANN[*].EFFECT&quot;</span><span class="p">,</span> <span class="c1"># (alias ANNOTATION): Effect in Sequence ontology terms (e.g. &#39;missense_variant&#39;, &#39;synonymous_variant&#39;, &#39;stop_gained&#39;, etc.)</span>
-            <span class="s2">&quot;ANN[*].CDNA_POS&quot;</span><span class="p">,</span> <span class="c1"># (alias POS_CDNA)</span>
-            <span class="s2">&quot;ANN[*].CDNA_LEN&quot;</span><span class="p">,</span> <span class="c1"># (alias LEN_CDNA)</span>
-            <span class="s2">&quot;ANN[*].CDS_POS&quot;</span><span class="p">,</span> <span class="c1"># (alias POS_CDS)</span>
-            <span class="s2">&quot;ANN[*].CDS_LEN&quot;</span><span class="p">,</span> <span class="c1"># (alias LEN_CDS)</span>
-            <span class="s2">&quot;ANN[*].AA_POS&quot;</span><span class="p">,</span> <span class="c1"># (alias POS_AA)</span>
-            <span class="s2">&quot;ANN[*].AA_LEN&quot;</span><span class="p">,</span> <span class="c1"># (alias LEN_AA)</span>
-            <span class="s2">&quot;FILTER&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ADP&quot;</span><span class="p">,</span> <span class="c1"># &quot;Average per-sample depth of bases with Phred score &gt;= 15&quot;</span>
-            <span class="s2">&quot;LOF[*].GENE&quot;</span><span class="p">,</span>  <span class="c1"># predicted Loss of function</span>
-            <span class="s2">&quot;LOF[*].GENEID&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;LOF[*].NUMTR&quot;</span><span class="p">,</span> <span class="c1"># Number of transcripts affected</span>
-            <span class="s2">&quot;LOF[*].PERC&quot;</span><span class="p">,</span> <span class="c1"># percentage of transcripts</span>
-            <span class="s2">&quot;NMD[*].GENE&quot;</span><span class="p">,</span> <span class="c1"># &quot;Predicted nonsense mediated decay effects for this variant.&quot;</span>
-            <span class="s2">&quot;NMD[*].GENEID&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;NMD[*].NUMTR&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;NMD[*].PERC&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;VARTYPE&quot;</span><span class="p">,</span> <span class="c1"># &quot;Comma separated list of variant types. One per allele&quot;</span>
-            <span class="s2">&quot;HOM&quot;</span><span class="p">,</span> <span class="c1"># &quot;Variant is homozygous&quot;</span>
-            <span class="s2">&quot;HET&quot;</span><span class="p">,</span> <span class="c1"># &quot;Variant is heterozygous&quot;</span>
-            <span class="s2">&quot;AC&quot;</span><span class="p">,</span> <span class="c1"># &quot;Allele Count&quot;</span>
-            <span class="s2">&quot;AF&quot;</span><span class="p">,</span> <span class="c1"># &quot;Allele Frequency&quot;</span>
-            <span class="s2">&quot;AN&quot;</span><span class="p">,</span> <span class="c1">#&quot;Total number of alleles in data sources&quot;</span>
-            <span class="s2">&quot;DS&quot;</span><span class="p">,</span> <span class="c1"># &quot;Data Sources containing allele&quot;</span>
-            <span class="s2">&quot;CDA&quot;</span><span class="p">,</span> <span class="c1"># &quot;Variation is interrogated in a clinical diagnostic assay&quot;</span>
-            <span class="s2">&quot;OTH&quot;</span><span class="p">,</span> <span class="c1"># &quot;Has other variant with exactly the same set of mapped positions on NCBI refernce assembly.&quot;</span>
-            <span class="s2">&quot;COMMON&quot;</span><span class="p">,</span> <span class="c1"># A common SNP is one that has at least one 1000Genomes population with a minor allel e of frequency &gt;= 1% and for which 2 or more founders contribute to that minor allele frequency.</span>
-            <span class="s2">&quot;VLD&quot;</span><span class="p">,</span> <span class="c1"># &quot;Is Validated.  This bit is set if the variant has 2+ minor allele count based on frequency or genotype data.&quot;</span>
-            <span class="s2">&quot;MUT&quot;</span><span class="p">,</span> <span class="c1"># &quot;Is mutation (journal citation, explicit fact): a low frequency variation that is cited in journal and other reputable sources&quot;</span>
-            <span class="s2">&quot;INT&quot;</span><span class="p">,</span> <span class="c1"># &quot;In Intron&quot;</span>
-            <span class="s2">&quot;PMC&quot;</span><span class="p">,</span> <span class="c1"># &quot;Links exist to PubMed Central article&quot;</span>
-            <span class="s2">&quot;HD&quot;</span><span class="p">,</span> <span class="c1"># &quot;Marker is on high density genotyping kit (50K density or greater).  The variant may have phenotype associations present in dbGaP.&quot;</span>
-            <span class="s2">&quot;PM&quot;</span><span class="p">,</span> <span class="c1"># &quot;Variant is Precious(Clinical,Pubmed Cited)&quot;</span>
-        <span class="p">],</span>
         <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;-s &#39;</span><span class="se">\t</span><span class="s2">&#39; -e &#39;.&#39;&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;bio/snpsift/extractfields&quot;</span>
+        <span class="s2">&quot;bio/snpsift/extractAllFields&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">fix_vcf</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;snpsift/splitted/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Removing empty fields, trailing &#39;;&#39; and non-canonical chromosomes &quot;</span>
+        <span class="s2">&quot;for </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bigr_scripts/fix_vcf/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">default_chr</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">23</span><span class="p">)),</span> <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mi">23</span><span class="p">),</span> <span class="s2">&quot;MT&quot;</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">],</span>
+        <span class="n">remove_non_conventional_chromosomes</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/BiGR/fix_vcf&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">split_vcf_features</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/format2info/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">call</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/splitted/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Splitting ANN field of </span><span class="si">{wildcards.sample}</span><span class="s2"> to better &quot;</span>
+        <span class="s2">&quot;end-user TSV experience&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bigr_scripts/split_ann/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/BiGR/split_vcf_features&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">format_to_info</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/gnomad/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">call</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/format2info/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Moving FORMAT data to INFO to increase readability and fixing field &quot;</span>
+        <span class="s2">&quot;name redundancy for </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bigr_scripts/format2info/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/BiGR/vcf_format_to_info&quot;</span>
 
 
 <span class="c1">###############</span>
@@ -399,69 +438,35 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.
         <span class="s2">&quot;bio/multiqc&quot;</span>
 
 
-<span class="c1">#################################</span>
-<span class="c1">### FINAL VCF FILE INDEXATION ###</span>
-<span class="c1">#################################</span>
-
-<span class="n">rule</span> <span class="n">tabix_index</span><span class="p">:</span>
-    <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{tools}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
-    <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{tools}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.vcf.gz.tbi&quot;</span>
-    <span class="n">message</span><span class="p">:</span>
-        <span class="s2">&quot;Indexing </span><span class="si">{wildcards.sample}</span><span class="s2"> final annotated VCF with tabix&quot;</span>
-    <span class="n">group</span><span class="p">:</span>
-        <span class="s2">&quot;Final_compression_</span><span class="si">{sample}</span><span class="s2">&quot;</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
-    <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
-    <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/</span><span class="si">{tools}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/tabix/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
-    <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;bio/tabix&quot;</span>
-
-
-<span class="n">rule</span> <span class="n">compress_pbgzip</span><span class="p">:</span>
-    <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{tools}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
-    <span class="n">output</span><span class="p">:</span>
-        <span class="s2">&quot;</span><span class="si">{tools}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
-    <span class="n">message</span><span class="p">:</span>
-        <span class="s2">&quot;Compressing </span><span class="si">{wildcards.sample}</span><span class="s2"> final annotated VCF with pbgzip&quot;</span>
-    <span class="n">group</span><span class="p">:</span>
-        <span class="s2">&quot;Final_compression_</span><span class="si">{sample}</span><span class="s2">&quot;</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
-    <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span>
-    <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/</span><span class="si">{tools}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/pbgzip/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
-    <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;bio/compress/pbgzip&quot;</span>
-
-
 <span class="c1">######################</span>
 <span class="c1">### VCF annotation ###</span>
 <span class="c1">######################</span>
 
+<span class="n">snpeff_snpsift_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;ref&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">],</span>
+    <span class="o">**</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;snpeff_snpsift&quot;</span><span class="p">]</span>
+<span class="p">}</span>
 
 <span class="n">module</span> <span class="n">snpeff_meta</span><span class="p">:</span>
     <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/snpeff_annotate/test/Snakefile&quot;</span>
-    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">snpeff_snpsift_config</span>
 
 <span class="n">use</span> <span class="n">rule</span> <span class="n">snpeff</span> <span class="kn">from</span> <span class="nn">snpeff_meta</span> <span class="k">with</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">calls</span><span class="o">=</span><span class="s2">&quot;calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
         <span class="n">calls_index</span><span class="o">=</span><span class="s2">&quot;calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz.tbi&quot;</span><span class="p">,</span>
         <span class="n">db</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;snpeff&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">calls</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpeff/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">),</span>
+        <span class="n">stats</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpeff/</span><span class="si">{sample}</span><span class="s2">.html&quot;</span><span class="p">),</span>
+        <span class="n">csvstats</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpeff/</span><span class="si">{sample}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
 
 
 <span class="n">module</span> <span class="n">snpsift</span><span class="p">:</span>
     <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/snpsift/test/Snakefile&quot;</span>
-    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">snpeff_snpsift_config</span>
 
-<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">snpsift</span> <span class="k">as</span> <span class="n">snpsift_</span><span class="o">*</span>
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">snpsift</span>
 </pre></div>
 </div>
 </div>
@@ -480,7 +485,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="variant_calling_ampliseq.html" class="btn btn-neutral float-right" title="VARIANT_CALLING_AMPLISEQ" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="salmon_quant.html" class="btn btn-neutral float-left" title="SALMON_QUANT" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sarek_enhanced.html" class="btn btn-neutral float-left" title="SAREK ENHANCED" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

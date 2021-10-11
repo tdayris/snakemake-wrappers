@@ -15,21 +15,23 @@ This wrapper can be used in the following way:
 .. code-block:: python
 
     rule get_variation:
+        # Optional: add fai as input to get VCF with annotated contig lengths (as required by GATK)
+        # and properly sorted VCFs.
+        # input:
+        #     fai="refs/genome.fasta.fai"
         output:
-            vcf="refs/variation.vcf.gz"
-            # Optional: add fai to get VCF with annotated contig lengths (as required by GATK)
-            # and properly sorted VCFs.
-            # fai="refs/genome.fasta.fai"
+            vcf="refs/variation.vcf.gz",
         params:
             species="saccharomyces_cerevisiae",
-            release="98", # releases <98 are unsupported
+            release="98",  # releases <98 are unsupported
             build="R64-1-1",
-            type="all" # one of "all", "somatic", "structural_variation"
+            type="all",  # one of "all", "somatic", "structural_variation"
+            # chromosome="21", # optionally constrain to chromosome, only supported for homo_sapiens
         log:
-            "logs/get_variation.log"
+            "logs/get_variation.log",
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/reference/ensembl-variation"
+            "0.79.0-1159-g7fe792175/bio/reference/ensembl-variation"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -78,6 +80,7 @@ Code
     release = int(snakemake.params.release)
     build = snakemake.params.build
     type = snakemake.params.type
+    chromosome = snakemake.params.get("chromosome", "")
 
     if release < 98:
         print("Ensembl releases <98 are unsupported.", file=open(snakemake.log[0], "w"))
@@ -90,12 +93,24 @@ Code
 
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
+    if chromosome and type != "all":
+        raise ValueError(
+            "Parameter chromosome given but chromosome-wise download"
+            "is only implemented for type='all'."
+        )
+
     if type == "all":
         if species == "homo_sapiens" and release >= 93:
-            suffixes = [
-                "-chr{}".format(chrom) for chrom in list(range(1, 23)) + ["X", "Y", "MT"]
-            ]
+            chroms = (
+                list(range(1, 23)) + ["X", "Y", "MT"] if not chromosome else [chromosome]
+            )
+            suffixes = ["-chr{}".format(chrom) for chrom in chroms]
         else:
+            if chromosome:
+                raise ValueError(
+                    "Parameter chromosome given but chromosome-wise download"
+                    "is only implemented for homo_sapiens in releases >=93."
+                )
             suffixes = [""]
     elif type == "somatic":
         suffixes = ["_somatic"]
@@ -150,3 +165,8 @@ Code
             file=sys.stderr,
         )
         exit(1)
+
+
+.. |nl| raw:: html
+
+   <br>

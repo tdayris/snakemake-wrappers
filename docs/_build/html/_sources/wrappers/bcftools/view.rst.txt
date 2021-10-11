@@ -27,7 +27,7 @@ This wrapper can be used in the following way:
             # optional extra parameters
             extra=lambda w, input: f"-S {input.samples}",
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/bcftools/view"
+            "0.79.0-1159-g7fe792175/bio/bcftools/view"
 
 
     rule bcf_view_o_vcf:
@@ -40,7 +40,7 @@ This wrapper can be used in the following way:
         params:
             extra="",
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/bcftools/view"
+            "0.79.0-1159-g7fe792175/bio/bcftools/view"
 
 
     rule bcf_view_o_vcf_gz:
@@ -53,7 +53,7 @@ This wrapper can be used in the following way:
         params:
             extra="",
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/bcftools/view"
+            "0.79.0-1159-g7fe792175/bio/bcftools/view"
 
 
     rule bcf_view_o_bcf:
@@ -66,7 +66,7 @@ This wrapper can be used in the following way:
         params:
             extra="",
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/bcftools/view"
+            "0.79.0-1159-g7fe792175/bio/bcftools/view"
 
 
     rule bcf_view_o_uncompressed_bcf:
@@ -80,7 +80,7 @@ This wrapper can be used in the following way:
             uncompressed_bcf=True,
             extra="",
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/bcftools/view"
+            "0.79.0-1159-g7fe792175/bio/bcftools/view"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -149,17 +149,6 @@ Code
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
     extra = snakemake.params[0]
-    output_file = snakemake.output[0]
-    if output_file.endswith(".bcf"):
-        extra += " --output-type b "
-    elif output_file.endswith(".vcf.gz"):
-        extra += " --output-type z "
-    elif output_file.endswith(".vcf"):
-        extra += " --output-type v "
-    else:
-        raise ValueError(
-            "Output file extension should be one of: vcf, bcf, vcf.gz"
-        )
 
     shell(
         "bcftools view {bcftools_opts} "
@@ -168,3 +157,8 @@ Code
         "-o {snakemake.output} "
         "{log}"
     )
+
+
+.. |nl| raw:: html
+
+   <br>

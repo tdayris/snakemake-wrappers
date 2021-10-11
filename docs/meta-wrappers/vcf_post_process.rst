@@ -27,7 +27,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
         "center": "GustaveRoussy",
         "annotation_tag": "ANN=",
         "sample_list": list(),
-        "genome": "/path/to/ref.fasta"
+        "genome": "/path/to/ref.fasta",
+        "known": "/path/to/dbsnp",
+        "gatk_filters": {},
+        "chr": list(range(1, 23)) + ["X", "Y"]
     }
 
     try:
@@ -36,6 +39,32 @@ This meta-wrapper can be used by integrating the following into your workflow:
     except NameError:
         config = default_config_vcf_post_process
 
+    """
+    Compress and index final VCF files
+    """
+    rule gath_final_vcf:
+        input:
+            expand(
+                "maf/occurence_annotated/{sample}.vcf.gz",
+                sample=config["sample_list"]
+            ),
+            expand(
+                "maf/occurence_annotated/{sample}.vcf.gz.tbi",
+                sample=config["sample_list"]
+            )
+        output:
+            "final.vcf.list"
+        message:
+            "Aquiring list of final VCF files"
+        threads: 2
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 128,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        log:
+            "logs/somatic/list.log"
+        shell:
+            "echo {input} | sed 's/\s\+/\\n/g' > {output} 2> {log}"
 
 
     """
@@ -48,18 +77,24 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 sample=config["sample_list"]
             )
         output:
-            "maf/maftools/complete.maf"
+            "maf/complete.maf"
         message:
             "Merging separates maf files in a single cohort maf"
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1024,
-            time_min=lambda wildcards, attempt: attempt * 15,
+            time_min=lambda wildcards, attempt: attempt * 45,
             tmpdir="tmp"
         log:
             "logs/maftools/concat.log"
+        params:
+            sed = "'s/FORMAT_{}_tumor_AF/Mutect2_Allele_Frequency/g'".format(
+                config["sample_list"][0]
+            )
         shell:
-            "cat {input} > {output} 2> {log}"
+            "head -n 1 {input[0]} | sed {params.sed} > {output} 2> {log} && "
+            "for VCF in {input}; do sed '1d' ${{VCF}}; done "
+            ">> {output} 2>> {log}"
 
 
     """
@@ -74,9 +109,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "Renaming columns to fit MAFtools requirement in {wildcards.sample}"
         threads: 1
         resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1024,
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
             time_min=lambda wildcards, attempt: attempt * 15,
             tmpdir="tmp"
+        group:
+            "vcf_to_maf"
         log:
             "logs/maftools/rename/{sample}.log"
         params:
@@ -89,12 +126,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "bio/BiGR/rename_snpsift_maf_cols"
 
 
+
+
     """
     Extracting all INFO/FORMAT data, the list is built from vcf header
     """
     rule extract_all_fields:
         input:
-            call="maf/splitted/{sample}.vcf"
+            call="maf/occurence_annotated/{sample}.vcf"
         output:
             tsv=temp("maf/extracted/{sample}.tsv")
         message:
@@ -104,12 +143,96 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcards, attempt: attempt * 10240,
             time_min=lambda wildcards, attempt: attempt * 25,
             tmpdir="tmp"
+        group:
+            "vcf_to_maf"
         log:
             "logs/snpsift/extract_all_fields/{sample}.log"
         params:
-            annotation_tag=config.get("annotation_tag", "ANN=")
+            annotation_tag=config.get("annotation_tag", "ANN="),
+            ignore_format=True
         wrapper:
             "bio/snpsift/extractAllFields"
+
+
+    """
+    Count variant occurence
+    """
+    rule variant_occurence_annotate:
+        input:
+            calls = ["maf/canonical/{sample}.vcf"],
+            occurence = "maf/occurences.txt"
+        output:
+            calls = ["maf/occurence_annotated/{sample}.vcf"]
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        log:
+            "logs/variant_occurence/uncompress/{sample}.log"
+        wrapper:
+            "bio/variantoccurence/annotate"
+
+
+    rule concatenate_per_chr_information:
+        input:
+            expand("maf/{chr}/occurence.txt", chr=config["chr"])
+        output:
+            "maf/occurences.txt"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        log:
+            "logs/variant_occurence/all.log"
+        shell:
+            "for i in {input}; do sed '1d' ${{i}}; done > {output} 2> {log}"
+
+
+    rule variant_occurence_per_chr:
+        input:
+            calls=expand(
+                "maf/canonical/{sample}.vcf.gz",
+                sample=config["sample_list"]
+            )
+        output:
+            txt="maf/{chr}/occurence.txt"
+        threads: 7
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        log:
+            "logs/variant_occurence/{chr}.log"
+        wrapper:
+            "bio/variantoccurence/chromosomes"
+
+
+    """
+    Remove non-canonical chromosomes, and empty info fields
+    """
+    rule fix_vcf:
+        input:
+            vcf="maf/splitted/{sample}.vcf"
+        output:
+            vcf=temp("maf/canonical/{sample}.vcf")
+        message:
+            "Cleaning {wildcards.sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        group:
+            "GLeaves"
+        log:
+            "logs/fix_vcf/{sample}.log"
+        params:
+            default_chr=config["chr"],
+            remove_non_conventional_chromosomes=False
+        wrapper:
+            "bio/BiGR/fix_vcf"
 
 
     """
@@ -118,7 +241,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule split_vcf_features:
         input:
-            call="gatk/variant_filtration/{sample}.vcf"
+            call="snpsift/format2info/{sample}.vcf"
         output:
             call=temp("maf/splitted/{sample}.vcf")
         message:
@@ -128,6 +251,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcards, attempt: attempt * 1024,
             time_min=lambda wildcards, attempt: attempt * 15,
             tmpdir="tmp"
+        group:
+            "GLeaves"
         log:
             "logs/split_vcf_features/{sample}.log"
         params:
@@ -137,7 +262,83 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
 
     """
-    Add filter tags
+    Copy format information, this is for end-users reading
+    """
+    rule format_to_info:
+        input:
+            call = "gatk/variant_filtration/{sample}.vcf"
+        output:
+            call = temp("snpsift/format2info/{sample}.vcf")
+        message:
+            "Moving format fields to info for {wildcards.sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        group:
+            "GLeaves"
+        log:
+            "logs/vcf_format_to_info/{sample}.log"
+        wrapper:
+            "bio/BiGR/vcf_format_to_info"
+
+
+    rule unzip_variant_filtration:
+        input:
+            "gatk/variant_filtration/{sample}.vcf.gz"
+        output:
+            temp("gatk/variant_filtration/{sample}.vcf")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        params:
+            "-c"
+        group:
+            "GLeaves"
+        log:
+            "logs/gunzip/variant_filtration/{sample}"
+        shell:
+            "gunzip {params} {input} > {output} 2> {log}"
+
+
+    """
+    Variant calling quality control
+    """
+    rule gatk_variant_evaluation:
+        input:
+            vcf="gatk/variant_filtration/{sample}.vcf.gz",
+            vcf_tbi=get_tbi("gatk/variant_filtration/{sample}.vcf.gz"),
+            bam="picard/markduplicates/{sample}_tumor.bam",
+            bai=get_bai("picard/markduplicates/{sample}_tumor.bam"),
+            ref=config["genome"],
+            fai=get_fai(config["genome"]),
+            dict=get_dict(config["genome"]),
+            known=config["known"],
+            known_tbi=get_tbi(config["known"])
+        output:
+            directory("gatk_variant_evaluation/{sample}")
+        message:
+            "Evaluating variant calling of {wildcards.sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        group:
+            "GATK_Stats"
+        log:
+            "logs/gatk/varianteval/{sample}.log"
+        params:
+            extra=""
+        wrapper:
+            "bio/gatk/varianteval"
+
+
+    """
+    Add filter tags, these filters do not remove variants, only annotates
     """
     rule gatk_variant_filtration:
         input:
@@ -145,7 +346,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             vcf_tbi=get_tbi("snpsift/annotate_corrected/{sample}.vcf.gz"),
             ref=config["genome"]
         output:
-            vcf="gatk/variant_filtration/{sample}.vcf"
+            vcf=temp("gatk/variant_filtration/{sample}.vcf.gz")
         message:
             "Filtering VCF for {wildcards.sample}"
         threads: 1
@@ -153,44 +354,54 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcards, attempt: attempt * 10240,
             time_min=lambda wildcards, attempt: attempt * 25,
             tmpdir="tmp"
+        group:
+            "GATK_Stats"
         log:
             "logs/gatk/variant_filtration/{sample}.log"
         params:
-            filters={
-                "Depth60X": "DP > 59",
-                "VAF10pct": "AF >= 0.1",
-                "GeneralPopulation": "dbNSFP_ExAC_Adj_AF <= 0.001",
-                "VAF5pct": "AF >= 0.05",
-            }
+            filters=config.get("gatk_filters", {
+                "DepthBelow60X": "DP < 59",
+                "BelowQualByDepth": "QD <= 2.0",
+                "BelowBaseQuality": "QUAL < 30.0",
+                "AboveFisherStrandBias": "FS > 60.0",
+                "AboveStrandOddsRatio": "SOR > 3.0",
+                "BelowMappingQuality": "MQ < 35.0",
+                "BelowMQRankSum": "MQRankSum < -12.5",
+                "BelowReadPosRankSum": "ReadPosRankSum < -8.0"
+            })
         wrapper:
             "bio/gatk/variantfiltration"
 
 
-    rule fix_SnpSift_Annotate:
+    rule fix_annotation_for_gatk:
         input:
-            call="snpsift/dbnsfp/{sample}.vcf.gz",
-            tbi=get_tbi("snpsift/dbnsfp/{sample}.vcf.gz")
+            call="snpsift/clinvar/{sample}.vcf"
         output:
             call=temp("snpsift/annotate_corrected/{sample}.vcf")
         message:
             "Correcting annotation type error in {wildcards.sample}"
-        threads: 4
+        threads: 1
         resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1024,
-            time_min=lambda wildcards, attempt: attempt * 15,
+            mem_mb=lambda wildcards, attempt: attempt * 512,
+            time_min=lambda wildcards, attempt: attempt * 25,
             tmpdir="tmp"
         params:
-            remove_ends="'s/END=\([0-9]\+,\?\)\+//g'",
-            remove_empty="'s/;;/;/g'",
-            remove_eofield="'s/;\t/\t/g'"
+            remove_list=[
+                "END=\([0-9]\+,\?\)\+"
+            ],
+            replace_dict=lambda wildcards: {
+                ";;": ";",
+                ";\t": "\t",
+                ":ADM:": ":AD:",
+                "ID=ADM,": "ID=AD,",
+                f"FORMAT_{wildcards.sample}_tumor_AF": "Allele_Frequency"
+            }
+        group:
+            "GATK_Stats"
         log:
             "logs/snpsift/annotate_corrected/{sample}.log"
-        shell:
-            "gunzip -c {input.call} | "
-            "sed {params.remove_ends} | "
-            "sed {params.remove_empty} | "
-            "sed {params.remove_eofield} "
-            "> {output.call} 2> {log}"
+        wrapper:
+            "bio/sed"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

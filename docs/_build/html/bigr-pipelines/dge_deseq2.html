@@ -117,6 +117,7 @@
 <li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sarek_enhanced.html">SAREK ENHANCED</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_calling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
@@ -419,6 +420,11 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/dge_deseq2/run.sh h
             <span class="n">factor</span><span class="o">=</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comparison_levels</span><span class="p">],</span>
             <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PC1_PC2&quot;</span><span class="p">,</span> <span class="s2">&quot;PC2_PC1&quot;</span><span class="p">]</span>
         <span class="p">),</span>
+        <span class="n">counts_with_deseq2</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{comparison}</span><span class="s2">_deseq2_</span><span class="si">{content}</span><span class="s2">_with_counts.tsv&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span> <span class="s2">&quot;sorted_on_pval&quot;</span><span class="p">,</span> <span class="s2">&quot;sorted_on_fold_change&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
         <span class="c1">#consensus=expand(</span>
         <span class="c1">#    &quot;consensusclusterplus/{comparison}&quot;,</span>
         <span class="c1">#    comparison=output_prefixes</span>

@@ -1,0 +1,140 @@
+.. _`biskmark_multisample`:
+
+BISKMARK_MULTISAMPLE
+====================
+
+A pipeline to map bisulfite converted sequence reads and determine cytosine methylation states
+
+
+Example
+-------
+
+This meta-wrapper can be used by integrating the following into your workflow:
+
+.. code-block:: python
+
+    default_config_bismark = {
+        "genome": "/path/to/fasta.fa",
+        "paired": True,
+        "samples": list()
+    }
+
+    try:
+        if config == dict():
+            config = default_config_bismark
+    except NameError:
+        config = default_config_bismark
+
+
+    rule bismark_methylation_extractor_pe_multisample:
+        input:
+            "bismark_multisample/deduplicated/multisample.PE.bam"
+        output:
+            mbias_r1="bismark_multisample/meth/multisample.M-bias_R1.png",
+            mbias_r2="bismark_multisample/meth/multisample.M-bias_R2.png",
+            mbias_report="bismark_multisample/meth/multisample.PE.M-bias.txt",
+            splitting_report="bismark_multisample/meth/multisample_PE_splitting_report.txt",
+            methylome_CpG_cov="bismark_multisample/meth_cpg/multisample.bismark.cov.gz",
+            methylome_CpG_mlevel_bedGraph="bismark_multisample/meth_cpg/multisample.bedGraph.gz",
+            read_base_meth_state_cpg="bismark_multisample/meth/CpG_context_multisample.txt.gz",
+            read_base_meth_state_chg="bismark_multisample/meth/CHG_context_multisample.txt.gz",
+            read_base_meth_state_chh="bismark_multisample/meth/CHH_context_multisample.txt.gz"
+        message: "Extracting methylation on all samples"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir="tmp"
+        log:
+            "logs/bismark_multisample/meth/multisample.log"
+        params:
+            output_dir="bismark_multisample/meth",
+            extra="--gzip --comprehensive --bedGraph"
+        wrapper:
+            "bio/bismark/bismark_methylation_extractor"
+
+
+    use rule bismark_methylation_extractor_pe_multisample as bismark_methylation_extractor_se_multisample with:
+        input:
+            "bismark_multisample/deduplicated/multisample.SE.bam"
+        output:
+            mbias_r1="bismark_multisample/meth/multisample.M-bias_R1.png",
+            mbias_report="bismark_multisample/meth/multisample.SE.M-bias.txt",
+            splitting_report="bismark_multisample/meth/multisample_SE_splitting_report.txt",
+            methylome_CpG_cov="bismark_multisample/meth_cpg/multisample.bismark.cov.gz",
+            methylome_CpG_mlevel_bedGraph="bismark_multisample/meth_cpg/multisample.bedGraph.gz",
+            read_base_meth_state_cpg="bismark_multisample/meth/CpG_context_multisample.txt.gz",
+            read_base_meth_state_chg="bismark_multisample/meth/CHG_context_multisample.txt.gz",
+            read_base_meth_state_chh="bismark_multisample/meth/CHH_context_multisample.txt.gz"
+
+
+    rule bismark_deduplicate_pe_multisample:
+        input:
+            expand("bismark/bams/{sample}.SE.bam", sample=config["samples"]),
+        output:
+            bam=temp("bismark_multisample/deduplicated/multisample.PE.bam"),
+            report="bismark_multisample/deduplicated/multisample.PE.deduplication_report.txt"
+        message:
+            "Deduplicating pair-ended mappings"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+            time_min=lambda wildcards, attempt: attempt * 30,
+            tmpdir="tmp"
+        log:
+            "logs/bismark_multisample/deduplicated/multisample.log"
+        params:
+            ""
+        wrapper:
+            "bio/bismark/deduplicate_bismark"
+
+
+    use rule bismark_deduplicate_pe_multisample as bismark_deduplicate_se_multisample with:
+        input:
+            expand("bismark/bams/{sample}.SE.bam", sample=config["samples"])
+        output:
+            bam=temp("bismark_multisample/deduplicated/multisample.SE.bam"),
+            report="bismark_multisample/deduplicated/multisample.SE.deduplication_report.txt"
+        message:
+            "Deduplicating single-ended mappings"
+
+Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
+For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Used wrappers
+---------------------
+
+The following individual wrappers are used in this meta-wrapper:
+
+
+* :ref:`bio/bismark/bismark_genome_preparation`
+
+* :ref:`bio/bismark/bismark`
+
+* :ref:`bio/bismark/deduplicate_bismark`
+
+
+Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
+
+
+
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+
