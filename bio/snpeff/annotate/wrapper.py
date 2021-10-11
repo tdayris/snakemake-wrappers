@@ -24,7 +24,7 @@ else:
     outprefix = ""
 
 incalls = snakemake.input[0]
-if incalls.endswith(".bcf"):
+if incalls.endswith((".bcf", "vcf.gz")):
     incalls = "< <(bcftools view {})".format(incalls)
 
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)

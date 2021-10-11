@@ -175,6 +175,37 @@ rule csv_report:
         "bio/rbt/csvreport"
 
 
+rule deseq2_complete_with_counts:
+    input:
+        left="results/{comparison}/{comparison}_{content}.tsv",
+        right="deseq2/{comparison}/dst.{comparison}.tsv"
+    output:
+        merged="results/{comparison}/{comparison}_deseq2_{content}_with_counts.tsv"
+    message:
+        "Adding counts to DESeq2 results for {wildcards.comparison}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/pandas/deseq2_with_counts/{comparison}_{content}.log"
+    params:
+        join="--check-order -e '.' -t $'\t' -j 1",
+        head="-n1",
+        sed="'1d'"
+    shell:
+        "paste "
+        "<(head {params.head} {input.left}) "
+        "<(head {params.head} {input.right}) "
+        "> {output} 2> {log} && "
+        "join {params.join} "
+        "<(sed {params.sed} {input.left} | sort) "
+        "<(sed {params.sed} {input.right} | sort) "
+        ">> {output} 2>> {log}"
+
+
+
 rule deseq2_to_gseaapp:
     input:
         tsv = "deseq2/{comparison}/wald.{comparison}.tsv",

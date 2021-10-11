@@ -24,7 +24,7 @@ rule bismark_methylation_extractor_pe_multisample:
         read_base_meth_state_cpg="bismark_multisample/meth/CpG_context_multisample.txt.gz",
         read_base_meth_state_chg="bismark_multisample/meth/CHG_context_multisample.txt.gz",
         read_base_meth_state_chh="bismark_multisample/meth/CHH_context_multisample.txt.gz"
-    message: "Extracting methylation on {wildcards.sample}"
+    message: "Extracting methylation on all samples"
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
@@ -82,4 +82,3 @@ use rule bismark_deduplicate_pe_multisample as bismark_deduplicate_se_multisampl
         report="bismark_multisample/deduplicated/multisample.SE.deduplication_report.txt"
     message:
         "Deduplicating single-ended mappings"
-

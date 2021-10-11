@@ -50,9 +50,9 @@ if snakemake.threads < min_threads:
 
 shell(
     "SnpSift dbnsfp"  # Tool and its subcommand
+    " {incall}"  # Path to input vcf file
     " {java_opts} {extra}"  # Extra parameters
     " {db}"  # Path to annotation vcf file
-    " {incall}"  # Path to input vcf file
     " {outcall}"  # Path to output vcf file
     " {log}"  # Logging behaviour
 )

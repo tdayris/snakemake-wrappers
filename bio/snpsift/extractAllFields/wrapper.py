@@ -6,6 +6,12 @@ __email__ = "thibault.dayris@gustaveroussy.fr"
 __license__ = "MIT"
 
 import re
+import logging
+
+logging.basicConfig(
+    filemode="w",
+    level=logging.DEBUG
+)
 
 from snakemake.shell import shell
 from snakemake_wrapper_utils.java import get_java_opts
@@ -48,7 +54,10 @@ with open(snakemake.input.call, "r") as vcf_stream:
     regex_general = r'##([^=]+)=(.+$)'
     regex_id = r"<ID=([^,]+),(.*)>"
     for line in vcf_stream:
+        logging.debug("")
+        logging.debug(line[:-1])
         if not line.startswith("##"):
+            logging.warning("Breaking!")
             break
 
         try:
@@ -56,12 +65,14 @@ with open(snakemake.input.call, "r") as vcf_stream:
         except IndexError:
             raise IndexError(line)
         if htype.lower() ==  "format":
+            logging.debug("FORMAT")
             if ignore_format:
                 continue
             hid, hinfo = re.findall(regex_id, line)[0]
             fields.append("'{}[{}]'".format(htype, hid))
         elif htype.lower() == "info":
             hid, hinfo = re.findall(regex_id, line)[0]
+            logging.debug("INFO: %s\t%s", hid, hinfo)
             if hid.lower() == "ann":
                 fields += [
                     "'ANN[*].ALLELE'",
@@ -113,6 +124,7 @@ with open(snakemake.input.call, "r") as vcf_stream:
                     "'NMD[*].PERC'"
                 ]
             else:
+                logging.debug("Adding unknown info: '%s'", hid)
                 fields.append(hid)
 
 

@@ -53,7 +53,9 @@ except NameError:
 
 rule split_multiallelic_varscan2:
     input:
-        "varscan2/reheaded/{sample}.vcf.gz"
+        call="varscan2/concat/{sample}.vcf.gz",
+        idx=get_tbi("varscan2/concat/{sample}.vcf.gz"),
+        fasta=config["genome"]
     output:
         temp("bcftools/varscan2/{sample}.vcf.gz")
     message:
@@ -64,7 +66,7 @@ rule split_multiallelic_varscan2:
         time_min=lambda wildcards, attempt: attempt * 35,
         tmpdir="tmp"
     params:
-        "-m -both --check-ref w"
+        extra = "-m -both --check-ref w"
     log:
         "logs/bcftools/norm/mutect2/{sample}.log"
     wrapper:

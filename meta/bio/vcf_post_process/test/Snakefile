@@ -41,7 +41,7 @@ rule gath_final_vcf:
         "final.vcf.list"
     message:
         "Aquiring list of final VCF files"
-    threads: 1
+    threads: 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 128,
         time_min=lambda wildcards, attempt: attempt * 15,
@@ -49,7 +49,7 @@ rule gath_final_vcf:
     log:
         "logs/somatic/list.log"
     shell:
-        "echo {input} > {output} 2> {log}"
+        "echo {input} | sed 's/\s\+/\\n/g' > {output} 2> {log}"
 
 
 """
@@ -62,18 +62,24 @@ rule concat_all_mafs:
             sample=config["sample_list"]
         )
     output:
-        "maf/maftools/complete.maf"
+        "maf/complete.maf"
     message:
         "Merging separates maf files in a single cohort maf"
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
+        time_min=lambda wildcards, attempt: attempt * 45,
         tmpdir="tmp"
     log:
         "logs/maftools/concat.log"
+    params:
+        sed = "'s/FORMAT_{}_tumor_AF/Mutect2_Allele_Frequency/g'".format(
+            config["sample_list"][0]
+        )
     shell:
-        "cat {input} > {output} 2> {log}"
+        "head -n 1 {input[0]} | sed {params.sed} > {output} 2> {log} && "
+        "for VCF in {input}; do sed '1d' ${{VCF}}; done "
+        ">> {output} 2>> {log}"
 
 
 """
@@ -138,10 +144,10 @@ Count variant occurence
 """
 rule variant_occurence_annotate:
     input:
-        calls = "maf/canonical/{sample}.vcf",
+        calls = ["maf/canonical/{sample}.vcf"],
         occurence = "maf/occurences.txt"
     output:
-        calls = "maf/occurence_annotated/{sample}.vcf"
+        calls = ["maf/occurence_annotated/{sample}.vcf"]
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -209,7 +215,7 @@ rule fix_vcf:
         "logs/fix_vcf/{sample}.log"
     params:
         default_chr=config["chr"],
-        remove_non_conventional_chromosomes=True
+        remove_non_conventional_chromosomes=False
     wrapper:
         "bio/BiGR/fix_vcf"
 
@@ -263,6 +269,26 @@ rule format_to_info:
         "bio/BiGR/vcf_format_to_info"
 
 
+rule unzip_variant_filtration:
+    input:
+        "gatk/variant_filtration/{sample}.vcf.gz"
+    output:
+        temp("gatk/variant_filtration/{sample}.vcf")
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        "-c"
+    group:
+        "GLeaves"
+    log:
+        "logs/gunzip/variant_filtration/{sample}"
+    shell:
+        "gunzip {params} {input} > {output} 2> {log}"
+
+
 """
 Variant calling quality control
 """
@@ -305,7 +331,7 @@ rule gatk_variant_filtration:
         vcf_tbi=get_tbi("snpsift/annotate_corrected/{sample}.vcf.gz"),
         ref=config["genome"]
     output:
-        vcf=temp("gatk/variant_filtration/{sample}.vcf")
+        vcf=temp("gatk/variant_filtration/{sample}.vcf.gz")
     message:
         "Filtering VCF for {wildcards.sample}"
     threads: 1
@@ -334,8 +360,7 @@ rule gatk_variant_filtration:
 
 rule fix_annotation_for_gatk:
     input:
-        call="snpsift/dbnsfp/{sample}.vcf.gz",
-        tbi=get_tbi("snpsift/dbnsfp/{sample}.vcf.gz")
+        call="snpsift/clinvar/{sample}.vcf"
     output:
         call=temp("snpsift/annotate_corrected/{sample}.vcf")
     message:
@@ -349,11 +374,12 @@ rule fix_annotation_for_gatk:
         remove_list=[
             "END=\([0-9]\+,\?\)\+"
         ],
-        replace_dict={
+        replace_dict=lambda wildcards: {
             ";;": ";",
             ";\t": "\t",
-            "ID=CLNV": "ID=clinvar_CLNV",
-            "ID=ALLELID": "ID=clinvar_ALLELEID"
+            ":ADM:": ":AD:",
+            "ID=ADM,": "ID=AD,",
+            f"FORMAT_{wildcards.sample}_tumor_AF": "Allele_Frequency"
         }
     group:
         "GATK_Stats"
