@@ -15,7 +15,7 @@ export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 message INFO "Environment loaded"
 
 SNAKEFILE="${PIPELINE_PATH}/Snakefile"
-CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
+CONFIG_PATH="${PIPELINE_PATH}/config.hg38.nochr.yaml"
 SNAKE_ARGS=()
 PROFILE="slurm"
 SUMMARY=""
@@ -26,10 +26,11 @@ while [ "$#" -gt 0 ]; do
     -p|--profile) PROFILE="${2}"; shift 2;;
     --summary) SUMMARY="${2}"; shift 2;;
     --rulegraph) GRAPH="${2}"; shift 2;;
-    hg19|HG19) CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"; shift;;
-    hg38|HG38) CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"; shift;;
-    hg19nochr) CONFIG_PATH="${PIPELINE_PATH}/config.hg19.nochr.yaml"; shift;;
-    hg38nochr) CONFIG_PATH="${PIPELINE_PATH}/config.hg38.nochr.yaml"; shift;;
+    hg19chr|HG19chr) CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"; shift;;
+    hg38chr|HG38chr) CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"; shift;;
+    hg19|HG19) CONFIG_PATH="${PIPELINE_PATH}/config.hg19.nochr.yaml"; shift;;
+    hg38|HG38) CONFIG_PATH="${PIPELINE_PATH}/config.hg38.nochr.yaml"; shift;;
+    mm10|MM10) CONFIG_PATH="${PIPELINE_PATH}/config.mm10.yaml"; shift;;
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac
 done
