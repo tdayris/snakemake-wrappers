@@ -147,6 +147,11 @@ rule target:
             factor=[i[0] for i in comparison_levels],
             axes=["PC1_PC2", "PC2_PC1"]
         ),
+        counts_with_deseq2=expand(
+            "results/{comparison}/{comparison}_deseq2_{content}_with_counts.tsv",
+            comparison=output_prefixes,
+            content=["complete", "sorted_on_pval", "sorted_on_fold_change"]
+        )
         #consensus=expand(
         #    "consensusclusterplus/{comparison}",
         #    comparison=output_prefixes
