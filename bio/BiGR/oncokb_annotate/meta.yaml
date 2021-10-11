@@ -1,0 +1,29 @@
+---
+name: oncokb_annotate
+description: Annotate a VCF file with a CSV-formatted OncoKB file
+authors:
+  - Thibault Dayris
+input:
+  - oncokb: The CSV from OncoKB used to annotate
+  - vcf: The VCF to annotate
+output:
+  - vcf: The annotated VCF
+notes: |
+  Space are replaced by underscores in column names. This is done in order
+  to preserve VCF format which does not allow spaces in field names. Field
+  values are not modified.
+
+  The character `#` is replaced by "nb" in column names, since non alphanumeric
+  characters are not allowed in field names uder official VCF format. Field
+  values are not modified.
+
+  The parenthesis `(` and `)` are deleted from column names, since non
+  alphanumeric characters are not allowed in field names uder official VCF
+  format. Field values are not modified.
+
+  The minus character `-` is replaced by an underscore in column names.
+  Field values are not modified.
+
+  The characters `/` and `\` are replaced by underscores in the columns names,
+  since non alphanumeric characters are not allowed in field names uder
+  official VCF format.

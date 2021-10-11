@@ -130,6 +130,23 @@ def run(wrapper, cmd, check_log=None):
             # go back to original directory
             os.chdir(origdir)
 
+
+@skip_if_not_modified
+def test_oncokb_annotate():
+    run(
+        "bio/BiGR/oncokb_annotate",
+        ["snakemake", "--cores", "1", "out.vcf", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_cancer_gene_census_annotate():
+    run(
+        "bio/BiGR/cancer_gene_census_annotate",
+        ["snakemake", "--cores", "1", "out.vcf", "--use-conda", "-F"]
+    )
+
+
 @skip_if_not_modified
 def test_bigr_fix_vcf():
     run(
