@@ -57,9 +57,10 @@ data = pandas.read_csv(
     }
 )
 
-print(data.head())
+logging.debug(data.head())
 
 if (gene2gene := snakemake.input.get("gene2gene", None)) is not None:
+    logging.info("Loading gene information")
     genetable = pandas.read_csv(
         gene2gene,
         sep="\t",
@@ -86,7 +87,25 @@ else:
     data.reset_index(inplace=True)
     data = data[["index", "log2FoldChange", "padj"]]
 
-print(data.head())
+logging.debug(data.head())
+
+if "counts" in snakemake.input.keys():
+    logging.info("Loading counts")
+    counts = pandas.read_csv(
+        snakemake.input["counts"],
+        sep="\t",
+        header=0,
+        index_col=0
+    )
+    data = pandas.merge(
+        data,
+        counts,
+        how="left",
+        left_index=True,
+        right_index=True
+    )
+
+logging.debug(data.head())
 
 padjthreshold = float(snakemake.params.get("alpha", 0.05))
 fc_threshold = float(snakemake.params.get("fold_change", 0.01))
@@ -104,7 +123,7 @@ data["Cluster_Sig"] = [
 ]
 
 if "fc_sig" in snakemake.output.keys():
-    logging.debug("Prining the log2(FC) / Significance table")
+    logging.info("Prining the log2(FC) / Significance table")
     tmp = data.copy()
     tmp = tmp[tmp["Cluster_Sig"] != "Non_Significative"]
     tmp.dropna(
@@ -119,6 +138,13 @@ if "fc_sig" in snakemake.output.keys():
         },
         inplace=True
     )
+    logging.debug(tmp.head())
+    tmp.sort_values(
+        by="stat_change",
+        ascending=False,
+        inplace=True,
+        na_position="last",
+    )
     tmp.to_csv(
         snakemake.output.fc_sig,
         sep="\t",
@@ -127,7 +153,7 @@ if "fc_sig" in snakemake.output.keys():
     del tmp
 
 if "fc_fc" in snakemake.output.keys():
-    logging.debug("Prining the log2(FC) / FC cluster table")
+    logging.info("Prining the log2(FC) / FC cluster table")
     tmp = data.copy()
     tmp = tmp[tmp["Cluster_Sig"] != "Non_Significative"]
     tmp = tmp[tmp["Cluster_FC"] != "Non_Significative"]
@@ -140,7 +166,15 @@ if "fc_fc" in snakemake.output.keys():
             "index": "GeneIdentifier",
             "log2FoldChange": "stat_change",
             "Cluster_FC": "cluster"
-        }
+        },
+        inplace=True
+    )
+    logging.debug(tmp.head())
+    tmp.sort_values(
+        by="stat_change",
+        ascending=False,
+        inplace=True,
+        na_position="last",
     )
     tmp.to_csv(
         snakemake.output.fc_fc,
@@ -150,7 +184,7 @@ if "fc_fc" in snakemake.output.keys():
     del tmp
 
 if "padj_sig" in snakemake.output.keys():
-    logging.debug("Prining the adjusted P-Value / Significance table")
+    logging.info("Prining the adjusted P-Value / Significance table")
     tmp = data.copy()
     tmp = tmp[tmp["Cluster_Sig"] != "Non_Significative"]
     tmp.dropna(
@@ -165,6 +199,13 @@ if "padj_sig" in snakemake.output.keys():
         },
         inplace=True
     )
+    logging.debug(tmp.head())
+    tmp.sort_values(
+        by="stat_change",
+        ascending=True,
+        inplace=True,
+        na_position="last",
+    )
     tmp.to_csv(
         snakemake.output.padj_sig,
         sep="\t",
@@ -173,7 +214,7 @@ if "padj_sig" in snakemake.output.keys():
     del tmp
 
 if "padj_fc" in snakemake.output.keys():
-    logging.debug("Prining the adjusted P-Value / FoldChange table")
+    logging.info("Prining the adjusted P-Value / FoldChange table")
     tmp = data.copy()
     tmp = tmp[tmp["Cluster_Sig"] != "Non_Significative"]
     tmp.dropna(
@@ -188,6 +229,13 @@ if "padj_fc" in snakemake.output.keys():
         },
         inplace=True
     )
+    logging.debug(tmp.head())
+    tmp.sort_values(
+        by="stat_change",
+        ascending=True,
+        inplace=True,
+        na_position="last",
+    )
     tmp.to_csv(
         snakemake.output.padj_fc,
         sep="\t",
@@ -196,7 +244,7 @@ if "padj_fc" in snakemake.output.keys():
     del tmp
 
 if "complete" in snakemake.output.keys():
-    logging.debug("Prining the complete table")
+    logging.info("Prining the complete table")
     tmp = data.copy()
     tmp.rename(
         columns={
@@ -207,6 +255,13 @@ if "complete" in snakemake.output.keys():
             "padj": "Adjusted_PValue"
         },
         inplace=True
+    )
+    logging.debug(tmp.head())
+    tmp.sort_values(
+        by="Adjusted_PValue",
+        ascending=True,
+        inplace=True,
+        na_position="last",
     )
     tmp.to_csv(
         snakemake.output.complete,
