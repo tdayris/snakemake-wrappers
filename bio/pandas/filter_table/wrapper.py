@@ -15,7 +15,7 @@ import logging
 import operator
 import pandas
 import numpy
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 
 def filter_dataframe(dataframe: pandas.DataFrame,
@@ -26,8 +26,16 @@ def filter_dataframe(dataframe: pandas.DataFrame,
     Filter a dataframe according to the column, value and boolean
     operator
     """
-    local_operator = ops[local_operator]
-    return dataframe[local_operator(dataframe[column], value)]
+    logging.info(
+        "Filtering %s with operator %s", str(column), str(local_operator)
+    )
+    try:
+        local_operator = ops[local_operator]
+        return dataframe[local_operator(dataframe[column], value)]
+    except TypeError:
+        logging.error(dataframe[column].head())
+        raise
+
 
 
 def filter_full_lines(dataframe: pandas.DataFrame,
@@ -77,6 +85,21 @@ def combine_columns(dataframe: pandas.DataFrame,
         dataframe[right_input_col]
     )
     return dataframe
+
+
+def prepare_int_conversion(value: Any) -> Any:
+    if isinstance(value, (int, float)):
+        return value
+    if value.upper() in ["", ".", "NA", "NAN", "#"]:
+        return numpy.nan
+    try:
+        if "|" in value:
+            return float(value.split("|")[-1])
+        return float(value.split(",")[-1])
+    except ValueError:
+        logging.error(f"Failed converting string to float {value}")
+        return numpy.nan
+
 
 
 logging.basicConfig(
@@ -143,6 +166,15 @@ if (not_cols := snakemake.params.get("drop_column", None)) is not None:
     logging.debug(f"The following columns are dropped out: {not_cols}")
     data = data[list(set(data.columns.tolist()) - set(not_cols))]
 
+if (convert_cols_type := snakemake.params.get("convert_cols_type", None)) is not None:
+    logging.debug(f"The following type concersion are made: {convert_cols_type}")
+    for column_name, new_type in convert_cols_type.items():
+        if new_type in ["int", "float"]:
+            data[column_name] = [
+                prepare_int_conversion(i) for i in data[column_name]
+            ]
+        data[column_name] = data[column_name].astype(new_type)
+
 
 if (line := snakemake.params.get("keep_line", None)) is not None:
     logging.debug(f"The following lines are kept: {line}")
@@ -155,15 +187,27 @@ if (not_line := snakemake.params.get("drop_line", None)) is not None:
 
 
 if (filters := snakemake.params.get("filters", None)) is not None:
-    logging.debug(f"The table will be filtered according to: {filters}")
     for filter in filters:
+        logging.debug(f"The table will be filtered according to: {filter}")
         data = filter_dataframe(data, *filter)
 
 
 if (filters := snakemake.params.get("full_line_filters", None)) is not None:
-    logging.debug(f"Applying the following filter on whole lines: {filters}")
     for filter in filters:
+        logging.debug(f"Applying the following filter on whole lines: {filter}")
         data = filter_full_lines(data, *filter)
+
+
+if (not_contains := snakemake.params.get("not_contains", None)) is not None:
+    for column, value in not_contains:
+        logging.debug(f"Filtering out line in which {column} contains: {value}")
+        data = data[~data[column].str.contains(value)]
+
+
+if (contains := snakemake.params.get("contains", None)) is not None:
+    for column, value in contains:
+        logging.debug(f"Filtering in line in which {column} contains: {value}")
+        data = data[data[column].str.contains(value)]
 
 
 if snakemake.params.get("dropna", False) is True:
