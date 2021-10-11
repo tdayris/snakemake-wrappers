@@ -5,10 +5,8 @@
 # __email__ = "thibault.dayris@gustaveroussy.fr"
 # __license__ = "MIT"
 
-# Snakemake wrapper for maftools compute trinucleotideMatrix
+# Snakemake wrapper for oncoplots
 
-# Many libraries are useless. This wrapper will be splitted in at least four
-# of them.
 base::library(package = "maftools", quietly = TRUE);
 
 # Building graphics environment command
