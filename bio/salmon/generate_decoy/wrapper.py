@@ -25,11 +25,11 @@ if snakemake.threads != min_threads:
 
 shell(
     "grep '^>' {genome_input} | cut -d ' ' -f 1 "
-    "> {snakemake.output.decoys} {log}"
+    "> {snakemake.output[0]} {log}"
 )
 
 shell(
     "sed -i.bak -e 's/>//g' {snakemake.output.decoys} {log} & "
     "cat {snakemake.input.transcriptome} {snakemake.input.genome} "
-    "> {snakemake.output.gentrome} {log} & wait"
+    "> {snakemake.output[1]} {log} & wait"
 )
