@@ -12,17 +12,6 @@ extra = snakemake.params.get("extra", "")
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 extra = snakemake.params[0]
-output_file = snakemake.output[0]
-if output_file.endswith(".bcf"):
-    extra += " --output-type b "
-elif output_file.endswith(".vcf.gz"):
-    extra += " --output-type z "
-elif output_file.endswith(".vcf"):
-    extra += " --output-type v "
-else:
-    raise ValueError(
-        "Output file extension should be one of: vcf, bcf, vcf.gz"
-    )
 
 shell(
     "bcftools view {bcftools_opts} "
