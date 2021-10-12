@@ -14,7 +14,7 @@ import re
 from typing import Any
 
 logging.basicConfig(
-    #filename=snakemake.log[0],
+    filename=snakemake.log[0],
     filemode="w",
     level=logging.DEBUG
 )
@@ -78,15 +78,13 @@ def annotate(line: str, tsv: pandas.DataFrame) -> str:
             else:
                 chomp[7] += f";{annot}"
 
-            if chomp[6] == "" or "PASS":
+            if chomp[6] in [".", "", "PASS"]:
                 chomp[6] = "ExistsInCanceGeneCensus"
             else:
                 chomp[6] += ";ExistsInCanceGeneCensus"
             line = "\t".join(chomp) + "\n"
         except KeyError:
             logging.warning(f"No annotation for {gene_name} from {line}")
-            pass
-
     return line
 
 
