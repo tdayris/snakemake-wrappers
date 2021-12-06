@@ -1,0 +1,15 @@
+rule estimate:
+    input:
+        signatures="signatures"
+    output:
+        csv="all_solutions.csv",
+        pdf="stability.pdf"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/sigprofiler/estimates.log"
+    wrapper:
+        "bio/sigprofiler/estimate"

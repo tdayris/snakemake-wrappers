@@ -1,0 +1,18 @@
+rule matrix:
+    input:
+        ref="GRCh38.tar.bz2",
+        vcf="snpsift/fixed/{sample}.vcf.gz",
+        vcf_index="snpsift/fixed/{sample}.vcf.gz.tbi"
+    output:
+        matrices=directory("matrices_{sample}")
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/SigProfiler/matrices/{sample}.log"
+    params:
+        project_name="matrices_{sample}",
+    wrapper:
+        "bio/sigprofiler/matrix"
