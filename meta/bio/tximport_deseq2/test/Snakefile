@@ -155,7 +155,9 @@ rule deseq2_dataset_from_tximport:
             else f"~BatchEffect+{contrasts[wildcards.comparison][0]}"
         ),
         levels=lambda wildcards: contrasts[wildcards.comparison][1:],
-        factor=lambda wildcards: contrasts[wildcards.comparison][0]
+        factor=lambda wildcards: contrasts[wildcards.comparison][0],
+        remove_zeros=True,
+        count_filter=5
     log:
         "logs/deseq2/deseq2_dataset_from_tximport/{comparison}.log"
     wrapper:
