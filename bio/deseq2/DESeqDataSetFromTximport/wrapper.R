@@ -82,7 +82,15 @@ if (levels & factor) {
 
 keep <- rowSums(counts(dds)) > count_filter;
 dds <- dds[keep, ];
-base::write("Low counts in DESeqDataSet were filtered.", stderr());
+print(head(dds));
+
+if ("remove_zeros" %in% base::names(snakemake@params)) {
+  keep <- rowSums(counts(dds)==0) < length(colnames(dds)) - 1;
+  print(head(keep))
+  dds <- dds[keep, ];
+}
+print(head(dds));
+base::message("Low counts in DESeqDataSet were filtered.");
 
 # Save as RDS
 output_path <- base::as.character(x = snakemake@output[["dds"]]);
