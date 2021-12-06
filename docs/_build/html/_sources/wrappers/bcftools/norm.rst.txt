@@ -22,7 +22,7 @@ This wrapper can be used in the following way:
         params:
             ""  # optional parameters for bcftools norm (except -o)
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/bcftools/norm"
+            "0.79.0-1159-g7fe792175/bio/bcftools/norm"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -43,11 +43,13 @@ Input/Output
 ------------
 **Input:**
 
-* Path to gzipped VCF or BCF, must be the first in the input file list
+* ``call``: Path to gzipped VCF or BCF, must be the first in the input file list
+* ``region``: Optional region BED/GTF file
+* ``fasta``: Required sequence file
 
 **Output:**
 
-* normalized VCF/BCF
+* normalized VCF/BCF, must be the first output element
 
 
 
@@ -78,8 +80,34 @@ Code
 
 
     from snakemake.shell import shell
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
+    extra = snakemake.params.get("extra", "")
+    fasta = ""
+    if "fasta" in snakemake.input.keys():
+        fasta = "--fasta-ref {}".format(snakemake.input["fasta"])
+
+    output_type = "--output-type "
+    if snakemake.output[0].endswith("bcf"):
+        output_type += "b"
+    elif snakemake.output[0].endswith("vcf"):
+        output_type += "v"
+    elif snakemake.output[0].endswith("vcf.gz"):
+        output_type += "z"
+    else:
+        output_type = "u"
+
+    region = ""
+    if "region" in snakemake.input.keys():
+        region = "--regions {}".format(snakemake.input["region"])
 
     shell(
-        "bcftools norm {snakemake.params} {snakemake.input[0]} " "-o {snakemake.output[0]}"
+        "bcftools norm {extra} {region} {fasta} "
+        "{output_type} --threads {snakemake.threads} "
+        "{snakemake.input.call} -o {snakemake.output[0]} {log}"
     )
+
+
+.. |nl| raw:: html
+
+   <br>

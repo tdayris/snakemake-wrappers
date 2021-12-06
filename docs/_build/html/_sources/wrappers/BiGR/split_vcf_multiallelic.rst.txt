@@ -22,7 +22,7 @@ This wrapper can be used in the following way:
         log:
             "logs/split_vcf_multiallelic.log"
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/BiGR/split_vcf_multiallelic"
+            "0.79.0-1159-g7fe792175/bio/BiGR/split_vcf_multiallelic"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -145,7 +145,8 @@ Code
                 values = info_field
 
             # Remove empty fields
-            values = list(filter(lambda x: x != "", values.split(",")))
+            # values = list(filter(lambda x: x != "", values.split(",")))
+            values = [i for i in values.split(",") if i != ""]
             if len(values) == allele_nb:
                 # The field has one value per allele
                 for idx, value in enumerate(values):
@@ -166,7 +167,7 @@ Code
     version = 1.0
     name = "split_vcf_multiallelic"
     url = f"github.com/tdayris/snakemake-wrappers/tree/Unofficial/bio/BiGR/{name}/wrapper.py"
-    header = f"""##BiGRCommandLine=<ID={name},CommandLine="{url}",Version={version},Date={datetime.date.today()}>\n"""
+    header = f'##BiGRCommandLine=<ID={name},CommandLine="{url}",Version="{version}",Date="{datetime.date.today()}">\n'
 
     with open(snakemake.input["vcf"]) as invcf, \
          open(snakemake.output["vcf"], 'w') as outvcf:
@@ -174,6 +175,7 @@ Code
             if line.startswith("##"):
                 # Header content
                 outvcf.write(line)
+                logging.info("Annotation field processed")
                 continue
 
             elif line.startswith("#"):
@@ -181,13 +183,13 @@ Code
                 colnames = line[1:-1].split("\t")
                 outvcf.write(header)
                 outvcf.write(line)
-                logging.INFO("Header processed")
+                logging.info("Header processed")
                 continue
 
             # Case line is a variant
             variant = {
-                colname: content
-                for colname, content in zip(colnames, line[:-1].split("\t"))
+               colname: content
+               for colname, content in zip(colnames, line[:-1].split("\t"))
             }
 
             if "," in variant["ALT"]:
@@ -210,7 +212,7 @@ Code
                         alt,
                         variant["QUAL"],
                         variant["FILTER"],
-                        *info,
+                        ";".join(info),
                         variant["FORMAT"],
                         *format
                     ]) + "\n")
@@ -219,3 +221,8 @@ Code
 
             # Mono allelic position
             outvcf.write(line)
+
+
+.. |nl| raw:: html
+
+   <br>

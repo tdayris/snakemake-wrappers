@@ -3,9 +3,9 @@
 RASUSA
 ======
 
-Randomly subsample sequencing reads to a specified coverage using `rasusa <https://github.com/mbhall88/rasusa>`_.
+Randomly subsample sequencing reads to a specified coverage.
 
-**URL**: 
+**URL**: https://github.com/mbhall88/rasusa
 
 Example
 -------
@@ -23,12 +23,13 @@ This wrapper can be used in the following way:
             r2="{sample}.subsampled.r2.fq",
         params:
             options="--seed 15",
-            genome_size="3mb", # required
-            coverage=20, # required
+            genome_size="3mb",  # required, unless `bases` is given
+            coverage=20,  # required, unless `bases is given
+            #bases="2gb"
         log:
             "logs/subsample/{sample}.log",
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/rasusa"
+            "0.79.0-1159-g7fe792175/bio/rasusa"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -43,7 +44,34 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``rasusa==0.3.0``
+* ``rasusa=0.6``
+
+Input/Output
+------------
+**Input:**
+
+* Reads to subsample in FASTA/Q format. Input files can be named or unnamed.
+
+**Output:**
+
+* File paths to write subsampled reads to. If using paired-end data, make sure there are two output files in the same order as the input.
+
+
+
+Params
+------
+
+* ``bases``: Explicitly set the number of bases required e.g., 4.3kb, 7Tb, 9000, 4.1MB |nl| If this option is given, ``coverage`` and ``genome_size`` are ignored
+
+
+* ``coverage``: The desired coverage to sub-sample the reads to. |nl| If ``bases`` is not provided, this option and ``genome_size`` are required
+
+
+* ``genome_size``: Genome size to calculate coverage with respect to. e.g., 4.3kb, 7Tb, 9000, 4.1MB |nl| Alternatively, a FASTA/Q index file can be provided and the genome size will be set to the sum of all reference sequences. |nl| If ``bases`` is not provided, this option and ``coverage`` are required
+
+
+* ``options``: Any other options as listed in `the docs <https://github.com/mbhall88/rasusa#usage>`_.
+
 
 
 
@@ -71,9 +99,21 @@ Code
 
     options = snakemake.params.get("options", "")
 
+    bases = snakemake.params.get("bases")
+    if bases is not None:
+        options += " -b {}".format(bases)
+    else:
+        covg = snakemake.params.get("coverage")
+        gsize = snakemake.params.get("genome_size")
+        if covg is None or gsize is None:
+            raise ValueError(
+                "If `bases` is not given, then `coverage` and `genome_size` must be"
+            )
+        options += " -g {gsize} -c {covg}".format(gsize=gsize, covg=covg)
 
-    shell(
-        "rasusa {options} -i {snakemake.input} -o {snakemake.output} "
-        "-c {snakemake.params.coverage} -g {snakemake.params.genome_size} "
-        "2> {snakemake.log}"
-    )
+    shell("rasusa {options} -i {snakemake.input} -o {snakemake.output} 2> {snakemake.log}")
+
+
+.. |nl| raw:: html
+
+   <br>

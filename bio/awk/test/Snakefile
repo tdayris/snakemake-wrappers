@@ -1,0 +1,13 @@
+rule test_awk:
+    input:
+        "input.file.txt"
+    output:
+        "output.file.txt"
+    log:
+        "logs/test_awk.log"
+    params:
+        begin = 'FS=OFS=" "',
+        body = ['print $0', 'print "toto"'],
+        end = 'print "FINAL INSTRUCTION"'
+    wrapper:
+        "master/bio/awk"

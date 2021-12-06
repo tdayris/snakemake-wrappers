@@ -110,6 +110,7 @@
 <li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sarek_enhanced.html">SAREK ENHANCED</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_calling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
@@ -332,6 +333,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
 <span class="n">localrules</span><span class="p">:</span> <span class="n">bigr_copy</span>
 
 <span class="n">ruleorder</span><span class="p">:</span> <span class="n">samtools_index_bam</span> <span class="o">&gt;</span> <span class="n">samtools_index</span>
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">gatk_filter_mutect_calls</span> <span class="o">&gt;</span> <span class="n">tabix_index</span>
 
 <span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;config.hg38.yaml&quot;</span><span class="p">)</span>
 <span class="n">configfile</span><span class="p">:</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
@@ -339,6 +341,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
 <span class="c1"># design = design.head(2).tail(1)</span>
 <span class="n">design</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">design</span><span class="p">)</span>
+
+<span class="n">design</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+<span class="n">design</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s2">&quot;s070&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">wildcard_constraints</span><span class="p">:</span>
     <span class="n">sample</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]),</span>
@@ -355,32 +360,27 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
     <span class="n">t2_paths</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">Downstream_file</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">fix_annotation_for_gatk</span> <span class="o">&gt;</span> <span class="n">pbgzip_compress</span>
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">gatk_variant_filtration</span> <span class="o">&gt;</span> <span class="n">pbgzip_compress</span>
 
 <span class="n">rule</span> <span class="nb">all</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">maf</span><span class="o">=</span><span class="s2">&quot;maf/maftools/complete.maf&quot;</span><span class="p">,</span>
+        <span class="n">maf</span><span class="o">=</span><span class="s2">&quot;maf/complete.maf&quot;</span><span class="p">,</span>
         <span class="n">mafs</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;maf/maftools/</span><span class="si">{sample}</span><span class="s2">.maf&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="p">),</span>
         <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;snpsift/dbnsfp/</span><span class="si">{sample}</span><span class="s2">.vcf.gz</span><span class="si">{index}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;.tbi&quot;</span><span class="p">]</span>
-        <span class="p">),</span>
-        <span class="c1">#html=&quot;multiqc/variant_calling_somatic.html&quot;,</span>
-        <span class="n">mapped</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-            <span class="n">status</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;normal&quot;</span><span class="p">,</span> <span class="s2">&quot;tumor&quot;</span><span class="p">],</span>
-            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;.bai&quot;</span><span class="p">]</span>
+           <span class="s2">&quot;maf/occurence_annotated/</span><span class="si">{sample}</span><span class="s2">.vcf.gz</span><span class="si">{index}</span><span class="s2">&quot;</span><span class="p">,</span>
+           <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+           <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;.tbi&quot;</span><span class="p">]</span>
         <span class="p">),</span>
         <span class="c1"># mutect2=expand(</span>
-        <span class="c1">#     &quot;mutect2/corrected/{sample}.vcf.gz&quot;,</span>
+        <span class="c1">#     &quot;bcftools/mutect2/{sample}.vcf.gz&quot;,</span>
         <span class="c1">#     sample=design[&quot;Sample_id&quot;].tolist()</span>
         <span class="c1"># ),</span>
         <span class="c1"># mutect2_tbi=expand(</span>
-        <span class="c1">#     &quot;mutect2/corrected/{sample}.vcf.gz.tbi&quot;,</span>
+        <span class="c1">#     &quot;bcftools/mutect2/{sample}.vcf.gz.tbi&quot;,</span>
         <span class="c1">#     sample=design[&quot;Sample_id&quot;].tolist()</span>
         <span class="c1"># ),</span>
         <span class="n">facets</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
@@ -388,15 +388,16 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
             <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
             <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;vcf.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;cnv.png&quot;</span><span class="p">,</span> <span class="s2">&quot;cov.pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;spider.pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;csv.gz&quot;</span><span class="p">]</span>
         <span class="p">),</span>
-        <span class="n">varscan2</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;varscan2/somatic/</span><span class="si">{sample}</span><span class="s2">.snp.vcf.gz&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="p">),</span>
-        <span class="n">varscan2_tbi</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;varscan2/somatic/</span><span class="si">{sample}</span><span class="s2">.snp.vcf.gz.tbi&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="p">),</span>
-        <span class="n">qc</span><span class="o">=</span><span class="s2">&quot;multiqc/variant_calling_somatic.html&quot;</span>
+        <span class="c1">#varscan2=expand(</span>
+        <span class="c1">#    &quot;bcftools/varscan2/{sample}.vcf.gz&quot;,</span>
+        <span class="c1">#    sample=design[&quot;Sample_id&quot;].tolist()</span>
+        <span class="c1">#),</span>
+        <span class="c1">#varscan2_tbi=expand(</span>
+        <span class="c1">#    &quot;bcftools/varscan2/{sample}.vcf.gz.tbi&quot;,</span>
+        <span class="c1">#    sample=design[&quot;Sample_id&quot;].tolist()</span>
+        <span class="c1">#),</span>
+        <span class="n">qc</span><span class="o">=</span><span class="s2">&quot;multiqc/variant_calling_somatic.html&quot;</span><span class="p">,</span>
+        <span class="n">calling_result</span><span class="o">=</span><span class="s2">&quot;final.vcf.list&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Finishing the WES Somatic Variant Calling&quot;</span>
 
@@ -411,7 +412,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
     <span class="s2">&quot;center&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;GustaveRoussy&quot;</span><span class="p">),</span>
     <span class="s2">&quot;annotation_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;ANN=&quot;</span><span class="p">,</span>
     <span class="s2">&quot;sample_list&quot;</span><span class="p">:</span> <span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span>
+    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;known&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;chr&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 
 <span class="n">module</span> <span class="n">vcf_post_process</span><span class="p">:</span>
@@ -602,21 +605,27 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
 <span class="c1">### VCF annotation ###</span>
 <span class="c1">######################</span>
 
+<span class="n">snpeff_snpsift_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;ref&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">],</span>
+    <span class="o">**</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;snpeff_snpsift&quot;</span><span class="p">]</span>
+<span class="p">}</span>
 
 <span class="n">module</span> <span class="n">snpeff_meta</span><span class="p">:</span>
     <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/snpeff_annotate/test/Snakefile&quot;</span>
-    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">snpeff_snpsift_config</span>
 
 <span class="n">use</span> <span class="n">rule</span> <span class="n">snpeff</span> <span class="kn">from</span> <span class="nn">snpeff_meta</span> <span class="k">with</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">calls</span><span class="o">=</span><span class="s2">&quot;mutect2/corrected/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
         <span class="n">calls_index</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;mutect2/corrected/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">),</span>
         <span class="n">db</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;snpeff&quot;</span><span class="p">]</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;snpeff_snpsift&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;snpeff_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;-lof -nodownload -noLog&quot;</span><span class="p">)</span>
 
 
 <span class="n">module</span> <span class="n">snpsift</span><span class="p">:</span>
     <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/snpsift/test/Snakefile&quot;</span>
-    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">snpeff_snpsift_config</span>
 
 
 <span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">snpsift</span> <span class="k">as</span> <span class="o">*</span>
@@ -637,19 +646,17 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
 <span class="c1">############################################################################</span>
 <span class="c1">### Correcting Mutect2 :                                                 ###</span>
 <span class="c1">### AS_FilterStatus: Number=1 and not Number=A which violates VCF format ###</span>
-<span class="c1">### AD becomes ADM: AD is reserved for Allele Depth, Mutect2 stores      ###</span>
-<span class="c1">###                 multiple information under &quot;AD&quot; field.               ###</span>
 <span class="c1">############################################################################</span>
 
 <span class="n">rule</span> <span class="n">correct_mutect2_vcf</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="s2">&quot;mutect2/filter/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
+        <span class="s2">&quot;bcftools/mutect2/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;mutect2/corrected/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
-        <span class="s2">&quot;Renaming reserved AD field and fixing AS_FilterStrand format error&quot;</span>
+        <span class="s2">&quot;Fixing AS_FilterStrand format error&quot;</span>
         <span class="s2">&quot; on </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">3</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">256</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span><span class="p">,</span>
@@ -657,13 +664,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/mutect2/correct_fields/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">rename_ad</span><span class="o">=</span><span class="s2">&quot;&#39;s/=AD,/=ADM,/g&#39;&quot;</span><span class="p">,</span>
-        <span class="n">rename_ad_format</span><span class="o">=</span><span class="s2">&quot;&#39;s/:AD:/:ADM:/g&#39;&quot;</span><span class="p">,</span>
         <span class="n">fix_as_filterstatus</span><span class="o">=</span><span class="s2">&quot;&#39;s/ID=AS_FilterStatus,Number=A/ID=AS_FilterStatus,Number=1/g&#39;&quot;</span>
     <span class="n">shell</span><span class="p">:</span>
         <span class="s2">&quot;(gunzip -c </span><span class="si">{input}</span><span class="s2"> | &quot;</span>
-        <span class="s2">&quot;sed </span><span class="si">{params.rename_ad}</span><span class="s2"> | &quot;</span>
-        <span class="s2">&quot;sed </span><span class="si">{params.rename_ad_format}</span><span class="s2"> | &quot;</span>
         <span class="s2">&quot;sed </span><span class="si">{params.fix_as_filterstatus}</span><span class="s2">) &quot;</span>
         <span class="s2">&quot;&gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
 
@@ -686,8 +689,6 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
 
 
 <span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">gatk_mutect2_somatic_meta</span>
-
-
 
 
 <span class="c1">################################</span>
@@ -781,39 +782,6 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_som
         <span class="s2">&quot;--ASSUME_SORT_ORDER coordinate --REMOVE_DUPLICATES true&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/picard/markduplicates&quot;</span>
-
-
-<span class="c1"># rule picard_add_replace_group:</span>
-<span class="c1">#     input:</span>
-<span class="c1">#         &quot;samtools/sort/{sample}_{status}.bam&quot;</span>
-<span class="c1">#     output:</span>
-<span class="c1">#         temp(&quot;picard/groups/{sample}_{status}.bam&quot;)</span>
-<span class="c1">#     message:</span>
-<span class="c1">#         &quot;Replacing groups within {wildcards.sample} with Picard&quot;</span>
-<span class="c1">#         &quot; ({wildcards.status})&quot;</span>
-<span class="c1">#     threads: 1</span>
-<span class="c1">#     resources:</span>
-<span class="c1">#         mem_mb = (</span>
-<span class="c1">#             lambda wildcards, attempt: min(attempt * 2048 + 2048, 8192)</span>
-<span class="c1">#         ),</span>
-<span class="c1">#         time_min = (</span>
-<span class="c1">#             lambda wildcards, attempt: min(attempt * 60, 120)</span>
-<span class="c1">#         )</span>
-<span class="c1">#     log:</span>
-<span class="c1">#         &quot;logs/picard/groups/{sample}_{status}.log&quot;</span>
-<span class="c1">#     params:</span>
-<span class="c1">#         lambda wildcards: &quot; &quot;.join([</span>
-<span class="c1">#         &quot;RGLB=standard&quot;,</span>
-<span class="c1">#         &quot;RGPL=illumina&quot;,</span>
-<span class="c1">#         &quot;RGPU={wildcards.sample}_{wildcards.status}&quot;,</span>
-<span class="c1">#         &quot;RGSM={wildcards.sample}_{wildcards.status}&quot;,</span>
-<span class="c1">#         &quot;RGCN=InstitutGustaveRoussy&quot;,</span>
-<span class="c1">#         &quot;RGDS=WES&quot;,</span>
-<span class="c1">#         &quot;SORT_ORDER=coordinate&quot;,</span>
-<span class="c1">#         &quot;RGDT={}&quot;.format(str(datetime.date.today()))</span>
-<span class="c1">#     ])</span>
-<span class="c1">#     wrapper:</span>
-<span class="c1">#         &quot;bio/picard/addorreplacereadgroups&quot;</span>
 
 
 <span class="c1">###################</span>

@@ -32,7 +32,7 @@ This wrapper can be used in the following way:
             run_extra=""
         threads: 8
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/strelka/germline"
+            "0.79.0-1159-g7fe792175/bio/strelka/germline"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -87,7 +87,7 @@ Code
         run_dir = snakemake.output
 
     shell(
-        "configureStrelkaGermlineWorkflow.py "  # configure the strelka run
+        "(configureStrelkaGermlineWorkflow.py "  # configure the strelka run
         "--bam {bam} "  # input bam
         "--referenceFasta {snakemake.input.fasta} "  # reference genome
         "--runDir {run_dir} "  # output directory
@@ -95,6 +95,11 @@ Code
         "&& {run_dir}/runWorkflow.py "  # run the strelka workflow
         "-m local "  # run in local mode
         "-j {snakemake.threads} "  # number of threads
-        "{run_extra} "  # additional parameters for the run
+        "{run_extra}) "  # additional parameters for the run
         "{log}"
     )  # logging
+
+
+.. |nl| raw:: html
+
+   <br>

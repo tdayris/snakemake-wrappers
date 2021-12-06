@@ -177,6 +177,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../maftools.html">MAFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mapdamage2.html">MAPDAMAGE2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../microphaser.html">MICROPHASER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
@@ -227,6 +228,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../snpsift.html">SNPSIFT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sourmash.html">SOURMASH</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../spades.html">SPADES</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sra-tools.html">SRA-TOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../star.html">STAR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../strelka.html">STRELKA</a></li>
@@ -366,7 +368,7 @@
         <span class="s2">&quot;logs/vep/annotate.log&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1111-g021ee08d2/bio/vep/annotate&quot;</span>
+        <span class="s2">&quot;0.79.0-1159-g7fe792175/bio/vep/annotate&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -435,14 +437,18 @@
 
 <span class="k">if</span> <span class="n">cache</span><span class="p">:</span>
     <span class="n">entrypath</span> <span class="o">=</span> <span class="n">get_only_child_dir</span><span class="p">(</span><span class="n">get_only_child_dir</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">cache</span><span class="p">)))</span>
-    <span class="n">species</span> <span class="o">=</span> <span class="n">entrypath</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">species</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">entrypath</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">entrypath</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_refseq&quot;</span><span class="p">)</span>
+        <span class="k">else</span> <span class="n">entrypath</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span>
+    <span class="p">)</span>
     <span class="n">release</span><span class="p">,</span> <span class="n">build</span> <span class="o">=</span> <span class="n">entrypath</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
     <span class="n">cache</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;--offline --cache --dir_cache </span><span class="si">{cache}</span><span class="s2"> --cache_version </span><span class="si">{release}</span><span class="s2"> --species </span><span class="si">{species}</span><span class="s2"> --assembly </span><span class="si">{build}</span><span class="s2">&quot;</span>
     <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="n">release</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">,</span> <span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">)</span>
 
 <span class="n">shell</span><span class="p">(</span>
-    <span class="s2">&quot;(bcftools view </span><span class="si">{snakemake.input.calls}</span><span class="s2"> | &quot;</span>
+    <span class="s2">&quot;(bcftools view &#39;</span><span class="si">{snakemake.input.calls}</span><span class="s2">&#39; | &quot;</span>
     <span class="s2">&quot;vep </span><span class="si">{extra}</span><span class="s2"> </span><span class="si">{fork}</span><span class="s2"> &quot;</span>
     <span class="s2">&quot;--format vcf &quot;</span>
     <span class="s2">&quot;--vcf &quot;</span>

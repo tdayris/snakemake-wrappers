@@ -62,13 +62,52 @@ This meta-wrapper can be used by integrating the following into your workflow:
     #
     # use rule * from bwa_fixmate as bwa_fixmate_*
 
+    ##################################
+    ### Correct multiallelic sites ###
+    ##################################
+
+    rule split_multiallelic_varscan2:
+        input:
+            call="varscan2/concat/{sample}.vcf.gz",
+            idx=get_tbi("varscan2/concat/{sample}.vcf.gz"),
+            fasta=config["genome"]
+        output:
+            temp("bcftools/varscan2/{sample}.vcf.gz")
+        message:
+            "Splitting Mutect2 multiallelic sites {wildcards.sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir="tmp"
+        params:
+            extra = "-m -both --check-ref w"
+        log:
+            "logs/bcftools/norm/mutect2/{sample}.log"
+        wrapper:
+            "bio/bcftools/norm"
+
+
+    ####################################
+    ### Complete and correct headers ###
+    ####################################
+
     """
-    This rule renames samples for further merges
+    This rule renames samples for further merges. It also adds chromosome
+    information and filters on provided regions
     """
     rule bcftools_reheader:
         input:
-            vcf="varscan2/concat/{sample}.vcf.gz",
-            vcf_tbi=get_tbi("varscan2/concat/{sample}.vcf.gz"),
+            vcf=(
+                "varscan2/concat/{sample}.vcf.gz"
+                if config.get("indel", False) is False
+                else "varscan2/somatic/{sample}.snp.vcf"
+            ),
+            vcf_tbi=get_tbi(
+                "varscan2/concat/{sample}.vcf.gz"
+                if config.get("indel", False) is False
+                else "varscan2/somatic/{sample}.snp.vcf"
+            ),
             #samples="varscan2/mpileup2cns/{sample}.sample.list",
             fasta=config["genome"],
             fai=get_fai(config["genome"]),
@@ -146,6 +185,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
         wrapper:
             "bio/bcftools/concat"
 
+    #######################
+    ### Variant Calling ###
+    #######################
 
     """
     This rule performs germline calling with Varscan2

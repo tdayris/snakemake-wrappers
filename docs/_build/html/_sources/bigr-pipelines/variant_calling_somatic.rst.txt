@@ -209,6 +209,7 @@ The pipeline contains the following steps:
     localrules: bigr_copy
 
     ruleorder: samtools_index_bam > samtools_index
+    ruleorder: gatk_filter_mutect_calls > tabix_index
 
     default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
     configfile: get_config(default_config)
@@ -216,6 +217,9 @@ The pipeline contains the following steps:
     # design = design.head(2).tail(1)
     design.dropna(inplace=True)
     print(design)
+
+    design.index = design["Sample_id"]
+    design.drop(index="s070", inplace=True)
 
     wildcard_constraints:
         sample = r"|".join(design["Sample_id"]),
@@ -232,32 +236,27 @@ The pipeline contains the following steps:
         t2_paths=design.Downstream_file,
     )
 
+    ruleorder: fix_annotation_for_gatk > pbgzip_compress
+    ruleorder: gatk_variant_filtration > pbgzip_compress
 
     rule all:
         input:
-            maf="maf/maftools/complete.maf",
+            maf="maf/complete.maf",
             mafs=expand(
                 "maf/maftools/{sample}.maf",
                 sample=design["Sample_id"].tolist()
             ),
             calls=expand(
-                "snpsift/dbnsfp/{sample}.vcf.gz{index}",
-                sample=design["Sample_id"].tolist(),
-                index=["", ".tbi"]
-            ),
-            #html="multiqc/variant_calling_somatic.html",
-            mapped=expand(
-                "picard/markduplicates/{sample}_{status}.bam{ext}",
-                sample=design["Sample_id"].tolist(),
-                status=["normal", "tumor"],
-                ext=["", ".bai"]
+               "maf/occurence_annotated/{sample}.vcf.gz{index}",
+               sample=design["Sample_id"].tolist(),
+               index=["", ".tbi"]
             ),
             # mutect2=expand(
-            #     "mutect2/corrected/{sample}.vcf.gz",
+            #     "bcftools/mutect2/{sample}.vcf.gz",
             #     sample=design["Sample_id"].tolist()
             # ),
             # mutect2_tbi=expand(
-            #     "mutect2/corrected/{sample}.vcf.gz.tbi",
+            #     "bcftools/mutect2/{sample}.vcf.gz.tbi",
             #     sample=design["Sample_id"].tolist()
             # ),
             facets=expand(
@@ -265,15 +264,16 @@ The pipeline contains the following steps:
                 sample=design["Sample_id"].tolist(),
                 ext=["vcf.gz", "cnv.png", "cov.pdf", "spider.pdf", "csv.gz"]
             ),
-            varscan2=expand(
-                "varscan2/somatic/{sample}.snp.vcf.gz",
-                sample=design["Sample_id"].tolist()
-            ),
-            varscan2_tbi=expand(
-                "varscan2/somatic/{sample}.snp.vcf.gz.tbi",
-                sample=design["Sample_id"].tolist()
-            ),
-            qc="multiqc/variant_calling_somatic.html"
+            #varscan2=expand(
+            #    "bcftools/varscan2/{sample}.vcf.gz",
+            #    sample=design["Sample_id"].tolist()
+            #),
+            #varscan2_tbi=expand(
+            #    "bcftools/varscan2/{sample}.vcf.gz.tbi",
+            #    sample=design["Sample_id"].tolist()
+            #),
+            qc="multiqc/variant_calling_somatic.html",
+            calling_result="final.vcf.list"
         message:
             "Finishing the WES Somatic Variant Calling"
 
@@ -288,7 +288,9 @@ The pipeline contains the following steps:
         "center": config["params"].get("center", "GustaveRoussy"),
         "annotation_tag": "ANN=",
         "sample_list": design["Sample_id"].tolist(),
-        "genome": config["ref"]["fasta"]
+        "genome": config["ref"]["fasta"],
+        "known": config["ref"]["dbsnp"],
+        "chr": config["params"]["chr"]
     }
 
     module vcf_post_process:
@@ -479,21 +481,27 @@ The pipeline contains the following steps:
     ### VCF annotation ###
     ######################
 
+    snpeff_snpsift_config = {
+        "ref": config["ref"],
+        **config["snpeff_snpsift"]
+    }
 
     module snpeff_meta:
         snakefile: "../../meta/bio/snpeff_annotate/test/Snakefile"
-        config: config
+        config: snpeff_snpsift_config
 
     use rule snpeff from snpeff_meta with:
         input:
             calls="mutect2/corrected/{sample}.vcf.gz",
             calls_index=get_tbi("mutect2/corrected/{sample}.vcf.gz"),
             db=config["ref"]["snpeff"]
+        params:
+            extra = config["snpeff_snpsift"].get("snpeff_extra", "-lof -nodownload -noLog")
 
 
     module snpsift:
         snakefile: "../../meta/bio/snpsift/test/Snakefile"
-        config: config
+        config: snpeff_snpsift_config
 
 
     use rule * from snpsift as *
@@ -514,19 +522,17 @@ The pipeline contains the following steps:
     ############################################################################
     ### Correcting Mutect2 :                                                 ###
     ### AS_FilterStatus: Number=1 and not Number=A which violates VCF format ###
-    ### AD becomes ADM: AD is reserved for Allele Depth, Mutect2 stores      ###
-    ###                 multiple information under "AD" field.               ###
     ############################################################################
 
     rule correct_mutect2_vcf:
         input:
-            "mutect2/filter/{sample}.vcf.gz"
+            "bcftools/mutect2/{sample}.vcf.gz"
         output:
             temp("mutect2/corrected/{sample}.vcf")
         message:
-            "Renaming reserved AD field and fixing AS_FilterStrand format error"
+            "Fixing AS_FilterStrand format error"
             " on {wildcards.sample}"
-        threads: 3
+        threads: 2
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 256,
             time_min=lambda wildcards, attempt: attempt * 20,
@@ -534,13 +540,9 @@ The pipeline contains the following steps:
         log:
             "logs/mutect2/correct_fields/{sample}.log"
         params:
-            rename_ad="'s/=AD,/=ADM,/g'",
-            rename_ad_format="'s/:AD:/:ADM:/g'",
             fix_as_filterstatus="'s/ID=AS_FilterStatus,Number=A/ID=AS_FilterStatus,Number=1/g'"
         shell:
             "(gunzip -c {input} | "
-            "sed {params.rename_ad} | "
-            "sed {params.rename_ad_format} | "
             "sed {params.fix_as_filterstatus}) "
             "> {output} 2> {log}"
 
@@ -563,8 +565,6 @@ The pipeline contains the following steps:
 
 
     use rule * from gatk_mutect2_somatic_meta
-
-
 
 
     ################################
@@ -658,39 +658,6 @@ The pipeline contains the following steps:
             "--ASSUME_SORT_ORDER coordinate --REMOVE_DUPLICATES true"
         wrapper:
             "bio/picard/markduplicates"
-
-
-    # rule picard_add_replace_group:
-    #     input:
-    #         "samtools/sort/{sample}_{status}.bam"
-    #     output:
-    #         temp("picard/groups/{sample}_{status}.bam")
-    #     message:
-    #         "Replacing groups within {wildcards.sample} with Picard"
-    #         " ({wildcards.status})"
-    #     threads: 1
-    #     resources:
-    #         mem_mb = (
-    #             lambda wildcards, attempt: min(attempt * 2048 + 2048, 8192)
-    #         ),
-    #         time_min = (
-    #             lambda wildcards, attempt: min(attempt * 60, 120)
-    #         )
-    #     log:
-    #         "logs/picard/groups/{sample}_{status}.log"
-    #     params:
-    #         lambda wildcards: " ".join([
-    #         "RGLB=standard",
-    #         "RGPL=illumina",
-    #         "RGPU={wildcards.sample}_{wildcards.status}",
-    #         "RGSM={wildcards.sample}_{wildcards.status}",
-    #         "RGCN=InstitutGustaveRoussy",
-    #         "RGDS=WES",
-    #         "SORT_ORDER=coordinate",
-    #         "RGDT={}".format(str(datetime.date.today()))
-    #     ])
-    #     wrapper:
-    #         "bio/picard/addorreplacereadgroups"
 
 
     ###################

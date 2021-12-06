@@ -18,7 +18,7 @@ from snakemake.shell import shell
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 logging.basicConfig(
-    #filename=snakemake.log[0],
+    filename=snakemake.log[0],
     filemode="w",
     level=logging.DEBUG
 )
@@ -106,7 +106,7 @@ def annotate(line: str, csv: pandas.DataFrame) -> str:
             else:
                 chomp[7] += f";{annot}"
 
-            if (chomp[6] == "") or (chomp[6] == "PASS"):
+            if chomp[6] in [".", "", "PASS"]:
                 chomp[6] = "ExistsInOncoKB"
             else:
                 chomp[6] += ";ExistsInOncoKB"

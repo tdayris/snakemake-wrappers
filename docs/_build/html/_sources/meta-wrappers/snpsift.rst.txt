@@ -14,7 +14,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
 .. code-block:: python
 
     default_config={
-        "samples":["test"],
         "ref": {
             "cosmic": "path/to/annotation",
             "dbsnp": "path/to/annotation",
@@ -23,7 +22,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "gmt": "path/to/annotation",
             "gwascat": "path/to/annotation",
             "kaviar": "path/to/annotation",
-        }
+            "gnomad": "path/to/gnomad",
+            "clinvar": "path/to/clinvar",
+        },
+        "params": {"ncbi_build": "GRCh38"}
     }
 
     try:
@@ -33,12 +35,77 @@ This meta-wrapper can be used by integrating the following into your workflow:
         config = default_config
 
 
-    #rule all:
-    #    input:
-    #        expand(
-    #            "snpsift/cosmic/{sample}.vcf",
-    #            sample=config["samples"]
-    #        )
+    rule snpsift_gnomad:
+        input:
+            call = "snpsift/clinvar/{sample}.vcf",
+            database = config["ref"]["gnomad"],
+            database_idx = config["ref"]["gnomad"] + ".tbi"
+        output:
+            call = temp("snpsift/gnomad/{sample}.vcf")
+        message:
+            "Annotating {wildcards.sample} with gnomAD"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        params:
+            extra=config.get(
+                "snpsift_gnomad",
+                "-name 'gnomad_' -exists 'ExistsInGnomAD' -tabix -noDownload -noLog"
+            )
+        log:
+            "logs/snpsift/gnomad/{sample}.log"
+        wrapper:
+            "bio/snpsift/annotate"
+
+
+    rule snpsift_clinvar:
+        input:
+            call = "snpsift/dbnsfp/{sample}.vcf",
+            database = config["ref"]["clinvar"],
+            database_idx = config["ref"]["clinvar"] + ".tbi"
+        output:
+            call = temp("snpsift/clinvar/{sample}.vcf")
+        message:
+            "Annotating {wildcards.sample} with ClinVar"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        params:
+            extra=config.get(
+                "snpsift_clinvar",
+                "-name 'clinvar_' -exists 'ExistsInClinVar' -tabix -noDownload -noLog"
+            )
+        log:
+            "logs/snpsift/clinvar/{sample}.log"
+        wrapper:
+            "bio/snpsift/annotate"
+
+
+    rule snpsift_gwascat:
+        input:
+            call = "snpsift/dbnsfp/{sample}.vcf",
+            gwascat = config["ref"]["gwascat"]
+        output:
+            call = temp("snpsift/gwascat/{sample}.vcf")
+        message:
+            "Annotating {wildcards.sample} with GWAS Catalog"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        params:
+            extra = config.get(
+                "snpsift_gwascat", "-noDownload -noLog"
+            )
+        log:
+            "logs/snpsift/gwascat/{sample}.log"
+        wrapper:
+            "bio/snpsift/gwascat"
 
 
     rule snpsift_dbnsfp:
@@ -52,38 +119,25 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "Annotating {wildcards.sample} with dbNSFP"
         threads: 1
         resources:
-            mem_mb=lambda wildcards, attempt: attempt * 15360 + 5125,
+            mem_mb=lambda wildcards, attempt: attempt * 20480 + 10240,
             time_min=lambda wildcards, attempt: attempt * 45,
             tmpdir="tmp"
+        params:
+            extra=config.get(
+                "snpsift_dbnsfp",
+                "-tabix -noDownload -noLog -n -f 'hg18_chr,hg18_pos(1-based)'"
+            )
         log:
             "logs/snpsift/dbnsfp/{sample}.log"
         wrapper:
             "bio/snpsift/dbnsfp"
 
 
-    rule snpsift_gwascat:
-        input:
-            call = "snpsift/cosmic/{sample}.vcf",
-            gwascat = config["ref"]["gwascat"]
-        output:
-            call = temp("snpsift/gwascat/{sample}.vcf")
-        message:
-            "Annotating {wildcards.sample} with GWAS Catalog"
-        threads: 1
-        resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-            time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir="tmp"
-        log:
-            "logs/snpsift/gwascat/{sample}.log"
-        wrapper:
-            "bio/snpsift/gwascat"
-
-
     rule snpsift_cosmic:
         input:
-            call="snpsift/dbsnp/{sample}.vcf",
-            database=config["ref"]["cosmic"]
+            call="snpsift/kaviar/{sample}.vcf",
+            database=config["ref"]["cosmic"],
+            database_idx=config["ref"]["cosmic"] + ".tbi"
         output:
             call=temp("snpsift/cosmic/{sample}.vcf")
         message:
@@ -91,30 +145,15 @@ This meta-wrapper can be used by integrating the following into your workflow:
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-            time_min=lambda wildcards, attempt: attempt * 45,
+            time_min=lambda wildcards, attempt: attempt * 120,
             tmpdir="tmp"
+        params:
+            extra=config.get(
+                "snpsift_cosmic",
+                "-name 'cosmic_' -exists 'ExistsInCosmic' -tabix -noDownload -noLog"
+            )
         log:
             "logs/snpsift/cosmic/{sample}.log"
-        wrapper:
-            "bio/snpsift/annotate"
-
-
-    rule snpsift_dbsnp:
-        input:
-            call="snpsift/kaviar/{sample}.vcf",
-            database=config["ref"]["dbsnp"]
-        output:
-            call=temp("snpsift/dbsnp/{sample}.vcf")
-
-        message:
-            "Annotating {wildcards.sample} with dbSNP"
-        threads: 1
-        log:
-            "logs/snpsift/dbsnp/{sample}.log"
-        resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-            time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir="tmp"
         wrapper:
             "bio/snpsift/annotate"
 
@@ -122,25 +161,31 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule snpsift_kaviar:
         input:
             call="snpsift/gmt/{sample}.vcf",
-            database=config["ref"]["kaviar"]
+            database=config["ref"]["kaviar"],
+            database_idx=config["ref"]["kaviar"] + ".tbi",
         output:
             call=temp("snpsift/kaviar/{sample}.vcf")
         message:
             "Annotating {wildcards.sample} with Kaviar"
         threads: 1
-        log:
-            "logs/snpsift/kaviar/{sample}.log"
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
             time_min=lambda wildcards, attempt: attempt * 45,
             tmpdir="tmp"
+        log:
+            "logs/snpsift/kaviar/{sample}.log"
+        params:
+            extra=config.get(
+                "snpsift_kaviar",
+                "-name 'Kaviar_' -exists 'ExistsInKaviar' -tabix -noDownload -noLog"
+            )
         wrapper:
             "bio/snpsift/annotate"
 
 
     rule snpsift_gmt:
         input:
-            call = "snpsift/vartype/{sample}.vcf",
+            call = "snpsift/dbsnp/{sample}.vcf",
             gmt = config["ref"]["gmt"]
         output:
             call = temp("snpsift/gmt/{sample}.vcf")
@@ -155,6 +200,31 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/snpsift/gmt/{sample}.log"
         wrapper:
             "bio/snpsift/genesets"
+
+
+    rule snpsift_dbsnp:
+        input:
+            call="snpsift/vartype/{sample}.vcf",
+            database=config["ref"]["dbsnp"]
+        output:
+            call=temp("snpsift/dbsnp/{sample}.vcf")
+
+        message:
+            "Annotating {wildcards.sample} with dbSNP"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        log:
+            "logs/snpsift/dbsnp/{sample}.log"
+        params:
+            extra=config.get(
+                "snpsift_dbsnp",
+                "-name 'dbSNP_' -exists 'ExistsInDBsnp' -tabix -noDownload -noLog"
+            )
+        wrapper:
+            "bio/snpsift/annotate"
 
 
     rule snpsift_vartype:

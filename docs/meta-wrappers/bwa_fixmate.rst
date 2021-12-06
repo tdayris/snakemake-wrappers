@@ -46,6 +46,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     """
     This rule sorts reads by position for further analyses.
+    This rule is shadowed in order to automatically delete undetermined number of
+    temporary files on error, which leads retry to fail
     """
     rule samtools_sort_coordinate:
         input:
@@ -60,6 +62,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcards, threads: threads * 1792,
             time_min=lambda wildcards, attempt: attempt * 90,
             tmpdir="tmp"
+        shadow: "minimal"
         log:
             "logs/samtools/query_sort_{sample}.log"
         params:

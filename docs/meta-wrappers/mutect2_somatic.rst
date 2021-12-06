@@ -70,6 +70,37 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
         return input_dict
 
+    ##################################
+    ### Correct multiallelic sites ###
+    ##################################
+
+    rule split_multiallelic_mutect2:
+        input:
+            call="mutect2/filter/{sample}.vcf.gz",
+            idx=get_tbi("mutect2/filter/{sample}.vcf.gz"),
+            fasta=config["genome"]
+        output:
+            temp("bcftools/mutect2/{sample}.vcf.gz")
+        message:
+            "Splitting Mutect2 multiallelic sites {wildcards.sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir="tmp"
+        params:
+            extra = config.get(
+                "gatk_bcftools_split_multiallelic",
+                "-m -both --check-ref w"
+            )
+        log:
+            "logs/bcftools/norm/mutect2/{sample}.log"
+        wrapper:
+            "bio/bcftools/norm"
+
+
+
+
 
     ###########################
     ### Filter Mutect calls ###
@@ -86,7 +117,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             #f1r2="mutect2/f1r2/{sample}.tar.gz",
             contamination="summary/{sample}_calculate_contamination.table"
         output:
-            vcf=temp("mutect2/filter/{sample}.vcf.gz")
+            vcf=temp("mutect2/filter/{sample}.vcf.gz"),
+            vcf_index=temp("mutect2/filter/{sample}.vcf.gz.tbi")
         message:
             "Filtering GATK calls on {wildcards.sample}"
         threads: 1
@@ -95,7 +127,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=lambda wildcards, attempt: attempt * 35,
             tmpdir="tmp"
         params:
-            extra=config.get("gatk_filter_mutect_calls_extra", "")
+            extra=config.get(
+                "gatk_filter_mutect_calls_extra",
+                "--create-output-variant-index --min-median-mapping-quality 35"
+            )
         log:
             "logs/mutect2/filter/{sample}.log"
         wrapper:
@@ -178,8 +213,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
             **mutect2_input(config)
         output:
             vcf=temp("mutect2/call/{sample}.vcf.gz"),
+            vcf_index=temp("mutect2/call/{sample}.vcf.gz.tbi"),
             f1r2=temp("mutect2/f1r2/{sample}.tar.gz"),
-            bam=temp("mutect2/bam/{sample}.bam")
+            #bam=temp("mutect2/bam/{sample}.bam")
         message:
             "Calling variants on {wildcards.sample} with GATK Mutect2"
         threads: 4
@@ -189,13 +225,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
             tmpdir="tmp"
         params:
             extra=lambda wildcards, output: (
+                "--create-output-variant-index "
                 "--max-reads-per-alignment-start 0 "
                 "--disable-read-filter MateOnSameContigOrNoMappedMateReadFilter "
                 #"--tumor-sample Mutect2_{}_tumor "
-                #"--normal-sample Mutect2_{}_normal ".format(
+                "--normal-sample Mutect2_{}_normal ".format(
                 #    wildcards.sample,
-                #    wildcards.sample
-                #)
+                    wildcards.sample
+                )
             )
         log:
             "logs/gatk/mutect2/call/{sample}.log"

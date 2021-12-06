@@ -49,7 +49,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "Compressing {wildcards.sample} VCF file, "
             "(built with {wildcards.tool} {wildcards.subcommand})"
         threads:
-            config.get("threads", 20)
+            1
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 1024, 10240),
             time_min=lambda wildcards, attempt: attempt * 30,
@@ -58,8 +58,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
             ""
         log:
             "logs/{tool}/{subcommand}/pbgzip/{sample}.log"
+        # wrapper:
+        #     "bio/compress/pbgzip"
         wrapper:
-            "bio/compress/pbgzip"
+            "bio/bcftools/view"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

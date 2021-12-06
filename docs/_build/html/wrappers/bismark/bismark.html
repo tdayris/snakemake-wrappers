@@ -195,6 +195,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../maftools.html">MAFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mapdamage2.html">MAPDAMAGE2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../microphaser.html">MICROPHASER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
@@ -245,6 +246,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../snpsift.html">SNPSIFT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sourmash.html">SOURMASH</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../spades.html">SPADES</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sra-tools.html">SRA-TOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../star.html">STAR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../strelka.html">STRELKA</a></li>
@@ -388,7 +390,7 @@
         <span class="n">extra</span><span class="o">=</span><span class="s1">&#39; --ambiguous --unmapped --nucleotide_coverage&#39;</span><span class="p">,</span>
         <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{sample}</span><span class="s1">_</span><span class="si">{genome}</span><span class="s1">&#39;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1111-g021ee08d2/bio/bismark/bismark&quot;</span>
+        <span class="s2">&quot;0.79.0-1159-g7fe792175/bio/bismark/bismark&quot;</span>
 
 <span class="c1"># Example: Single-ended reads</span>
 <span class="n">rule</span> <span class="n">bismark_se</span><span class="p">:</span>
@@ -410,7 +412,7 @@
         <span class="n">extra</span><span class="o">=</span><span class="s1">&#39; --ambiguous --unmapped --nucleotide_coverage&#39;</span><span class="p">,</span>
         <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{sample}</span><span class="s1">_</span><span class="si">{genome}</span><span class="s1">&#39;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1111-g021ee08d2/bio/bismark/bismark&quot;</span>
+        <span class="s2">&quot;0.79.0-1159-g7fe792175/bio/bismark/bismark&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -513,7 +515,7 @@
     <span class="n">cmdline_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--se {snakemake.input.fq:q}&quot;</span><span class="p">)</span>
     <span class="n">mode_prefix</span> <span class="o">=</span> <span class="s2">&quot;se&quot;</span>
     <span class="k">if</span> <span class="n">basename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">basename</span> <span class="o">=</span> <span class="n">basename_without_ext</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">fq</span><span class="p">)</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">basename_without_ext</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">fq</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_bismark_bt2&quot;</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="c1"># for PE data, you should also specify read2 input by -I or --in2, and</span>
     <span class="c1"># specify read2 output by -O or --out2.</span>

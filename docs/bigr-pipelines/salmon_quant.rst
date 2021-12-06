@@ -141,7 +141,176 @@ The pipeline contains the following steps:
         design.Downstream_file
     )
 
-    ruleorder: salmon_meta_salmon_quant_paired > salmon_quant_paired
+    #ruleorder: salmon_meta_salmon_quant_paired > salmon_quant_paired
+
+
+    rule target:
+        input:
+            "multiqc/MultiQC.html",
+            "salmon/TPM.genes.tsv",
+            "salmon/TPM.transcripts.tsv"
+        output:
+            directory("results_to_upload")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 512,
+            time_min=lambda wildcards, attempt: attempt * 25,
+            tmpdir="tmp"
+        log:
+            "log/results_to_upload.log"
+        params:
+            "-cv"
+        shell:
+            "rsync {params} {input} {output} > {log} 2>&1"
+
+
+    ########################
+    ### Aggregate counts ###
+    ########################
+
+
+    rule aggregate_gene_counts:
+        input:
+            quant=expand(
+                "salmon/pseudo_mapping/{sample}/quant.genes.sf",
+                sample=design["Sample_id"]
+            ),
+            tx2gene="salmon/tx2gene.tsv"
+        output:
+            tsv="salmon/TPM.genes.tsv"
+        message:
+            "Aggregating genes counts with their gene names"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 4,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        params:
+            header=False,
+            position=False,
+            gencode=True,
+            genes=True
+        log:
+            "logs/aggregate/genes.log"
+        wrapper:
+            "bio/pandas/salmon"
+
+
+    rule aggregate_transcript_counts:
+        input:
+            quant=expand(
+                "salmon/pseudo_mapping/{sample}/quant.sf",
+                sample=design["Sample_id"]
+            ),
+            tx2gene="salmon/tx2gene.tsv"
+        output:
+            tsv="salmon/TPM.transcripts.tsv"
+        message:
+            "Aggregating transcript counts with their gene names"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 4,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        params:
+            header=False,
+            position=False,
+            gencode=True,
+            genes=False
+        log:
+            "logs/aggregate/transcripts.log"
+        wrapper:
+            "bio/pandas/salmon"
+
+
+    rule tx_to_gene:
+        input:
+            gtf = config["ref"]["gtf"]
+        output:
+            tx2gene = temp("salmon/tx2gene.tsv"),
+            tx2gene_large = temp("salmon/tx2gene_with_positions.tsv"),
+            gene2gene = temp("salmon/gene2gene.tsv"),
+            gene2gene_large = temp("salmon/gene2gene_with_chr.tsv")
+        message:
+            "Gathering transcripts and genes names together from GTF"
+        threads: 1
+        resources:
+            mem_mb = lambda wildcards, attempt: attempt * 1024 * 4,
+            time_min = lambda wildcards, attempt: min(attempt * 10, 15),
+            tmpdir="tmp"
+        log:
+            "logs/tx_to_gene.log"
+        wrapper:
+            "bio/gtf/tx2gene"
+
+
+    ########################
+    ### Quality Controls ###
+    ########################
+
+
+    rule multiqc:
+        input:
+            salmon=expand(
+                "salmon/pseudo_mapping/{sample}/quant.sf",
+                sample=design["Sample_id"]
+            ),
+            html=expand(
+                "fastp/html/pe/{sample}.fastp.html",
+                sample=design["Sample_id"]
+            ),
+            json=expand(
+                "fastp/json/pe/{sample}.fastp.json",
+                sample=design["Sample_id"]
+            ),
+            fastq_screen=expand(
+                "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+                sample=design["Sample_id"],
+                stream=["1", "2"],
+                ext=["txt", "png"]
+            )
+        output:
+            report(
+                "multiqc/MultiQC.html",
+                caption="../common/reports/multiqc.rst",
+                category="Quality Controls"
+            )
+        message:
+            "Aggregating quality reports from Fastp and Salmon"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir="tmp"
+        log:
+            "logs/multiqc.log"
+        wrapper:
+            "bio/multiqc"
+
+
+
+    rule fastq_screen:
+        input:
+            "reads/{sample}.{stream}.fq.gz"
+        output:
+            txt=temp("fastq_screen/{sample}.{stream}.fastq_screen.txt"),
+            png=temp("fastq_screen/{sample}.{stream}.fastq_screen.png")
+        message:
+            "Assessing quality of {wildcards.sample}, stream {wildcards.stream}"
+        threads: config.get("threads", 20)
+        resources:
+            mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
+            time_min=lambda wildcard, attempt: attempt * 50,
+            tmpdir="tmp"
+        params:
+            fastq_screen_config=config["fastq_screen"],
+            subset=100000,
+            aligner='bowtie2'
+        log:
+            "logs/fastq_screen/{sample}.{stream}.log"
+        wrapper:
+            "bio/fastq_screen"
+
 
     #############################
     ### Salmon quantification ###
@@ -162,39 +331,7 @@ The pipeline contains the following steps:
         config: salmon_config
 
 
-    rule multiqc:
-        input:
-            salmon=expand(
-                "salmon/pseudo_mapping/{sample}/quant.sf",
-                sample=design["Sample_id"]
-            ),
-            html=expand(
-                "fastp/html/pe/{sample}.fastp.html",
-                sample=design["Sample_id"]
-            ),
-            json=expand(
-                "fastp/json/pe/{sample}.fastp.json",
-                sample=design["Sample_id"]
-            )
-        output:
-            report(
-                "multiqc/MultiQC.html",
-                caption="../common/reports/multiqc.rst",
-                category="Quality Controls"
-            )
-        message:
-            "Aggregating quality reports from Fastp and Salmon"
-        threads: 1
-        resources:
-            mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
-            time_min=lambda wildcards, attempt: attempt * 35
-        log:
-            "logs/multiqc.log"
-        wrapper:
-            "bio/multiqc"
-
-
-    use rule * from salmon_meta as salmon_meta_*
+    use rule * from salmon_meta
 
 
     use rule salmon_quant_paired from salmon_meta with:
@@ -204,8 +341,9 @@ The pipeline contains the following steps:
                 category="2. Raw Salmon output",
                 caption="../../common/reports/salmon_quant.rst"
             ),
+            quant_genes="salmon/pseudo_mapping/{sample}/quant.genes.sf",
             lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
-            mapping=temp("salmon/bams/{sample}.bam")
+            #mapping=temp("salmon/bams/{sample}.bam")
 
 
     ############################
@@ -231,7 +369,8 @@ The pipeline contains the following steps:
         threads: 1
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
-            time_min=lambda wildcard, attempt: attempt * 45
+            time_min=lambda wildcard, attempt: attempt * 45,
+            tmpdir="tmp"
         params:
             adapters=config["params"].get("fastp_adapters", None),
             extra=config["params"].get("fastp_extra", "")

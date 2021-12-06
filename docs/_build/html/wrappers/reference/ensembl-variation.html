@@ -177,6 +177,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../maftools.html">MAFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mapdamage2.html">MAPDAMAGE2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../microphaser.html">MICROPHASER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
@@ -238,6 +239,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../snpsift.html">SNPSIFT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sourmash.html">SOURMASH</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../spades.html">SPADES</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sra-tools.html">SRA-TOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../star.html">STAR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../strelka.html">STRELKA</a></li>
@@ -345,21 +347,23 @@
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>This wrapper can be used in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">get_variation</span><span class="p">:</span>
+    <span class="c1"># Optional: add fai as input to get VCF with annotated contig lengths (as required by GATK)</span>
+    <span class="c1"># and properly sorted VCFs.</span>
+    <span class="c1"># input:</span>
+    <span class="c1">#     fai=&quot;refs/genome.fasta.fai&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;refs/variation.vcf.gz&quot;</span>
-        <span class="c1"># Optional: add fai to get VCF with annotated contig lengths (as required by GATK)</span>
-        <span class="c1"># and properly sorted VCFs.</span>
-        <span class="c1"># fai=&quot;refs/genome.fasta.fai&quot;</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;refs/variation.vcf.gz&quot;</span><span class="p">,</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">species</span><span class="o">=</span><span class="s2">&quot;saccharomyces_cerevisiae&quot;</span><span class="p">,</span>
-        <span class="n">release</span><span class="o">=</span><span class="s2">&quot;98&quot;</span><span class="p">,</span> <span class="c1"># releases &lt;98 are unsupported</span>
+        <span class="n">release</span><span class="o">=</span><span class="s2">&quot;98&quot;</span><span class="p">,</span>  <span class="c1"># releases &lt;98 are unsupported</span>
         <span class="n">build</span><span class="o">=</span><span class="s2">&quot;R64-1-1&quot;</span><span class="p">,</span>
-        <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;all&quot;</span> <span class="c1"># one of &quot;all&quot;, &quot;somatic&quot;, &quot;structural_variation&quot;</span>
+        <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>  <span class="c1"># one of &quot;all&quot;, &quot;somatic&quot;, &quot;structural_variation&quot;</span>
+        <span class="c1"># chromosome=&quot;21&quot;, # optionally constrain to chromosome, only supported for homo_sapiens</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/get_variation.log&quot;</span>
+        <span class="s2">&quot;logs/get_variation.log&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># save space and time with between workflow caching (see docs)</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1111-g021ee08d2/bio/reference/ensembl-variation&quot;</span>
+        <span class="s2">&quot;0.79.0-1159-g7fe792175/bio/reference/ensembl-variation&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -400,6 +404,7 @@
 <span class="n">release</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">release</span><span class="p">)</span>
 <span class="n">build</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">build</span>
 <span class="nb">type</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">type</span>
+<span class="n">chromosome</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chromosome&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">release</span> <span class="o">&lt;</span> <span class="mi">98</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ensembl releases &lt;98 are unsupported.&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;w&quot;</span><span class="p">))</span>
@@ -412,12 +417,24 @@
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+<span class="k">if</span> <span class="n">chromosome</span> <span class="ow">and</span> <span class="nb">type</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="s2">&quot;Parameter chromosome given but chromosome-wise download&quot;</span>
+        <span class="s2">&quot;is only implemented for type=&#39;all&#39;.&quot;</span>
+    <span class="p">)</span>
+
 <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">species</span> <span class="o">==</span> <span class="s2">&quot;homo_sapiens&quot;</span> <span class="ow">and</span> <span class="n">release</span> <span class="o">&gt;=</span> <span class="mi">93</span><span class="p">:</span>
-        <span class="n">suffixes</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;-chr</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chrom</span><span class="p">)</span> <span class="k">for</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">23</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;MT&quot;</span><span class="p">]</span>
-        <span class="p">]</span>
+        <span class="n">chroms</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">23</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;MT&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">chromosome</span> <span class="k">else</span> <span class="p">[</span><span class="n">chromosome</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">suffixes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-chr</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chrom</span><span class="p">)</span> <span class="k">for</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">chromosome</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Parameter chromosome given but chromosome-wise download&quot;</span>
+                <span class="s2">&quot;is only implemented for homo_sapiens in releases &gt;=93.&quot;</span>
+            <span class="p">)</span>
         <span class="n">suffixes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
 <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;somatic&quot;</span><span class="p">:</span>
     <span class="n">suffixes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_somatic&quot;</span><span class="p">]</span>

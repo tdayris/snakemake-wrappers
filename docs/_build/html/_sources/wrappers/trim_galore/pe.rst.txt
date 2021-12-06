@@ -17,18 +17,18 @@ This wrapper can be used in the following way:
 
     rule trim_galore_pe:
         input:
-            ["reads/{sample}.1.fastq.gz", "reads/{sample}.2.fastq.gz"]
+            ["reads/{sample}.1.fastq.gz", "reads/{sample}.2.fastq.gz"],
         output:
             "trimmed/{sample}.1_val_1.fq.gz",
-             "trimmed/{sample}.1.fastq.gz_trimming_report.txt",
-             "trimmed/{sample}.2_val_2.fq.gz",
-             "trimmed/{sample}.2.fastq.gz_trimming_report.txt"
+            "trimmed/{sample}.1.fastq.gz_trimming_report.txt",
+            "trimmed/{sample}.2_val_2.fq.gz",
+            "trimmed/{sample}.2.fastq.gz_trimming_report.txt",
         params:
-            extra="--illumina -q 20"
+            extra="--illumina -q 20",
         log:
-            "logs/trim_galore/{sample}.log"
+            "logs/trim_galore/{sample}.log",
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/trim_galore/pe"
+            "0.79.0-1159-g7fe792175/bio/trim_galore/pe"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -43,7 +43,7 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``trim-galore==0.4.5``
+* ``trim-galore==0.6.6``
 
 Input/Output
 ------------
@@ -134,3 +134,8 @@ Code
         " {snakemake.input})"
         " {log}"
     )
+
+
+.. |nl| raw:: html
+
+   <br>

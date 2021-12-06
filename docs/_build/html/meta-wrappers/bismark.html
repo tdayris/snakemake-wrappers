@@ -45,7 +45,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="BWA_FIXMATE" href="bwa_fixmate.html" />
+    <link rel="next" title="BISKMARK_MULTISAMPLE" href="bismark_multisample.html" />
     <link rel="prev" title="DESEQ2_POST_PROCESS" href="bioinfokit.html" /> 
 </head>
 
@@ -106,6 +106,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="bismark_multisample.html">BISKMARK_MULTISAMPLE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compress_index_vcf.html">COMPRESS_INDEX_VCF</a></li>
@@ -275,8 +276,8 @@
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Extracting methylation on </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bismark/meth/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
@@ -292,7 +293,6 @@
         <span class="s2">&quot;bismark/deduplicated/</span><span class="si">{sample}</span><span class="s2">.SE.bam&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">mbias_r1</span><span class="o">=</span><span class="s2">&quot;bismark/meth/</span><span class="si">{sample}</span><span class="s2">.M-bias_R1.png&quot;</span><span class="p">,</span>
-        <span class="n">mbias_r2</span><span class="o">=</span><span class="s2">&quot;bismark/meth/</span><span class="si">{sample}</span><span class="s2">.M-bias_R2.png&quot;</span><span class="p">,</span>
         <span class="n">mbias_report</span><span class="o">=</span><span class="s2">&quot;bismark/meth/</span><span class="si">{sample}</span><span class="s2">.SE.M-bias.txt&quot;</span><span class="p">,</span>
         <span class="n">splitting_report</span><span class="o">=</span><span class="s2">&quot;bismark/meth/</span><span class="si">{sample}</span><span class="s2">_SE_splitting_report.txt&quot;</span><span class="p">,</span>
         <span class="n">methylome_CpG_cov</span><span class="o">=</span><span class="s2">&quot;bismark/meth_cpg/</span><span class="si">{sample}</span><span class="s2">.bismark.cov.gz&quot;</span><span class="p">,</span>
@@ -312,8 +312,8 @@
         <span class="s2">&quot;Deduplicating </span><span class="si">{wildcards.sample}</span><span class="s2"> pair-ended mapping&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">30</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bismark/deduplicated/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
@@ -350,16 +350,16 @@
         <span class="n">ambiguous_2</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bismark/bams/</span><span class="si">{sample}</span><span class="s2">_ambiguous_reads_2.fq.gz&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Mapping pair-ended </span><span class="si">{wildcards.sample}</span><span class="s2"> with Bismark&quot;</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">20</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">8</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">120</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bismark/mapping/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">extra</span><span class="o">=</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;--fastq --bam --gzip --phred33-quals --ambiguous --unmapped --nucleotide_coverage --rg_tag &#39;@RG</span><span class="se">\t</span><span class="s2">ID:</span><span class="si">{</span><span class="n">w</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="se">\t</span><span class="s2">SM:</span><span class="si">{</span><span class="n">w</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="se">\t</span><span class="s2">PU:</span><span class="si">{</span><span class="n">w</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="se">\t</span><span class="s2">PL:ILLUMINA</span><span class="se">\t</span><span class="s2">CN:IGR</span><span class="se">\t</span><span class="s2">DS:MiraSeq</span><span class="se">\t</span><span class="s2">PG:BOWTIE2&#39;&quot;</span><span class="p">,</span>
-        <span class="n">basename</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">&quot;</span>
+        <span class="n">extra</span><span class="o">=</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;--fastq --bam --gzip --phred33-quals --ambiguous --unmapped --nucleotide_coverage &quot;</span><span class="p">,</span> <span class="c1"># --rg_tag &#39;@RG\\tID:{w.sample}\\tSM:{w.sample}\\tPU:{w.sample}\\tPL:ILLUMINA\\tCN:IGR\\tDS:MiraSeq\\tPG:BOWTIE2&#39;&quot;,</span>
+        <span class="c1">#basename=&quot;{sample}&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/bismark/bismark&quot;</span>
 
@@ -367,15 +367,15 @@
 <span class="n">use</span> <span class="n">rule</span> <span class="n">bismark_mapping_pair</span> <span class="k">as</span> <span class="n">bismark_mapping_single</span> <span class="k">with</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">genome</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span>
-        <span class="n">fq_1</span><span class="o">=</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.fq.gz&quot;</span><span class="p">,</span>
+        <span class="n">fq</span><span class="o">=</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.fq.gz&quot;</span><span class="p">,</span>
         <span class="n">bismark_indexes_dir</span><span class="o">=</span><span class="s2">&quot;biskmark/index/Bisulfite_Genome&quot;</span><span class="p">,</span>
         <span class="n">genomic_freq</span><span class="o">=</span><span class="s2">&quot;biskmark/index/genomic_nucleotide_frequencies.txt&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">bam</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bismark/bams/</span><span class="si">{sample}</span><span class="s2">.SE.bam&quot;</span><span class="p">),</span>
         <span class="n">report</span><span class="o">=</span><span class="s2">&quot;bismark/bams/</span><span class="si">{sample}</span><span class="s2">_SE_report.txt&quot;</span><span class="p">,</span>
         <span class="n">nucleotide_stats</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bismark/bams/</span><span class="si">{sample}</span><span class="s2">.SE.nucleotide_stats.txt&quot;</span><span class="p">),</span>
-        <span class="n">bam_unmapped_1</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bismark/bams/</span><span class="si">{sample}</span><span class="s2">_unmapped_reads_1.fq.gz&quot;</span><span class="p">),</span>
-        <span class="n">ambiguous_1</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bismark/bams/</span><span class="si">{sample}</span><span class="s2">_ambiguous_reads_1.fq.gz&quot;</span><span class="p">)</span>
+        <span class="c1">#bam_unmapped_1=temp(&quot;bismark/bams/{sample}_unmapped_reads_1.fq.gz&quot;),</span>
+        <span class="c1">#ambiguous_1=temp(&quot;bismark/bams/{sample}_ambiguous_reads_1.fq.gz&quot;)</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Mapping single-ended </span><span class="si">{wildcards.sample}</span><span class="s2"> with Bismark&quot;</span>
 
@@ -388,10 +388,10 @@
         <span class="n">temp</span><span class="p">(</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;biskmark/index/Bisulfite_Genome&quot;</span><span class="p">)),</span>
         <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;biskmark/index/genomic_nucleotide_frequencies.txt&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing genome with Bismark&quot;</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">20</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">7</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">40</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bismark/genome_preparation.log&quot;</span>
@@ -410,8 +410,8 @@
         <span class="s2">&quot;Linking fasta genome for bismark&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/bismark/genome_linking.log&quot;</span>
@@ -453,7 +453,7 @@ For additional parameters in each individual wrapper, please refer to their corr
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="bwa_fixmate.html" class="btn btn-neutral float-right" title="BWA_FIXMATE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="bismark_multisample.html" class="btn btn-neutral float-right" title="BISKMARK_MULTISAMPLE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="bioinfokit.html" class="btn btn-neutral float-left" title="DESEQ2_POST_PROCESS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

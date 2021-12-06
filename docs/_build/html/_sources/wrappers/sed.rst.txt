@@ -25,7 +25,7 @@ This wrapper can be used in the following way:
             replace_dict={"test": "replaced"},
             tmp="sed.tmp"
         wrapper:
-            "0.77.0-1111-g021ee08d2/bio/sed"
+            "0.79.0-1159-g7fe792175/bio/sed"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -149,7 +149,12 @@ Code
         intermediar.append(
             f"'1 s/^.$/{new_header}/'"
         )
+    
 
+    # Case of series of replacements
+    if (replace_dict := snakemake.params.get("replace_dict")) is not None:
+        for replace, replacement in replace_dict.items():
+            intermediar.append(f"'s/{replace}/{replacement}/g'")
 
     # Case of line removal on several criteria
     if (remove_list := snakemake.params.get("remove_list")) is not None:
@@ -158,11 +163,6 @@ Code
     if (remove_lines := snakemake.params.get("remove_lines")) is not None:
         for line_to_remove in remove_lines:
             intermediar.append(f"'{line_to_remove}d'")
-
-    # Case of series of replacements
-    if (replace_dict := snakemake.params.get("replace_dict")) is not None:
-        for replace, replacement in replace_dict.items():
-            intermediar.append(f"'s/{replace}/{replacement}/g'")
 
     # Other cases
     if (regex := snakemake.params.get("regex")) is not None:
@@ -189,3 +189,8 @@ Code
         sed_value = next(sed_iterator, None)
 
     shell("mv -v {temp_outfile} {snakemake.output[0]} {log}")
+
+
+.. |nl| raw:: html
+
+   <br>

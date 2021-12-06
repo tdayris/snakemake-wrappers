@@ -336,10 +336,14 @@ The pipeline contains the following steps:
     ### VCF annotation ###
     ######################
 
+    snpeff_snpsift_config = {
+        "ref": config["ref"],
+        **config["snpeff_snpsift"]
+    }
 
     module snpeff_meta:
         snakefile: "../../meta/bio/snpeff_annotate/test/Snakefile"
-        config: config
+        config: snpeff_snpsift_config
 
     use rule snpeff from snpeff_meta with:
         input:
@@ -350,7 +354,7 @@ The pipeline contains the following steps:
 
     module snpsift:
         snakefile: "../../meta/bio/snpsift/test/Snakefile"
-        config: config
+        config: snpeff_snpsift_config
 
     use rule * from snpsift as snpsift_*
 

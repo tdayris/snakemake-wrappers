@@ -101,6 +101,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="bioinfokit.html">DESEQ2_POST_PROCESS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bismark.html">BISKMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bismark_multisample.html">BISKMARK_MULTISAMPLE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compress_index_vcf.html">COMPRESS_INDEX_VCF</a></li>
@@ -387,6 +388,37 @@
         <span class="s2">&quot;logs/rbt/csv-report/</span><span class="si">{comparison}</span><span class="s2">_</span><span class="si">{subset}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/rbt/csvreport&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">deseq2_complete_with_counts</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">left</span><span class="o">=</span><span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{comparison}</span><span class="s2">_</span><span class="si">{content}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+        <span class="n">right</span><span class="o">=</span><span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/dst.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">merged</span><span class="o">=</span><span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{comparison}</span><span class="s2">_deseq2_</span><span class="si">{content}</span><span class="s2">_with_counts.tsv&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Adding counts to DESeq2 results for </span><span class="si">{wildcards.comparison}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/pandas/deseq2_with_counts/</span><span class="si">{comparison}</span><span class="s2">_</span><span class="si">{content}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">join</span><span class="o">=</span><span class="s2">&quot;--check-order -e &#39;.&#39; -t $&#39;</span><span class="se">\t</span><span class="s2">&#39; -j 1&quot;</span><span class="p">,</span>
+        <span class="n">head</span><span class="o">=</span><span class="s2">&quot;-n1&quot;</span><span class="p">,</span>
+        <span class="n">sed</span><span class="o">=</span><span class="s2">&quot;&#39;1d&#39;&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;paste &quot;</span>
+        <span class="s2">&quot;&lt;(head </span><span class="si">{params.head}</span><span class="s2"> </span><span class="si">{input.left}</span><span class="s2">) &quot;</span>
+        <span class="s2">&quot;&lt;(head </span><span class="si">{params.head}</span><span class="s2"> </span><span class="si">{input.right}</span><span class="s2">) &quot;</span>
+        <span class="s2">&quot;&gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;join </span><span class="si">{params.join}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;&lt;(sed </span><span class="si">{params.sed}</span><span class="s2"> </span><span class="si">{input.left}</span><span class="s2"> | sort) &quot;</span>
+        <span class="s2">&quot;&lt;(sed </span><span class="si">{params.sed}</span><span class="s2"> </span><span class="si">{input.right}</span><span class="s2"> | sort) &quot;</span>
+        <span class="s2">&quot;&gt;&gt; </span><span class="si">{output}</span><span class="s2"> 2&gt;&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
 
 
 <span class="n">rule</span> <span class="n">deseq2_to_gseaapp</span><span class="p">:</span>

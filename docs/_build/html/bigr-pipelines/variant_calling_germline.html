@@ -110,6 +110,7 @@
 <li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sarek_enhanced.html">SAREK ENHANCED</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a><ul>
@@ -477,10 +478,15 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ger
 <span class="c1">### VCF annotation ###</span>
 <span class="c1">######################</span>
 
+<span class="n">snpeff_snpsift_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;ref&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">],</span>
+    <span class="o">**</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;snpeff_snpsift&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
 
 <span class="n">module</span> <span class="n">snpeff_meta</span><span class="p">:</span>
     <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/snpeff_annotate/test/Snakefile&quot;</span>
-    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">snpeff_snpsift_config</span>
 
 <span class="n">use</span> <span class="n">rule</span> <span class="n">snpeff</span> <span class="kn">from</span> <span class="nn">snpeff_meta</span> <span class="k">with</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
@@ -491,7 +497,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ger
 
 <span class="n">module</span> <span class="n">snpsift</span><span class="p">:</span>
     <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/snpsift/test/Snakefile&quot;</span>
-    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">snpeff_snpsift_config</span>
 
 <span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">snpsift</span>
 
@@ -549,7 +555,8 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ger
     <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span>
     <span class="s2">&quot;known&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;af_only&quot;</span><span class="p">],</span>
     <span class="s2">&quot;bed&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;capture_kit_bed&quot;</span><span class="p">],</span>
-    <span class="s2">&quot;dbsnp&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">]</span>
+    <span class="s2">&quot;dbsnp&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;sample_list&quot;</span><span class="p">:</span> <span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
 <span class="p">}</span>
 
 <span class="n">module</span> <span class="n">gatk_mutect2_germline_meta</span><span class="p">:</span>

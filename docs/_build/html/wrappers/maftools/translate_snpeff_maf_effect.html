@@ -180,6 +180,7 @@
 <li class="toctree-l3"><a class="reference internal" href="plotmafsummary.html">PLOT_MAF_SUMMARY</a></li>
 <li class="toctree-l3"><a class="reference internal" href="readmaf.html">READ_MAF</a></li>
 <li class="toctree-l3"><a class="reference internal" href="signatures.html">SIGNATURES</a></li>
+<li class="toctree-l3"><a class="reference internal" href="somaticinteractions.html">SOMATIC INTERACTIONS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="titv.html">TITV</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">TRANSLATE_SNPEFF_MAF_EFFECT</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
@@ -197,6 +198,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../mapdamage2.html">MAPDAMAGE2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../microphaser.html">MICROPHASER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
@@ -247,6 +249,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../snpsift.html">SNPSIFT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sourmash.html">SOURMASH</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../spades.html">SPADES</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sra-tools.html">SRA-TOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../star.html">STAR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../strelka.html">STRELKA</a></li>
@@ -359,7 +362,7 @@
     <span class="n">output</span><span class="p">:</span>
         <span class="n">maf</span> <span class="o">=</span> <span class="s2">&quot;renamed.maf&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
-        <span class="s2">&quot;0.77.0-1111-g021ee08d2/bio/maftools/translate_snpeff_maf_effect&quot;</span>
+        <span class="s2">&quot;0.79.0-1159-g7fe792175/bio/maftools/translate_snpeff_maf_effect&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely.</p>
@@ -434,72 +437,103 @@
     <span class="s2">&quot;3_prime_UTR_variant&quot;</span>
 <span class="p">]</span>
 
+<span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">snpeff_term</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Guess the best MAFTools term from SnpEff/SnpSift very</span>
+<span class="sd">    precise annotation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">snpeff_term</span> <span class="o">=</span> <span class="n">snpeff_term</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)</span>
 
-<span class="n">translation_dict</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;chromosome_number_variation&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;exon_loss_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;frameshift_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Missense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;stop_gained&quot;</span><span class="p">:</span> <span class="s2">&quot;Nonsense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;stop_lost&quot;</span><span class="p">:</span> <span class="s2">&quot;Missense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;start_lost&quot;</span><span class="p">:</span> <span class="s2">&quot;Nonsense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;splice_acceptor_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;splice_acceptor_variant&amp;intron_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;splice_region_variant&amp;non_coding_transcript_exon_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;splice_region_variant&amp;synonymous_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;splice_donor_variant&amp;intron_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;splice_donor_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;structural_interaction_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Missense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;rare_amino_acid_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Missense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;missense_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Missense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;missense_variant&amp;splice_region_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;disruptive_inframe_insertion&quot;</span><span class="p">:</span> <span class="s2">&quot;Frame_Shift_Ins&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;conservative_inframe_insertion&quot;</span><span class="p">:</span> <span class="s2">&quot;In_Frame_Ins&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;disruptive_inframe_deletion&quot;</span><span class="p">:</span> <span class="s2">&quot;Frame_Shift_Del&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;conservative_inframe_deletion&quot;</span><span class="p">:</span> <span class="s2">&quot;In_Frame_Del&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;5_prime_UTR_truncation+exon_loss_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;5_prime_UTR_variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;3_prime_UTR_truncation+exon_loss&quot;</span><span class="p">:</span> <span class="s2">&quot;3_prime_UTR_variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;splice_branch_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;splice_region_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;stop_retained_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Nonsense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;initiator_codon_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Missense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;synonymous_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;initiator_codon_variant+non_canonical_start_codon&quot;</span><span class="p">:</span> <span class="s2">&quot;Missense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s1">&#39;stop_retained_variant&#39;</span><span class="p">:</span> <span class="s2">&quot;Nonsense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;coding_sequence_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Missense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;5_prime_UTR_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;5_prime_UTR_variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;3_prime_UTR_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;3_prime_UTR_variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;5_prime_UTR_premature_start_codon_gain_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;5_prime_UTR_variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;upstream_gene_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;downstream_gene_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;TF_binding_site_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;regulatory_region_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Missense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;miRNA&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;custom&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;sequence_feature&quot;</span><span class="p">:</span> <span class="s2">&quot;Missense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;conserved_intron_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;intron_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;intragenic_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;conserved_intergenic_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;intergenic_region&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;coding_sequence_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Missense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;non_coding_exon_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;non_coding_transcript_exon_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;nc_transcript_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;gene_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Missense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;chromosome&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Variant_Classification&quot;</span><span class="p">:</span> <span class="s2">&quot;Variant_Classification&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;protein_protein_contact&quot;</span><span class="p">:</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">,</span>
-    <span class="s1">&#39;splice_region_variant&amp;intron_variant&#39;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s1">&#39;splice_acceptor_variant&amp;splice_region_variant&amp;intron_variant&amp;non_coding_transcript_exon_variant&#39;</span><span class="p">:</span> <span class="s2">&quot;Splice_Site&quot;</span><span class="p">,</span>
-    <span class="s1">&#39;stop_gained&amp;splice_region_variant&#39;</span><span class="p">:</span> <span class="s2">&quot;Nonsense_Mutation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;frameshift_variant&amp;splice_region_variant&quot;</span><span class="p">:</span> <span class="s2">&quot;Frame_Shift_Ins&quot;</span>
-<span class="p">}</span>
+    <span class="n">nonsense</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;stop_retained_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;stop_lost&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;start_lost&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;stop_gained&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;stop_retained_variant&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">nonsense</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">snpeff_term</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Nonsense_Mutation&quot;</span>
+
+    <span class="n">frame_ins</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;inframe_insertion&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">frame_ins</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">snpeff_term</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;In_Frame_Ins&quot;</span>
+
+    <span class="n">frame_del</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;inframe_deletion&quot;</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">frame_del</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">snpeff_term</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;In_Frame_Del&quot;</span>
+
+    <span class="n">frame_shift_ins</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;duplication&quot;</span><span class="p">,</span> <span class="c1"># Duplication of a large chromosome segment (over 1% or 1,000,000 bases)</span>
+        <span class="s2">&quot;disruptive_inframe_insertion&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;frameshift_variant&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">frame_shift_ins</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">snpeff_term</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Frame_Shift_Ins&quot;</span>
+
+    <span class="n">frame_shift_del</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;chromosome&quot;</span><span class="p">,</span> <span class="c1"># A large parte (over 1%) of the chromosome was deleted.</span>
+        <span class="s2">&quot;disruptive_inframe_deletion&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;exon_loss_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;feature_ablation&quot;</span><span class="p">,</span>
+
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">frame_shift_del</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">snpeff_term</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Frame_Shift_Del&quot;</span>
+
+    <span class="n">splice</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;splice_acceptor_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;splice_donor_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;splice_region_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;exon_loss&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;exon_loss_variant&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">splice</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">snpeff_term</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Splice_Site&quot;</span>
+
+    <span class="n">p5</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;5_prime_UTR_premature_start_codon_gain_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;start_retained&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;5_prime_UTR_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;5_prime_UTR_truncation&quot;</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">p5</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">snpeff_term</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;5_prime_UTR_variant&quot;</span>
+
+    <span class="n">p3</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;3_prime_UTR_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;3_prime_UTR_truncation&quot;</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">p3</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">snpeff_term</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;3_prime_UTR_variant&quot;</span>
+
+    <span class="n">missense</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;coding_sequence_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;inversion&quot;</span><span class="p">,</span> <span class="c1"># Inversion of a large chromosome segment (over 1% or 1,000,000 bases).</span>
+        <span class="s2">&quot;exon_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gene_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gene_fusion&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bidirectional_gene_fusion&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rearranged_at_DNA_level&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;missense_variant&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;initiator_codon_variant&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;structural_interaction_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rare_amino_acid_variant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;transcript_variant&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">missense</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">snpeff_term</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Missense_Mutation&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;Synonymous_Variant&quot;</span>
+
 
 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Reading MAF file&quot;</span><span class="p">)</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;maf&quot;</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Maf file loaded&quot;</span><span class="p">)</span>
 <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Variant_Classification&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">translation_dict</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Variant_Classification&quot;</span><span class="p">]</span>
+    <span class="n">translate</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Variant_Classification&quot;</span><span class="p">]</span>
 <span class="p">]</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Variant_Classification translated&quot;</span><span class="p">)</span>
 <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;maf&quot;</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
