@@ -78,3 +78,13 @@ def link_fq_somatic(
             link_dict["tumor"][f"reads/tumor/{sample}.2.fq.gz"] = t2
 
     return link_dict
+
+
+def link_vcf(sample_names: list[str], files: list[str]) -> dict[str, str]:
+    """
+    Build a dictionnary linking a vcf path to its axpected path
+    """
+    return {
+        f"data_input/calls/{sample}.vcf.gz": file
+        for file, sample in zip(files, sample_names)
+    }
