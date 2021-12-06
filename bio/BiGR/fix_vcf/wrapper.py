@@ -6,6 +6,7 @@ split ANN field in the INFO column in a VCF file
 """
 
 import datetime
+import gzip
 import logging
 import re
 
@@ -14,6 +15,14 @@ logging.basicConfig(
     filemode="w",
     level=logging.INFO
 )
+
+
+def open_function(file: str):
+    """Return the correct opening function"""
+    if file.endswith(".gz"):
+        return gzip.open(file, "rb")
+    return open(file, "r")
+
 
 def create_header(section: str,
                   key: str,
@@ -50,6 +59,31 @@ def add_format(format_header: str,
         result.append(add_sample(value, format))
     return "\t".join(result)
 
+
+def sort_headers(lines) -> str:
+    infos = []
+    formats = []
+    filters = []
+    contigs = []
+    fileformats = []
+    others = []
+
+    for line in lines:
+        if line.startswith("##INFO"):
+            infos.append(line)
+        elif line.startswith("##FORMAT"):
+            formats.append(line)
+        elif line.startswith("##FILTER"):
+            filters.append(line)
+        elif line.startswith("##contig"):
+            contigs.append(line)
+        elif line.startswith("##fileformat"):
+            fileformats.append(line)
+        else:
+            others.append(line)
+
+    return "".join(fileformats + filters + formats + infos + others + contigs)
+
 default_chr = list(map(str, range(23))) + ["MT", "X", "Y"]
 if "default_chr" in snakemake.params.keys():
     default_chr = snakemake.params["default_chr"]
@@ -61,17 +95,30 @@ name = "fix_vcf"
 url = f"github.com/tdayris/snakemake-wrappers/tree/Unofficial/bio/BiGR/{name}/wrapper.py"
 headers = f"""##BiGRCommandLine=<ID={name},CommandLine="{url}",Version={version},Date={datetime.date.today()}>\n"""
 
+header_list = []
 
-with (open(snakemake.input["vcf"], "r") as vcfin,
-      open(snakemake.output["vcf"], "w") as vcfout):
+
+logging.debug("Opening VCFs")
+if str(snakemake.output["vcf"]).endswith("vcf.gz"):
+    out_vcf = snakemake.output["vcf"][:-3]
+else:
+    out_vcf = snakemake.output["vcf"]
+
+with (open_function(snakemake.input["vcf"]) as vcfin,
+      open(out_vcf, "w", encoding="utf-8") as vcfout):
     for line in vcfin:
+        if isinstance(line, bytes):
+            line = line.decode("utf-8")
+
         if line.startswith("##"):
             # Header/formats/filters...
-            vcfout.write(line)
+            #vcfout.write(line)
+            header_list.append(line)
             continue
 
         elif line.startswith("#"):
             # Column names
+            vcfout.write(sort_headers(header_list))
             vcfout.write(headers)
             print(line)
             chomp = line[:-1].split("\t")
@@ -90,3 +137,12 @@ with (open(snakemake.input["vcf"], "r") as vcfin,
         info = info.replace(";;", ";").strip(";")
         line = "\t".join([chrom, pos, idx, ref, alt, qual, fil, info, format, *samples]) + "\n"
         vcfout.write(line)
+
+
+if str(snakemake.output["vcf"]).endswith("vcf.gz"):
+    logging.info(f"Compressing {out_vcf}")
+    shell("pbgzip -c {out_vcf} > {snakemake.output['vcf']} 2> {log}")
+    logging.info(f"Indexing {snakemake.output['call']}")
+    shell("tabix -p vcf {snakemake.output['vcf']} >> {log} 2>&1")
+    logging.info(f"Removing temporary file {out_vcf}")
+    shell("rm --verbose {out_vcf} >> {log} 2>&1")

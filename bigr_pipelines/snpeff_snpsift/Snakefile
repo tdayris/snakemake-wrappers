@@ -4,6 +4,12 @@ import pandas
 import sys
 from pathlib import Path
 
+logging.basicConfig(
+    filename="snakemake.snpeff_snpsift.log",
+    filemode="w",
+    level=logging.DEBUG
+)
+
 worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
 common = str(worflow_source_dir / "../common/python")
 sys.path.append(common)
@@ -17,21 +23,26 @@ min_version("6.0")
 
 default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
 configfile: get_config(default_config)
-design = build_design(os.getcwd(), search_fastq_pairs)
+design = build_design(os.getcwd(), search_vcf_files)
 
 from pathlib import Path
 
+container: "docker://continuumio/miniconda3:4.4.10"
+localrules: bigr_copy
 
 samples_list = design["Sample_id"]
-
 
 wildcard_constraints:
     sample = r"|".join(samples_list)
 
+vcf_links = link_vcf(
+    design.Sample_id,
+    design.Upstream_file
+)
 
 last_vcf = (
-    "snpsift/gnomad/{sample}.vcf"
-    if config["params"]["NBCI_build"] != "mm10"
+    "bigr/cancer_gene_census/{sample}.vcf"
+    if config["params"]["ncbi_build"] != "mm10"
     else "snpsift/dbsnp/{sample}.vcf"
 )
 
@@ -60,15 +71,18 @@ module compress_index_vcf_meta:
     config: config
 
 
-use rule pbgzip_compress from compress_index_vcf_meta with:
-    output:
-        protected("{tool}/{subcommand}/{sample}.vcf.gz")
+use rule * from compress_index_vcf_meta
 
 
-use rule tabix_index from compress_index_vcf_meta with:
-    output:
-        protected("{tool}/{subcommand}/{sample}.vcf.gz.tbi")
-    threads: 1
+# use rule pbgzip_compress from compress_index_vcf_meta with:
+#     output:
+#         protected("{tool}/{subcommand}/{sample}.vcf.gz")
+#
+#
+# use rule tabix_index from compress_index_vcf_meta with:
+#     output:
+#         protected("{tool}/{subcommand}/{sample}.vcf.gz.tbi")
+#     threads: 1
 
 
 #####################
@@ -90,14 +104,14 @@ rule extractfields:
     log:
         "logs/snpsift/extractAllFields/{sample}.log"
     params:
-        extra="-s '\t' -e '.'"
+        extra="-s $'\\t' -e '.'"
     wrapper:
         "bio/snpsift/extractAllFields"
 
 
 rule fix_vcf:
     input:
-        vcf="snpsift/splitted/{sample}.vcf"
+        vcf=last_vcf
     output:
         vcf=temp("snpsift/fixed/{sample}.vcf")
     message:
@@ -111,48 +125,10 @@ rule fix_vcf:
     log:
         "logs/bigr_scripts/fix_vcf/{sample}.log"
     params:
-        default_chr=[*map(str, range(23)), *range(23), "MT", "X", "Y"],
+        default_chr=config["params"]["chr"],
         remove_non_conventional_chromosomes=True
     wrapper:
         "bio/BiGR/fix_vcf"
-
-
-rule split_vcf_features:
-    input:
-        call="snpsift/format2info/{sample}.vcf"
-    output:
-        call=temp("snpsift/splitted/{sample}.vcf")
-    message:
-        "Splitting ANN field of {wildcards.sample} to better "
-        "end-user TSV experience"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
-        tmpdir="tmp"
-    log:
-        "logs/bigr_scripts/split_ann/{sample}.log"
-    wrapper:
-        "bio/BiGR/split_vcf_features"
-
-
-rule format_to_info:
-    input:
-        call="snpsift/gnomad/{sample}.vcf"
-    output:
-        call=temp("snpsift/format2info/{sample}.vcf")
-    message:
-        "Moving FORMAT data to INFO to increase readability and fixing field "
-        "name redundancy for {wildcards.sample}"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
-        tmpdir="tmp"
-    log:
-        "logs/bigr_scripts/format2info/{sample}.log"
-    wrapper:
-        "bio/BiGR/vcf_format_to_info"
 
 
 ###############
@@ -187,9 +163,74 @@ rule multiqc:
         "bio/multiqc"
 
 
-######################
-### VCF annotation ###
-######################
+##########################
+### Custom annotations ###
+##########################
+
+
+rule cancer_gene_census_annotate:
+    input:
+        vcf="bigr/oncokb/{sample}.vcf",
+        cgc=config["ref"]["cancer_census"]
+    output:
+        vcf=temp("bigr/cancer_gene_census/{sample}.vcf")
+    message:
+        "Adding CancerGeneCensus annotation in {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
+        time_min=lambda wildcards, attempt: attempt * 25,
+        tmpdir="tmp"
+    log:
+        "logs/bigr/cancer_gene_census_annotate/{sample}.log"
+    wrapper:
+        "bio/BiGR/cancer_gene_census_annotate"
+
+
+rule oncokb_annotate:
+    input:
+        vcf="snpsift/clinvar/{sample}.vcf", #"splice_ai/{sample}.vcf",
+        oncokb=config["ref"]["oncokb"]
+    output:
+        vcf=temp("bigr/oncokb/{sample}.vcf")
+    message:
+        "Adding OncoKB annotation in {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 6,
+        time_min=lambda wildcards, attempt: attempt * 35,
+        tmpdir="tmp"
+    log:
+        "logs/bigr/oncokb/{sample}.log"
+    wrapper:
+        "bio/BiGR/oncokb_annotate"
+
+
+rule splice_ai:
+    input:
+        vcf = "snpsift/clinvar/{sample}.vcf",
+        fasta = config["ref"]["fasta"]
+    output:
+        vcf = temp("splice_ai/{sample}.vcf")
+    message:
+        "Adding Splice Variant annotation to {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 3,
+        time_min=lambda wildcards, attempt: attempt * 60 * 4,
+        tmpdir="tmp"
+    params:
+        annotation=config["params"].get("ncbi_build", "grch38").lower(),
+        piped = True
+    log:
+        "logs/splice_ai/{sample}.log"
+    wrapper:
+        "bio/spliceai"
+
+
+#########################
+### snpeff annotation ###
+#########################
 
 snpeff_snpsift_config = {
     "ref": config["ref"],
@@ -202,13 +243,14 @@ module snpeff_meta:
 
 use rule snpeff from snpeff_meta with:
     input:
-        calls="calls/{sample}.vcf.gz",
-        calls_index="calls/{sample}.vcf.gz.tbi",
+        calls="data_input/calls/{sample}.vcf.gz",
+        calls_index="data_input/calls/{sample}.vcf.gz.tbi",
         db=config["ref"]["snpeff"]
-    output:
-        calls=temp("snpeff/{sample}.vcf"),
-        stats=temp("snpeff/{sample}.html"),
-        csvstats=temp("snpeff/{sample}.csv")
+
+
+##########################
+### snpsift annotation ###
+##########################
 
 
 module snpsift:
@@ -216,3 +258,24 @@ module snpsift:
     config: snpeff_snpsift_config
 
 use rule * from snpsift
+
+
+#################################################
+### Gather files from iRODS or mounting point ###
+#################################################
+
+rule bigr_copy:
+    output:
+        "data_input/calls/{sample}.vcf.gz"
+    message:
+        "Getting {wildcards.sample} VCF file"
+    threads: 1
+    resources:
+      mem_mb=lambda wildcards, attempt: min(attempt * 1024, 2048),
+      time_min=lambda wildcards, attempt: attempt * 45,
+    params:
+        input=lambda wildcards, output: vcf_links[output[0]]
+    log:
+        "logs/bigr_copy/{sample}.log"
+    wrapper:
+        "bio/BiGR/copy"

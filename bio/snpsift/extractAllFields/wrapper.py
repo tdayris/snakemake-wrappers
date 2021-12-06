@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """Snakemake wrapper for SnpSift extractFields"""
 
 __author__ = "Thibault Dayris"
@@ -5,8 +8,9 @@ __copyright__ = "Copyright 2020, Dayris Thibault"
 __email__ = "thibault.dayris@gustaveroussy.fr"
 __license__ = "MIT"
 
-import re
+import gzip
 import logging
+import re
 
 logging.basicConfig(
     filemode="w",
@@ -49,13 +53,12 @@ help = [
     "POS: Position over the chromosome",
     "ID: Variant identifier"
 ]
-with open(snakemake.input.call, "r") as vcf_stream:
+with gzip.open(snakemake.input.call, "rb") as vcf_stream:
     ignore_format = snakemake.params.get("ignore_format", False) is True
     regex_general = r'##([^=]+)=(.+$)'
     regex_id = r"<ID=([^,]+),(.*)>"
     for line in vcf_stream:
-        logging.debug("")
-        logging.debug(line[:-1])
+        line = line.decode("utf-8")
         if not line.startswith("##"):
             logging.warning("Breaking!")
             break

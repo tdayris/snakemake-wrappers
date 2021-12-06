@@ -1,6 +1,42 @@
 design: design.tsv
-fastp:
-  fastp_extra: ''
+snpeff_snpsift:
+  snpeff_extra: -noLog -nodownload -lof
+  snpsift_kaviar: -name 'Kaviar_' -exists 'ExistsInKaviar' -tabix -noDownload -noLog
+  snpsift_cosmic: -name 'cosmic_' -exists 'ExistsInCosmic' -tabix -noDownload -noLog
+  snpsift_dbsnp: -name 'dbSNP_' -exists 'ExistsInDBsnp' -tabix -noDownload -noLog
+  snpsift_clinvar: -name 'clinvar_' -exists 'ExistsInClinVar' -tabix -noDownload -noLog
+  snpsift_gnomad: -name 'gnomad_' -exists 'ExistsInGnomAD' -tabix -noDownload -noLog
+  snpsift_dbnsfp: -noDownload -noLog -f 'hg18_chr,hg18_pos(1-based)' -n  -g hg19
+  snpsift_gwascat: -g hg19 -noDownload -noLog
+params:
+  center: GustaveRoussy
+  ncbi_build: GRCh37
+  chr:
+    - chr1
+    - chr2
+    - chr3
+    - chr4
+    - chr5
+    - chr6
+    - chr7
+    - chr8
+    - chr9
+    - chr10
+    - chr11
+    - chr12
+    - chr13
+    - chr14
+    - chr15
+    - chr16
+    - chr17
+    - chr18
+    - chr19
+    - chr20
+    - chr21
+    - chr22
+    - chrX
+    - chrY
+    - chrMT
 ref:
   cosmic: /mnt/beegfs/database/bioinfo/COSMIC/73_20150629/CosmicCodingMuts.vcf
   dbsnp: /mnt/beegfs/database/bioinfo/Index_DB/dbSNP/hg19/144_20150605/All_20150605.vcf.gz
@@ -10,38 +46,6 @@ ref:
   kaviar: /mnt/beegfs/database/bioinfo/Index_DB/Kaviar/HG19/Kaviar-160204-Public/vcfs/Kaviar-160204-Public-hg19-trim.vcf.gz
   snpeff: /mnt/beegfs/database/bioinfo/Index_DB/SnpEff/GRCh37.75/
   capture_kit_bed: /mnt/beegfs/userdata/t_dayris/hglft_www_2d6a7_9d3a70.bed
+  oncokb: /mnt/beegfs/database/bioinfo/Index_DB/OncoKB/OncoKB.csv
+  cancer_census: /mnt/beegfs/database/bioinfo/Index_DB/CancerGeneCensus/Census_allTue_Aug_31_15_11_39_2021.csv
 threads: 20
-fastq_screen:
-  database:
-    Contaminants:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Adapters/Contaminants
-    AThaliana:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Arabidopsis/Arabidopsis_thaliana.TAIR10
-    Drosophila:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Drosophila/BDGP6
-    Ecoli:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/E_coli/Ecoli
-    Human:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Human/Homo_sapiens.GRCh38
-    Lambda:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Lambda/Lambda
-    Mitochondria:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Mitochondria/mitochondria
-    Mouse:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Mouse/Mus_musculus.GRCm38
-    PhiX:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/PhiX/phi_plus_SNPs
-    Rat:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Rat/Rnor_6.0
-    rRNA:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/rRNA/GRCm38_rRNA
-    Vectors:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Vectors/Vectors
-    Worm:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Worm/Caenorhabditis_elegans.WBcel235
-    Yeast:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Yeast/Saccharomyces_cerevisiae.R64-1-1
-    SalmoSalar:
-      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/SalmoSalar/Salmo_salar.ICSASG_v2
-  aligner_paths:
-    bowtie2: bowtie2
