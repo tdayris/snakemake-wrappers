@@ -45,7 +45,10 @@ if "pon" in snakemake.input.keys():
 extra = snakemake.params.get("extra", "")
 java_opts = get_java_opts(snakemake)
 
+java_opts += f" -XX:+UseParallelGC -XX:ParallelGCThreads={snakemake.threads}"
+
 shell(
+    "OMP_NUM_THREADS={snakemake.threads} && export OMP_NUM_THREADS && "
     "gatk --java-options '{java_opts}' Mutect2 "  # Tool and its subprocess
     " {tumor} "  # Path to tumor input file
     "--input {snakemake.input.map} "  # Path to input mapping file
@@ -55,6 +58,7 @@ shell(
     "{intervals} "  # Path to optional intervals
     "--output {snakemake.output.vcf} "  # Path to output vcf file
     "--reference {snakemake.input.fasta} "  # Path to reference fasta file
+    "--native-pair-hmm-threads {snakemake.threads} "  # Maximum number of threads
     "{extra} "  # Extra parameters
     "{log}"  # Logging behaviour
 )

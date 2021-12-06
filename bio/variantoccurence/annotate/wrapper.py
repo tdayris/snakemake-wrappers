@@ -33,7 +33,7 @@ def annotate_vcf(inv: str, outv: str, occurence: dict[str, int]) -> None:
 
             else:
                 chomp = line.split("\t")
-                var_occ = occurence[":".join(chomp[0:5])]
+                var_occ = occurence.get(":".join(chomp[0:5]), "0")
                 if chomp[7] == ".":
                     chomp[7] = f"VarOcc={var_occ}"
                 else:
