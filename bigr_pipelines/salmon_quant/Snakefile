@@ -55,7 +55,8 @@ rule target:
     input:
         "multiqc/MultiQC.html",
         "salmon/TPM.genes.tsv",
-        "salmon/TPM.transcripts.tsv"
+        "salmon/TPM.transcripts.tsv",
+        "salmon/Raw.genes.tsv"
     output:
         directory("results_to_upload")
     threads: 1
@@ -74,6 +75,36 @@ rule target:
 ########################
 ### Aggregate counts ###
 ########################
+
+
+rule aggregate_raw_counts:
+    input:
+        quant=expand(
+            "salmon/pseudo_mapping/{sample}/quant.genes.sf",
+            sample=design["Sample_id"]
+        ),
+        tx2gene="salmon/tx2gene.tsv"
+    output:
+        tsv="salmon/Raw.genes.tsv"
+    message:
+        "Aggregating genes counts with their gene names"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 4,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        header=False,
+        position=False,
+        gencode=True,
+        genes=True,
+        index_label=True,
+        fillna="Unknown",
+        column="NumReads"
+    log:
+        "logs/aggregate/genes.log"
+    wrapper:
+        "bio/pandas/salmon"
 
 
 rule aggregate_gene_counts:
@@ -297,7 +328,7 @@ use rule salmon_quant_paired from salmon_meta with:
 
 use rule salmon_quant_paired from salmon_meta as salmon_quant_single with:
     input:
-        r="reads/{sample}.fq.gz",
+        r="fastp/trimmed/pe/{sample}.fq.gz",
         index=config["ref"].get("salmon_index", "salmon/index"),
         gtf=config["ref"]["gtf"]
     output:
