@@ -20,6 +20,10 @@ extra = snakemake.params.get("extra", "")
 # to fill the requested parameter '-o'
 prefix = commonprefix(snakemake.output)
 
+region = ""
+if "bed" in snakemake.input.keys():
+    region = "-e {snakemake.input.bed}"
+
 shell(
     "msisensor-pro msi"  # Tool and its sub-command
     " -d {snakemake.input.microsat}"  # Path to homopolymer/microsat file
@@ -27,6 +31,7 @@ shell(
     " -t {snakemake.input.tumor}"  # Path to tumor bam
     " -o {prefix}"  # Path to output distribution file
     " -b {snakemake.threads}"  # Maximum number of threads used
+    " {region}"
     " {extra}"  # Optional extra parameters
     " {log}"  # Logging behavior
 )
