@@ -1,0 +1,37 @@
+# pipeline_path = workflow.get_source()
+# print(pipeline_path)
+
+
+rule target:
+    input:
+        "SigProfiler/s050/s050_matrix.yaml"
+
+
+rule sigprofiler_matrix_generator:
+    input:
+        vcf = "snpsift/fixed/{sample}.vcf",
+        sigprofiler_script = "/home/tdayris/Documents/Developments/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/matrix_generator.py"
+    output:
+        yaml = "SigProfiler/{sample}/{sample}_matrix.yaml",
+        matrices = directory("SigProfiler/{sample}/test")
+    message:
+        "Building substitution matrices with SigProfiler on {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
+    conda:
+        "/home/tdayris/Documents/Developments/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/sigprofiler.yaml"
+    log:
+        "logs/sigprofiler/matrix_generator/{sample}.log"
+    params:
+        mk = "--parents --verbose",
+        rs = "--checksum --verbose --human-readable --partial --progress"
+    shell:
+        "mkdir {params.mk} {output.matrices}/input "
+        "> {log} 2>&1 && "
+        "rsync {params.rs} {input.vcf} {output.matrices}/input "
+        ">> {log} 2>&1 && "
+        "python3 {input.sigprofiler_script} {input.vcf} {output.yaml} "
+        ">> {log} 2>&1 "
