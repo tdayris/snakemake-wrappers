@@ -10,7 +10,7 @@ __license__ = "MIT"
 
 from snakemake.shell import shell
 
-log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 gtf = ""
 if "gtf" in snakemake.input.keys():
@@ -24,15 +24,17 @@ contained = ""
 if "contained" in snakemake.output.keys():
     contained = "--contained {}".format(snakemake.output["contained"])
 
-anno = "--anno {}".format(snakemake.output["vcf"])
+#anno = "--anno {}".format(snakemake.output["vcf"])
 extra = snakemake.params.get("extra", "")
 
 shell(
     "sansa annotate "
     "{gtf} "
     "{db} "
-    "{anno} "
+    #"{anno} "
     "{contained} "
     "{extra} "
+    "{snakemake.input.vcf} "
+    " > {snakemake.output.vcf} "
     "{log}"
 )

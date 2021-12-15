@@ -128,7 +128,7 @@ with gzip.open(snakemake.input.call, "rb") as vcf_stream:
                 ]
             else:
                 logging.debug("Adding unknown info: '%s'", hid)
-                fields.append(hid)
+                fields.append(f"'{hid}'")
 
 
 if isinstance(fields, list):
