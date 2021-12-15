@@ -162,6 +162,14 @@ if (tr2gene_path := snakemake.input.get("tx2gene", None)) is not None:
         how="left"
     )
 
+if snakemake.params.get("genes", False) is True:
+    merged_frame.index.name = "Ensembl_Gene_ID"
+else:
+    merged_frame.index.name = "Ensembl_Transcript_ID"
+
+if (fillna := snakemake.params.get("fillna", None)) is not None:
+    merged_frame.fillna(fillna, inplace=True)
+
 logging.debug("Saving DataFrame to disk")
 merged_frame.to_csv(
     snakemake.output["tsv"],

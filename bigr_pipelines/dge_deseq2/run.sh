@@ -23,6 +23,7 @@ while [ "$#" -gt 0 ]; do
   case "${1}" in
     hg19|HG19) CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"; shift;;
     hg38|HG38) CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"; shift;;
+    mm10|MM10) CONFIG_PATH="${PIPELINE_PATH}/config.mm10.yaml"; shift;;
     -p|--profile) PROFILE="${2}"; shift 2;;
     --summary) SUMMARY="${2}"; shift 2;;
     --rulegraph) GRAPH="${2}"; shift 2;;

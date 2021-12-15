@@ -6,61 +6,213 @@ __email__ = "thibault.dayris@gustaveroussy.fr"
 __license__ = "MIT"
 
 import datetime
+import gzip
 import logging
+import os.path
 
-def create_header(sample_name, field_name):
-    return f"""##INFO=<ID=FORMAT_{sample_name}_{field_name},Number=.,Type=String,Description="Copy of the value of the field {field_name} from FORMAT concerning sample/tool {sample_name}">"""
+from snakemake.utils import makedirs
+from typing import List, Optional, Union
+
+logging.basicConfig(
+    filename=snakemake.log[0],
+    filemode="w",
+    level=logging.DEBUG
+)
+
+makedirs(os.path.dirname(snakemake.output["call"]))
+
+
+def open_function(file: str):
+    """Return the correct opening function"""
+    if file.endswith(".gz"):
+        return gzip.open(file, "rb")
+    return open(file, "r")
+
+
+def get_supplementary_headers(prefixes: List[str]) -> str:
+    prefixes = [p.replace("-", "_") for p in prefixes]
+    headers = [
+        """##FILTER=<ID=IsGermline,Number=.,Type=String,Description="Variant exists in Normal">\n""",
+        """##FILTER=<ID=IsSomatic,Number=.,Type=String,Description="Variant does not exists in Normal, but exists in Tumor">\n""",
+        """##INFO=<ID=Match_Norm_Seq_Allele1,Number=.,Type=String,Description="Normal allele 1">\n""",
+        """##INFO=<ID=Match_Norm_Seq_Allele2,Number=.,Type=String,Description="Normal allele 2">\n""",
+        """##INFO=<ID=Start_Position,Number=.,Type=String,Description="Mutation start coordinate (1 based)">\n""",
+        """##INFO=<ID=End_Position,Number=.,Type=String,Description="Mutation end coordinate (1 based)">\n""",
+        """##INFO=<ID=Tumor_Seq_Allele1,Number=.,Type=String,Description="Tumor allele 1">\n""",
+        """##INFO=<ID=Tumor_Seq_Allele2,Number=.,Type=String,Description="Tumor allele 2">\n""",
+        """##INFO=<ID=t_depth,Number=.,Type=String,Description="Read depth across this locus in tumor">\n""",
+        """##INFO=<ID=t_ref_count,Number=.,Type=String,Description="Read depth supporting the reference allele in tumor">\n""",
+        """##INFO=<ID=t_alt_count,Number=.,Type=String,Description="Read depth supporting the variant allele in tumor">\n""",
+        """##INFO=<ID=n_depth,Number=.,Type=String,Description="Read depth across this locus in normal">\n""",
+        """##INFO=<ID=n_ref_count,Number=.,Type=String,Description="Read depth supporting the reference allele in normal">\n""",
+        """##INFO=<ID=n_alt_count,Number=.,Type=String,Description="Read depth supporting the variant allele in normal">\n""",
+        """##INFO=<ID=vcf_tumor_gt,Number=.,Type=String,Description="Tumor sample genotype column from VCF">\n""",
+        """##INFO=<ID=vcf_normal_gt,Number=.,Type=String,Description="Normal sample genotype column from VCF">\n""",
+        """##INFO=<ID=MutationNumberAt,Number=.,Type=String,Description="This is the nth mutation seen at this position">\n""",
+        """##INFO=<ID=Matched_Norm_Sample_Barcode,Number=.,Type=String,Description="Normal sample name">\n""",
+        """##INFO=<ID=Tumor_Sample_Barcode,Number=.,Type=String,Description="Tumor sample name">\n""",
+    ]
+
+    for prefix in prefixes:
+        headers += [
+            f"""##INFO=<ID={prefix}_MutationStatus,Number=.,Type=String,Description="{prefix} mutation status (het, hom, ...)">\n""",
+            f"""##INFO=<ID={prefix}_Reference_Allele,Number=.,Type=String,Description="{prefix} reference allele">\n""",
+            f"""##INFO=<ID={prefix}_Seq_Allele1,Number=.,Type=String,Description="{prefix} alternative allele 1">\n""",
+            f"""##INFO=<ID={prefix}_Seq_Allele2,Number=.,Type=String,Description="{prefix} alternative allele 2">\n""",
+            f"""##INFO=<ID={prefix}_DP,Number=.,Type=String,Description="{prefix} read depth">\n""",
+            f"""##INFO=<ID={prefix}_AD_allele1,Number=.,Type=String,Description="{prefix} allele 1 depth">\n""",
+            f"""##INFO=<ID={prefix}_AD_allele2,Number=.,Type=String,Description="{prefix} allele 2 depth">\n""",
+            f"""##INFO=<ID={prefix}_AF,Number=.,Type=String,Description="{prefix} allele frequency">\n""",
+            f"""##INFO=<ID={prefix}_Seq_Allele2,Number=.,Type=String,Description="{prefix} alternative allele 2">\n"""
+        ]
+
+    return headers
+
+
+def annotate_mutect2(genotype: str,
+                     ref: str,
+                     alt: str,
+                     prefix: str,
+                     filter: str,
+                     dp: str,
+                     ad: str,
+                     af: str,
+                     normal: bool = False,
+                     tumor: bool = False) -> List[Union[List[str], str]]:
+    """Break down a genotype information, break down DP/AD/AF into info"""
+
+    prefix = prefix.replace("-", "_")
+    annotation = [
+        f"{prefix}_Reference_Allele={ref}",
+        f"{prefix}_DP={dp}",
+        f"{prefix}_AF={af}"
+    ]
+
+    if normal is True:
+        annotation.append(f"Matched_Norm_Sample_Barcode={prefix}")
+        annotation.append(f"n_depth={dp}")
+        annotation.append(f"vcf_normal_gt={genotype}")
+    if tumor is True:
+        annotation.append(f"Tumor_Sample_Barcode={prefix}")
+        annotation.append(f"t_depth={dp}")
+        annotation.append(f"vcf_tumor_gt={genotype}")
+
+    if genotype in ["./.", "././.", "./././."]:
+        return annotation
+
+    genotype_list = genotype.split("/")
+    if genotype_list[0] == "0":
+        annotation.append(f"{prefix}_Seq_Allele1={ref}")
+        annotation.append(f"{prefix}_AD_allele1={ad.split(',')[0]}")
+        if normal is True:
+            annotation.append(f"Match_Norm_Seq_Allele1={ref}")
+            annotation.append(f"n_ref_count={ad.split(',')[0]}")
+        if tumor is True:
+            annotation.append(f"Tumor_Seq_Allele1={ref}")
+            annotation.append(f"t_ref_count={ad.split(',')[0]}")
+    else:
+        annotation.append(f"{prefix}_Seq_Allele1={alt}")
+        if normal is True:
+            annotation.append(f"Match_Norm_Seq_Allele1={alt}")
+        if tumor is True:
+            annotation.append(f"Tumor_Seq_Allele1={alt}")
+
+    for idx, value in enumerate(genotype_list[1:], start=2):
+        try:
+            annotation.append(f"{prefix}_AD_allele{idx}={ad.split(',')[idx-1]}")
+            if value == "0":
+                annotation.append(f"{prefix}_Seq_Allele{idx}={ref}")
+                if normal is True:
+                    annotation.append(f"Match_Norm_Seq_Allele{idx}={ref}")
+                if tumor is True:
+                    annotation.append(f"Tumor_Seq_Allele{idx}={ref}")
+            else:
+                    annotation.append(f"{prefix}_Seq_Allele{idx}={alt}")
+                    annotation.append(f"t_alt_count={ad.split(',')[idx-1]}")
+                    if normal is True:
+                        annotation.append(f"Match_Norm_Seq_Allele{idx}={alt}")
+                        annotation.append(f"n_alt_count={ad.split(',')[idx-1]}")
+                    if tumor is True:
+                        annotation.append(f"Tumor_Seq_Allele{idx}={alt}")
+                        annotation.append(f"MutationNumberAt={idx-1}")
+        except IndexError:
+            logging.error(
+                f"Genotype has a different length compaired to corresponding allele depth. Skipping: {genotype}, {prefix}, {ad}"
+            )
+
+    if all(i == "0" for i in genotype_list):
+        annotation.append(f"{prefix}_MutationStatus=HomozygousReference")
+    elif all(i == "1" for i in genotype_list):
+        annotation.append(f"{prefix}_MutationStatus=HomozygousMutant")
+    else:
+        annotation.append(f"{prefix}_MutationStatus=Heterozygous")
+
+    return filter, ";".join(annotation)
 
 colnames = None
-version = 1.0
+samples = None
+version = 2.0
 name = "vcf_format_to_info"
 url = f"github.com/tdayris/snakemake-wrappers/tree/Unofficial/bio/BiGR/{name}/wrapper.py"
-header = f'##BiGRCommandLine=<ID={name},CommandLine="{url}",Version={version},Date={datetime.date.today()}>\n'
-format_headers = []
+headers = [f'##BiGRCommandLine=<ID={name},CommandLine="{url}",Version="{version}",Date="{datetime.date.today()}">\n']
 
-logging.info("Looking for all possible format fields among all samples")
-with open(snakemake.input.call, "r") as instream:
-    for line in instream:
-        if line.startswith("##"):
-            continue
 
-        if line.startswith("#"):
-            colnames = line[1:-1].split("\t")
-            continue
+if str(snakemake.output["call"]).endswith("vcf.gz"):
+    out_vcf = snakemake.output["call"][:-3]
+else:
+    out_vcf = snakemake.output["call"]
 
-        formats = line.split("\t")[8]
-        samples = colnames[9:]
-        for sample in samples:
-            for format in formats.split(":"):
-                format_headers.append(create_header(sample, format))
-
-header += "\n".join(set(format_headers)) + "\n"
-logging.debug(header)
-logging.info("Formats were built, now annotating VCF")
-
-with (open(snakemake.input.call, "r") as instream,
-      open(snakemake.output.call, "w") as outstream):
+with (open_function(snakemake.input["call"]) as instream,
+      open(out_vcf, "w") as outstream):
 
     for line in instream:
+        if isinstance(line, bytes):
+            line = line.decode("utf-8")
+
         if line.startswith("##"):
             outstream.write(line)
             continue
         if line.startswith("#"):
             colnames = line[1:-1].split("\t")
-            outstream.write(header)
+            samples = colnames[9:]
+
+            headers += get_supplementary_headers(samples)
+            outstream.write("".join(headers))
             outstream.write(line)
         else:
-            chomp = line[:-1].split("\t")
-
-            for sample in colnames[9:]:
-                if chomp[7] == ".":
-                    chomp[7] = ""
-                else:
-                    chomp[7] += ";"
-
-                chomp[7] += ";".join(
-                    "FORMAT_{}_{}={}".format(sample, k, v) for k, v in zip(
-                        chomp[8].split(":"), chomp[9].split(":")
-                    )
+            chomp = dict(zip(colnames, line[:-1].split("\t")))
+            filter = None
+            for idx, sample in enumerate(samples):
+                format_sample = dict(zip(chomp["FORMAT"].split(":"), chomp[sample].split(":")))
+                filter, sample_annotation = annotate_mutect2(
+                    genotype = format_sample.get("GT", "./."),
+                    ref = chomp["REF"],
+                    alt = chomp["ALT"],
+                    prefix = sample,
+                    filter = chomp["FILTER"],
+                    ad = format_sample.get("AD", ".,."),
+                    af = format_sample.get("AF", "."),
+                    dp = format_sample.get("DP", "."),
+                    normal = snakemake.params.get("normal_sample", None) == sample,
+                    tumor = snakemake.params.get("tumor_sample", None) == sample
                 )
-            outstream.write("\t".join(chomp) + "\n")
+                if chomp["INFO"] in ["." or ""]:
+                    chomp["INFO"] = sample_annotation
+                else:
+                    chomp["INFO"] += f";{sample_annotation}"
+
+            if chomp["FILTER"] in ["", ".", "PASS"]:
+                chomp["FILTER"] = filter
+            else:
+                chomp["FILTER"] += f";{filter}"
+
+            outstream.write("\t".join([chomp[col] for col in colnames]) + "\n")
+
+
+if str(snakemake.output["call"]).endswith("vcf.gz"):
+    logging.info(f"Compressing {out_vcf}")
+    shell("pbgzip -c {out_vcf} > {snakemake.output['vcf']} 2> {log}")
+    logging.info(f"Indexing {snakemake.output['call']}")
+    shell("tabix -p vcf {snakemake.output['vcf']} >> {log} 2>&1")
+    logging.info(f"Removing temporary file {out_vcf}")
+    shell("rm --verbose {out_vcf} >> {log} 2>&1")

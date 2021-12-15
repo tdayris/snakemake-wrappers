@@ -166,6 +166,7 @@ if (not_cols := snakemake.params.get("drop_column", None)) is not None:
     logging.debug(f"The following columns are dropped out: {not_cols}")
     data = data[list(set(data.columns.tolist()) - set(not_cols))]
 
+
 if (convert_cols_type := snakemake.params.get("convert_cols_type", None)) is not None:
     logging.debug(f"The following type concersion are made: {convert_cols_type}")
     for column_name, new_type in convert_cols_type.items():
@@ -238,7 +239,7 @@ if (dedup_cols := snakemake.params.get("drop_duplicates_on", None)) is not None:
 
 
 if (new_index := snakemake.params.get("new_index_col", None)) is not None:
-    logging.debug("Setting {nex_index} as first column")
+    logging.debug(f"Setting {new_index} as first column")
     index_values = data.pop(new_index)
     data.insert(new_index, 0, index_values, allow_duplicates = False)
 
@@ -246,9 +247,26 @@ if (new_index := snakemake.params.get("new_index_col", None)) is not None:
 logging.debug(f"Head of the final DataFrame:\n{data.head()}")
 
 
-if ("set_index" in snakemake.params.keys()):
-    (data.reset_index(inplace=True)
-         .set_index(snakemake.params["set_index"], inplace=True))
+if (new_index := snakemake.params.get("set_index", None)) is not None:
+    previous_index = None
+    if snakemake.params.get("drop_duplicated_index", True) is True:
+        data.drop_duplicates(subset=new_index, keep="first", inplace=True)
+
+    if snakemake.params.get("override_previous_index", False) is True:
+        previous_index = "index" if data.index.name is None else str(data.index.name)
+
+    data.reset_index(inplace=True)
+    data.set_index(new_index, inplace=True)
+
+    try:
+        del data[previous_index]
+    except KeyError:
+        pass
+
+    if (not_cols := snakemake.params.get("drop_column", None)) is not None:
+        logging.debug(f"The following columns are dropped out: {not_cols}")
+        data = data[list(set(data.columns.tolist()) - set(not_cols))]
+
 
 data.to_csv(
     snakemake.output["table"],

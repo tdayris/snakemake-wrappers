@@ -1,0 +1,14 @@
+rule test_estimate_igs:
+    input:
+        bed = "surselect.bed"
+    output:
+        yaml = "igs.yaml"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/igs_estimation.log"
+    wrapper:
+        "bio/tmb/igs_estimation"

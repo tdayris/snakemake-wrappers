@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 
 """
 Snakemake wrapper for cnv_facets
@@ -16,7 +18,7 @@ log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 extra = snakemake.params.get("extra", "")
 if "bed" in snakemake.input:
     extra += " --targets {input.bed}"
-    
+
 vcf = ""
 if "vcf" in snakemake.input.keys():
     vcf = f"--snp-vcf {snakemake.input.vcf} "
@@ -45,7 +47,7 @@ elif "pileup" in snakemake.input.keys():
     shell(
         "cnv_facets.R "
         "--pileup {snakemake.input.pileup} "
-        "--out {snakemake.output.prefix} "
+        "--out {snakemake.params.prefix} "
         "--snp-nprocs {snakemake.threads} "
         "{vcf} "
         "{extra} "

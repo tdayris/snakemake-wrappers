@@ -1,0 +1,19 @@
+rule test_extract_somatic:
+    input:
+        vcf = "{sample}.vcf.gz"
+    output:
+        yaml = temp("tmb/{sample}.yaml")
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/extract_somatic_mutations/{sample}.log"
+    params:
+        filter_in = [],
+        filter_out = [],
+        min_coverage = 10,
+        allele_depth = "AD"
+    wrapper:
+        "bio/tmb/extract_somatic"

@@ -1,0 +1,14 @@
+rule geninstall:
+    output:
+        ref="GRCh38.tar.bz2"
+    params:
+        ref="GRCh38"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/sigprofiler/geninstall.log"
+    wrapper:
+        "bio/sigprofiler/geninstall"

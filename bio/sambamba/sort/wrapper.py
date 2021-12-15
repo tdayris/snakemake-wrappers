@@ -16,17 +16,18 @@ mapout = snakemake.output["mapping"]
 tempdir = tempfile.mkdtemp()
 if "tmpdir" in snakemake.resources.keys():
     tempdir = snakemake.resources["tmpdir"]
-    
+
 memory = "--memory-limit "
-if "mem_mb" in snakemake.resources:
-    memory += str(int(snakemake.resources["mem_mb"] / snakemake.threads))
+if "mem_mb" in snakemake.resources.keys():
+    memory += str(int(snakemake.resources["mem_mb"] / snakemake.threads)) + "MB"
 else:
-    memry += "2GB"
+    memory += "2GB"
 
 
 shell(
     "sambamba sort "
     "{snakemake.params} "
+    "{memory} "
     "--tmpdir {tempdir} "
     "--nthreads {snakemake.threads} "
     "--out {mapout} "

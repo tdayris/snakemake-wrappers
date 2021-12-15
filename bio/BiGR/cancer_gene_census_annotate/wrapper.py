@@ -6,6 +6,7 @@ Annotate a VCF with a TSV file from Cancer Gene Census
 """
 
 import datetime
+import gzip
 import logging
 import pandas
 import numpy
@@ -18,6 +19,13 @@ logging.basicConfig(
     filemode="w",
     level=logging.DEBUG
 )
+
+
+def open_function(file: str):
+    """Return the correct opening function"""
+    if file.endswith(".gz"):
+        return gzip.open(file, "rb")
+    return open(file, "r")
 
 
 def get_headers(cols: list[str], description: dict[str, Any]) -> str:
@@ -33,11 +41,11 @@ def get_headers(cols: list[str], description: dict[str, Any]) -> str:
         f"""##BiGRCommandLine=<ID={name},CommandLine="{url}",Version={version},Date={datetime.date.today()}>\n"""
     ]
     headers += [
-        f"""##INFO<ID=f"CanceGeneCensus_{key}",Number={value["nb"]},Type={value["type"]},Description="{value["desc"]}">\n"""
+        f"""##INFO=<ID=CancerGeneCensus_{key},Number={value["nb"]},Type={value["type"]},Description="{value["desc"]}">\n"""
         for key, value in description.items()
     ]
     headers.append(
-        f"""##FILTER<ID=ExistsInCanceGeneCensus,Description="Transcript exists in Cancer Gene Census">\n"""
+        """##FILTER=<ID=ExistsInCancerGeneCensus,Description="Transcript exists in Cancer Gene Census">\n"""
     )
     return "".join(headers)
 
@@ -47,18 +55,35 @@ def dict_to_info(annot: dict[str, Any]) -> str:
     res = []
     for key, value in annot.items():
         if isinstance(value, bool):
-            res.append(f"CanceGeneCensus_{key}")
+            res.append(f"CancerGeneCensus_{key}")
         elif (value == "") or (value is None):
             continue
         else:
-            res.append(f"CanceGeneCensus_{key}={str(value)}")
+            value = str(value)
+            value = value.translate(
+                value.maketrans(
+                    "-/ ()#,;\\\t\"",
+                    "___..n|.___"
+                )
+            )
+            # value = (str(value).replace("-", "_")
+            #                    .replace("/", "_")
+            #                    .replace("\\", "_")
+            #                    .replace(' ', '_')
+            #                    .replace("(", "")
+            #                    .replace(")", "")
+            #                    .replace("#", "nb")
+            #                    .replace("\t", "_")
+            #                    .replace(",", "|")
+            #                    .replace(";", "_"))
+            res.append(f"CancerGeneCensus_{key}={value}")
 
     return ";".join(res)
 
 
 def annotate(line: str, tsv: pandas.DataFrame) -> str:
     """
-    Annotate a VCF formatted line with CanceGeneCensus
+    Annotate a VCF formatted line with CancerGeneCensus
     """
     # Extract transcript if from VCF line (must be annotated with SnpEff!)
     try:
@@ -68,7 +93,8 @@ def annotate(line: str, tsv: pandas.DataFrame) -> str:
             if i.startswith("ANN")
         ][0].split("|")[3].split(".")[0]
     except IndexError:
-        logging.error(f"Could not find SnpEff annotation in: {line}")
+        #logging.error(f"Could not find SnpEff annotation in: {line}")
+        pass
     else:
         try:
             annot = dict_to_info(tsv.loc[gene_name].to_dict())
@@ -81,21 +107,26 @@ def annotate(line: str, tsv: pandas.DataFrame) -> str:
             if chomp[6] in [".", "", "PASS"]:
                 chomp[6] = "ExistsInCanceGeneCensus"
             else:
-                chomp[6] += ";ExistsInCanceGeneCensus"
+                chomp[6] += ";ExistsInCancerGeneCensus"
             line = "\t".join(chomp) + "\n"
+            logging.info(f"Annotation found for {gene_name} from {line}")
         except KeyError:
-            logging.warning(f"No annotation for {gene_name} from {line}")
+            #logging.warning(f"No annotation for {gene_name} from {line}")
+            pass
+
     return line
 
 
-# Load CanceGeneCensus TSV file
+# Load CancerGeneCensus TSV file
 logging.info("Loading annotation DB")
 tsv  = pandas.read_csv(
     snakemake.input["cgc"],
-    sep="\t",
+    sep=",",
     header=0,
     true_values=["yes", "Yes"]
 )
+logging.debug(tsv.head())
+logging.debug(tsv.columns.tolist())
 
 # Some characters are not allowed in VCF. They are replaced here.
 new_cols = []
@@ -103,7 +134,7 @@ for colname in tsv .columns.tolist():
     new_cols.append(colname.replace("-", "_")
                            .replace("/", "_")
                            .replace("\\", "_")
-                           .replace(" ", "_")
+                           .replace(' ', '_')
                            .replace("(", "")
                            .replace(")", "")
                            .replace("#", "nb"))
@@ -116,7 +147,7 @@ description = {
     "Gene_Symbol": {
         "type": "String",
         "nb": "1",
-        "desc": "Gene symbol from Cance Gene Census"
+        "desc": "Gene symbol from Cancer Gene Census"
     },
     "Name": {
         "type": "String",
@@ -163,20 +194,79 @@ description = {
         "nb": "1",
         "desc": "Cancer Gene Census Tumor type"
     },
+    'Tumour_TypesGermline': {
+        "type": "String",
+        "nb": "1",
+        "desc": "Cancer Gene Census Tumor type"
+    },
+    'Cancer_Syndrome': {
+        "type": "String",
+        "nb": "1",
+        "desc": "Cancer Gene Census Syndrome annotation"
+    },
+
+    "Tissue_Type": {
+        "type": "String",
+        "nb": "1",
+        "desc": "Cancer Gene Census tissue origin"
+    },
+    "Molecular_Genetics": {
+        "type": "String",
+        "nb": "1",
+        "desc": "Cancer Gene Census molecular annotation"
+    },
+    "Role_in_Cancer": {
+        "type": "String",
+        "nb": "1",
+        "desc": "Cancer Gene Census Role annotation"
+    },
+    "Mutation_Types": {
+        "type": "String",
+        "nb": "1",
+        "desc": "Cancer Gene Census type of mutation"
+    },
+    "Translocation_Partner": {
+        "type": "String",
+        "nb": "1",
+        "desc": "Cancer Gene Census possible translocation partner"
+    },
+    "Other_Germline_Mut": {
+        "type": "String",
+        "nb": "1",
+        "desc": "Cancer Gene Census, Non cancer mutations"
+    },
+    "Other_Syndrome": {
+        "type": "String",
+        "nb": "1",
+        "desc": "Cancer Gene Census, Non cancer Syndrome annotation"
+    },
+    "Synonyms": {
+        "type": "String",
+        "nb": "1",
+        "desc": "Cancer Gene Census Synonymous mutations"
+    },
 }
 
 
 # Annotating input VCF
 logging.debug("Opening VCFs")
-with (open(snakemake.input["vcf"], "r") as in_vcf,
-      open(snakemake.output["vcf"], 'w') as out_vcf):
+if str(snakemake.output["vcf"]).endswith("vcf.gz"):
+    out_vcf = snakemake.output["vcf"][:-3]
+else:
+    out_vcf = snakemake.output["vcf"]
+
+with (open_function(snakemake.input["vcf"]) as in_vcf,
+      open(out_vcf, 'w', encoding="utf-8") as out_vcf):
     for line in in_vcf:
+        if isinstance(line, bytes):
+            line = line.decode("utf-8")
+
         if line.startswith("##"):
             pass
 
         elif line.startswith("#"):
             new_headers = get_headers(
-                tsv .columns.tolist(),
+                tsv.columns.tolist(),
                 description
             )
             line = new_headers + line
@@ -186,3 +276,12 @@ with (open(snakemake.input["vcf"], "r") as in_vcf,
             line = annotate(line, tsv)
 
         out_vcf.write(line)
+
+
+if str(snakemake.output["vcf"]).endswith("vcf.gz"):
+    logging.info(f"Compressing {out_vcf}")
+    shell("pbgzip -c {out_vcf} > {snakemake.output['vcf']} 2> {log}")
+    logging.info(f"Indexing {snakemake.output['call']}")
+    shell("tabix -p vcf {snakemake.output['vcf']} >> {log} 2>&1")
+    logging.info(f"Removing temporary file {out_vcf}")
+    shell("rm --verbose {out_vcf} >> {log} 2>&1")

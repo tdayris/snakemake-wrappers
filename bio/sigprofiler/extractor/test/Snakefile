@@ -1,0 +1,18 @@
+rule extractor:
+    input:
+        vcf=expand("snpsift/fixed/{sample}.vcf.gz", sample=sample_list),
+        ref="GRCh38.tar.bz2"
+    output:
+        signatures=directory("signatures")
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/SigProfiler/signatures.log"
+    params:
+        ref="GRCh38",
+        extractor_extra={}
+    wrapper:
+        "bio/sigprofiler/extractor"

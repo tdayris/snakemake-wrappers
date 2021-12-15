@@ -11,7 +11,12 @@ from snakemake_wrapper_utils.samtools import get_samtools_opts
 samtools_opts = get_samtools_opts(snakemake)
 log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
 
+ref = ""
+if "fasta" in snakemake.input.keys():
+    ref = f"--reference {snakemake.input['fasta']}"
 
 shell(
-    "samtools view {snakemake.params.extra} {samtools_opts} -o {snakemake.output[0]} {snakemake.input[0]} {log}"
+    "samtools view {snakemake.params.extra} {ref} {samtools_opts} "
+    "-o {snakemake.output[0]} {snakemake.input['aln']} "
+    "{snakemake.params.position} {log}"
 )

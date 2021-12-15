@@ -10,6 +10,11 @@ snpeff_snpsift:
   snpsift_gnomad: -name 'gnomad_' -exists 'ExistsInGnomAD' -tabix -noDownload -noLog
   snpsift_dbnsfp: -noDownload -noLog -f 'hg18_chr,hg18_pos(1-based)' -n -g mm10
   snpsift_gwascat: -g mm10 -noDownload -noLog
+  vcf_to_tsv_extra: "-e '.' -s $'\\t'"
+facets_extra: --snp-count-orphans --gbuild mm10 --nbhd-snp 250
+gunzip_extra: --to-stdout --decompress --force --verbose
+sambamba:
+  markdup: --remove-duplicates
 params:
   center: GustaveRoussy
   ncbi_build: GRCm38
@@ -62,6 +67,11 @@ gark_filters:
   BelowMappingQuality: "MQ < 35.0"
   BelowMQRankSum: "MQRankSum < -12.5"
   BelowReadPosRankSum: "ReadPosRankSum < -8.0"
+samtools:
+  fixmate_extra: -cmr
+msisensor_pro:
+  scan: -m 50
+  msi: -f 0.05
 threads: 20
 fastq_screen:
   database:

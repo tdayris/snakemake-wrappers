@@ -4,6 +4,12 @@ import pandas
 import sys
 from pathlib import Path
 
+logging.basicConfig(
+    filename="snakemake.snpeff_snpsift.log",
+    filemode="w",
+    level=logging.DEBUG
+)
+
 worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
 common = str(worflow_source_dir / "../common/python")
 sys.path.append(common)
@@ -17,21 +23,27 @@ min_version("6.0")
 
 default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
 configfile: get_config(default_config)
-design = build_design(os.getcwd(), search_fastq_pairs)
+design = build_design(os.getcwd(), search_vcf_files)
+design["Sample_id"] = design["Sample_id"].str.replace("-", "_")
 
 from pathlib import Path
 
+container: "docker://continuumio/miniconda3:4.4.10"
+localrules: bigr_copy
 
 samples_list = design["Sample_id"]
-
 
 wildcard_constraints:
     sample = r"|".join(samples_list)
 
+vcf_links = link_vcf(
+    design.Sample_id,
+    design.Upstream_file
+)
 
 last_vcf = (
-    "snpsift/gnomad/{sample}.vcf"
-    if config["params"]["NBCI_build"] != "mm10"
+    "bigr/cancer_gene_census/{sample}.vcf"
+    if config["params"]["ncbi_build"] != "mm10"
     else "snpsift/dbsnp/{sample}.vcf"
 )
 
@@ -47,9 +59,21 @@ rule all:
         tsv=expand(
             "snpsift/extractFields/{sample}.tsv",
             sample=samples_list
-        )
+        ),
+        description="columns_description.txt"
+    output:
+        directory("results_to_upload")
     message:
         "Finishing the annotation pipeline"
+    params:
+        ln = "--symbolic --force --relative --verbose",
+        mkdir = "--parents --verbose"
+    shell:
+        "mkdir {params.mkdir} results_to_upload/ && "
+        "ln {params.ln} snpsift/fixed results_to_upload/VCF && "
+        "ln {params.ln} snpsift/extractFields results_to_upload/TSV && "
+        "ln {params.ln} multiqc results_to_upload/QC && "
+        "ln {params.ln} columns_description.txt results_to_upload/"
 
 #################################
 ### FINAL VCF FILE INDEXATION ###
@@ -60,15 +84,18 @@ module compress_index_vcf_meta:
     config: config
 
 
-use rule pbgzip_compress from compress_index_vcf_meta with:
-    output:
-        protected("{tool}/{subcommand}/{sample}.vcf.gz")
+use rule * from compress_index_vcf_meta
 
 
-use rule tabix_index from compress_index_vcf_meta with:
-    output:
-        protected("{tool}/{subcommand}/{sample}.vcf.gz.tbi")
-    threads: 1
+# use rule pbgzip_compress from compress_index_vcf_meta with:
+#     output:
+#         protected("{tool}/{subcommand}/{sample}.vcf.gz")
+#
+#
+# use rule tabix_index from compress_index_vcf_meta with:
+#     output:
+#         protected("{tool}/{subcommand}/{sample}.vcf.gz.tbi")
+#     threads: 1
 
 
 #####################
@@ -90,14 +117,14 @@ rule extractfields:
     log:
         "logs/snpsift/extractAllFields/{sample}.log"
     params:
-        extra="-s '\t' -e '.'"
+        extra="-s $'\\t' -e '.'"
     wrapper:
         "bio/snpsift/extractAllFields"
 
 
 rule fix_vcf:
     input:
-        vcf="snpsift/splitted/{sample}.vcf"
+        vcf=last_vcf
     output:
         vcf=temp("snpsift/fixed/{sample}.vcf")
     message:
@@ -111,49 +138,36 @@ rule fix_vcf:
     log:
         "logs/bigr_scripts/fix_vcf/{sample}.log"
     params:
-        default_chr=[*map(str, range(23)), *range(23), "MT", "X", "Y"],
+        default_chr=config["params"]["chr"],
         remove_non_conventional_chromosomes=True
     wrapper:
         "bio/BiGR/fix_vcf"
 
 
-rule split_vcf_features:
+############################
+### Column signification ###
+############################
+
+
+rule column_signification:
     input:
-        call="snpsift/format2info/{sample}.vcf"
+        expand("snpsift/fixed/{sample}.vcf", sample=samples_list)
     output:
-        call=temp("snpsift/splitted/{sample}.vcf")
+        "columns_description.txt"
     message:
-        "Splitting ANN field of {wildcards.sample} to better "
-        "end-user TSV experience"
-    threads: 1
+        "Extract column description from VCF headers"
+    threads: 8
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        mem_mb=lambda wildcards, attempt: attempt * 256,
         time_min=lambda wildcards, attempt: attempt * 15,
         tmpdir="tmp"
     log:
-        "logs/bigr_scripts/split_ann/{sample}.log"
-    wrapper:
-        "bio/BiGR/split_vcf_features"
-
-
-rule format_to_info:
-    input:
-        call="snpsift/gnomad/{sample}.vcf"
-    output:
-        call=temp("snpsift/format2info/{sample}.vcf")
-    message:
-        "Moving FORMAT data to INFO to increase readability and fixing field "
-        "name redundancy for {wildcards.sample}"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
-        tmpdir="tmp"
-    log:
-        "logs/bigr_scripts/format2info/{sample}.log"
-    wrapper:
-        "bio/BiGR/vcf_format_to_info"
-
+        "logs/columns_description.log"
+    params:
+    shell:
+        "(cat {input} | grep -P '##INFO' | sort | uniq | "
+        "grep -oP \"(ID=[^,]+|Description=.+$)\" | cut -f2- -d'=' | "
+        "paste - - | sed 's/\\\">/\\\"/g') > {output} 2> {log}"
 
 ###############
 ### MultiQC ###
@@ -187,9 +201,331 @@ rule multiqc:
         "bio/multiqc"
 
 
+###################################
+### OncoKB and CancerGeneCensus ###
+### Custom annotations          ###
+###################################
+
+
+rule cancer_gene_census_annotate:
+    input:
+        vcf="bigr/oncokb/{sample}.vcf",
+        cgc=config["ref"]["cancer_census"]
+    output:
+        vcf=temp("bigr/cancer_gene_census/{sample}.vcf")
+    message:
+        "Adding CancerGeneCensus annotation in {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
+        time_min=lambda wildcards, attempt: attempt * 25,
+        tmpdir="tmp"
+    log:
+        "logs/bigr/cancer_gene_census_annotate/{sample}.log"
+    wrapper:
+        "bio/BiGR/cancer_gene_census_annotate"
+
+
+rule oncokb_annotate:
+    input:
+        #vcf="snpsift/clinvar/{sample}.vcf",
+        vcf="bigr/format_to_info/{sample}.vcf",
+        oncokb=config["ref"]["oncokb"]
+    output:
+        vcf=temp("bigr/oncokb/{sample}.vcf")
+    message:
+        "Adding OncoKB annotation in {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 6,
+        time_min=lambda wildcards, attempt: attempt * 35,
+        tmpdir="tmp"
+    log:
+        "logs/bigr/oncokb/{sample}.log"
+    wrapper:
+        "bio/BiGR/oncokb_annotate"
+
+
+####################
+## Format to info ##
+####################
+
+rule format_to_info:
+    input:
+        call="vcftools/mane/{sample}.vcf.gz"
+    output:
+        call="bigr/format_to_info/{sample}.vcf"
+    message:
+        "Annotating {wildcards.sample} with clear Format descriptions"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/bigr/format_to_info/{sample}.log"
+    params:
+        extra = ""
+    wrapper:
+        "bio/BiGR/vcf_format_to_info"
+
+
+#####################
+## MANE annotation ##
+#####################
+
+
+rule additional_headers_mane:
+    output:
+        temp("mane/description.txt")
+    message:
+        "Building annotation headers for MANE"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 128,
+        time_min=lambda wildcards, attempt: attempt * 2,
+        tmpdir="tmp"
+    log:
+        "logs/mane/description.log"
+    params:
+        'key=INFO,ID=MANE_NCBI_GeneID,Number=1,Type=String,Description="NCBI_GeneID field from MANE"',
+        'key=INFO,ID=MANE_Ensembl_Gene,Number=1,Type=String,Description="Ensembl_Gene field from MANE"',
+        'key=INFO,ID=MANE_HGNC_ID,Number=1,Type=String,Description="HGNC_ID field from MANE"',
+        'key=INFO,ID=MANE_symbol,Number=1,Type=String,Description="symbol field from MANE"',
+        'key=INFO,ID=MANE_name,Number=1,Type=String,Description="name field from MANE"',
+        'key=INFO,ID=MANE_RefSeq_nuc,Number=1,Type=String,Description="RefSeq_nuc field from MANE"',
+        'key=INFO,ID=MANE_RefSeq_prot,Number=1,Type=String,Description="RefSeq_prot field from MANE"',
+        'key=INFO,ID=MANE_Ensembl_nuc,Number=1,Type=String,Description="Ensembl_nuc field from MANE"',
+        'key=INFO,ID=MANE_Ensembl_prot,Number=1,Type=String,Description="Ensembl_prot field from MANE"',
+        'key=INFO,ID=MANE_MANE_status,Number=1,Type=String,Description="MANE_status field from MANE"',
+        'key=INFO,ID=MANE_GRCh38_chr,Number=1,Type=String,Description="GRCh38_chr field from MANE"',
+        'key=INFO,ID=MANE_chr_start,Number=1,Type=String,Description="chr_start field from MANE"',
+        'key=INFO,ID=MANE_chr_end,Number=1,Type=String,Description="chr_end field from MANE"',
+        'key=INFO,ID=MANE_chr_strand,Number=1,Type=String,Description="chr_strand field from MANE"',
+    shell:
+        'for PARAM in {params}; do echo "${{PARAM}}"; done > {output} 2> {log}'
+
+
+rule vcftools_annotate_mane:
+    input:
+        vcf = "vcftools/revel/{sample}.vcf.gz",
+        annotation = config["ref"]["mane"],
+        description = "mane/description.txt"
+    output:
+        vcf = temp("vcftools/mane/{sample}.vcf.gz")
+    message:
+        "Annotating {wildcards.sample} with MANE database, using VCFTools"
+    threads: 4
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/vcftools/annotate/{sample}.mane.log"
+    params:
+        extra = (
+            "--columns INFO/MANE_NCBI_GeneID,INFO/MANE_Ensembl_Gene,"
+            "INFO/MANE_HGNC_ID,INFO/MANE_symbol,INFO/MANE_name,"
+            "INFO/MANE_RefSeq_nuc,INFO/MANE_RefSeq_prot,INFO/MANE_Ensembl_nuc,"
+            "INFO/MANE_Ensembl_prot,INFO/MANE_MANE_status,CHROM,FROM,TO,"
+            "INFO/MANE_chr_strand"
+        )
+    wrapper:
+        "bio/vcftools/annotate"
+
+
 ######################
-### VCF annotation ###
+## Revel annotation ##
 ######################
+
+
+rule additional_headers_revel:
+    output:
+        temp("revel/description.txt")
+    message:
+        "Building annotation headers for REVEL"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 128,
+        time_min=lambda wildcards, attempt: attempt * 2,
+        tmpdir="tmp"
+    log:
+        "logs/mane/description.log"
+    params:
+        'key=INFO,ID=REVEL_aaref,Number=1,Type=String,Description="Reference Amino Acid from REVEL"',
+        'key=INFO,ID=REVEL_aaalt,Number=1,Type=String,Description="Alternative Amino Acid from REVEL"',
+        'key=INFO,ID=REVEL,Number=1,Type=String,Description="REVEL score"',
+        'key=INFO,ID=REVEL_Ensembl_transcriptid,Number=1,Type=String,Description="Ensemble transcript id from REVEL"',
+    shell:
+        'for PARAM in {params}; do echo "${{PARAM}}"; done > {output} 2> {log}'
+
+
+rule vcftools_annotate_revel:
+    input:
+        vcf = "vcftools/mistic/{sample}.vcf.gz",
+        annotation = config["ref"]["revel"],
+        description = "revel/description.txt"
+    output:
+        vcf = temp("vcftools/revel/{sample}.vcf.gz")
+    message:
+        "Annotating {wildcards.sample} with REVEL database, using VCFTools"
+    threads: 4
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/vcftools/annotate/{sample}.revel.log"
+    params:
+        extra = (
+            "--columns CHROM,POS,-,REF,ALT,INFO/REVEL_aaref,INFO/REVEL_aaalt,INFO/REVEL,INFO/REVEL_Ensembl_transcriptid"
+            if config["params"]["ncbi_build"] == "GRCh38" else
+            "--columns CHROM,-,POS,REF,ALT,INFO/AAREF,INFO/AAALT,INFO/REVEL,INFO/REVEL_Ensembl_transcriptid"
+        )
+    wrapper:
+        "bio/vcftools/annotate"
+
+
+#######################
+## Mistic annotation ##
+#######################
+
+
+rule additional_headers_mistic:
+    output:
+        temp("mistic/description.txt")
+    message:
+        "Building annotation headers for REVEL"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 128,
+        time_min=lambda wildcards, attempt: attempt * 2,
+        tmpdir="tmp"
+    log:
+        "logs/mane/description.log"
+    params:
+        'key=INFO,ID=MISTIC_score,Number=1,Type=String,Description="MISTIC high sensitivity prediction for exome analysis"',
+        'key=INFO,ID=MISTIC_pred,Number=1,Type=String,Description="MISTIC prediction for global performance"',
+    shell:
+        'for PARAM in {params}; do echo "${{PARAM}}"; done > {output} 2> {log}'
+
+
+rule vcftools_annotate_mistic:
+    input:
+        vcf = "splice_ai/annot/{sample}.vcf.gz",
+        annotation = config["ref"]["mistic"],
+        description = "mistic/description.txt"
+    output:
+        vcf = temp("vcftools/mistic/{sample}.vcf.gz")
+    message:
+        "Annotating {wildcards.sample} with MISTIC database, using VCFTools"
+    threads: 4
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/vcftools/annotate/{sample}.mistic.log"
+    params:
+        extra = (
+            "--columns CHROM,POS,REF,ALT,INFO/MISTIC_score,INFO/MISTIC_pred"
+        )
+    wrapper:
+        "bio/vcftools/annotate"
+
+
+##########################
+## Splice AI annotation ##
+##########################
+
+
+rule splice_ai:
+    input:
+        vcf = "bigr/occurence_annotated/{sample}.vcf",
+        fasta = config["ref"]["fasta"]
+    output:
+        vcf = temp("splice_ai/annot/{sample}.vcf.gz")
+    message:
+        "Adding Splice Variant annotation to {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 2048 * 5,
+        time_min=lambda wildcards, attempt: attempt * 60 * 1.5,
+        tmpdir="tmp",
+        gres="gpu:t4:1"
+    params:
+        annotation=config["params"].get("ncbi_build", "grch38").lower(),
+        piped = True
+    log:
+        "logs/splice_ai/{sample}.log"
+    wrapper:
+        "bio/spliceai"
+
+
+########################################
+## Compute occurence of each variant  ##
+## within the complete cohort         ##
+########################################
+
+
+rule variant_occurence_annotate:
+    input:
+        calls = ["snpsift/clinvar/{sample}.vcf"],
+        occurence = "bigr/occurences/all_chroms.txt"
+    output:
+        calls = [temp("bigr/occurence_annotated/{sample}.vcf")]
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/variant_occurence/uncompress/{sample}.log"
+    wrapper:
+        "bio/variantoccurence/annotate"
+
+
+rule concatenate_per_chr_information:
+    input:
+        expand(
+            "bigr/occurence/{chr}.txt",
+            chr=config["params"]["chr"]
+        )
+    output:
+        temp("bigr/occurences/all_chroms.txt")
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/variant_occurence/all.log"
+    shell:
+        "for i in {input}; do sed '1d' ${{i}}; done > {output} 2> {log}"
+
+
+rule variant_occurence_per_chr:
+    input:
+        calls=expand(
+            "snpsift/clinvar/{sample}.vcf",
+            sample=samples_list
+        )
+    output:
+        txt=temp("bigr/occurence/{chr}.txt")
+    threads: 7
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
+    log:
+        "logs/variant_occurence/{chr}.log"
+    wrapper:
+        "bio/variantoccurence/chromosomes"
+
+
+#########################
+### snpeff annotation ###
+#########################
 
 snpeff_snpsift_config = {
     "ref": config["ref"],
@@ -202,13 +538,14 @@ module snpeff_meta:
 
 use rule snpeff from snpeff_meta with:
     input:
-        calls="calls/{sample}.vcf.gz",
-        calls_index="calls/{sample}.vcf.gz.tbi",
+        calls="data_input/calls/{sample}.vcf.gz",
+        calls_index="data_input/calls/{sample}.vcf.gz.tbi",
         db=config["ref"]["snpeff"]
-    output:
-        calls=temp("snpeff/{sample}.vcf"),
-        stats=temp("snpeff/{sample}.html"),
-        csvstats=temp("snpeff/{sample}.csv")
+
+
+##########################
+### snpsift annotation ###
+##########################
 
 
 module snpsift:
@@ -216,3 +553,24 @@ module snpsift:
     config: snpeff_snpsift_config
 
 use rule * from snpsift
+
+
+#################################################
+### Gather files from iRODS or mounting point ###
+#################################################
+
+rule bigr_copy:
+    output:
+        "data_input/calls/{sample}.vcf.gz"
+    message:
+        "Getting {wildcards.sample} VCF file"
+    threads: 1
+    resources:
+      mem_mb=lambda wildcards, attempt: min(attempt * 1024, 2048),
+      time_min=lambda wildcards, attempt: attempt * 45,
+    params:
+        input=lambda wildcards, output: vcf_links[output[0]]
+    log:
+        "logs/bigr_copy/{sample}.log"
+    wrapper:
+        "bio/BiGR/copy"

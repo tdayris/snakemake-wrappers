@@ -12,21 +12,21 @@ except NameError:
 """
 This rule indexes the bam file since almost all downstream tools requires it
 """
-rule samtools_index:
+rule sambamba_index:
     input:
-        "samtools/sort/{sample}.bam"
+        "sambamba/sort/{sample}.bam"
     output:
-        temp("samtools/sort/{sample}.bam.bai")
+        temp("sambamba/sort/{sample}.bam.bai")
     message: "Indexing mapped reads of {wildcards.sample}"
-    threads: 1
+    threads: 5
     resources:
         mem_mb=1536,
         time_min=lambda wildcards, attempt: attempt * 45,
         tmpdir="tmp"
     log:
-        "logs/samtools/sort/{sample}.log"
+        "logs/sambamba/index/{sample}.log"
     wrapper:
-        "bio/samtools/index"
+        "bio/sambamba/index"
 
 
 """
@@ -34,27 +34,23 @@ This rule sorts reads by position for further analyses.
 This rule is shadowed in order to automatically delete undetermined number of
 temporary files on error, which leads retry to fail
 """
-rule samtools_sort_coordinate:
+rule sambamba_sort_coordinate:
     input:
-        "samtools/fixmate/{sample}.bam"
+        mapping="samtools/fixmate/{sample}.bam"
     output:
-        temp("samtools/sort/{sample}.bam"),
-        tmp_dir = temp(directory("samtools/fixmate/{sample}.tmp"))
+        mapping=temp("sambamba/sort/{sample}.bam"),
     message:
-        "Sorting {wildcards.sample} reads by query name for fixing mates"
-    threads: config.get("threads", 20)
+        "Sorting {wildcards.sample} reads by positions"
+    threads: 20
     resources:
         mem_mb=lambda wildcards, threads: threads * 1792,
         time_min=lambda wildcards, attempt: attempt * 90,
         tmpdir="tmp"
     shadow: "minimal"
     log:
-        "logs/samtools/query_sort_{sample}.log"
-    params:
-        extra = "-m 1536M",
-        tmp_dir = "samtools/fixmate/{sample}.tmp"
+        "logs/sambamba/sort/{sample}.log"
     wrapper:
-        "bio/samtools/sort"
+        "bio/sambamba/sort"
 
 
 """
@@ -105,6 +101,7 @@ rule bwa_mem:
         mem_mb=lambda wildcards, attempt: attempt * 6144 + 61440,
         time_min=lambda wildcards, attempt: attempt * 120,
         tmpdir="tmp"
+    shadow: "shallow"
     params:
         index=lambda wildcards, input: os.path.splitext(input["index"][0])[0],
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}\tPU:{sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",

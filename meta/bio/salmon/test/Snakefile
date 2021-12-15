@@ -12,9 +12,9 @@ reference.
 """
 rule salmon_quant_paired:
     input:
-        r1="reads/{sample}.1.fq.gz",
-        r2="reads/{sample}.2.fq.gz",
-        index="salmon/index",
+        r1="fastp/trimmed/pe/{sample}.1.fq.gz",
+        r2="fastp/trimmed/pe/{sample}.2.fq.gz",
+        index=config.get("salmon_index", "salmon/index"),
         gtf=config["gtf"]
     output:
         quant="salmon/pseudo_mapping/{sample}/quant.sf",
@@ -23,14 +23,15 @@ rule salmon_quant_paired:
     message: "Quantifying {wildcards.sample} with Salmon"
     threads: min(config.get("threads", 20), 20)
     resources:
-        time_min=lambda wildcards, attempt: attempt * 60,
-        mem_mb=lambda wildcards, attempt: (
-            attempt * 5120 + 25600
-        ),
+        time_min=lambda wildcards, attempt: attempt * 75,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 12,
         tmpdir="tmp"
     params:
         libType = config.get("salmon_libtype", "A"),
-        extra = config.get("salmon_quant_extra", "--numBootstraps 100 --validateMappings --gcBias --seqBias --posBias")
+        extra = config.get(
+            "salmon_quant_extra",
+            "--numBootstraps 100 --validateMappings --gcBias --seqBias --posBias"
+        )
     log:
         "logs/salmon/quant/{sample}.log"
     wrapper:

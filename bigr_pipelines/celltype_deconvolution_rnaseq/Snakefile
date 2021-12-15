@@ -23,6 +23,7 @@ logging.basicConfig(
 default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
 configfile: get_config(default_config)
 design = get_design(os.getcwd(), search_fastq_pairs)
+#print(design)
 
 if "Sample_id" in design.columns.tolist():
     design.set_index("Sample_id", inplace=True)
@@ -32,6 +33,8 @@ fastq_links = link_fq(
     design.Upstream_file,
     design.Downstream_file
 )
+
+localrules: get_cibersort
 
 
 rule target:
@@ -51,14 +54,16 @@ rule target:
             tool=["cibersort_abs", "cibersort", "quantiseq", "xcell", "epic"]
         )
 
-#####################
-### Deconvolution ###
-#####################
+################################
+### Deconvolution: CIBERSORT ###
+################################
 
 
 rule cibersort_abs:
     input:
-        expr_mat="immunedeconv/TPM.tsv"
+        expr_mat="immunedeconv/TPM.tsv",
+        cibersort_binary="CIBERSORT.R",
+        cibersort_mat="LM22.txt"
     output:
         histogram="cibersort_abs/celltypes.hist.png",
         dotplot="cibersort_abs/celltypes.dotplot.png",
@@ -73,8 +78,7 @@ rule cibersort_abs:
         time_min=lambda wildcards, attempt: attempt * 15,
         tmp="tmp"
     params:
-        cibersort_binary="/path/to/cibersort/non/free",
-        cibersort_mat="/path/to/celltypes.mat"
+        gene_col="Hugo_ID"
     log:
         "logs/immunedeconv/cibersort_abs.log"
     wrapper:
@@ -83,7 +87,9 @@ rule cibersort_abs:
 
 rule cibersort:
     input:
-        expr_mat="immunedeconv/TPM.tsv"
+        expr_mat="immunedeconv/TPM.tsv",
+        cibersort_binary="CIBERSORT.R",
+        cibersort_mat="LM22.txt"
     output:
         histogram="cibersort/celltypes.hist.png",
         dotplot="cibersort/celltypes.dotplot.png",
@@ -100,10 +106,39 @@ rule cibersort:
     log:
         "logs/immunedeconv/Cibersort.log"
     params:
-        cibersort_binary="/path/to/cibersort/non/free",
-        cibersort_mat="/path/to/celltypes.mat"
+        gene_col="Hugo_ID"
     wrapper:
         "bio/immunedeconv/cibersort"
+
+
+rule get_cibersort:
+    input:
+        cibersort_binary="/mnt/beegfs/software/cibersort/1.0.6/CIBERSORT.R",
+        cibersort_mat="/mnt/beegfs/software/cibersort/1.0.6/LM22.txt"
+    output:
+        cibersort_binary=temp("CIBERSORT.R"),
+        cibersort_mat=temp("LM22.txt")
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    message:
+        "Gathering Cibersort requirements"
+    log:
+        "logs/cibersort.bin.log"
+    params:
+        rsync = "--verbose --checksum --human-readable",
+        chmod = "u+x"
+    shell:
+        "rsync {params.rsync} {input.cibersort_binary} {output.cibersort_binary} > {log} 2>&1 && "
+        "chmod {params.chmod} {output.cibersort_binary} >> {log} 2>&1 && "
+        "rsync {params.rsync} {input.cibersort_mat} {output.cibersort_mat} >> {log} 2>&1"
+
+
+#############################
+### Deconvolution: OTHERS ###
+#############################
 
 
 rule mcpcounter:
@@ -122,6 +157,8 @@ rule mcpcounter:
         tmp="tmp"
     message:
         "Using MCP-Counter to deconvolute expression into cell types"
+    params:
+        gene_col="Hugo_ID"
     log:
         "logs/immunedeconv/mcpcounter.log"
     wrapper:
@@ -142,6 +179,8 @@ rule epic:
         mem_mb=lambda wildcards, attempt: attempt * 2048,
         time_min=lambda wildcards, attempt: attempt * 15,
         tmp="tmp"
+    params:
+        gene_col="Hugo_ID"
     message:
         "Using EPIC to deconvolute expression into cell types"
     log:
@@ -166,6 +205,8 @@ rule quantiseq:
         tmp="tmp"
     message:
         "Using QuantiSeq to deconvolute expression into cell types"
+    params:
+        gene_col="Hugo_ID"
     log:
         "logs/immunedeconv/quantiseq.log"
     wrapper:
@@ -188,208 +229,70 @@ rule xcell:
         tmp="tmp"
     message:
         "Using xCell to deconvolute expression into cell types"
+    params:
+        gene_col="Hugo_ID"
     log:
         "logs/immunedeconv/xcell.log"
     wrapper:
         "bio/immunedeconv/xcell"
 
+######################
+### Quantification ###
+######################
 
-#########################
-### Extracting counts ###
-#########################
 
-rule gene_counts:
+rule subset_gene_counts:
     input:
-        table="salmon/TPM.genes.tsv"
+        table="salmon_quant/salmon/TPM.genes.tsv"
     output:
         table="immunedeconv/TPM.tsv"
-    message: "Cleaning salmon quantification file"
+    message:
+        "Formatting counts for ImmuneDeconv"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 2048,
-        time_min=lambda wildcards, attempt: attempt * 5,
-        tmp="tmp"
+        mem_mb=lambda wildcards, attempt: attempt * 512,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
     log:
-        "logs/pandas/cleaning.log"
+        "logs/immunedeconv/filter_gene_counts.log"
     params:
-        drop_column=["Strand", "Start", "Stop"],
-        drop_null_lines=True,
-        drop_na_lines=True,
-        drop_duplicated_lines=True,
-        keep_index=True,
-        set_index=""
+        drop_column = ["target_id"],
+        set_index = "Hugo_ID",
+        drop_duplicated_lines = True,
+        keep_index = True,
+        drop_duplicated_index = True,
+        override_previous_index = True,
+        filters = [
+            ["Hugo_ID", "!=", "Unknown"]
+        ]
     wrapper:
         "bio/pandas/filter_table"
 
 
-rule pandas_merge_salmon_tr:
+rule run_salmon_pipeline:
     input:
-        quant = expand(
-            "salmon/pseudo_mapping/{sample}/quant.sf",
-            sample=design.index.tolist()
-        ),
-        tx2gene = lambda wildcards: "salmon/gene2gene_with_chr.tsv" if wildcards.content == "genes" else "salmon/tx2gene_with_positions.tsv"
+        config = "config.yaml"
     output:
-        tsv = "salmon/TPM.{content}.tsv"
+        qc = "salmon_quant/multiqc/MultiQC.html",
+        gene_counts = "salmon_quant/salmon/TPM.genes.tsv",
+        transcript_counts = "salmon_quant/salmon/TPM.transcripts.tsv",
+        results = directory("salmon_quant/results_to_upload")
     message:
-        "Merging salmon counts, according to {wildcards.content}"
-    threads:
-        1
+        "Quantifying reads over the genome"
+    handover: True
+    priority: 10
+    threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 2048,
-        time_min=lambda wildcards, attempt: attempt * 10,
-        tmp="tmp"
+        time_min=lambda wildcards, attempt: attempt * 60 + 45,
+        tmpdir="tmp"
+    log:
+        "logs/salmon_quant_pipeline.log"
     params:
-        header = True,
-        position = True,
-        gencode = True,
-        drop_patch = True,
-        genes = lambda wildcards: str(wildcards.content).lower() == "genes"
-    log:
-        "logs/pandas_merge_salmon/{content}.log"
-    wrapper:
-        "bio/pandas/salmon"
-
-
-rule tx_to_gene:
-    input:
-        gtf = config["ref"]["gtf"]
-    output:
-        tx2gene = temp("salmon/tx2gene.tsv"),
-        tx2gene_large = temp("salmon/tx2gene_with_positions.tsv"),
-        gene2gene = temp("salmon/gene2gene.tsv"),
-        gene2gene_large = temp("salmon/gene2gene_with_chr.tsv")
-    message:
-        "Extracting transcript to gene correspondancy for further use"
-    # cache: True
-    threads:
-        1
-    resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 3072, 4096),
-        time_min=lambda wildcards, attempt: min(attempt * 10, 15),
-        tmp="tmp"
-    log:
-        "logs/tx_to_gene.log"
-    wrapper:
-        "bio/gtf/tx2gene"
-
-#############################
-### Salmon quantification ###
-#############################
-
-salmon_config = {
-    "genome": config["ref"]["genome"],
-    "transcriptome": config["ref"]["transcriptome"],
-    "gtf": config["ref"]["gtf"],
-    "salmon_libtype": config["params"]["salmon_libtype"],
-    "salmon_quant_extra": config["params"]["salmon_quant_extra"],
-    "salmon_index_extra": config["params"]["salmon_index_extra"]
-}
-
-
-module salmon_meta:
-    snakefile: "../../meta/bio/salmon/test/Snakefile"
-    config: salmon_config
-
-
-rule multiqc:
-    input:
-        salmon=expand(
-            "salmon/pseudo_mapping/{sample}/quant.sf",
-            sample=design.index
-        ),
-        html=expand(
-            "fastp/html/pe/{sample}.fastp.html",
-            sample=design.index
-        ),
-        json=expand(
-            "fastp/json/pe/{sample}.fastp.json",
-            sample=design.index
-        )
-    output:
-        report(
-            "multiqc/MultiQC.html",
-            caption="../common/reports/multiqc.rst",
-            category="Quality Controls"
-        )
-    message:
-        "Aggregating quality reports from Fastp and Salmon"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
-        time_min=lambda wildcards, attempt: attempt * 35,
-        tmp="tmp"
-    log:
-        "logs/multiqc.log"
-    wrapper:
-        "bio/multiqc"
-
-
-use rule * from salmon_meta as *
-
-
-use rule salmon_quant_paired from salmon_meta with:
-    output:
-        quant=report(
-            "salmon/pseudo_mapping/{sample}/quant.sf",
-            category="2. Raw Salmon output",
-            caption="../../common/reports/salmon_quant.rst"
-        ),
-        lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
-        mapping=temp("salmon/bams/{sample}.bam")
-
-
-############################
-### FASTP FASTQ CLEANING ###
-############################
-
-rule fastp_clean:
-    input:
-        sample=expand(
-            "reads/{sample}.{stream}.fq.gz",
-            stream=["1", "2"],
-            allow_missing=True
-        ),
-    output:
-        trimmed=expand(
-            "fastp/trimmed/pe/{sample}.{stream}.fastq",
-            stream=["1", "2"],
-            allow_missing=True
-        ),
-        html="fastp/html/pe/{sample}.fastp.html",
-        json=temp("fastp/json/pe/{sample}.fastp.json")
-    message: "Cleaning {wildcards.sample} with Fastp"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
-        time_min=lambda wildcard, attempt: attempt * 45,
-        tmp="tmp"
-    params:
-        adapters=config["params"].get("fastp_adapters", None),
-        extra=config["params"].get("fastp_extra", "")
-    log:
-        "logs/fastp/{sample}.log"
-    wrapper:
-        "bio/fastp"
-
-
-#################################################
-### Gather files from iRODS or mounting point ###
-#################################################
-
-rule bigr_copy:
-    output:
-        "reads/{sample}.{stream}.fq.gz"
-    message:
-        "Gathering {wildcards.sample} fastq file ({wildcards.stream})"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-        time_min=lambda wildcard, attempt: attempt * 45,
-        tmp="tmp"
-    params:
-        input=lambda wildcards, output: fastq_links[output[0]]
-    log:
-        "logs/bigr_copy/{sample}.{stream}.log"
-    wrapper:
-        "bio/BiGR/copy"
+        ln = "--force --symbolic --relative",
+        mk = "--verbose --parents"
+    shell:
+        "mkdir {params.mk} salmon_quant && "
+        "ln {params.ln} design.tsv salmon_quant/design.tsv && "
+        "cd salmon_quant/ && "
+        "bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh"

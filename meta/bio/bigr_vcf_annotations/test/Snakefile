@@ -1,0 +1,57 @@
+default_config_bigr_vcf_annotate = {
+    "fasta": "/path/to/file.fasta",
+    "annotation": "grch38",
+    "cgc": "/path/to/cancer/census.csv"
+}
+
+
+rule gunzip_vcf:
+    input:
+        ""
+    output:
+        pipe("tmp/gunzipped/{sample}.vcf")
+    message:
+        "Unzipping Parallel Block Gzipped {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 512,
+        time_min=lambda wildcards, attempt: attempt * 25,
+        tmpdir="tmp"
+    params:
+        "-c"
+    log:
+        "logs/gunzip/bigr_annotate/{sample}.log"
+    shell:
+        "gunzip {params} {input} > {output} 2> {log}"
+
+
+rule splice_ai:
+    input:
+        vcf = "tmp/gunzipped/{sample}.vcf",
+        fasta = config["fasta"]
+    output:
+        vcf = temp("splice_ai/{sample}.vcf")
+    message:
+        "Adding Splice Variant annotation to {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 2048,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
+    params:
+        annotation=config.get("annotation", "grch38").lower(),
+        piped = True
+    log:
+        "logs/splice_ai/{sample}.log"
+    wrapper:
+        "bio/spliceai"
+
+
+rule cancer_census:
+    input:
+        vcf="splice_ai/{sample}.vcf",
+        cgc=config["cgc"]
+    output:
+        vcf=temp("cancer_gene_census/{sample}.vcf")
+    message:
+        "Adding Cencer gene Census annotation to {wildcards.sample}"

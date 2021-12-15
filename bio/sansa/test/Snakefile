@@ -1,0 +1,17 @@
+rule test_sansa:
+    input:
+        vcf = "in.vcf",
+        # vcf_tbi = "test.vcf.gz.tbi",
+        db = "annotation.vcf",
+        # db_tbi = "annot.vcf.gz.tbi",
+        gtf = "annot.gtf"
+    output:
+        vcf = "out.vcf",
+        contained = "gene.list.txt"
+    threads: 1
+    log:
+        "logs/sansa.log"
+    params:
+        extra = ""
+    wrapper:
+        "master/bio/sansa"

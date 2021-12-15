@@ -105,6 +105,12 @@ if "resources" in job_properties:
             raise ValueError(
                 "Too much time requested: {}".format(str(arg_dict["time"]))
             )
+    if resources.get("gres", None) is not None:
+        if "T4" in resources["gres"].upper():
+            arg_dict["gres"] = resources["gres"]
+            arg_dict["ntasks"] = 1
+            arg_dict["nodes"] = 1
+            arg_dict["partition"] = "visuq"
 
 
 # Threads
@@ -114,7 +120,7 @@ if "threads" in job_properties:
 opt_keys = ["array", "account", "begin", "cpus_per_task",
             "dependency", "workdir", "error", "job_name", "mail_type",
             "mail_user", "ntasks", "nodes", "output", "partition",
-            "quiet", "time", "wrap", "constraint", "mem"]
+            "quiet", "time", "wrap", "constraint", "mem", "gres"]
 
 arg_dict["output"] = "logs/slurm/slurm-%x-%j-%N.out"
 if arg_dict["output"] is not None:
@@ -124,7 +130,7 @@ if arg_dict["error"] is not None:
     os.makedirs(os.path.dirname(arg_dict["error"]), exist_ok=True)
 
 arg_dict["mail_type"] = "END,FAIL"
-arg_dict["mail_user"] = "bigr@gustaveroussy.fr"
+arg_dict["mail_user"] = "thibault.dayris@gustaveroussy.fr"
 
 opts = ""
 for k, v in arg_dict.items():

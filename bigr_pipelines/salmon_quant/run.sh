@@ -27,6 +27,7 @@ while [ "$#" -gt 0 ]; do
     --rulegraph) GRAPH="${2}"; shift 2;;
     hg19|HG19) CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"; shift;;
     hg38|HG38) CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"; shift;;
+    mm10|MM10) CONFIG_PATH="${PIPELINE_PATH}/config.mm10.yaml"; shift;;
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac
 done

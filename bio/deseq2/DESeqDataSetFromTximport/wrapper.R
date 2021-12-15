@@ -74,7 +74,14 @@ if (levels & factor) {
   factor <- base::as.character(x = snakemake@params[["factor"]]);
 
   dds[[factor]] <- base::factor(dds[[factor]], levels = levels);
-  dds[[factor]] <- stats::relevel(dds[[factor]], ref = levels[[1]]);
+  if ("ref_level" %in% base::names(snakemake@params)) {
+      dds[[factor]] <- stats::relevel(
+        dds[[factor]], 
+        ref = snakemake@params[["ref_level"]]
+    );
+  } else {
+    dds[[factor]] <- stats::relevel(dds[[factor]], ref = levels[[1]]);
+  }
   dds[[factor]] <- droplevels(dds[[factor]]);
   base::write("Factors have been releveled", stderr());
 }
@@ -82,7 +89,15 @@ if (levels & factor) {
 
 keep <- rowSums(counts(dds)) > count_filter;
 dds <- dds[keep, ];
-base::write("Low counts in DESeqDataSet were filtered.", stderr());
+print(head(dds));
+
+if ("remove_zeros" %in% base::names(snakemake@params)) {
+  keep <- rowSums(counts(dds)==0) < length(colnames(dds)) - 1;
+  print(head(keep))
+  dds <- dds[keep, ];
+}
+print(head(dds));
+base::message("Low counts in DESeqDataSet were filtered.");
 
 # Save as RDS
 output_path <- base::as.character(x = snakemake@output[["dds"]]);

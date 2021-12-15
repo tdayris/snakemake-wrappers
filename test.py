@@ -132,6 +132,14 @@ def run(wrapper, cmd, check_log=None):
 
 
 @skip_if_not_modified
+def test_sansa():
+    run(
+        "bio/sansa",
+        ["snakemake", "--cores", "1", "out.vcf", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
 def test_oncokb_annotate():
     run(
         "bio/BiGR/oncokb_annotate",

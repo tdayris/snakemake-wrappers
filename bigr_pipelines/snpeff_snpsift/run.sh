@@ -36,10 +36,6 @@ while [ "$#" -gt 0 ]; do
 done
 message INFO "Environment loaded"
 
-if [ ! -d "calls" ]; then
-  error_handling "${LINENO}" 1 "VCF files must be in a directory called 'calls'"
-fi
-
 # Run pipeline
 message CMD "conda_activate ${CONDA_ENV_PATH}"
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"

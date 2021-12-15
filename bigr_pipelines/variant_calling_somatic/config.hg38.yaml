@@ -1,6 +1,6 @@
 design: design.tsv
 fastp:
-  fastp_extra: ''
+  fastp_extra: --verbose --trim_poly_g --trim_poly_x --average_qual 10 --overrepresentation_analysis --cut_front 5 --cut_tail 5 --cut_window_size 5
 snpeff_snpsift:
   snpeff_extra: -noLog -nodownload -lof
   snpsift_kaviar: -name 'Kaviar_' -exists 'ExistsInKaviar' -tabix -noDownload -noLog
@@ -10,6 +10,10 @@ snpeff_snpsift:
   snpsift_gnomad: -name 'gnomad_' -exists 'ExistsInGnomAD' -tabix -noDownload -noLog
   snpsift_dbnsfp: -noDownload -noLog -f 'hg18_chr,hg18_pos(1-based)' -n -g hg38
   snpsift_gwascat: -g hg38 -noDownload -noLog
+facets_extra: --snp-count-orphans --gbuild hg38 --nbhd-snp 250
+gunzip_extra: --to-stdout --decompress --force --verbose
+sambamba:
+  markdup: --remove-duplicates
 gatk:
   gatk_filter_mutect_calls_extra: --create-output-variant-index --min-median-mapping-quality 35
   gatk_bcftools_split_multiallelic: "-m -both --check-ref w"
@@ -25,8 +29,11 @@ gatk:
     BelowMappingQuality: "MQ < 35.0"
     BelowMQRankSum: "MQRankSum < -12.5"
     BelowReadPosRankSum: "ReadPosRankSum < -8.0"
-  samtools:
-    fixmate_extra: -cmr
+samtools:
+  fixmate_extra: -cmr
+msisensor_pro:
+  scan: -m 50
+  msi: -f 0.05
 params:
   center: GustaveRoussy
   ncbi_build: GRCh38

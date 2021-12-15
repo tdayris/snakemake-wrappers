@@ -36,7 +36,7 @@ def get_alpha_cluster(value: numpy.float,
     return "Non_Significative"
 
 logging.basicConfig(
-    filename=snakemake.log[0],
+    #filename=snakemake.log[0],
     filemode="w",
     level=logging.DEBUG
 )
@@ -58,6 +58,9 @@ data = pandas.read_csv(
 )
 
 logging.debug(data.head())
+base_cols = list(
+    set(["log2FoldChange", "padj"] + snakemake.params.get("keep_cols", []))
+)
 
 if (gene2gene := snakemake.input.get("gene2gene", None)) is not None:
     logging.info("Loading gene information")
@@ -67,7 +70,7 @@ if (gene2gene := snakemake.input.get("gene2gene", None)) is not None:
         header=0,
         index_col=None
     )
-    print(genetable.head())
+    logging.debug(genetable.head())
 
     data = pandas.merge(
         data.copy(),
@@ -76,16 +79,38 @@ if (gene2gene := snakemake.input.get("gene2gene", None)) is not None:
         right_on="Gene_ID",
         how="left"
     )
-
-    data = data[[
-        "Gene_ID", "Gene_Name",
-        "log2FoldChange", "padj",
+    
+    base_cols += [
+        "Gene_Name",
         "Chromosome", "Strand"
-    ]]
+    ]
+    logging.debug(data.head())
+
+    data = data[["Gene_ID"] + base_cols]
     data.rename(columns={"Gene_ID": "index"}, inplace=True)
 else:
     data.reset_index(inplace=True)
-    data = data[["index", "log2FoldChange", "padj"]]
+    data = data[["index"] + base_cols]
+
+if (counts := snakemake.input.get("dst", None)) is not None:
+    logging.info("Loading gene counts")
+    counts_table = pandas.read_csv(
+        counts,
+        sep="\t",
+        header=0,
+        index_col=0
+    )
+    base_cols += counts_table.columns.to_list()
+    logging.debug(counts_table.head())
+    
+    data = pandas.merge(
+        data.copy(),
+        counts_table,
+        left_on="index",
+        right_index=True,
+        how="left"
+    )
+    data[["index"] + base_cols]
 
 logging.debug(data.head())
 
