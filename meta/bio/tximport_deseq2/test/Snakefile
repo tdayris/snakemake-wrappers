@@ -126,7 +126,8 @@ rule deseq2:
         mem_mb=lambda wildcards, attempt: attempt * 2048,
         time_min=lambda wildcards, attempt: attempt * 60
     params:
-        contrast=lambda wildcards: contrasts[wildcards.comparison]
+        contrast=lambda wildcards: contrasts[wildcards.comparison],
+        
     log:
         "logs/deseq2/deseq/{comparison}.log"
     wrapper:
@@ -156,6 +157,7 @@ rule deseq2_dataset_from_tximport:
         ),
         levels=lambda wildcards: contrasts[wildcards.comparison][1:],
         factor=lambda wildcards: contrasts[wildcards.comparison][0],
+        ref_level=lambda wildcards: contrasts[wildcards.comparison][-1],
         remove_zeros=True,
         count_filter=5
     log:

@@ -74,7 +74,14 @@ if (levels & factor) {
   factor <- base::as.character(x = snakemake@params[["factor"]]);
 
   dds[[factor]] <- base::factor(dds[[factor]], levels = levels);
-  dds[[factor]] <- stats::relevel(dds[[factor]], ref = levels[[1]]);
+  if ("ref_level" %in% base::names(snakemake@params)) {
+      dds[[factor]] <- stats::relevel(
+        dds[[factor]], 
+        ref = snakemake@params[["ref_level"]]
+    );
+  } else {
+    dds[[factor]] <- stats::relevel(dds[[factor]], ref = levels[[1]]);
+  }
   dds[[factor]] <- droplevels(dds[[factor]]);
   base::write("Factors have been releveled", stderr());
 }
