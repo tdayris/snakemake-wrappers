@@ -8,7 +8,9 @@ __license__ = "MIT"
 import datetime
 import gzip
 import logging
+import os.path
 
+from snakemake.utils import makedirs
 from typing import List, Optional, Union
 
 logging.basicConfig(
@@ -16,6 +18,8 @@ logging.basicConfig(
     filemode="w",
     level=logging.DEBUG
 )
+
+makedirs(os.path.dirname(snakemake.output["call"]))
 
 
 def open_function(file: str):
@@ -26,6 +30,7 @@ def open_function(file: str):
 
 
 def get_supplementary_headers(prefixes: List[str]) -> str:
+    prefixes = [p.replace("-", "_") for p in prefixes]
     headers = [
         """##FILTER=<ID=IsGermline,Number=.,Type=String,Description="Variant exists in Normal">\n""",
         """##FILTER=<ID=IsSomatic,Number=.,Type=String,Description="Variant does not exists in Normal, but exists in Tumor">\n""",
@@ -76,6 +81,7 @@ def annotate_mutect2(genotype: str,
                      tumor: bool = False) -> List[Union[List[str], str]]:
     """Break down a genotype information, break down DP/AD/AF into info"""
 
+    prefix = prefix.replace("-", "_")
     annotation = [
         f"{prefix}_Reference_Allele={ref}",
         f"{prefix}_DP={dp}",
@@ -169,6 +175,7 @@ with (open_function(snakemake.input["call"]) as instream,
         if line.startswith("#"):
             colnames = line[1:-1].split("\t")
             samples = colnames[9:]
+
             headers += get_supplementary_headers(samples)
             outstream.write("".join(headers))
             outstream.write(line)
