@@ -140,6 +140,22 @@ def test_oncokb_annotate():
 
 
 @skip_if_not_modified
+def test_pharmkdb_annotate():
+    run(
+        "bio/BiGR/pharmkdb_annotate",
+        ["snakemake", "--cores", "1", "out.vcf", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_awk():
+    run(
+        "bio/awk",
+        ["snakemake", "--cores", "1", "output.file.txt", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
 def test_cancer_gene_census_annotate():
     run(
         "bio/BiGR/cancer_gene_census_annotate",
