@@ -1,6 +1,6 @@
-# pipeline_path = workflow.get_source()
-# print(pipeline_path)
 
+organism = (config.get("params", {"genome_build": "GRCh38"})
+                  .get("genome_build", "GRCh38"))
 
 rule target:
     input:
@@ -10,10 +10,10 @@ rule target:
 rule sigprofiler_matrix_generator:
     input:
         vcf = "snpsift/fixed/{sample}.vcf",
-        sigprofiler_script = "/home/tdayris/Documents/Developments/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/matrix_generator.py"
+        sigprofiler_script = "scripts/matrix_generator.py"
     output:
         yaml = "SigProfiler/{sample}/{sample}_matrix.yaml",
-        matrices = directory("SigProfiler/{sample}/test")
+        matrices = directory("SigProfiler/{sample}/test/input")
     message:
         "Building substitution matrices with SigProfiler on {wildcards.sample}"
     threads: 1
@@ -22,16 +22,73 @@ rule sigprofiler_matrix_generator:
         time_min=lambda wildcards, attempt: attempt * 45,
         tmpdir="tmp"
     conda:
-        "/home/tdayris/Documents/Developments/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/sigprofiler.yaml"
+        "env/sigprofiler.yaml"
     log:
         "logs/sigprofiler/matrix_generator/{sample}.log"
     params:
         mk = "--parents --verbose",
-        rs = "--checksum --verbose --human-readable --partial --progress"
+        rs = "--checksum --verbose --human-readable --partial --progress",
+        org = organism
     shell:
         "mkdir {params.mk} {output.matrices}/input "
         "> {log} 2>&1 && "
         "rsync {params.rs} {input.vcf} {output.matrices}/input "
         ">> {log} 2>&1 && "
-        "python3 {input.sigprofiler_script} {input.vcf} {output.yaml} "
+        "python3 {input.sigprofiler_script} {input.vcf} {output.yaml} --organism {params.org}"
         ">> {log} 2>&1 "
+
+
+rule signature_extractor:
+    input:
+        matrices = "SigProfiler/{sample}/test/input",
+        sigprofiler_script = "script/signature_extractor.py"
+    output:
+        directory("SigProfiler/{sample}/test/Res")
+    message:
+        "Extracting signatures in {wildcards.sample}"
+    threads: 8
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp",
+        gres="gpu:t4:1"
+    log:
+        "logs/sigprofiler/extractor/{sample}.log"
+    conda:
+        "env/sigprofiler.yaml"
+    params:
+        sig = lambda wildcards: f"SigProfiler/{wildcards.sample}/test",
+        org = organism
+    shell:
+        "python3 {input.sigprofiler_script} "
+        "{params.sig} "
+        "--threads {snakemake.threads} "
+        "--organism {params.org} "
+        "> {log} 2>&1"
+
+
+rule sigprofiler_decompose:
+    input:
+        res = "SigProfiler/{sample}/test/Res",
+        sigprofiler_script = "scripts/sigprofiler_decompose.py"
+    output:
+        directory("SigProfiler/{sample}/test/Res2")
+    message:
+        "Decomposing sugnatures on {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/sigprofiler/decompose/{sample}.log"
+    params:
+        org = organism
+    conda:
+        "env/sigprofiler.yaml"
+    shell:
+        "python3 {input.sigprofiler_script} "
+        "{output} "
+        "--organism {params.organism} "
+        "--verbose "
+        "> {log} 2>&1"
