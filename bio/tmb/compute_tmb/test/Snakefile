@@ -1,0 +1,19 @@
+rule test_compute_tmb:
+    input:
+        igs = "igs.yaml",
+        samples = expand(
+            "tmb/{sample}.yaml", sample=sample_list
+        )
+    output:
+        tsv = "TMB.tsv"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/tmb.log"
+    params:
+        high_threshold = 10
+    wrapper:
+        "bio/tmb/compute_tmb"
