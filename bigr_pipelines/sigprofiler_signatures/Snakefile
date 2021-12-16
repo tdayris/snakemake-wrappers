@@ -70,11 +70,12 @@ rule sigprofiler_matrix_generator:
         "logs/sigprofiler/matrix_generator/{sample}.log"
     params:
         mk = "--parents --verbose",
+        gz = "--stdout --decompress --force --verbose"
         org = organism
     shell:
         "mkdir {params.mk} {output.matrices}/input "
         "> {log} 2>&1 && "
-        "gunzip -c {input.vcf} > {output.matrices}/input "
+        "gunzip {params.gz} {input.vcf} > {output.matrices}/input/{wildcards.sample}.vcf "
         "2>> {log} && "
         "python3 {input.sigprofiler_script} {input.vcf} {output.yaml} --organism {params.org}"
         ">> {log} 2>&1 "
