@@ -65,7 +65,7 @@ rule sigprofiler_matrix_generator:
         time_min=lambda wildcards, attempt: attempt * 45,
         tmpdir="tmp"
     conda:
-        "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/sigprofiler.yaml"
+        "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/matrix_generator.yaml"
     log:
         "logs/sigprofiler/matrix_generator/{sample}.log"
     params:
@@ -97,7 +97,7 @@ rule signature_extractor:
     log:
         "logs/sigprofiler/extractor/{sample}.log"
     conda:
-        "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/sigprofiler.yaml"
+        "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/extractor.yaml"
     params:
         sig = lambda wildcards: f"SigProfiler/{wildcards.sample}/test",
         org = organism
