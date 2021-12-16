@@ -75,17 +75,20 @@ if (levels & factor) {
 
   dds[[factor]] <- base::factor(dds[[factor]], levels = levels);
   if ("ref_level" %in% base::names(snakemake@params)) {
+      base::message("Ref level: ", snakemake@params[["ref_level"]]);
       dds[[factor]] <- stats::relevel(
         dds[[factor]], 
         ref = snakemake@params[["ref_level"]]
     );
   } else {
+    base::message("Ref level: ", levels[[1]]);
     dds[[factor]] <- stats::relevel(dds[[factor]], ref = levels[[1]]);
   }
   dds[[factor]] <- droplevels(dds[[factor]]);
   base::write("Factors have been releveled", stderr());
 }
-
+print(dds[[factor]]);
+print(colData(dds));
 
 keep <- rowSums(counts(dds)) > count_filter;
 dds <- dds[keep, ];
