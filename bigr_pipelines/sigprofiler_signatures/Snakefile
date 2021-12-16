@@ -1,10 +1,53 @@
+import logging
+import os
+import pandas
+import sys
+from pathlib import Path
+
+logging.basicConfig(
+    filename="snakemake.sigprofiler.log",
+    filemode="w",
+    level=logging.DEBUG
+)
+
+worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+common = str(worflow_source_dir / "../common/python")
+sys.path.append(common)
+
+from file_manager import *
+from files_linker import *
+from write_yaml import *
+from messages import *
+from snakemake.utils import min_version
+min_version("6.0")
+
+default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
+configfile: get_config(default_config)
+design = build_design(os.getcwd(), search_vcf_files)
+design["Sample_id"] = design["Sample_id"].str.replace("-", "_")
+
+container: "docker://continuumio/miniconda3:4.4.10"
+localrules: bigr_copy
+
+samples_list = design["Sample_id"]
+
+wildcard_constraints:
+    sample = r"|".join(samples_list)
+
+vcf_links = link_vcf(
+    design.Sample_id,
+    design.Upstream_file
+)
 
 organism = (config.get("params", {"genome_build": "GRCh38"})
                   .get("genome_build", "GRCh38"))
 
 rule target:
     input:
-        "SigProfiler/s050/s050_matrix.yaml"
+        expand(
+            "SigProfiler/{sample}/{sample}_matrix.yaml",
+            sample=samples_list
+        )
 
 
 rule sigprofiler_matrix_generator:
