@@ -52,8 +52,8 @@ rule target:
 
 rule sigprofiler_matrix_generator:
     input:
-        vcf = "snpsift/fixed/{sample}.vcf",
-        sigprofiler_script = "scripts/matrix_generator.py"
+        vcf = "snpsift/fixed/{sample}.vcf.gz",
+        sigprofiler_script = "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/matrix_generator.py"
     output:
         yaml = "SigProfiler/{sample}/{sample}_matrix.yaml",
         matrices = directory("SigProfiler/{sample}/test/input")
@@ -65,18 +65,17 @@ rule sigprofiler_matrix_generator:
         time_min=lambda wildcards, attempt: attempt * 45,
         tmpdir="tmp"
     conda:
-        "env/sigprofiler.yaml"
+        "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/sigprofiler.yaml"
     log:
         "logs/sigprofiler/matrix_generator/{sample}.log"
     params:
         mk = "--parents --verbose",
-        rs = "--checksum --verbose --human-readable --partial --progress",
         org = organism
     shell:
         "mkdir {params.mk} {output.matrices}/input "
         "> {log} 2>&1 && "
-        "rsync {params.rs} {input.vcf} {output.matrices}/input "
-        ">> {log} 2>&1 && "
+        "gunzip -c {input.vcf} > {output.matrices}/input "
+        "2>> {log} && "
         "python3 {input.sigprofiler_script} {input.vcf} {output.yaml} --organism {params.org}"
         ">> {log} 2>&1 "
 
@@ -84,7 +83,7 @@ rule sigprofiler_matrix_generator:
 rule signature_extractor:
     input:
         matrices = "SigProfiler/{sample}/test/input",
-        sigprofiler_script = "script/signature_extractor.py"
+        sigprofiler_script = "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/signature_extractor.py"
     output:
         directory("SigProfiler/{sample}/test/Res")
     message:
@@ -98,7 +97,7 @@ rule signature_extractor:
     log:
         "logs/sigprofiler/extractor/{sample}.log"
     conda:
-        "env/sigprofiler.yaml"
+        "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/sigprofiler.yaml"
     params:
         sig = lambda wildcards: f"SigProfiler/{wildcards.sample}/test",
         org = organism
@@ -113,7 +112,7 @@ rule signature_extractor:
 rule sigprofiler_decompose:
     input:
         res = "SigProfiler/{sample}/test/Res",
-        sigprofiler_script = "scripts/sigprofiler_decompose.py"
+        sigprofiler_script = "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/sigprofiler_decompose.py"
     output:
         directory("SigProfiler/{sample}/test/Res2")
     message:
@@ -128,7 +127,7 @@ rule sigprofiler_decompose:
     params:
         org = organism
     conda:
-        "env/sigprofiler.yaml"
+        "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/sigprofiler.yaml"
     shell:
         "python3 {input.sigprofiler_script} "
         "{output} "
