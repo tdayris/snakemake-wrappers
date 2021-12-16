@@ -52,7 +52,7 @@ rule target:
 
 rule sigprofiler_matrix_generator:
     input:
-        vcf = "snpsift/fixed/{sample}.vcf",
+        vcf = "snpsift/fixed/{sample}.vcf.gz",
         sigprofiler_script = "scripts/matrix_generator.py"
     output:
         yaml = "SigProfiler/{sample}/{sample}_matrix.yaml",
@@ -70,13 +70,12 @@ rule sigprofiler_matrix_generator:
         "logs/sigprofiler/matrix_generator/{sample}.log"
     params:
         mk = "--parents --verbose",
-        rs = "--checksum --verbose --human-readable --partial --progress",
         org = organism
     shell:
         "mkdir {params.mk} {output.matrices}/input "
         "> {log} 2>&1 && "
-        "rsync {params.rs} {input.vcf} {output.matrices}/input "
-        ">> {log} 2>&1 && "
+        "gunzip -c {input.vcf} > {output.matrices}/input "
+        "2>> {log} && "
         "python3 {input.sigprofiler_script} {input.vcf} {output.yaml} --organism {params.org}"
         ">> {log} 2>&1 "
 
