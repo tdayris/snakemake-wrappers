@@ -206,9 +206,9 @@ rule tx_to_gene:
     input:
         gtf=config["gtf"]
     output:
-        tx2gene_small="tximport/tx2gene.tsv",
-        tx2gene_large="tximport/transcripts2genes.tsv",
-        gene2gene_large="tximport/gene2gene.tsv"
+        tx2gene_small=temp("tximport/tx2gene.tsv"),
+        tx2gene_large=temp("tximport/transcripts2genes.tsv"),
+        gene2gene_large=temp("tximport/gene2gene.tsv")
     message: "Building transcripts/genes conversion table"
     cache: True
     threads: 1
@@ -223,7 +223,6 @@ rule tx_to_gene:
         "logs/tximport/tx2gene.log"
     wrapper:
         "bio/gtf/tx2gene"
-
 
 ######################
 ### Design parsing ###
