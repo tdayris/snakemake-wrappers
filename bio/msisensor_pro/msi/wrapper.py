@@ -22,7 +22,7 @@ prefix = commonprefix(snakemake.output)
 
 region = ""
 if "bed" in snakemake.input.keys():
-    region = "-e {snakemake.input.bed}"
+    region = f"-e {snakemake.input.bed}"
 
 shell(
     "msisensor-pro msi"  # Tool and its sub-command
