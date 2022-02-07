@@ -1,6 +1,6 @@
 design: design.tsv
 fastp:
-  fastp_extra: ''
+  fastp_extra: --verbose --trim_poly_g --trim_poly_x --average_qual 10 --overrepresentation_analysis --cut_front 5 --cut_tail 5 --cut_window_size 5
 snpeff_snpsift:
   snpeff_extra: -noLog -nodownload -lof
   snpsift_kaviar: -name 'Kaviar_' -exists 'ExistsInKaviar' -tabix -noDownload -noLog
@@ -10,6 +10,10 @@ snpeff_snpsift:
   snpsift_gnomad: -name 'gnomad_' -exists 'ExistsInGnomAD' -tabix -noDownload -noLog
   snpsift_dbnsfp: -noDownload -noLog -f 'hg18_chr,hg18_pos(1-based)' -n  -g hg19
   snpsift_gwascat: -g hg19 -noDownload -noLog
+tmb:
+  min_coverage: 10
+  allele_depth_keyname: "AD"
+  tmb_highness_threshold: 10
 params:
   center: GustaveRoussy
   ncbi_build: GRCh37
@@ -53,17 +57,20 @@ ref:
   gnomad: /mnt/beegfs/database/bioinfo/Index_DB/gnomad/gnomad.genomes.r3.0.sites.vcf.bgz
   clinvar: /mnt/beegfs/database/bioinfo/Index_DB/ClinVar/GRCh37/clinvar_20210404.vcf.gz
 gark_filters:
-  DepthBelow60X: "DP < 59",
-  VAFAbove10pct: "AF >= 0.1",
-  GeneralPopulationBelow1pml: "dbNSFP_ExAC_Adj_AF >= 0.001",
-  VAFAbove5pct: "AF >= 0.05",
-  BelowQualByDepth: "QD <= 2.0",
-  BelowBaseQuality: "QUAL < 30.0",
-  AboveFisherStrandBias: "FS > 60.0",
-  AboveStrandOddsRatio: "SOR > 3.0",
-  BelowMappingQuality: "MQ < 35.0",
-  BelowMQRankSum: "MQRankSum < -12.5",
+  DepthBelow60X: "DP < 59"
+  VAFAbove10pct: "AF >= 0.1"
+  GeneralPopulationBelow1pml: "dbNSFP_ExAC_Adj_AF >= 0.001"
+  VAFAbove5pct: "AF >= 0.05"
+  BelowQualByDepth: "QD <= 2.0"
+  BelowBaseQuality: "QUAL < 30.0"
+  AboveFisherStrandBias: "FS > 60.0"
+  AboveStrandOddsRatio: "SOR > 3.0"
+  BelowMappingQuality: "MQ < 35.0"
+  BelowMQRankSum: "MQRankSum < -12.5"
   BelowReadPosRankSum: "ReadPosRankSum < -8.0"
+gatk:
+  base_recal_extra: ""
+  apply_base_recal_extra: "--create-output-bam-index"
 samtools:
   fixmate_extra: -cmr
 msisensor_pro:

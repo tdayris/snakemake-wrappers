@@ -13,10 +13,15 @@ snpeff_snpsift:
 facets_extra: --snp-count-orphans --gbuild hg38 --nbhd-snp 250
 gunzip_extra: --to-stdout --decompress --force --verbose
 sambamba:
-  markdup: --remove-duplicates
+  markdup: --remove-duplicates --overflow-list-size 600000
+tmb:
+  min_coverage: 10
+  allele_depth_keyname: "AD"
+  tmb_highness_threshold: 10
 gatk:
   gatk_filter_mutect_calls_extra: --create-output-variant-index --min-median-mapping-quality 35
   gatk_bcftools_split_multiallelic: "-m -both --check-ref w"
+  apply_base_recal_extra: --create-output-bam-index
   gark_filters:
     DepthBelow60X: "DP < 59"
     VAFAbove10pct: "AF >= 0.1"
