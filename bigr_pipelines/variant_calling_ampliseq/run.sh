@@ -2,7 +2,7 @@
 set -e
 
 # This adds several functions and variable in the environment
-PIPELINE_PREFIX="/mnt/beegfs/pipelines/snakemake-wrappers"
+PIPELINE_PREFIX=$(readlink -e "$(dirname ${0})/../..")
 # shellcheck source=/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/bash/messages.sh
 source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/messages.sh"
 # shellcheck source=/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/bash/environment.sh
@@ -27,6 +27,8 @@ while [ "$#" -gt 0 ]; do
     --rulegraph) GRAPH="${2}"; shift 2;;
     hg19|HG19) CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"; shift;;
     hg38|HG38) CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"; shift;;
+    IAD168514_241_hg19|IAD168514_241_HG19) CONFIG_PATH="${PIPELINE_PATH}/IAD168514_241_hg19.yaml"; shift;;
+    IAD168514_241_hg38|IAD168514_241_HG38) CONFIG_PATH="${PIPELINE_PATH}/IAD168514_241_hg38.yaml"; shift;;
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac
 done
@@ -35,7 +37,7 @@ message INFO "Environment loaded"
 
 if [ ! -f "config.yaml" ]; then
   message INFO "Missing config file, falling back to default arguments"
-  cp "${CONFIG_PATH}" "config.yaml"
+  rsync -cv "${CONFIG_PATH}" "config.yaml"
 else
   message INFO "Config file already provided"
 fi
