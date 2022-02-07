@@ -273,3 +273,11 @@ data.to_csv(
     sep=sep,
     index=snakemake.params.get("keep_index", False)
 )
+
+if "xlsx" in snakemake.output.keys():
+    data.to_excel(
+        snakemake.output["xlsx"],
+        header=True,
+        index=True,
+        na_rep="."
+    )
