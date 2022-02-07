@@ -48,18 +48,19 @@ base::message("DESeq2 command line:");
 base::message(deseq2_cmd);
 
 # Create object
-wald <- tryCatch({
-    base::eval(base::parse(text = deseq2_cmd))
-  },
-  error = function(e) {
-    dds <- cleanColData(
-      dds = dds,
-      factor = base::as.character(x = snakemake@params[["factor"]])
-    );
-    base::eval(base::parse(text = deseq2_cmd))
-  }
-);
-#wald <- base::eval(base::parse(text = deseq2_cmd));
+# wald <- tryCatch({
+#     base::eval(base::parse(text = deseq2_cmd))
+#   },
+#   error = function(e) {
+#     print("Error caught, redefining factor")
+#     dds <- cleanColData(
+#       dds = dds,
+#       factor = base::as.character(x = snakemake@params[["factor"]])
+#     );
+#     base::eval(base::parse(text = deseq2_cmd))
+#   }
+# );
+wald <- base::eval(base::parse(text = deseq2_cmd));
 
 # Save results as RDS
 output_rds <- base::as.character(x = snakemake@output[["rds"]]);
@@ -89,6 +90,7 @@ if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
   results_cmd <- base::paste0("DESeq2::results(", extra_results, ")");
   base::message("Command line used for TSV results creation:");
   base::message(results_cmd);
+  base::message(resultsName(wald));
 
   for (resultname in names) {
     # Building table
@@ -163,6 +165,7 @@ if ("contrast" %in% base::names(snakemake@params)) {
 
 # Saving normalized counts on demand
 table <- SummarizedExperiment::assay(wald);
+table <- counts(wald);
 if ("normalized_counts" %in% base::names(snakemake@output)) {
   output_table <- base::as.character(x=snakemake@output[["normalized_counts"]]);
   utils::write.table(x = table, file = output_table, sep = "\t", quote = FALSE);
