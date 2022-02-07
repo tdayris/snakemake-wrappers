@@ -158,8 +158,7 @@ rule target:
         ),
         pcas=expected_pcas,
         general_pcas=expand(
-            "figures/pca/general.pca.{factor}_{axes}.png",
-            factor=[i[0] for i in comparison_levels],
+            "figures/pca/general.pca_{axes}.png",
             axes=["PC1_PC2", "PC2_PC1"]
         ),
         counts_with_deseq2=expand(
@@ -324,8 +323,8 @@ use rule tximport from tximport_deseq2 with:
 
 rule salmon_quant:
     input:
-        design="design.tsv",
-        config="config.yaml"
+        design=ancient("design.tsv"),
+        config=ancient("config.yaml")
     output:
         results=directory("salmon_quant/results_to_upload"),
         quant_genes=expand(
