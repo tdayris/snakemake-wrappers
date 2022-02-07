@@ -1,0 +1,127 @@
+default_config_vcr = {
+    "bed": "/path/to/capture_kit.bed",
+    "organism": "GRCh38",
+    "bin_size": 1,
+    "threads": 10
+}
+
+
+def build_regions(bed):
+    """Return a list of regions with human readable names from a bed6"""
+    with open(bed, "r") as capture_kit:
+        line = next(capture_kit, None)
+        while line is not None:
+            chrom, start, stop, *name = line[:-1].split("\t")
+            parsable_info = ("_".join(name)
+                                .replace(";", "_")
+                                .replace("=", "_")
+                                .replace(" ", "_")
+                                .replace(",", "_"))
+            yield f"{name}_{parsable_info}", f"{chrom}:{start}:{stop}"
+            line = next(capture_kit, None)
+
+region_dict = dict(build_regions(config["bed"]))
+
+
+rule genome_coverage_bam:
+    input:
+        bam = "sambamba/markdup/{sample}.bam"
+    output:
+        coverage = temp("deeptools/bamcoverage/{sample}.{region}.bedgraph")
+    message:
+        "Computing {wildcards.sample} coverage over {wildcards.region}"
+    threads:
+        config.get("threads", 10)
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 3,
+        time_min=lambda wildcards, attempt: attempt * 35,
+        tmpdir="tmp"
+    log:
+        "logs/deeptools/bamcoverage/{sample}.{region}.log"
+    params:
+        extra = config.get("bin_size", "--binSize 1")
+    wrapper:
+        "bio/deeptools/bamcoverage"
+
+
+rule aggregate_coverage_bam:
+    input:
+        expand(
+            "deeptools/bamcoverage/{sample}.{region}.bedgraph",
+            region=region_dict.values(),
+            allow_missing=True
+        )
+    output:
+        temp("deeptools/bamcoverage/{sample}.bedgraph")
+    message:
+        "Concatenating all regions for {wildcards.sample}"
+    threads: 2
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/deeptools/concat/{sample}.log"
+    params:
+        sort="-k1,1 -k2,2n"
+    shell:
+        "cat {input} | sort {params.sort} > {output} 2> {log}"
+
+rule compute_mean_coverage:
+    input:
+        "deeptools/bamcoverage/{sample}.bedgraph"
+    output:
+        temp("deeptools/bamcoverage/{sample}.meandepth.tsv")
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/awk/meandepth/{sample}.log"
+    params:
+        begin = 'FS=OFS="\t"',
+        body = ['print $0 FS $4/($3-$2)']
+    wrapper:
+        "bio/awk"
+
+
+rule create_info_table:
+    output:
+        temp("bcftools/annotate/info.txt")
+    message:
+        "Building VCF header for bcftools annotate"
+    threads: 1
+    resources:
+        mem_mb=128,
+        time_min=2,
+        tmpdir="tmp"
+    log:
+        "logs/bcftools/annotate/header.log"
+    params:
+        header='##INFO=<ID=REGION_COVERAGE,Number=1,Type=Integer,Description=\"Number of reads within Amplicon region\">\n##INFO=<ID=MEAN_REGION_COVERAGE,Number=1,Type=Float,Description=\"Mean coverage over the Amplicon region\">'
+    shell:
+        'echo "{params.header}" > {output} 2> {log}'
+
+
+rule bcftools_annotate:
+    input:
+        calls="gatk/mutect2/{sample}.vcf.gz",
+        calls_index="gatk/mutect2/{sample}.vcf.gz.tbi",
+        annotation="deeptools/bamcoverage/{sample}.bedgraph",
+        info="bcftools/annotate/info.txt"
+    output:
+        temp("bcftools/annotate/{sample}.vcf.gz")
+    message:
+        "Adding region depth information on {wildcards.sample}"
+    threads: 2
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 4,
+        time_min=lambda wildcards, attempt: attempt * 30,
+        tmpdir="tmp"
+    log:
+        "logs/bcftools/annotate/{sample}.log"
+    params:
+        "--columns CHROM,FROM,TO,REGION_COVERAGE,MEAN_REGION_COVERAGE"
+    wrapper:
+        "bio/bcftools/annotate"
