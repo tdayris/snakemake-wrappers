@@ -59,7 +59,7 @@ data = pandas.read_csv(
 
 logging.debug(data.head())
 base_cols = list(
-    set(["log2FoldChange", "padj"] + snakemake.params.get("keep_cols", []))
+    set(["log2FoldChange", "padj", "pvalue"] + snakemake.params.get("keep_cols", []))
 )
 
 if (gene2gene := snakemake.input.get("gene2gene", None)) is not None:
@@ -110,7 +110,17 @@ if (counts := snakemake.input.get("dst", None)) is not None:
         right_index=True,
         how="left"
     )
+    
+    ref_samples = snakemake.params.get("ref_samples", None)
+    test_samples = snakemake.params.get("test_sample", None)
+    if all(isinstance(i, list) for i in [ref_samples, test_samples]):
+        base_cols += ["ratio"]
+        data["ref_mean"] = data[ref_samples].mean(axis=1)
+        data["test_mean"] = data[test_samples].mean(axis=1)
+        data["ratio"] = data["test_mean"] / data["ref_mean"]
+    
     data[["index"] + base_cols]
+    
 
 logging.debug(data.head())
 
