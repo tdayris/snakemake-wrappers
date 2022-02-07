@@ -5,8 +5,9 @@
 from snakemake.shell import shell
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
-shell("export LD_LIBRARY_PATH=/usr/local/cuda-11.1/targets/x86_64-linux/lib:${{LD_LIBRARY_PATH}}")
-shell("export PATH=/usr/local/cuda/bin:${{PATH}}")
+if "gres" in snakemake.resources.keys():
+    shell("export LD_LIBRARY_PATH=/usr/local/cuda-11.1/targets/x86_64-linux/lib:${{LD_LIBRARY_PATH}}")
+    shell("export PATH=/usr/local/cuda/bin:${{PATH}}")
 shell("export OMP_NUM_THREADS={snakemake.threads}")
 
 if snakemake.params.piped is True:
