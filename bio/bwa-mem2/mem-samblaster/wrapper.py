@@ -39,3 +39,6 @@ shell(
     " {sort_extra}"
     ") {log}"
 )
+
+# Checking VCF format in search for truncated files
+shell(" ( echo 'Removing {snakemake.output.bam} if it's truncated.' ; ( samtools view {snakemake.output.bam} | tail ) || rm --verbose {snakemake.output.bam} ) {log} 2>&1 ")

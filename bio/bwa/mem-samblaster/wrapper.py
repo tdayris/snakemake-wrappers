@@ -13,6 +13,7 @@ from snakemake.shell import shell
 extra = snakemake.params.get("extra", "")
 sort_extra = snakemake.params.get("sort_extra", "")
 samblaster_extra = snakemake.params.get("samblaster_extra", "")
+sambamba_view_extra = snakemake.params.get("sambamba_view_extra", "")
 
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
@@ -23,18 +24,32 @@ if not isinstance(snakemake.input.reads, str) and len(snakemake.input.reads) not
 }:
     raise ValueError("input must have 1 (single-end) or " "2 (paired-end) elements")
 
+
+threads = snakemake.threads
+if threads < 4:
+    raise ValueError("At least 4 threads are required for this wrapper")
+if (threads-1)%3 == 0:
+    bwa_threads = sambamba_view_threads = sambamba_sort_threads = int((threads-1)/3)
+if (threads-1)%3 == 1:
+    bwa_threads = int((threads-1)/3)+1
+    sambamba_view_threads = sambamba_sort_threads = int((threads-1)/3)
+if (threads-1)%3 == 2:
+    bwa_threads = sambamba_sort_threads = int((threads-1)/3)+1
+    sambamba_view_threads = int((threads-1)/3)
+
 shell(
     "(bwa mem"
-    " -t {snakemake.threads}"
+    " -t {bwa_threads}"
     " {extra}"
     " {snakemake.params.index}"
     " {snakemake.input.reads}"
     " | samblaster"
     " {samblaster_extra}"
     " | sambamba view -S -f bam /dev/stdin"
-    " -t {snakemake.threads}"
+    " -t {sambamba_view_threads}"
+    " {sambamba_view_extra}"
     " | sambamba sort /dev/stdin"
-    " -t {snakemake.threads}"
+    " -t {sambamba_sort_threads}"
     " -o {snakemake.output.bam}"
     " {sort_extra}"
     ") {log}"

@@ -68,3 +68,6 @@ shell(
     " {snakemake.input.reads}"
     " | " + pipe_cmd + ") {log}"
 )
+
+# Checking VCF format in search for truncated files
+shell(" ( echo 'Removing {snakemake.output[0]} if it s truncated.' ; ( samtools view {snakemake.output[0]} | tail ) || rm --verbose {snakemake.output[0]} ) {log} ")

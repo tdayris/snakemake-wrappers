@@ -66,6 +66,7 @@ else:
     raise ValueError("Unexpected value for params.sort ({})".format(sort))
 
 with tempfile.TemporaryDirectory() as tmp:
+    #shell("mkdir --patents --verbose $(basename {snakemake.output[0]})")
     shell(
         "(bwa mem"
         " -t {snakemake.threads}"
