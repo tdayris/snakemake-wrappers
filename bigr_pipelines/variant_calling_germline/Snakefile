@@ -49,7 +49,8 @@ rule all:
             sample=design["Sample_id"].tolist(),
             index=["", ".tbi"]
         ),
-        html="multiqc/variant_calling_germline.html"
+        html="multiqc/variant_calling_germline.html",
+        tmb="TMB.tsv"
     message:
         "Finishing the WES Germline Variant Calling pipeline"
 
@@ -158,6 +159,28 @@ rule fastq_screen:
         "bio/fastq_screen"
 
 
+##############################
+### Tumor Molecular Burden ###
+##############################
+
+tmb_config = {
+    "bed": config["ref"]["capture_kit_bed"],
+    "filter_in": config["tmb"].get("filter_in", []),
+    "filter_out": config["tmb"].get("filter_out", []),
+    "min_coverage": config["tmb"].get("min_coverage", []),
+    "allele_depth_keyname": config["tmb"].get("allele_depth_keyname", "AD"),
+    "tmb_highness_threshold": config["tmb"].get("tmb_highness_threshold", 10),
+    "sample_list": design.Sample_id.tolist()
+}
+
+module tmb_meta:
+    snakefile: "../../meta/bio/somatic_tmb/test/Snakefile"
+    config: tmb_config
+
+
+use rule * from tmb_meta
+
+
 #################################
 ### FINAL VCF FILE INDEXATION ###
 #################################
@@ -172,13 +195,63 @@ use rule * from compress_index_vcf_meta as compress_index_vcf_*
 ### VCF annotation ###
 ######################
 
+# rule annotate_vcf:
+#     input:
+#         design="design.tsv",
+#         calls=expand(
+#             "mutect2/corrected/{sample}.vcf.gz", sample=design["Sample_id"]
+#         ),
+#         calls_index=expand(
+#             get_tbi("mutect2/corrected/{sample}.vcf.gz"),
+#             sample=design["Sample_id"]
+#         ),
+#     output:
+#         calls=temp(expand(
+#             "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz",
+#             sample=design["Sample_id"]
+#         )),
+#         calls_index=temp(expand(
+#             "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz.tbi",
+#             sample=design["Sample_id"]
+#         )),
+#         table=temp(expand(
+#             "snpeff_snpsift/snpsift/extractFields/{sample}.tsv",
+#             sample=design["Sample_id"]
+#         )),
+#         html="snpeff_snpsift/multiqc/SnpEff_annotation.html",
+#         html_data=directory("snpeff_snpsift/multiqc/SnpEff_annotation_data")
+#     message:
+#         "Annotating VCF"
+#     threads: 2
+#     resources:
+#         mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
+#         time_min=lambda wildcards, attempt: attempt * 60 * 4,
+#         tmpdir="tmp"
+#     handover: True
+#     log:
+#         "logs/snpeff_snpsift_pipeline.log"
+#     params:
+#         mkdir="--parents --verbose",
+#         ln="--symbolic --force --relative --verbose",
+#         variant_dir="mutect2/corrected/",
+#         outdir="snpeff_snpsift",
+#         pipeline_path="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh"
+#     shell:
+#         "mkdir {params.mkdir} {params.outdir} > {log} 2>&1 && "
+#         "ln {params.ln} {input.config} {params.outdir} >> {log} 2>&1 && "
+#         "ln {params.ln} {params.variant_dir} {params.outdir} >> {log} 2>&1 && "
+#         "cd {params.outdir} && "
+#         "bash {params.pipeline_path} >> {log} 2>&1 && "
+#         "mv --force --verbose snpeff_snpsift/* . >> {log} 2>&1"
+
 rule snpeff_snpsift_pipeline:
     input:
         calls=expand(
             "meta_caller/calls/{sample}.vcf.gz{index}",
             sample=design["Sample_id"].tolist(),
             index=["", ".tbi"]
-        )
+        ),
+        config="config.yaml"
     output:
         snpeff_stats=expand(
             "snpeff/report/{sample}.html",
@@ -194,14 +267,30 @@ rule snpeff_snpsift_pipeline:
             index=["", ".tbi"]
         )
     handover: True
+    shadow: 'shallow'
     message: "Annotating VCF files"
     params:
-        organism = config["params"].get("organism", "hg38")
+        organism = config["params"].get("organism", "hg38"),
+        mkdir="--parents --verbose",
+        ln="--symbolic --force --relative --verbose",
+        variant_dir="mutect2/corrected/",
+        outdir="snpeff_snpsift",
+        pipeline_path=config.get(
+            "snpeff_snpsift_run_path",
+            "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh"
+        )
     log:
         "log/snpeff_snpsift_pipeline.log"
     shell:
-        "bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh {params.organism} > log 2>&1"
-        
+        "mkdir {params.mkdir} {params.outdir}/data_input/calls/ > {log} 2>&1 && "
+        "ln {params.ln} {input.config} {params.outdir} >> {log} 2>&1 && "
+        "ln {params.ln} {params.variant_dir}/* {params.outdir}/data_input/calls/ >> {log} 2>&1 && "
+        "cd {params.outdir} && "
+        "bash {params.pipeline_path} {params.organism} | tee -a ${{OLDPWD}}/{log} 2>&1 && "
+        "ln {params.ln} snpsift/ ${{OLDPWD}}/snpsift >> {log} 2>&1 && "
+        "ln {params.ln} snpeff/ ${{OLDPWD}}/snpsift >> {log} 2>&1 "
+
+
 
 #####################################
 ### Merge variant calling results ###
@@ -349,7 +438,7 @@ rule sambamba_markduplicates:
         bam=temp("sambamba/markdup/{sample}.bam")
     message:
         "Removing duplicates on {wildcards.sample}"
-    threads: 10
+    threads: 6
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 10240,
         time_min=lambda wildcards, attempt: attempt * 45,
@@ -357,11 +446,13 @@ rule sambamba_markduplicates:
     log:
         "logs/sambamba/markduplicates/{sample}.log"
     params:
-        extra = "--remove-duplicates"
+        extra = config["sambamba"].get(
+            "markdup", "--remove-duplicates --overflow-list-size 600000"
+        )
     wrapper:
         "bio/sambamba/markdup"
-        
-        
+
+
 use rule sambamba_index from bwa_meta with:
     input:
         "{tool}/{command}/{sample}.bam"
