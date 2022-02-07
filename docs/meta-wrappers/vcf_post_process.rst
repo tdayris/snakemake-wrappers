@@ -89,7 +89,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/maftools/concat.log"
         params:
             sed = "'s/FORMAT_{}_tumor_AF/Mutect2_Allele_Frequency/g'".format(
-                config["sample_list"][0]
+                config["sample_list"]
             )
         shell:
             "head -n 1 {input[0]} | sed {params.sed} > {output} 2> {log} && "
@@ -149,7 +149,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/snpsift/extract_all_fields/{sample}.log"
         params:
             annotation_tag=config.get("annotation_tag", "ANN="),
-            ignore_format=True
+            ignore_format=True,
+            extra=config.get("extract_all_fields_extra", "-e '.' -s ','")
         wrapper:
             "bio/snpsift/extractAllFields"
 

@@ -224,11 +224,12 @@ The pipeline contains the following steps:
     rule all:
         input:
             calls=expand(
-                "snpsift/dbnsfp/{sample}.vcf.gz{index}",
+                "meta_caller/calls/{sample}.vcf.gz{index}",
                 sample=design["Sample_id"].tolist(),
                 index=["", ".tbi"]
             ),
-            html="multiqc/variant_calling_germline.html"
+            html="multiqc/variant_calling_germline.html",
+            tmb="TMB.tsv"
         message:
             "Finishing the WES Germline Variant Calling pipeline"
 
@@ -257,8 +258,8 @@ The pipeline contains the following steps:
                 stream=["1", "2"],
                 ext=["txt", "png"]
             ),
-            picards_metrics=expand(
-                "picard/markduplicates/metrics/{sample}.picard.metrics.txt",
+            sambamba_metrics=expand(
+                "sambamba/markdup/{sample}.bam",
                 sample=design["Sample_id"]
             ),
             snpeff_stats=expand(
@@ -290,8 +291,8 @@ The pipeline contains the following steps:
 
     rule alignment_summary:
         input:
-            bam="samtools/sort/{sample}.bam",
-            bam_index="samtools/sort/{sample}.bam.bai",
+            bam="sambamba/sort/{sample}.bam",
+            bam_index="sambamba/sort/{sample}.bam.bai",
             ref=config['ref']['fasta'],
             ref_idx=get_fai(config['ref']['fasta']),
             ref_dict=get_dict(config['ref']['fasta']),
@@ -337,6 +338,28 @@ The pipeline contains the following steps:
             "bio/fastq_screen"
 
 
+    ##############################
+    ### Tumor Molecular Burden ###
+    ##############################
+
+    tmb_config = {
+        "bed": config["ref"]["capture_kit_bed"],
+        "filter_in": config["tmb"].get("filter_in", []),
+        "filter_out": config["tmb"].get("filter_out", []),
+        "min_coverage": config["tmb"].get("min_coverage", []),
+        "allele_depth_keyname": config["tmb"].get("allele_depth_keyname", "AD"),
+        "tmb_highness_threshold": config["tmb"].get("tmb_highness_threshold", 10),
+        "sample_list": design.Sample_id.tolist()
+    }
+
+    module tmb_meta:
+        snakefile: "../../meta/bio/somatic_tmb/test/Snakefile"
+        config: tmb_config
+
+
+    use rule * from tmb_meta
+
+
     #################################
     ### FINAL VCF FILE INDEXATION ###
     #################################
@@ -351,28 +374,101 @@ The pipeline contains the following steps:
     ### VCF annotation ###
     ######################
 
-    snpeff_snpsift_config = {
-        "ref": config["ref"],
-        **config["snpeff_snpsift"]
-    }
+    # rule annotate_vcf:
+    #     input:
+    #         design="design.tsv",
+    #         calls=expand(
+    #             "mutect2/corrected/{sample}.vcf.gz", sample=design["Sample_id"]
+    #         ),
+    #         calls_index=expand(
+    #             get_tbi("mutect2/corrected/{sample}.vcf.gz"),
+    #             sample=design["Sample_id"]
+    #         ),
+    #     output:
+    #         calls=temp(expand(
+    #             "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz",
+    #             sample=design["Sample_id"]
+    #         )),
+    #         calls_index=temp(expand(
+    #             "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz.tbi",
+    #             sample=design["Sample_id"]
+    #         )),
+    #         table=temp(expand(
+    #             "snpeff_snpsift/snpsift/extractFields/{sample}.tsv",
+    #             sample=design["Sample_id"]
+    #         )),
+    #         html="snpeff_snpsift/multiqc/SnpEff_annotation.html",
+    #         html_data=directory("snpeff_snpsift/multiqc/SnpEff_annotation_data")
+    #     message:
+    #         "Annotating VCF"
+    #     threads: 2
+    #     resources:
+    #         mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
+    #         time_min=lambda wildcards, attempt: attempt * 60 * 4,
+    #         tmpdir="tmp"
+    #     handover: True
+    #     log:
+    #         "logs/snpeff_snpsift_pipeline.log"
+    #     params:
+    #         mkdir="--parents --verbose",
+    #         ln="--symbolic --force --relative --verbose",
+    #         variant_dir="mutect2/corrected/",
+    #         outdir="snpeff_snpsift",
+    #         pipeline_path="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh"
+    #     shell:
+    #         "mkdir {params.mkdir} {params.outdir} > {log} 2>&1 && "
+    #         "ln {params.ln} {input.config} {params.outdir} >> {log} 2>&1 && "
+    #         "ln {params.ln} {params.variant_dir} {params.outdir} >> {log} 2>&1 && "
+    #         "cd {params.outdir} && "
+    #         "bash {params.pipeline_path} >> {log} 2>&1 && "
+    #         "mv --force --verbose snpeff_snpsift/* . >> {log} 2>&1"
 
-
-    module snpeff_meta:
-        snakefile: "../../meta/bio/snpeff_annotate/test/Snakefile"
-        config: snpeff_snpsift_config
-
-    use rule snpeff from snpeff_meta with:
+    rule snpeff_snpsift_pipeline:
         input:
-            calls="meta_caller/calls/{sample}.vcf.gz",
-            calls_index=get_tbi("meta_caller/calls/{sample}.vcf.gz"),
-            db=config["ref"]["snpeff"]
+            calls=expand(
+                "meta_caller/calls/{sample}.vcf.gz{index}",
+                sample=design["Sample_id"].tolist(),
+                index=["", ".tbi"]
+            ),
+            config="config.yaml"
+        output:
+            snpeff_stats=expand(
+                "snpeff/report/{sample}.html",
+                sample=design["Sample_id"]
+            ),
+            snpeff_csvstats=expand(
+                "snpeff/csvstats/{sample}.csv",
+                sample=design["Sample_id"]
+            ),
+            fixed=expand(
+                "snpsift/fixed/{sample}.vcf.gz{index}",
+                sample=design["Sample_id"],
+                index=["", ".tbi"]
+            )
+        handover: True
+        shadow: 'shallow'
+        message: "Annotating VCF files"
+        params:
+            organism = config["params"].get("organism", "hg38"),
+            mkdir="--parents --verbose",
+            ln="--symbolic --force --relative --verbose",
+            variant_dir="mutect2/corrected/",
+            outdir="snpeff_snpsift",
+            pipeline_path=config.get(
+                "snpeff_snpsift_run_path",
+                "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh"
+            )
+        log:
+            "log/snpeff_snpsift_pipeline.log"
+        shell:
+            "mkdir {params.mkdir} {params.outdir}/data_input/calls/ > {log} 2>&1 && "
+            "ln {params.ln} {input.config} {params.outdir} >> {log} 2>&1 && "
+            "ln {params.ln} {params.variant_dir}/* {params.outdir}/data_input/calls/ >> {log} 2>&1 && "
+            "cd {params.outdir} && "
+            "bash {params.pipeline_path} {params.organism} | tee -a ${{OLDPWD}}/{log} 2>&1 && "
+            "ln {params.ln} snpsift/ ${{OLDPWD}}/snpsift >> {log} 2>&1 && "
+            "ln {params.ln} snpeff/ ${{OLDPWD}}/snpsift >> {log} 2>&1 "
 
-
-    module snpsift:
-        snakefile: "../../meta/bio/snpsift/test/Snakefile"
-        config: snpeff_snpsift_config
-
-    use rule * from snpsift
 
 
     #####################################
@@ -446,15 +542,15 @@ The pipeline contains the following steps:
             fasta_index=get_fai(config["ref"]["fasta"]),
             fasta_dict=get_dict(config["ref"]["fasta"]),
             contamination="summary/{sample}_calculate_contamination.table",
-            bam="picard/markduplicates/mapping/{sample}.bam",
-            bam_index=get_bai("picard/markduplicates/mapping/{sample}.bam"),
+            bam="sambamba/markdup/{sample}.bam",
+            bam_index=get_bai("sambamba/markdup/{sample}.bam"),
             f1r2="gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz"
 
 
     use rule get_pileup_summaries from gatk_mutect2_germline_meta with:
         input:
-            bam="picard/markduplicates/mapping/{sample}.bam",
-            bam_index=get_bai("picard/markduplicates/mapping/{sample}.bam"),
+            bam="sambamba/markdup/{sample}.bam",
+            bam_index=get_bai("sambamba/markdup/{sample}.bam"),
             intervals=config["ref"]["capture_kit_bed"],
             variants=config["ref"]["af_only"],
             variants_index=get_tbi(config["ref"]["af_only"])
@@ -465,8 +561,8 @@ The pipeline contains the following steps:
             fasta=config["ref"]["fasta"],
             fasta_index=get_fai(config["ref"]["fasta"]),
             fasta_dict=get_dict(config["ref"]["fasta"]),
-            map="picard/markduplicates/mapping/{sample}.bam",
-            map_index=get_bai("picard/markduplicates/mapping/{sample}.bam"),
+            map="sambamba/markdup/{sample}.bam",
+            map_index=get_bai("sambamba/markdup/{sample}.bam"),
             germline=config["ref"]["af_only"],
             germline_tbi=get_tbi(config["ref"]["af_only"]),
             intervals=config["ref"]["capture_kit_bed"]
@@ -513,36 +609,40 @@ The pipeline contains the following steps:
     ### Deduplicating ###
     #####################
 
-    rule picard_markduplicates:
+    rule sambamba_markduplicates:
         input:
-            bam="samtools/sort/{sample}.bam"
+            bam="sambamba/sort/{sample}.bam",
+            bai=get_bai("sambamba/sort/{sample}.bam")
         output:
-            bam=temp("picard/markduplicates/mapping/{sample}.bam"),
-            metrics=temp("picard/markduplicates/metrics/{sample}.picard.metrics.txt")
+            bam=temp("sambamba/markdup/{sample}.bam")
         message:
             "Removing duplicates on {wildcards.sample}"
-        threads: 1
+        threads: 6
         resources:
-            mem_mb=lambda wildcards, attempt: min(attempt * 5120, 10240),
+            mem_mb=lambda wildcards, attempt: attempt * 10240,
             time_min=lambda wildcards, attempt: attempt * 45,
             tmpdir="tmp"
         log:
-            "logs/picard/markduplicates/{sample}.markdup.log"
+            "logs/sambamba/markduplicates/{sample}.log"
         params:
-            "--ASSUME_SORT_ORDER coordinate --REMOVE_DUPLICATES true"
+            extra = config["sambamba"].get(
+                "markdup", "--remove-duplicates --overflow-list-size 600000"
+            )
         wrapper:
-            "bio/picard/markduplicates"
+            "bio/sambamba/markdup"
 
 
-    use rule samtools_index from bwa_meta as picard_index with:
+    use rule sambamba_index from bwa_meta with:
         input:
-            "picard/markduplicates/mapping/{sample}.bam"
+            "{tool}/{command}/{sample}.bam"
         output:
-            temp(get_bai("picard/markduplicates/mapping/{sample}.bam"))
+            temp("{tool}/{command}/{sample}.bam.bai")
         message:
-            "Indexing Picard deduplicated bam for {wildcards.sample}"
+            "Indexing mapped reads of {wildcards.sample} ({wildcards.tool}/{wildcards.command})"
         log:
-            "logs/picard/markduplicates/{sample}.index.log"
+            "logs/sambamba/sort/{sample}_{tool}_{command}.log"
+        params:
+            extra = ""
 
 
     ##############################
@@ -560,21 +660,10 @@ The pipeline contains the following steps:
         config: gatk_bqsr_config
 
 
-    use rule samtools_index from bwa_meta as gatk_index with:
-        input:
-            "gatk/recal_bam/{sample}.bam"
-        output:
-            temp(get_bai("gatk/recal_bam/{sample}.bam"))
-        message:
-            "Indexing GATK recalibrated bam for {wildcards.sample}"
-        log:
-            "logs/gatk/apply_baserecalibrator/{sample}.index.log"
-
-
     use rule gatk_apply_baserecalibrator from gatk_bqsr_meta with:
         input:
-            bam="picard/markduplicates/mapping/{sample}.bam",
-            bam_index=get_bai("picard/markduplicates/mapping/{sample}.bam"),
+            bam="sambamba/markdup/{sample}.bam",
+            bam_index=get_bai("sambamba/markdup/{sample}.bam"),
             ref=config['ref']['fasta'],
             ref_idx=get_fai(config['ref']['fasta']),
             ref_dict=get_dict(config['ref']['fasta']),
@@ -583,8 +672,8 @@ The pipeline contains the following steps:
 
     use rule gatk_compute_baserecalibration_table from gatk_bqsr_meta with:
         input:
-            bam="picard/markduplicates/mapping/{sample}.bam",
-            bam_index=get_bai("picard/markduplicates/mapping/{sample}.bam"),
+            bam="sambamba/markdup/{sample}.bam",
+            bam_index=get_bai("sambamba/markdup/{sample}.bam"),
             ref=config['ref']['fasta'],
             ref_idx=get_fai(config['ref']['fasta']),
             ref_dict=get_dict(config['ref']['fasta']),

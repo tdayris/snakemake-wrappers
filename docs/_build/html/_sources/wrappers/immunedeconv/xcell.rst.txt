@@ -23,7 +23,7 @@ This wrapper can be used in the following way:
             tsv="celltypes.tsv",
             rds="celltypes.RDS"
         wrapper:
-            "0.79.0-1159-g7fe792175/bio/immunedeconv/xcell"
+            "0.79.0-1233-g75ee1b83d/bio/immunedeconv/xcell"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -43,9 +43,9 @@ Software dependencies
 * ``conda-forge::r-tidyr==1.1.3``
 * ``conda-forge::r-tibble==3.1.2``
 * ``bioconda::r-immunedeconv==2.0.3``
-* ``conda-forge::r-readr==1.4.0``
+* ``conda-forge::r-readr-r41h03ef668_0==1.4.0``
 * ``conda-forge::r-rcolorbrewer==1.1_2``
-* ``conda-forge::r-randomcolor==1.1.0``
+* ``conda-forge::r-randomcolor==1.1.0.1``
 
 Input/Output
 ------------
@@ -73,6 +73,17 @@ Code
 .. code-block:: R
 
     #!/usr/bin/R
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2021, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt");
+    base::sink(log.file);
+    base::sink(log.file,type="message");
 
     # Load libraries
     base::library(package="dplyr", quietly=TRUE);
@@ -242,6 +253,11 @@ Code
         dev.off();
       }
     }
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    base::sink(type="message");
+    base::sink();
 
 
 .. |nl| raw:: html

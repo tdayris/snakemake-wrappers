@@ -33,7 +33,7 @@ This wrapper can be used in the following way:
         log:
             "logs/mutect_{sample}.log"
         wrapper:
-             "0.79.0-1159-g7fe792175/bio/gatk/mutect"
+             "0.79.0-1233-g75ee1b83d/bio/gatk/mutect"
 
     rule mutect2_bam:
         input:
@@ -55,7 +55,7 @@ This wrapper can be used in the following way:
         log:
             "logs/mutect_{sample}.log"
         wrapper:
-             "0.79.0-1159-g7fe792175/bio/gatk/mutect"
+             "0.79.0-1233-g75ee1b83d/bio/gatk/mutect"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -156,7 +156,10 @@ Code
     extra = snakemake.params.get("extra", "")
     java_opts = get_java_opts(snakemake)
 
+    java_opts += f" -XX:+UseParallelGC -XX:ParallelGCThreads={snakemake.threads}"
+
     shell(
+        "OMP_NUM_THREADS={snakemake.threads} && export OMP_NUM_THREADS && "
         "gatk --java-options '{java_opts}' Mutect2 "  # Tool and its subprocess
         " {tumor} "  # Path to tumor input file
         "--input {snakemake.input.map} "  # Path to input mapping file
@@ -166,9 +169,13 @@ Code
         "{intervals} "  # Path to optional intervals
         "--output {snakemake.output.vcf} "  # Path to output vcf file
         "--reference {snakemake.input.fasta} "  # Path to reference fasta file
+        "--native-pair-hmm-threads {snakemake.threads} "  # Maximum number of threads
         "{extra} "  # Extra parameters
         "{log}"  # Logging behaviour
     )
+
+    # Checking VCF format in search for truncated files
+    shell(" ( echo 'Removing {snakemake.output.vcf} if it is truncated.' ; ( gunzip -c {snakemake.output.vcf} | tail ) || rm --verbose {snakemake.output.vcf} ) {log} ")
 
 
 .. |nl| raw:: html

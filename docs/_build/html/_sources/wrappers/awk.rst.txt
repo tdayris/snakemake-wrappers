@@ -1,0 +1,124 @@
+.. _`bio/awk`:
+
+AWK
+===
+
+Run any awk scripts easily
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_awk:
+        input:
+            "input.file.txt"
+        output:
+            "output.file.txt"
+        log:
+            "logs/test_awk.log"
+        params:
+            begin = 'FS=OFS=" "',
+            body = ['print $0', 'print "toto"'],
+            end = 'print "FINAL INSTRUCTION"'
+        wrapper:
+            "0.79.0-1233-g75ee1b83d/bio/awk"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``conda-forge::gawk==5.1.0``
+
+Input/Output
+------------
+**Input:**
+
+* Path to an input text file
+
+**Output:**
+
+* Path to an output text file
+
+
+
+Params
+------
+
+* ``begin``: List of Awk BEGIN instructions. They will be separated by semi-columns.
+
+* ``body``: List of Awk core instructions. They will be separated by semi-columns.
+
+* ``end``: Awk END instructions. They will be separated by semi-columns.
+
+
+
+
+Notes
+-----
+
+notes
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+
+    """Snakemake wrapper for Awk scripts"""
+
+
+    from snakemake.shell import shell
+    from typing import List, Optional
+
+    def join_awk_sections(instructions: Optional[List[str]] = None) -> Optional[str]:
+        """Return the joint awk instruction, of None is no instruction are provided"""
+        if (instructions == []) or (instructions is None):
+            return None
+        if isinstance(instructions, str):
+            return instructions
+        return ";".join(instructions)
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    begin = ""
+    if (begin_instructions := join_awk_sections(snakemake.params.get("begin", []))) is not None:
+        begin = f"BEGIN{{{begin_instructions}}}"
+
+    end = ""
+    if (end_instructions := join_awk_sections(snakemake.params.get("end", []))) is not None:
+        end = f"END{{{end_instructions}}}"
+
+    body = f"{{{join_awk_sections(snakemake.params.get('body', []))}}}"
+
+    shell(
+        "awk '{begin} {body} {end}' {snakemake.input} > {snakemake.output} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

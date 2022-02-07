@@ -105,6 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compress_index_vcf.html">COMPRESS_INDEX_VCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coverage_variant_region.html">COVERAGE_VARIANT_REGION</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_pe.html">DADA2-PE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_se.html">DADA2-SE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deseq2_post_process.html">DESEQ2_POST_PROCESS</a></li>
@@ -118,6 +119,7 @@
 <li class="toctree-l2"><a class="reference internal" href="maftools.html">MAFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="meta_caller.html">META_CALLER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="meta_caller_germline.html">META_CALLER_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="msi_sensor_pro.html">MSI_SENSOR_PRO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mutect2_germline.html">MUTECT2_GERMLINE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mutect2_somatic.html">MUTECT2_SOMATIC</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">SALMON</a><ul>
@@ -128,6 +130,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="snpeff_annotate.html">SNPEFF_ANNOTATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpsift.html">SNPSIFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="somatic_tmb.html">SOMATIC TMB</a></li>
 <li class="toctree-l2"><a class="reference internal" href="star_arriba.html">STAR-ARRIBA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="star_mapping.html">STAR_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tximport_deseq2.html">TXIMPORT_DESEQ2</a></li>
@@ -221,15 +224,46 @@
     <span class="s2">&quot;transcriptome&quot;</span><span class="p">:</span> <span class="s2">&quot;path/to/transcriptome.fasta&quot;</span>
 <span class="p">}</span>
 
+<span class="k">def</span> <span class="nf">get_best_index</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return cached indexes if available&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;salmon_index&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;salmon_index&quot;</span><span class="p">]</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;transcriptome&quot;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;salmon_index_extra&quot;</span><span class="p">])</span>
+    <span class="n">hg38_flamingo</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.cdna.fasta&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--keepDuplicates --gencode&quot;</span>
+    <span class="p">)</span>
+    <span class="n">hg19_flamingo</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/GRCh37.75.homo_sapiens.cdna.fasta&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.main_chr.fa&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--keepDuplicates --gencode&quot;</span>
+    <span class="p">)</span>
+    <span class="n">mm10_flamingo</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.cdna.nopatch.fasta&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--keepDuplicates --gencode&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;transcriptome&quot;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">hg38_flamingo</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;salmon/index_hg38&quot;</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;transcriptome&quot;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">hg19_flamingo</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;salmon/index_hg19&quot;</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;transcriptome&quot;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">mm10_flamingo</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;salmon/index_mm10&quot;</span>
+
+    <span class="k">return</span> <span class="s2">&quot;salmon/index&quot;</span>
+
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule pseudo-map and quantifies your paired reads over the indexed</span>
 <span class="sd">reference.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">salmon_quant_paired</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">r1</span><span class="o">=</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.1.fq.gz&quot;</span><span class="p">,</span>
-        <span class="n">r2</span><span class="o">=</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.2.fq.gz&quot;</span><span class="p">,</span>
-        <span class="n">index</span><span class="o">=</span><span class="s2">&quot;salmon/index&quot;</span><span class="p">,</span>
+        <span class="n">r1</span><span class="o">=</span><span class="s2">&quot;fastp/trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.1.fastq&quot;</span><span class="p">,</span>
+        <span class="n">r2</span><span class="o">=</span><span class="s2">&quot;fastp/trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.2.fastq&quot;</span><span class="p">,</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">get_best_index</span><span class="p">(),</span>
         <span class="n">gtf</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;gtf&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">quant</span><span class="o">=</span><span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
@@ -238,14 +272,15 @@
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Quantifying </span><span class="si">{wildcards.sample}</span><span class="s2"> with Salmon&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="mi">20</span><span class="p">)</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">attempt</span> <span class="o">*</span> <span class="mi">5120</span> <span class="o">+</span> <span class="mi">25600</span>
-        <span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">75</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">12</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">libType</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;salmon_libtype&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">),</span>
-        <span class="n">extra</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;salmon_quant_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;--numBootstraps 100 --validateMappings --gcBias --seqBias --posBias&quot;</span><span class="p">)</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant_extra&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--numBootstraps 100 --validateMappings --gcBias --seqBias --posBias&quot;</span>
+        <span class="p">)</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/salmon/quant/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
@@ -256,16 +291,15 @@
 <span class="sd">Index your transcriptome or gentrome file with Salmon in order to map your</span>
 <span class="sd">reads against this reference.</span>
 
-<span class="sd">This rule is cached since it should be used only once per reference genome.</span>
+<span class="sd">These rules are cached since it should be used only once per reference genome.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">salmon_index</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">sequences</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/gentrome.fasta&quot;</span><span class="p">,</span>
         <span class="n">decoys</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/decoys.txt&quot;</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">index</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;salmon/index&quot;</span><span class="p">)</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;salmon/index&quot;</span><span class="p">))</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing transcriptome/gentrome sequences with Salmon&quot;</span>
-    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">threads</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="mi">20</span><span class="p">)</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="p">(</span>
@@ -283,21 +317,110 @@
         <span class="s2">&quot;bio/salmon/index&quot;</span>
 
 
+<span class="n">rule</span> <span class="n">salmon_index_hg38</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">sequences</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/gentrome.hg38.fasta&quot;</span><span class="p">,</span>
+        <span class="n">decoys</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/decoys.hg38.txt&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;salmon/index_hg38&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing transcriptome/gentrome sequences with Salmon&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">20</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">25600</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--keepDuplicates --gencode&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/salmon/index.hg38.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/salmon/index&quot;</span>
+
+
+<span class="c1">#use rule salmon_index as salmon_index_hg38 with:</span>
+<span class="c1">#    input:</span>
+<span class="c1">#        sequences=&quot;salmon/decoy/gentrome.hg38.fasta&quot;,</span>
+<span class="c1">#        decoys=&quot;salmon/decoy/decoys.hg38.txt&quot;</span>
+<span class="c1">#    output:</span>
+<span class="c1">#        index=directory(&quot;salmon/index_hg38&quot;)</span>
+<span class="c1">#    log:</span>
+<span class="c1">#        &quot;logs/salmon/index.hg38.log&quot;</span>
+
+<span class="n">rule</span> <span class="n">salmon_index_hg19</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">sequences</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/gentrome.hg19.fasta&quot;</span><span class="p">,</span>
+        <span class="n">decoys</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/decoys.hg19.txt&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;salmon/index_hg19&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing transcriptome/gentrome sequences with Salmon&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">20</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">25600</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--keepDuplicates --gencode&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/salmon/index.hg19.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/salmon/index&quot;</span>
+
+<span class="c1">#use rule salmon_index as salmon_index_hg19 with:</span>
+<span class="c1">#    input:</span>
+<span class="c1">#        sequences=&quot;salmon/decoy/gentrome.hg19.fasta&quot;,</span>
+<span class="c1">#        decoys=&quot;salmon/decoy/decoys.hg19.txt&quot;</span>
+<span class="c1">#    output:</span>
+<span class="c1">#        index=directory(&quot;salmon/index_hg19&quot;)</span>
+<span class="c1">#    log:</span>
+<span class="c1">#        &quot;logs/salmon/index.hg19.log&quot;</span>
+
+<span class="n">rule</span> <span class="n">salmon_index_mm10</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">sequences</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/gentrome.mm10.fasta&quot;</span><span class="p">,</span>
+        <span class="n">decoys</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/decoys.mm10.txt&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;salmon/index_mm10&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Indexing transcriptome/gentrome sequences with Salmon&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">20</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">25600</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--keepDuplicates --gencode&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/salmon/index.mm10.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/salmon/index&quot;</span>
+
+<span class="c1">#use rule salmon_index as salmon_index_mm10 with:</span>
+<span class="c1">#    input:</span>
+<span class="c1">#        sequences=&quot;salmon/decoy/gentrome.mm10.fasta&quot;,</span>
+<span class="c1">#        decoys=&quot;salmon/decoy/decoys.mm10.txt&quot;</span>
+<span class="c1">#    output:</span>
+<span class="c1">#        index=directory(&quot;salmon/index_mm10&quot;)</span>
+<span class="c1">#    log:</span>
+<span class="c1">#        &quot;logs/salmon/index.mm10.log&quot;</span>
+
+
+
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This rule is optional in case you want to use decoy sequences within your</span>
 <span class="sd">transcriptome. See salmon documentation for more information.</span>
 
-<span class="sd">This rule is cached since it should be used only once per reference genome.</span>
+<span class="sd">These rules are cached since it should be used only once per reference genome.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">salmon_generate_decoy_sequence</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">transcriptome</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;transcriptome&quot;</span><span class="p">],</span>
         <span class="n">genome</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">decoys</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/decoys.txt&quot;</span><span class="p">,</span>
-        <span class="n">gentrome</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/gentrome.fasta&quot;</span>
+        <span class="n">decoys</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;salmon/decoy/decoys.txt&quot;</span><span class="p">),</span>
+        <span class="n">gentrome</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;salmon/decoy/gentrome.fasta&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Building gentrome and decoy sequences for Salmon&quot;</span>
-    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
@@ -307,6 +430,95 @@
         <span class="s2">&quot;logs/salmon/decoys.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/salmon/generate_decoy&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">salmon_generate_decoy_sequence_hg38</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">transcriptome</span><span class="o">=</span><span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.cdna.fasta&quot;</span><span class="p">,</span>
+        <span class="n">genome</span><span class="o">=</span><span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">decoys</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/decoys.hg38.txt&quot;</span><span class="p">,</span>
+        <span class="n">gentrome</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/gentrome.hg38.fasta&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Building gentrome and decoy sequences for Salmon&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/salmon/decoys.hg38.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/salmon/generate_decoy&quot;</span>
+
+
+<span class="c1">#use rule salmon_generate_decoy_sequence as salmon_generate_decoy_sequence_hg38 with:</span>
+<span class="c1">#    input:</span>
+<span class="c1">#        transcriptome=&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.cdna.fasta&quot;,</span>
+<span class="c1">#        genome=&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta&quot;</span>
+<span class="c1">#    output:</span>
+<span class="c1">#        decoys=&quot;salmon/decoy/decoys.hg38.txt&quot;,</span>
+<span class="c1">#        gentrome=&quot;salmon/decoy/gentrome.hg38.fasta&quot;</span>
+<span class="c1">#    log:</span>
+<span class="c1">#        &quot;logs/salmon/decoys.hg38.log&quot;</span>
+
+<span class="n">rule</span> <span class="n">salmon_generate_decoy_sequence_hg19</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">transcriptome</span><span class="o">=</span><span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/GRCh37.75.homo_sapiens.cdna.fasta&quot;</span><span class="p">,</span>
+        <span class="n">genome</span><span class="o">=</span><span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.main_chr.fa&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">decoys</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/decoys.hg19.txt&quot;</span><span class="p">,</span>
+        <span class="n">gentrome</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/gentrome.hg19.fasta&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Building gentrome and decoy sequences for Salmon&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/salmon/decoys.hg19.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/salmon/generate_decoy&quot;</span>
+
+<span class="c1">#use rule salmon_generate_decoy_sequence as salmon_generate_decoy_sequence_hg19 with:</span>
+<span class="c1">#    input:</span>
+<span class="c1">#        transcriptome=&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/GRCh37.75.homo_sapiens.cdna.fasta&quot;,</span>
+<span class="c1">#        genome=&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.main_chr.fa&quot;</span>
+<span class="c1">#    output:</span>
+<span class="c1">#        decoys=&quot;salmon/decoy/decoys.hg19.txt&quot;,</span>
+<span class="c1">#        gentrome=&quot;salmon/decoy/gentrome.hg19.fasta&quot;</span>
+<span class="c1">#    log:</span>
+<span class="c1">#        &quot;logs/salmon/decoys.hg19mm.log&quot;</span>
+
+<span class="n">rule</span> <span class="n">salmon_generate_decoy_sequence_mm10</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">transcriptome</span><span class="o">=</span><span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.cdna.nopatch.fasta&quot;</span><span class="p">,</span>
+        <span class="n">genome</span><span class="o">=</span><span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">decoys</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/decoys.mm10.txt&quot;</span><span class="p">,</span>
+        <span class="n">gentrome</span><span class="o">=</span><span class="s2">&quot;salmon/decoy/gentrome.mm10.fasta&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Building gentrome and decoy sequences for Salmon&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/salmon/decoys.mm10.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/salmon/generate_decoy&quot;</span>
+
+<span class="c1">#use rule salmon_generate_decoy_sequence as salmon_generate_decoy_sequence_mm10 with:</span>
+<span class="c1">#    input:</span>
+<span class="c1">#        transcriptome=&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.cdna.nopatch.fasta&quot;,</span>
+<span class="c1">#        genome=&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta&quot;</span>
+<span class="c1">#    output:</span>
+<span class="c1">#        decoys=&quot;salmon/decoy/decoys.mm10.txt&quot;,</span>
+<span class="c1">#        gentrome=&quot;salmon/decoy/gentrome.mm10.fasta&quot;</span>
+<span class="c1">#    log:</span>
+<span class="c1">#        &quot;logs/salmon/decoys.mm10.log&quot;</span>
 </pre></div>
 </div>
 <p>Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.

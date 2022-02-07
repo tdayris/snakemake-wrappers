@@ -141,7 +141,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcards, attempt: attempt * 2048,
             time_min=lambda wildcards, attempt: attempt * 60
         params:
-            contrast=lambda wildcards: contrasts[wildcards.comparison]
+            contrast=lambda wildcards: contrasts[wildcards.comparison],
+
         log:
             "logs/deseq2/deseq/{comparison}.log"
         wrapper:
@@ -170,7 +171,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 else f"~BatchEffect+{contrasts[wildcards.comparison][0]}"
             ),
             levels=lambda wildcards: contrasts[wildcards.comparison][1:],
-            factor=lambda wildcards: contrasts[wildcards.comparison][0]
+            factor=lambda wildcards: contrasts[wildcards.comparison][0],
+            ref_level=lambda wildcards: contrasts[wildcards.comparison][-1],
+            remove_zeros=True,
+            count_filter=5
         log:
             "logs/deseq2/deseq2_dataset_from_tximport/{comparison}.log"
         wrapper:
@@ -217,9 +221,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
             gtf=config["gtf"]
         output:
-            tx2gene_small="tximport/tx2gene.tsv",
-            tx2gene_large="tximport/transcripts2genes.tsv",
-            gene2gene_large="tximport/gene2gene.tsv"
+            tx2gene_small=temp("tximport/tx2gene.tsv"),
+            tx2gene_large=temp("tximport/transcripts2genes.tsv"),
+            gene2gene_large=temp("tximport/gene2gene.tsv")
         message: "Building transcripts/genes conversion table"
         cache: True
         threads: 1
@@ -234,7 +238,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/tximport/tx2gene.log"
         wrapper:
             "bio/gtf/tx2gene"
-
 
     ######################
     ### Design parsing ###

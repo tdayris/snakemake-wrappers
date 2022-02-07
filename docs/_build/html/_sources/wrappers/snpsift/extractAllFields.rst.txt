@@ -26,7 +26,7 @@ This wrapper can be used in the following way:
         resources:
             mem_mb=1024
         wrapper:
-            "0.79.0-1159-g7fe792175/bio/snpsift/extractAllFields"
+            "0.79.0-1233-g75ee1b83d/bio/snpsift/extractAllFields"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -70,6 +70,9 @@ Code
 
 .. code-block:: python
 
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+
     """Snakemake wrapper for SnpSift extractFields"""
 
     __author__ = "Thibault Dayris"
@@ -77,8 +80,9 @@ Code
     __email__ = "thibault.dayris@gustaveroussy.fr"
     __license__ = "MIT"
 
-    import re
+    import gzip
     import logging
+    import re
 
     logging.basicConfig(
         filemode="w",
@@ -121,13 +125,12 @@ Code
         "POS: Position over the chromosome",
         "ID: Variant identifier"
     ]
-    with open(snakemake.input.call, "r") as vcf_stream:
+    with gzip.open(snakemake.input.call, "rb") as vcf_stream:
         ignore_format = snakemake.params.get("ignore_format", False) is True
         regex_general = r'##([^=]+)=(.+$)'
         regex_id = r"<ID=([^,]+),(.*)>"
         for line in vcf_stream:
-            logging.debug("")
-            logging.debug(line[:-1])
+            line = line.decode("utf-8")
             if not line.startswith("##"):
                 logging.warning("Breaking!")
                 break
@@ -197,7 +200,7 @@ Code
                     ]
                 else:
                     logging.debug("Adding unknown info: '%s'", hid)
-                    fields.append(hid)
+                    fields.append(f"'{hid}'")
 
 
     if isinstance(fields, list):

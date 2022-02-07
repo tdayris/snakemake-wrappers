@@ -351,7 +351,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
 <span class="n">rule</span> <span class="nb">all</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;snpsift/dbnsfp/</span><span class="si">{sample}</span><span class="s2">.vcf.gz</span><span class="si">{index}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf.gz</span><span class="si">{index}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
             <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;.tbi&quot;</span><span class="p">]</span>
         <span class="p">),</span>
@@ -404,8 +404,8 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
 
 <span class="n">rule</span> <span class="n">alignment_summary</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
-        <span class="n">bam_index</span><span class="o">=</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">,</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;sambamba/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="s2">&quot;sambamba/sort/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">,</span>
         <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">],</span>
         <span class="n">ref_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
         <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
@@ -437,14 +437,14 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
         <span class="s2">&quot;Assessing quality of </span><span class="si">{wildcards.sample}</span><span class="s2">, </span><span class="si">{wildcards.stream}</span><span class="s2">&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">8192</span><span class="p">),</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">50</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">fastq_screen_config</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fastq_screen&quot;</span><span class="p">],</span>
         <span class="n">subset</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
         <span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;bowtie2&#39;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/fastqc/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.log&quot;</span>
+        <span class="s2">&quot;logs/fastqscreen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/fastq_screen&quot;</span>
 
@@ -487,6 +487,80 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
 
 
 
+<span class="n">rule</span> <span class="n">annotate_vcf</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">design</span><span class="o">=</span><span class="s2">&quot;design.tsv&quot;</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">,</span>
+        <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;meta_caller/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">calls_index</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;meta_caller/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">),</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">calls</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">calls_index</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf.gz.tbi&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">table</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift/extractFields/</span><span class="si">{sample}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">html</span><span class="o">=</span><span class="s2">&quot;snpeff_snpsift/multiqc/SnpEff_annotation.html&quot;</span><span class="p">,</span>
+        <span class="n">html_data</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;snpeff_snpsift/multiqc/SnpEff_annotation_data&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Annotating VCF&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">handover</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/snpeff_snpsift_pipeline.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">mkdir</span><span class="o">=</span><span class="s2">&quot;--parents --verbose&quot;</span><span class="p">,</span>
+        <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;--symbolic --force --relative --verbose&quot;</span><span class="p">,</span>
+        <span class="n">variant_dir</span><span class="o">=</span><span class="s2">&quot;mutect2/corrected/&quot;</span><span class="p">,</span>
+        <span class="n">outdir</span><span class="o">=</span><span class="s2">&quot;snpeff_snpsift&quot;</span><span class="p">,</span>
+        <span class="n">pipeline_path</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift_run_path&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh&quot;</span>
+        <span class="p">),</span>
+        <span class="n">organism</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;organism&quot;</span><span class="p">,</span> <span class="s2">&quot;hg38&quot;</span><span class="p">)</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mkdir}</span><span class="s2"> </span><span class="si">{params.outdir}</span><span class="s2">/data_input/calls/ &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;ln </span><span class="si">{params.ln}</span><span class="s2"> </span><span class="si">{input.config}</span><span class="s2"> </span><span class="si">{params.outdir}</span><span class="s2"> &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;ln </span><span class="si">{params.ln}</span><span class="s2"> </span><span class="si">{params.variant_dir}</span><span class="s2">/* </span><span class="si">{params.outdir}</span><span class="s2">/data_input/calls/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;cd </span><span class="si">{params.outdir}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;bash </span><span class="si">{params.pipeline_path}</span><span class="s2"> </span><span class="si">{params.organism}</span><span class="s2"> | tee -a ${{OLDPWD}}/</span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1&quot;</span>
+        <span class="s2">&quot;ln </span><span class="si">{params.ln}</span><span class="s2"> snpsift/ ${{OLDPWD}}/snpsift &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;ln </span><span class="si">{params.ln}</span><span class="s2"> snpeff/ ${{OLDPWD}}/snpsift &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &quot;</span>
+
+
+<span class="c1">###############################</span>
+<span class="c1">### Region depth annotation ###</span>
+<span class="c1">###############################</span>
+<span class="n">coverage_variant_region_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bed&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;capture_kit_bed&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;threads&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;bin_size&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">&quot;deeptools&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;bin_size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bin_size&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">module</span> <span class="n">coverage_variant_region_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/coverage_variant_region/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">coverage_variant_region_config</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">coverage_variant_region_meta</span>
+
 <span class="c1">#####################################</span>
 <span class="c1">### Merge variant calling results ###</span>
 <span class="c1">#####################################</span>
@@ -496,7 +570,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
     <span class="n">config</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span> <span class="s2">&quot;bed&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;capture_kit_bed&quot;</span><span class="p">]}</span>
 
 
-<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">metacaller_germline_meta</span> <span class="k">as</span> <span class="o">*</span>
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">metacaller_germline_meta</span>
 
 
 <span class="c1">############################################################################</span>
@@ -570,8 +644,8 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
 
 <span class="n">use</span> <span class="n">rule</span> <span class="n">gatk_apply_baserecalibrator</span> <span class="kn">from</span> <span class="nn">gatk_bqsr_meta</span> <span class="k">with</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
-        <span class="n">bam_index</span><span class="o">=</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">,</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;sambamba/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="s2">&quot;sambamba/sort/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">,</span>
         <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">],</span>
         <span class="n">ref_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
         <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
@@ -580,8 +654,8 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_amp
 
 <span class="n">use</span> <span class="n">rule</span> <span class="n">gatk_compute_baserecalibration_table</span> <span class="kn">from</span> <span class="nn">gatk_bqsr_meta</span> <span class="k">with</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
-        <span class="n">bam_index</span><span class="o">=</span><span class="s2">&quot;samtools/sort/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">,</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;sambamba/sort/</span><span class="si">{sample}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="s2">&quot;sambamba/sort/</span><span class="si">{sample}</span><span class="s2">.bam.bai&quot;</span><span class="p">,</span>
         <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">],</span>
         <span class="n">ref_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
         <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>

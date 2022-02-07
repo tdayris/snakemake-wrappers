@@ -190,37 +190,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "bio/rbt/csvreport"
 
 
-    rule deseq2_complete_with_counts:
-        input:
-            left="results/{comparison}/{comparison}_{content}.tsv",
-            right="deseq2/{comparison}/dst.{comparison}.tsv"
-        output:
-            merged="results/{comparison}/{comparison}_deseq2_{content}_with_counts.tsv"
-        message:
-            "Adding counts to DESeq2 results for {wildcards.comparison}"
-        threads: 1
-        resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1024,
-            time_min=lambda wildcards, attempt: attempt * 15,
-            tmpdir="tmp"
-        log:
-            "logs/pandas/deseq2_with_counts/{comparison}_{content}.log"
-        params:
-            join="--check-order -e '.' -t $'\t' -j 1",
-            head="-n1",
-            sed="'1d'"
-        shell:
-            "paste "
-            "<(head {params.head} {input.left}) "
-            "<(head {params.head} {input.right}) "
-            "> {output} 2> {log} && "
-            "join {params.join} "
-            "<(sed {params.sed} {input.left} | sort) "
-            "<(sed {params.sed} {input.right} | sort) "
-            ">> {output} 2>> {log}"
-
-
-
     rule deseq2_to_gseaapp:
         input:
             tsv = "deseq2/{comparison}/wald.{comparison}.tsv",
@@ -251,8 +220,34 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcards, attempt: min(attempt * 2048, 10240),
             time_min=lambda wildcards, attempt: min(attempt * 40, 200),
             tmpdir="tmp"
+        params:
+            ref_sample="", #TODO
+            test_sample="" #TODO
         log:
             "logs/deseq2_to_gseaapp/{comparison}.log"
+        wrapper:
+            "bio/pandas/deseq2_to_gseaapp"
+
+
+
+    rule deseq2_to_gseaapp_with_counts:
+        input:
+            tsv = "deseq2/{comparison}/wald.{comparison}.tsv",
+            gene2gene = "tximport/gene2gene.tsv",
+            dst = "deseq2/{comparison}/dst.{comparison}.tsv"
+        output:
+            complete = "results/{comparison}/{comparison}_deseq2_complete_with_counts.tsv",
+            fc_fc = "results/{comparison}/{comparison}_deseq2_sorted_on_fold_change_with_counts.tsv",
+            padj_fc = "results/{comparison}/{comparison}_deseq2_sorted_on_pval_with_counts.tsv"
+        message:
+            "Subsetting DESeq2 results for {wildcards.comparison} with counts"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 2048, 10240),
+            time_min=lambda wildcards, attempt: min(attempt * 40, 200),
+            tmpdir="tmp"
+        log:
+            "logs/deseq2_to_gseaapp/{comparison}.counts.log"
         wrapper:
             "bio/pandas/deseq2_to_gseaapp"
 
@@ -309,7 +304,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         wrapper:
             "bio/seaborn/clustermap"
 
-    rule test_pandas_deseq2_merge:
+    rule pandas_deseq2_merge:
         input:
             wald_tsv = "deseq2/{comparison}/wald.{comparison}.tsv",
             dst_tsv = "deseq2/{comparison}/dst.{comparison}.tsv",
@@ -396,26 +391,29 @@ This meta-wrapper can be used by integrating the following into your workflow:
             counts="salmon/TMP.genes.nochr.tsv"
         output:
             png=expand(
-                "figures/pca/general.pca.{factor}_{axes}.png",
-                axes=["PC1_PC2", "PC2_PC1"],
-                allow_missing=True
+                "figures/pca/general.pca_{axes}.png",
+                axes=["PC1_PC2", "PC2_PC1"]
             )
         message:
-            "Plotting general PCA over {wildcards.factor}"
+            "Plotting general PCA"
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 4096,
             time_min=lambda wildcards, attempt: attempt * 5,
             tmpdir="tmp"
         log:
-            "logs/seaborn/pca/general.{factor}.png"
+            "logs/seaborn/pca/general.log"
         params:
             axes=[1, 2],
-            conditions=lambda wildcards: dict(zip(
+            # conditions=lambda wildcards: dict(zip(
+            #     config["design"].index.tolist(),
+            #     config["design"][wildcards.factor].tolist()
+            # )),
+            conditions = dict(zip(
                 config["design"].index.tolist(),
-                config["design"][wildcards.factor].tolist()
+                config["design"].drop(["Sample_id", "Upstream_file", "Downstream_file"], axis=1).iloc[:, :-1].apply("_".join, axis=1).to_list()
             )),
-            prefix=lambda wildcards: f"figures/pca/general.pca.{wildcards.factor}"
+            prefix=lambda wildcards: f"figures/pca/general.pca"
         wrapper:
             "bio/seaborn/pca"
 

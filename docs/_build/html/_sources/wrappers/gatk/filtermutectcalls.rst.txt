@@ -37,7 +37,7 @@ This wrapper can be used in the following way:
         resources:
             mem_mb=1024,
         wrapper:
-            "0.79.0-1159-g7fe792175/bio/gatk/filtermutectcalls"
+            "0.79.0-1233-g75ee1b83d/bio/gatk/filtermutectcalls"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -141,6 +141,9 @@ Code
         "-O {snakemake.output.vcf} "
         "{log}"
     )
+
+    # Checking VCF format in search for truncated files
+    shell(" ( echo 'Removing {snakemake.output.vcf} if it is truncated.' ; ( gunzip -c {snakemake.output.vcf} | tail ) || rm --verbose {snakemake.output.vcf} ) {log} ")
 
 
 .. |nl| raw:: html

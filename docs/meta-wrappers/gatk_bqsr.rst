@@ -56,7 +56,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         log:
             "logs/gatk/applybqsr/{sample}.log"
         params:
-            extra=""
+            extra=config.get("apply_base_recal_extra", "")
         wrapper:
             "bio/gatk/applybqsr"
 

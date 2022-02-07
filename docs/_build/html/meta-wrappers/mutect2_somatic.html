@@ -105,6 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compress_index_vcf.html">COMPRESS_INDEX_VCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coverage_variant_region.html">COVERAGE_VARIANT_REGION</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_pe.html">DADA2-PE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_se.html">DADA2-SE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deseq2_post_process.html">DESEQ2_POST_PROCESS</a></li>
@@ -118,6 +119,7 @@
 <li class="toctree-l2"><a class="reference internal" href="maftools.html">MAFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="meta_caller.html">META_CALLER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="meta_caller_germline.html">META_CALLER_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="msi_sensor_pro.html">MSI_SENSOR_PRO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mutect2_germline.html">MUTECT2_GERMLINE</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">MUTECT2_SOMATIC</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
@@ -129,6 +131,7 @@
 <li class="toctree-l2"><a class="reference internal" href="salmon.html">SALMON</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpeff_annotate.html">SNPEFF_ANNOTATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpsift.html">SNPSIFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="somatic_tmb.html">SOMATIC TMB</a></li>
 <li class="toctree-l2"><a class="reference internal" href="star_arriba.html">STAR-ARRIBA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="star_mapping.html">STAR_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tximport_deseq2.html">TXIMPORT_DESEQ2</a></li>
@@ -257,10 +260,10 @@
         <span class="n">fasta</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span>
         <span class="n">fasta_index</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
         <span class="n">fasta_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
-        <span class="nb">map</span><span class="o">=</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">,</span>
-        <span class="n">map_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">),</span>
-        <span class="n">tumor</span><span class="o">=</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">,</span>
-        <span class="n">tumor_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">),</span>
+        <span class="nb">map</span><span class="o">=</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">,</span>
+        <span class="n">map_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">),</span>
+        <span class="n">tumor</span><span class="o">=</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">,</span>
+        <span class="n">tumor_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">),</span>
         <span class="n">germline</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;known&quot;</span><span class="p">],</span>
         <span class="n">germline_tbi</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;known&quot;</span><span class="p">]),</span>
         <span class="n">intervals</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;bed&quot;</span><span class="p">]</span>
@@ -281,7 +284,7 @@
         <span class="n">idx</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;mutect2/filter/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">),</span>
         <span class="n">fasta</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bcftools/mutect2/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;bcftools/mutect2/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Splitting Mutect2 multiallelic sites </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
@@ -310,12 +313,14 @@
 <span class="n">rule</span> <span class="n">gatk_filter_mutect_calls</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;mutect2/call/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">vcf_tbi</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;mutect2/call/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">),</span>
         <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span>
         <span class="n">ref_index</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
         <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
-        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">,</span>
-        <span class="n">bam_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">),</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">),</span>
         <span class="c1">#f1r2=&quot;mutect2/f1r2/{sample}.tar.gz&quot;,</span>
+        <span class="n">f1r2</span><span class="o">=</span><span class="s2">&quot;gatk/orientation_model/</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.artifacts-prior.tar.gz&quot;</span><span class="p">,</span>
         <span class="n">contamination</span><span class="o">=</span><span class="s2">&quot;summary/</span><span class="si">{sample}</span><span class="s2">_calculate_contamination.table&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">vcf</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;mutect2/filter/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">),</span>
@@ -376,8 +381,8 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">rule</span> <span class="n">get_pileup_summaries</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
-        <span class="n">bam_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">),</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">),</span>
         <span class="n">intervals</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;bed&quot;</span><span class="p">],</span>
         <span class="n">variants</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;known&quot;</span><span class="p">],</span>
         <span class="n">variants_index</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;known&quot;</span><span class="p">])</span>
@@ -403,6 +408,31 @@
         <span class="s2">&quot;bio/gatk/getpileupsummaries&quot;</span>
 
 
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Build orientation bias model to filter false positive calls</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">gatk_learn_read_orientation_model</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">f1r2</span><span class="o">=</span><span class="s2">&quot;mutect2/f1r2/</span><span class="si">{sample}</span><span class="s2">.tar.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;gatk/orientation_model/</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.artifacts-prior.tar.gz&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Learning orientation bias in </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">8192</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;gatk/orientation_model/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/gatk/learnreadorientationmodel&quot;</span>
+
+
+
 <span class="c1">######################</span>
 <span class="c1">### Actual Calling ###</span>
 <span class="c1">######################</span>
@@ -419,7 +449,7 @@
         <span class="c1">#bam=temp(&quot;mutect2/bam/{sample}.bam&quot;)</span>
     <span class="n">message</span><span class="p">:</span>
         <span class="s2">&quot;Calling variants on </span><span class="si">{wildcards.sample}</span><span class="s2"> with GATK Mutect2&quot;</span>
-    <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">20</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">8192</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>
@@ -428,10 +458,19 @@
         <span class="n">extra</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="p">(</span>
             <span class="s2">&quot;--create-output-variant-index &quot;</span>
             <span class="s2">&quot;--max-reads-per-alignment-start 0 &quot;</span>
+            <span class="s2">&quot;--annotation AlleleFraction &quot;</span>
+            <span class="s2">&quot;--annotation AS_QualByDepth &quot;</span>
+            <span class="s2">&quot;--annotation BaseQuality &quot;</span>
+            <span class="s2">&quot;--annotation Coverage &quot;</span>
+            <span class="s2">&quot;--annotation MappingQuality &quot;</span>
+            <span class="s2">&quot;--annotation PossibleDeNovo &quot;</span>
+            <span class="s2">&quot;--annotation QualByDepth &quot;</span>
+            <span class="s2">&quot;--annotation ReferenceBases &quot;</span>
+            <span class="s2">&quot;--annotation StrandOddsRatio &quot;</span>
             <span class="s2">&quot;--disable-read-filter MateOnSameContigOrNoMappedMateReadFilter &quot;</span>
-            <span class="c1">#&quot;--tumor-sample Mutect2_{}_tumor &quot;</span>
-            <span class="s2">&quot;--normal-sample Mutect2_</span><span class="si">{}</span><span class="s2">_normal &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="c1">#    wildcards.sample,</span>
+            <span class="s2">&quot;--tumor-sample </span><span class="si">{}</span><span class="s2">_tumor &quot;</span>
+            <span class="s2">&quot;--normal-sample </span><span class="si">{}</span><span class="s2">_normal &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span>
                 <span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span>
             <span class="p">)</span>
         <span class="p">)</span>
@@ -451,11 +490,11 @@
         <span class="n">ref_index</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
         <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
         <span class="n">bams</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_list&quot;</span><span class="p">]</span>
         <span class="p">),</span>
         <span class="n">bams_index</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">),</span>
+            <span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">),</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_list&quot;</span><span class="p">]</span>
         <span class="p">),</span>
         <span class="n">gvcfs</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
@@ -491,11 +530,11 @@
         <span class="n">ref_index</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
         <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
         <span class="n">bams</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_list&quot;</span><span class="p">]</span>
         <span class="p">),</span>
         <span class="n">bams_index</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">),</span>
+            <span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">),</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_list&quot;</span><span class="p">]</span>
         <span class="p">),</span>
         <span class="n">gvcfs</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
@@ -529,8 +568,8 @@
         <span class="n">fasta</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span>
         <span class="n">fasta_index</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
         <span class="n">fasta_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
-        <span class="nb">map</span><span class="o">=</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">,</span>
-        <span class="n">map_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;picard/markduplicates/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">),</span>
+        <span class="nb">map</span><span class="o">=</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">,</span>
+        <span class="n">map_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;sambamba/markdup</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">),</span>
         <span class="n">germline</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;known&quot;</span><span class="p">],</span>
         <span class="n">germline_tbi</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;known&quot;</span><span class="p">]),</span>
         <span class="n">intervals</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;bed&quot;</span><span class="p">]</span>

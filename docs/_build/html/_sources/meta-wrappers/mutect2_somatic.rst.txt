@@ -56,10 +56,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
             fasta=config["genome"],
             fasta_index=get_fai(config["genome"]),
             fasta_dict=get_dict(config["genome"]),
-            map="picard/markduplicates/{sample}_normal.bam",
-            map_index=get_bai("picard/markduplicates/{sample}_normal.bam"),
-            tumor="picard/markduplicates/{sample}_tumor.bam",
-            tumor_index=get_bai("picard/markduplicates/{sample}_tumor.bam"),
+            map="sambamba/markdup/{sample}_normal.bam",
+            map_index=get_bai("sambamba/markdup/{sample}_normal.bam"),
+            tumor="sambamba/markdup/{sample}_tumor.bam",
+            tumor_index=get_bai("sambamba/markdup/{sample}_tumor.bam"),
             germline=config["known"],
             germline_tbi=get_tbi(config["known"]),
             intervals=config["bed"]
@@ -80,7 +80,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             idx=get_tbi("mutect2/filter/{sample}.vcf.gz"),
             fasta=config["genome"]
         output:
-            temp("bcftools/mutect2/{sample}.vcf.gz")
+            "bcftools/mutect2/{sample}.vcf.gz"
         message:
             "Splitting Mutect2 multiallelic sites {wildcards.sample}"
         threads: 1
@@ -109,12 +109,14 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule gatk_filter_mutect_calls:
         input:
             vcf="mutect2/call/{sample}.vcf.gz",
+            vcf_tbi=get_tbi("mutect2/call/{sample}.vcf.gz"),
             ref=config["genome"],
             ref_index=get_fai(config["genome"]),
             ref_dict=get_dict(config["genome"]),
-            bam="picard/markduplicates/{sample}_tumor.bam",
-            bam_index=get_bai("picard/markduplicates/{sample}_tumor.bam"),
+            bam="sambamba/markdup/{sample}_tumor.bam",
+            bam_index=get_bai("sambamba/markdup/{sample}_tumor.bam"),
             #f1r2="mutect2/f1r2/{sample}.tar.gz",
+            f1r2="gatk/orientation_model/{sample}/{sample}.artifacts-prior.tar.gz",
             contamination="summary/{sample}_calculate_contamination.table"
         output:
             vcf=temp("mutect2/filter/{sample}.vcf.gz"),
@@ -175,8 +177,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule get_pileup_summaries:
         input:
-            bam="picard/markduplicates/{sample}_{status}.bam",
-            bam_index=get_bai("picard/markduplicates/{sample}_{status}.bam"),
+            bam="sambamba/markdup/{sample}_{status}.bam",
+            bam_index=get_bai("sambamba/markdup/{sample}_{status}.bam"),
             intervals=config["bed"],
             variants=config["known"],
             variants_index=get_tbi(config["known"])
@@ -202,6 +204,31 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "bio/gatk/getpileupsummaries"
 
 
+
+    """
+    Build orientation bias model to filter false positive calls
+    """
+    rule gatk_learn_read_orientation_model:
+        input:
+            f1r2="mutect2/f1r2/{sample}.tar.gz"
+        output:
+            temp("gatk/orientation_model/{sample}/{sample}.artifacts-prior.tar.gz")
+        message:
+            "Learning orientation bias in {wildcards.sample}"
+        threads: 1
+        resources:
+            time_min=lambda wildcards, attempt: attempt * 60,
+            mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
+            tmpdir="tmp"
+        params:
+            extra=""
+        log:
+            "gatk/orientation_model/{sample}.log"
+        wrapper:
+            "bio/gatk/learnreadorientationmodel"
+
+
+
     ######################
     ### Actual Calling ###
     ######################
@@ -218,7 +245,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             #bam=temp("mutect2/bam/{sample}.bam")
         message:
             "Calling variants on {wildcards.sample} with GATK Mutect2"
-        threads: 4
+        threads: 20
         resources:
             time_min=lambda wildcards, attempt: attempt * 60 * 15,
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
@@ -227,10 +254,19 @@ This meta-wrapper can be used by integrating the following into your workflow:
             extra=lambda wildcards, output: (
                 "--create-output-variant-index "
                 "--max-reads-per-alignment-start 0 "
+                "--annotation AlleleFraction "
+                "--annotation AS_QualByDepth "
+                "--annotation BaseQuality "
+                "--annotation Coverage "
+                "--annotation MappingQuality "
+                "--annotation PossibleDeNovo "
+                "--annotation QualByDepth "
+                "--annotation ReferenceBases "
+                "--annotation StrandOddsRatio "
                 "--disable-read-filter MateOnSameContigOrNoMappedMateReadFilter "
-                #"--tumor-sample Mutect2_{}_tumor "
-                "--normal-sample Mutect2_{}_normal ".format(
-                #    wildcards.sample,
+                "--tumor-sample {}_tumor "
+                "--normal-sample {}_normal ".format(
+                    wildcards.sample,
                     wildcards.sample
                 )
             )
@@ -250,11 +286,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             ref_index=get_fai(config["genome"]),
             ref_dict=get_dict(config["genome"]),
             bams=expand(
-                "picard/markduplicates/{sample}_normal.bam",
+                "sambamba/markdup/{sample}_normal.bam",
                 sample=config["sample_list"]
             ),
             bams_index=expand(
-                get_bai("picard/markduplicates/{sample}_normal.bam"),
+                get_bai("sambamba/markdup/{sample}_normal.bam"),
                 sample=config["sample_list"]
             ),
             gvcfs=expand(
@@ -290,11 +326,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             ref_index=get_fai(config["genome"]),
             ref_dict=get_dict(config["genome"]),
             bams=expand(
-                "picard/markduplicates/{sample}_normal.bam",
+                "sambamba/markdup/{sample}_normal.bam",
                 sample=config["sample_list"]
             ),
             bams_index=expand(
-                get_bai("picard/markduplicates/{sample}_normal.bam"),
+                get_bai("sambamba/markdup/{sample}_normal.bam"),
                 sample=config["sample_list"]
             ),
             gvcfs=expand(
@@ -328,8 +364,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             fasta=config["genome"],
             fasta_index=get_fai(config["genome"]),
             fasta_dict=get_dict(config["genome"]),
-            map="picard/markduplicates/{sample}_normal.bam",
-            map_index=get_bai("picard/markduplicates/{sample}_normal.bam"),
+            map="sambamba/markdup/{sample}_normal.bam",
+            map_index=get_bai("sambamba/markdup{sample}_normal.bam"),
             germline=config["known"],
             germline_tbi=get_tbi(config["known"]),
             intervals=config["bed"]

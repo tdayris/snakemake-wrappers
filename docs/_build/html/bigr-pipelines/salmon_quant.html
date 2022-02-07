@@ -297,20 +297,39 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 <span class="n">configfile</span><span class="p">:</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
 <span class="n">design</span> <span class="o">=</span> <span class="n">get_design</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">search_fastq_pairs</span><span class="p">)</span>
 
-<span class="n">fastq_links</span> <span class="o">=</span> <span class="n">link_fq</span><span class="p">(</span>
-    <span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">,</span>
-    <span class="n">design</span><span class="o">.</span><span class="n">Upstream_file</span><span class="p">,</span>
-    <span class="n">design</span><span class="o">.</span><span class="n">Downstream_file</span>
-<span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">fastq_links</span> <span class="o">=</span> <span class="n">link_fq</span><span class="p">(</span>
+        <span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">,</span>
+        <span class="n">design</span><span class="o">.</span><span class="n">Upstream_file</span><span class="p">,</span>
+        <span class="n">design</span><span class="o">.</span><span class="n">Downstream_file</span>
+    <span class="p">)</span>
 
-<span class="c1">#ruleorder: salmon_meta_salmon_quant_paired &gt; salmon_quant_paired</span>
+    <span class="n">ruleorder</span><span class="p">:</span> <span class="n">salmon_quant_paired</span> <span class="o">&gt;</span> <span class="n">salmon_quant_single</span>
+    <span class="n">ruleorder</span><span class="p">:</span> <span class="n">multiqc</span> <span class="o">&gt;</span> <span class="n">multiqc_single</span>
+    <span class="n">ruleorder</span><span class="p">:</span> <span class="n">fastp_clean</span> <span class="o">&gt;</span> <span class="n">fastp_clean_single_end</span>
+<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+    <span class="n">fastq_links</span> <span class="o">=</span> <span class="n">link_fq</span><span class="p">(</span>
+        <span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">,</span>
+        <span class="n">design</span><span class="o">.</span><span class="n">Upstream_file</span>
+    <span class="p">)</span>
 
+    <span class="n">ruleorder</span><span class="p">:</span> <span class="n">salmon_quant_single</span> <span class="o">&gt;</span> <span class="n">salmon_quant_paired</span>
+    <span class="n">ruleorder</span><span class="p">:</span> <span class="n">multiqc_single</span> <span class="o">&gt;</span> <span class="n">multiqc</span>
+    <span class="n">ruleorder</span><span class="p">:</span> <span class="n">fastp_clean_single_end</span> <span class="o">&gt;</span> <span class="n">fastp_clean</span>
+
+<span class="c1">#print(fastq_links)</span>
+
+
+<span class="n">wildcard_constraints</span><span class="p">:</span>
+    <span class="n">sample</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="o">.</span><span class="n">to_list</span><span class="p">()),</span>
+    <span class="n">stream</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>
 
 <span class="n">rule</span> <span class="n">target</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="s2">&quot;multiqc/MultiQC.html&quot;</span><span class="p">,</span>
         <span class="s2">&quot;salmon/TPM.genes.tsv&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;salmon/TPM.transcripts.tsv&quot;</span>
+        <span class="s2">&quot;salmon/TPM.transcripts.tsv&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;salmon/Raw.genes.tsv&quot;</span>
     <span class="n">output</span><span class="p">:</span>
         <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;results_to_upload&quot;</span><span class="p">)</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
@@ -319,9 +338,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">25</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;log/results_to_upload.log&quot;</span>
+        <span class="s2">&quot;logs/results_to_upload.log&quot;</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="s2">&quot;-cv&quot;</span>
+        <span class="s2">&quot;--verbose --checksum --human-readable&quot;</span>
     <span class="n">shell</span><span class="p">:</span>
         <span class="s2">&quot;rsync </span><span class="si">{params}</span><span class="s2"> </span><span class="si">{input}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2"> &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1&quot;</span>
 
@@ -329,6 +348,36 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
 <span class="c1">########################</span>
 <span class="c1">### Aggregate counts ###</span>
 <span class="c1">########################</span>
+
+
+<span class="n">rule</span> <span class="n">aggregate_raw_counts</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">quant</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">tx2gene</span><span class="o">=</span><span class="s2">&quot;salmon/tx2gene.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">tsv</span><span class="o">=</span><span class="s2">&quot;salmon/Raw.genes.tsv&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Aggregating genes counts with their gene names&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">position</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">gencode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">genes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">index_label</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">fillna</span><span class="o">=</span><span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
+        <span class="n">column</span><span class="o">=</span><span class="s2">&quot;NumReads&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/aggregate/genes.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/pandas/salmon&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">aggregate_gene_counts</span><span class="p">:</span>
@@ -351,7 +400,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
         <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">position</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">gencode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">genes</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">genes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">index_label</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">fillna</span><span class="o">=</span><span class="s2">&quot;Unknown&quot;</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/aggregate/genes.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
@@ -378,7 +429,8 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
         <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">position</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">gencode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">genes</span><span class="o">=</span><span class="kc">False</span>
+        <span class="n">genes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">index_label</span><span class="o">=</span><span class="kc">True</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/aggregate/transcripts.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
@@ -450,6 +502,33 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
         <span class="s2">&quot;bio/multiqc&quot;</span>
 
 
+<span class="n">use</span> <span class="n">rule</span> <span class="n">multiqc</span> <span class="k">as</span> <span class="n">multiqc_single</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">salmon</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">json</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">fastq_screen</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">report</span><span class="p">(</span>
+            <span class="s2">&quot;multiqc/MultiQC.html&quot;</span><span class="p">,</span>
+            <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;../common/reports/multiqc.rst&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;Quality Controls&quot;</span>
+        <span class="p">)</span>
+
+
 
 <span class="n">rule</span> <span class="n">fastq_screen</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
@@ -461,8 +540,8 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
         <span class="s2">&quot;Assessing quality of </span><span class="si">{wildcards.sample}</span><span class="s2">, stream </span><span class="si">{wildcards.stream}</span><span class="s2">&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
     <span class="n">resources</span><span class="p">:</span>
-        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">8192</span><span class="p">),</span>
-        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8192</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">75</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
     <span class="n">params</span><span class="p">:</span>
         <span class="n">fastq_screen_config</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fastq_screen&quot;</span><span class="p">],</span>
@@ -472,6 +551,18 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
         <span class="s2">&quot;logs/fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/fastq_screen&quot;</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">fastq_screen</span> <span class="k">as</span> <span class="n">fastq_screen_single</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.fq.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">txt</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.fastq_screen.txt&quot;</span><span class="p">),</span>
+        <span class="n">png</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.fastq_screen.png&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Assessing quality of </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/fastq_screen/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
 
 
 <span class="c1">#############################</span>
@@ -508,6 +599,22 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
         <span class="c1">#mapping=temp(&quot;salmon/bams/{sample}.bam&quot;)</span>
 
 
+<span class="n">use</span> <span class="n">rule</span> <span class="n">salmon_quant_paired</span> <span class="kn">from</span> <span class="nn">salmon_meta</span> <span class="k">as</span> <span class="n">salmon_quant_single</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">r</span><span class="o">=</span><span class="s2">&quot;fastp/trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.fq.gz&quot;</span><span class="p">,</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;salmon_index&quot;</span><span class="p">,</span> <span class="s2">&quot;salmon/index&quot;</span><span class="p">),</span>
+        <span class="n">gtf</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;gtf&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">quant</span><span class="o">=</span><span class="n">report</span><span class="p">(</span>
+            <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;2. Raw Salmon output&quot;</span><span class="p">,</span>
+            <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;../../common/reports/salmon_quant.rst&quot;</span>
+        <span class="p">),</span>
+        <span class="n">quant_genes</span><span class="o">=</span><span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span>
+        <span class="n">lib</span><span class="o">=</span><span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/lib_format_counts.json&quot;</span><span class="p">,</span>
+        <span class="c1">#mapping=temp(&quot;salmon/bams/{sample}.bam&quot;)</span>
+
+
 <span class="c1">############################</span>
 <span class="c1">### FASTP FASTQ CLEANING ###</span>
 <span class="c1">############################</span>
@@ -520,13 +627,13 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
             <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">),</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">trimmed</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+        <span class="n">trimmed</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;fastp/trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq&quot;</span><span class="p">,</span>
             <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
             <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">),</span>
+        <span class="p">)),</span>
         <span class="n">html</span><span class="o">=</span><span class="s2">&quot;fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
-        <span class="n">json</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span><span class="p">)</span>
+        <span class="n">json</span><span class="o">=</span><span class="s2">&quot;fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Cleaning </span><span class="si">{wildcards.sample}</span><span class="s2"> with Fastp&quot;</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
@@ -540,6 +647,15 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
         <span class="s2">&quot;logs/fastp/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/fastp&quot;</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">fastp_clean</span> <span class="k">as</span> <span class="n">fastp_clean_single_end</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">sample</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.fq.gz&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">trimmed</span><span class="o">=</span><span class="s2">&quot;fastp/trimmed/pe/</span><span class="si">{sample}</span><span class="s2">.fastq&quot;</span><span class="p">,</span>
+        <span class="n">html</span><span class="o">=</span><span class="s2">&quot;fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
+        <span class="n">json</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span><span class="p">)</span>
 
 
 <span class="c1">#################################################</span>
@@ -561,6 +677,15 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
         <span class="s2">&quot;logs/bigr_copy/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/BiGR/copy&quot;</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">bigr_copy</span> <span class="k">as</span> <span class="n">bigr_copy_single_end</span> <span class="k">with</span><span class="p">:</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;reads/</span><span class="si">{sample}</span><span class="s2">.fq.gz&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Gathering </span><span class="si">{wildcards.sample}</span><span class="s2"> fastq file&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bigr_copy/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
 </pre></div>
 </div>
 </div>

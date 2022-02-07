@@ -224,7 +224,7 @@ The pipeline contains the following steps:
     rule all:
         input:
             calls=expand(
-                "snpsift/dbnsfp/{sample}.vcf.gz{index}",
+                "snpsift/fixed/{sample}.vcf.gz{index}",
                 sample=design["Sample_id"].tolist(),
                 index=["", ".tbi"]
             ),
@@ -277,8 +277,8 @@ The pipeline contains the following steps:
 
     rule alignment_summary:
         input:
-            bam="samtools/sort/{sample}.bam",
-            bam_index="samtools/sort/{sample}.bam.bai",
+            bam="sambamba/sort/{sample}.bam",
+            bam_index="sambamba/sort/{sample}.bam.bai",
             ref=config['ref']['fasta'],
             ref_idx=get_fai(config['ref']['fasta']),
             ref_dict=get_dict(config['ref']['fasta']),
@@ -310,14 +310,14 @@ The pipeline contains the following steps:
             "Assessing quality of {wildcards.sample}, {wildcards.stream}"
         threads: config.get("threads", 20)
         resources:
-            mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
+            mem_mb=lambda wildcard, attempt: attempt * 1024 * 8,
             time_min=lambda wildcard, attempt: attempt * 50
         params:
             fastq_screen_config=config["fastq_screen"],
             subset=100000,
             aligner='bowtie2'
         log:
-            "logs/fastqc/{sample}.{stream}.log"
+            "logs/fastqscreen/{sample}.{stream}.log"
         wrapper:
             "bio/fastq_screen"
 
@@ -360,6 +360,80 @@ The pipeline contains the following steps:
 
 
 
+    rule annotate_vcf:
+        input:
+            design="design.tsv",
+            config="config.yaml",
+            calls=expand(
+                "meta_caller/calls/{sample}.vcf.gz",
+                sample=design["Sample_id"]
+            ),
+            calls_index=expand(
+                get_tbi("meta_caller/calls/{sample}.vcf.gz"),
+                sample=design["Sample_id"]
+            ),
+        output:
+            calls=temp(expand(
+                "snpsift/fixed/{sample}.vcf.gz",
+                sample=design["Sample_id"]
+            )),
+            calls_index=temp(expand(
+                "snpsift/fixed/{sample}.vcf.gz.tbi",
+                sample=design["Sample_id"]
+            )),
+            table=temp(expand(
+                "snpsift/extractFields/{sample}.tsv",
+                sample=design["Sample_id"]
+            )),
+            html="snpeff_snpsift/multiqc/SnpEff_annotation.html",
+            html_data=directory("snpeff_snpsift/multiqc/SnpEff_annotation_data")
+        message:
+            "Annotating VCF"
+        threads: 2
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
+            time_min=lambda wildcards, attempt: attempt * 60 * 4,
+            tmpdir="tmp"
+        handover: True
+        log:
+            "logs/snpeff_snpsift_pipeline.log"
+        params:
+            mkdir="--parents --verbose",
+            ln="--symbolic --force --relative --verbose",
+            variant_dir="mutect2/corrected/",
+            outdir="snpeff_snpsift",
+            pipeline_path=config.get(
+                "snpeff_snpsift_run_path",
+                "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh"
+            ),
+            organism = config["params"].get("organism", "hg38")
+        shell:
+            "mkdir {params.mkdir} {params.outdir}/data_input/calls/ > {log} 2>&1 && "
+            "ln {params.ln} {input.config} {params.outdir} >> {log} 2>&1 && "
+            "ln {params.ln} {params.variant_dir}/* {params.outdir}/data_input/calls/ >> {log} 2>&1 && "
+            "cd {params.outdir} && "
+            "bash {params.pipeline_path} {params.organism} | tee -a ${{OLDPWD}}/{log} 2>&1"
+            "ln {params.ln} snpsift/ ${{OLDPWD}}/snpsift >> {log} 2>&1 && "
+            "ln {params.ln} snpeff/ ${{OLDPWD}}/snpsift >> {log} 2>&1 "
+
+
+    ###############################
+    ### Region depth annotation ###
+    ###############################
+    coverage_variant_region_config = {
+        "bed": config["ref"]["capture_kit_bed"],
+        "threads": config["threads"],
+        "bin_size": config.get(
+            "deeptools", {"bin_size": 10}
+        ).get("bin_size", 10)
+    }
+
+    module coverage_variant_region_meta:
+        snakefile: "../../meta/bio/coverage_variant_region/test/Snakefile"
+        config: coverage_variant_region_config
+
+    use rule * from coverage_variant_region_meta
+
     #####################################
     ### Merge variant calling results ###
     #####################################
@@ -369,7 +443,7 @@ The pipeline contains the following steps:
         config: {"genome": config["ref"]["fasta"], "bed": config["ref"]["capture_kit_bed"]}
 
 
-    use rule * from metacaller_germline_meta as *
+    use rule * from metacaller_germline_meta
 
 
     ############################################################################
@@ -443,8 +517,8 @@ The pipeline contains the following steps:
 
     use rule gatk_apply_baserecalibrator from gatk_bqsr_meta with:
         input:
-            bam="samtools/sort/{sample}.bam",
-            bam_index="samtools/sort/{sample}.bam.bai",
+            bam="sambamba/sort/{sample}.bam",
+            bam_index="sambamba/sort/{sample}.bam.bai",
             ref=config['ref']['fasta'],
             ref_idx=get_fai(config['ref']['fasta']),
             ref_dict=get_dict(config['ref']['fasta']),
@@ -453,8 +527,8 @@ The pipeline contains the following steps:
 
     use rule gatk_compute_baserecalibration_table from gatk_bqsr_meta with:
         input:
-            bam="samtools/sort/{sample}.bam",
-            bam_index="samtools/sort/{sample}.bam.bai",
+            bam="sambamba/sort/{sample}.bam",
+            bam_index="sambamba/sort/{sample}.bam.bai",
             ref=config['ref']['fasta'],
             ref_idx=get_fai(config['ref']['fasta']),
             ref_dict=get_dict(config['ref']['fasta']),

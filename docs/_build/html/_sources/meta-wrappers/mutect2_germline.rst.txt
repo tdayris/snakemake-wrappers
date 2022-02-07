@@ -54,8 +54,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             fasta_index=get_fai(config["genome"]),
             fasta_dict=get_dict(config["genome"]),
             contamination="summary/{sample}_calculate_contamination.table",
-            bam="samtools/sort/{sample}.bam",
-            bam_index=get_bai("samtools/sort/{sample}.bam"),
+            bam="sambamba/sort/{sample}.bam",
+            bam_index=get_bai("sambamba/sort/{sample}.bam"),
             f1r2="gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz"
         output:
             vcf=temp("mutect2/filter/{sample}.vcf.gz")
@@ -134,8 +134,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule get_pileup_summaries:
         input:
-            bam="samtools/sort/{sample}.bam",
-            bam_index=get_bai("samtools/sort/{sample}.bam"),
+            bam="sambamba/sort/{sample}.bam",
+            bam_index=get_bai("sambamba/sort/{sample}.bam"),
             intervals=config["bed"],
             variants=config["known"],
             variants_index=get_tbi(config["known"])
@@ -168,8 +168,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
             fasta=config["genome"],
             fasta_index=get_fai(config["genome"]),
             fasta_dict=get_dict(config["genome"]),
-            map="samtools/sort/{sample}.bam",
-            map_index=get_bai("samtools/sort/{sample}.bam"),
+            map="sambamba/sort/{sample}.bam",
+            map_index=get_bai("sambamba/sort/{sample}.bam"),
             germline=config["known"],
             germline_tbi=get_tbi(config["known"]),
             intervals=config["bed"]
@@ -178,9 +178,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
             f1r2=temp("mutect2/f1r2/{sample}.tar.gz")
         message:
             "Calling variants on {wildcards.sample} with GATK Mutect2"
-        threads: 4
+        threads: 10
         resources:
-            time_min=lambda wildcards, attempt: attempt * 45,
+            time_min=lambda wildcards, attempt: attempt * 60 * 5,
             tmpdir="tmp",
             mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480)
         params:

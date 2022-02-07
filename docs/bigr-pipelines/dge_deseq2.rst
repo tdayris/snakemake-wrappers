@@ -143,6 +143,8 @@ The pipeline contains the following steps:
 
     try:
         design = pandas.read_csv("design.tsv", sep="\t", header=0, index_col=0)
+        design["Sample_id"] = design.index.tolist()
+        #design.set_index("Sample_id", inplace=True)
     except FileNotFoundError:
         logging.error(
             """A design file is required for this pipeline. It is a TSV with
@@ -171,11 +173,24 @@ The pipeline contains the following steps:
             """
         )
 
-    fastq_links = link_fq(
-        design.index,
-        design.Upstream_file,
-        design.Downstream_file
-    )
+    try:
+        fastq_links = link_fq(
+            design.Sample_id,
+            design.Upstream_file,
+            design.Downstream_file
+        )
+
+        ruleorder: multiqc > multiqc_se
+        ruleorder: salmon_quant > salmon_quant_se
+
+    except AttributeError:
+        fastq_links = link_fq(
+            design.Sample_id,
+            design.Upstream_file
+        )
+
+        ruleorder: multiqc_se > multiqc
+        ruleorder: salmon_quant_se > salmon_quant
 
     # A list that holds all comparisons expected for this snakemake pipeline
     comparison_levels = list(yield_comps(
@@ -200,7 +215,7 @@ The pipeline contains the following steps:
 
     samples_per_prefixes = dict(zip(output_prefixes, samples_iterator))
     logging.debug(samples_per_prefixes)
-    print(samples_per_prefixes.keys())
+    #print(samples_per_prefixes.keys())
 
     expected_pcas = [
         f"figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca/pca_{factor}_{axes}_{elipse}.png"
@@ -254,8 +269,7 @@ The pipeline contains the following steps:
             ),
             pcas=expected_pcas,
             general_pcas=expand(
-                "figures/pca/general.pca.{factor}_{axes}.png",
-                factor=[i[0] for i in comparison_levels],
+                "figures/pca/general.pca_{axes}.png",
                 axes=["PC1_PC2", "PC2_PC1"]
             ),
             counts_with_deseq2=expand(
@@ -289,34 +303,85 @@ The pipeline contains the following steps:
 
     use rule * from deseq2_post_process as *
 
+    use rule pandas_merge_salmon_tr from deseq2_post_process with:
+        input:
+            quant = expand(
+                "salmon_quant/salmon/pseudo_mapping/{sample}/quant.sf",
+                sample=design.Sample_id.tolist()
+            ),
+            tx2gene = "tximport/transcripts2genes.tsv"
+
+
     use rule multiqc from deseq2_post_process with:
         input:
             txt=lambda wildcards: expand(
-                "fastq_screen/{sample}.{stream}.fastq_screen.txt",
+                "salmon_quant/fastq_screen/{sample}.{stream}.fastq_screen.txt",
                 sample=samples_per_prefixes[wildcards.comparison],
                 stream=["1", "2"]
             ),
             png=lambda wildcards: expand(
-                "fastq_screen/{sample}.{stream}.fastq_screen.png",
+                "salmon_quant/fastq_screen/{sample}.{stream}.fastq_screen.png",
                 sample=samples_per_prefixes[wildcards.comparison],
                 stream=["1", "2"]
             ),
             salmon=lambda wildcards: expand(
-                "salmon/pseudo_mapping/{sample}/quant.sf",
+                "salmon_quant/salmon/pseudo_mapping/{sample}/quant.sf",
                 sample=samples_per_prefixes[wildcards.comparison]
             ),
             html=lambda wildcards: expand(
-                "fastp/html/pe/{sample}.fastp.html",
+                "salmon_quant/fastp/html/pe/{sample}.fastp.html",
                 sample=samples_per_prefixes[wildcards.comparison]
             ),
             json=lambda wildcards: expand(
-                "fastp/json/pe/{sample}.fastp.json",
+                "salmon_quant/fastp/json/pe/{sample}.fastp.json",
                 sample=samples_per_prefixes[wildcards.comparison]
             ),
             config="multiqc/{comparison}/multiqc_config.yaml",
             fqscreen=lambda wildcards: expand(
-                "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+                "salmon_quant/fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
                 stream=["1", "2"],
+                ext=["txt", "png"],
+                sample=samples_per_prefixes[wildcards.comparison]
+            ),
+            additional_plots = [
+                #temp("pairwise_scatterplot_mqc.png"),
+                #temp("clustermap_sample_mqc.png"),
+                "multiqc/{comparison}/clustermap_sample_mqc.png",
+                #"multiqc/{comparison}/clustermap_genes_mqc.png",
+                "multiqc/{comparison}/pca_plot_mqc.png",
+                "multiqc/{comparison}/volcanoplot_mqc.png",
+                "multiqc/{comparison}/distro_expr_mqc.png",
+                "multiqc/{comparison}/ma_plot_mqc.png",
+                #temp("multiqc/{comparison}/clustermap_sample_mqc.png"),
+                #temp("pca_axes_correlation_mqc.png")
+            ]
+
+
+    use rule multiqc from deseq2_post_process as multiqc_se with:
+        input:
+            txt=lambda wildcards: expand(
+                "salmon_quant/fastq_screen/{sample}.fastq_screen.txt",
+                sample=samples_per_prefixes[wildcards.comparison]
+            ),
+            png=lambda wildcards: expand(
+                "fastq_screen/{sample}.fastq_screen.png",
+                sample=samples_per_prefixes[wildcards.comparison]
+            ),
+            salmon=lambda wildcards: expand(
+                "salmon_quant/salmon/pseudo_mapping/{sample}/quant.sf",
+                sample=samples_per_prefixes[wildcards.comparison]
+            ),
+            html=lambda wildcards: expand(
+                "salmon_quant/fastp/html/pe/{sample}.fastp.html",
+                sample=samples_per_prefixes[wildcards.comparison]
+            ),
+            json=lambda wildcards: expand(
+                "salmon_quant/fastp/json/pe/{sample}.fastp.json",
+                sample=samples_per_prefixes[wildcards.comparison]
+            ),
+            config="multiqc/{comparison}/multiqc_config.yaml",
+            fqscreen=lambda wildcards: expand(
+                "salmon_quant/fastq_screen/{sample}.fastq_screen.{ext}",
                 ext=["txt", "png"],
                 sample=samples_per_prefixes[wildcards.comparison]
             ),
@@ -352,121 +417,105 @@ The pipeline contains the following steps:
         config: deseq2_config
 
 
-    use rule * from tximport_deseq2 as tximport_deseq2_*
+    use rule * from tximport_deseq2
+
+    use rule tximport from tximport_deseq2 with:
+        input:
+            quant=lambda wildcards: expand(
+                "salmon_quant/salmon/pseudo_mapping/{sample}/quant.sf",
+                sample=samples_per_prefixes[wildcards.comparison]
+            ),
+            tx_to_gene="tximport/tx2gene.tsv"
 
 
     #############################
     ### Salmon quantification ###
     #############################
 
-    salmon_config = {
-        "genome": config["ref"]["genome"],
-        "transcriptome": config["ref"]["transcriptome"],
-        "gtf": config["ref"]["gtf"],
-        "salmon_libtype": config["params"]["salmon_libtype"],
-        "salmon_quant_extra": config["params"]["salmon_quant_extra"],
-        "salmon_index_extra": config["params"]["salmon_index_extra"]
-    }
-
-
-    module salmon_meta:
-        snakefile: "../../meta/bio/salmon/test/Snakefile"
-        config: salmon_config
-
-
-    use rule * from salmon_meta as *
-
-
-    use rule salmon_quant_paired from salmon_meta with:
-        output:
-            quant=report(
-                "salmon/pseudo_mapping/{sample}/quant.sf",
-                category="2. Raw Salmon output",
-                caption="../../common/reports/salmon_quant.rst"
-            ),
-            lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
-            mapping=temp("salmon/bams/{sample}.bam")
-
-
-    ####################################
-    ### FastQ Screen quality control ###
-    ####################################
-
-
-    rule fastq_screen:
+    rule salmon_quant:
         input:
-            "reads/{sample}.{stream}.fq.gz"
+            design=ancient("design.tsv"),
+            config=ancient("config.yaml")
         output:
-            txt="fastq_screen/{sample}.{stream}.fastq_screen.txt",
-            png="fastq_screen/{sample}.{stream}.fastq_screen.png"
-        message:
-            "Assessing quality of {wildcards.sample}, stream {wildcards.stream}"
-        threads: config.get("threads", 20)
-        resources:
-            mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
-            time_min=lambda wildcard, attempt: attempt * 50
-        params:
-            fastq_screen_config=config["fastq_screen"],
-            subset=100000,
-            aligner='bowtie2'
-        log:
-            "logs/fastq_screen/{sample}.{stream}.log"
-        wrapper:
-            "bio/fastq_screen"
-
-
-    ############################
-    ### FASTP FASTQ CLEANING ###
-    ############################
-
-    rule fastp_clean:
-        input:
-            sample=expand(
-                "reads/{sample}.{stream}.fq.gz",
-                stream=["1", "2"],
-                allow_missing=True
+            results=directory("salmon_quant/results_to_upload"),
+            quant_genes=expand(
+                "salmon_quant/salmon/pseudo_mapping/{sample}/quant.genes.sf",
+                sample=design["Sample_id"]
             ),
-        output:
-            trimmed=expand(
-                "fastp/trimmed/pe/{sample}.{stream}.fastq",
-                stream=["1", "2"],
-                allow_missing=True
+            quant=expand(
+                "salmon_quant/salmon/pseudo_mapping/{sample}/quant.sf",
+                sample=design["Sample_id"]
             ),
-            html="fastp/html/pe/{sample}.fastp.html",
-            json=temp("fastp/json/pe/{sample}.fastp.json")
-        message: "Cleaning {wildcards.sample} with Fastp"
-        threads: 1
-        resources:
-            mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
-            time_min=lambda wildcards, attempt: attempt * 45
-        params:
-            adapters=config["params"].get("fastp_adapters", None),
-            extra=config["params"].get("fastp_extra", "")
-        log:
-            "logs/fastp/{sample}.log"
-        wrapper:
-            "bio/fastp"
-
-
-    #################################################
-    ### Gather files from iRODS or mounting point ###
-    #################################################
-
-    rule bigr_copy:
-        output:
-            "reads/{sample}.{stream}.fq.gz"
+            tx2gene="salmon_quant/salmon/tx2gene.tsv",
+            html=temp(expand(
+                "salmon_quant/fastp/html/pe/{sample}.fastp.html",
+                sample=design["Sample_id"]
+            )),
+            json=expand(
+                "salmon_quant/fastp/json/pe/{sample}.fastp.json",
+                sample=design["Sample_id"]
+            ),
+            fastq_screen=temp(expand(
+                "salmon_quant/fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+                sample=design["Sample_id"],
+                stream=["1", "2"],
+                ext=["txt", "png"]
+            )),
+            quant_qc="salmon_quant/multiqc/MultiQC.html",
+            quant_gene_table="salmon_quant/salmon/TPM.genes.tsv",
+            quant_tr_table="salmon_quant/salmon/TPM.transcripts.tsv"
         message:
-            "Gathering {wildcards.sample} fastq file ({wildcards.stream})"
+            "Quantifying mRNAs over gentrome"
         threads: 1
+        handover: True
         resources:
-            mem_mb=lambda wildcards, attempt: min(attempt * 1024, 2048),
-            time_min=lambda wildcards, attempt: attempt * 45
-        params:
-            input=lambda wildcards, output: fastq_links[output[0]]
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 4,
+            time_min=lambda wildcards, attempt: attempt * 60 * 4,
+            tmpdir="tmp"
         log:
-            "logs/bigr_copy/{sample}.{stream}.log"
-        wrapper:
-            "bio/BiGR/copy"
+            "logs/salmon_quant_pipeline.log"
+        params:
+            ln="--symbolic --force --relative --verbose",
+            mkdir="--parents --verbose",
+            quant_dir="salmon_quant",
+            pipeline_path="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh",
+            pipeline_params="--nt"
+        shell:
+            "(mkdir {params.mkdir} {params.quant_dir} && "
+            "ln {params.ln} {input.design} {params.quant_dir} && "
+            "ln {params.ln} {input.config} {params.quant_dir} && "
+            "cd {params.quant_dir} && "
+            "bash {params.pipeline_path} {params.pipeline_params}) # >> {log} 2>&1"
+
+
+    use rule salmon_quant as salmon_quant_se with:
+        output:
+            results=directory("salmon_quant/results_to_upload"),
+            quant_genes=expand(
+                "salmon_quant/salmon/pseudo_mapping/{sample}/quant.genes.sf",
+                sample=design["Sample_id"]
+            ),
+            quant=expand(
+                "salmon_quant/salmon/pseudo_mapping/{sample}/quant.sf",
+                sample=design["Sample_id"]
+            ),
+            tx2gene="salmon/tx2gene.tsv",
+            html=temp(expand(
+                "fastp/html/pe/{sample}.fastp.html",
+                sample=design["Sample_id"]
+            )),
+            json=expand(
+                "fastp/json/pe/{sample}.fastp.json",
+                sample=design["Sample_id"]
+            ),
+            fastq_screen=temp(expand(
+                "fastq_screen/{sample}.fastq_screen.{ext}",
+                sample=design["Sample_id"],
+                ext=["txt", "png"]
+            )),
+            quant_qc="salmon_quant/multiqc/MultiQC.html",
+            quant_gene_table="salmon_quant/salmon/TPM.genes.tsv",
+            quant_tr_table="salmon_quant/salmon/TPM.transcripts.tsv"
 
 
 

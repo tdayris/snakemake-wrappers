@@ -24,24 +24,45 @@ This meta-wrapper can be used by integrating the following into your workflow:
     except NameError:
         config = defualt_config_bwa_fixmate
 
+    def get_best_bwa_index():
+        """Return cached data if available"""
+        if config["genome"] == "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta":
+            return multiext(
+                "bwa_mem2/index/genome.hg38", ".0123", ".amb", ".ann", ".pac"
+            )
+        elif config["genome"] == "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa":
+            return multiext(
+                "bwa_mem2/index/genome.hg19", ".0123", ".amb", ".ann", ".pac"
+            )
+        elif config["genome"] == "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta":
+            return multiext(
+                "bwa_mem2/index/genome.mm10", ".0123", ".amb", ".ann", ".pac"
+            )
+        return multiext(
+            "bwa_mem2/index/genome", ".0123", ".amb", ".ann", ".pac"
+        )
+
+
     """
     This rule indexes the bam file since almost all downstream tools requires it
     """
-    rule samtools_index:
+    rule sambamba_index:
         input:
-            "samtools/sort/{sample}.bam"
+            "sambamba/sort/{sample}.bam"
         output:
-            temp("samtools/sort/{sample}.bam.bai")
+            temp("sambamba/sort/{sample}.bam.bai")
         message: "Indexing mapped reads of {wildcards.sample}"
-        threads: 1
+        threads: 5
         resources:
             mem_mb=1536,
             time_min=lambda wildcards, attempt: attempt * 45,
             tmpdir="tmp"
+        params:
+            extra = config.get("sambamba_index", "")
         log:
-            "logs/samtools/sort/{sample}.log"
+            "logs/sambamba/index/{sample}.log"
         wrapper:
-            "bio/samtools/index"
+            "bio/sambamba/index"
 
 
     """
@@ -49,27 +70,25 @@ This meta-wrapper can be used by integrating the following into your workflow:
     This rule is shadowed in order to automatically delete undetermined number of
     temporary files on error, which leads retry to fail
     """
-    rule samtools_sort_coordinate:
+    rule sambamba_sort_coordinate:
         input:
-            "samtools/fixmate/{sample}.bam"
+            mapping="samtools/fixmate/{sample}.bam"
         output:
-            temp("samtools/sort/{sample}.bam"),
-            tmp_dir = temp(directory("samtools/fixmate/{sample}.tmp"))
+            mapping=temp("sambamba/sort/{sample}.bam"),
         message:
-            "Sorting {wildcards.sample} reads by query name for fixing mates"
-        threads: config.get("threads", 20)
+            "Sorting {wildcards.sample} reads by positions"
+        threads: 20
         resources:
             mem_mb=lambda wildcards, threads: threads * 1792,
             time_min=lambda wildcards, attempt: attempt * 90,
             tmpdir="tmp"
         shadow: "minimal"
-        log:
-            "logs/samtools/query_sort_{sample}.log"
         params:
-            extra = "-m 1536M",
-            tmp_dir = "samtools/fixmate/{sample}.tmp"
+            extra = config.get("sambamba_sort_extra", "")
+        log:
+            "logs/sambamba/sort/{sample}.log"
         wrapper:
-            "bio/samtools/sort"
+            "bio/sambamba/sort"
 
 
     """
@@ -109,9 +128,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 stream=["1", "2"],
                 allow_missing=True
             ),
-            index=multiext(
-                "bwa_mem2/index/genome", ".0123", ".amb", ".ann", ".pac"
-            )
+            index=get_best_bwa_index()
         output:
             temp("bwa_mem2/mem/{sample}.bam")
         message: "Mapping {wildcards.sample} with BWA"
@@ -120,6 +137,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             mem_mb=lambda wildcards, attempt: attempt * 6144 + 61440,
             time_min=lambda wildcards, attempt: attempt * 120,
             tmpdir="tmp"
+        shadow: "shallow"
         params:
             index=lambda wildcards, input: os.path.splitext(input["index"][0])[0],
             extra=r"-R '@RG\tID:{sample}\tSM:{sample}\tPU:{sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
@@ -145,7 +163,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 "bwa_mem2/index/genome", ".0123", ".amb", ".ann", ".pac"
             )
         message: "Indexing reference genome with BWA"
-        cache: True
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 6144 + 66560,
@@ -155,6 +172,73 @@ This meta-wrapper can be used by integrating the following into your workflow:
             prefix=lambda wildcards, output: os.path.splitext(output[0])[0]
         log:
             "logs/bwa_mem2/index/genome.log"
+        wrapper:
+            "bio/bwa-mem2/index"
+
+    rule bwa_index_hg38:
+        input:
+            "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta"
+        output:
+            multiext(
+                "bwa_mem2/index/genome.hg38", ".0123", ".amb", ".ann", ".pac"
+            )
+        message: "Indexing reference genome with BWA (HG38)"
+        threads: 1
+        resources:
+            mem_mb=128,
+            time_min=5,
+            tmpdir="tmp"
+        params:
+            prefix="bwa_mem2/index/genome.hg38",
+            mk="--parents --verbose",
+            ln="--verbose --relative --symbolic --force"
+        log:
+            "logs/bwa_mem2/index/genome.hg38.log"
+        shell:
+            "mkdir {params.mk} bwa_mem2/index/ > {log} 2>&1 && "
+            "ln {params.ln} /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/cache/bwa_mem2/index/genome.hg38/* bwa_mem2/index/ "
+            ">> {log} 2>&1"
+
+
+    rule bwa_index_hg19:
+        input:
+            "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa"
+        output:
+            multiext(
+                "bwa_mem2/index/genome.hg19", ".0123", ".amb", ".ann", ".pac"
+            )
+        message: "Indexing reference genome with BWA (HG19)"
+        cache: True
+        threads: 1
+        resources:
+            mem_mb=66560,
+            time_min=120,
+            tmpdir="tmp"
+        params:
+            prefix="bwa_mem2/index/genome.hg19"
+        log:
+            "logs/bwa_mem2/index/genome.hg19.log"
+        wrapper:
+            "bio/bwa-mem2/index"
+
+    rule bwa_index_mm10:
+        input:
+            "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta"
+        output:
+            multiext(
+                "bwa_mem2/index/genome.mm10", ".0123", ".amb", ".ann", ".pac"
+            )
+        message: "Indexing reference genome with BWA (MM10)"
+        cache: True
+        threads: 1
+        resources:
+            mem_mb=66560,
+            time_min=120,
+            tmpdir="tmp"
+        params:
+            prefix="bwa_mem2/index/genome.mm10"
+        log:
+            "logs/bwa_mem2/index/genome.mm10.log"
         wrapper:
             "bio/bwa-mem2/index"
 

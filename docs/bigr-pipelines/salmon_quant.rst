@@ -135,20 +135,39 @@ The pipeline contains the following steps:
     configfile: get_config(default_config)
     design = get_design(os.getcwd(), search_fastq_pairs)
 
-    fastq_links = link_fq(
-        design.Sample_id,
-        design.Upstream_file,
-        design.Downstream_file
-    )
+    try:
+        fastq_links = link_fq(
+            design.Sample_id,
+            design.Upstream_file,
+            design.Downstream_file
+        )
 
-    #ruleorder: salmon_meta_salmon_quant_paired > salmon_quant_paired
+        ruleorder: salmon_quant_paired > salmon_quant_single
+        ruleorder: multiqc > multiqc_single
+        ruleorder: fastp_clean > fastp_clean_single_end
+    except AttributeError:
+        fastq_links = link_fq(
+            design.Sample_id,
+            design.Upstream_file
+        )
 
+        ruleorder: salmon_quant_single > salmon_quant_paired
+        ruleorder: multiqc_single > multiqc
+        ruleorder: fastp_clean_single_end > fastp_clean
+
+    #print(fastq_links)
+
+
+    wildcard_constraints:
+        sample=r"|".join(design.Sample_id.to_list()),
+        stream=r"|".join(map(str, range(3)))
 
     rule target:
         input:
             "multiqc/MultiQC.html",
             "salmon/TPM.genes.tsv",
-            "salmon/TPM.transcripts.tsv"
+            "salmon/TPM.transcripts.tsv",
+            "salmon/Raw.genes.tsv"
         output:
             directory("results_to_upload")
         threads: 1
@@ -157,9 +176,9 @@ The pipeline contains the following steps:
             time_min=lambda wildcards, attempt: attempt * 25,
             tmpdir="tmp"
         log:
-            "log/results_to_upload.log"
+            "logs/results_to_upload.log"
         params:
-            "-cv"
+            "--verbose --checksum --human-readable"
         shell:
             "rsync {params} {input} {output} > {log} 2>&1"
 
@@ -167,6 +186,36 @@ The pipeline contains the following steps:
     ########################
     ### Aggregate counts ###
     ########################
+
+
+    rule aggregate_raw_counts:
+        input:
+            quant=expand(
+                "salmon/pseudo_mapping/{sample}/quant.genes.sf",
+                sample=design["Sample_id"]
+            ),
+            tx2gene="salmon/tx2gene.tsv"
+        output:
+            tsv="salmon/Raw.genes.tsv"
+        message:
+            "Aggregating genes counts with their gene names"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 4,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        params:
+            header=False,
+            position=False,
+            gencode=True,
+            genes=True,
+            index_label=True,
+            fillna="Unknown",
+            column="NumReads"
+        log:
+            "logs/aggregate/genes.log"
+        wrapper:
+            "bio/pandas/salmon"
 
 
     rule aggregate_gene_counts:
@@ -189,7 +238,9 @@ The pipeline contains the following steps:
             header=False,
             position=False,
             gencode=True,
-            genes=True
+            genes=True,
+            index_label=True,
+            fillna="Unknown"
         log:
             "logs/aggregate/genes.log"
         wrapper:
@@ -216,7 +267,8 @@ The pipeline contains the following steps:
             header=False,
             position=False,
             gencode=True,
-            genes=False
+            genes=False,
+            index_label=True
         log:
             "logs/aggregate/transcripts.log"
         wrapper:
@@ -288,6 +340,33 @@ The pipeline contains the following steps:
             "bio/multiqc"
 
 
+    use rule multiqc as multiqc_single with:
+        input:
+            salmon=expand(
+                "salmon/pseudo_mapping/{sample}/quant.sf",
+                sample=design["Sample_id"]
+            ),
+            html=expand(
+                "fastp/html/pe/{sample}.fastp.html",
+                sample=design["Sample_id"]
+            ),
+            json=expand(
+                "fastp/json/pe/{sample}.fastp.json",
+                sample=design["Sample_id"]
+            ),
+            fastq_screen=expand(
+                "fastq_screen/{sample}.fastq_screen.{ext}",
+                sample=design["Sample_id"],
+                ext=["txt", "png"]
+            )
+        output:
+            report(
+                "multiqc/MultiQC.html",
+                caption="../common/reports/multiqc.rst",
+                category="Quality Controls"
+            )
+
+
 
     rule fastq_screen:
         input:
@@ -299,8 +378,8 @@ The pipeline contains the following steps:
             "Assessing quality of {wildcards.sample}, stream {wildcards.stream}"
         threads: config.get("threads", 20)
         resources:
-            mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
-            time_min=lambda wildcard, attempt: attempt * 50,
+            mem_mb=lambda wildcard, attempt: min(attempt * 1024 * 8, 8192),
+            time_min=lambda wildcard, attempt: attempt * 75,
             tmpdir="tmp"
         params:
             fastq_screen_config=config["fastq_screen"],
@@ -310,6 +389,18 @@ The pipeline contains the following steps:
             "logs/fastq_screen/{sample}.{stream}.log"
         wrapper:
             "bio/fastq_screen"
+
+
+    use rule fastq_screen as fastq_screen_single with:
+        input:
+            "reads/{sample}.fq.gz"
+        output:
+            txt=temp("fastq_screen/{sample}.fastq_screen.txt"),
+            png=temp("fastq_screen/{sample}.fastq_screen.png")
+        message:
+            "Assessing quality of {wildcards.sample}"
+        log:
+            "logs/fastq_screen/{sample}.log"
 
 
     #############################
@@ -346,6 +437,22 @@ The pipeline contains the following steps:
             #mapping=temp("salmon/bams/{sample}.bam")
 
 
+    use rule salmon_quant_paired from salmon_meta as salmon_quant_single with:
+        input:
+            r="fastp/trimmed/pe/{sample}.fq.gz",
+            index=config["ref"].get("salmon_index", "salmon/index"),
+            gtf=config["ref"]["gtf"]
+        output:
+            quant=report(
+                "salmon/pseudo_mapping/{sample}/quant.sf",
+                category="2. Raw Salmon output",
+                caption="../../common/reports/salmon_quant.rst"
+            ),
+            quant_genes="salmon/pseudo_mapping/{sample}/quant.genes.sf",
+            lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
+            #mapping=temp("salmon/bams/{sample}.bam")
+
+
     ############################
     ### FASTP FASTQ CLEANING ###
     ############################
@@ -358,13 +465,13 @@ The pipeline contains the following steps:
                 allow_missing=True
             ),
         output:
-            trimmed=expand(
+            trimmed=temp(expand(
                 "fastp/trimmed/pe/{sample}.{stream}.fastq",
                 stream=["1", "2"],
                 allow_missing=True
-            ),
+            )),
             html="fastp/html/pe/{sample}.fastp.html",
-            json=temp("fastp/json/pe/{sample}.fastp.json")
+            json="fastp/json/pe/{sample}.fastp.json"
         message: "Cleaning {wildcards.sample} with Fastp"
         threads: 1
         resources:
@@ -378,6 +485,15 @@ The pipeline contains the following steps:
             "logs/fastp/{sample}.log"
         wrapper:
             "bio/fastp"
+
+
+    use rule fastp_clean as fastp_clean_single_end with:
+        input:
+            sample=["reads/{sample}.fq.gz"]
+        output:
+            trimmed="fastp/trimmed/pe/{sample}.fastq",
+            html="fastp/html/pe/{sample}.fastp.html",
+            json=temp("fastp/json/pe/{sample}.fastp.json")
 
 
     #################################################
@@ -399,6 +515,15 @@ The pipeline contains the following steps:
             "logs/bigr_copy/{sample}.{stream}.log"
         wrapper:
             "bio/BiGR/copy"
+
+
+    use rule bigr_copy as bigr_copy_single_end with:
+        output:
+            "reads/{sample}.fq.gz"
+        message:
+            "Gathering {wildcards.sample} fastq file"
+        log:
+            "logs/bigr_copy/{sample}.log"
 
 
 

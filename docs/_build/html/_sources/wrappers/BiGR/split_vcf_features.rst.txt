@@ -27,7 +27,7 @@ This wrapper can be used in the following way:
         log:
             "logs/mouse.log"
         wrapper:
-            "0.79.0-1159-g7fe792175/bio/BiGR/split_vcf_features"
+            "0.79.0-1233-g75ee1b83d/bio/BiGR/split_vcf_features"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -92,6 +92,7 @@ Code
     """
 
     import datetime
+    import gzip
     import logging
 
     logging.basicConfig(
@@ -102,13 +103,26 @@ Code
 
     annotation_tag = snakemake.params.get("annotation_tag", "ANN=")
 
+
+    def open_function(file: str):
+        """Return the correct opening function"""
+        if file.endswith(".gz"):
+            return gzip.open(file, "rb")
+        return open(file, "r")
+
     version = 1.0
     name = "split_vcf_features"
     url = f"github.com/tdayris/snakemake-wrappers/tree/Unofficial/bio/BiGR/{name}/wrapper.py"
     header = f"""##BiGRCommandLine=<ID={name},CommandLine="{url}",Version="{version}",Date="{datetime.date.today()}">\n"""
 
+
+    if str(snakemake.output["call"]).endswith("vcf.gz"):
+        out_vcf = snakemake.output["call"][:-3]
+    else:
+        out_vcf = snakemake.output["call"]
+
     with open(snakemake.input["call"], "r") as input_vcf, \
-         open(snakemake.output["call"], "w") as splitted_vcf:
+         open(out_vcf, "w") as splitted_vcf:
 
         # Copy headers without any modification
         for nb, line in enumerate(input_vcf):
@@ -161,6 +175,15 @@ Code
             else:
                 # Handling case annotation contains only one feature
                 splitted_vcf.write(line)
+
+
+    if str(snakemake.output["call"]).endswith("vcf.gz"):
+        logging.info(f"Compressing {out_vcf}")
+        shell("pbgzip -c {out_vcf} > {snakemake.output['call']} 2> {log}")
+        logging.info(f"Indexing {snakemake.output['call']}")
+        shell("tabix -p vcf {snakemake.output['call']} >> {log} 2>&1")
+        logging.info(f"Removing temporary file {out_vcf}")
+        shell("rm --verbose {out_vcf} >> {log} 2>&1")
 
 
 .. |nl| raw:: html

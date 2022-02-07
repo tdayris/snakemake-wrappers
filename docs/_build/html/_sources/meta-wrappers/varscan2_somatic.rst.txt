@@ -223,12 +223,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule samtools_mpilup:
         input:
             bam=[
-                "picard/markduplicates/{sample}_tumor.bam",
-                "picard/markduplicates/{sample}_normal.bam"
+                "sambamba/markdup/{sample}_tumor.bam",
+                "sambamba/markdup/{sample}_normal.bam"
             ],
             bam_index=[
-                get_bai("picard/markduplicates/{sample}_tumor.bam"),
-                get_bai("picard/markduplicates/{sample}_normal.bam")
+                get_bai("sambamba/markdup/{sample}_tumor.bam"),
+                get_bai("sambamba/markdup/{sample}_normal.bam")
             ],
             reference_genome=config["genome"],
             reference_genome_idx=get_fai(config["genome"]),

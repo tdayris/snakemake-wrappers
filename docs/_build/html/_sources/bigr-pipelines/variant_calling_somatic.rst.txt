@@ -20,11 +20,15 @@ In order to run the pipeline, use the following commands
 
   # Copy/paste the following line for **HG19**
 
-  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_somatic/run.sh
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_somatic/run.sh hg19
 
   # Copy/paste the following line for **HG38**
 
   bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_somatic/run.sh hg38
+
+  # Copy/paste the following line for **MM10**
+
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_somatic/run.sh mm10
 
 
 Input/Output
@@ -149,7 +153,7 @@ Please refer to each wrapper in above list for additional configuration paramete
 Notes
 -----
 
-Prerequisites:
+Prerequisites for piREST:
 
 * A TSV formatted design file, *named 'design.tsv'* with the following columns:
 
@@ -160,12 +164,18 @@ Prerequisites:
   * - Sample_id
     - Upstream_fastq
     - Downstream_fastq
+    - datasetIdBED
+    - genomeVersion
   * - Name of the Sample1
     - Path to upstream fastq file
     - Path to downstream fastq file
+    - dataset Id corresponding to the axpected bed file
+    - the genome version used for this sample
   * - Name of the Sample2
     - Path to upstream fastq file
     - Path to downstream fastq file
+    - dataset Id corresponding to the axpected bed file
+    - the genome version used for this sample
   * - ...
     - ...
     - ...
@@ -208,18 +218,19 @@ The pipeline contains the following steps:
     container: "docker://continuumio/miniconda3:4.4.10"
     localrules: bigr_copy
 
-    ruleorder: samtools_index_bam > samtools_index
+    ruleorder: sambamba_index_bam > sambamba_index
     ruleorder: gatk_filter_mutect_calls > tabix_index
+    ruleorder: mutect2_somatic > tabix_index
 
     default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
     configfile: get_config(default_config)
-    design = get_design(os.getcwd(), search_fastq_pairs)
-    # design = design.head(2).tail(1)
+    design = get_design(os.getcwd(), search_fastq_somatic)
+    #design = design.head(2).tail(1)
     design.dropna(inplace=True)
-    print(design)
+    #print(design)
 
     design.index = design["Sample_id"]
-    design.drop(index="s070", inplace=True)
+    #design.drop(index="s070", inplace=True)
 
     wildcard_constraints:
         sample = r"|".join(design["Sample_id"]),
@@ -231,9 +242,9 @@ The pipeline contains the following steps:
     fastq_links = link_fq_somatic(
         sample_names=design.Sample_id,
         n1_paths=design.Upstream_file_normal,
-        t1_paths=design.Upstream_file,
-        n2_paths=design.Downstrea_file_normal,
-        t2_paths=design.Downstream_file,
+        t1_paths=design.Upstream_file_tumor,
+        n2_paths=design.Downstream_file_normal,
+        t2_paths=design.Downstream_file_tumor,
     )
 
     ruleorder: fix_annotation_for_gatk > pbgzip_compress
@@ -241,24 +252,32 @@ The pipeline contains the following steps:
 
     rule all:
         input:
-            maf="maf/complete.maf",
-            mafs=expand(
-                "maf/maftools/{sample}.maf",
+            #maf="maf/complete.maf",
+            #mafs=expand(
+            #    "maf/maftools/{sample}.maf",
+            #    sample=design["Sample_id"].tolist()
+            #),
+            #calls=expand(
+            #   "maf/occurence_annotated/{sample}.vcf.gz{index}",
+            #   sample=design["Sample_id"].tolist(),
+            #   index=["", ".tbi"]
+            # ),
+            mutect2=expand(
+                "bcftools/mutect2/{sample}.vcf.gz",
                 sample=design["Sample_id"].tolist()
             ),
-            calls=expand(
-               "maf/occurence_annotated/{sample}.vcf.gz{index}",
-               sample=design["Sample_id"].tolist(),
-               index=["", ".tbi"]
+            mutect2_tbi=expand(
+                "bcftools/mutect2/{sample}.vcf.gz.tbi",
+                sample=design["Sample_id"].tolist()
             ),
-            # mutect2=expand(
-            #     "bcftools/mutect2/{sample}.vcf.gz",
-            #     sample=design["Sample_id"].tolist()
-            # ),
-            # mutect2_tbi=expand(
-            #     "bcftools/mutect2/{sample}.vcf.gz.tbi",
-            #     sample=design["Sample_id"].tolist()
-            # ),
+            annotated_vcf=expand(
+                "bigr/f2i/{sample}.vcf.gz",
+                sample=design["Sample_id"].tolist()
+            ),
+            annotated_vcf_tbi=expand(
+                "bigr/f2i/{sample}.vcf.gz.tbi",
+                sample=design["Sample_id"].tolist()
+            ),
             facets=expand(
                 "facets/{sample}/{sample}.{ext}",
                 sample=design["Sample_id"].tolist(),
@@ -272,8 +291,12 @@ The pipeline contains the following steps:
             #    "bcftools/varscan2/{sample}.vcf.gz.tbi",
             #    sample=design["Sample_id"].tolist()
             #),
+            msisensor=expand(
+                "msisensor/{sample}/{sample}.msi",
+                sample=design["Sample_id"].tolist()
+            ),
             qc="multiqc/variant_calling_somatic.html",
-            calling_result="final.vcf.list"
+            #calling_result="final.vcf.list"
         message:
             "Finishing the WES Somatic Variant Calling"
 
@@ -287,7 +310,7 @@ The pipeline contains the following steps:
         "ncbi_build": config["params"].get("ncbi_build", "GRCh38"),
         "center": config["params"].get("center", "GustaveRoussy"),
         "annotation_tag": "ANN=",
-        "sample_list": design["Sample_id"].tolist(),
+        "sample_list": design["Sample_id"].to_list(),
         "genome": config["ref"]["fasta"],
         "known": config["ref"]["dbsnp"],
         "chr": config["params"]["chr"]
@@ -316,8 +339,8 @@ The pipeline contains the following steps:
                 sample=design["Sample_id"],
                 status=["normal", "tumor"]
             ),
-            picard_metrics=expand(
-                "picard/metrics/{sample}_{status}.picard.metrics.txt",
+            sambamba_metrics=expand(
+                "sambamba/markdup/{sample}_{status}.bam",
                 sample=design["Sample_id"],
                 status=["normal", "tumor"]
             ),
@@ -354,8 +377,8 @@ The pipeline contains the following steps:
 
     rule alignment_summary:
         input:
-            bam="samtools/sort/{sample}_{status}.bam",
-            bam_index=get_bai("samtools/sort/{sample}_{status}.bam"),
+            bam="sambamba/sort/{sample}_{status}.bam",
+            bam_index=get_bai("sambamba/sort/{sample}_{status}.bam"),
             ref=config['ref']['fasta'],
             ref_idx=get_fai(config['ref']['fasta']),
             ref_dict=get_dict(config['ref']['fasta']),
@@ -390,8 +413,8 @@ The pipeline contains the following steps:
             " (considering {wildcards.status})"
         threads: config.get("threads", 20)
         resources:
-            mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
-            time_min=lambda wildcard, attempt: attempt * 50,
+            mem_mb=lambda wildcard, attempt: min(attempt * 1024 * 8, 20480),
+            time_min=lambda wildcard, attempt: attempt * 75,
             tmpdir="tmp"
         params:
             fastq_screen_config=config["fastq_screen"],
@@ -403,18 +426,56 @@ The pipeline contains the following steps:
             "bio/fastq_screen"
 
 
+    ######################
+    ### MSI sensor pro ###
+    ######################
+
+    msi_sensor_config = {
+        "fasta": config["ref"]["fasta"],
+        "bed": config["ref"]["capture_kit_bed"],
+        "msi_scan_extra": config["msisensor_pro"].get("scan", ""),
+        "msi_pro_extra": config["msisensor_pro"].get("msi", "")
+    }
+
+    module missensor_pro_meta:
+        snakefile: "../../meta/bio/msi_sensor_pro/test/Snakefile"
+        config: msi_sensor_config
+
+    use rule * from missensor_pro_meta
+
     ##################
     ### CNV Facets ###
     ##################
 
 
+    rule add_chr_to_pileup:
+        input:
+            "samtools/mpileup/{sample}.mpileup.gz"
+        output:
+            temp("samtools/mpileup/{sample}.chr.mpileup.gz")
+        message:
+            "Adding 'chr' to sequences on {wildcards.sample}"
+        threads: 3
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 512,
+            time_min=lambda wildcards, attempt: attempt * 75,
+            tmpdir="tmp"
+        log:
+            "logs/cnv_facets/add_chr/{sample}.log"
+        params:
+            gzip = "-c",
+            awk = 'BEGIN {FS="\\t"; print "Chromosome\\tPosition\\tRef\\tAlt\\tFile1R\\tFile1A\\tFile1E\\tFile1D\\tFile2R\\tFile2A\\tFile2E\\tFile2D"} {if ($1 !~ /^chr*/) {print "chr"$0} else {print $0}}'
+        shell:
+            "gunzip {params.gzip} {input} | "
+            "awk '{params.awk}' | "
+            "gzip {params.gzip} > {output} 2> {log}"
+
+
     rule cnv_facets:
         input:
-            #tumor_bam="picard/markduplicates/{sample}_tumor.bam",
-            #tumor_bai=get_bai("picard/markduplicates/{sample}_tumor.bam"),
-            #normal_bam="picard/markduplicates/{sample}_normal.bam",
-            #normal_bai=get_bai("picard/markduplicates/{sample}_normal.bam"),
-            pileup="samtools/mpileup/{sample}.mpileup.gz",
+            #pileup="samtools/mpileup/{sample}.chr.mpileup.gz",
+            tumor_bam="sambamba/markdup/{sample}_tumor.bam",
+            normal_bam="sambamba/markdup/{sample}_normal.bam",
             vcf=config["ref"]["dbsnp"],
             vcf_index=get_tbi(config["ref"]["dbsnp"]),
             bed=config["ref"]["capture_kit_bed"]
@@ -426,16 +487,17 @@ The pipeline contains the following steps:
             pileup="facets/{sample}/{sample}.csv.gz"
         message:
             "Searching for CNV in {wildcards.sample} with Facets"
-        threads: 20
+        threads: 10
         resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1024 * 20,
-            time_min=lambda wildcards, attempt: attempt * 60,
+            mem_mb=lambda wildcards, attempt: (attempt * 1024 * 20) + 102400,
+            time_min=lambda wildcards, attempt: attempt * 60 * 2,
             tmpdir="tmp"
         params:
             extra=config.get(
                 "facets_extra",
                 "--snp-count-orphans --gbuild hg38 --nbhd-snp 250"
-            )
+            ),
+            prefix="facets/{sample}/{sample}"
         log:
             "logs/facets/cnv/{sample}.log"
         wrapper:
@@ -481,30 +543,124 @@ The pipeline contains the following steps:
     ### VCF annotation ###
     ######################
 
-    snpeff_snpsift_config = {
-        "ref": config["ref"],
-        **config["snpeff_snpsift"]
-    }
-
-    module snpeff_meta:
-        snakefile: "../../meta/bio/snpeff_annotate/test/Snakefile"
-        config: snpeff_snpsift_config
-
-    use rule snpeff from snpeff_meta with:
+    rule vcf_to_tsv_somatic:
         input:
-            calls="mutect2/corrected/{sample}.vcf.gz",
-            calls_index=get_tbi("mutect2/corrected/{sample}.vcf.gz"),
-            db=config["ref"]["snpeff"]
+            call="bigr/f2i/{sample}.vcf.gz",
+            call_index="bigr/f2i/{sample}.vcf.gz.tbi"
+        output:
+            tsv="snpsift/extractAllFields/{sample}.tsv"
+        threads: 2
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 10240,
+            time_min=lambda wildcards, attempt: attempt * 25,
+            tmpdir="tmp"
+        log:
+            "logs/snpsift/extract_all_fields/{sample}.log"
         params:
-            extra = config["snpeff_snpsift"].get("snpeff_extra", "-lof -nodownload -noLog")
+            extra=config["snpeff_snpsift"].get(
+                "vcf_to_tsv_extra", "-e '.' -s ';'"
+            )
+        wrapper:
+            "bio/snpsift/extractAllFields"
 
 
-    module snpsift:
-        snakefile: "../../meta/bio/snpsift/test/Snakefile"
-        config: snpeff_snpsift_config
+    rule format_to_info_somatic:
+        input:
+            call = "snpeff_snpsift/snpsift/fixed/{sample}.vcf"
+        output:
+            call = temp("bigr/f2i/{sample}.vcf")
+        message:
+            "Moving format fields to info for {wildcards.sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp",
+            #partition="visuq",
+            #grep="gpu:T4:1"
+        params:
+            normal_sample=lambda wildcards: f"{wildcards.sample}_normal",
+            tumor_sample=lambda wildcards: f"{wildcards.sample}_tumor"
+        log:
+            "logs/vcf_format_to_info/{sample}.log"
+        wrapper:
+            "bio/BiGR/vcf_format_to_info"
 
 
-    use rule * from snpsift as *
+    rule gunzip_annotated_vcf:
+        input:
+            "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz"
+        output:
+            temp("snpeff_snpsift/snpsift/fixed/{sample}.vcf")
+        message:
+            "Temporary unzipping for manual edition of {wildcards.sample}'s VCF"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 512,
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        log:
+            "logs/gunzip/{sample}_annotated.log"
+        params:
+            config.get("gunzip_extra", "--to-stdout --decompress --force --verbose")
+        shell:
+            "gunzip {params} {input} > {output} 2> {log}"
+
+
+
+    rule annotate_vcf:
+        input:
+            design="design.tsv",
+            config="config.yaml",
+            calls=expand(
+                "mutect2/corrected/{sample}.vcf.gz",
+                sample=design["Sample_id"]
+            ),
+            calls_index=expand(
+                get_tbi("mutect2/corrected/{sample}.vcf.gz"),
+                sample=design["Sample_id"]
+            ),
+        output:
+            calls=temp(expand(
+                "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz",
+                sample=design["Sample_id"]
+            )),
+            calls_index=temp(expand(
+                "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz.tbi",
+                sample=design["Sample_id"]
+            )),
+            table=temp(expand(
+                "snpeff_snpsift/snpsift/extractFields/{sample}.tsv",
+                sample=design["Sample_id"]
+            )),
+            html="snpeff_snpsift/multiqc/SnpEff_annotation.html",
+            html_data=directory("snpeff_snpsift/multiqc/SnpEff_annotation_data")
+        message:
+            "Annotating VCF"
+        threads: 2
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
+            time_min=lambda wildcards, attempt: attempt * 60 * 4,
+            tmpdir="tmp"
+        handover: True
+        log:
+            "logs/snpeff_snpsift_pipeline.log"
+        params:
+            mkdir="--parents --verbose",
+            ln="--symbolic --force --relative --verbose",
+            variant_dir="mutect2/corrected/",
+            outdir="snpeff_snpsift",
+            pipeline_path=config.get(
+                "snpeff_snpsift_run_path",
+                "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh"
+            ),
+            organism = config["params"].get("organism", "hg38")
+        shell:
+            "mkdir {params.mkdir} {params.outdir}/data_input/calls/ > {log} 2>&1 && "
+            "ln {params.ln} {input.config} {params.outdir} >> {log} 2>&1 && "
+            "ln {params.ln} {params.variant_dir}/* {params.outdir}/data_input/calls/ >> {log} 2>&1 && "
+            "cd {params.outdir} && "
+            "bash {params.pipeline_path} {params.organism} | tee -a ${{OLDPWD}}/{log} 2>&1"
 
 
     #####################################
@@ -555,7 +711,8 @@ The pipeline contains the following steps:
         "known": config["ref"]["af_only"],
         "bed": config["ref"]["capture_kit_bed"],
         "dbsnp": config["ref"]["dbsnp"],
-        "sample_list": design["Sample_id"].to_list()
+        "sample_list": design["Sample_id"].to_list(),
+        "chrom": config["params"]["chr"]
     }
 
 
@@ -590,7 +747,11 @@ The pipeline contains the following steps:
     gatk_bqsr_config = {
         "threads": config["threads"],
         "genome": config["ref"]["fasta"],
-        "dbsnp": config["ref"]["dbsnp"]
+        "dbsnp": config["ref"]["dbsnp"],
+        "base_recal_extra": "",
+        "apply_base_recal_extra": config.get(
+            "gatk", {"apply_base_recal_extra": "--create-output-bam-index"}
+        ).get("apply_base_recal_extra", "--create-output-bam-index")
     }
 
     module gatk_bqsr_meta:
@@ -600,24 +761,29 @@ The pipeline contains the following steps:
 
     use rule gatk_apply_baserecalibrator from gatk_bqsr_meta with:
         input:
-            bam="picard/markduplicates/{sample}_{status}.bam",
-            bam_index=get_bai("picard/markduplicates/{sample}_{status}.bam"),
+            bam="sambamba/markdup/{sample}_{status}.bam",
+            bam_index=get_bai("sambamba/markdup/{sample}_{status}.bam"),
             ref=config['ref']['fasta'],
             ref_idx=get_fai(config['ref']['fasta']),
             ref_dict=get_dict(config['ref']['fasta']),
             recal_table="gatk/recal_data_table/{sample}_{status}.grp"
         output:
-            bam="gatk/recal_bam/{sample}_{status}.bam"
+            bam="gatk/recal_bam/{sample}_{status}.bam",
+            bai=get_bai("gatk/recal_bam/{sample}_{status}.bam")
         message:
             "Applying BQSR on {wildcards.status} {wildcards.sample} with GATK"
+        params:
+            extra=config.get(
+                "gatk", {"apply_base_recal_extra", "--create-output-bam-index"}
+            ).get("apply_base_recal_extra", "--create-output-bam-index")
         log:
             "logs/gatk/applybqsr/{sample}.{status}.log"
 
 
     use rule gatk_compute_baserecalibration_table from gatk_bqsr_meta with:
         input:
-            bam="picard/markduplicates/{sample}_{status}.bam",
-            bam_index=get_bai("picard/markduplicates/{sample}_{status}.bam"),
+            bam="sambamba/markdup/{sample}_{status}.bam",
+            bam_index=get_bai("sambamba/markdup/{sample}_{status}.bam"),
             ref=config['ref']['fasta'],
             ref_idx=get_fai(config['ref']['fasta']),
             ref_dict=get_dict(config['ref']['fasta']),
@@ -636,28 +802,27 @@ The pipeline contains the following steps:
     ### Deduplicating ###
     #####################
 
-    rule picard_markduplicates:
+    rule sambamba_markduplicates:
         input:
-            bam="samtools/sort/{sample}_{status}.bam",
-            bai=get_bai("samtools/sort/{sample}_{status}.bam")
+            bam="sambamba/sort/{sample}_{status}.bam",
+            bai=get_bai("sambamba/sort/{sample}_{status}.bam")
         output:
-            bam=temp("picard/markduplicates/{sample}_{status}.bam"),
-            metrics=temp(
-                "picard/metrics/{sample}_{status}.picard.metrics.txt"
-            )
+            bam=temp("sambamba/markdup/{sample}_{status}.bam")
         message:
             "Removing duplicates on {wildcards.sample} ({wildcards.status})"
-        threads: 1
+        threads: 10
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 10240,
             time_min=lambda wildcards, attempt: attempt * 45,
             tmpdir="tmp"
         log:
-            "logs/picard/markduplicates/{sample}_{status}.log"
+            "logs/sambamba/markduplicates/{sample}_{status}.log"
         params:
-            "--ASSUME_SORT_ORDER coordinate --REMOVE_DUPLICATES true"
+            extra = config.get(
+                "sambamba", {"markdup": "--remove-duplicates"}
+            ).get("markdup", "--remove-duplicates")
         wrapper:
-            "bio/picard/markduplicates"
+            "bio/sambamba/markdup"
 
 
     ###################
@@ -669,27 +834,45 @@ The pipeline contains the following steps:
         config: {"threads": config["threads"], "genome": config["ref"]["fasta"]}
 
 
-    use rule samtools_index from bwa_fixmate_meta with:
+    def get_best_bwa_index():
+        """Return cached data if available"""
+        if config["ref"]["fasta"] == "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta":
+            return multiext(
+                "bwa_mem2/index/genome.hg38", ".0123", ".amb", ".ann", ".pac"
+            )
+        elif config["ref"]["fasta"] == "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa":
+            return multiext(
+                "bwa_mem2/index/genome.hg19", ".0123", ".amb", ".ann", ".pac"
+            )
+        elif config["ref"]["fasta"] == "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta":
+            return multiext(
+                "bwa_mem2/index/genome.mm10", ".0123", ".amb", ".ann", ".pac"
+            )
+        return multiext(
+            "bwa_mem2/index/genome", ".0123", ".amb", ".ann", ".pac"
+        )
+
+
+    use rule sambamba_index from bwa_fixmate_meta with:
         input:
-            "samtools/sort/{sample}_{status}.bam"
+            "sambamba/sort/{sample}_{status}.bam"
         output:
-            temp("samtools/sort/{sample}_{status}.bam.bai")
+            temp("sambamba/sort/{sample}_{status}.bam.bai")
         message:
             "Indexing mapped reads of {wildcards.status} {wildcards.sample}"
         log:
-            "logs/samtools/sort/{sample}.{status}.log"
+            "logs/sambamba/sort/{sample}.{status}.log"
 
 
-    use rule samtools_sort_coordinate from bwa_fixmate_meta with:
+    use rule sambamba_sort_coordinate from bwa_fixmate_meta with:
         input:
-            "samtools/fixmate/{sample}_{status}.bam"
+            mapping="samtools/fixmate/{sample}_{status}.bam"
         output:
-            temp("samtools/sort/{sample}_{status}.bam")
+            mapping=temp("sambamba/sort/{sample}_{status}.bam")
         message:
-            "Sorting {wildcards.status} {wildcards.sample} reads by query "
-            "name for fixing mates"
+            "Sorting {wildcards.status} {wildcards.sample} reads by position"
         log:
-            "logs/samtools/query_sort_{sample}.{status}.log"
+            "logs/sambamba/sort/{sample}.{status}.log"
 
 
     use rule samtools_fixmate from bwa_fixmate_meta with:
@@ -711,26 +894,64 @@ The pipeline contains the following steps:
                 stream=["1", "2"],
                 allow_missing=True
             ),
-            index=multiext(
-                "bwa_mem2/index/genome", ".0123", ".amb", ".ann", ".pac"
-            )
+            index=get_best_bwa_index()
         output:
             temp("bwa_mem2/mem/{sample}_{status}.bam")
         message:
             "Mapping {wildcards.status} {wildcards.sample} with BWA"
         params:
             index=lambda wildcards, input: os.path.splitext(input["index"][0])[0],
-            extra=r"-R '@RG\tID:{sample}_{status}\tSM:{sample}_{status}\tPU:{sample}_{status}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
+            extra="-R '@RG\tID:{sample}_{status}\tSM:{sample}_{status}\tPU:{sample}_{status}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
             sort="samtools",         # We chose Samtools to sort by queryname
             sort_order="queryname",  # Queryname sort is needed for a fixmate
             sort_extra="-m 1536M"     # We extand the sort buffer memory
         log:
             "logs/bwa_mem2/mem/{sample}.{status}.log"
 
+    # rule bwa_samblaster_sambamba:
+    #     input:
+    #         reads=expand(
+    #             "fastp/trimmed/pe/{sample}_{status}.{stream}.fastq",
+    #             stream=["1", "2"],
+    #             allow_missing=True
+    #         ),
+    #         index=get_best_bwa_index()
+    #     output:
+    #         bam=temp("bwa_mem2/mem/{sample}_{status}.bam")
+    #     message:
+    #         "Mapping {wildcards.status} {wildcards.sample} with BWA, removing "
+    #         "duplicates with Samblaster, sorting and filtering with Sambamba."
+    #     threads:
+    #         min(config.get("threads", 20), 20)
+    #     threads: 1
+    #     resources:
+    #         mem_mb=lambda wildcards, attempt: attempt * 6144 + 61440,
+    #         time_min=lambda wildcards, attempt: attempt * 120,
+    #         tmpdir="tmp"
+    #     shadow: "shallow"
+    #     params:
+    #         index=get_best_bwa_index()[0].split('.')[0],
+    #         extra=lambda wildcards: f"-R '@RG\tID:{wildcards.sample}_{wildcards.status}\tSM:{wildcards.sample}_{wildcards.status}\tPU:{wildcards.sample}_{wildcards.status}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
+    #         sort_extra=config.get("sambamba", {"sort_extra": ""}).get("sort_extra", ""),
+    #         samblaster_extra=config.get("samblaster", {"extra": ""}).get("extra", ""),
+    #         sambamba_view_extra=config.get("sambamba", {"view_extra": "-h"}).get("view_extra", "-h")
+    #     log:
+    #         "logs/bwa_samblaster_sambamba/{sample}_{status}.log"
+    #
+
+
+
 
     use rule bwa_index from bwa_fixmate_meta with:
         input:
             config["ref"]["fasta"]
+
+
+    use rule bwa_index_hg38 from bwa_fixmate_meta
+
+    use rule bwa_index_hg19 from bwa_fixmate_meta
+
+    use rule bwa_index_mm10 from bwa_fixmate_meta
 
 
     ############################
@@ -745,15 +966,15 @@ The pipeline contains the following steps:
                 allow_missing=True
             ),
         output:
-            trimmed=expand(
+            trimmed=temp(expand(
                 "fastp/trimmed/pe/{sample}_{status}.{stream}.fastq",
                 stream=["1", "2"],
                 allow_missing=True
-            ),
+            )),
             html="fastp/html/pe/{sample}_{status}.fastp.html",
-            json=temp("fastp/json/pe/{sample}_{status}.fastp.json")
+            json="fastp/json/pe/{sample}_{status}.fastp.json"
         message: "Cleaning {wildcards.status} {wildcards.sample} with Fastp"
-        threads: 1
+        threads: 10
         resources:
             mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
             time_min=lambda wildcard, attempt: attempt * 45,
@@ -802,18 +1023,29 @@ The pipeline contains the following steps:
         snakefile: "../../meta/bio/index_datasets/test/Snakefile"
         config: index_datasets_config
 
-    use rule * from index_datasets
+    use rule samtools_faidx from index_datasets
 
-    use rule samtools_bam_index from index_datasets with:
+    use rule picard_create_sequence_dictionnary from index_datasets
+
+    rule sambamba_index_bam:
         input:
-            "{command}/{subsommand}/{sample}_{status}.bam"
+            "{tool}/{subcommand}/{sample}_{status}.bam"
         output:
-            get_bai("{command}/{subsommand}/{sample}_{status}.bam")
+            "{tool}/{subcommand}/{sample}_{status}.bam.bai"
         message:
-            "Indexing bam from {wildcards.command} ({wildcards.subcommand}) "
-            "with samtools for {wildcards.sample} ({wildcards.status})"
+            "Indexing {wildcards.sample} ({wildcards.status}) "
+            "from {wildcards.tool}:{wildcards.subcommand}"
+        threads: 8
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024 * 16,
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir="tmp"
         log:
-            "logs/samtools/sort/{command}_{subsommand}/{sample}_{status}.log"
+            "sambamba/index/{tool}_{subcommand}/{sample}_{status}.log"
+        params:
+            extra = ""
+        wrapper:
+            "bio/sambamba/index"
 
 
 

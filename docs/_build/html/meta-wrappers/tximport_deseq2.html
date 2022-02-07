@@ -105,6 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="bwa_fixmate.html">BWA_FIXMATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwa_mapping.html">BWA_MAPPING</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compress_index_vcf.html">COMPRESS_INDEX_VCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coverage_variant_region.html">COVERAGE_VARIANT_REGION</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_pe.html">DADA2-PE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dada2_se.html">DADA2-SE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deseq2_post_process.html">DESEQ2_POST_PROCESS</a></li>
@@ -118,11 +119,13 @@
 <li class="toctree-l2"><a class="reference internal" href="maftools.html">MAFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="meta_caller.html">META_CALLER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="meta_caller_germline.html">META_CALLER_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="msi_sensor_pro.html">MSI_SENSOR_PRO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mutect2_germline.html">MUTECT2_GERMLINE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mutect2_somatic.html">MUTECT2_SOMATIC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="salmon.html">SALMON</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpeff_annotate.html">SNPEFF_ANNOTATE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpsift.html">SNPSIFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="somatic_tmb.html">SOMATIC TMB</a></li>
 <li class="toctree-l2"><a class="reference internal" href="star_arriba.html">STAR-ARRIBA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="star_mapping.html">STAR_MAPPING</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">TXIMPORT_DESEQ2</a><ul>
@@ -342,7 +345,8 @@
         <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span>
     <span class="n">params</span><span class="p">:</span>
-        <span class="n">contrast</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">contrasts</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="n">contrast</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">contrasts</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
+
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deseq2/deseq/</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
@@ -371,7 +375,10 @@
             <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;~BatchEffect+</span><span class="si">{</span><span class="n">contrasts</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">),</span>
         <span class="n">levels</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">contrasts</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">][</span><span class="mi">1</span><span class="p">:],</span>
-        <span class="n">factor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">contrasts</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">factor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">contrasts</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">ref_level</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">contrasts</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">remove_zeros</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">count_filter</span><span class="o">=</span><span class="mi">5</span>
     <span class="n">log</span><span class="p">:</span>
         <span class="s2">&quot;logs/deseq2/deseq2_dataset_from_tximport/</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
@@ -418,9 +425,9 @@
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">gtf</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;gtf&quot;</span><span class="p">]</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">tx2gene_small</span><span class="o">=</span><span class="s2">&quot;tximport/tx2gene.tsv&quot;</span><span class="p">,</span>
-        <span class="n">tx2gene_large</span><span class="o">=</span><span class="s2">&quot;tximport/transcripts2genes.tsv&quot;</span><span class="p">,</span>
-        <span class="n">gene2gene_large</span><span class="o">=</span><span class="s2">&quot;tximport/gene2gene.tsv&quot;</span>
+        <span class="n">tx2gene_small</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;tximport/tx2gene.tsv&quot;</span><span class="p">),</span>
+        <span class="n">tx2gene_large</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;tximport/transcripts2genes.tsv&quot;</span><span class="p">),</span>
+        <span class="n">gene2gene_large</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;tximport/gene2gene.tsv&quot;</span><span class="p">)</span>
     <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Building transcripts/genes conversion table&quot;</span>
     <span class="n">cache</span><span class="p">:</span> <span class="kc">True</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
@@ -435,7 +442,6 @@
         <span class="s2">&quot;logs/tximport/tx2gene.log&quot;</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/gtf/tx2gene&quot;</span>
-
 
 <span class="c1">######################</span>
 <span class="c1">### Design parsing ###</span>
