@@ -62,3 +62,6 @@ shell(
     "{extra} "  # Extra parameters
     "{log}"  # Logging behaviour
 )
+
+# Checking VCF format in search for truncated files
+shell(" ( echo 'Removing {snakemake.output.vcf} if it is truncated.' ; ( gunzip -c {snakemake.output.vcf} | tail ) || rm --verbose {snakemake.output.vcf} ) {log} ")
