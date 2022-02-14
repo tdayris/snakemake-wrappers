@@ -470,7 +470,7 @@ rule splice_ai:
 
 rule variant_occurence_annotate:
     input:
-        calls = ["snpsift/clinvar/{sample}.vcf"],
+        calls = ["snpsift/exac/{sample}.vcf"],
         occurence = "bigr/occurences/all_chroms.txt"
     output:
         calls = [temp("bigr/occurence_annotated/{sample}.vcf")]
@@ -507,7 +507,7 @@ rule concatenate_per_chr_information:
 rule variant_occurence_per_chr:
     input:
         calls=expand(
-            "snpsift/clinvar/{sample}.vcf",
+            "snpsift/vartype/{sample}.vcf",
             sample=samples_list
         )
     output:
