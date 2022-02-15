@@ -2,7 +2,7 @@ from pathlib import Path
 
 tsv_dir_path = Path("snpsift/extractFields")
 tsv_paths = [p.name for p in tsv_dir_path.iterdir() if p.name.endswith("tsv")]
-sample_names = [tsv[:-len(".tsv")] for tsv in tsv_paths][0:1]
+sample_names = [tsv[:-len(".tsv")] for tsv in tsv_paths]
 
 how_list = ["census_only", "oncokb_only", "all"]
 dp_list = list(map(str, [5, 10, 40, 60]))
@@ -46,14 +46,34 @@ rule pandas_filter_tsv:
       "logs/pandas_filter/{sample}/{how}.{dp}.log"
    params:
       new_cols = lambda wildcards: [
-         ["Mutect2_Allele_Frequency", "=", f"{wildcards.sample}_tumor_AF"]
+         ["Mutect2_Allele_Frequency", "=", f"{wildcards.sample}_tumor_AF"],
+         ["Chromosome", "=", "CHROM"],
+         ["Reference_Allele", "=", "REF"],
+         ["Variant_Type", "=", "VARTYPE"],
+         ["Variant_ID", "=", "ID"],
+         ["Filter", "=", "FILTER"],
+         ["Variant_Classification", "=", "ANN[*].EFFECT"],
+         ["Transcript_ID", "=", "ANN[*].FEATUREID"],
+         ["Gene", "=", "ANN[*].GENEID"],
+         ["dbNSFP_ExAC_AlleleFrequency", "=", "dbNSFP_ExAC_AF"],
+         ["SYMBOL", "=", "ANN[*].GENE"],
+         ["Mutect2_Read_depth", "=", f"{wildcards.sample}_tumor_DP"],
+         ["Kaviar_Allele_Frequency", "=", "Kaviar_AF"],
+         ["Hugo_Symbol", "=", "ANN[*].GENE"],
+         ["HGVSc", "=", "ANN[*].HGVS_C"],
+         ["Feature", "=", "ANN[*].FEATURE"],
+         ["dbSNP_Clinical_Diagnostic_Assay", "=", "dbSNP_CDA"],
+         ["MSigDb_Pathways", "=", "MSigDb"],
+         ["BIOTYPE", "=", "ANN[*].BIOTYPE"],
+         ["IMPACT", "=", "ANN[*].IMPACT"],
+         ["HGVSp", "=", "ANN[*].HGVS_P"]
       ],
       prefixes = [
          ["Chromosome", "chr"]
       ],
       keep_column = lambda wildcards: [
             "Chromosome",
-            "Start_Position",
+            "POS",
             "Variant_ID",
             "SYMBOL",
             "Reference_Allele",
@@ -69,7 +89,6 @@ rule pandas_filter_tsv:
             "Mutect2_Allele_Frequency",
             "Variant_Type",
             "Tumor_Sample_Barcode",
-            "dbSNP_Pubmed",
             "dbSNP_Clinical_Diagnostic_Assay",
             "dbNSFP_ExAC_AlleleFrequency",
             "Kaviar_Allele_Frequency",
@@ -89,7 +108,6 @@ rule pandas_filter_tsv:
             "Gene",
             "Feature",
             "Filter",
-            "Center",
             "Hugo_Symbol",
             "End_Position",
             "CancerGeneCensus_Gene_Symbol",
@@ -125,12 +143,12 @@ rule pandas_filter_tsv:
       ],
       convert_cols_type = lambda wildcards: {
             "Mutect2_Allele_Frequency": "float",
-            "Mutect2_Read_depth": "float",
+            "Mutect2_Read_depth": "int",
             f"{wildcards.sample}_tumor_AF": "float",
             f"{wildcards.sample}_normal_AF": "float",
-            f"{wildcards.sample}_normal_AD_allele2": "float",
-            f"{wildcards.sample}_tumor_DP": "float",
-            f"{wildcards.sample}_tumor_AD_allele2": "float",
+            #f"{wildcards.sample}_normal_AD_allele2": "float",
+            f"{wildcards.sample}_tumor_DP": "int",
+            #f"{wildcards.sample}_tumor_AD_allele2": "float",
       },
       filters = lambda wildcards: [
             # ["Variant_Classification", "!=", "downstream_gene_variant"],
@@ -146,11 +164,11 @@ rule pandas_filter_tsv:
             #['Mutect2_Allele_Frequency', ">=", 0.1],
             [f"{wildcards.sample}_tumor_AF", ">=", 0.1],
             [f"{wildcards.sample}_normal_AF", "<=", 0.1],
-            [f"{wildcards.sample}_normal_AD_allele2", "<=", float(wildcards.dp)],
-            [f"{wildcards.sample}_tumor_AD_allele2", ">=", float(wildcards.dp)],
+            ##[f"{wildcards.sample}_normal_AD_allele2", "<=", float(wildcards.dp)],
+            ##[f"{wildcards.sample}_tumor_AD_allele2", ">=", float(wildcards.dp)],
             [f"{wildcards.sample}_tumor_DP", ">=", float(wildcards.dp)],
             #["dbNSFP_ExAC_AlleleFrequency", "<=", 0.05],
-            ["VarOcc", "<=", len(sample_names) - 1]
+            ["VarOcc", "<=", float(len(sample_names) - 1)]
       ],
       not_contains = lambda wildcards: [
             ["Filter", "germline"],
@@ -168,13 +186,13 @@ rule pandas_filter_tsv:
             ["Filter", "AboveStrandOddsRatio"],
             ["Filter", "BelowMQRankSum"],
             ["Filter", "BelowReadPosRankSum"],
-            ["Filter", "VarOccAbove105"],
+            ##["Filter", "VarOccAbove105"],
             #["Filter", f"DepthBelow{wildcards.filter}X"],
             #["Filter", "AFBelow40pct"]
       ],
       contains = lambda wildcards: [
             ["Filter", (
-               "ExistsInCancerGeneCensus" if wildcards.how == "census_only" else (
+               "ExistsInCanceGeneCensus" if wildcards.how == "census_only" else (
                   "ExistsInOncoKB" if wildcards.how == "oncokb_only" else ""))]
       ],
       drop_duplicated_lines=True

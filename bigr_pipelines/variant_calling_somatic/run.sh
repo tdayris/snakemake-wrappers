@@ -44,6 +44,11 @@ else
   message INFO "Config file already provided"
 fi
 
+if [ "${ANMO}" = "RUN" ]; then
+  message INFO "ANMO-like filters are used on final TSV files"
+  echo -e "\nANMO: true" >> "config.yaml"
+fi
+
 # Run pipeline
 message CMD "conda_activate ${CONDA_ENV_PATH}"
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
@@ -57,10 +62,4 @@ elif [ "${GRAPH}" != "" ]; then
 else
   message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --cache ${CACHE_RULES[*]} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} ${SNAKE_ARGS[*]}"
   snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --cache "${CACHE_RULES[@]}" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" && message INFO "Variant calling successful" || error_handling "${LINENO}" 2 "Error while running variant calling pipeline"
-fi
-
-if [ "${ANMO}" != "IGNORE" ]; then
-  message INFO "ANMO-like post processes are being performed"
-  message CMD "snakemake -s ${PIPELINE_PATH}/post_process.smk --configfile config.yaml --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} ${SNAKE_ARGS[*]}"
-  snakemake -s "${PIPELINE_PATH}/post_process_ANMO.smk" --configfile "config.yaml" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[*]}" && message INFO "ANMO-like Post Processing successful" || error_handling "${LINENO}" 2 "Error while running post processes, your initial variant calling is fine"
 fi
