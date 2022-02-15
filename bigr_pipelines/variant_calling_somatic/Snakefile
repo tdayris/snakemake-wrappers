@@ -611,8 +611,8 @@ use rule gatk_compute_baserecalibration_table from gatk_bqsr_meta with:
 
 rule sambamba_markduplicates:
     input:
-        bam="sambamba/sort/{sample}_{status}.bam",
-        bai=get_bai("sambamba/sort/{sample}_{status}.bam")
+        bam="samtools/filter/{sample}_{status}.bam",
+        bai=get_bai("samtools/filter/{sample}_{status}.bam")
     output:
         bam=temp("sambamba/markdup/{sample}_{status}.bam")
     message:
@@ -630,6 +630,32 @@ rule sambamba_markduplicates:
         ).get("markdup", "--remove-duplicates")
     wrapper:
         "bio/sambamba/markdup"
+
+
+
+"""
+Filter a bam over the capturekit bed file
+"""
+rule samtools_filter_bed:
+    input:
+        "sambamba/sort/{sample}_{status}.bam"
+        fasta=config["genome"],
+        fasta_idx=get_fai(config["genome"]),
+        fasta_dict=get_dict(config["genome"]),
+        bed=config["bed"]
+    output:
+        temp("samtools/filter/{sample}_{status}.bam")
+    threads: 10
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 2048,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        extra="--bam --with-header"
+    log:
+        "logs/samtools/filter/{sample}_{status}.log"
+    wrapper:
+        "bio/samtools/view"
 
 
 ###################
