@@ -12,10 +12,38 @@ java_opts = get_java_opts(snakemake)
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 extra = snakemake.params.get("extra", "")
 
+# Uncompression shall be done on user request
+incall = snakemake.input["call"]
+if incall.endswith("bcf"):
+    min_threads += 1
+    incall = "< <(bcftools view {})".format(incall)
+elif incall.endswith("gz"):
+    min_threads += 1
+    incall = "< <(gunzip -c {})".format(incall)
+
+# Compression shall be done according to user-defined output
+outcall = snakemake.output["call"]
+if outcall.endswith("gz"):
+    min_threads += 1
+    outcall = "| bcftools view --output-type z > {}".format(outcall)
+elif outcall.endswith("bcf"):
+    min_threads += 1
+    outcall = "| bcftools view --output-type b > {}".format(outcall)
+else:
+    outcall = "> {}".format(outcall)
+
+# Each (un)compression raises the thread number
+if snakemake.threads < min_threads:
+    raise ValueError(
+        "At least {} threads required, {} provided".format(
+            min_threads, snakemake.threads
+        )
+    )
+
 shell(
     "SnpSift varType"  # Tool and its subcommand
     " {java_opts} {extra}"  # Extra parameters
-    " {snakemake.input.vcf}"  # Path to input vcf file
-    " > {snakemake.output.vcf}"  # Path to output vcf file
+    " {incall}"  # Path to input vcf file
+    " {outcall}"  # Path to output vcf file
     " {log}"  # Logging behaviour
 )

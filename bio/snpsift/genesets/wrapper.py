@@ -25,12 +25,12 @@ elif snakemake.input["call"].endswith("gz"):
 
 # Compression shall be done according to user-defined output
 outcall = snakemake.output["call"]
-if snakemake.output["call"].endswith("gz"):
+if outcall.endswith("gz"):
     min_threads += 1
-    outcall = "| gzip -c > {}".format(outcall)
-elif snakemake.output["call"].endswith("bcf"):
+    outcall = "| bcftools view --output-type z > {}".format(outcall)
+elif outcall.endswith("bcf"):
     min_threads += 1
-    outcall = "| bcftools view > {}".format(outcall)
+    outcall = "| bcftools view --output-type b > {}".format(outcall)
 else:
     outcall = "> {}".format(outcall)
 

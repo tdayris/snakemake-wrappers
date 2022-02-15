@@ -32,10 +32,10 @@ elif incall.endswith("gz"):
 outcall = snakemake.output["call"]
 if outcall.endswith("gz"):
     min_threads += 1
-    outcall = "| gzip -c > {}".format(outcall)
+    outcall = "| bcftools view --output-type z > {}".format(outcall)
 elif outcall.endswith("bcf"):
     min_threads += 1
-    outcall = "| bcftools view > {}".format(outcall)
+    outcall = "| bcftools view --output-type b > {}".format(outcall)
 else:
     outcall = "> {}".format(outcall)
 
