@@ -1,0 +1,57 @@
+samples = [
+    "s245","s156","s214","s098","s209","s254","s226","s250",
+    "s118","s249","s198","s094","s227","s100","s117","s225",
+    "s271","s239","s193","s263","s068","s181","s050","s203",
+    "s086","s184","s204","s119","s201","s274","s275","s219",
+    "s084","s145","s257","s090","s158","s213","s182","s190",
+    "s255","s077","s131","s070","s081","s083","s229","s217",
+    "s137","s064","s230","s247","s173","s111","s087","s244",
+    "s280","s220","s202","s238","s218","s242","s207","s185",
+    "s221","s062","s157","s276","s212","s063","s200","s246",
+    "s251","s166","s197","s089","s223","s191","s114","s199",
+    "s162","s235","s168","s259","s133","s248","s261","s165",
+    "s183","s211","s208","s188","s101","s099","s189","s243",
+    "s167","s088","s192","s113","s096","s148","s232","s234"
+]
+
+signatures = [
+    "SBS01","SBS02","SBS03","SBS04","SBS05","SBS06","SBS08",
+    "SBS10","SBS15","SBS17","SBS18","SBS22","SBS24","SBS25",
+    "SBS29","SBS35","SBS36","SBS40","SBS42","SBS43","SBS44",
+    "SBS46","SBS55","SBS56","SBS59"
+]
+
+rule test_plot_sigprofiler_single_sample:
+    input:
+        sigpro = expand(
+            "SigProfiler/{sample}/test/output/Sig_activities.txt",
+            sample=samples
+        ),
+        prob = expand(
+            "SigProfiler/{sample}/test/output/Mutation_Probabilities.txt",
+            sample=samples
+        )
+    output:
+        matrix = "SigProfiler/sig_activities_absolute_values.tsv",
+        percent_matrix = "SigProfiler/sig_activities_percent.tsv",
+        clustermap = "SigProfiler/clustermap.png",
+        jaccard_clustermap = "SigProfiler/clustermap_jaccard.png",
+        histogram = expand(
+            "SigProfiler/histograms/hist.{content}.{sample}.png",
+            sample=samples,
+            content=["absolute", "percent"]
+        ),
+        mut_prob = directory("SigProfiler/MutProb/"),
+        transposed_hist = directory("SigProfiler/transposed_histogram/")
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/sigprofiler/plot.log"
+    params:
+        hist_prefix="SigProfiler/histograms/hist.",
+        prob_prefix="SigProfiler/MutProb/MutationProbabilities."
+    wrapper:
+        "/bio/seaborn/plot_sigprofiler_single_sample"
