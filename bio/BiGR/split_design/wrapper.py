@@ -79,23 +79,24 @@ for col in complete_design.columns:
         # R and DESeq2 sort levels through alphanumerical order. We have
         # to provide user-understandable name ; so let us sort out the
         # levels and guess reference name.
-        level, ref = sorted([l1, l2])
+        for level, ref in [[l1, l2], [l2, l1]]:
 
-        # Building humand readable design name
-        design_name = f"{out_design_dir}/DGE_considering_factor_{col}_comparing_test_{level}_vs_ref_{ref}.tsv"
-        tmp = complete_design[complete_design[col].isin([level, ref])]
-
-        logging.info(
-            "%s: Considering level %s and reference %s",
-            design_name,
-            level,
-            ref
-        )
-
-        tmp.to_csv(
-            design_name,
-            sep="\t",
-            index=True,
-            header=True,
-            index_label="Sample_id"
-        )
+            # Building humand readable design name
+            design_name = f"{out_design_dir}/DGE_considering_factor_{col}_comparing_test_{level}_vs_reference_{ref}.tsv"
+            tmp = complete_design[complete_design[col].isin([level, ref])]
+            tmp.replace([" ", level, ref], ["", f"test_{level}", f"reference_{ref}"], inplace=True)
+    
+            logging.info(
+                "%s: Considering level %s and reference %s",
+                design_name,
+                level,
+                ref
+            )
+    
+            tmp.to_csv(
+                design_name,
+                sep="\t",
+                index=True,
+                header=True,
+                index_label="Sample_id"
+            )

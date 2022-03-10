@@ -1,0 +1,50 @@
+gene_list = ["ENSMUSG00000000028", "ENSMUSG00000000056", "ENSMUSG00000118603", "ENSMUSG00000002147"]
+
+rule test_plot_deseq_genes:
+    input:
+        deseq="wald.tsv",
+        intermediar="inter.tsv",
+        dst="dst.tsv",
+        assays="assays.tsv",
+        gene2gene="/home/tdayris/Documents/Clusters/flamingo/scratch/bioinfo_core/B21074_FRPO_01/data_output/DGE_No_Batch_Without955/tximport/gene2gene.tsv",
+        metadata="metadata.tsv",
+        filter_theta="theta.tsv"
+    output:
+        log_counts="log_counts.png",
+        log_mu="log_mu.png",
+        # maplot="MAplot.png",
+        gene_plots=expand(
+            "geneplots/{gene}.png",
+            gene=gene_list
+        ),
+        independent_filtering="independent_filter.png",
+        pval="pval.png",
+        filter_theta="theta.png"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        condition_dict={
+            "s897": "Control_Week2",
+            "s929": "Control_Week2",
+            "s921": "DOX_Week2",
+            "s931": "DOX_Week2",
+            "s933": "DOX_Week2",
+            "s943": "Control_Month5",
+            "s948": "Control_Month5",
+            "s954": "Control_Month5",
+            "s967": "DOX_Month5",
+            "s971": "DOX_Month5",
+            "s974": "DOX_Month5",
+            "s980": "DOX_Month5"
+        },
+        gene_list=gene_list,
+        gene_plots_prefix="geneplots/",
+        comparison="comparing_test_Month5_vs_ref_Week2",
+        chromosomes=list(range(0, 24)) + ["X", "Y", "MT"] + list(map(str, range(0, 24)))
+    log:
+        "logs/plot_deseq_genes.log"
+    wrapper:
+        "file:///home/tdayris/Documents/Clusters/flamingo/pipelines/snakemake-wrappers/bio/seaborn/plot_deseq_genes/"

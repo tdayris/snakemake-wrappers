@@ -28,11 +28,11 @@ def get_best_index():
         "--keepDuplicates --gencode"
     )
     
-    if (config["transcriptome"], config["genome"]) == hg38_flamingo:
+    if args == hg38_flamingo:
         return "salmon/index_hg38"
-    elif (config["transcriptome"], config["genome"]) == hg19_flamingo:
+    elif args == hg19_flamingo:
         return "salmon/index_hg19"
-    elif (config["transcriptome"], config["genome"]) == mm10_flamingo:
+    elif args == mm10_flamingo:
         return "salmon/index_mm10"
     
     return "salmon/index"
@@ -102,7 +102,7 @@ rule salmon_index:
 rule salmon_index_hg38:
     input:
         sequences="salmon/decoy/gentrome.hg38.fasta",
-        decoys="salmon/decoy/decoys.hg38.txt"
+        decoys="salmon/decoy/decoys.hg38.txt",
     output:
         index=directory("salmon/index_hg38")
     message: "Indexing transcriptome/gentrome sequences with Salmon"
