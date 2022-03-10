@@ -10,9 +10,9 @@ to be fullfiled.
 
 import argparse
 import logging
-import yaml
+import sys
 
-
+from SigProfilerMatrixGenerator import install as genInstall
 from SigProfilerMatrixGenerator.scripts import SigProfilerMatrixGeneratorFunc as matGen
 
 logging.basicConfig(
@@ -21,6 +21,8 @@ logging.basicConfig(
     level=logging.DEBUG
 )
 
+logging.getLogger('matplotlib.font_manager').disabled = True
+logging.getLogger('matplotlib.backends.backend_pdf').disabled = True
 
 if __name__ == '__main__':
     logging.info("Parsing command line input")
@@ -30,10 +32,7 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
-        "vcf", type=str, nargs=1, help="Path to input VCF file"
-    )
-    parser.add_argument(
-        "yaml", type=str, nargs=1, help="Path to output yaml file"
+        "vcf", type=str, help="Path to input VCF file"
     )
     parser.add_argument(
         "-o",
@@ -44,20 +43,35 @@ if __name__ == '__main__':
         choices=["GRCh38", "GRCh37"],
         default="GRCh38"
     )
+    parser.add_argument(
+        "-s", "--sample-name",
+        help="Name of the sample to process",
+        type=str,
+        default=None
+    )
+    parser.add_argument(
+        "--install", help="Install genome",
+        action="store_true"
+    )
     args = parser.parse_args()
 
     vcf_path = args.vcf
-    out_yaml = args.yaml
-    dir_name, vcf_name = vcf_path.rsplit("\t", 1)
+    dir_name, vcf_name = vcf_path.rsplit("/", 1)
+    organism = args.organism[0] if isinstance(args.organism, list) else args.organism
+    organism = str(organism)
+    sample_name = args.sample_name if args.sample_name is not None else vcf_name.split(".")[0]
     logging.info("Retrieving input information")
     logging.debug(f"Working at: {dir_name}")
     logging.debug(f"Working on: {vcf_name}")
-
+    
     try:
+        if args.install is True:
+            genInstall.install('GRCh38')
+
         logging.info("Creating matrix")
         matrices = matGen.SigProfilerMatrixGeneratorFunc(
             project="test",
-            genome=args.organism,
+            genome=organism,
             vcfFiles=dir_name,
             exome=True,
             bed_file=None,
@@ -71,6 +85,3 @@ if __name__ == '__main__':
         logging.error(e)
         raise
 
-    logging.info(f"Saving results to {out_yaml}")
-    with open(out_yaml, 'w') as yamlstream:
-        yamlstream.write(yaml.dump(matrices, default_flow_style=False))
