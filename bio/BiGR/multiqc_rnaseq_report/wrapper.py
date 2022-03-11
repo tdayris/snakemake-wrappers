@@ -27,7 +27,7 @@ logging.basicConfig(
 
 section_dict = {
     "clustermap_sample": {
-        "section": "clustermap_sample",
+        "section": "Clustermap_Sample",
         "title": "Sample clustered heatmap",
         "description": (
             "Per sample clustered heatmap. This plot has been build based on "
@@ -39,7 +39,7 @@ section_dict = {
         "plot_name": "clustermap_sample_mqc.png"
     },
     "clustermap_genes": {
-        "section": "clustermap_genes",
+        "section": "Clustermap_Genes",
         "title": "Heatmap of samples clustered over genes",
         "description": (
             "Per genes clustered heatmap. This plot has been build based on "
@@ -50,9 +50,9 @@ section_dict = {
         ),
         "plot_name": "clustermap_gene_mqc.png"
     },
-    "pca_axes_correlation": {
-        "section": "pca_axes_correlation",
-        "title": "PCA Axe correlations",
+    "PCA_axes_correlation": {
+        "section": "PCA_axes_correlation",
+        "title": "PCA Axes correlations",
         "description": (
             "This histogram shows which factor has a higher  correlation with "
             "the first axe of the PCA. This may help to understand why a DGE "
@@ -62,8 +62,8 @@ section_dict = {
         ),
         "plot_name": "pca_axes_correlation_mqc.png"
     },
-    "pairwise_scatterplot": {
-        "section": "pairwise_scatterplot",
+    "Pairwise_Scatterplot": {
+        "section": "Pairwise_Scatterplot",
         "title": "Pairwise Scatterplot",
         "description": (
             "This is a pairwise scatterplot. It contains: (1) in diagonal: the "
@@ -72,12 +72,12 @@ section_dict = {
             "against each other. <br><br>A value of 0.95 and above shows high "
             "similarities like ones observed in cell lines. A value between "
             "0.95 and 0.80 shows average similarities. A lesser value shows "
-            "noticable dissimilarities. (powered by pcaExplorer)"
+            "noticable dissimilarities."
         ),
         "plot_name": "pairwise_scatterplot_mqc.png"
     },
     "pca_plot": {
-        "section": "pca_plot",
+        "section": "PCA_Plot",
         "title": "Principal Component Analysis",
         "description": (
             "Principal Component Analysis (PCA) is a common method to display "
@@ -89,7 +89,7 @@ section_dict = {
         "plot_name": "pca_plot_mqc.png"
     },
     "volcanoplot": {
-        "section": "volcanoplot",
+        "section": "Volcano_Plot",
         "title": "Volcano Plot",
         "description": (
             "The volcanoplot shows the repartition of genes across two "
@@ -103,19 +103,52 @@ section_dict = {
         "plot_name": "volcanoplot_mqc.png"
     },
     "distro_expr": {
-        "section": "distro_expr",
+        "section": "Expression_Distribution",
         "title": "Expression Distribution",
         "description": (
-            "The distribution of the expression of the genes is a common quality "
+            "The distribution of normalised genes expression is a common quality "
             "control performed over a differential gene analysis. <br><br> We "
             "expect all samples to have similar distribution, otherwise, it would"
             " sign a possible error before the end of the normalization process."
-            " (powered by pcaExplorer)"
         ),
         "plot_name": "distro_expr_mqc.png"
     },
+    "distro_mu": {
+        "section": "Mu_Distribution",
+        "title": "µ(ij) Distribution",
+        "description": (
+            "The distribution of gene's µ(ij) in DESeq2 is a common quality "
+            "control performed over a differential gene analysis. <br><br> We "
+            "expect all samples to have similar distribution, otherwise, it would"
+            " sign a possible error before the end of the normalization process."
+            "<br><br>µ(ij) are numerical values used by DESeq2 within its NB-GML."
+        ),
+        "plot_name": "distro_mu_mqc.png"
+    },
+    "pvalue_qc": {
+        "section": "PValue_QC",
+        "title": "Ajdusted P-Value distribution",
+        "description": (
+            "Ajusted P-Values should have less 'non significative' observations "
+            "than significative ones. Thus, these variations of expression  "
+            "should come from all studied chromosomes."
+
+        ),
+        "plot_name": "pvalue_qc.png"
+    },
+    "inde_theta_filter": {
+        "section": "Independent_Filtering_Theta_Threshold",
+        "title": "Independent Filtering (Theta threshold)",
+        "description": (
+            "Theta threshold (in red) if used in independent filtering to define "
+            "weather an observation should be filtered out or not. This graph "
+            "should have two knees, and the Theta value should come befor the "
+            "first one."
+        ),
+        "plot_name": "theta_knee_plot_mqc.png"
+    },
     "ma_plot": {
-        "section": "ma_plot",
+        "section": "MA_Plot",
         "title": "MA-plot",
         "description": (
             "The MAplot compares M (log(ratio)) to A (mean average).<br><br> "
@@ -125,12 +158,23 @@ section_dict = {
         ),
         "plot_name": "ma_plot_mqc.png"
     },
+    "independent_filter": {
+        "section": "Independent_Filtering",
+        "title": "Independent Filtering",
+        "description": (
+            "Independent filtering allows to identify outlayers and possible "
+            "false positive low p-values. These graphs are here to illustrate "
+            "the amount of calls filtered out by this method."
+        ),
+        "plot_name": "independent_filtering_mqc.png"
+    },
     "consensus_cluster_plus": {
         "section": "consensus_cluster_plus",
         "title": "Consensus Clustering",
         "description": (
             "This graph has been done on DESeq2 normalized counts..<br><br> "
-            "This helps to highlight possible confounding effects. We expect our sample to be well separated over the factor of interest. (powered by "
+            "This helps to highlight possible confounding effects. We expect "
+            "our sample to be well separated over the factor of interest. (powered by "
             "'consensus cluster plus')"
         ),
         "plot_name": "consensus_cluster_plus.png"
