@@ -1,0 +1,141 @@
+from snakemake.utils import min_version
+from pathlib import Path
+from yaml import dump
+from typing import List
+min_version("6.0")
+
+import sys
+
+worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+common = str(worflow_source_dir / "../common/python")
+sys.path.append(common)
+
+from file_manager import *
+from files_linker import *
+from write_yaml import *
+from messages import message
+
+logging.basicConfig(
+    filename="snakemake.low_pass_wgs_copy_number.log",
+    filemode="w",
+    level=logging.DEBUG
+)
+
+default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
+configfile: get_config(default_config)
+design = get_design(os.getcwd(), search_fastq_pairs)
+
+
+rule target:
+    input:
+        bins = expand(
+            "wisecondorx/{sample}/{sample}_bins.bed",
+            sample=design["Sample_id"]
+        )
+
+
+##############################
+### Copy number prediction ###
+##############################
+
+
+wisecondorx_config = {
+    "convert_extra": config["wisecondorx"]["convert_extra"],
+    "newref_extra": config["wisecondorx"]["newref_extra"],
+    "predict_extra": config["wisecondorx"]["predict_extra"],
+    "gender_extra": config["wisecondorx"]["gender_extra"],
+    "ref": config["ref"]["fasta"],
+    "reference_samples": config["ref"]["ref_samples"],
+}
+
+
+module wisecondorx_meta:
+    snakefile: "../../meta/bio/wisecondorx/test/Snakefile"
+    config: wisecondorx_config
+
+
+use rule * from wisecondorx_meta
+
+
+###############
+### Mapping ###
+###############
+
+
+bowtie2_config = {
+    "ref": config["ref"],
+    "bowtie2_build_extra": config["bowtie2"]["build_extra"]
+    "bowtie2_map_extra": config["bowtie2"]["map_extra"]
+}
+
+
+module bowtie2_meta:
+    snakefile: "../../meta/bio/bowtie2/test/Snakefile"
+    config: bowtie2_config
+
+
+use rule * from bowtie2_meta
+
+
+####################################
+### Fastq gathering and cleaning ###
+####################################
+
+rule fastp_clean:
+    input:
+        sample=expand(
+            "reads/{sample}.{stream}.fq.gz",
+            stream=["1", "2"],
+            allow_missing=True
+        ),
+    output:
+        trimmed=temp(expand(
+            "fastp/trimmed/pe/{sample}.{stream}.fastq",
+            stream=["1", "2"],
+            allow_missing=True
+        )),
+        html="fastp/html/pe/{sample}.fastp.html",
+        json="fastp/json/pe/{sample}.fastp.json"
+    message: "Cleaning {wildcards.sample} with Fastp"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
+        time_min=lambda wildcard, attempt: attempt * 45,
+        tmpdir="tmp"
+    params:
+        adapters=config["params"].get("fastp_adapters", None),
+        extra=config["params"].get("fastp_extra", "")
+    log:
+        "logs/fastp/{sample}.log"
+    wrapper:
+        "bio/fastp"
+
+
+#################################################
+### Gather files from iRODS or mounting point ###
+#################################################
+
+rule bigr_copy:
+    output:
+        "reads/{sample}.{stream}.fq.gz"
+    message:
+        "Gathering {wildcards.sample} fastq file ({wildcards.stream})"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
+        time_min=lambda wildcard, attempt: attempt * 45
+    params:
+        input=lambda wildcards, output: fastq_links[output[0]]
+    log:
+        "logs/bigr_copy/{sample}.{stream}.log"
+    wrapper:
+        "bio/BiGR/copy"
+
+
+use rule bigr_copy as bigr_copy_single_end with:
+    output:
+        "reads/{sample}.fq.gz"
+    message:
+        "Gathering {wildcards.sample} fastq file"
+    log:
+        "logs/bigr_copy/{sample}.log"

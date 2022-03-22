@@ -1,0 +1,20 @@
+rule wisecondorx_newref:
+    input:
+        aln = expand(
+            "wisecondorx/convert/{sample}.npz",
+            sample=config["reference_samples"]
+        )
+    output:
+        "wisecondorx/reference.npz"
+    message: "Building reference with WisecondorX"
+    threads: 8
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        extra=config.get("newref_extra", "")
+    log:
+        "logs/wisecondorx/reference.log"
+    wrapper:
+        "bio/wisecondorx/newref"

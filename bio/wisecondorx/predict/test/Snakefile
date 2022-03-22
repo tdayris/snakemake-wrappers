@@ -1,0 +1,22 @@
+rule wisecondorx_predict:
+    input:
+        test = "wisecondorx/convert/{sample}.npz",
+        ref = "wisecondorx/reference.npz"
+    output:
+        bins = "wisecondorx/{sample}/{sample}_bins.bed",
+        segments = "wisecondorx/{sample}/{sample}_segments.bed",
+        aberrations ="wisecondorx/{sample}/{sample}_aberrations.bed",
+        statistics = "wisecondorx/{sample}/{sample}_statistics.bed"
+    message: "Predict copy number alterations for {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        extra = config.get("predict_extra", ""),
+        prefix = lambda wildcards: f"wisecondorx/{wildcards.sample}/{wildcards.sample}"
+    log:
+        "logs/wisecondorx/predict/{sample}.log"
+    wrapper:
+        "bio/wisecondorx/predict"
