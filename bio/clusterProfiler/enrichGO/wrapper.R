@@ -19,14 +19,22 @@ base::library(package = "DOSE", quietly = TRUE);
 base::library(package = "clusterProfiler", quietly = TRUE);
 # Loading databases
 base::library(package = "org.Hs.eg.db", quietly = TRUE);
-
+orgdb <- org.Hs.eg.db
 # Loading input dataset
 geneList <- base::readRDS(
   file = snakemake@input[["rds"]]
 );
 
-extra <- "gene = base::names(geneList), readable = TRUE";
-if ("enrichGO_extra" %in% snakemake@params) {
+extra <- "gene = base::names(geneList), readable = TRUE, OrgDb = orgdb";
+if ("ontology" %in% base::names(snakemake@params)) {
+  extra <- base::paste(
+    extra,
+    base::paste0("ont='", snakemake@params[["ontology"]], "'"),
+    sep=", "
+  );
+}
+
+if ("enrichGO_extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
     extra,
     snakemake@params[["enrichGO_extra"]],

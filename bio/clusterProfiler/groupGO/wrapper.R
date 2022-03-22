@@ -33,6 +33,13 @@ if ("organism" %in% base::names(snakemake@params)) {
 }
 
 extra <- "gene = base::names(geneList), OrgDb = organism, readable = TRUE";
+if ("ontology" %in% base::names(snakemake@params)) {
+  extra <- base::paste(
+    extra,
+    base::paste0("ont='", snakemake@params[["ontology"]], "'"),
+    sep=", "
+  );
+}
 if ("groupGO_extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
     extra,

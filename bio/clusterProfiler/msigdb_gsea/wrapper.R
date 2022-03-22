@@ -31,18 +31,22 @@ geneList <- base::readRDS(
 );
 
 organism <- org.Hs.eg.db;
+spieces <- "Homo sapiens";
 if ("organism" %in% base::names(snakemake@params)) {
   if (snakemake@params[["organism"]] == "Mm") {
     organism <- org.Mm.eg.db;
+    spieces = "Mus musculus";
   }
 }
 
 # Loading MSigDB
-msigdb_extra <- 'species = "Homo sapiens"';
-if ("msigdb_extra" %in% snakemake@params) {
-  msigdb_extra <- base::as.character(
-    x = snakemake@params[["msigdb_extra"]]
-  );
+msigdb_extra <- 'species = spieces';
+if ("msigdb_extra" %in% base::names(snakemake@params)) {
+  msigdb_extra <- base::paste(
+    msigdb_extra,
+    base::as.character(x = snakemake@params[["msigdb_extra"]]),
+    sep=", "
+  )
 }
 
 command <- base::paste0(
@@ -50,6 +54,7 @@ command <- base::paste0(
   msigdb_extra,
   ")"
 )
+base::message(command);
 
 db <- base::eval(
   base::parse(
@@ -59,10 +64,19 @@ db <- base::eval(
 base::message("Libraries, datasets and database retrieved");
 
 # Performing GSEA
-gsea <- clusterProfiler::GSEA(
-  geneList,
-  TERM2GENE = db
-);
+gsea_extra <- "geneList, TERM2GENE = db";
+if ("msigdb_gsea_extra" %in% base::names(snakemake@params)) {
+  gsea_extra <- base::paste(
+    gsea_extra,
+    base::as.character(snakemake@params[["msigdb_gsea_extra"]]),
+    sep=", "
+  );
+}
+gsea <- base::eval(
+  base::parse(
+    text = command
+  )
+)
 
 gsea <- clusterProfiler::setReadable(
     gsea,
