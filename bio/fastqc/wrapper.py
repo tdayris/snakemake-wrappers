@@ -11,8 +11,12 @@ import re
 from tempfile import TemporaryDirectory
 
 from snakemake.shell import shell
+from snakemake.utils import makedirs
 
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+tmp = snakemake.resources.get('tmpdir')
+if tmp is not None:
+    makedirs(tmp)
 
 
 def basename_without_ext(file_path):
@@ -33,7 +37,7 @@ def basename_without_ext(file_path):
 
 # Run fastqc, since there can be race conditions if multiple jobs
 # use the same fastqc dir, we create a temp dir.
-with TemporaryDirectory() as tempdir:
+with TemporaryDirectory(dir=tmp) as tempdir:
     shell(
         "fastqc {snakemake.params} -t {snakemake.threads} "
         "--outdir {tempdir:q} {snakemake.input[0]:q}"

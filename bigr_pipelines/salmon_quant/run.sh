@@ -44,12 +44,12 @@ message CMD "conda_activate ${CONDA_ENV_PATH}"
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
 
 if [ "${SUMMARY}" != "" ]; then
-  message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --cache salmon_index --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} ${SNAKE_ARGS[*]} --summary > ${SUMMARY}"
-  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --cache salmon_index --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" --summary > "${SUMMARY}"
+  message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} ${SNAKE_ARGS[*]} --summary > ${SUMMARY}"
+  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" --summary > "${SUMMARY}"
 elif [ "${GRAPH}" != "" ]; then
-  message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --cache salmon_index --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} ${SNAKE_ARGS[*]} --rulegraph | dot -Tpng > ${GRAPH}"
-  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --cache salmon_index --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" --rulegraph | dot -Tpng > "${GRAPH}"
+  message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} ${SNAKE_ARGS[*]} --rulegraph | dot -Tpng > ${GRAPH}"
+  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" --rulegraph | dot -Tpng > "${GRAPH}"
 else
-  message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --cache salmon_index --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} ${SNAKE_ARGS[*]}"
-  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --cache salmon_index --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" && message INFO "Quantification successful" || error_handling "${LINENO}" 2 "Error while running Salmon quant pipeline"
+  message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} ${SNAKE_ARGS[*]}"
+  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" && message INFO "Quantification successful" || error_handling "${LINENO}" 2 "Error while running Salmon quant pipeline"
 fi
