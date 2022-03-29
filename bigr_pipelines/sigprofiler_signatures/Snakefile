@@ -11,6 +11,7 @@ logging.basicConfig(
 )
 
 worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+worflow_source_dir = Path("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/")
 common = str(worflow_source_dir / "../common/python")
 sys.path.append(common)
 
@@ -23,7 +24,7 @@ min_version("6.0")
 
 default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
 configfile: get_config(default_config)
-design = get_design(os.getcwd(), search_vcf_files).head(1)
+design = get_design(os.getcwd(), search_vcf_files)
 design["Sample_id"] = design["Sample_id"].str.replace("-", "_")
 
 install_genome = False
@@ -51,9 +52,65 @@ rule target:
             #"SigProfiler/{sample}/Res/JOB_METADATA.txt",
             #"SigProfiler/{sample}/test/output",
             #"DBS/{sample}/test/output",
-            "ID/{sample}/test/output",
+            #"ID/{sample}/test/output",
+            "{sample}/sigprofiler/output",
             sample=samples_list
         )
+
+
+rule sigprofiler_1_1_6_prepare:
+    input:
+        vcf = "data_input/calls/{sample}.vcf.gz"
+    output:
+        directory("{sample}/sigprofiler/vcf")
+    threads: 4
+    resources:
+        mem_mb = lambda wildcards, attempt: attempt * 1024 * 4,
+        time_min = lambda wildcards, attempt: attempt * 30,
+        tmpdir = "tmp"
+    log:
+        "logs/SigProfiler/prepare/{sample}.log"
+    params:
+        mk = "--parents --verbose",
+        gz = "--stdout --force",
+        cp = "--verbose",
+        gr = '-vP "^#"',
+        cut = "-f 1-5",
+        sed = "'/^chr/! s/^/chr/g'",
+    shell:
+        "mkdir {params.mk} {wildcards.sample}/sigprofiler/vcf > {log} 2>&1 && "
+        # "cp {params.cp} {input.vcf} {wildcards.sample}/sigprofiler/vcf/{wildcards.sample}.vcf.gz >> {log} 2>&1 && "
+        # "gunzip {params.gz} {input.vcf} > {wildcards.sample}/sigprofiler/vcf/{wildcards.sample}.vcf 2>> {log} && "
+        "gunzip {params.gz} {input.vcf} | grep {params.gr} | cut {params.cut} | "
+        "sed {params.sed} > {wildcards.sample}/sigprofiler/vcf/{wildcards.sample}.vcf 2>> {log} && "
+        "tree >> {log} 2>&1  "
+
+
+rule sigprofiler_1_1_6_run:
+    input:
+        vcf = "{sample}/sigprofiler/vcf",
+        sigprofiler_script = "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/sigprofiler_1.1.6.py"
+    output:
+        directory("{sample}/sigprofiler/output")
+    threads: 10
+    resources:
+        mem_mb = lambda wildcards, attempt: attempt * 1024 * 4,
+        time_min = lambda wildcards, attempt: attempt * 30,
+        tmpdir = "tmp"
+    log:
+        "logs/SigProfiler/run/{sample}.log"
+    params:
+        org = organism,
+        install = "--install" if install_genome is True else "",
+        rundir = lambda wildcards: f"{wildcards.sample}/sigprofiler"
+    conda:
+        "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/sigprofiler.p37.yaml"
+    shell:
+        # "cd {params.rundir} > {log} 2>&1 && echo 'Moved to {params.rundir}' >> {log} 2>&1 && tree >> {log} 2>&1 && "
+        "tree --all {params.rundir} >> {log} 2>&1 && "
+        "rm --force --verbose {params.rundir}/vcf/.snakemake_timestamp >> {log} 2>&1 && "
+        "python3 {input.sigprofiler_script} {params.org} {params.rundir} {params.install} >> {log} 2>&1 "
+
 
 
 rule sigprofiler_single_sample_sbs:
