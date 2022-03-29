@@ -22,16 +22,35 @@ logging.basicConfig(
 )
 
 default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
+
 configfile: get_config(default_config)
+
 design = get_design(os.getcwd(), search_fastq_pairs)
+
+reference_samples = design[design["Status"] == "Reference"]["Sample_id"]
+seeds = config.get("seeds", [123, 666, 42])
+nb_reads = config.get("nb_reads", [10000000])
+
+fastq_links = link_fq(
+    design.Sample_id,
+    design.Upstream_file,
+    design.Downstream_file
+)
+
+
+wildcard_constraints:
+    seed = r"|".join(map(str, seeds)),
+    n = r"|".join(map(str, nb_reads)),
+    sample = r"|".join(design["Sample_id"])
 
 
 rule target:
-    input:
-        bins = expand(
-            "wisecondorx/{sample}/{sample}_bins.bed",
-            sample=design["Sample_id"]
-        )
+    input: 
+        "wisecondorx/subset_reference.npz"
+        #bins = expand(
+        #    "wisecondorx/{sample}/{sample}_bins.bed",
+        #    sample=design["Sample_id"]
+        #)
 
 
 ##############################
@@ -44,8 +63,8 @@ wisecondorx_config = {
     "newref_extra": config["wisecondorx"]["newref_extra"],
     "predict_extra": config["wisecondorx"]["predict_extra"],
     "gender_extra": config["wisecondorx"]["gender_extra"],
-    "ref": config["ref"]["fasta"],
-    "reference_samples": config["ref"]["ref_samples"],
+    "ref": config["ref"]["genome"],
+    "reference_samples": reference_samples,
 }
 
 
@@ -57,6 +76,28 @@ module wisecondorx_meta:
 use rule * from wisecondorx_meta
 
 
+use rule wisecondorx_convert as wisecondorx_subset_convert with:
+    input:
+        aln = "seqtk/bam/{sample}.{seed}.{n}.bam",
+        ref = config["ref"]["genome"]
+    output:
+        "wisecondorx/subset/{sample}.{seed}.{n}.npz"
+    log:
+        "logs/wisecondorx/subset/{sample}.{seed}.{n}.log"
+
+
+use rule wisecondorx_newref as wisecondorx_subset_newref with:
+    input:
+        aln = expand(
+            "wisecondorx/subset/{sample}.{seed}.{n}.npz",
+            sample=design["Sample_id"],
+            seed=seeds,
+            n=nb_reads
+        )
+    output:
+        "wisecondorx/subset_reference.npz"
+
+
 ###############
 ### Mapping ###
 ###############
@@ -64,7 +105,7 @@ use rule * from wisecondorx_meta
 
 bowtie2_config = {
     "ref": config["ref"],
-    "bowtie2_build_extra": config["bowtie2"]["build_extra"]
+    "bowtie2_build_extra": config["bowtie2"]["build_extra"],
     "bowtie2_map_extra": config["bowtie2"]["map_extra"]
 }
 
@@ -77,38 +118,51 @@ module bowtie2_meta:
 use rule * from bowtie2_meta
 
 
+use rule bowtie2_map from bowtie2_meta as bowtie2_map_subsets with:
+    input:
+        samples=expand(
+            "seqtk/fastq/{sample}.{seed}.{n}.{stream}.fq.gz",
+            stream=[1, 2],
+            allow_missing=True
+        ),
+        genome_index=multiext(
+            "bowtie2/index/genome",
+            ".1.bt2", ".2.bt2", ".3.bt2", ".4.bt2", ".rev.1.bt2", ".rev.2.bt2"
+        )
+    output:
+       temp("seqtk/bam/{sample}.{seed}.{n}.bam")
+    log:
+        "logs/bowtie2/seqtk/{sample}.{seed}.{n}.log" 
+
+
 ####################################
 ### Fastq gathering and cleaning ###
 ####################################
 
-rule fastp_clean:
+
+rule subset_high_coverage_wgs:
     input:
-        sample=expand(
-            "reads/{sample}.{stream}.fq.gz",
-            stream=["1", "2"],
-            allow_missing=True
-        ),
+        f1="reads/{sample}.1.fq.gz",
+        f2="reads/{sample}.2.fq.gz"
     output:
-        trimmed=temp(expand(
-            "fastp/trimmed/pe/{sample}.{stream}.fastq",
-            stream=["1", "2"],
-            allow_missing=True
-        )),
-        html="fastp/html/pe/{sample}.fastp.html",
-        json="fastp/json/pe/{sample}.fastp.json"
-    message: "Cleaning {wildcards.sample} with Fastp"
-    threads: 1
+        f1=temp("seqtk/fastq/{sample}.{seed}.{n}.1.fq.gz"),
+        f2=temp("seqtk/fastq/{sample}.{seed}.{n}.2.fq.gz")
+    message: 
+        "Subsetting {wildcards.sample} using "
+        "seed = {wildcards.seed} and keeping "
+        "{wildcards.n} reads"
+    threads: 10
     resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
-        time_min=lambda wildcard, attempt: attempt * 45,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 10,
         tmpdir="tmp"
-    params:
-        adapters=config["params"].get("fastp_adapters", None),
-        extra=config["params"].get("fastp_extra", "")
     log:
-        "logs/fastp/{sample}.log"
+        "logs/seqtk/{sample}.{seed}.{n}.log"
+    params:
+        n=lambda wildcards: int(wildcards.n),
+        seed=lambda wildcards: int(wildcards.seed)
     wrapper:
-        "bio/fastp"
+        "bio/seqtk/subsample/pe"
 
 
 #################################################
@@ -130,12 +184,3 @@ rule bigr_copy:
         "logs/bigr_copy/{sample}.{stream}.log"
     wrapper:
         "bio/BiGR/copy"
-
-
-use rule bigr_copy as bigr_copy_single_end with:
-    output:
-        "reads/{sample}.fq.gz"
-    message:
-        "Gathering {wildcards.sample} fastq file"
-    log:
-        "logs/bigr_copy/{sample}.log"
