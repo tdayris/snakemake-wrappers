@@ -1,7 +1,7 @@
-.. _`celltype_deconvolution_rnaseq (under development)`:
+.. _`celltype_deconvolution_rnaseq`:
 
-CELLTYPE_DECONVOLUTION_RNASEQ (UNDER DEVELOPMENT)
-=================================================
+CELLTYPE_DECONVOLUTION_RNASEQ
+=============================
 
 Perform trimming and quantification on RNASeq, then cell type opulation deconvolution
 
@@ -20,11 +20,11 @@ In order to run the pipeline, use the following commands
 
   # Copy/paste the following line for **HG19**
 
-  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/celltype_deconvolution_rnaseq/run.sh hg19
 
   # Copy/paste the following line for **HG38**
 
-  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh hg38
+  bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/celltype_deconvolution_rnaseq/run.sh hg38
 
 
 Input/Output

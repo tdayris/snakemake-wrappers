@@ -1,7 +1,7 @@
-.. _`SnpEff_SnpSift (under development)`:
+.. _`SnpEff_SnpSift`:
 
-SNPEFF_SNPSIFT (UNDER DEVELOPMENT)
-==================================
+SNPEFF_SNPSIFT
+==============
 
 Annotate VCF files with SnpEff and SNpSift
 

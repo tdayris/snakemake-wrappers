@@ -1,7 +1,7 @@
-.. _`Variant_Calling_Somatic (under development)`:
+.. _`Variant_Calling_Somatic`:
 
-VARIANT_CALLING_SOMATIC (UNDER DEVELOPMENT)
-===========================================
+VARIANT_CALLING_SOMATIC
+=======================
 
 Perform Variant calling on Somatic
 

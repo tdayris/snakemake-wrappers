@@ -27,7 +27,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/star_index_genome.log"
         cache: True
         wrapper:
-            "0.79.0-1266-g4f9e1419f/bio/star/index"
+            "0.79.0-1274-g1c3f62c3a/bio/star/index"
 
     rule star_align:
         input:
@@ -52,7 +52,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 " --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"
         threads: 12
         wrapper:
-            "0.79.0-1266-g4f9e1419f/bio/star/align"
+            "0.79.0-1274-g1c3f62c3a/bio/star/align"
 
     rule arriba:
         input:
@@ -70,7 +70,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/arriba/{sample}.log"
         threads: 1
         wrapper:
-            "0.79.0-1266-g4f9e1419f/bio/arriba"
+            "0.79.0-1274-g1c3f62c3a/bio/arriba"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

@@ -1,7 +1,7 @@
-.. _`Variant_Calling_Germline (under development)`:
+.. _`Variant_Calling_Germline`:
 
-VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)
-============================================
+VARIANT_CALLING_GERMLINE
+========================
 
 Perform Variant calling on Germline
 

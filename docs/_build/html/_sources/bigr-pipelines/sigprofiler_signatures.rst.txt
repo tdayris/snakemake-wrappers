@@ -1,7 +1,7 @@
-.. _`sigprofiler_signatures`:
+.. _`sigprofiler_signatures (Under development)`:
 
-SIGPROFILER_SIGNATURES
-======================
+SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT)
+==========================================
 
 Compute mutational signatures with SigProfiler
 

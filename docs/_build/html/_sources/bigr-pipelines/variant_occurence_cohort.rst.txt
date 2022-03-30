@@ -1,7 +1,7 @@
-.. _`variant_occurence_cohort`:
+.. _`variant_occurence_cohort (Under development)`:
 
-VARIANT_OCCURENCE_COHORT
-========================
+VARIANT_OCCURENCE_COHORT (UNDER DEVELOPMENT)
+============================================
 
 Compute variant occurences over a given cohort
 

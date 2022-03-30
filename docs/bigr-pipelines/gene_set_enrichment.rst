@@ -1,7 +1,7 @@
-.. _`gene_set_enrichment`:
+.. _`gene_set_enrichment (Under development)`:
 
-GENE_SET_ENRICHMENT
-===================
+GENE_SET_ENRICHMENT (UNDER DEVELOPMENT)
+=======================================
 
 Perform gene set enrichment analysis and produce wide range of graphs
 
