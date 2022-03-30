@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GENE_SET_ENRICHMENT &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="LOW_PASS_WGS_COPY_NUMBER" href="low_pass_wgs_copy_number.html" />
+    <link rel="prev" title="FASTQC_MULTIQC" href="fastqc_multiqc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Snakemake Wrappers
+          </a>
+              <div class="version">
+                heads/Unofficial
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers and Pipelines</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../pipelines.html">BiGR Pipelines</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="WES_germline.html">WES_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCL2FASTQ (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="celltype_deconvolution_rnaseq.html">CELLTYPE_DECONVOLUTION_RNASEQ (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dge_deseq2.html">DGE_DESEQ2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">GENE_SET_ENRICHMENT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snakefile">Snakefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="low_pass_wgs_copy_number.html">LOW_PASS_WGS_COPY_NUMBER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sarek_enhanced.html">SAREK ENHANCED</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sigprofiler_signatures.html">SIGPROFILER_SIGNATURES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline_wes.html">VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_somatic.html">VARIANT_CALLING_SOMATIC (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_callling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_occurence_cohort.html">VARIANT_OCCURENCE_COHORT</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Snakemake Wrappers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../pipelines.html">BiGR Pipelines</a> &raquo;</li>
+      <li>GENE_SET_ENRICHMENT</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/bigr-pipelines/gene_set_enrichment.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="gene-set-enrichment">
+<span id="id1"></span><h1>GENE_SET_ENRICHMENT<a class="headerlink" href="#gene-set-enrichment" title="Permalink to this headline"></a></h1>
+<p>Perform gene set enrichment analysis and produce wide range of graphs</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
+<p>In order to run the pipeline, use the following commands</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</section>
+<section id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline"></a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>A TSV-formatted text table with one line per gene, one column per factor of interest and a numerical value in each of them.</p></li>
+<li><p>An optional text file containing list of pathways of interest. Pathway names must be exact.</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>Gene Set enrichment table</p></li>
+<li><p>multiple graphs</p></li>
+</ul>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<p>This pipeline can be used in “two times”. First run the pipeline from the TSV input file, then look at the pathways of interest, then relaunch the pipeline to include focuced graphs and comparisons.</p>
+<p>If only one comparison is provided in the input TSV file, then a single Gene set enrichment analysis is done. If more than one comparison is done, then each of them gets a separated gene set enrichment analysis.</p>
+<p>The input TSV file looks like:</p>
+</section>
+<section id="snakefile">
+<h2>Snakefile<a class="headerlink" href="#snakefile" title="Permalink to this headline"></a></h2>
+<p>The pipeline contains the following steps:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">min_version</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">yaml</span> <span class="kn">import</span> <span class="n">dump</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="n">min_version</span><span class="p">(</span><span class="s2">&quot;6.0&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">worflow_source_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">get_sources</span><span class="p">())))</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">common</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;../common/python&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">common</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">file_manager</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">files_linker</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">write_yaml</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">messages</span> <span class="kn">import</span> <span class="n">message</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;snakemake.gene_set_enrichment.log&quot;</span><span class="p">,</span>
+    <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+<span class="p">)</span>
+
+<span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;config.hg38.yaml&quot;</span><span class="p">)</span>
+<span class="n">configfile</span><span class="p">:</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_comparison_list</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return list of comparison levels</span>
+<span class="sd">    Open the input file listing comparisons and ranking value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ranks</span><span class="p">:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">header</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+
+<span class="n">comparisons</span> <span class="o">=</span> <span class="n">get_comparison_list</span><span class="p">(</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ranks.list.tsv&quot;</span><span class="p">,</span> <span class="s2">&quot;ranks.list.tsv&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">dbs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;gomf&quot;</span><span class="p">,</span> <span class="s2">&quot;ncg&quot;</span><span class="p">,</span> <span class="s2">&quot;gocc&quot;</span><span class="p">,</span> <span class="s2">&quot;gobp&quot;</span><span class="p">,</span> <span class="s2">&quot;do&quot;</span><span class="p">,</span> <span class="s2">&quot;dgn&quot;</span><span class="p">]</span>
+<span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;gsea&quot;</span><span class="p">,</span> <span class="s2">&quot;enrich&quot;</span><span class="p">]</span>
+<span class="n">plots</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;barplot&quot;</span><span class="p">,</span> <span class="s2">&quot;dotplot&quot;</span><span class="p">,</span> <span class="s2">&quot;upsetplot&quot;</span><span class="p">,</span> <span class="s2">&quot;heatplot&quot;</span><span class="p">]</span>
+
+
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">enrichDO</span> <span class="o">&gt;</span> <span class="n">enrichGO</span>
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">enrichDGN</span> <span class="o">&gt;</span> <span class="n">enrichGO</span>
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">enrichNCG</span> <span class="o">&gt;</span> <span class="n">enrichGO</span>
+
+<span class="n">wildcard_constraints</span><span class="p">:</span>
+    <span class="n">comparison</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comparisons</span><span class="p">),</span>
+    <span class="n">method</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">methods</span><span class="p">),</span>
+    <span class="n">db</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dbs</span><span class="p">)</span>
+
+
+<span class="n">rule</span> <span class="n">target</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">rds</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;gene_lists/</span><span class="si">{comparison}</span><span class="s2">.RDS&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">comparisons</span>
+        <span class="p">),</span>
+        <span class="n">png_enrich</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{plot}</span><span class="s2">.</span><span class="si">{method}</span><span class="s2">.</span><span class="si">{db}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">comparisons</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="n">plots</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">methods</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">db</span><span class="o">=</span><span class="n">dbs</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="p">),</span>
+        <span class="c1"># png_go=expand(</span>
+        <span class="c1">#     &quot;results/{comparison}/{plot}.{method}.{db}.png&quot;,</span>
+        <span class="c1">#     comparison=comparisons, plot=plots[2], method=methods[0], db=dbs</span>
+        <span class="c1"># )</span>
+
+
+
+<span class="n">rule</span> <span class="n">expand_rank_list</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">tsv</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ranks.list.tsv&quot;</span><span class="p">,</span> <span class="s2">&quot;ranks.list.tsv&quot;</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">tsv</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;gene_lists/</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">comparisons</span>
+        <span class="p">),</span>
+        <span class="n">rds</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;gene_lists/</span><span class="si">{comparison}</span><span class="s2">.RDS&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">comparisons</span>
+        <span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Expanding rank lists&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">gene_id_type</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;gene_id_type&quot;</span><span class="p">,</span> <span class="s2">&quot;ENSEMBL&quot;</span>
+        <span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/expand.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/clusterProfiler/hg38_genelist&quot;</span>
+
+
+<span class="c1">##############################</span>
+<span class="c1">### Use of ClusterProfiler ###</span>
+<span class="c1">##############################</span>
+
+
+<span class="n">module</span> <span class="n">clusterprofiler_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/clusterprofiler/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">clusterprofiler_meta</span>
+</pre></div>
+</div>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Thibault Dayris</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fastqc_multiqc.html" class="btn btn-neutral float-left" title="FASTQC_MULTIQC" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="low_pass_wgs_copy_number.html" class="btn btn-neutral float-right" title="LOW_PASS_WGS_COPY_NUMBER" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016, The Snakemake team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

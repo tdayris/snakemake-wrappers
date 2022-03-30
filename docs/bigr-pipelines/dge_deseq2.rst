@@ -196,14 +196,16 @@ The pipeline contains the following steps:
     comparison_levels = list(yield_comps(
         complete_design=design,
         aggregate=config["design"].get("aggregate_col"),
-        remove=config["design"].get("remove_col")
+        remove=config["design"].get("remove_col"),
+        contains=config["design"].get("include_only")
     ))
 
     # Stored as a list for futrther re-use
     output_prefixes = [
-        f"DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}"
+        f"DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}"
         for factor, test, ref in comparison_levels
     ]
+    # print(output_prefixes)
 
     # An iterator that holds all samples involved in the comparisons
     # listed above
@@ -213,21 +215,28 @@ The pipeline contains the following steps:
         remove=config["design"].get("remove_col")
     )
 
-    samples_per_prefixes = dict(zip(output_prefixes, samples_iterator))
-    logging.debug(samples_per_prefixes)
-    #print(samples_per_prefixes.keys())
+
 
     expected_pcas = [
-        f"figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca/pca_{factor}_{axes}_{elipse}.png"
+        f"figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca/pca_{factor}_{axes}_{elipse}.png"
         for (factor, test, ref) in comparison_levels
         for axes in ["ax_1_ax_2", "ax_2_ax_3"] # , "ax_3_ax_4"]
         for elipse in ["with_elipse", "without_elipse"]
     ]
 
     condition_dict = {
-        f"DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}": relation_condition_sample(design.copy(), factor)
+        f"DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}": relation_condition_sample(design.copy(), factor, test, ref)
         for factor, test, ref in comparison_levels
     }
+
+    samples_per_prefixes = dict(zip(output_prefixes, condition_dict))
+    samples_per_prefixes = {
+        prefix: list(condition_dict[prefix].keys())
+        for prefix in output_prefixes
+    }
+    logging.debug(samples_per_prefixes)
+    # print(samples_per_prefixes)
+    # print(condition_dict)
 
 
     ############################
@@ -254,14 +263,14 @@ The pipeline contains the following steps:
                 comparison=output_prefixes
             ),
             gseaapp=expand(
-                "results/{comparison}/{comparison}_{subset}.tsv",
+                "results/{comparison}/deseq2_{subset}_{comparison}.tsv",
                 comparison=output_prefixes,
-                subset=["complete", "sorted_on_fold_change", "sorted_on_pval"]
+                subset=["complete_results", "sorted_on_fold_change", "sorted_on_pval"]
             ),
             csv_report=expand(
                 "results/{comparison}/html_table_deseq2_{subset}.tar.bz2",
                 comparison=output_prefixes,
-                subset=["complete", "sorted_on_fold_change", "sorted_on_pval"]
+                subset=["complete_results", "sorted_on_fold_change", "sorted_on_pval"]
             ),
             deseq2_wald=expand(
                 "deseq2/{comparison}/wald.{comparison}.RDS",
@@ -273,9 +282,9 @@ The pipeline contains the following steps:
                 axes=["PC1_PC2", "PC2_PC1"]
             ),
             counts_with_deseq2=expand(
-                "results/{comparison}/{comparison}_deseq2_{content}_with_counts.tsv",
+                "results/{comparison}/deseq2_{content}_with_counts_{comparison}.tsv",
                 comparison=output_prefixes,
-                content=["complete", "sorted_on_pval", "sorted_on_fold_change"]
+                content=["complete_results", "sorted_on_pval", "sorted_on_fold_change"]
             )
             #consensus=expand(
             #    "consensusclusterplus/{comparison}",
@@ -292,7 +301,14 @@ The pipeline contains the following steps:
         "condition_dict": condition_dict,
         "samples_per_prefixes": samples_per_prefixes,
         "design": design.copy(),
-        "thresholds": config["thresholds"]
+        "thresholds": config["thresholds"],
+        "genes_of_interest": config.get(
+            "genes_of_interest", ["ENSG00000141510"]
+        ),
+        "chromosomes": config["ref"].get(
+            "chromosomes",
+            list(range(24)) + ["MT", "X", "Y"] + list(map(str, range(24)))
+        )
     }
 
 
@@ -352,6 +368,10 @@ The pipeline contains the following steps:
                 "multiqc/{comparison}/volcanoplot_mqc.png",
                 "multiqc/{comparison}/distro_expr_mqc.png",
                 "multiqc/{comparison}/ma_plot_mqc.png",
+                "multiqc/{comparison}/distro_mu_mqc.png",
+                "multiqc/{comparison}/independent_filter_mqc.png",
+                "multiqc/{comparison}/inde_theta_filter_mqc.png",
+                "multiqc/{comparison}/pvalue_qc_mqc.png",
                 #temp("multiqc/{comparison}/clustermap_sample_mqc.png"),
                 #temp("pca_axes_correlation_mqc.png")
             ]
@@ -394,6 +414,10 @@ The pipeline contains the following steps:
                 "multiqc/{comparison}/volcanoplot_mqc.png",
                 "multiqc/{comparison}/distro_expr_mqc.png",
                 "multiqc/{comparison}/ma_plot_mqc.png",
+                "multiqc/{comparison}/distro_mu_mqc.png",
+                "multiqc/{comparison}/independent_filtering_mqc.png",
+                "multiqc/{comparison}/theta_knee_plot_mqc.png",
+                "multiqc/{comparison}/pvalue_qc.png",
                 #temp("multiqc/{comparison}/clustermap_sample_mqc.png"),
                 #temp("pca_axes_correlation_mqc.png")
             ]

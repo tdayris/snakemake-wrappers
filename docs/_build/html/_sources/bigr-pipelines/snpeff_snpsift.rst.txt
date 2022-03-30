@@ -164,13 +164,16 @@ The pipeline contains the following steps:
             "Finishing the annotation pipeline"
         params:
             ln = "--symbolic --force --relative --verbose",
-            mkdir = "--parents --verbose"
+            mkdir = "--parents --verbose",
+            rs = "--checksum --verbose --recursive --human-readable"
+        log:
+            "logs/rsync/results.log"
         shell:
-            "mkdir {params.mkdir} results_to_upload/ && "
-            "ln {params.ln} snpsift/fixed results_to_upload/VCF && "
-            "ln {params.ln} snpsift/extractFields results_to_upload/TSV && "
-            "ln {params.ln} multiqc results_to_upload/QC && "
-            "ln {params.ln} columns_description.txt results_to_upload/"
+            "mkdir {params.mkdir} results_to_upload/ > {log} 2>&1 && "
+            "rsync {params.rs} snpsift/fixed results_to_upload/VCF >> {log} 2>&1 && "
+            "rsync {params.rs} snpsift/extractFields results_to_upload/TSV >> {log} 2>&1 && "
+            "rsync {params.rs} multiqc results_to_upload/QC >> {log} 2>&1 && "
+            "rsync {params.rs} columns_description.txt results_to_upload/ >> {log} 2>&1 "
 
     #################################
     ### FINAL VCF FILE INDEXATION ###
@@ -204,7 +207,7 @@ The pipeline contains the following steps:
             call="snpsift/fixed/{sample}.vcf.gz",
             call_index=get_tbi("snpsift/fixed/{sample}.vcf.gz")
         output:
-            tsv=protected("snpsift/extractFields/{sample}.tsv")
+            tsv="snpsift/extractFields/{sample}.tsv"
         message:
             "Making {wildcards.sample} annotated VCF readable"
         threads: 2
@@ -567,7 +570,7 @@ The pipeline contains the following steps:
 
     rule variant_occurence_annotate:
         input:
-            calls = ["snpsift/clinvar/{sample}.vcf"],
+            calls = ["snpsift/dbvar/{sample}.vcf"],
             occurence = "bigr/occurences/all_chroms.txt"
         output:
             calls = [temp("bigr/occurence_annotated/{sample}.vcf")]
@@ -604,7 +607,7 @@ The pipeline contains the following steps:
     rule variant_occurence_per_chr:
         input:
             calls=expand(
-                "snpsift/clinvar/{sample}.vcf",
+                "snpsift/vartype/{sample}.vcf",
                 sample=samples_list
             )
         output:

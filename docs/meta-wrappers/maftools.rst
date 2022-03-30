@@ -143,6 +143,10 @@ Used wrappers
 The following individual wrappers are used in this meta-wrapper:
 
 
+* :ref:`bio/maftools/trinucleotidematrix_hg19`
+
+* :ref:`bio/maftools/trinucleotidematrix_hg38`
+
 * :ref:`bio/maftools/translate_snpeff_maf_effect`
 
 * :ref:`bio/maftools/readmaf`

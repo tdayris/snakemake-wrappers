@@ -239,11 +239,15 @@ Used wrappers
 The following individual wrappers are used in this meta-wrapper:
 
 
+* :ref:`bio/bismark/bismark2report`
+
+* :ref:`bio/bismark/bismark_methylation_extractor`
+
+* :ref:`bio/bismark/deduplicate_bismark`
+
 * :ref:`bio/bismark/bismark_genome_preparation`
 
 * :ref:`bio/bismark/bismark`
-
-* :ref:`bio/bismark/deduplicate_bismark`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.

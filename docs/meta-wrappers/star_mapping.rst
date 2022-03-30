@@ -152,6 +152,10 @@ Used wrappers
 The following individual wrappers are used in this meta-wrapper:
 
 
+* :ref:`bio/picard/collectalignmentsummarymetrics`
+
+* :ref:`bio/samtools/view`
+
 * :ref:`bio/star/index`
 
 * :ref:`bio/star/align`

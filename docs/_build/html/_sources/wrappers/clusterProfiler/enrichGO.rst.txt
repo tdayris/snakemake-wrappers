@@ -21,7 +21,7 @@ This wrapper can be used in the following way:
             rds = "enrichGO.RDS",
             tsv = "enrichGO.tsv"
         wrapper:
-            "0.79.0-1233-g75ee1b83d/bio/clusterProfiler/enrichGO"
+            "0.79.0-1266-g4f9e1419f/bio/clusterProfiler/enrichGO"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -99,14 +99,22 @@ Code
     base::library(package = "clusterProfiler", quietly = TRUE);
     # Loading databases
     base::library(package = "org.Hs.eg.db", quietly = TRUE);
-
+    orgdb <- org.Hs.eg.db
     # Loading input dataset
     geneList <- base::readRDS(
       file = snakemake@input[["rds"]]
     );
 
-    extra <- "gene = base::names(geneList), readable = TRUE";
-    if ("enrichGO_extra" %in% snakemake@params) {
+    extra <- "gene = base::names(geneList), readable = TRUE, OrgDb = orgdb";
+    if ("ontology" %in% base::names(snakemake@params)) {
+      extra <- base::paste(
+        extra,
+        base::paste0("ont='", snakemake@params[["ontology"]], "'"),
+        sep=", "
+      );
+    }
+
+    if ("enrichGO_extra" %in% base::names(snakemake@params)) {
       extra <- base::paste(
         extra,
         snakemake@params[["enrichGO_extra"]],
