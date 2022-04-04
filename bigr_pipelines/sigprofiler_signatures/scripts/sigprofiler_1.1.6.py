@@ -42,5 +42,6 @@ sig.sigProfilerExtractor(
     minimum_signatures=1,
     maximum_signatures=10,
     nmf_replicates=100,
-    cpu=10
+    cpu=10,
+    gpu=("--gpu" in sys.argv)
 )
