@@ -1,7 +1,7 @@
-.. _`Variant_Calling_Somatic (under development)`:
+.. _`Variant_Calling_Somatic`:
 
-VARIANT_CALLING_SOMATIC (UNDER DEVELOPMENT)
-===========================================
+VARIANT_CALLING_SOMATIC
+=======================
 
 Perform Variant calling on Somatic
 
@@ -262,26 +262,40 @@ The pipeline contains the following steps:
             #   sample=design["Sample_id"].tolist(),
             #   index=["", ".tbi"]
             # ),
-            mutect2=expand(
-                "bcftools/mutect2/{sample}.vcf.gz",
-                sample=design["Sample_id"].tolist()
-            ),
-            mutect2_tbi=expand(
-                "bcftools/mutect2/{sample}.vcf.gz.tbi",
-                sample=design["Sample_id"].tolist()
-            ),
-            annotated_vcf=expand(
-                "bigr/f2i/{sample}.vcf.gz",
-                sample=design["Sample_id"].tolist()
-            ),
-            annotated_vcf_tbi=expand(
-                "bigr/f2i/{sample}.vcf.gz.tbi",
-                sample=design["Sample_id"].tolist()
-            ),
+            #mutect2=expand(
+            #    "bcftools/mutect2/{sample}.vcf.gz",
+            #    sample=design["Sample_id"].tolist()
+            #),
+            #mutect2_tbi=expand(
+            #    "bcftools/mutect2/{sample}.vcf.gz.tbi",
+            #    sample=design["Sample_id"].tolist()
+            #),
+            #annotated_vcf=expand(
+            #    "snpeff_snpsift/results_to_upload",
+            #),
             facets=expand(
                 "facets/{sample}/{sample}.{ext}",
                 sample=design["Sample_id"].tolist(),
                 ext=["vcf.gz", "cnv.png", "cov.pdf", "spider.pdf", "csv.gz"]
+            ),
+            calls=expand(
+                "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz",
+                sample=design["Sample_id"]
+            ),
+            calls_index=expand(
+                "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz.tbi",
+                sample=design["Sample_id"]
+            ),
+            table=expand(
+                "snpeff_snpsift/snpsift/extractFields/{sample}.tsv",
+                sample=design["Sample_id"]
+            ),
+            html="snpeff_snpsift/multiqc/SnpEff_annotation.html",
+            html_data="snpeff_snpsift/multiqc/SnpEff_annotation_data",
+            snpeff=expand(
+                "snpeff_snpsift/snpeff/csvstats/{sample}.{ext}",
+                sample=design["Sample_id"],
+                ext=["csv", "genes.txt"]
             ),
             #varscan2=expand(
             #    "bcftools/varscan2/{sample}.vcf.gz",
@@ -297,9 +311,196 @@ The pipeline contains the following steps:
             ),
             qc="multiqc/variant_calling_somatic.html",
             #calling_result="final.vcf.list"
+            results=expand("pandas/filter/{how}/dp{dp}/{sample}.dp{dp}.tsv",
+                how=["all", "census_only", "oncokb_only"] if config.get("ANMO", False) is True else ["all"],
+                sample=design["Sample_id"].tolist(),
+                dp=["10", "40", "60"]
+            ),
+            results_xl=expand("pandas/filter/{how}/dp{dp}/{sample}.dp{dp}.xlsx",
+                how=["all", "census_only", "oncokb_only"] if config.get("ANMO", False) is True else ["all"],
+                sample=design["Sample_id"].tolist(),
+                dp=["10", "40", "60"]
+            )
+        output:
+            directory("results_to_upload")
         message:
             "Finishing the WES Somatic Variant Calling"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 768,
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        log:
+            "logs/resultdir.log"
+        params:
+            mk="--parents --verbose",
+            rs="--checksum --verbose --human-readable",
+            dirlist=" ".join([f"results_to_upload/{content}" for content in ["msi", "tmb", "vcf", "tsv", "xlsx", "cnv", "qc"]])
+        shell:
+            "mkdir {params.mk} {params.dirlist} > {log} 2>&1 && "
+            "rsync {params.rs} {input.msisensor} {output}/msi/ >> {log} 2>&1 && "
+            "rsync {params.rs} {input.results} {output}/tsv/ >> {log} 2>&1 && "
+            "rsync {params.rs} {input.results} {output}/xlsx/ >> {log} 2>&1 && "
+            "rsync {params.rs} {input.facets} {output}/cnv/ >> {log} 2>&1 && "
+            "rsync {params.rs} {input.calls} {input.calls_index} {output}/vcf/ >> {log} 2>&1 && "
+            "rsync {params.rs} {input.html} {input.qc} {output}/qc/ >> {log} 2>&1 "
 
+
+    #########################
+    ### ANMO-like filters ###
+    #########################
+
+
+    rule pandas_filter_tsv:
+       input:
+          table="snpeff_snpsift/snpsift/extractFields/{sample}.tsv"
+       output:
+          table="pandas/filter/{how}/dp{dp}/{sample}.dp{dp}.tsv",
+          xlsx="pandas/filter/{how}/dp{dp}/{sample}.dp{dp}.xlsx"
+       threads: 1
+       resources:
+          mem_mb=lambda wildcards, attempt: attempt * 1024 * 8,
+          time_min=lambda wildcards, attempt: attempt * 15,
+          tmpdir="tmp"
+       log:
+          "logs/pandas_filter/{sample}/{how}.{dp}.log"
+       params:
+          new_cols = lambda wildcards: [
+             ["Mutect2_Allele_Frequency", "=", f"{wildcards.sample}_tumor_AF"]
+          ],
+          prefixes = [
+             ["Chromosome", "chr"]
+          ],
+          keep_column = lambda wildcards: [
+                "Chromosome",
+                "Start_Position",
+                "Variant_ID",
+                "SYMBOL",
+                "Reference_Allele",
+                "Tumor_Seq_Allele1",
+                "Mutect2_Read_depth",
+                "Tumor_Seq_Allele2",
+                "HGVSc",
+                "HGVSp",
+                "VarOcc",
+                "BIOTYPE",
+                "IMPACT",
+                "Variant_Classification",
+                "Mutect2_Read_depth",
+                "Mutect2_Allele_Frequency",
+                "Variant_Type",
+                "Tumor_Sample_Barcode",
+                "dbSNP_Pubmed",
+                "dbSNP_Clinical_Diagnostic_Assay",
+                "dbNSFP_ExAC_AlleleFrequency",
+                "Kaviar_Allele_Frequency",
+                "MSigDb_Pathways",
+                "dbNSFP_Polyphen2_HDIV_pred",
+                "dbNSFP_SIFT_pred",
+                "dbNSFP_FATHMM_pred",
+                "dbNSFP_ClinPred_score",
+                "dbNSFP_MutationTaster_pred",
+                'dbNSFP_MutationAssessor_pred',
+                "dbNSFP_MetaLR_pred",
+                "dbNSFP_LIST_S2_pred",
+                "dbNSFP_LRT_pred",
+                "dbNSFP_BayesDel_noAF_pred",
+                "dbNSFP_Aloft_pred",
+                "Transcript_ID",
+                "Gene",
+                "Feature",
+                "Filter",
+                "Center",
+                "Hugo_Symbol",
+                "End_Position",
+                "CancerGeneCensus_Gene_Symbol",
+                "CancerGeneCensus_Name",
+                "CancerGeneCensus_Entrez_GeneId",
+                "CancerGeneCensus_Tier",
+                "CancerGeneCensus_Somatic",
+                "CancerGeneCensus_Germline",
+                "CancerGeneCensus_Tumour_TypesSomatic",
+                "OncoKB_Hugo_Symbol",
+                "OncoKB_Entrez_Gene_ID",
+                "OncoKB_GRCh37_Isoform",
+                "OncoKB_GRCh37_RefSeq",
+                "OncoKB_GRCh38_RefSeq",
+                "OncoKB_OncoKB_Annotated",
+                "OncoKB_Is_Oncogene",
+                "OncoKB_Is_Tumor_Suppressor_Gene",
+                "OncoKB_MSK_IMPACT",
+                "OncoKB_MSK_HEME",
+                f"{wildcards.sample}_normal_Reference_Allele",
+                f"{wildcards.sample}_normal_Seq_Allele1",
+                f"{wildcards.sample}_normal_Seq_Allele2",
+                f"{wildcards.sample}_normal_DP",
+                f"{wildcards.sample}_normal_AD_allele2",
+                f"{wildcards.sample}_normal_AF",
+                f"{wildcards.sample}_tumor_Reference_Allele",
+                f"{wildcards.sample}_tumor_Seq_Allele1",
+                f"{wildcards.sample}_tumor_Seq_Allele2",
+                f"{wildcards.sample}_tumor_DP",
+                f"{wildcards.sample}_tumor_AD_allele1",
+                f"{wildcards.sample}_tumor_AD_allele2",
+                f"{wildcards.sample}_tumor_AF",
+          ],
+          convert_cols_type = lambda wildcards: {
+                "Mutect2_Allele_Frequency": "float",
+                "Mutect2_Read_depth": "int",
+                f"{wildcards.sample}_tumor_AF": "float",
+                f"{wildcards.sample}_normal_AF": "float",
+                #f"{wildcards.sample}_normal_AD_allele2": "float",
+                f"{wildcards.sample}_tumor_DP": "int",
+                #f"{wildcards.sample}_tumor_AD_allele2": "float",
+          },
+          filters = lambda wildcards: [
+                # ["Variant_Classification", "!=", "downstream_gene_variant"],
+                # ["Variant_Classification", "!=", "intergenic_region"],
+                # ["Variant_Classification", "!=", "synonymous_variant"],
+                # ["Variant_Classification", "!=", "non_coding_transcript_exon_variant"],
+                # ["Variant_Classification", "!=", "upstream_gene_variant"],
+                # ["Variant_Classification", "!=", "splice_region_variant&synonymous_variant"],
+                # ["Variant_Classification", "!=", "non_coding_transcript_variant"],
+                # ["Variant_Classification", "!=", "intron_variant"],
+                ["Variant_Classification", "!=", "Synonymous_Variant"],
+                #["Mutect2_Read_depth", ">=", int(wildcards.filter)],
+                #['Mutect2_Allele_Frequency', ">=", 0.1],
+                [f"{wildcards.sample}_tumor_AF", ">=", 0.1],
+                [f"{wildcards.sample}_normal_AF", "<=", 0.1],
+                #[f"{wildcards.sample}_normal_AD_allele2", "<=", float(wildcards.dp)],
+                #[f"{wildcards.sample}_tumor_AD_allele2", ">=", float(wildcards.dp)],
+                [f"{wildcards.sample}_tumor_DP", ">=", float(wildcards.dp)],
+                #["dbNSFP_ExAC_AlleleFrequency", "<=", 0.05],
+                ["VarOcc", "<=", len(design["Sample_id"].tolist()) - 1]
+          ] if config.get("ANMO", False) is True else [],
+          not_contains = lambda wildcards: [
+                ["Filter", "germline"],
+                ["Filter", "multiallelic"],
+                #"Filter": "fragment",
+                #"Filter": "contamination",
+                #"Filter": "weak_evidence",
+                #"Filter": "slippage",
+                #"Filter": "strand_bias",
+                #"Filter": "map_qual",
+                ["Filter", "haplotype"],
+                #"Filter": "base_qual",
+                #["Filter", "DPBelow5"],
+                ["Filter", "AboveFisherStrandBias"],
+                ["Filter", "AboveStrandOddsRatio"],
+                ["Filter", "BelowMQRankSum"],
+                ["Filter", "BelowReadPosRankSum"],
+                #["Filter", "VarOccAbove105"],
+                #["Filter", f"DepthBelow{wildcards.filter}X"],
+                #["Filter", "AFBelow40pct"]
+          ],
+          contains = lambda wildcards: [
+                ["Filter", (
+                   "ExistsInCancerGeneCensus" if wildcards.how == "census_only" else (
+                      "ExistsInOncoKB" if wildcards.how == "oncokb_only" else ""))]
+          ],
+          drop_duplicated_lines=True
+       wrapper:
+            "bio/pandas/filter_table"
 
 
     ##################
@@ -355,6 +556,10 @@ The pipeline contains the following steps:
                 "picard/alignment_summary/{sample}_{status}.summary.txt",
                 sample=design["Sample_id"],
                 status=["normal", "tumor"]
+            ),
+            snpeff=expand(
+                "snpeff_snpsift/csvstats/{sample}.genes.txt",
+                sample=design["Sample_id"]
             )
         output:
             report(
@@ -543,71 +748,6 @@ The pipeline contains the following steps:
     ### VCF annotation ###
     ######################
 
-    rule vcf_to_tsv_somatic:
-        input:
-            call="bigr/f2i/{sample}.vcf.gz",
-            call_index="bigr/f2i/{sample}.vcf.gz.tbi"
-        output:
-            tsv="snpsift/extractAllFields/{sample}.tsv"
-        threads: 2
-        resources:
-            mem_mb=lambda wildcards, attempt: attempt * 10240,
-            time_min=lambda wildcards, attempt: attempt * 25,
-            tmpdir="tmp"
-        log:
-            "logs/snpsift/extract_all_fields/{sample}.log"
-        params:
-            extra=config["snpeff_snpsift"].get(
-                "vcf_to_tsv_extra", "-e '.' -s ';'"
-            )
-        wrapper:
-            "bio/snpsift/extractAllFields"
-
-
-    rule format_to_info_somatic:
-        input:
-            call = "snpeff_snpsift/snpsift/fixed/{sample}.vcf"
-        output:
-            call = temp("bigr/f2i/{sample}.vcf")
-        message:
-            "Moving format fields to info for {wildcards.sample}"
-        threads: 1
-        resources:
-            mem_mb=lambda wildcards, attempt: attempt * 2048,
-            time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir="tmp",
-            #partition="visuq",
-            #grep="gpu:T4:1"
-        params:
-            normal_sample=lambda wildcards: f"{wildcards.sample}_normal",
-            tumor_sample=lambda wildcards: f"{wildcards.sample}_tumor"
-        log:
-            "logs/vcf_format_to_info/{sample}.log"
-        wrapper:
-            "bio/BiGR/vcf_format_to_info"
-
-
-    rule gunzip_annotated_vcf:
-        input:
-            "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz"
-        output:
-            temp("snpeff_snpsift/snpsift/fixed/{sample}.vcf")
-        message:
-            "Temporary unzipping for manual edition of {wildcards.sample}'s VCF"
-        threads: 1
-        resources:
-            mem_mb=lambda wildcards, attempt: attempt * 512,
-            time_min=lambda wildcards, attempt: attempt * 45,
-            tmpdir="tmp"
-        log:
-            "logs/gunzip/{sample}_annotated.log"
-        params:
-            config.get("gunzip_extra", "--to-stdout --decompress --force --verbose")
-        shell:
-            "gunzip {params} {input} > {output} 2> {log}"
-
-
-
     rule annotate_vcf:
         input:
             design="design.tsv",
@@ -622,19 +762,80 @@ The pipeline contains the following steps:
             ),
         output:
             calls=temp(expand(
-                "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz",
+                "snpeff_snpsift/results_to_upload/VCF/{sample}.vcf.gz",
                 sample=design["Sample_id"]
             )),
             calls_index=temp(expand(
-                "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz.tbi",
+                "snpeff_snpsift/results_to_upload/VCF/{sample}.vcf.gz.tbi",
                 sample=design["Sample_id"]
             )),
             table=temp(expand(
+                "snpeff_snpsift/results_to_upload/TSV/{sample}.tsv",
+                sample=design["Sample_id"]
+            )),
+            html="snpeff_snpsift/results_to_upload/QC/SnpEff_annotation.html",
+            raw_html=temp("snpeff_snpsift/multiqc/SnpEff_annotation.html"),
+            raw_html_data=temp(directory("snpeff_snpsift/multiqc/SnpEff_annotation_data")),
+            bigr_format_to_info=temp(expand(
+                "snpeff_snpsift/bigr/format_to_info/{sample}.vcf",
+                sample=design["Sample_id"]
+            )),
+            bigr_occurence_per_chr=temp(expand(
+                "snpeff_snpsift/bigr/occurence/{chrom}.txt",
+                chrom=config["params"]["chr"]
+            )),
+            bigr_occurence_annot=temp(expand(
+                "snpeff_snpsift/bigr/occurence_annotated/{sample}.vcf",
+                sample=design["Sample_id"]
+            )),
+            bigr_occurences=temp("snpeff_snpsift/bigr/occurences/all_chrom.txt"),
+            config=temp("snpeff_snpsift/config.yaml"),
+            column_description=temp("snpeff_snpsift/columns_description.txt"),
+            design=temp("snpeff_snpsift/design.tsv"),
+            logs=temp(directory("logs")),
+            db_descriptions=temp(expand(
+                "snpeff_snpsift/{db}/description.txt",
+                db=["revel", "mane", "mistic"]
+            )),
+            snpsift_intermediar=temp(expand(
+                "snpeff_snpsift/snpsift/{db}/{sample}.vcf",
+                db=["clinvar", "dbnsfp", "dbsnp", "gmt", "kaviar", "vartype"],
+                sample=design["Sample_id"]
+            )),
+            splice_ai=temp(expand(
+                "snpeff_snpsift/splice_ai/annot/{sample}.vcf.gz",
+                sample=design["Sample_id"]
+            )),
+            tmpdir=temp(directory("snpeff_snpsift/tmp")),
+            vcftools=temp(expand(
+                "snpeff_snpsift/vcftools/{db}/{sample}.vcf.gz",
+                db=["revel", "mane", "mistic"],
+                sample=design["Sample_id"]
+            )),
+            snpeff_raw_call=temp(expand(
+                "snpeff_snpsift/snpeff/calls/{sample}.vcf{ext}",
+                sample=design["Sample_id"],
+                ext=["", ".gz", ".gz.tbi"]
+            )),
+            snpeff_raw_html=temp(expand(
+                "snpeff_snpsift/snpeff/html/{sample}.html",
+                sample=design["Sample_id"],
+            )),
+            snpeff_raw_csvstats=temp(expand(
+                "snpeff_snpsift/snpeff/csvstats/{sample}.{ext}",
+                sample=design["Sample_id"],
+                ext=["csv", "genes.txt"]
+            )),
+            snpsift_raw_fields=temp(expand(
                 "snpeff_snpsift/snpsift/extractFields/{sample}.tsv",
                 sample=design["Sample_id"]
             )),
-            html="snpeff_snpsift/multiqc/SnpEff_annotation.html",
-            html_data=directory("snpeff_snpsift/multiqc/SnpEff_annotation_data")
+            snpsift_raw_vcf=temp(expand(
+                "snpeff_snpsift/snpsift/fixed/{sample}.{ext}",
+                sample=design["Sample_id"],
+                ext=["vcf", "vcf.gz", "vcf.gz.tbi"]
+            ))
+            #results=directory("snpeff_snpsift/results_to_upload")
         message:
             "Annotating VCF"
         threads: 2
@@ -654,13 +855,14 @@ The pipeline contains the following steps:
                 "snpeff_snpsift_run_path",
                 "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh"
             ),
+            smk="--nt",
             organism = config["params"].get("organism", "hg38")
         shell:
-            "mkdir {params.mkdir} {params.outdir}/data_input/calls/ > {log} 2>&1 && "
+            "mkdir {params.mkdir} {params.outdir}/data_input > {log} 2>&1 && "
             "ln {params.ln} {input.config} {params.outdir} >> {log} 2>&1 && "
-            "ln {params.ln} {params.variant_dir}/* {params.outdir}/data_input/calls/ >> {log} 2>&1 && "
+            "ln {params.ln} {params.variant_dir}/ {params.outdir}/data_input/calls >> {log} 2>&1 && "
             "cd {params.outdir} && "
-            "bash {params.pipeline_path} {params.organism} | tee -a ${{OLDPWD}}/{log} 2>&1"
+            "bash {params.pipeline_path} {params.organism} {params.smk} | tee -a ${{OLDPWD}}/{log} 2>&1"
 
 
     #####################################
@@ -804,8 +1006,8 @@ The pipeline contains the following steps:
 
     rule sambamba_markduplicates:
         input:
-            bam="sambamba/sort/{sample}_{status}.bam",
-            bai=get_bai("sambamba/sort/{sample}_{status}.bam")
+            bam="samtools/filter/{sample}_{status}.bam",
+            bai=get_bai("samtools/filter/{sample}_{status}.bam")
         output:
             bam=temp("sambamba/markdup/{sample}_{status}.bam")
         message:
@@ -823,6 +1025,32 @@ The pipeline contains the following steps:
             ).get("markdup", "--remove-duplicates")
         wrapper:
             "bio/sambamba/markdup"
+
+
+
+    """
+    Filter a bam over the capturekit bed file
+    """
+    rule samtools_filter_bed:
+        input:
+            "sambamba/sort/{sample}_{status}.bam"
+            fasta=config["genome"],
+            fasta_idx=get_fai(config["genome"]),
+            fasta_dict=get_dict(config["genome"]),
+            bed=config["bed"]
+        output:
+            temp("samtools/filter/{sample}_{status}.bam")
+        threads: 10
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        params:
+            extra="--bam --with-header"
+        log:
+            "logs/samtools/filter/{sample}_{status}.log"
+        wrapper:
+            "bio/samtools/view"
 
 
     ###################

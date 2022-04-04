@@ -261,9 +261,9 @@ Used wrappers
 The following individual wrappers are used in this meta-wrapper:
 
 
-* :ref:`bio/samtools/index`
+* :ref:`bio/sambamba/index`
 
-* :ref:`bio/samtools/sort`
+* :ref:`bio/sambamba/sort`
 
 * :ref:`bio/samtools/fixmate`
 

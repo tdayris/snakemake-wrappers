@@ -1,0 +1,12 @@
+rule test_hg38_genelist:
+    input:
+        tsv = "path/to/genes.tsv"
+    output:
+        rds = "path/to/genelist.RDS",
+        tsv = "path/to/genelist.tsv"
+    params:
+        gene_id_type = "ENSEMBL"
+    log:
+        "logs/genelist.log"
+    wrapper:
+        "master/bio/clusterProfiler/hg38_genelist"

@@ -29,7 +29,7 @@ This wrapper can be used in the following way:
             levels = ["A", "B"],
             factor = "Cond"
         wrapper:
-            "0.79.0-1233-g75ee1b83d/bio/deseq2/DESeqDataSetFromTximport/"
+            "0.79.0-1274-g1c3f62c3a/bio/deseq2/DESeqDataSetFromTximport/"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -150,7 +150,6 @@ Code
       design = formula
     );
     base::write("DESeqDataSet built.", stderr());
-    saveRDS(dds, "my_dds.RDS")
 
     levels <- ("levels" %in% base::names(snakemake@params));
     factor <- ("factor" %in% base::names(snakemake@params));
@@ -166,7 +165,7 @@ Code
       if ("ref_level" %in% base::names(snakemake@params)) {
           base::message("Ref level: ", snakemake@params[["ref_level"]]);
           dds[[factor]] <- stats::relevel(
-            dds[[factor]], 
+            dds[[factor]],
             ref = snakemake@params[["ref_level"]]
         );
       } else {
@@ -181,12 +180,11 @@ Code
 
     keep <- rowSums(counts(dds)) > count_filter;
     dds <- dds[keep, ];
-    print(head(dds));
 
     if ("remove_zeros" %in% base::names(snakemake@params)) {
       keep <- rowSums(counts(dds)==0) < length(colnames(dds)) - 1;
-      print(head(keep))
       dds <- dds[keep, ];
+      base::write("Zeros have been removed", stderr());
     }
     print(head(dds));
     base::message("Low counts in DESeqDataSet were filtered.");

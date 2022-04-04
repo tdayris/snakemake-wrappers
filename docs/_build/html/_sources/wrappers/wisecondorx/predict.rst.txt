@@ -1,0 +1,114 @@
+.. _`bio/wisecondorx/predict`:
+
+WISECONDORX PREDICT
+===================
+
+Predict copy number alterations
+
+**URL**: https://github.com/CenterForMedicalGeneticsGhent/WisecondorX#stage-3-predict-copy-number-alterations
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule wisecondorx_predict:
+        input:
+            test = "wisecondorx/convert/{sample}.npz",
+            ref = "wisecondorx/reference.npz"
+        output:
+            bins = "wisecondorx/{sample}/{sample}_bins.bed",
+            segments = "wisecondorx/{sample}/{sample}_segments.bed",
+            aberrations ="wisecondorx/{sample}/{sample}_aberrations.bed",
+            statistics = "wisecondorx/{sample}/{sample}_statistics.bed"
+        message: "Predict copy number alterations for {wildcards.sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        params:
+            extra = config.get("predict_extra", ""),
+            prefix = lambda wildcards: f"wisecondorx/{wildcards.sample}/{wildcards.sample}"
+        log:
+            "logs/wisecondorx/predict/{sample}.log"
+        wrapper:
+            "bio/wisecondorx/predict"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``wisecondorx``
+
+Input/Output
+------------
+**Input:**
+
+* ``test``: Path to sample NPZ
+* ``ref``: Path to reference NPZ
+
+**Output:**
+
+* ``bins``: all bin-wise information
+* ``segments``: all segment-wise information
+* ``aberrations``: aberrant segments, defined by the `--beta` or `--zscore` parameters.
+* ``statistics``: per chromosome and overall statistics.
+
+
+
+Params
+------
+
+* ``extra``: Extra parameters for WisecondorX predict
+
+* ``prefix``: Result prefix
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+
+    """Snakemake wrapper for WisecondorX predict"""
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell()
+    extra = snakemake.params.get("extra", "")
+    prefix = snakemake.params.get("prefix", None)
+    if prefix is None:
+        prefix = snakemake.output["bins"][:-len("_bins.bed")]
+
+    shell(
+        "WisecondorX predict {snakemake.input.test} "
+        "{snakemake.input.ref} {prefix} {extra} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

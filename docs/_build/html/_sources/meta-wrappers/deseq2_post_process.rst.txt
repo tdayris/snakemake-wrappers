@@ -15,7 +15,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     default_deseq2_post_process_config = {
         "condition_dict": {"DGE": {"S1": "A", "S2": "A", "S3": "B", "S4": "B"}},
-        "samples_per_prefixes": {"DGE": ["S1", "S2", "S3", "S4"]}
+        "samples_per_prefixes": {"DGE": ["S1", "S2", "S3", "S4"]},
+        "genes_of_interest": ["ENSG00000141510"]
     }
 
     # This meta requires a list of sample per comparison level, since multiple
@@ -66,7 +67,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 "multiqc/{comparison}/pca_plot_mqc.png",
                 "multiqc/{comparison}/volcanoplot_mqc.png",
                 "multiqc/{comparison}/distro_expr_mqc.png",
+                "multiqc/{comparison}/distro_mu_mqc.png",
                 "multiqc/{comparison}/ma_plot_mqc.png",
+                "multiqc/{comparison}/independent_filter_mqc.png",
+                "multiqc/{comparison}/inde_theta_filter_mqc.png",
+                "multiqc/{comparison}/pvalue_qc_mqc.png"
                 #temp("multiqc/{comparison}/clustermap_sample_mqc.png"),
                 #temp("pca_axes_correlation_mqc.png")
             ]
@@ -90,24 +95,32 @@ This meta-wrapper can be used by integrating the following into your workflow:
         input:
              #pairwise_scatterplot = "image.png",
              #clustermap_sample = "image.png",
-             #clustermap_genes = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap/ClusteredHeatmap.genes.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png",
-             clustermap_sample = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap/ClusteredHeatmap.samples.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png",
-             pca_plot = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca/pca_{factor}_ax_1_ax_2_with_elipse.png",
-             volcanoplot = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/volcano/Volcano.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png",
-             distro_expr = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/distro_expr/distro_expr.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png",
-             ma_plot = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/maplot/maplot.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.png"
+             #clustermap_genes = "figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/clustermap/ClusteredHeatmap.genes.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.png",
+             clustermap_sample = "figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/clustermap/ClusteredHeatmap.samples.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.png",
+             pca_plot = "figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca/pca_{factor}_ax_1_ax_2_with_elipse.png",
+             volcanoplot = "figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/volcano/Volcano.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.png",
+             distro_expr = "figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/log_counts/log_dst.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.png",
+             ma_plot = "figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/maplot/maplot.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.png",
+             distro_mu = "figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/log_counts/log_mu.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.png",
+             independent_filter = "figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/deseq2/independent_filter.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.png",
+             pvalue_qc = "figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/deseq2/pval.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.png",
+             inde_theta_filter = "figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/deseq2/theta.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.png"
              #pca_axes_correlation = "image.png",
         output:
-            multiqc_config = "multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/multiqc_config.yaml",
-            plots = [
+            multiqc_config = "multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/multiqc_config.yaml",
+            lots = [
                 #temp("pairwise_scatterplot_mqc.png"),
-                #temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap_genes_mqc.png"),
-                temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap_sample_mqc.png"),
-                temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca_plot_mqc.png"),
-                temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/volcanoplot_mqc.png"),
-                temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/distro_expr_mqc.png"),
-                temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/ma_plot_mqc.png"),
-                #temp("multiqc/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/clustermap_sample_mqc.png"),
+                #temp("multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/clustermap_genes_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/clustermap_sample_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca_plot_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/volcanoplot_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/distro_expr_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/distro_mu_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/ma_plot_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/independent_filter_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/inde_theta_filter_mqc.png"),
+                temp("multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pvalue_qc_mqc.png")
+                #temp("multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/clustermap_sample_mqc.png"),
                 #temp("pca_axes_correlation_mqc.png")
             ]
         message:
@@ -120,7 +133,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/multiqc/config.{factor}.{test}.{ref}.log"
         params:
             title = "Differentiel Gene Expression",
-            subtitle = "Comparing {factor}: {test} (test) VS {ref} (reference)",
+            subtitle = "Comparing {factor}: {test} VS {ref} ",
             intro_text = "This differential analysis covers {test} vs {ref}. {ref} is the reference. A fold change of 1.5 for the gene XXX means XXX is 1.5 times more expressed in {test} than in {ref}, and this difference is significative when pvalue is low (lower than 0.05).",
             report_comment = "This report has been made at Gustave Roussy.",
             show_analysis_paths = False,
@@ -171,7 +184,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     rule csv_report:
         input:
-            "results/{comparison}/{comparison}_{subset}.tsv"
+            "results/{comparison}/deseq2_{subset}_{comparison}.tsv"
         output:
             temp(directory("rbt/csv-report/{comparison}/html_table_deseq2_{subset}"))
         message:
@@ -196,21 +209,21 @@ This meta-wrapper can be used by integrating the following into your workflow:
             gene2gene = "tximport/gene2gene.tsv"
         output:
             complete = report(
-                "results/{comparison}/{comparison}_complete.tsv",
-                caption="../report/gseapp_complete.rst",
+                "results/{comparison}/deseq2_complete_results_{comparison}.tsv",
+                caption="../common/report/gseapp_complete.rst",
                 category="6. DGE Tables",
                 subcategory="{comparison}"
             ),
             fc_fc = report(
-                "results/{comparison}/{comparison}_sorted_on_fold_change.tsv",
-                caption="../report/gseapp_fc_fc.rst",
+                "results/{comparison}/deseq2_sorted_on_fold_change_{comparison}.tsv",
+                caption="../common/report/gseapp_fc_fc.rst",
                 category="9. GSEAapp Shiny",
                 subcategory="{comparison}"
             ),
             padj_fc = report(
-                "results/{comparison}/{comparison}_sorted_on_pval.tsv",
+                "results/{comparison}/deseq2_sorted_on_pval_{comparison}.tsv",
                 category="9. GSEAapp Shiny",
-                caption="../report/gseapp_padj_fc.rst",
+                caption="../common/report/gseapp_padj_fc.rst",
                 subcategory="{comparison}"
             )
         message:
@@ -236,9 +249,24 @@ This meta-wrapper can be used by integrating the following into your workflow:
             gene2gene = "tximport/gene2gene.tsv",
             dst = "deseq2/{comparison}/dst.{comparison}.tsv"
         output:
-            complete = "results/{comparison}/{comparison}_deseq2_complete_with_counts.tsv",
-            fc_fc = "results/{comparison}/{comparison}_deseq2_sorted_on_fold_change_with_counts.tsv",
-            padj_fc = "results/{comparison}/{comparison}_deseq2_sorted_on_pval_with_counts.tsv"
+            complete = report(
+                "results/{comparison}/deseq2_complete_results_with_counts_{comparison}.tsv",
+                caption="../common/report/gseapp_complete_counts.rst",
+                category="6. DGE Tables",
+                subcategory="{comparison}"
+            ),
+            fc_fc = report(
+                "results/{comparison}/deseq2_sorted_on_fold_change_with_counts_{comparison}.tsv",
+                caption="../common/report/gseapp_fc_fc_counts.rst",
+                category="9. GSEAapp Shiny",
+                subcategory="{comparison}"
+            ),
+            padj_fc = report(
+                "results/{comparison}/deseq2_sorted_on_pval_with_counts_{comparison}.tsv",
+                category="9. GSEAapp Shiny",
+                caption="../common/report/gseapp_padj_fc_counts.rst",
+                subcategory="{comparison}"
+            )
         message:
             "Subsetting DESeq2 results for {wildcards.comparison} with counts"
         threads: 1
@@ -255,6 +283,55 @@ This meta-wrapper can be used by integrating the following into your workflow:
     ###############
     ### Seaborn ###
     ###############
+
+    """
+    This rule performs various quality control graphs and per-gene information plots
+    """
+    rule plot_deseq_genes:
+        input:
+            deseq="deseq2/{comparison}/wald.{comparison}.tsv",
+            intermediar="deseq2/{comparison}/mcols.{comparison}.tsv",
+            dst="deseq2/{comparison}/dst.{comparison}.tsv",
+            assays="deseq2/{comparison}/assays.mu.{comparison}.tsv",
+            gene2gene="tximport/gene2gene.tsv",
+            metadata="deseq2/{comparison}/metadata.{comparison}.tsv",
+            filter_theta="deseq2/{comparison}/filter.theta.{comparison}.tsv",
+        output:
+            log_counts="figures/{comparison}/log_counts/log_dst.{comparison}.png",
+            log_mu="figures/{comparison}/log_counts/log_mu.{comparison}.png",
+            gene_plots=report(
+                expand(
+                    "results/{comparison}/gene_plots/{gene}.png",
+                    gene=config.get("genes_of_interest", ["ENSG00000141510"]),
+                    allow_missing=True
+                ),
+                category="10. Gene Expression plots",
+                caption="../common/reports/gene_expression_plot.rst",
+                subcategory="{comparison}"
+            ),
+            independent_filtering="figures/{comparison}/deseq2/independent_filter.{comparison}.png",
+            pval="figures/{comparison}/deseq2/pval.{comparison}.png",
+            filter_theta="figures/{comparison}/deseq2/theta.{comparison}.png"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        params:
+            condition_dict=lambda wildcards: config["condition_dict"][wildcards.comparison],
+            gene_list=config.get(
+                "genes_of_interest", ["ENSG00000141510"]
+            ),
+            gene_plots_prefix=lambda wildcards: f"results/{wildcards.comparison}/gene_plots/",
+            comparison=lambda wildcards: wildcards.comparison,
+            chromosomes=config.get(
+                "chromosomes",
+                list(range(24)) + ["MT", "X", "Y"] + list(map(str, range(24)))
+            )
+        log:
+            "logs/deseq2/plot_genes/{comparison}.log"
+        wrapper:
+            "bio/seaborn/plot_deseq_genes"
 
     """
     This rule creates a gene-clustered heatmap
@@ -298,7 +375,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             tmpdir="tmp"
         params:
             conditions=lambda wildcards: config["condition_dict"][wildcards.comparison],
-            factor="{comparison}"
+            factor=lambda wildcards: (
+                str(wildcards.comparison)[len("DGE_considering_factor_"):]
+                if str(wildcards.comparison).startswith("DGE_considering_factor_")
+                else str(wildcards.comparison)
+            )
         log:
             "logs/seaborn/clustermap/{comparison}.sample.log"
         wrapper:
@@ -487,9 +568,9 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule pcaexplorer_pca:
         input:
-            dst = "deseq2/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/wald.DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}.RDS"
+            dst = "deseq2/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/wald.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.RDS"
         output:
-            png = "figures/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca/pca_{factor}_ax_{a}_ax_{b}_{elipse}.png"
+            png = "figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca/pca_{factor}_ax_{a}_ax_{b}_{elipse}.png"
         message:
             "Plotting PCA for ({wildcards.factor}:"
             "{wildcards.a}/{wildcards.b}:{wildcards.elipse})"
@@ -505,7 +586,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             w = 1024,
             h = 768
         log:
-            "logs/pcaexplorer/PCA/DGE_considering_factor_{factor}_comparing_test_{test}_vs_ref_{ref}/pca_ingroup_{factor}_ax_{a}_{b}_{elipse}.log"
+            "logs/pcaexplorer/PCA/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca_ingroup_{factor}_ax_{a}_{b}_{elipse}.log"
         wrapper:
             "bio/pcaExplorer/PCA"
 
@@ -583,13 +664,33 @@ The following individual wrappers are used in this meta-wrapper:
 
 * :ref:`bio/BiGR/multiqc_rnaseq_report`
 
+* :ref:`bio/rbt/csvreport`
+
+* :ref:`bio/pandas/deseq2_to_gseaapp`
+
+* :ref:`bio/seaborn/plot_deseq_genes`
+
+* :ref:`bio/seaborn/clustermap_genes`
+
 * :ref:`bio/seaborn/clustermap`
 
+* :ref:`bio/pandas/deseq2_merge`
+
+* :ref:`bio/consensusclusterplus`
+
 * :ref:`bio/enhancedVolcano/volcano-deseq2`
+
+* :ref:`bio/seaborn/pca`
+
+* :ref:`bio/pandas/filter_table`
+
+* :ref:`bio/pandas/salmon`
 
 * :ref:`bio/pcaExplorer/PCA`
 
 * :ref:`bio/pcaExplorer/distro_expr`
+
+* :ref:`bio/deseq2/plotMA`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.

@@ -1,9 +1,9 @@
-.. _`msi_sensor_pro`:
+.. _`msisensor_pro`:
 
-MSI_SENSOR_PRO
-==============
+MSISENSOR_PRO
+=============
 
-Use MSISensor to call for MSI
+Compute MSI scores with MSI sensor pro
 
 
 Example
@@ -166,6 +166,13 @@ When running with
 the software dependencies will be automatically deployed into an isolated environment before execution.
 
 
+
+
+
+Notes
+-----
+
+Key names are parameters passed through the configurarion dictionnary
 
 
 

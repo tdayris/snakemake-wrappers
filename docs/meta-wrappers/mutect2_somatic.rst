@@ -99,9 +99,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "bio/bcftools/norm"
 
 
-
-
-
     ###########################
     ### Filter Mutect calls ###
     ###########################
@@ -418,6 +415,12 @@ The following individual wrappers are used in this meta-wrapper:
 * :ref:`bio/gatk/getpileupsummaries`
 
 * :ref:`bio/gatk/mutect`
+
+* :ref:`bio/bcftools/norm`
+
+* :ref:`bio/gatk/createsomaticpanelofnormals`
+
+* :ref:`bio/gatk/genomicsdbimport`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.

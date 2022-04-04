@@ -349,17 +349,17 @@ Used wrappers
 The following individual wrappers are used in this meta-wrapper:
 
 
-* :ref:`bio/bcftools/concat`
+* :ref:`bio/bcftools/merge`
 
-* :ref:`bio/samtools/mpileup`
+* :ref:`bio/bcftools/reheader`
 
-* :ref:`bio/tabix`
+* :ref:`bio/bcftools/query`
 
-* :ref:`bio/varscan/mpileup2indel`
+* :ref:`bio/compress/pbgzip`
 
-* :ref:`bio/varscan/mpileup2snp`
+* :ref:`bio/gatk/mutect`
 
-* :ref:`bio/gatk/mutect2`
+* :ref:`bio/strelka/germline`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.

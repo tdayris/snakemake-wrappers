@@ -29,11 +29,12 @@ BLACKLIST = {
     "__init__.py",
     "test.py",
     ".pytest_cache",
+    "bash_aliases.sh"
 } | SCRIPTS
 PIPELINE_BLACKLIST = {
     "common",
     "README.md",
-    "salmon_tximport_deseq2",
+    "bash_aliases.sh",
     "Makefile"
 }
 TAG = subprocess.check_output(["git", "describe", "--tags"]).decode().strip()

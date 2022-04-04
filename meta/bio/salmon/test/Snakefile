@@ -51,7 +51,7 @@ rule salmon_quant_paired:
         quant="salmon/pseudo_mapping/{sample}/quant.sf",
         lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
         mapping=temp("salmon/bams/{sample}.bam")
-    #message: "Quantifying {wildcards.sample} with Salmon"
+    message: "Quantifying {wildcards.sample} with Salmon"
     threads: min(config.get("threads", 20), 20)
     resources:
         time_min=lambda wildcards, input, attempt: attempt * 45 * (input.size_mb / 10240),
@@ -120,15 +120,6 @@ rule salmon_index_hg38:
         "bio/salmon/index"
 
 
-#use rule salmon_index as salmon_index_hg38 with:
-#    input:
-#        sequences="salmon/decoy/gentrome.hg38.fasta",
-#        decoys="salmon/decoy/decoys.hg38.txt"
-#    output:
-#        index=directory("salmon/index_hg38")
-#    log:
-#        "logs/salmon/index.hg38.log"
-
 rule salmon_index_hg19:
     input:
         sequences="salmon/decoy/gentrome.hg19.fasta",
@@ -149,14 +140,6 @@ rule salmon_index_hg19:
     wrapper:
         "bio/salmon/index"
 
-#use rule salmon_index as salmon_index_hg19 with:
-#    input:
-#        sequences="salmon/decoy/gentrome.hg19.fasta",
-#        decoys="salmon/decoy/decoys.hg19.txt"
-#    output:
-#        index=directory("salmon/index_hg19")
-#    log:
-#        "logs/salmon/index.hg19.log"
 
 rule salmon_index_mm10:
     input:
@@ -177,17 +160,6 @@ rule salmon_index_mm10:
         "logs/salmon/index.mm10.log"
     wrapper:
         "bio/salmon/index"
-
-#use rule salmon_index as salmon_index_mm10 with:
-#    input:
-#        sequences="salmon/decoy/gentrome.mm10.fasta",
-#        decoys="salmon/decoy/decoys.mm10.txt"
-#    output:
-#        index=directory("salmon/index_mm10")
-#    log:
-#        "logs/salmon/index.mm10.log"
-
-
 
 """
 This rule is optional in case you want to use decoy sequences within your
@@ -220,8 +192,6 @@ rule salmon_generate_decoy_sequence_hg38:
         genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta"
     output:
         multiext("salmon/decoy/gentrome.hg38", ".decoy", ".fasta")
-        #decoys="salmon/decoy/decoys.hg38.txt",
-        #gentrome="salmon/decoy/gentrome.hg38.fasta"
     message: "Building gentrome and decoy sequences for Salmon"
     threads: 2
     cache: True
@@ -237,24 +207,12 @@ rule salmon_generate_decoy_sequence_hg38:
         "bio/salmon/generate_decoy"
 
 
-#use rule salmon_generate_decoy_sequence as salmon_generate_decoy_sequence_hg38 with:
-#    input:
-#        transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.cdna.fasta",
-#        genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta"
-#    output:
-#        decoys="salmon/decoy/decoys.hg38.txt",
-#        gentrome="salmon/decoy/gentrome.hg38.fasta"
-#    log:
-#        "logs/salmon/decoys.hg38.log"
-
 rule salmon_generate_decoy_sequence_hg19:
     input:
         transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/GRCh37.75.homo_sapiens.cdna.fasta",
         genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.main_chr.fa"
     output:
         multiext("salmon/decoy/gentrome.hg19", ".decoy", ".fasta")
-        #decoys="salmon/decoy/decoys.hg19.txt",
-        #gentrome="salmon/decoy/gentrome.hg19.fasta"
     message: "Building gentrome and decoy sequences for Salmon"
     threads: 2
     cache: True
@@ -269,15 +227,6 @@ rule salmon_generate_decoy_sequence_hg19:
     wrapper:
         "bio/salmon/generate_decoy"
 
-#use rule salmon_generate_decoy_sequence as salmon_generate_decoy_sequence_hg19 with:
-#    input:
-#        transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/GRCh37.75.homo_sapiens.cdna.fasta",
-#        genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.main_chr.fa"
-#    output:
-#        decoys="salmon/decoy/decoys.hg19.txt",
-#        gentrome="salmon/decoy/gentrome.hg19.fasta"
-#    log:
-#        "logs/salmon/decoys.hg19mm.log"
 
 rule salmon_generate_decoy_sequence_mm10:
     input:
@@ -285,8 +234,6 @@ rule salmon_generate_decoy_sequence_mm10:
         genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta"
     output:
         multiext("salmon/decoy/gentrome.mm10", ".decoys", ".fasta")
-        #decoys="salmon/decoy/decoys.mm10.txt",
-        #gentrome="salmon/decoy/gentrome.mm10.fasta"
     message: "Building gentrome and decoy sequences for Salmon"
     threads: 2
     cache: True
@@ -300,13 +247,3 @@ rule salmon_generate_decoy_sequence_mm10:
         prefix="salmon/decoy/gentrome.mm10"
     wrapper:
         "bio/salmon/generate_decoy"
-
-#use rule salmon_generate_decoy_sequence as salmon_generate_decoy_sequence_mm10 with:
-#    input:
-#        transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.cdna.nopatch.fasta",
-#        genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta"
-#    output:
-#        decoys="salmon/decoy/decoys.mm10.txt",
-#        gentrome="salmon/decoy/gentrome.mm10.fasta"
-#    log:
-#        "logs/salmon/decoys.mm10.log"

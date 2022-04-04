@@ -35,6 +35,55 @@ This meta-wrapper can be used by integrating the following into your workflow:
         config = default_config
 
 
+    rule snpsift_dbvar:
+        input:
+            call = "snpsift/gnomad/{sample}.vcf",
+            database = config["ref"]["dbvar"],
+            database_idx = config["ref"]["dbvar"] + ".tbi"
+        output:
+            call = temp("snpsift/dbvar/{sample}.vcf")
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        params:
+            extra=config.get(
+                "snpsift_dbvar",
+                "-name 'dbVar_' -exists 'ExistsInDbVar' -tabix -noDownload -noLog"
+            )
+        log:
+            "logs/snpsift/dbvar/{sample}.log"
+        wrapper:
+            "bio/snpsift/annotate"
+
+
+    rule snpsift_exac:
+        input:
+            call = "snpsift/gnomad/{sample}.vcf",
+            database = config["ref"]["exac"],
+            database_idx = config["ref"]["exac"] + ".tbi"
+        output:
+            call = temp("snpsift/exac/{sample}.vcf")
+        message:
+            "Annotating {wildcards.sample} with ExAC"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
+            time_min=lambda wildcards, attempt: attempt * 75,
+            tmpdir="tmp"
+        params:
+            extra=config.get(
+                "snpsift_exac",
+                "-name 'gnomAD_exomes_' -exists 'ExistsInExac' -tabix -noDownload -noLog"
+            )
+        log:
+            "logs/snpsift/exac/{sample}.log"
+        wrapper:
+            "bio/snpsift/annotate"
+
+
+
     rule snpsift_gnomad:
         input:
             call = "snpsift/clinvar/{sample}.vcf",
@@ -125,7 +174,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=config.get(
                 "snpsift_dbnsfp",
-                "-tabix -noDownload -noLog -n -f 'hg18_chr,hg18_pos(1-based)'"
+                "-noDownload -noLog -n -f 'hg18_chr,hg18_pos(1-based)'"
             )
         log:
             "logs/snpsift/dbnsfp/{sample}.log"
@@ -229,13 +278,13 @@ This meta-wrapper can be used by integrating the following into your workflow:
 
     rule snpsift_vartype:
         input:
-            vcf="snpeff/calls/{sample}.vcf.gz",
-            vcf_tbi="snpeff/calls/{sample}.vcf.gz.tbi"
+            call="snpeff/calls/{sample}.vcf",
+            #vcf_tbi="snpeff/calls/{sample}.vcf.gz.tbi"
         output:
-            vcf=temp("snpsift/vartype/{sample}.vcf")
+            call=temp("snpsift/vartype/{sample}.vcf")
         message:
             "Annotating variant types in {wildcards.sample}"
-        threads: 1
+        threads: 2
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
             time_min=lambda wildcards, attempt: attempt * 45,

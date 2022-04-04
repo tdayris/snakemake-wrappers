@@ -27,7 +27,7 @@ This wrapper can be used in the following way:
         resources:
             mem_mb=1024
         wrapper:
-            "0.79.0-1233-g75ee1b83d/bio/snpsift/genesets"
+            "0.79.0-1274-g1c3f62c3a/bio/snpsift/genesets"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -99,12 +99,12 @@ Code
 
     # Compression shall be done according to user-defined output
     outcall = snakemake.output["call"]
-    if snakemake.output["call"].endswith("gz"):
+    if outcall.endswith("gz"):
         min_threads += 1
-        outcall = "| gzip -c > {}".format(outcall)
-    elif snakemake.output["call"].endswith("bcf"):
+        outcall = "| bcftools view --output-type z > {}".format(outcall)
+    elif outcall.endswith("bcf"):
         min_threads += 1
-        outcall = "| bcftools view > {}".format(outcall)
+        outcall = "| bcftools view --output-type b > {}".format(outcall)
     else:
         outcall = "> {}".format(outcall)
 

@@ -26,7 +26,7 @@ This wrapper can be used in the following way:
             "logs/fastqc/{sample}.log"
         threads: 1
         wrapper:
-            "0.79.0-1233-g75ee1b83d/bio/fastqc"
+            "0.79.0-1274-g1c3f62c3a/bio/fastqc"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -89,8 +89,12 @@ Code
     from tempfile import TemporaryDirectory
 
     from snakemake.shell import shell
+    from snakemake.utils import makedirs
 
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    tmp = snakemake.resources.get('tmpdir')
+    if tmp is not None:
+        makedirs(tmp)
 
 
     def basename_without_ext(file_path):
@@ -111,7 +115,7 @@ Code
 
     # Run fastqc, since there can be race conditions if multiple jobs
     # use the same fastqc dir, we create a temp dir.
-    with TemporaryDirectory() as tempdir:
+    with TemporaryDirectory(dir=tmp) as tempdir:
         shell(
             "fastqc {snakemake.params} -t {snakemake.threads} "
             "--outdir {tempdir:q} {snakemake.input[0]:q}"

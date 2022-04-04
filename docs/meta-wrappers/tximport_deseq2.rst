@@ -134,7 +134,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
                 caption=normalized_counts_rst ,
                 category="Normalized counts"
             ),
-            dst=temp("deseq2/{comparison}/dst.{comparison}.RDS")
+            dst=temp("deseq2/{comparison}/dst.{comparison}.RDS"),
+            intermediar_values="deseq2/{comparison}/mcols.{comparison}.tsv",
+            assays_mu="deseq2/{comparison}/assays.mu.{comparison}.tsv",
+            filter_theta="deseq2/{comparison}/filter.theta.{comparison}.tsv",
+            metadata="deseq2/{comparison}/metadata.{comparison}.tsv"
         message: "Running DESeq2 analysis for {wildcards.comparison}"
         threads: 1
         resources:
@@ -142,7 +146,12 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=lambda wildcards, attempt: attempt * 60
         params:
             contrast=lambda wildcards: contrasts[wildcards.comparison],
-
+            #name=lambda wildcards: "_".join([
+            #   contrasts[wildcards.comparison][0],
+            #   contrasts[wildcards.comparison][1],
+            #   "vs",
+            #   contrasts[wildcards.comparison][2]
+            #])
         log:
             "logs/deseq2/deseq/{comparison}.log"
         wrapper:
@@ -284,6 +293,8 @@ Used wrappers
 
 The following individual wrappers are used in this meta-wrapper:
 
+
+* :ref:`bio/rbt/csvreport`
 
 * :ref:`bio/gtf/tx2gene`
 

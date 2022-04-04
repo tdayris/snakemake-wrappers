@@ -58,8 +58,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
             ""
         log:
             "logs/{tool}/{subcommand}/pbgzip/{sample}.log"
-        # wrapper:
-        #     "bio/compress/pbgzip"
         wrapper:
             "bio/bcftools/view"
 
@@ -84,7 +82,7 @@ The following individual wrappers are used in this meta-wrapper:
 
 * :ref:`bio/tabix`
 
-* :ref:`bio/compress/pbgzip`
+* :ref:`bio/bcftools/view`
 
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.

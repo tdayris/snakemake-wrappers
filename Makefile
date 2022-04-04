@@ -18,7 +18,7 @@ CONDA_ACTIVATE   = source $$(conda info --base)/etc/profile.d/conda.sh && conda 
 html:
 	source $$(conda info --base)/etc/profile.d/conda.sh && \
 	conda activate && \
-	conda activate snakemake && \
+	conda activate bigr_snakemake && \
 	cd docs && \
 	rm -rf wrappers/* && \
 	rm -rf meta-wrappers/* && \
@@ -34,7 +34,7 @@ html:
 test:
 	source $$(conda info --base)/etc/profile.d/conda.sh && \
 	conda activate && \
-	conda activate snakemake && \
+	conda activate bigr_snakemake && \
 	pytest -vvs 'test.py::$(ARGS)'
 .PHONY: test
 
