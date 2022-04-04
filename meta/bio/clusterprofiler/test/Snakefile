@@ -108,6 +108,26 @@ rule pathview:
     wrapper:
         "bio/clusterProfiler/pathview"
 
+rule treeplot:
+    input:
+        gene_list="gene_lists/{comparison}.RDS",
+        rds = "{method}/{db}/{comparison}/{method}.{db}.{comparison}.RDS",
+    output:
+        png = "results/{comparison}/treeplot.{method}.{db}.png"
+    threads: 1
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        tmpdir="tmp"
+    params:
+        extra_pairwise_termism = config.get("pairwise_termism_extra", ""),
+        extra_treeplot = config.get("treeplot_extra", "")
+    log:
+        "logs/treeplot/{comparison}.{db}.{method}.log"
+    wrapper:
+        "bio/clusterprofiler/treeplot"
+
+
 
 """
 The following rules will performs analysis with Gene Onthology
@@ -145,7 +165,7 @@ rule enrichGO:
         rds = "gene_lists/{comparison}.RDS"
     output:
         rds = temp("enrich/{db}/{comparison}/enrich.{db}.{comparison}.RDS"),
-        tsv = "results/enrich.{db}.{comparison}.tsv"
+        tsv = "results/{comparison}/enrich.{db}.{comparison}.tsv"
     message: "Running enrichGO {params.ontology} on {wildcards.comparison}"
     threads: 1
     resources:

@@ -25,6 +25,8 @@ get_parameter <- function(param_name, default_value) {
 build_gene_list <- function(gene_frame, comparison_name) {
   geneList <- gene_frame[, comparison_name];
   base::names(geneList) <- gene_frame$ENTREZID;
+  geneList <- geneList[! is.nan(geneList)];
+  geneList <- geneList[order(geneList, decreasing=TRUE)];
   return(geneList);
 }
 
@@ -40,16 +42,26 @@ tsv <- utils::read.table(
 gene_id_type <- get_parameter("gene_id_type", "ENSEMBL");
 base::message("Dataset and libraries loaded");
 
+if (gene_id_type == "SYMBOL") {
+  tsv$ENSEMBL <- mapIds(
+    org.Hs.eg.db,
+    keys=tsv[, gene_id_type],
+    colum='ENSEMBL',
+    keytype=gene_id_type,
+    multiVals='first'
+  );
+}
+
 tsv$ENTREZID <- mapIds(
   org.Hs.eg.db,
   keys=tsv[, gene_id_type],
   column="ENTREZID",
   keytype=gene_id_type,
   multiVals="first"
-)
+);
 
 comparison_names <- base::colnames(tsv);
-comparison_names <- comparison_names[! comparison_names %in% c("ENSEMBL", "ENTREZID")];
+comparison_names <- comparison_names[! comparison_names %in% c("SYMBOL", "ENSEMBL", "ENTREZID")];
 nb_comparisons <- base::length(comparison_names);
 base::message("Comparison acquired");
 

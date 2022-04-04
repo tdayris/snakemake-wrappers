@@ -25,6 +25,8 @@ base::library(package = "enrichplot", quietly = TRUE);
 enriched <- base::readRDS(
   file = base::as.character(x = snakemake@input[["rds"]])
 );
+print(head(enriched));
+message(head(enriched));
 
 fc <- NULL;
 if ("gene_list" %in% base::names(snakemake@input)) {
@@ -32,6 +34,8 @@ if ("gene_list" %in% base::names(snakemake@input)) {
     file = base::as.character(snakemake@input[["gene_list"]])
   );
 }
+print(head(fc));
+message(head(fc));
 
 heatplot_extra <- "x = enriched, foldChange = fc";
 if ("heatplot_extra" %in% base::names(snakemake@params)) {
