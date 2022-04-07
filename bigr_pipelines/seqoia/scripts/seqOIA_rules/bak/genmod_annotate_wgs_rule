@@ -1,9 +1,0 @@
-rule genmod_annotate_wgs:
-	input:
-		"{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_VTN.vcf"
-	output:
-		temp("{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_annotated.vcf")
-	log:
-		"{basedir}/{analysis}/log/chr_{index}/{analysis}_chr_{index}_genmod_annotated.log"
-	shell:
-		'docker_wrapper -c \"genmod annotate {input} -b 38 --regions -o {output}\" 2>&1 | tee -a {log}'

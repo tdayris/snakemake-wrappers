@@ -1,9 +1,0 @@
-rule quality_wes_changement:
-	input:
-		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_snpsift_annotated_wes.vcf"
-	output:
-		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_qual_changed_wes.vcf"
-	log:
-		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_qual_changed_wes.log"
-	shell:
-		'sed -E "s/[(\d|.)]+\tPASS/800\tPASS/g" {input} > {output} 2>&1 | tee -a {log}'

@@ -1,7 +1,0 @@
-rule picard_bed_to_interval_list:
-	input:
-		"/data/annotations/Human/GRCh38/DB/custom/Twist_Bioscience/Merge_CORE-SPIKE_GRCh38.{index}.merged.bed"
-	output:
-		"/scratch2/tmp/alegendre/wes_file/Merge_CORE-SPIKE_GRCh38.{index}.interval_list"
-	shell:
-		"java -Xmx8000m -Xms8000m -XX:ParallelGCThreads=2 -XX:+AggressiveHeap -jar /usr/share/java/gatk-package-4.1.0.0-local.jar BedToIntervalList -I {input} -O {output} -SD /data/annotations/Human/GRCh38/index/sorted_primary_assemblies/GRCh38.92.dict | tee -a {log}"

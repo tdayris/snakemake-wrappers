@@ -1,7 +1,0 @@
-rule fastq_split_wgs:
-	input:
-		"{basedir}/test/{sample}.fastq.gz"
-	output:
-		"{basedir}/{sample}/{sample}.done"
-	shell:
-		" zcat {input} | split -d --lines=60000000 --filter='gzip > $FILE.gz' - {wildcards.basedir}/{wildcards.sample}/{wildcards.sample}_split_ && touch {output}" 
