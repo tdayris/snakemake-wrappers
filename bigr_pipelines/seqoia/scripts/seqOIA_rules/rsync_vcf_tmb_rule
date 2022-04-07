@@ -1,0 +1,11 @@
+rule rsync_vcf_tmb:
+	input:
+		"{basedir}/{analysis}/{prefix}/sign_mut/{prefix}_concat.vcf"
+	output:
+		"{basedir}/{analysis}/{prefix}/{prefix}_concat.vcf"
+	log:
+		"{basedir}/{analysis}/log/{prefix}/rsync_vcf.log"
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ /mnt/beegfs/software/seqoia/singularity/docker-ssh_latest.sif bash -c "rsync -Paz {input} {output} 2>&1 | tee -a {log}"
+		"""

@@ -1,0 +1,42 @@
+rule CNV_csv_modification:
+	input:
+		facet_chr = lambda wildcards: expand("{basedir}/{analysis}/Facet/chr_{index}/{analysis}_chr_{index}_facet_result.annotated.tsv",  basedir=basedir, analysis=wildcards.analysis, index=facet),
+		facet_genome = "{basedir}/{analysis}/Facet/annotSV/{analysis}_facet_result.annotated.tsv",
+		wisecondor = "{basedir}/{analysis}/Wisecondor/{analysis}_wisecondor.annotated.tsv",
+		script_python = lambda wildcards: expand("{script_dir}/CNV_fusion_modificator.py", script_dir=script_dir)
+	output:
+		"{basedir}/{analysis}/Facet/annotSV/{analysis}_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Wisecondor/{analysis}_wisecondor.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_1/{analysis}_chr_1_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_2/{analysis}_chr_2_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_3/{analysis}_chr_3_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_4/{analysis}_chr_4_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_5/{analysis}_chr_5_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_6/{analysis}_chr_6_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_7/{analysis}_chr_7_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_8/{analysis}_chr_8_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_9/{analysis}_chr_9_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_10/{analysis}_chr_10_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_11/{analysis}_chr_11_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_12/{analysis}_chr_12_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_13/{analysis}_chr_13_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_14/{analysis}_chr_14_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_15/{analysis}_chr_15_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_16/{analysis}_chr_16_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_17/{analysis}_chr_17_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_18/{analysis}_chr_18_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_19/{analysis}_chr_19_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_20/{analysis}_chr_20_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_21/{analysis}_chr_21_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_22/{analysis}_chr_22_facet_result.annotated.final.tsv",
+		"{basedir}/{analysis}/Facet/chr_X/{analysis}_chr_X_facet_result.annotated.final.tsv",
+	params:
+		mercury = config["CNV_FUSION_modificator"]["mercury"],
+		curie = config["CNV_FUSION_modificator"]["curie"],
+		gene_census = config["CNV_FUSION_modificator"]["gene_census"]
+	log:
+		"{basedir}/{analysis}/log/CNV_Fusion_modificator.log"
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ -B /mnt/beegfs/pipelines/sandbox_dir/seqoia/singularity/seqoia_cancer-main:/mnt/beegfs/pipelines/sandbox_dir/seqoia/singularity/seqoia_cancer-main -B /mnt/beegfs/scratch//tmp/shared_files_tmp/CNV/gene_list:/scratch2/tmp/shared_files_tmp/CNV/gene_list /mnt/beegfs/software/seqoia/singularity/python3-numpy_1.16.2-1.sif bash -c "python3 {input.script_python} --facet_chr_file {input.facet_chr} --facet_genome_file {input.facet_genome} --wisecondor_file {input.wisecondor} -m {params.mercury} -c {params.curie} -g {params.gene_census} 2>&1 | tee -a {log}"
+		"""

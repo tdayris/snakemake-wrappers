@@ -1,0 +1,18 @@
+rule snpeff_wts_wes:
+	input:
+		"{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_genotype.vcf"
+	output:
+		vcf=temp("{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_snpeff.vcf"),
+		stat="{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_snpeff_stat.html",
+		txt="{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_snpeff_stat.genes.txt"
+	log:
+		"{basedir}/{analysis}/log/chr_{index}/{analysis}_chr_{index}_snpEff.log"
+	params:
+		database=config["snpeff_wgs"]["DATABASE"],
+		version=config["snpeff_wgs"]["VERSION"],
+		genome=config["snpeff_wgs"]["GENOME"],
+		snpeff_options=config["snpeff_wgs"]["OPTIONS"]
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ /mnt/beegfs/software/seqoia/singularity/snpeff_snpsift_4.3t-1.sif bash -c "java -Xmx7500m -Xms7500m -XX:ParallelGCThreads=1 -XX:+AggressiveHeap -jar /usr/share/java/snpEff.jar ann -c /mnt/beegfs/database/bioinfo/seqoia/original/annotations/snpeff_config_file/{params.version}/snpEff.config.seqoia {params.snpeff_options} -s {output.stat} -dataDir {params.database}/{params.version} {params.genome} {input} 2>&1 1> {output.vcf} | tee -a {log}"
+		"""

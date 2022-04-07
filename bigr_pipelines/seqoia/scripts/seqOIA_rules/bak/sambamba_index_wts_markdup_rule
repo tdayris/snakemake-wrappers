@@ -1,0 +1,12 @@
+rule sambamba_index_wts_markdup:
+	input:
+		lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_markdup.temp.bam", basedir=basedir, analysis=wildcards.analysis, prefix=wildcards.prefix, index=wildcards.index)
+	output:
+		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_markdup.temp.bam.bai"
+	resources: io=3
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_index_markdup.log"
+	params:
+		sambamba_index_options = config["sambamba_index_wgs_markdup"]["OPTIONS"]
+	shell:
+		"sambamba index {params.sambamba_index_options} {input} {output} 2>&1 | tee -a {log}"

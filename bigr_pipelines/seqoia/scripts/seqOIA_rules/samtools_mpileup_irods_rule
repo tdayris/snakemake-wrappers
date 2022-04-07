@@ -1,0 +1,15 @@
+rule samtools_mpileup_wgs:
+	input:
+		bam = "{basedir}/{analysis}/{prefix}/chr_{identito_index}/{prefix}_chr_{identito_index}_markdup.temp.bam",
+		bed = "/data/annotations/Human/GRCh38/DB/custom/identitovigilence/rsID.{identito_index}.bed"
+	output:
+		"{basedir}/{analysis}/{prefix}/chr_{identito_index}/{prefix}_chr_{identito_index}.mpileup"
+	resources: io=4
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{identito_index}/{prefix}_chr_{identito_index}_mpileup.log"
+	params:
+		reference = config["general_informations"]["FASTA_FILE"],
+		samtools_mpileup_options = config["samtools_mpileup_wgs"]["OPTIONS"]
+	shell:
+		"samtools mpileup {params.samtools_mpileup_options} -f {params.reference} -l {input.bed}  {input.bam} -o {output} 2>&1 | tee -a {log}"
+	

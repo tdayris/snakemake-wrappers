@@ -1,0 +1,17 @@
+rule star_fusion:
+	input:
+		R1 = "{basedir}/{analysis}/{sample}/star_fusion/{sample}_concat_R1.fastq",
+		R2 = "{basedir}/{analysis}/{sample}/star_fusion/{sample}_concat_R2.fastq"
+	output:
+		tsv = temp("{basedir}/{analysis}/{sample}/star_fusion/star-fusion.fusion_predictions.abridged.tsv"),
+		folder = "{basedir}/{analysis}/{sample}/star_fusion"
+	resources: io=20
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}_star_fusion.log"
+	params:
+		genome_dir = config["star_fusion"]["GENOME_DIR"],
+		star_fusion_options = config["star_fusion"]["OPTIONS"],
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ /mnt/beegfs/software/seqoia/singularity/star-fusion_1.9.0-4.sif bash -c "/usr/bin/STAR-Fusion {params.star_fusion_options} --genome_lib_dir {params.genome_dir} --left_fq {input.R2} --right_fq {input.R1} --output_dir {output.folder} 2>&1 | tee -a {log}"
+		"""

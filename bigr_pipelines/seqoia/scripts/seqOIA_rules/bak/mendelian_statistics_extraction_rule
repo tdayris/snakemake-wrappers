@@ -1,0 +1,23 @@
+rule mendelian_statistics_extraction:
+	input:
+		vcf_final = "{basedir}/{analysis}/{analysis}_final_temp.vcf",
+		vcf = "{basedir}/{analysis}/mendelian/{analysis}_bcftools_mendelian_result.vcf"
+	output:
+		"{basedir}/{analysis}/mendelian/{analysis}_mendelian_stats.txt"
+	log:
+		"{basedir}/{analysis}/log/mendelian/{analysis}_mendelian_stats.log"
+	run:
+		with open(input.vcf, "r") as f:
+			l = f.readline()
+			if "NO-FAMILY" in l:
+				flag = False
+			else:
+				flag = True
+		if flag == False:
+			print("NO-FAMILY")
+			cmd = "echo NO-FAMILY > " + str(output)
+			shell(cmd)
+		if flag == True:
+			cmd = "grep -vP \"^#\" {input.vcf_final} | wc -l > {output}"
+			print(cmd)
+			shell(cmd)

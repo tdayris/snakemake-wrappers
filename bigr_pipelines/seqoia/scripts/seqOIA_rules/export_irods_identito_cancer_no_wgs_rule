@@ -1,0 +1,9 @@
+rule export_irods_identito_cancer:
+	input:
+		identito_globale_wgs = expand("{basedir}/{analysis}/{analysis}_identito_globale_temp.csv", basedir=basedir, analysis=analysis)
+	output:
+		identito = "{export_dir}/{analysis}/{analysis}_identito_globale.csv",
+	log:
+		basedir+"/{analysis}/log/{analysis}_identito_export_irods.log"
+	shell:
+		"rsync -Paz {input.identito_globale_wgs} {output.identito} 2>&1 | tee -a {log}"

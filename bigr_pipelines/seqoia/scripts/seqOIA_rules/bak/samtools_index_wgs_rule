@@ -1,0 +1,12 @@
+rule samtools_index_wgs:
+	input:
+		"{basedir}/{analysis}/{sample}/{sample}_sorted.bam"
+	output:
+		temp("{basedir}/{analysis}/{sample}/{sample}_sorted.bam.bai")
+	resources: io=10
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}_samtools_index.log"
+	params:
+		samtools_index_options = config["samtools_index"]["OPTIONS"]
+	shell:
+		'docker_wrapper -c \"samtools index {params.samtools_index_options} {input} {output} \" 2>&1 | tee -a {log}'

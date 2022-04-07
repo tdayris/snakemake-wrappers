@@ -1,0 +1,15 @@
+rule gatk_applybqsr_wgs:
+	input:
+		bam = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.temp.bam",		
+		recalibration_file = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_recalibration.table",
+		bai = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.temp.bam.bai"
+	output:
+		bam = temp("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bam"),
+                bai = temp("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bai")
+	resources: io=4
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_gatk_applybqsr.log"
+	params:
+		gatk_applybqsr_options = config["gatk_applybqsr"]["OPTIONS"],
+	shell:
+		'java -Xmx11500m -Xms11500m -XX:ParallelGCThreads=2 -XX:+AggressiveHeap -jar /usr/share/java/gatk-package-4.1.0.0-local.jar ApplyBQSR {params.gatk_applybqsr_options} -I {input.bam} -bqsr-recal-file {input.recalibration_file} -O {output.bam} 2>&1 | tee -a {log}'

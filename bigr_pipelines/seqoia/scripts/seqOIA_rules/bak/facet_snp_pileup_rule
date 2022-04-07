@@ -1,0 +1,14 @@
+rule facet_snp_pileup:
+	input:
+		bam_T = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bam", basedir=basedir, analysis=wildcards.analysis, prefix = wgs_tumor, index=wildcards.index),
+		bam_C = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bam", basedir=basedir, analysis=wildcards.analysis, prefix = wgs_constit, index=wildcards.index)
+	output:
+		"{basedir}/{analysis}/Facet/chr_{index}/{analysis}_chr_{index}_facet_pileup.txt.gz"
+	log:
+		"{basedir}/{analysis}/log/Facet/chr_{index}/{analysis}_chr_{index}_facet_pileup.log"
+	resources: io = 3
+	params:
+		facet_pileup_options = config["facet_snp_pileup"]["OPTIONS"],
+		dbsnp = config["facet_snp_pileup"]["DATABASE"]
+	shell:
+		"snp-pileup {params.facet_pileup_options} {params.dbsnp} {output} {input.bam_C} {input.bam_T} 2>&1 | tee -a {log}"

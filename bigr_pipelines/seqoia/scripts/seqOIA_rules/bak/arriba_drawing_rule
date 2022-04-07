@@ -1,0 +1,16 @@
+rule arriba_drawing:
+	input:
+		tsv = "{basedir}/{analysis}/{sample}/star_fusion/fusion_inspector/{sample}.FusionInspector.fusions.abridged.tsv.coding_effect",
+		bam = "{basedir}/{analysis}/{sample}/Arriba/Aligned.sortedByCoord.out.bam",
+		bai = "{basedir}/{analysis}/{sample}/Arriba/Aligned.sortedByCoord.out.bam.bai"
+	output:
+		pdf = "{basedir}/{analysis}/{sample}/Arriba/{sample}_arriba_fusion.pdf"
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}_arriba_drawing.log"
+	params:
+		arriba_options = config["arriba_drawing"]["OPTIONS"],
+		database = config["arriba_drawing"]["DATABASE"],
+		protein = config["arriba_drawing"]["PROTEIN_ANNOT"],
+		cytoband = config["arriba_drawing"]["CYTOBAND"]
+	shell:
+		"draw_fusions.R {params.arriba_options} --fusions={input.tsv} --alignments={input.bam} --output={output.pdf} --annotation={params.database} --cytobands={params.cytoband} --proteinDomains={params.protein} 2>&1 | tee -a {log}"

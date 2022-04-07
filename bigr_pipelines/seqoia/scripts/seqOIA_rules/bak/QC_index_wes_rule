@@ -1,0 +1,77 @@
+rule QC_index_wes:
+	input:
+		script_python = lambda wildcards: expand("{script_dir}/QC.py", script_dir = script_dir),
+		flagstat = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_flagstat.txt",analysis = wildcards.analysis, prefix=wildcards.prefix, index=index),
+		snpeff = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_snpeff_stat.html", prefix=wildcards.prefix, basedir=basedir, analysis = wildcards.analysis, index=index),
+		fastqc = lambda wildcards: expand("{basedir}/{analysis}/{sample}/{sample}_{mate}_001_fastqc/fastqc_data.txt", sample=sample_ids,analysis = wildcards.analysis, mate=mate),
+		insert_size = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_size_metrics.txt", prefix=wildcards.prefix, index = index, basedir=basedir, analysis = wildcards.analysis),
+		gatk_doc = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}.sample_summary", prefix=wildcards.prefix, index = autosome, basedir=basedir, analysis = wildcards.analysis),
+		gatk_callable = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_callableloci.table.txt", prefix=wildcards.prefix, index = index, basedir=basedir, analysis = wildcards.analysis),
+		picard_alignment = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_collect_summary_metrics.txt", prefix=wildcards.prefix, index = index, basedir=basedir, analysis = wildcards.analysis),
+		picard_variant = lambda wildcards: expand(["{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_variant.variant_calling_summary_metrics","{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_variant.variant_calling_detail_metrics"], prefix=wildcards.prefix, index = index, basedir=basedir, analysis = wildcards.analysis),
+		markdup = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_metrics.txt", prefix=wildcards.prefix, index = index, basedir=basedir, analysis = wildcards.analysis),
+		hsmetrics = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_hsmetrics.txt", prefix=wildcards.prefix, index = index, basedir=basedir, analysis = wildcards.analysis),
+		targeted_pcr = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_pcr_metrics.txt", prefix=wildcards.prefix, index = index, basedir=basedir, analysis = wildcards.analysis),
+		quality_yield = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_collect_quality_yield_metrics.txt", prefix=wildcards.prefix, index = index, basedir=basedir, analysis = wildcards.analysis)
+	output:
+		"{basedir}/{analysis}/{prefix}/{prefix}_qc_stat.csv"
+	log:
+		"{basedir}/{analysis}/log/log/{prefix}/{prefix}_qc.log"
+	run:
+		prefix_idxstats = []
+		prefix_fastqc = []
+		sample_regex=r""+ wildcards.prefix + "_(L\d_\d+)"
+		
+		with open(wildcards.basedir + "/" + wildcards.analysis + "/" + wildcards.prefix + "/pcr_metrics.txt", "w+") as f:
+                        path = str(input.targeted_pcr).replace("[","").replace("]","").replace(",","").replace("'","")
+                        f.write(path)
+		
+		with open(wildcards.basedir + "/" + wildcards.analysis + "/" + wildcards.prefix + "/flagstats.txt", "w+") as f:
+			path = str(input.flagstat).replace("[","").replace("]","").replace(",","").replace("'","")
+			f.write(path)
+
+		with open(wildcards.basedir + "/" + wildcards.analysis + "/" + wildcards.prefix + "/hsmetrics.txt", "w+") as f:
+                        path = str(input.hsmetrics).replace("[","").replace("]","").replace(",","").replace("'","")
+                        f.write(path)
+		
+		with open(wildcards.basedir + "/" + wildcards.analysis + "/" + wildcards.prefix + "/snpeff.txt", "w+") as f:
+                        path = str(input.snpeff).replace("[","").replace("]","").replace(",","").replace("'","")
+                        f.write(path)
+		
+		for k in input.fastqc:
+			if re.search(sample_regex, k):
+				prefix_fastqc.append(k)
+		prefix_fastqc = str(prefix_fastqc).replace("[","").replace("]","").replace(",","").replace("'","")
+		with open(wildcards.basedir + "/" + wildcards.analysis + "/" + wildcards.prefix + "/fastqc.txt", "w+") as f:
+                         f.write(prefix_fastqc)
+
+		with open(wildcards.basedir + "/" + wildcards.analysis + "/" + wildcards.prefix + "/insert_size.txt", "w+") as f:
+                        path = str(input.insert_size).replace("[","").replace("]","").replace(",","").replace("'","")
+                        f.write(path)
+
+		with open(wildcards.basedir + "/" + wildcards.analysis + "/" + wildcards.prefix + "/gatk_doc.txt", "w+") as f:
+                        path = str(input.gatk_doc).replace("[","").replace("]","").replace(",","").replace("'","")
+                        f.write(path)
+
+		with open(wildcards.basedir + "/" + wildcards.analysis + "/" + wildcards.prefix + "/gatk_callable.txt", "w+") as f:
+                        path = str(input.gatk_callable).replace("[","").replace("]","").replace(",","").replace("'","")
+                        f.write(path)
+		
+		with open(wildcards.basedir + "/" + wildcards.analysis + "/" + wildcards.prefix + "/picard_alignment.txt", "w+") as f:
+                        path = str(input.picard_alignment).replace("[","").replace("]","").replace(",","").replace("'","")
+                        f.write(path)
+		
+		with open(wildcards.basedir + "/" + wildcards.analysis + "/" + wildcards.prefix + "/markdup.txt", "w+") as f:
+                        path = str(input.markdup).replace("[","").replace("]","").replace(",","").replace("'","")
+                        f.write(path)
+
+		with open(wildcards.basedir + "/" + wildcards.analysis + "/" + wildcards.prefix + "/picard_variant.txt", "w+") as f:
+                        path = str(input.picard_variant).replace("[","").replace("]","").replace(",","").replace("'","")
+                        f.write(path)
+
+		with open(wildcards.basedir + "/" + wildcards.analysis + "/" + wildcards.prefix + "/quality_yield.txt", "w+") as f:
+                        path = str(input.quality_yield).replace("[","").replace("]","").replace(",","").replace("'","")
+                        f.write(path)
+
+		cmd = "set -o pipefail; python3 {input.script_python} -m {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/markdup.txt -qy {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/quality_yield.txt -pcr {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/pcr_metrics.txt -am {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/picard_alignment.txt -cl {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/gatk_callable.txt -vm {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/picard_variant.txt -f {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/fastqc.txt -fl {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/flagstats.txt -is {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/insert_size.txt -s {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/snpeff.txt -hs {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/hsmetrics.txt -doc {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/gatk_doc.txt -p {wildcards.prefix} -o {output} "
+		shell(cmd)

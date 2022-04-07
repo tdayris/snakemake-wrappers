@@ -1,0 +1,13 @@
+rule wisecondor_convert_genome:
+	input:
+		bam = "{basedir}/{analysis}/{prefix}/{prefix}_facet_merged.bam",
+		bai = "{basedir}/{analysis}/{prefix}/{prefix}_facet_merged.bam.bai"
+	output:
+		npz = temp("{basedir}/{analysis}/{prefix}/{prefix}_wisecondor_merged.npz")
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_wisecondor_merged.log"
+	resources: io=10
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ -B /mnt/beegfs/pipelines/sandbox_dir/seqoia/singularity/seqoia_cancer-main:/mnt/beegfs/pipelines/sandbox_dir/seqoia/singularity/seqoia_cancer-main /mnt/beegfs/software/seqoia/singularity/wisecondorx_1.1.5-1.sif bash -c "WisecondorX convert {input.bam} {output.npz} 2>&1 | tee -a {log}"
+		"""

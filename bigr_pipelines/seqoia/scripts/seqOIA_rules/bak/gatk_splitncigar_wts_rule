@@ -1,0 +1,14 @@
+rule gatk_splitncigar_wts:
+	input:
+		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.temp.bam"
+	output:
+		temp("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_splitncigar.bam")
+	resources: io=10
+	priority: 46
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_gatk_splitncigar.log"
+	params:
+		gatk_splitncigar_options = config["gatk_splitncigar"]["OPTIONS"],
+		reference = config["general_informations"]["FASTA_FILE"],
+	shell:
+		'java -Xmx11500m -Xms11500m -XX:ParallelGCThreads=2 -XX:+AggressiveHeap -jar /usr/share/java/gatk-package-4.1.0.0-local.jar SplitNCigarReads {params.gatk_splitncigar_options} -R {params.reference} -I {input} -O {output} 2>&1 | tee -a {log}'

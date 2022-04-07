@@ -1,0 +1,14 @@
+rule bedtools_wes:
+	input:
+		"{basedir}/{analysis}/{prefix}/{prefix}_concat_nobed.vcf"
+	output:
+		"{basedir}/{analysis}/{prefix}/sign_mut/{prefix}_concat.vcf"
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_bedtools.log"
+	params:
+		bedtools_options = config["bedtools"]["OPTIONS"],
+		bed = config["bedtools"]["BED"]
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ /mnt/beegfs/software/seqoia/singularity/bedtools_2.26.0dfsg-3.sif bash -c "bedtools intersect {params.bedtools_options} -a {input} -b {params.bed} > {output} 2>&1 | tee -a {log}"
+		"""

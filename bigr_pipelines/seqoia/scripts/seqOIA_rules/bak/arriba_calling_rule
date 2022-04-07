@@ -1,0 +1,16 @@
+rule arriba_calling:
+	input:
+		bam = "{basedir}/{analysis}/{sample}/Arriba/Aligned.sortedByCoord.out.bam",
+		sam = "{basedir}/{analysis}/{sample}/Arriba/Chimeric.out.sam",
+		bai = "{basedir}/{analysis}/{sample}/Arriba/Aligned.sortedByCoord.out.bam.bai"
+	output:
+		temp("{basedir}/{analysis}/{sample}/Arriba/{sample}_arriba_fusion.tsv")
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}_arriba_calling.log"
+	params:
+		arriba_options = config["arriba_calling"]["OPTIONS"],
+		reference = config["arriba_calling"]["REFERENCE"],
+		genome_dir = config["arriba_calling"]["GENOME_DIR"],
+		database = config["arriba_calling"]["DATABASE"]
+	shell:
+		"arriba {params.arriba_options} -c {input.sam} -x {input.bam}  -o {output} -a {params.reference} -g {params.genome_dir} -b {params.database} 2>&1 | tee -a {log}"

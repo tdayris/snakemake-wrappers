@@ -1,0 +1,13 @@
+rule tabix_wes:
+	input:
+		vcf_mutect_wes = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_select_variant_somatic_wes_VTN.vcf",  basedir=basedir, analysis=wildcards.analysis,prefix=vcf_id,index=wildcards.index),
+	output:
+		database = temp("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_mutect2_wes_database.vcf.gz"),
+		database_index = temp("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_mutect2_wes_database.vcf.gz.tbi"),
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_mutect2_wes_database.log"
+	resources: io=1
+	params:
+		tabix = config["tabix_wes"]["OPTIONS"]
+	shell:
+		"bgzip -c {input.vcf_mutect_wes} > {output.database} && tabix {params.tabix} {output.database} 2>&1 | tee -a {log}"

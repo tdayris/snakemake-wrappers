@@ -1,0 +1,26 @@
+rule samtools_merge_wts:
+	input:
+                flag = lambda wildcards: expand("{basedir}/{analysis}/{sample}/{sample}_star_samtools_view.done",analysis=wildcards.analysis, sample=sample_ids_star)	
+	output:
+        	temp("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_merged.bam")
+	priority: 47
+	resources: io=10
+	log:
+        	"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_samtools_merge_star.log"
+	params:
+		samtools_merge_options = config["samtools_merge"]["OPTIONS"]
+	run:
+		input = []
+		analysis_id = analysis	
+		sample_regex=r"^" + wildcards.prefix + "_(L\d_\d+)$"		
+		for sample in sample_ids:
+			if re.search(sample_regex, sample):
+				file_bam = []
+				file_bam = [f for f in os.listdir("{basedir}/{}/{}/".format(analysis_id, sample)) if re.match(r'^.+_chr_'+ wildcards.index +'_star.bam$', f)]
+				file_bam[0] = "{basedir}/{}/{}/".format(analysis_id, sample) + file_bam[0]
+				input = input + file_bam
+		print(len(input))
+		input = str(input).replace("[","").replace("]","").replace(",","").replace("'","")	
+		print(input)
+		cmd = "set -o pipefail; samtools merge {params.samtools_merge_options} {output} " + input + " 2>&1 | tee -a {log}"
+		shell(cmd)

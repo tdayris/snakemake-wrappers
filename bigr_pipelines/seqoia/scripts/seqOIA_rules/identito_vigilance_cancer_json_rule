@@ -1,0 +1,11 @@
+rule identito_vigilance_cancer_json:
+	input:
+		csv = "{basedir}/{analysis}/{prefix}/{prefix}_identito.csv",
+		script_py = lambda wildcards: expand("{script_dir}/identito_vigilance_json.py", script_dir=script_dir)
+	output:
+		csv = "{basedir}/{analysis}/{prefix}/{prefix}_identito.json"
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_identito_json.log"
+	params:
+	shell:
+		"python3 {input.script_py} -csv {input.csv} -o {output.csv}"

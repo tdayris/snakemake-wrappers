@@ -1,0 +1,16 @@
+rule gatk_index_trio_wgs:
+	input:
+		"{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_snpsift_phastcons.vcf"
+	output:
+		"{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_snpsift_phastcons.vcf.idx"
+	log:
+		"{basedir}/{analysis}/log/chr_{index}/{analysis}_chr_{index}_gatk_index.log"
+	params:
+		gatk_index_options = config["gatk_index"]["OPTIONS"]
+	run:
+		if os.stat(str(input)).st_size == 0:
+			cmd = "touch {output} 2>&1 | tee -a {log}"
+			shell(cmd)
+		else:
+			cmd = "java -Xmx4000m -Xms4000m -XX:ParallelGCThreads=2 -XX:+AggressiveHeap -jar /usr/share/java/gatk-package-4.1.0.0-local.jar IndexFeatureFile {params.gatk_index_options} -F {input} 2>&1 | tee -a {log}"
+			shell(cmd)

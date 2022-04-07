@@ -1,0 +1,11 @@
+rule export_labo_identito:
+	input:
+		identito_json = lambda wildcards: expand("{export_dir}/{analysis}/{prefix}_identito.json", export_dir = export_dir, analysis=analysis, prefix=wildcards.prefix),
+		identito_csv = lambda wildcards: expand("{export_dir}/{analysis}/{prefix}/{prefix}_identito.csv", export_dir = export_dir, analysis=analysis, prefix=wildcards.prefix)
+	output:
+		json = "{export_dir}/export_labo/{prefix}_identito_labo.json",
+		csv = "{export_dir}/export_labo/{prefix}_identito_labo.csv"
+	log:
+		basedir+"/" + analysis + "/log/{prefix}_identito_export_labo.log"
+	shell:
+		"ln -s {input.identito_json} {output.json} && ln -s {input.identito_csv} {output.csv} 2>&1 | tee -a {log}"

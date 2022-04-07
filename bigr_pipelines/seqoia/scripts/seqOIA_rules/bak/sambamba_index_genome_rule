@@ -1,0 +1,11 @@
+rule sambamba_index_genome:
+	input:
+		bam = "{basedir}/{analysis}/{prefix}/{prefix}_facet_merged.bam",
+	output:
+		bai = temp("{basedir}/{analysis}/{prefix}/{prefix}_facet_merged.bam.bai")
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_samtools_index.log"
+	params:
+		sambamba_index_options = config["sambamba_index_genome"]["OPTIONS"]
+	shell:
+		"sambamba index {params.sambamba_index_options} {input.bam} 2>&1 | tee -a {log}"

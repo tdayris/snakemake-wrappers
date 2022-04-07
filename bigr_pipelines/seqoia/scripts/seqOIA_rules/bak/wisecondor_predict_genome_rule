@@ -1,0 +1,19 @@
+rule wisecondor_predict_genome:
+	input:
+		npz_tumor = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/{prefix}_wisecondor_merged.npz", basedir=basedir, analysis=analysis, prefix=wgs_tumor)
+	output:
+		cnv = "{basedir}/{analysis}/Wisecondor/{analysis}_wisecondor.plots/",
+		#cnv_genome = "{basedir}/{analysis}/Wisecondor/{analysis}_wisecondor.plots/genome_wide.png",
+		bed_1 = temp("{basedir}/{analysis}/Wisecondor/{analysis}_wisecondor_bins.bed"),
+		bed_2 = temp("{basedir}/{analysis}/Wisecondor/{analysis}_wisecondor_aberrations.bed"),
+		bed_3 = temp("{basedir}/{analysis}/Wisecondor/{analysis}_wisecondor_segments.bed"),
+		stat = temp("{basedir}/{analysis}/Wisecondor/{analysis}_wisecondor_chr_statistics.txt")
+
+	log:
+		"{basedir}/{analysis}/log/{analysis}_wisecondor_predict.log"
+	params:
+		wisecondor_options = config["wisecondor_predict"]["OPTIONS"],
+		pon = config["wisecondor_predict"]["PON"]
+	resources: io=10
+	shell:
+		"WisecondorX predict {params.wisecondor_options} {input.npz_tumor} {params.pon} {wildcards.basedir}/{wildcards.analysis}/Wisecondor/{wildcards.analysis}_wisecondor 2>&1 | tee -a {log}"

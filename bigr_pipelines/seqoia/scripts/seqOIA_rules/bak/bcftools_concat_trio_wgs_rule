@@ -1,0 +1,16 @@
+rule bcftools_concat_trio_wgs:
+	input:
+		lambda wildcards : expand("{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_snpsift_phastcons.vcf", index=index, basedir = basedir, analysis = wildcards.analysis)
+	output:
+		"{basedir}/{analysis}/{analysis}_final_temp.vcf"
+	resources: io=30
+	log:
+		"{basedir}/{analysis}/log/{analysis}_final_bcftools_concat.log"
+	run:
+		l = []
+		for k in input:
+			if os.stat(str(k)).st_size !=0:
+				l.append(str(k))
+		input_files = str(l).replace("[","").replace("]","").replace(",","").replace("'","")
+		cmd = "set -o pipefail; bcftools concat -o {output} "+ input_files +" 2>&1 | tee -a {log}"
+		shell(cmd)

@@ -1,0 +1,18 @@
+rule gatk_genomicsDBimport_wts_wes:
+	input:
+		vcf_wts = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts.vcf",  basedir=basedir,  basedir=basedir, analysis=wildcards.analysis,prefix=wts,index=wildcards.index),
+		idx_wts = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts.vcf.idx",  basedir=basedir,  basedir=basedir, analysis=wildcards.analysis,prefix=wts,index=wildcards.index),
+		vcf_wgs = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}.vcf",  basedir=basedir,  basedir=basedir, analysis=wildcards.analysis,prefix=wgs_constit,index=wildcards.index),
+		idx_wgs = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}.vcf.idx",  basedir=basedir,  basedir=basedir, analysis=wildcards.analysis,prefix=wgs_constit,index=wildcards.index),
+		vcf_mutect_wes = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_select_variant_somatic_wes.vcf",  basedir=basedir,  basedir=basedir, analysis=wildcards.analysis,prefix=vcf_id,index=wildcards.index),
+		#idx_mutect_wes = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_mutect2.vcf.idx",  basedir=basedir,  basedir=basedir, analysis=wildcards.analysis,prefix=vcf_id,index=wildcards.index)
+	output:
+		temp("{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_database")
+	log:
+		"{basedir}/{analysis}/log/chr_{index}/{analysis}_chr_{index}_genomics_wts_wes_database.log"
+	resources: io=1
+        params:
+		reference = config["general_informations"]["FASTA_FILE"],
+		gatk_genomicsDBimport_options = config["gatk_genomicsDBImport"]["OPTIONS"]
+	shell:
+		'java -Xmx11500m -Xms11500m -XX:ParallelGCThreads=4 -XX:+AggressiveHeap -jar /usr/share/java/gatk-package-4.1.0.0-local.jar GenomicsDBImport {params.gatk_genomicsDBimport_options} -V {input.vcf_wgs} -V {input.vcf_mutect_wes} -V {input.vcf_wts} --genomicsdb-workspace-path {output} --reader-threads 3 --intervals {wildcards.index}  2>&1 | tee -a {log}'

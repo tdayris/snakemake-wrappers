@@ -1,0 +1,15 @@
+rule gatk_callableloci_wes:
+	input:
+		bam = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.temp.bam",
+		bai = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.temp.bam.bai"
+	output:
+		summary = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_callableloci.table.txt",
+		bed = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_callableloci.bed"
+	resources: io=2
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_callableloci.log"
+	params:
+		reference = config["general_informations"]["FASTA_FILE"],
+		gatk_callableloci_options = config["gatk_callableloci_wes"]["OPTIONS"]
+	shell:
+		'java -Xmx11500m -Xms11500m -XX:ParallelGCThreads=2 -XX:+AggressiveHeap -jar /usr/share/java/GenomeAnalysisTK.jar -T CallableLoci {params.gatk_callableloci_options} -I {input.bam} -R {params.reference} -o {output.bed} -summary {output.summary} -L {wildcards.index} 2>&1 | tee -a {log}'

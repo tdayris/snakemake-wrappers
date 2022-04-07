@@ -1,0 +1,35 @@
+rule export_irods_bam_cancer_wts:
+	input:
+		vcf = "{basedir}/{analysis}/{analysis}_final_temp.vcf",
+		bam_wts = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_markdup.temp.bam",  basedir=basedir, analysis=wildcards.analysis, prefix = wts, index=index),
+		bai_wts = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_markdup.temp.bam.bai",  basedir=basedir, analysis=wildcards.analysis, prefix = wts, index=index),
+	output:
+		flag = "{export_dir}/{analysis}/{analysis}_bam_export.done",
+	resources: io = 35
+	log:
+		basedir+"/{analysis}/log/{analysis}_export_bam_irods.log"
+	run:
+		bam_wts = input.bam_wts
+		bai_wts = input.bai_wts
+		bam_wgs = input.bam
+		bai_wgs = input.bai
+		bam = bam_wts + bam_wgs
+		bai = bai_wts + bai_wgs
+		bam_list = []
+		bai_list = []
+                
+		for k in bam:
+			k = k.split('/')
+			k = k[0:2] + ["."] + k[2:]
+			bam_list.append("/".join(k))
+                
+		for k in bai:
+			k = k.split('/')
+			k = k[0:2] + ["."] + k[2:]
+			bai_list.append("/".join(k))
+                
+		bai_string = " ".join(bai_list)
+		bam_string = " ".join(bam_list)
+		command = "rsync -Paz --relative " + bai_string + " {wildcards.export_dir}/{wildcards.analysis}/ && rsync -Paz --relative " + bam_string + " {wildcards.export_dir}/{wildcards.analysis}/ && touch {output.flag} 2>&1 | tee -a {log}"
+		print(command)
+		shell(command)

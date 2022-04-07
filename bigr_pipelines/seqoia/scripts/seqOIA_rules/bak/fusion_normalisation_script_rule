@@ -1,0 +1,11 @@
+rule fusion_normalisation_script:
+	input:
+		fusion_catcher = "{basedir}/{analysis}/{sample}/fusion_catcher/final-list_candidate-fusion-genes.txt",
+		star_fusion = "{basedir}/{analysis}/{sample}/star_fusion/star-fusion.fusion_predictions.abridged.tsv",
+		arriba = "{basedir}/{analysis}/{sample}/Arriba/{sample}_arriba_fusion_normalized.tsv"
+	output:
+		temp("{basedir}/{analysis}/{sample}/star_fusion/fusion_merged.txt")
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}_fusion_normalisation.log"
+	shell:
+		'tail -n +2 {input.star_fusion} | cut -f1 > {output} && tail -n +2 {input.fusion_catcher} | cut -f1,2 | sed -e "s/\t/--/g" | sort | uniq >> {output} && tail -n +2 {input.arriba} >> {output} 2>&1 | tee -a {log}'

@@ -1,0 +1,16 @@
+rule snpeff_tmb:
+	input:
+		"{basedir}/{analysis}/{prefix}/{prefix}_concat_VTN_uniq_tmb.vcf"
+	output:
+		vcf="{basedir}/{analysis}/{prefix}/{prefix}_annotated.vcf",
+		stat=temp("{basedir}/{analysis}/{prefix}/{prefix}_snpeff_stat.html"),
+		txt=temp("{basedir}/{analysis}/{prefix}/{prefix}_snpeff_stat.genes.txt")
+	log:
+		"{basedir}/{analysis}/log//{prefix}/{prefix}_snpEff.log"
+	params:
+		database=config["snpeff_tmb"]["DATABASE"],
+		version=config["snpeff_tmb"]["VERSION"],
+		genome=config["snpeff_tmb"]["GENOME"],
+		snpeff_options=config["snpeff_tmb"]["OPTIONS"]
+	shell:
+		"java -Xmx7500m -Xms7500m -XX:ParallelGCThreads=1 -XX:+AggressiveHeap -jar /usr/share/java/snpEff.jar ann -c /data/annotations/snpeff_config_file/{params.version}/snpEff.config.seqoia {params.snpeff_options} -s {output.stat} -dataDir {params.database}/{params.version} {params.genome} {input} 2>&1 1> {output.vcf} | tee -a {log}"

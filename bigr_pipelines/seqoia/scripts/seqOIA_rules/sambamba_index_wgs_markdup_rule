@@ -1,0 +1,14 @@
+rule sambamba_index_wgs_markdup:
+	input:
+		lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.temp.bam", basedir=basedir, analysis=wildcards.analysis, prefix=wildcards.prefix, index=wildcards.index)
+	output:
+		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.temp.bam.bai"
+	resources: io=3
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_index_markdup.log"
+	params:
+		sambamba_index_options = config["sambamba_index_wgs_markdup"]["OPTIONS"]
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ /mnt/beegfs/software/seqoia/singularity/sambamba_0.7.1-static.sif bash -c "sambamba index {params.sambamba_index_options} {input} {output} 2>&1 | tee -a {log}"
+		"""

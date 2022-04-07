@@ -1,0 +1,19 @@
+rule tar_cancer:
+	input:
+		charge_mut = "{export_dir}/{analysis}/Charge_mutationnelle",
+		fusions = "{export_dir}/{analysis}/Fusions",
+		sign_mut = "{export_dir}/{analysis}/Signature_mutationelle",
+	output:
+		"{export_dir}/{analysis}/{analysis}.tar.gz"
+	log:
+		basedir + "/{analysis}/log/output_tar/{analysis}_output_tar.log"
+	run:
+		input_folder = input
+		new_folder = []
+		print(input_folder, type(input_folder))
+		for k in input_folder:
+			new_folder.append(k.split("/")[-1])
+		print(new_folder)
+		new_folder = str(new_folder).replace("[","").replace("]","").replace(",","").replace("'","")
+		cmd = "tar -czvf {output} -C {wildcards.export_dir}/{wildcards.analysis} " + str(new_folder) + " 2>&1 | tee -a {log}"
+		shell(cmd)

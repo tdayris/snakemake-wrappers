@@ -1,0 +1,20 @@
+rule picard_collect_illumina_base_calling_metrics_wgs:
+	input:
+		basecalls = lambda wildcards: expand("{input_dir}/{sequenceur}/{run}/Data/Intensities/BaseCalls/", sequenceur=wildcards.sequenceur, run=wildcards.run),
+		template = "ILLUMINA_metrics.txt"
+	output:
+		"{basedir}/{analysis}/{sequenceur}/{run}/L{lane}/L{lane}_illumina_metrics.txt"
+	resources: io=2
+	log:
+		"{basedir}/{analysis}/log/{sequenceur}/{run}/L{lane}/L{lane}_illumina_metrics.txt"
+	params:
+		picard_collect_illumina_metrics_options = lambda wildcards: config["picard_collect_illumina_metrics"]["OPTIONS"][str(wildcards.run)]
+	run:
+		lane_id = lambda wildcards: wildcards.Lane
+		cmd1 = "cp " + str(input.template) + " " + str(output) + " && sed -i \"s/LANE_ILLUMINA/" + str(lane_id) + "/g\" " + str(output)
+		print(cmd1)
+		shell(cmd1)
+		cmd = "java -Xmx12000m -Xms12000m -XX:ParallelGCThreads=2 -XX:+AggressiveHeap -jar /usr/share/java/GenomeAnalysisTK.jar CollectIlluminaBasecallingMetrics {params.picard_collect_illumina_metrics_options} -B={input.basecalls} -L=00{wildcards.lane} -O={output} 2>&1 | tee -a {log}"
+		shell(cmd)
+
+

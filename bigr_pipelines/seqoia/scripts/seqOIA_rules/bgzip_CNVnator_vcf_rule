@@ -1,0 +1,10 @@
+rule bgzip_CNVnator_vcf:
+	input:
+		vcf = "{basedir}/{analysis}/{prefix}/CNVnator/{prefix}_cnvnator_2000.vcf",
+	output:
+		bgzip = "{basedir}/{analysis}/{prefix}/CNVnator/{prefix}_cnvnator_2000.vcf.gz",
+		tbi = "{basedir}/{analysis}/{prefix}/CNVnator/{prefix}_cnvnator_2000.vcf.gz.tbi"
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_bgzip_tbi_vcf.log"
+	shell:
+		"bgzip -c {input.vcf} > {output.bgzip} && tabix -p vcf {output.bgzip} 2>&1 | tee -a {log}"

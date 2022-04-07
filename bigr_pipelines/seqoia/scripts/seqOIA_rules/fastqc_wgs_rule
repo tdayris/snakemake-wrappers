@@ -1,0 +1,22 @@
+rule fastqc_wgs:
+	input:
+		expand("{export_dir}/{sequenceur}/{run}/renaming.done",zip, export_dir=export_dir, sequenceur=sequenceur,  run=run, input_dir=input_dir)
+	output:
+		"{basedir}/{analysis}/{sample}/{sample}_{mate}_001_fastqc/fastqc_data.txt",
+		"{basedir}/{analysis}/{sample}/{sample}_{mate}_001_fastqc/summary.txt",
+		"{basedir}/{analysis}/{sample}/{sample}_{mate}_001_fastqc/Icons",
+		"{basedir}/{analysis}/{sample}/{sample}_{mate}_001_fastqc/Images",
+		"{basedir}/{analysis}/{sample}/{sample}_{mate}_001_fastqc.html",
+		"{basedir}/{analysis}/{sample}/{sample}_{mate}_001_fastqc/fastqc_report.html",
+		"{basedir}/{analysis}/{sample}/{sample}_{mate}_001_fastqc/fastqc.fo",
+		"{basedir}/{analysis}/{sample}/{sample}_{mate}_001_fastqc.zip"	
+	resources: io=3
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}_{mate}_fastqc.log"
+	params:
+		fastqc_options = config["fastqc"]["OPTIONS"],
+		run = lambda wildcards: config["general_informations"]["RUN"],
+		sequenceur = lambda wildcards: config["general_informations"]["SEQUENCEUR"]
+	shell:
+		"docker_wrapper -c \'fastqc -o {wildcards.basedir}/{wildcards.analysis}/{wildcards.sample} "+ str(export_dir) + "/{params.sequenceur}/{params.run}/fastq/{wildcards.sample}_{wildcards.mate}_001.fastq.gz  {params.fastqc_options}\' 2>&1 | tee -a {log}"
+

@@ -1,0 +1,22 @@
+rule bwa_mem_wgs:
+	input:
+		expand("{export_dir}/{sequenceur}/{run}/renaming.done",zip, sequenceur=sequenceur,  run=run, export_dir=export_dir)
+	output:
+		bam = temp("{basedir}/{analysis}/{sample}/{sample}_sorted.bam")
+	resources: io=2
+	priority: 50
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}.bwa_mem.log"
+	params:
+		reference = config["general_informations"]["FASTA_FILE"],
+		run = lambda wildcards: config["general_informations"]["RUN"],
+		sequenceur = lambda wildcards: config["general_informations"]["SEQUENCEUR"],
+		bwa_mem_options = config["bwa_mem"]["OPTIONS"],
+		pl_rg = "ILLUMINA",
+		pm_rg = "NovaSeq 6000 Sequencing System",
+		lb_rg = lambda wildcards: str(wildcards.sample).split('_')[0],
+		pu_rg = config["general_informations"]["PLATFORM"],
+		samtools_sort_options = config["samtools_sort"]["OPTIONS"],
+		tSM = lambda wildcards: str(wildcards.sample).split('_')[0]
+	shell:
+		"set -o pipefail; bwa mem {params.bwa_mem_options} -R '@RG\\tID:{wildcards.sample}\\tPL:{params.pl_rg}\\tLB:{params.lb_rg}\\tPU:{params.pu_rg}\\tSM:{params.tSM}' {params.reference} {wildcards.export_dir}/{params.sequenceur}/{params.run}/fastq/{wildcards.sample}_R1_001.fastq.gz {wildcards.export_dir}/{params.sequenceur}/{params.run}/fastq/{wildcards.sample}_R2_001.fastq.gz | samtools sort {params.samtools_sort_options} -O bam -o {output.bam} 2>&1 | tee -a {log}"

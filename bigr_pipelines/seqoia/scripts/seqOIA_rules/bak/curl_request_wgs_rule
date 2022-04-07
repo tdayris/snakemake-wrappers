@@ -1,0 +1,60 @@
+rule curl_request_wgs:
+	input:
+		flag = "{export_path}/{sequenceur}/{run}/renaming.done",
+		auth = conf_path + ".config.pipeline"
+	output:
+		flag = "{export_path}/{sequenceur}/{run}/json/curl_request.done",
+		json = "{export_path}/{sequenceur}/{run}/json/"
+	params:
+		prefix = config["general_informations"]["SAMPLES"],
+		vcf_version = config["general_informations"]["VCF_VERSION"]
+	log:
+		"{export_path}/{sequenceur}/{run}/log/curl_request.log"
+	run:	
+		with open(input.auth, "r") as f:
+			list_f = f.readlines()
+			for lines in list_f:
+				if lines.startswith("spice_user"):
+					spice_user = lines.split('=')[1][:-1]
+				if lines.startswith("spice_mdp"):
+					spice_mdp = lines.split("=")[1][:-1]
+				if lines.startswith("spice_ip"):
+					spice_ip = lines.split("=")[1][:-1]
+		cmd1 = "curl -c cookie-jar.txt --insecure -X POST -H 'Accept: application/json' -F 'login=" + str(spice_user) + "' -F 'password=" + str(spice_mdp) + "' https://" + str(spice_ip) + "/api/user/login"
+		shell(cmd1)
+		list_file = []
+		valid_json = []
+		for id_ano in params.prefix:
+			if id_ano.split("_")[-1] in ["WGS-C", "WTS", "WES-T", "WGS-T"]:
+				id_anon_cancer = id_ano.split("_")[0]
+				cmd2 = "curl -L -b cookie-jar.txt -o {wildcards.export_path}/{wildcards.sequenceur}/{wildcards.run}/json/" + str(id_ano) + ".json --insecure -X GET -H 'Accept: application/json'  https://" + str(spice_ip) +"/api/seqoia/prescriptions/sampleid/" + str(id_anon_cancer)
+			else:
+				cmd2 = "curl -L -b cookie-jar.txt -o {wildcards.export_path}/{wildcards.sequenceur}/{wildcards.run}/json/" + str(id_ano) + ".json --insecure -X GET -H 'Accept: application/json'  https://" + str(spice_ip) +"/api/seqoia/prescriptions/sampleid/" + str(id_ano)
+			shell(cmd2)
+			list_file.append(str(wildcards.export_path) + "/" + str(wildcards.sequenceur)+ "/" + str(wildcards.run) + "/json/" + str(id_ano) + ".json")
+		for k in list_file:
+			print(k)
+			flag = False
+			if os.stat(k).st_size == 0:
+				print("rm {}".format(k))
+				shell("rm {}".format(k))
+				flag = True
+			if flag == False:
+				with open(k, encoding='utf-8') as json_file:
+					data = json.load(json_file)
+					if "code" in data:
+						print("rm {}".format(k))
+						shell("rm {}".format(k))
+						flag = True
+			if flag == False:
+				valid_json.append(k)
+		print(valid_json)
+		if len(valid_json) != 0:
+			for k in valid_json:
+				with open(k, "r", encoding = 'utf-8') as f:
+					data = json.load(f)
+				data["vcf_version"] = str(params.vcf_version)
+				with open(k, "w", encoding = 'utf-8') as f:
+					json.dump(data,f, ensure_ascii=False)
+		cmd3 = "touch {output.flag}"
+		shell(cmd3)

@@ -1,0 +1,16 @@
+rule gatk_index_wgs:
+	input:
+		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_reheader.vcf"
+	output:
+		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_reheader.vcf.idx"
+	resources: io = 2
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_gatk_index.log"
+	params:
+		gatk_index_options = config["gatk_index"]["OPTIONS"]
+	run:
+		chr_file = "{}".format(input)
+		if wildcards.index == "Y" and os.stat(chr_file).st_size==0:
+			shell("set -o pipefail; touch {output}")
+		else:
+			shell("java -Xmx4000m -Xms4000m -XX:ParallelGCThreads=2 -XX:+AggressiveHeap -jar /usr/share/java/gatk-package-4.1.0.0-local.jar IndexFeatureFile {params.gatk_index_options} -F {input} 2>&1 | tee -a {log}")

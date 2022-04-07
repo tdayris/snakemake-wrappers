@@ -1,0 +1,27 @@
+rule QC_globale_cancer:
+    input:
+        qc_wgs = expand("{basedir}/{analysis}/{prefix}/{prefix}_qc_stat.csv", basedir=basedir, analysis=analysis, prefix=[wgs_tumor, wgs_constit]),
+        qc_wes = expand("{basedir}/{analysis}/{prefix}/{prefix}_wes_qc_stat.csv",basedir=basedir, analysis=analysis, prefix=wes_tumor),
+        qc_wts = expand("{basedir}/{analysis}/{prefix}/{prefix}_wts_qc_stat.csv", basedir=basedir, analysis=analysis, prefix=wts),
+        snpeff = expand("{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_snpeff_stat.html", basedir=basedir,analysis=analysis, index=autosome),
+        variant = expand(["{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_variant.variant_calling_summary_metrics", "{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_variant.variant_calling_detail_metrics"],basedir=basedir, analysis=analysis, index=index),
+        script_python = lambda wildcards: expand("{script_dir}/QC_globale_cancer.py", script_dir = script_dir)
+    output:
+        qc = "{basedir}/{analysis}/{analysis}_qc.csv"
+    params:
+        prefix = config["general_informations"]["SAMPLES"],
+        version = config["general_informations"]["ID_PIPELINE"]
+    log:
+        basedir+"/{analysis}/log/{analysis}_qc_globale.log"
+    run:
+        qc_file = input.qc_wgs + input.qc_wes + input.qc_wts
+        print("QC_FILE :", qc_file)
+        run = []
+        for k in params.prefix:
+            run.append(config["general_informations"][k.split('_')[1]]["RUN"])
+        run = set(run)
+        run = list(run)
+        run = str(run).replace(",","").replace("]","").replace("[","").replace("'","")
+        qc_file = str(qc_file).replace(",","").replace("]","").replace("[","").replace("'","")
+        cmd = "python3 {input.script_python} -r " + str(run) + " -i " + str(qc_file) + " -p {params.version} -vm {input.variant} -s {input.snpeff} -o {output} 2>&1 | tee -a {log}"
+        shell(cmd)

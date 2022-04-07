@@ -1,0 +1,11 @@
+rule QC_globale_wgs:
+	input:
+		qc = expand("{basedir}/{analysis}/{prefix}/{prefix}_qc_stat.csv", analysis=analysis, prefix=prefix),
+		run_path = expand("{export_dir}/{sequenceur}/{run}", sequenceur=sequenceur,  run=run, export_dir=export_dir),
+		script_python = lambda wildcards: expand("{script_dir}/QC-globale.py", script_dir = script_dir)
+	output:
+		qc = "{basedir}/{analysis}/{analysis}_qc.csv"
+	log:
+		"{basedir}/{analysis}/log/{analysis}_qc_globale.log"
+	shell:
+		"python3 {input.script_python} -i {input.qc} -a {input.run_path} -o {output} 2>&1 | tee -a {log}" 

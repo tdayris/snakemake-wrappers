@@ -1,0 +1,16 @@
+rule gatk_mutect2_wes_tumor_only:
+	input:
+		bam_T = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bam",
+		bai_T = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bai",
+	output:
+		vcf = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_tumor_only_mutect2.vcf",
+		idx = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_tumor_only_mutect2.vcf.idx",
+		stat = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_tumor_only_mutect2.vcf.stats"
+	resources: io=1
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_tumor_only_mutect2_wes.log"
+	params:
+		reference = config["general_informations"]["FASTA_FILE"],
+		mutect2_options = config["gatk_mutect2_wes_tumor_only"]["OPTIONS"],
+	shell:
+		'java -Xmx7500m -Xms7500m -XX:ParallelGCThreads=1 -XX:+AggressiveHeap -jar /usr/share/java/gatk-package-4.1.2.0-local.jar Mutect2 {params.mutect2_options} -I {input.bam_T} -L {wildcards.index} -O {output.vcf} -R {params.reference} 2>&1 | tee -a {log}'

@@ -1,0 +1,14 @@
+rule snpsift_annotate_TMB_rule:
+	input:
+		"{basedir}/{analysis}/{prefix}/{prefix}_annotated.vcf"
+	output:
+		temp("{basedir}/{analysis}/{prefix}/{prefix}_tmb_snpsift_annotated.vcf")
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_tmb_snpsift_annotated.log"
+	params:
+		db=config["snpsift_annotate_tmb"]["DATABASES"],
+		options=config["snpsift_annotate_tmb"]["OPTIONS"],
+		name=config["snpsift_annotate_tmb"]["NAME"],
+		infos=config["snpsift_annotate_tmb"]["INFOS"]
+	shell:
+		"java -Xmx1000m -Xms1000m -XX:ParallelGCThreads=2 -XX:+AggressiveHeap -jar /usr/share/java/SnpSift.jar annotate -c /etc/snpeff/snpEff.config {params.options} -name {params.name} -info {params.infos} {params.db} {input} 2>&1 1> {output} | tee -a {log}"

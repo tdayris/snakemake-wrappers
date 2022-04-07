@@ -1,0 +1,14 @@
+rule bcl2fastq_wgs:
+	input:
+		runfolder = "{input_dir}/{sequenceur}/{run}/",
+		flag = "{export_dir}/{sequenceur}/{run}/check_bcl.done",
+		sample_sheet = "{input_dir}/sample_sheet/{run}.csv"
+	output:
+		"{export_dir}/{sequenceur}/{run}_test/fastq/{lane}_{surface}{swath}.done"
+	resources: io=38
+	params:
+		bcl2fastq_wgs_options = config["bcl2fastq_wgs"]["OPTIONS"]
+	log:
+		"{export_dir}/{sequenceur}/{run}/log/bcl2fastq/{lane}_{surface}{swath}_bcl2fastq.log"
+	shell:
+		"bcl2fastq {params.bcl2fastq_wgs_options} -R {input.runfolder} -o {wildcards.export_dir}/{wildcards.sequenceur}/{wildcards.run}/fastq/{wildcards.lane}_{wildcards.surface}{wildcards.swath} --sample-sheet {input.sample_sheet} --tiles {wildcards.lane}_{wildcards.surface}{wildcards.swath} && touch {output} 2>&1 | tee -a {log}"

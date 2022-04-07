@@ -1,0 +1,15 @@
+rule sambamba_slice_wts:
+	input:
+		bam = "{basedir}/{analysis}/{sample}/{sample}_star_sorted.bam",
+		bai = "{basedir}/{analysis}/{sample}/{sample}_star_sorted.bam.bai"
+	output:
+		"{basedir}/{analysis}/{sample}/{sample}_star_sambamba_slice.done"
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}_star_sambamba_slice.log"
+	resources: io=20
+	params:
+		sambamba_slice_options = config["sambamba_slice"]["OPTIONS"]
+	run:
+		for x in index:
+		    cmd = "sambamba slice {params.sambamba_slice_options} {input.bam} " + str(x) + " -o {wildcards.basedir}/{wildcards.analysis}/{wildcards.sample}/{wildcards.sample}_chr_" + str(x) + ".bam && touch {output} 2>&1 | tee -a {log}"
+		    shell(cmd)

@@ -1,0 +1,10 @@
+rule identito_globale_cancer:
+	input:
+		identito = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/{prefix}_identito.csv",  basedir=basedir, analysis=wildcards.analysis, prefix=[wes_tumor, wgs_constit]),
+		script_python = lambda wildcards: expand("{script_dir}/identito-vigilance-globale.py", script_dir = script_dir)
+	output:
+		identito = "{basedir}/{analysis}/{analysis}_identito_globale_temp.csv"
+	log:
+		"{basedir}/{analysis}/{analysis}_identito_globale.log"
+	shell:
+		"python3 {input.script_python} -i {input.identito} -o {output.identito}" 

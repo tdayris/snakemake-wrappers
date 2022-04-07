@@ -1,0 +1,13 @@
+rule samtools_idxstats_wgs:
+	input:
+		bam = "{basedir}/{analysis}/{sample}/{sample}_sorted.bam",
+		bai = "{basedir}/{analysis}/{sample}/{sample}_sorted.bam.bai"	
+	resources: io=10
+	output:
+		temp("{basedir}/{analysis}/{sample}/{sample}_idxstats.txt")
+	params:
+		samtools_idxstats_options=config["samtools_idxstats"]["OPTIONS"]
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}_samtools_idxstats.log"
+	shell:
+		"set -o pipefail; samtools idxstats {params.samtools_idxstats_options} {input.bam} > {output} 2>&1 | tee -a {log}"

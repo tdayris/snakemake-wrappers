@@ -1,0 +1,15 @@
+rule sambamba_flagstat_wts:
+	input:
+		bam = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_markdup.temp.bam",
+		bai = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_markdup.temp.bam.bai" 
+	output:
+		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_flagstat_wts.txt"
+	resources: io=8
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_sambamba_flagstat.log"
+	params:
+		sambamba_flagstat_options = config["sambamba_flagstat"]["OPTIONS"]
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ /mnt/beegfs/software/seqoia/singularity/sambamba_0.7.1-static.sif bash -c "sambamba flagstat {params.sambamba_flagstat_options} {input.bam} > {output} 2>&1 | tee -a {log}"
+		"""

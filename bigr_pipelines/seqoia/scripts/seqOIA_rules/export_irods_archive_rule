@@ -1,0 +1,20 @@
+import json
+import time
+
+rule export_irods_archive:
+	input:
+		vcf = "{export_dir}/{analysis}/{analysis}_final.vcf",
+		qc_lab = "{export_dir}/{analysis}/{analysis}_qc_lab.csv",
+		CNV = "{export_dir}/{analysis}/CNV/",
+		bam = ,
+		bai = ,
+		fastq = ,
+	output:
+		irods_export="{export_dir}/{analysis}/irods_archive_export.json",
+		irods_response="{export_dir}/{analysis}/irods_archive_response.txt"
+	log:
+		basedir+"/{analysis}/log/irods_archive_export.log"
+	params:
+		general_informations = params["general_informations"],
+		compte_rendu = params["Compte_rendu"],
+	run:

@@ -1,0 +1,11 @@
+rule arriba_normalization:
+	input:
+		tsv = "{basedir}/{analysis}/{sample}/Arriba/{sample}_arriba_fusion.tsv",
+		py = expand("{script_dir}/Parseur_output_200218.py", script_dir=script_dir)
+	output:
+		temp = temp("{basedir}/{analysis}/{sample}/Arriba/{sample}_arriba_fusion_normalized_temp.tsv"),
+		normalized = temp("{basedir}/{analysis}/{sample}/Arriba/{sample}_arriba_fusion_normalized.tsv")
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}_arriba_normalization.log"
+	shell:
+		"python3 {input.py} {input.tsv} {output.temp} && sort {output.temp} | uniq > {output.normalized} 2>&1 | tee -a {log}"

@@ -1,0 +1,11 @@
+rule tar_output_trio:
+	input:
+		CNV = "{export_dir}/{analysis}/CNV/",
+		samplot = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/CNVnator/samplot/",basedir=basedir, analysis=wildcards.analysis, prefix = proband),
+		instanSV = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/CNVnator/instanSV/{prefix}_instanSV.pdf",basedir=basedir, analysis=wildcards.analysis, prefix = proband)
+	output:
+		"{export_dir}/{analysis}/{analysis}.tar.gz"
+	log:
+		basedir+"/{analysis}/log/output_tar/{analysis}_output_tar.log"
+	shell:
+		"tar -czvf {output} {input.CNV} 2>&1 | tee -a {log}"

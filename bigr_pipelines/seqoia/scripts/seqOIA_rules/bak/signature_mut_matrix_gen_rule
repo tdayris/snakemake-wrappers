@@ -1,0 +1,13 @@
+rule signature_mut_matrix_gen:
+	input:
+		vcf = "{basedir}/{analysis}/{prefix}/sign_mut/{prefix}_concat.vcf",
+		py_file = expand("{script_dir}/signatures_mut/SigProfile_MatrixGeneration_200429.py", script_dir=script_dir)
+	output:
+		SBS96 = "{basedir}/{analysis}/{prefix}/sign_mut/output/plots/SBS_96_plots_test_exome.pdf",
+		ID83 = "{basedir}/{analysis}/{prefix}/sign_mut/output/plots/ID_83_plots_test_exome.pdf",
+		DBS78 = "{basedir}/{analysis}/{prefix}/sign_mut/output/plots/DBS_78_plots_test_exome.pdf"
+	resources: io=30
+	log:
+		"{basedir}/{analysis}/log/sign_mut_generation.log"
+	shell:
+		"python3 {input.py_file} -i {input.vcf} 2>&1 | tee -a {log}"

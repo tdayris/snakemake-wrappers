@@ -1,0 +1,17 @@
+rule annotSV_CNVnator:
+	input:
+		vcf = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/CNVnator/{prefix}_cnvnator_2000.vcf", basedir=basedir, analysis = wildcards.analysis, prefix=proband),
+		final_vcf = "{basedir}/{analysis}/{analysis}_final_temp.vcf"
+	output:
+		tsv = "{basedir}/{analysis}/{prefix}/CNVnator/{prefix}_CNVnator.annotated.tsv"
+	resources: io=2
+	params:
+		annotSV_options = config["AnnotSV_CNVnator"]["OPTIONS"],
+		database = config["AnnotSV_CNVnator"]["DATABASE"],
+		annotSV_version = config["AnnotSV_CNVnator"]["VERSION"],
+	log:
+		"{basedir}/{analysis}/log/CNVnator/{analysis}_CNVnator_annotsv.log"
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ -B /mnt/beegfs/pipelines/sandbox_dir/seqoia/singularity/seqoia_cancer-main:/mnt/beegfs/pipelines/sandbox_dir/seqoia/singularity/seqoia_cancer-main /mnt/beegfs/software/seqoia/singularity/annotsv_2.5.1-2.sif bash -c "AnnotSV {params.annotSV_options} -SVinputFile {input.vcf} -outputFile {output.tsv} -annotationsDir {params.database}/{params.annotSV_version}/ -snvIndelFiles {input.final_vcf} -snvIndelSamples {wildcards.prefix} -candidateSnvIndelFiles {input.final_vcf} -candidateSnvIndelSamples {wildcards.prefix} 2>&1 | tee -a {log}"
+		"""

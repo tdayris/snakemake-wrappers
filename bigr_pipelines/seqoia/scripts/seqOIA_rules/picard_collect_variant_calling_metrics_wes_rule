@@ -1,0 +1,22 @@
+rule picard_collect_variant_calling_metrics_wes:
+	input:
+		vcf = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_reheader.vcf",
+		idx = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_reheader.vcf.idx"
+	output:
+		counts = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_variant.variant_calling_summary_metrics",
+		proportions = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_variant.variant_calling_detail_metrics"
+	resources: io=2
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_collect_variant_calling_metrics.log"
+	params:
+		picard_collect_variant_calling_metrics_options = config["picard_collect_variant_calling_metrics_wes"]["OPTIONS"],
+		database=config["picard_collect_variant_calling_metrics_wes"]["DATABASE"],
+		genome = config["picard_collect_variant_calling_metrics_wes"]["GENOME"]
+	run:
+		chr_file = "{}".format(input.vcf)
+                if os.stat(chr_file).st_size==0:
+                        cmd = "set -o pipefail; touch {output.counts} && touch {output.proportions}"
+                        shell(cmd)
+		else:
+			shell("java -Xmx8000m -Xms8000m -XX:ParallelGCThreads=2 -XX:+AggressiveHeap -jar /usr/share/java/gatk-package-4.1.0.0-local.jar CollectVariantCallingMetrics {params.picard_collect_variant_calling_metrics_options} -I {input.vcf} -O {wildcards.basedir}/{wildcards.analysis}/{wildcards.prefix}/chr_{wildcards.index}/{wildcards.prefix}_chr_{wildcards.index}_variant -TI /data/annotations/Human/GRCh38/DB/custom/Twist_Bioscience/interval_lists/Merge_CORE-SPIKE_GRCh38.{wildcards.index}.interval_list  --DBSNP {params.database} 2>&1 | tee -a {log}")
+

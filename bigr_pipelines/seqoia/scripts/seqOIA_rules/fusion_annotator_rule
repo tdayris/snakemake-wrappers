@@ -1,0 +1,15 @@
+rule fusion_annotator:
+	input:
+		tsv = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/star_fusion/fusion_inspector/{prefix}.FusionInspector.fusions.abridged.coding_effect.final.tsv", prefix=wildcards.prefix, basedir=basedir, analysis = wildcards.analysis) 
+	output:
+		txt = "{basedir}/{analysis}/{prefix}/star_fusion/fusion_inspector/annotator/{prefix}.star-fusion-annotator.annotated_list.txt"
+	resources: io=2
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_star_fusion_annotator.log"
+	params:
+		fusion_annotator_options = config["fusion_annotator"]["OPTIONS"],
+		genome_dir = config["fusion_annotator"]["GENOME_DIR"],
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ -B /mnt/beegfs/database/bioinfo/seqoia/original/scratch2/tmp/shared_files_tmp/CNV/gene_list:/scratch2/tmp/shared_files_tmp/CNV/gene_list -B /mnt/beegfs/database/bioinfo/seqoia/original/annotations/Human/GRCh38/index/star-fusion/v1.9/GRCh38_gencode_v33_CTAT_lib_Apr062020/ctat_genome_lib_build_dir:/mnt/beegfs/database/bioinfo/seqoia/original/annotations/Human/GRCh38/index/star-fusion/v1.9/GRCh38_gencode_v33_CTAT_lib_Apr062020/ctat_genome_lib_build_dir /mnt/beegfs/software/seqoia/singularity/star-fusion_1.9.0-4.sif bash -c "/usr/local/src/STAR-Fusion/FusionAnnotator/FusionAnnotator {params.fusion_annotator_options} --genome_lib_dir {params.genome_dir} --annotate {input.tsv} > {output.txt} 2>&1 | tee -a {log}"
+		"""

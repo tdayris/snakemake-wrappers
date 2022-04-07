@@ -1,0 +1,12 @@
+rule importation_S3:
+	input:
+		json = "{export_dir}/{analysis}/{analysis}.json",
+		flag = "{export_dir}/{analysis}/{analysis}_importation_gleaves.done",
+		script_bash = lambda wildcards: expand("{script_dir}/archive_run_scality.sh", script_dir = script_dir),
+		config = lambda wildcards: expand("{conf_path}/.aws/config", conf_path = conf_path)
+	output:
+		flag = "{export_dir}/{analysis}/{analysis}_importation_S3.done"
+	log:
+		basedir+"/{analysis}/log/{analysis}_importation_S3.log"
+	shell:
+		"export DEBUG=0; bash {input.script_bash} {wildcards.export_dir}/{wildcards.analysis} 2>&1 | tee -a {log} && touch {output.flag}"

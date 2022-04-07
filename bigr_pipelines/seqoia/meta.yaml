@@ -1,0 +1,54 @@
+---
+name: seqOIA single-sample
+description: Run seqOIA over single sample : WES (tumor/normal) + RNA (tumor).
+authors:
+  - Thibault Dayris
+  - Marc Deloger
+input:
+  - Path to Fastq WES Tumor (R1 + R2)
+  - Path to Fastq WES Normal (R1 + R2)
+  - Path to Fastq RNA Tumor (R1 + R2)
+output:
+  - seqOIA results
+usage:
+  - \# Go to your working directory
+  - cd /path/to/my/working/directory
+  - \# Build a design file (see below)
+  - \# Copy/paste the following line
+  - bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/seqoia/run.sh
+notes: |
+  Prerequisites:
+
+  * A TSV formatted design file, *named 'design.tsv'* with the following columns:
+
+  .. list-table:: Desgin file format
+    :widths: 33 33 33
+    :header-rows: 1
+
+    * - SAMPLE_ID
+      - WES_T_UP
+      - WES_T_DOWN
+      - WES_N_UP
+      - WES_N_DOWN
+      - RNA_T_UP
+      - RNA_T_DOWN
+    * - Name of the Sample1
+      - Path to upstream fastq WES Tumor
+      - Path to downstream fastq WES Tumor
+      - Path to upstream fastq WES Normal
+      - Path to downstream fastq WES Normal
+      - Path to upstream fastq RNA Tumor
+      - Path to downstream fastq RNA Tumor
+    * - Name of the Sample2
+      - Path to upstream fastq WES Tumor
+      - Path to downstream fastq WES Tumor
+      - Path to upstream fastq WES Normal
+      - Path to downstream fastq WES Normal
+      - Path to upstream fastq RNA Tumor
+      - Path to downstream fastq RNA Tumor
+    * - ...
+      - ...
+      - ...
+      - ...
+      - ...
+      - ...

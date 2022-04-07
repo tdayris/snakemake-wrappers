@@ -1,0 +1,17 @@
+rule identito_vigilance_cancer_wts:
+	input:
+		variants = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{identito_index}/{prefix}_chr_{identito_index}.wts.checkvariants", basedir=basedir, analysis = wildcards.analysis, identito_index=identito_index, prefix=wildcards.prefix),
+		rsID_pos = "/data/annotations/Human/GRCh38/DB/custom/identitovigilence/rsID.pos.txt",
+		script_python = lambda wildcards: expand("{script_dir}/identito-vigilance.py", script_dir = script_dir)
+	output:
+		csv = "{basedir}/{analysis}/{prefix}/{prefix}_wts_identito_temp.csv",
+		txt = "{basedir}/{analysis}/{prefix}/{prefix}_wts_identito.chip.txt"
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_wts_identito.log"
+	params:
+		identito_vigilance_options = config["identito_vigilance"]["OPTIONS"],
+		run = lambda wildcards: config["general_informations"][str(wildcards.prefix).split('_')[1]]["RUN"],
+		prefix_name = lambda wildcards: str(wildcards.prefix).split('_S')[0]
+	shell:
+		"grep ';{params.prefix_name};' {wildcards.input_dir}/identito/{params.run}_identito.csv > {output.txt} && python3 {wildcards.script_python} {params.identito_vigilance_options} -v {input.variants} -r {input.rsID_pos} -i {output.txt} -o {output.csv}" 
+

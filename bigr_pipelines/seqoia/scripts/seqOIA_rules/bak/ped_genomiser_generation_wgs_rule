@@ -1,0 +1,18 @@
+rule ped_genomiser_generation_wgs:
+	input:
+		info = lambda wildcards: expand("{input_path}/xml/{sequenceur}/{run}/RunInfo.xml",sequenceur=wildcards.sequenceur, run=wildcards.run,input_path=input_path),
+		parameter = lambda wildcards: expand("{input_path}/xml/{sequenceur}/{run}/RunParameters.xml",sequenceur=wildcards.sequenceur, run=wildcards.run, input_path=input_path),
+		json = "{export_path}/{sequenceur}/{run}/json/",
+		flag = "{export_path}/{sequenceur}/{run}/json/curl_request.done",
+		database_script = expand("{script_dir}/sample_sheet_database.py", script_dir=script_dir),
+		config_scrit = expand("{script_dir}/ped_genomiser_generation.py", script_dir=script_dir),
+		json_A00666 = "{export_path}/A00666/",
+		json_A00651 = "{export_path}/A00651/",
+		sheet = expand("{input_path}/sample_sheet/", input_path=input_path)
+	output:
+		"{export_path}/{sequenceur}/{run}/ped_genomiser_generation.done"
+	log:
+		"{export_path}/{sequenceur}/{run}/log/ped_genomiser_generation.log"
+	run:
+		cmd = "python3 {input.database_script} -ss {input.sheet}  -j666 {input.json_A00666} -j651 {input.json_A00651} -o " + str(sample_db) + "  && python3 {input.config_scrit} -j {input.json} -c " + str(sample_db) + " && touch {output} 2>&1 | tee -a {log}"
+		shell(cmd)

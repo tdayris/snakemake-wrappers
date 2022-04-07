@@ -1,0 +1,20 @@
+rule wisecondor_predict_trio:
+	input:
+		npz = "{basedir}/{analysis}/{prefix}/{prefix}_wisecondor_merged.npz"
+	output:
+		cnv = "{basedir}/{analysis}/Wisecondor/{prefix}_wisecondor.plots/",
+		bed_1 = "{basedir}/{analysis}/Wisecondor/{prefix}_wisecondor_bins.bed",
+		bed_2 = "{basedir}/{analysis}/Wisecondor/{prefix}_wisecondor_aberrations.bed",
+		bed_3 = "{basedir}/{analysis}/Wisecondor/{prefix}_wisecondor_segments.bed",
+		stat = "{basedir}/{analysis}/Wisecondor/{prefix}_wisecondor_chr_statistics.txt"
+
+	log:
+		"{basedir}/{analysis}/log/{prefix}_wisecondor_predict.log"
+	params:
+		wisecondor_options = config["wisecondor_predict"]["OPTIONS"],
+		pon = config["wisecondor_predict"]["PON"]
+	resources: io=10
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ -B /mnt/beegfs/pipelines/sandbox_dir/seqoia/singularity/seqoia_cancer-main:/mnt/beegfs/pipelines/sandbox_dir/seqoia/singularity/seqoia_cancer-main /mnt/beegfs/software/seqoia/singularity/wisecondorx_1.1.5-1.sif bash -c "WisecondorX predict {params.wisecondor_options} {input.npz} {params.pon} {wildcards.basedir}/{wildcards.analysis}/Wisecondor/{wildcards.prefix}_wisecondor 2>&1 | tee -a {log}"
+		"""

@@ -1,0 +1,12 @@
+rule sambamba_merge_wisecondor:
+	input:
+                lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bam",  basedir=basedir, analysis=wildcards.analysis, prefix=wildcards.prefix, index=index)
+	output:
+        	"{basedir}/{analysis}/{prefix}/{prefix}_wisecondor_merged.bam"
+	resources: io=3
+	log:
+        	"{basedir}/{analysis}/log/{prefix}/{prefix}_sambamba_merge_facet.log"
+	params:
+		sambamba_merge_options = config["sambamba_merge_wisecondor"]["OPTIONS"]
+	shell:
+		"sambamba merge {params.sambamba_merge_options} {output} {input} 2>&1 | tee -a {log}"

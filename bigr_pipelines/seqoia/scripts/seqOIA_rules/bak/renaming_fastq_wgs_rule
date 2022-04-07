@@ -1,0 +1,14 @@
+rule renaming_fastq_wgs:
+	input:
+		flag_bcl2fastq = lambda wildcards: expand("{export_path}/{sequenceur}/{run}/fastq/{lane}_{surface}{swath}.done", export_path =wildcards.export_path, run=wildcards.run, sequenceur=wildcards.sequenceur,lane=lane, surface=surface, swath=swath),
+		sample_sheet = lambda wildcards: expand("{input_path}/sample_sheet/{run}.csv", run=wildcards.run, input_path=input_path),
+		runfolder = lambda wildcards: expand("{input_path}/{sequenceur}/{run}/",run=wildcards.run, sequenceur=wildcards.sequenceur, input_path=input_path),
+		script_python = expand("{script_dir}/renaming_fastq.py", script_dir=script_dir)
+	output:
+		"{export_path}/{sequenceur}/{run}/renaming.done"
+	params:
+		prefix = config["general_informations"]["SAMPLES"]
+	log:
+		"{export_path}/{sequenceur}/{run}/log/renaming_fastq.log"
+	shell:
+		"python3 {input.script_python} -r {wildcards.run} -s {input.sample_sheet} -se {wildcards.sequenceur} -ri {input.runfolder} -f {input.flag_bcl2fastq} && touch {output} 2>&1 | tee -a {log}"

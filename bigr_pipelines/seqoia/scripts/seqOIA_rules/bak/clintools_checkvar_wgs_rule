@@ -1,0 +1,14 @@
+rule clintools_checkvar_wgs:
+	input:
+		"{basedir}/{analysis}/{prefix}/chr_{identito_index}/{prefix}_chr_{identito_index}.mpileup"
+	output:
+		variant = "{basedir}/{analysis}/{prefix}/chr_{identito_index}/{prefix}_chr_{identito_index}.checkvariants",
+		tempFile = temp("{basedir}/{analysis}/{prefix}/chr_{identito_index}/chr_{identito_index}.txt")
+	resources: io=3
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{identito_index}/{prefix}_chr_{identito_index}_clintools_checkvariants.log"
+	run:
+		shell("touch {output.tempFile}")
+		shell("echo -e \'{wildcards.prefix}\\t{input}' > {output.tempFile}")
+		shell("check_variants.py {output.tempFile} > {output.variant}")
+

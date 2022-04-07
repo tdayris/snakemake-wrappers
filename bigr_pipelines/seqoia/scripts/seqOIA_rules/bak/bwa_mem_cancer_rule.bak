@@ -1,0 +1,24 @@
+rule bwa_mem_cancer:
+	input:
+		R1 = lambda wildcards: expand("{export_dir}/{sequenceur}/{run}/fastq/{sample}_R1_001.fastq.gz",export_dir=export_dir, sequenceur = config["general_informations"][str(wildcards.sample).split("_")[1]]["SEQUENCEUR"], run = config["general_informations"][str(wildcards.sample).split("_")[1]]["RUN"], sample=wildcards.sample),
+		R2 = lambda wildcards: expand("{export_dir}/{sequenceur}/{run}/fastq/{sample}_R2_001.fastq.gz",export_dir=export_dir, sequenceur = config["general_informations"][str(wildcards.sample).split("_")[1]]["SEQUENCEUR"], run = config["general_informations"][str(wildcards.sample).split("_")[1]]["RUN"], sample=wildcards.sample)
+	output:
+		bam = temp("{basedir}/{analysis}/{sample}/{sample}_sorted.bam")
+	resources: io=2
+	priority: 50
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}.bwa_mem.log"
+	params:
+		reference = config["general_informations"]["FASTA_FILE"],
+		bwa_mem_options = config["bwa_mem"]["OPTIONS"],
+		pl_rg = "ILLUMINA",
+		lb_rg = config["general_informations"]["TARGET_TYPE"],
+		pu_rg = config["general_informations"]["PLATEFORME UNIT"],
+		samtools_sort_options = config["samtools_sort"]["OPTIONS"],
+		tSM = lambda wildcards: str(wildcards.sample).split('_S')[0]
+	shell:
+		"""
+		mkdir -p {basedir}/{analysis}/{wildcards.sample}/
+		chmod -R 777 {basedir}/{analysis}/{wildcards.sample}
+		docker run --user root:root -v /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -v /mnt/beegfs/userdata/root/seqoia/scratch2:/mnt/beegfs/userdata/root/seqoia/scratch2:z gitlab-bioinfo.aphp.fr:5000/sequoia-docker-tools/bwa-samtools:0.7.15-1 bash -c "set -o pipefail ; bwa mem {params.bwa_mem_options} -R '@RG\\tID:{wildcards.sample}\\tPL:{params.pl_rg}\\tLB:{params.lb_rg}\\tPU:{params.pu_rg}\\tSM:{params.tSM}' {params.reference} {input.R1} {input.R2} | samtools sort {params.samtools_sort_options} -O bam -o {output.bam} 2>&1 | tee -a {log}"
+		"""

@@ -1,0 +1,22 @@
+rule snpsift_annotate_leaves_trio_wgs:
+	input:
+		"{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_snpsift_dbnsfp.vcf"
+	output:
+		temp("{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_snpsift_annotate_leaves.vcf")
+	log:
+		"{basedir}/{analysis}/log/chr_{index}/{analysis}_chr_{index}_snpsift_annotate_leaves.log"
+	params:
+		databases=config["snpsift_annotate_leaves"]["DATABASES"],
+		snpsift_annotate_leaves_options=config["snpsift_annotate_leaves"]["OPTIONS"]
+	run:
+		base_cmd = "java -Xmx1000m -Xms1000m -XX:ParallelGCThreads=2 -XX:+AggressiveHeap -jar /usr/share/java/SnpSift.jar annotate -c /etc/snpeff/snpEff.config " + params.snpsift_annotate_leaves_options
+		cmd = None
+		for i in range(len(params.databases)):
+			db_dict = params.databases[i]
+			if i == 0:
+				cmd = (base_cmd + " -name {name} -info {info_fields} {db} {input_file} |".format(name=db_dict['name'], info_fields=db_dict['info_fields'],db=db_dict['path'], input_file=input))
+			else:
+				cmd += (base_cmd + " -name {name} -info {info_fields} {db} - |".format(name=db_dict['name'], info_fields=db_dict['info_fields'], db=db_dict['path']))
+		cmd = cmd[:-1] + " 2>&1 1> {output} | tee -a {log}"
+		print(cmd)
+		shell(cmd)

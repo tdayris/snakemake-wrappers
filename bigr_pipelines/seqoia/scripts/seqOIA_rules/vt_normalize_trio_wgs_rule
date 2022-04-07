@@ -1,0 +1,12 @@
+rule vt_normalize_trio_wgs:
+	input:
+		"{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_VTD.vcf"
+	output:
+		temp("{basedir}/{analysis}/chr_{index}/{analysis}_chr_{index}_VTN.vcf")
+	log:
+		"{basedir}/{analysis}/log/chr_{index}/{analysis}_chr_{index}_normalize.log"
+	params:
+		vt_normalize_options=config["vt_normalize"]["OPTIONS"],
+		reference=config["general_informations"]["FASTA_FILE"]
+	shell:
+		"vt normalize {params.vt_normalize_options} -r {params.reference} {input} | vt uniq - -o {output} 2>&1 | tee -a {log}"

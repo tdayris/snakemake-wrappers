@@ -1,0 +1,15 @@
+rule sambamba_markdup:
+	input:
+		bam = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_merged.bam"
+	output:
+		marked = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.temp.bam",
+		bai = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.temp.bam.bai"
+		#metrics = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_metrics.txt",
+	resources: io=5
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_sambamba_markdup.log"
+	params:
+		sambamba_markdup_options = config["sambamba_markdup"]["OPTIONS"]
+	shell:
+		"sambamba markdup {params.sambamba_markdup_options} {input} {output.marked} 2>&1 | tee -a {log}"
+

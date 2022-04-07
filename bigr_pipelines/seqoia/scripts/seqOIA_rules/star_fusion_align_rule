@@ -1,0 +1,16 @@
+rule star_fusion_align:
+	input:
+		R1 = "{basedir}/{analysis}/{sample}/star_fusion/{sample}_concat_R1.fastq",
+		R2 = "{basedir}/{analysis}/{sample}/star_fusion/{sample}_concat_R2.fastq"
+	output:
+		folder = "{basedir}/{analysis}/{sample}/star_fusion",
+		star_file = "{basedir}/{analysis}/{sample}/star_fusion/Chimeric.out.junction",
+		bam = "{basedir}/{analysis}/{sample}/star_fusion/Aligned.sortedByCoord.out.bam"
+	resources: io=20
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}_star_fusion_align.log"
+	params:
+		genome_dir = config["star_fusion"]["GENOME_DIR_ALIGN"],
+		star_fusion_align_options = config["star_fusion"]["OPTIONS_ALIGN"],
+	shell:
+		"STAR {params.star_fusion_align_options} --genomeDir {params.genome_dir} --outFileNamePrefix {output.folder} --readFilesIn {input.R1} {input.R2} 2>&1 | tee -a {log}"

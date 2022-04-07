@@ -1,0 +1,12 @@
+rule CNVnator_circular_plot:
+	input:
+		root = "{basedir}/{analysis}/{prefix}/CNVnator/{prefix}_cnvnator.root",
+		vcf = "{basedir}/{analysis}/{prefix}/CNVnator/{prefix}_cnvnator_2000.vcf",
+	output:
+		png = "{basedir}/{analysis}/{prefix}/CNVnator/graphs/{prefix}_genome.png"
+	params:
+		his_cnvnator_options = config["CNVnator"]["HIS"],
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_cnvnator_circular_plot.log"
+	shell:
+		"plotcircular.py -bs {params.his_cnvnator_options} -rdbs {params.his_cnvnator_options} -pbs {params.his_cnvnator_options} {input.root}  -t {wildcards.prefix} -o {output.png} 2>&1 | tee -a {log}"

@@ -1,0 +1,11 @@
+rule export_XML:
+	input:
+		info = "{input_path}/{sequenceur}/{run}/RunInfo.xml",
+		parameter = "{input_path}/{sequenceur}/{run}/RunParameters.xml"
+	output:
+		info = "{input_path}/xml/{sequenceur}/{run}/RunInfo.xml",
+		parameter = "{input_path}/xml/{sequenceur}/{run}/RunParameters.xml"
+	log:
+		export_dir+"/{sequenceur}/{run}/log/export_XML.log"
+	shell:
+		"rsync -P {input.info} {output.info} && rsync -P {input.parameter} {output.parameter} 2>&1 | tee -a {log}"

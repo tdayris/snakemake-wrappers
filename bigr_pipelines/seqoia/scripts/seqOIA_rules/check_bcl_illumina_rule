@@ -1,0 +1,22 @@
+rule check_bcl_illumina:
+	input:
+		run_path = lambda wildcards: expand("{input_path}/{sequenceur}/{run}",input_path=input_path, sequenceur=wildcards.sequenceur, run=wildcards.run),
+		sample_sheet = lambda wildcards: expand("{input_path}/sample_sheet/{run}.csv",input_path=input_path,run=wildcards.run),
+		flag = lambda wildcards: expand("{input_path}/{sequenceur}/{run}/CopyComplete.txt",input_path=input_path, sequenceur=wildcards.sequenceur, run=wildcards.run)
+	output:
+		flag = "{export_path}/{sequenceur}/{run}/check_bcl.done",
+	log:
+		"{export_path}/{sequenceur}/{run}/log/check_bcl.log"
+	run:
+		import glob
+		path = str(input.run_path) + "/Data/Intensities/BaseCalls/**/**/*.cbcl"
+		list_bcl = glob.glob(path)
+		print(list_bcl)
+		print(len(list_bcl))
+		path_notemp = str(input.run_path) + "/Data/Intensities/BaseCalls/**/**/*tmp.cbcl"
+		list_tmp = glob.glob(path_notemp)
+		print(list_tmp)
+		print(len(list_tmp))
+		if len(list_bcl) in [436,2543,2544,872,1272] and len(list_tmp) == 0:
+			cmd = "touch {output.flag} 2>&1 | tee -a {log}"
+			shell(cmd)

@@ -1,0 +1,16 @@
+rule bcftools_reheader_cancer:
+	input:
+		"{basedir}/{analysis}/{analysis}_final_no_reheader.vcf"
+	output:
+		"{basedir}/{analysis}/{analysis}_final_temp.vcf"
+	log:
+		"{basedir}/{analysis}/log/bcftools_reheader.log"
+	run:
+		with open(basedir + "/" + wildcards.analysis + "/" + wildcards.analysis + "_name.vcf", "w+") as f:
+			wts_prefix = "_".join(wts.split("_")[0:2])
+			wes_prefix = "_".join(wes_tumor.split("_")[0:2])
+			wgs_prefix = "_".join(wgs_constit.split("_")[0:2])
+			string = "\n".join([wts_prefix,wes_prefix,wgs_prefix])
+			f.write(str(string))
+		cmd = 'singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ /mnt/beegfs/software/seqoia/singularity/bcftools_1.9-1.sif bash -c "set -o pipefail; bcftools reheader -s {basedir}/{wildcards.analysis}/{wildcards.analysis}_name.vcf -o {output} {input} 2>&1 | tee -a {log}"'
+		shell(cmd)

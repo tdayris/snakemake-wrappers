@@ -1,0 +1,418 @@
+shell.prefix("module load singularity/3.6.3; date; hostname; pwd;")
+workdir: config["general_path"]["DIR_PATH"]
+basedir = config["general_path"]["BASEDIR"]
+input_dir = config["general_path"]["INPUT_PATH"]
+conf_path = config["general_path"]["CONF_PATH"]
+script_dir = config["general_path"]["SCRIPT_DIR"]
+rulePath = config["general_path"]["SNAKEMAKE_RULES"]
+export_dir = config["general_path"]["EXPORT_PATH"]
+
+import re
+from os import listdir
+from os.path import isfile, join
+import os
+import json
+import csv
+
+###########################
+index= config["general_informations"]["CHR"]["INDEX"]
+index_wes = config["general_informations"]["CHR"]["INDEX_WES"]
+identito_index = config["general_informations"]["CHR"]["IDENTITO_INDEX"]
+facet = config["general_informations"]["CHR"]["FACET"]
+autosome = config["general_informations"]["CHR"]["AUTOSOME"]
+mate=["R1","R2"]
+analysis = config["general_informations"]["ANALYSIS"]
+############################ SAMPLES ######################
+#prefix = config["general_informations"]["SAMPLES"]
+vcf_id = config["general_informations"]["VCF_ID"]
+wes_tumor = config["general_informations"]["WES-T"]["ID"]
+wgs_constit = config["general_informations"]["WGS-C"]["ID"]
+wts = config["general_informations"]["WTS"]["ID"]
+print("WES Tumor:", wes_tumor)
+print("WGS Constit:", wgs_constit)
+print("RNA: ", wts)
+print("Workdir: ", config["general_path"]["DIR_PATH"])
+###########################################################
+sequencing_type = ["WGS-C", "WES-T", "WTS"]
+
+sequenceur = []
+run = []
+
+for seq in sequencing_type:
+    if not "RUN" in config["general_informations"][seq]["RUN"]:
+        run.append(config["general_informations"][seq]["RUN"])
+    if not "SEQUENCEUR" in config["general_informations"][seq]["SEQUENCEUR"]:
+        sequenceur.append(config["general_informations"][seq]["SEQUENCEUR"])
+print("Sequenceur :", sequenceur)
+print("Run :", run)
+
+#print("Prefix: ",prefix)
+sample_ids_bwa = []
+sample_ids_star = []
+sample_ids = []
+lane_picard = {}
+for seq in sequencing_type:
+    run_id = config["general_informations"][seq]["RUN"]
+    swath = config["general_informations"][seq]["FLOWCELL"]["SWATH"]
+    surface = config["general_informations"][seq]["FLOWCELL"]["SURFACE"]
+    lane = config["general_informations"][seq]["FLOWCELL"]["LANE"]
+    id = config["general_informations"][seq]["ID"]
+    lane_picard[run_id] = {}
+    lane_picard[run_id]["LANE"] = config["general_informations"][seq]["FLOWCELL"]["LANE"]
+    lane_picard[run_id]["SEQUENCEUR"] = config["general_informations"][seq]["SEQUENCEUR"]
+    if seq != "WTS":
+        for l,su,sw in [(l,su,sw) for l in lane for su in surface for sw in swath]:
+            sample_ids_bwa.append(id + "_L" + l + "_" + su + sw)
+    else:
+        for l,su,sw in [(l,su,sw) for l in lane for su in surface for sw in swath]:
+            sample_ids_star.append(id + "_L" + l + "_" + su + sw)
+    for l,su,sw in [(l,su,sw) for l in lane for su in surface for sw in swath]:
+        sample_ids.append(id + "_L" + l + "_" + su + sw)
+print("LANE_PICARD: ", lane_picard)
+print("Samples_BWA: ",sample_ids_bwa)
+print("Samples_star: ",sample_ids_star)
+print("Samples_ids:", sample_ids)
+
+###########################################################
+rulePath = config["general_path"]["SNAKEMAKE_RULES"]
+include: rulePath+"/bwa_mem_cancer_rule"
+include: rulePath+"/star_cancer_rule"
+include: rulePath+"/sambamba_index_wgs_rule"
+include: rulePath+"/sambamba_merge_wgs_rule"
+include: rulePath+"/sambamba_slice_wgs_rule"
+include: rulePath+"/sambamba_index_wts_rule"
+include: rulePath+"/sambamba_slice_wts_rule"
+include: rulePath+"/sambamba_merge_wts_rule"
+include: rulePath+"/picard_markdup_wgs_rule"
+include: rulePath+"/picard_markdup_wts_rule"
+include: rulePath+"/sambamba_index_wgs_markdup_rule"
+include: rulePath+"/sambamba_index_wts_markdup_rule"
+include: rulePath+"/gatk_base_recalibrator_wgs_cancer_rule"
+include: rulePath+"/gatk_base_recalibrator_wts_rule"
+include: rulePath+"/gatk_applybqsr_wgs_cancer_rule"
+include: rulePath+"/gatk_applybqsr_wts_rule"
+include: rulePath+"/gatk_haplotype_caller_wgs_cancer_rule"
+include: rulePath+"/gatk_haplotype_caller_wts_rule"
+include: rulePath+"/gatk_mutect2_wes_rule"
+include: rulePath+"/gatk_filter_mutect_calls_wes_rule"
+include: rulePath+"/bcftools_merge_wts_wes_rule"
+include: rulePath+"/vt_decompose_cancer_wgs_rule"
+include: rulePath+"/vt_normalize_uniq_cancer_wgs_rule"
+include: rulePath+"/vt_decompose_cancer_wts_rule"
+include: rulePath+"/vt_normalize_uniq_cancer_wts_rule"
+include: rulePath+"/vt_normalize_uniq_cancer_wes_rule"
+include: rulePath+"/vt_decompose_cancer_wes_rule"
+include: rulePath+"/snpeff_wts_wes_rule"
+include: rulePath+"/snpsift_annotate_leaves_trio_wgs_rule"
+include: rulePath+"/snpsift_phastcons_trio_wgs_rule"
+include: rulePath+"/snpsift_dbnsfp_trio_GRCh38_wgs_rule"
+include: rulePath+"/bcftools_concat_cancer_rule"
+include: rulePath+"/star_fusion_inspector_rule"
+include: rulePath+"/star_fusion_rule"
+include: rulePath+"/star_arriba_rule"
+include: rulePath+"/gatk_select_variants_mutect_wes_rule"
+include: rulePath+"/fusion_annotator_rule"
+include: rulePath+"/fastq_concat_rule"
+include: rulePath+"/fusion_catcher_rule"
+include: rulePath+"/fusion_normalisation_script_rule"
+include: rulePath+"/fusion_reciproque_creation_rule"
+include: rulePath+"/export_irods_bam_wgs_rule"
+include: rulePath+"/export_irods_bam_cancer_wts_rule"
+include: rulePath+"/gatk_mutect2_wes_tumor_only_rule"
+include: rulePath+"/tabix_wes_rule"
+include: rulePath+"/snpsift_annotate_wes_rule"
+include: rulePath+"/sambamba_index_bam_rule"
+include: rulePath+"/arriba_calling_rule"
+include: rulePath+"/arriba_drawing_rule"
+include: rulePath+"/gatk_mergevcf_mutect2_rule"
+include: rulePath+"/arriba_normalization_rule"
+include: rulePath+"/bcftools_reheader_cancer_rule"
+include: rulePath+"/bcftools_concat_wes_rule"
+include: rulePath+"/signature_mut_matrix_gen_rule"
+include: rulePath+"/signature_mut_matrix_ext_rule"
+include: rulePath+"/signature_mut_matrix_decomp_rule"
+include: rulePath+"/snpeff_tmb_rule"
+include: rulePath+"/tmb_curie_rule"
+include: rulePath+"/QC_cancer_wgs_rule"
+include: rulePath+"/QC_cancer_wes_rule"
+include: rulePath+"/QC_cancer_wts_rule"
+include: rulePath+"/sambamba_flagstat_wgs_rule"
+include: rulePath+"/sambamba_flagstat_wts_rule"
+include: rulePath+"/fastqc_cancer_rule"
+include: rulePath+"/picard_collect_insert_size_metrics_wgs_cancer_rule"
+include: rulePath+"/picard_collect_insert_size_metrics_wts_rule"
+include: rulePath+"/QC_globale_cancer_no_wgs_rule"
+include: rulePath+"/gatk_depth_coverage_wgs_rule"
+include: rulePath+"/gatk_depth_coverage_cancer_wes_rule"
+include: rulePath+"/gatk_depth_coverage_cancer_wts_rule"
+include: rulePath+"/picard_collect_alignment_summary_metrics_wgs_rule"
+include: rulePath+"/picard_collect_alignment_summary_metrics_wts_rule"
+include: rulePath+"/picard_collect_variant_calling_metrics_cancer_rule"
+include: rulePath+"/picard_collect_wgs_metrics_rule"
+include: rulePath+"/gatk_callableloci_wgs_rule"
+include: rulePath+"/gatk_callableloci_wes_rule"
+include: rulePath+"/gatk_callableloci_wts_rule"
+include: rulePath+"/gatk_index_cancer_rule"
+include: rulePath+"/export_irods_vcf_cancer_rule"
+include: rulePath+"/QC_sample_name_cancer_rule"
+include: rulePath+"/picard_collect_quality_yield_metrics_wgs_rule"
+include: rulePath+"/picard_collect_quality_yield_metrics_wts_rule"
+include: rulePath+"/validation_QC_cancer_rule"
+include: rulePath+"/export_irods_tar_output_cancer_no_wgs_rule"
+include: rulePath+"/tar_cancer_no_wgs_rule"
+include: rulePath+"/json_export_cancer_no_wgs_rule"
+include: rulePath+"/rsync_vcf_tmb_rule"
+include: rulePath+"/clintools_checkvar_wgs_rule"
+include: rulePath+"/samtools_mpileup_wgs_rule"
+include: rulePath+"/identito_vigilance_cancer_wgs_rule"
+include: rulePath+"/identito_globale_cancer_no_wgs_rule"
+include: rulePath+"/export_irods_identito_cancer_no_wgs_rule"
+include: rulePath+"/importation_gleaves_rule"
+include: rulePath+"/picard_collect_targeted_pcr_metrics_wes_rule"
+include: rulePath+"/fusion_csv_modification_rule"
+include: rulePath+"/CNV_csv_modification_rule"
+include: rulePath+"/identito_vigilance_json_rule"
+include: rulePath+"/QC_globale_json_rule"
+include: rulePath+"/bedtools_wes_rule"
+include: rulePath+"/vt_decompose_cancer_database_rule"
+include: rulePath+"/vt_normalize_uniq_cancer_database_rule"
+include: rulePath+"/tabix_cancer_vcf_wes_rule"
+include: rulePath+"/tabix_cancer_vcf_wts_rule"
+include: rulePath+"/tabix_cancer_vcf_wgs_rule"
+include: rulePath+"/gatk_filter_mutect_calls_wes_tumor_only_rule"
+include: rulePath+"/snpsift_annotate_TMB_rule"
+include: rulePath+"/vt_decompose_cancer_tmb_rule"
+include: rulePath+"/vt_normalize_uniq_cancer_tmb_rule"
+include: rulePath+"/gatk_select_variants_mutect_tumor_only_rule"
+include: rulePath+"/quality_wes_changement_rule"
+include: rulePath+"/export_labo_identito_rule"
+include: rulePath+"/export_labo_qc_rule"
+include: rulePath+"/export_irods_identito_sample_wgs_rule"
+#########ANALYSIS PIPELINE########
+bwa_mem = expand("{basedir}/{sample}/{sample}_sorted.bam", basedir=basedir, analysis=analysis, sample=sample_ids_bwa)
+fastqc = expand("{basedir}/{sample}/{sample}_{mate}_001_fastqc/fastqc_data.txt",basedir=basedir, analysis=analysis, sample=sample_ids, mate=mate)
+samtools_index = expand("{basedir}/{sample}/{sample}_sorted.bam.bai",basedir=basedir, analysis=analysis, sample = sample_ids_bwa)
+samtools_view = expand("{basedir}/{sample}/{sample}_samtools_view.done",basedir=basedir, analysis=analysis, sample = sample_ids_bwa)
+samtools_merge = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_merged.bam",basedir=basedir, analysis=analysis, prefix=[wes_tumor, wgs_constit], index=index)
+markdup = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_markedup.bam","{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_metrics.txt"], basedir=basedir, analysis=analysis, prefix = [wes_tumor, wgs_constit], index=index)
+index_markedup = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_markedup.bam.bai", basedir=basedir, analysis=analysis, prefix=[wes_tumor, wgs_constit], index=index)
+gatk_base_recalibrator = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_recalibration.table",basedir=basedir, analysis=analysis,prefix=[wes_tumor, wgs_constit], index=index)
+gatk_ApplyBQSR = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bam","{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bai"], basedir=basedir, analysis=analysis,prefix=[wes_tumor, wgs_constit], index=index)
+gatk_haplotype_caller = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.vcf","{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.vcf.idx"], basedir=basedir, analysis=analysis,prefix=wgs_constit, index=index)
+############# WTS ##################################
+star = expand("{basedir}/{sample}/{sample}_star_sorted.bam", basedir=basedir, analysis=analysis, sample=sample_ids_star)
+star_fusion = expand(["{basedir}/{sample}/star_fusion/star-fusion.fusion_predictions.abridged.tsv","{basedir}/{sample}/star_fusion"], basedir=basedir, analysis=analysis, sample=wts)
+star_fusion_arriba= expand(["{basedir}/{sample}/Arriba/", "{basedir}/{sample}/Arriba/Chimeric.out.sam", "{basedir}/{sample}/Arriba/Aligned.sortedByCoord.out.bam"], basedir=basedir, analysis=analysis, sample=wts)
+arriba = expand("{basedir}/{sample}/Arriba/{sample}_arriba_fusion.tsv", basedir=basedir, analysis=analysis, sample=wts)
+arriba_drawing = expand("{basedir}/{sample}/Arriba/{sample}_arriba_fusion.pdf", basedir=basedir, analysis=analysis, sample=wts)
+arriba_norm = expand(["{basedir}/{sample}/Arriba/{sample}_arriba_fusion_normalized.tsv", "{basedir}/{sample}/Arriba/{sample}_arriba_fusion_normalized_temp.tsv"], basedir=basedir, analysis=analysis, sample=wts)
+fusion_catcher = expand("{basedir}/{sample}/fusion_catcher/final-list_candidate-fusion-genes.txt", basedir=basedir, analysis=analysis, sample=wts)
+fusion_inspector = expand("{basedir}/{sample}/star_fusion/fusion_inspector/", basedir=basedir, analysis=analysis, sample=wts)
+fastq_concat = expand(["{basedir}/{sample}/star_fusion/{sample}_concat_R1.fastq", "{basedir}/{sample}/star_fusion/{sample}_concat_R2.fastq"], basedir=basedir, analysis=analysis, sample=wts)
+fusion_annotator = expand("{basedir}/{sample}/star_fusion/annotator/star-fusion-annotator.annotated_list.txt", basedir=basedir, analysis=analysis, sample=wts)
+fusion_normalize = expand("{basedir}/{sample}/star_fusion/fusion_merged.txt", basedir=basedir, analysis=analysis, sample=wts)
+fusion_reciproque = expand("{basedir}/{sample}/star_fusion/fusion_merged_reciproque.txt", basedir=basedir, analysis=analysis, sample=wts)
+chimeraviz = expand("{basedir}/{sample}/star_fusion/chimeraviz/{sample}_chimeraviz.svg", basedir=basedir, analysis=analysis, sample=wts)
+samtools_index_wts = expand("{basedir}/{sample}/{sample}_star_sorted.bam.bai",basedir=basedir, analysis=analysis, sample = sample_ids_star)
+samtools_view_wts = expand("{basedir}/{sample}/{sample}_star_samtools_view.done",basedir=basedir, analysis=analysis, sample = sample_ids_star)
+samtools_merge_wts = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_merged.bam",basedir=basedir, analysis=analysis, prefix = wts, index=index)
+markdup_wts = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_markdup.bam","{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_metrics.txt"], basedir=basedir, analysis=analysis, prefix = wts, index=index)
+index_markedup_wts = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_markdup.bam.bai", basedir=basedir, analysis=analysis, prefix=wts, index=index)
+gatk_base_recalibrator_wts = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_recalibration.table",basedir=basedir, analysis=analysis,prefix=wts, index=index)
+gatk_ApplyBQSR_wts = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_bqsr.bam","{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_bqsr.bai"], basedir=basedir, analysis=analysis,prefix=wts, index=index)
+gatk_haplotype_caller_wts = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts.vcf","{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts.vcf.idx"], basedir=basedir, analysis=analysis,prefix=wts, index=index)
+snpsift_annotate_wes = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_snpsift_annotated_wes.vcf", basedir=basedir, analysis=analysis, prefix=wes_tumor, index = index)
+#############MUTECT2 WES-T/WGS-C#####################
+mutect2_wes = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_mutect2.vcf", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_mutect2.vcf.idx", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_mutect2.vcf.stats"], basedir=basedir, analysis=analysis, prefix=vcf_id, index=index)
+mutect2_wes_tumor_only = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_tumor_only_mutect2.vcf", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_tumor_only_mutect2.vcf.idx", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_tumor_only_mutect2.vcf.stats"], basedir=basedir, analysis=analysis, prefix=wes_tumor, index=index)
+filter_mutect_wes = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_somatic_wes.vcf", prefix=vcf_id, basedir=basedir, analysis=analysis, index=index)
+select_variant = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_select_variant_somatic_wes.vcf", prefix=vcf_id, basedir=basedir, analysis=analysis, index=index)
+mergevcf = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_merged.vcf", basedir=basedir, analysis=analysis, prefix=vcf_id, index=index)
+tabix_wes = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_mutect2_wes_database.vcf.gz", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_mutect2_wes_database.vcf.gz.tbi"], prefix=vcf_id, basedir=basedir, analysis=analysis, index=index)
+##############FACET WGS-C/WGS-T #####################
+samtools_merge_facet = expand("{basedir}/{prefix}/{prefix}_facet_merged.bam", basedir=basedir, analysis=analysis, prefix=[wgs_constit])
+sambamba_index_genome = expand("{basedir}/{prefix}/{prefix}_facet_merged.bam.bai", basedir=basedir, analysis=analysis, prefix=[wgs_constit])
+facet_pileup_genome = expand("{basedir}/Facet/{analysis}_facet_pileup.txt.gz", basedir=basedir, analysis=analysis)
+facet_Rplot_genome = expand(["{basedir}/Facet/{analysis}_facet_Rplots.pdf", "{basedir}/Facet/{analysis}_facet_result.bed"], basedir=basedir, analysis=analysis)
+annotSV_genome = expand("{basedir}/Facet/annotSV/{analysis}_facet_result.annotated.tsv", basedir=basedir, analysis=analysis)
+facet_pileup = expand("{basedir}/Facet/chr_{index}/{analysis}_chr_{index}_facet_pileup.txt.gz", basedir=basedir, analysis=analysis, index=facet)
+facet_Rplot = expand(["{basedir}/Facet/chr_{index}/{analysis}_chr_{index}_facet_Rplots.pdf","{basedir}/Facet/chr_{index}/{analysis}_chr_{index}_facet_result.bed"], basedir=basedir, analysis=analysis, index=facet)
+annotSV = expand("{basedir}/Facet/chr_{index}/{analysis}_chr_{index}_facet_result.annotated.tsv", basedir=basedir, analysis=analysis, index=facet)
+annotSV_wisecondor = expand("{basedir}/Wisecondor/{analysis}_wisecondor.annotated.tsv", basedir=basedir, analysis=analysis)
+################WISECONDOR###########################
+wisecondor_predict = expand(["{basedir}/Wisecondor/{analysis}_wisecondor.plots/chr{index}.png", "{basedir}/Wisecondor/{analysis}_wisecondor.plots/genome_wide.png", "{basedir}/Wisecondor/{analysis}_wisecondor_bins.bed", "{basedir}/Wisecondor/{analysis}_wisecondor_aberrations.bed", "{basedir}/Wisecondor/{analysis}_wisecondor_segments.bed", "{basedir}/Wisecondor/{analysis}_wisecondor_chr_statistics.txt"], basedir=basedir, analysis=analysis, index=index)
+Fusion_modif = expand("{basedir}/{sample}/star_fusion/fusion_inspector/{sample}.FusionInspector.fusions.abridged.coding_effect.final.tsv", basedir=basedir, analysis=analysis, sample=wts)
+CNV_modif = expand(["{basedir}/Facet/chr_1/{analysis}_chr_1_facet_result.annotated.final.tsv","{basedir}/Facet/chr_2/{analysis}_chr_2_facet_result.annotated.final.tsv","{basedir}/Facet/chr_3/{analysis}_chr_3_facet_result.annotated.final.tsv","{basedir}/Facet/chr_4/{analysis}_chr_4_facet_result.annotated.final.tsv","{basedir}/Facet/chr_5/{analysis}_chr_5_facet_result.annotated.final.tsv","{basedir}/Facet/chr_6/{analysis}_chr_6_facet_result.annotated.final.tsv","{basedir}/Facet/chr_7/{analysis}_chr_7_facet_result.annotated.final.tsv","{basedir}/Facet/chr_8/{analysis}_chr_8_facet_result.annotated.final.tsv","{basedir}/Facet/chr_9/{analysis}_chr_9_facet_result.annotated.final.tsv","{basedir}/Facet/chr_10/{analysis}_chr_10_facet_result.annotated.final.tsv","{basedir}/Facet/chr_11/{analysis}_chr_11_facet_result.annotated.final.tsv","{basedir}/Facet/chr_12/{analysis}_chr_12_facet_result.annotated.final.tsv","{basedir}/Facet/chr_13/{analysis}_chr_13_facet_result.annotated.final.tsv","{basedir}/Facet/chr_14/{analysis}_chr_14_facet_result.annotated.final.tsv","{basedir}/Facet/chr_15/{analysis}_chr_15_facet_result.annotated.final.tsv","{basedir}/Facet/chr_16/{analysis}_chr_16_facet_result.annotated.final.tsv","{basedir}/Facet/chr_17/{analysis}_chr_17_facet_result.annotated.final.tsv","{basedir}/Facet/chr_18/{analysis}_chr_18_facet_result.annotated.final.tsv","{basedir}/Facet/chr_19/{analysis}_chr_19_facet_result.annotated.final.tsv","{basedir}/Facet/chr_20/{analysis}_chr_20_facet_result.annotated.final.tsv","{basedir}/Facet/chr_21/{analysis}_chr_21_facet_result.annotated.final.tsv","{basedir}/Facet/chr_22/{analysis}_chr_22_facet_result.annotated.final.tsv","{basedir}/Facet/chr_X/{analysis}_chr_X_facet_result.annotated.final.tsv", "{basedir}/Facet/annotSV/{analysis}_facet_result.annotated.final.tsv", "{basedir}/Wisecondor/{analysis}_wisecondor.annotated.final.tsv"], basedir=basedir, analysis=analysis)
+################### ANNOT  ###########################
+combinevariant_wts_wes = expand("{basedir}/chr_{index}/{analysis}_chr_{index}.vcf", basedir=basedir, analysis=analysis, index = index)
+genotype_gvcf = expand("{basedir}/chr_{index}/{analysis}_chr_{index}_genotype.vcf", basedir=basedir, analysis=analysis, index=index)
+vt_decompose = expand("{basedir}/chr_{index}/{analysis}_chr_{index}_VTD.vcf", basedir=basedir, analysis=analysis, index = index)
+vt_normalize = expand("{basedir}/chr_{index}/{analysis}_chr_{index}_VTN.vcf", basedir=basedir, analysis=analysis, index=index)
+snpeff = expand("{basedir}/chr_{index}/{analysis}_chr_{index}_snpeff.vcf", basedir=basedir, analysis=analysis, index=index)
+snpsift_dbnsfp = expand("{basedir}/chr_{index}/{analysis}_chr_{index}_snpsift_dbnsfp.vcf",basedir=basedir, analysis=analysis, index=index)
+snpsift_annotate_leaves = expand("{basedir}/chr_{index}/{analysis}_chr_{index}_snpsift_annotate_leaves.vcf", basedir=basedir, analysis=analysis, index=index)
+snpsift_phastcons = expand("{basedir}/chr_{index}/{analysis}_chr_{index}_snpsift_phastcons.vcf",basedir=basedir, analysis=analysis, index=index)
+bcftools_concat = expand("{basedir}/{analysis}_final_no_reheader.vcf", basedir=basedir, analysis=analysis)
+bcftools_reheader = expand("{basedir}/{analysis}/{analysis}_final_temp.vcf", basedir=basedir, analysis=analysis)
+tar_output = expand("{export_dir}/{analysis}/{analysis}.tar.gz", export_dir=export_dir, analysis=analysis)
+
+######### SIGN MUT/CHARGE MUT/MICROSAT ##########
+msisensor = expand("{basedir}/{prefix}/Msisensor.txt", basedir=basedir, analysis=analysis, prefix=vcf_id)
+concat_wes = expand(["{basedir}/{prefix}/sign_mut/{prefix}_concat.vcf","{basedir}/{prefix}/sign_mut/"], basedir=basedir, analysis=analysis, prefix=wes_tumor)
+sign_mut_gen = expand(["{basedir}/{prefix}/sign_mut/output/plots/SBS_96_plots_test_exome.pdf", "{basedir}/{prefix}/sign_mut/output/plots/ID_83_plots_test_exome.pdf", "{basedir}/{prefix}/sign_mut/output/plots/DBS_78_plots_test_exome.pdf"], basedir=basedir, analysis=analysis,prefix=wes_tumor)
+sign_mut_ext = expand("{basedir}/{prefix}/sign_mut/Res/", basedir=basedir, analysis=analysis, prefix=wes_tumor)
+sign_mut_decomp = expand(["{basedir}/{prefix}/sign_mut/Res/Deconvolution_DBS78_Decomposed/Signature_plotDBS_78_plots_Deconvolution_DBS78_Decomposed.pdf", "{basedir}/{prefix}/sign_mut/Res/Deconvolution_DBS78_Decomposed/Deconvolution_DBS78_Decomposed_Activities_Plot_SBS78.pdf", "{basedir}/{prefix}/sign_mut/Res/Deconvolution_ID83_Decomposed/Signature_plotID_83_plots_Deconvolution_ID83_Decomposed.pdf", "{basedir}/{prefix}/sign_mut/Res/Deconvolution_ID83_Decomposed/Deconvolution_ID83_Decomposed_Activities_Plot_SBS83.pdf", "{basedir}/{prefix}/sign_mut/Res/Deconvolution_SB96_Decomposed/Deconvolution_SB96_Decomposed_Activities_Plot_SBS96.pdf", "{basedir}/{prefix}/sign_mut/Res/Deconvolution_SB96_Decomposed/Signature_plotSBS_96_plots_Deconvolution_SB96_Decomposed.pdf"], basedir=basedir, analysis=analysis, prefix=wes_tumor)
+snpeff_tmb = expand(["{basedir}/{prefix}/sign_mut/{prefix}_annotated.vcf", "{basedir}/{prefix}/sign_mut/{prefix}_snpeff_stat.html", "{basedir}/{prefix}/sign_mut/{prefix}_snpeff_stat.genes.txt"], basedir=basedir, analysis=analysis, prefix=wes_tumor)
+tmb = expand("{basedir}/{prefix}/charge_mut/TMB_result.txt",basedir=basedir, analysis=analysis, prefix=wes_tumor)
+#########IDENTITO-VIGILANCE#########
+#samtools_mpileup_wgs = expand("{basedir}/{prefix}/chr_{identito_index}/{prefix}_chr_{identito_index}.mpileup", basedir=basedir, analysis=analysis, prefix=[wes_tumor, wgs_constit], identito_index = identito_index)
+#samtools_mpileup_wts = expand("{basedir}/{prefix}/chr_{identito_index}/{prefix}_chr_{identito_index}.wts.mpileup", basedir=basedir, analysis=analysis, prefix= wts, identito_index = identito_index)
+#clintools_checkvariant = expand("{basedir}/{prefix}/chr_{identito_index}/{prefix}_chr_{identito_index}.checkvariants", basedir=basedir, analysis=analysis, prefix= [wes_tumor, wgs_constit], identito_index=identito_index)
+#clintools_checkvariant_wts = expand("{basedir}/{prefix}/chr_{identito_index}/{prefix}_chr_{identito_index}.wts.checkvariants", basedir=basedir, analysis=analysis, prefix= wts, identito_index=identito_index)
+#identito_vigilance = expand("{basedir}/{prefix}/{prefix}_identito.csv", basedir=basedir, analysis=analysis, prefix=[wes_tumor, wgs_constit])
+#identito_vigilance_wts = expand("{basedir}/{prefix}/{prefix}_wts_identito.csv", basedir=basedir, analysis=analysis, prefix= wts)
+#identito_globale = expand("{basedir}/{analysis}_identito.csv", basedir=basedir, analysis=analysis)
+
+############## QC #################
+targeted_pcr = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_pcr_metrics.txt", basedir=basedir, analysis=analysis, prefix=wes_tumor, index=index)
+idxstats = expand("{basedir}/{sample}/{sample}_idxstats.txt",basedir=basedir, analysis=analysis, sample=sample_ids)
+flagstat = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_flagstat.txt",basedir=basedir, analysis=analysis, prefix=[wes_tumor, wgs_constit], index=index)
+flagstat_wts = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_flagstat_wts.txt",basedir=basedir, analysis=analysis, prefix=wts, index=index)
+insert_size = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_size_metrics.txt","{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_size_metrics.pdf"], basedir=basedir, analysis=analysis, prefix=[wgs_constit, wes_tumor], index="22")
+insert_size_wts = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_size_metrics_wts.txt","{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_size_metrics_wts.pdf"], basedir=basedir, analysis=analysis, prefix = wts, index="22")
+coverage_wgs = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.sample_summary", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.sample_statistics", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.sample_cumulative_coverage_proportions", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.sample_cumulative_coverage_counts"], basedir=basedir, analysis=analysis, prefix=[wgs_constit],  index=autosome)
+coverage_wes = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.wes.sample_summary", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.wes.sample_statistics", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.wes.sample_cumulative_coverage_proportions", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.wes.sample_cumulative_coverage_counts"], basedir=basedir, analysis=analysis, prefix=[wes_tumor],  index=autosome)
+coverage_wts = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.wts.sample_summary", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.wts.sample_statistics", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.wts.sample_cumulative_coverage_proportions", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}.wts.sample_cumulative_coverage_counts"], basedir=basedir, analysis=analysis, prefix=[wts],  index=autosome)
+picard_alignment_metrics = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_collect_summary_metrics.txt", basedir=basedir, analysis=analysis, prefix=[wes_tumor, wgs_constit],index=index)
+picard_alignment_metrics_wts = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_collect_summary_metrics_wts.txt", basedir=basedir, analysis=analysis, prefix=wts,index=index)
+vcf_index = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_reheader.vcf.idx", basedir=basedir, analysis=analysis, prefix=[wes_tumor, wgs_constit, wts], index=index)
+picard_collect_variant_metrics = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_variant.variant_calling_summary_metrics","{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_variant.variant_calling_detail_metrics"], basedir=basedir, analysis=analysis, prefix=vcf_id, index = index)
+picard_collect_wgs_metrics = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_collect_wgs_metrics.txt", basedir=basedir, analysis=analysis, prefix=[wgs_constit, wts], index=autosome)
+gatk_callable_loci_wgs = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_callableloci.table.txt", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_callableloci.bed"], basedir=basedir, analysis=analysis, prefix=[wgs_constit], index=index)
+gatk_callable_loci_wes = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_callableloci.table.txt", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_callableloci.bed"], basedir=basedir, analysis=analysis, prefix=wes_tumor, index=index)
+gatk_callable_loci_wts = expand(["{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_callableloci.table.txt", "{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_callableloci.bed"], basedir=basedir, analysis=analysis, prefix=wts, index=index)
+quality_yield = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_collect_quality_yield_metrics.txt", basedir=basedir, analysis=analysis, prefix=[wes_tumor, wgs_constit], index=index)
+quality_yield_wts = expand("{basedir}/{prefix}/chr_{index}/{prefix}_chr_{index}_collect_quality_yield_metrics_wts.txt", basedir=basedir, analysis=analysis, prefix = wts, index=index)
+#QC_wgs = expand("{basedir}/{prefix}/{prefix}_qc_stat.csv", basedir=basedir, analysis=analysis, prefix=[wgs_constit])
+#QC_wes = expand("{basedir}/{prefix}/{prefix}_wes_qc_stat.csv", basedir=basedir, analysis=analysis, prefix=wes_tumor)
+#QC_wts = expand("{basedir}/{prefix}/{prefix}_wts_qc_stat.csv", basedir=basedir, analysis=analysis, prefix=wts)
+#QC_globale  = expand("{basedir}/{analysis}_qc.csv", basedir=basedir, analysis=analysis)
+#QC_lab = expand("{basedir}/{analysis}_qc_lab.csv", basedir=basedir, analysis=analysis)
+#QC_validation = expand("{basedir}/{analysis}_qc_validation.done", basedir=basedir, analysis=analysis)
+#json_export = expand("{export_dir}/{analysis}/{analysis}.json", export_dir=export_dir, analysis=analysis)
+export_gleaves = expand("{export_dir}/{analysis}/{analysis}_importation_gleaves.done", export_dir=export_dir, analysis=analysis)
+#json_identito = expand("{export_dir}/{analysis}/{prefix}_identito.json", export_dir=export_dir, analysis=analysis, prefix=[wes_tumor, wgs_constit])
+#json_QC = expand("{export_dir}/{analysis}/{analysis}_qc_lab.json", export_dir=export_dir, analysis=analysis)
+############## FILE REMOVING AND RSYNC ############
+export_vcf = expand(["{export_dir}/{analysis}/{analysis}_final.vcf", "{export_dir}/{analysis}/{analysis}_qc.csv", "{export_dir}/{analysis}/{analysis}_qc_lab.csv", "{export_dir}/{analysis}/config/"], export_dir=export_dir, analysis=analysis)
+export_bam = expand("{export_dir}/{analysis}/{analysis}_bam_export.done", export_dir=export_dir, analysis=analysis)
+export_tar_data = expand(["{export_dir}/{analysis}/export_data_tar.done","{export_dir}/{analysis}/Signature_mutationelle/Signatures/Deconvolution_DBS78_Decomposed_Activities_Plot_SBS78.pdf","{export_dir}/{analysis}/Signature_mutationelle/Signatures/Signature_plotDBS_78_plots_Deconvolution_DBS78_Decomposed.pdf", "{export_dir}/{analysis}/Signature_mutationelle/Signatures/Signature_plotID_83_plots_Deconvolution_ID83_Decomposed.pdf", "{export_dir}/{analysis}/Signature_mutationelle/Signatures/Signature_plotSBS_96_plots_Deconvolution_SB96_Decomposed.pdf", "{export_dir}/{analysis}/Signature_mutationelle/Signatures/Deconvolution_ID83_Decomposed_Activities_Plot_SBS83.pdf", "{export_dir}/{analysis}/Signature_mutationelle/Signatures/Deconvolution_SB96_Decomposed_Activities_Plot_SBS96.pdf", "{export_dir}/{analysis}/CNV", "{export_dir}/{analysis}/Charge_mutationnelle", "{export_dir}/{analysis}/Fusions", "{export_dir}/{analysis}/Instabilite_microsatellite", "{export_dir}/{analysis}/Signature_mutationelle"], export_dir=export_dir, analysis=analysis)
+tar_output = expand("{export_dir}/{analysis}/{analysis}.tar.gz", export_dir=export_dir, analysis=analysis)
+#export_identito = expand(["{export_dir}/{analysis}/{analysis}_identito_export.done", "{export_dir}/{analysis}/{analysis}_identito.csv"], export_dir=export_dir, analysis=analysis)
+#export_labo_identito = expand(["{export_dir}/export_labo/{prefix}_identito_labo.json", "{export_dir}/export_labo/{prefix}_identito_labo.csv"], export_dir=export_dir,prefix=[wes_tumor, wgs_constit])
+#export_labo_qc = expand(["{export_dir}/export_labo/{analysis}_qc_lab.json", "{export_dir}/export_labo/{analysis}_qc_lab.csv"], export_dir=export_dir, analysis=analysis)
+#export_identito_sample = expand("{export_dir}/{analysis}/{prefix}/{prefix}_identito.csv", export_dir=export_dir, analysis=analysis, prefix = [wes_tumor, wgs_constit])
+
+rule all:
+    input:
+        ###Alignement#########
+        #bwa_mem,
+        #samtools_index,
+        #samtools_view
+        #samtools_merge,
+        #gatk_base_recalibrator
+        #gatk_ApplyBQSR
+        #gatk_haplotype_caller,
+        #####INDEX-WTS########
+        #star
+        #star_fusion_align,
+        #star_fusion,
+        #star_fusion_arriba,
+        #arriba,
+        #arriba_drawing,
+        #arriba_norm
+        #fusion_catcher,
+        #fusion_annotator,
+        #fusion_inspector,
+        #chimeraviz,
+        #samtools_index_wts
+        #samtools_view_wts
+        #samtools_merge_wts
+        #gatk_base_recalibrator_wts
+        #gatk_ApplyBQSR_wts
+        #gatk_haplotype_caller_wts,
+        #gatk_haplotype_caller_wes
+        #####MUTECT2 WES######
+        #mutect2_wes
+        #mutect2_wes_tumor_only
+        #filter_mutect_wes
+        #select_variant
+        #tabix_wes
+        ###### FACET #######
+        #samtools_merge_facet
+        #facet_pileup
+        #facet_Rplot,
+        #annotSV,
+        #facet_pileup_genome,
+        #facet_Rplot_genome,
+        #annotSV_genome,
+        #annotSV_wisecondor,
+        #wisecondor_convert,
+        #wisecondor_predict
+        #msisensor,
+        #concat_wes,
+        #sign_mut_gen,
+        #sign_mut_ext,
+        #sign_mut_decomp,
+        #snpeff_tmb,
+        #tmb,
+        #Fusion_modif,
+        #CNV_modif,
+        ######VCF_MERGE/ANNOT##
+        #snpsift_annotate_wes
+        #combinevariant_wts_wes
+        #vt_decompose
+        #vt_normalize
+        #snpeff
+        #snpsift_dbnsfp
+        #snpsfit_annotate_leaves
+        #snpsift_phastcons
+        #bcftools_concat,
+        #bcftools_reheader,
+        #####MUTECT2 WGS#######
+        #mutect_2_wgs
+        #filter_mutect_wgs
+        ##### QC
+        #coverage_wgs,
+        #coverage_wes,
+        #gatk_callable_loci_wgs,
+        #gatk_callable_loci_wes,
+        #gatk_callable_loci_wts,
+        #flagstat,
+        #flagstat_wts,
+        #insert_size,
+        #insert_size_wts,
+        #quality_yield,
+        #quality_yield_wts,
+        #picard_alignment_metrics,
+        #picard_alignment_metrics_wts,
+        #targeted_pcr,
+        #QC_wgs,
+        #QC_wes,
+        #QC_wts,
+        #QC_globale,
+        #QC_lab,
+        #QC_validation,
+        #export_vcf,
+        #export_bam,
+        #export_tar_data,
+        #tar_output,
+        #json_export,
+        #json_identito,
+        #json_QC,
+        #identito_globale,
+        export_gleaves,
+        #export_labo_identito,
+        #export_labo_qc,
+        #export_gleaves,
+        #export_identito

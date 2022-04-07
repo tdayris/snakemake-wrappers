@@ -1,0 +1,14 @@
+rule samplot:
+	input:
+		bgzip = "{basedir}/{analysis}/{prefix}/CNVnator/{prefix}_cnvnator_2000.vcf.gz",
+		tbi = "{basedir}/{analysis}/{prefix}/CNVnator/{prefix}_cnvnator_2000.vcf.gz.tbi",
+		bam = "{basedir}/{analysis}/{prefix}/{prefix}_cnvnator_merged.bam",
+		bai = "{basedir}/{analysis}/{prefix}/{prefix}_cnvnator_merged.bam.bai"
+	output:
+		folder = "{basedir}/{analysis}/{prefix}/CNVnator/samplot/"
+	params:
+		samplot_options = config["Samplot"]["OPTIONS"]
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_samplot.log"
+	shell:
+		"samplot {params.samplot_options} --vcf {input.bgzip} -d {output.folder} -b {input.bam} --command_file /tmp/samplot_{wildcards.analysis}.tmp 2>&1 | tee -a {log}"

@@ -1,0 +1,19 @@
+rule fusion_csv_modification:
+	input:
+		fusion_inspector = "{basedir}/{analysis}/{sample}/star_fusion/fusion_inspector/{sample}.FusionInspector.fusions.abridged.tsv.coding_effect",
+		arriba = "{basedir}/{analysis}/{sample}/Arriba/{sample}_arriba_fusion.tsv",
+		catcher = "{basedir}/{analysis}/{sample}/fusion_catcher/final-list_candidate-fusion-genes.txt",
+		star = "{basedir}/{analysis}/{sample}/star_fusion/star-fusion.fusion_predictions.abridged.tsv",
+		script_python = lambda wildcards: expand("{script_dir}/CNV_fusion_modificator.py", script_dir=script_dir)
+	output:
+		"{basedir}/{analysis}/{sample}/star_fusion/fusion_inspector/{sample}.FusionInspector.fusions.abridged.coding_effect.final.tsv",
+	params:
+		mercury = config["CNV_FUSION_modificator"]["mercury"],
+		curie = config["CNV_FUSION_modificator"]["curie"],
+		gene_census = config["CNV_FUSION_modificator"]["gene_census"]
+	log:
+		"{basedir}/{analysis}/log/{sample}_Fusion_modificator.log"
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ -B /mnt/beegfs/pipelines/sandbox_dir/seqoia/singularity/seqoia_cancer-main:/mnt/beegfs/pipelines/sandbox_dir/seqoia/singularity/seqoia_cancer-main -B /mnt/beegfs/database/bioinfo/seqoia/original/scratch2/tmp/shared_files_tmp/CNV/gene_list:/scratch2/tmp/shared_files_tmp/CNV/gene_list /mnt/beegfs/software/seqoia/singularity/python3-numpy_1.16.2-1.sif bash -c "python3 {input.script_python} --fusion_inspector_file {input.fusion_inspector} --arriba_file {input.arriba} --fusion_catcher_file {input.catcher} --star_file {input.star} -m {params.mercury} -c {params.curie} -g {params.gene_census} 2>&1 | tee -a {log}"
+		"""

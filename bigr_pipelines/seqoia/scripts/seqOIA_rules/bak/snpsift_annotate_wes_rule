@@ -1,0 +1,13 @@
+rule snpsift_annotate_wes:
+	input:
+		vcf = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_merged_VTN.vcf",
+		database = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_mutect2_wes_database.vcf.gz",  basedir=basedir, analysis=wildcards.analysis, prefix=vcf_id ,index=wildcards.index),
+		database_index = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_mutect2_wes_database.vcf.gz.tbi", basedir=basedir, analysis=wildcards.analysis, prefix=vcf_id,index=wildcards.index)
+	output:
+		temp("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_snpsift_annotated_wes.vcf")
+	log:
+		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_snpsift_annotated_wes.log"
+	params:
+		snpsift_options = config["snpsift_annotate_wes"]["OPTIONS"],
+	shell:
+		"java -Xmx500m -Xms500m -XX:ParallelGCThreads=1 -XX:+AggressiveHeap -jar /usr/share/java/SnpSift.jar annotate -c /etc/snpeff/snpEff.config {params.snpsift_options} {input.database} {input.vcf} 2>&1 1> {output} | tee -a {log}"

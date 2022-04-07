@@ -1,0 +1,21 @@
+rule gatk_mutect2_wes:
+	input:
+		bam_T = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bam", index=wildcards.index, prefix=wes_tumor, basedir=basedir, analysis=wildcards.analysis),
+		bai_T = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bai", index=wildcards.index, prefix=wes_tumor, basedir=basedir, analysis=wildcards.analysis),
+		bam_C = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bam", index=wildcards.index, prefix=wgs_constit, basedir=basedir, analysis=wildcards.analysis),
+                bai_C = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_bqsr.bai", index=wildcards.index, prefix=wgs_constit, basedir=basedir, analysis=wildcards.analysis)
+	output:
+		vcf = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_mutect2.vcf",
+		idx = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_mutect2.vcf.idx",
+		stat = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_mutect2.vcf.stats"
+	resources: io=1
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_mutect2_wes.log"
+	params:
+		reference = config["general_informations"]["FASTA_FILE"],
+		mutect2_options = config["gatk_mutect2_wes"]["OPTIONS"],
+		constit = str(config["general_informations"]["WGS-C"]["ID"]).split("_S")[0]
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ /mnt/beegfs/software/seqoia/singularity/gatk_4.1.2.0-1.sif bash -c "java -Xmx4000m -Xms4000m -XX:ParallelGCThreads=1 -XX:+AggressiveHeap -jar /usr/share/java/gatk-package-4.1.2.0-local.jar Mutect2 {params.mutect2_options} -I {input.bam_T} -I {input.bam_C} -normal {params.constit} -L {wildcards.index} -O {output.vcf} -R {params.reference} 2>&1 | tee -a {log}"
+		"""

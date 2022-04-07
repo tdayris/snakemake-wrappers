@@ -1,0 +1,12 @@
+rule bedtools_wes:
+	input:
+		"{basedir}/{analysis}/{prefix}/{prefix}_concat_nobed.vcf"
+	output:
+		"{basedir}/{analysis}/{prefix}/sign_mut/{prefix}_concat.vcf"
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_bedtools.log"
+	params:
+		bedtools_options = config["bedtools"]["OPTIONS"],
+		bed = config["bedtools"]["BED"]
+	shell:
+		"bedtools intersect {params.bedtools_options} -a {input} -b {params.bed} > {output} 2>&1 | tee -a {log}"

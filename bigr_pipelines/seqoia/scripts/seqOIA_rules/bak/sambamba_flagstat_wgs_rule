@@ -1,0 +1,13 @@
+rule sambamba_flagstat_wgs:
+	input:
+		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.temp.bam"
+	output:
+		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_flagstat.txt"
+	resources: io=8
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_sambamba_flagstat.log"
+	params:
+		sambamba_flagstat_options = config["sambamba_flagstat"]["OPTIONS"]
+	shell:
+		"sambamba flagstat {params.sambamba_flagstat_options} {input} > {output} 2>&1 | tee -a {log}"
+

@@ -1,0 +1,9 @@
+rule export_irods_identito_sample_wgs:
+	input:
+		identito = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/{prefix}_identito_temp.csv", basedir=basedir, analysis=analysis, prefix=wildcards.prefix)
+	output:
+		identito = "{export_dir}/{analysis}/{prefix}/{prefix}_identito.csv",
+	log:
+		basedir+"/{analysis}/log/{prefix}/{prefix}_identito_export_irods.log"
+	shell:
+		"rsync -Paz {input.identito} {output.identito} 2>&1 | tee -a {log}"

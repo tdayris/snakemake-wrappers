@@ -1,0 +1,18 @@
+rule bcftools_reheader_wgs:
+	input:
+		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_snpsift_phastcons.vcf"
+	output:
+		temp("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_reheader.vcf")
+	resources: io=6
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_bcftools_reheader.log"
+	run:
+		with open("{wildcards.basedir}/" + wildcards.analysis + "/" + wildcards.prefix + "/" + wildcards.prefix + "_name.vcf", "w+") as f:
+			f.write(str(wildcards.prefix))
+		chr_file = "{}".format(input)	
+		if os.stat(chr_file).st_size==0:
+			cmd = "set -o pipefail; touch {output}"
+			shell(cmd)
+		else:
+			cmd = "set -o pipefail; bcftools reheader -s " + "{basedir}/" + wildcards.analysis + "/" + wildcards.prefix + "/" + wildcards.prefix + "_name.vcf -o {output} {input} 2>&1 | tee -a {log}"
+			shell(cmd)

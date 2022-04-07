@@ -1,0 +1,11 @@
+rule chimeraviz_cancer:
+	input:
+		tsv = "{basedir}/{analysis}/{sample}/star_fusion/fusion_inspector/{sample}.FusionInspector.fusions.abridged.tsv",
+		R = lambda wildcards: expand("{script_dir}/Wrapper_chimeraviz_191203.r", script_dir=script_dir)
+	output:
+		svg = "{basedir}/{analysis}/{sample}/star_fusion/chimeraviz/{sample}_chimeraviz.svg"
+	log:
+		"{basedir}/{analysis}/log/{sample}/star_fusion/{sample}_chimeraviz.log"
+	params:
+	shell:
+		"Rscript {input.R} {input.tsv} chimeraviz/{wildcards.sample}_chimeraviz.svg && cp chimeraviz/{wildcards.sample}_chimeraviz.svg {output.svg} 2>&1 | tee -a {log}"

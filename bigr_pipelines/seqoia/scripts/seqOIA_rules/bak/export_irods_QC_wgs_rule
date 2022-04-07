@@ -1,0 +1,12 @@
+rule export_irods_QC_wgs:
+	input:
+		QC = "{basedir}/{analysis}/{analysis}_qc.csv",
+		QC_lab = "{basedir}/{analysis}/{analysis}_qc_lab_temp.csv"
+	output:
+		"{export_dir}/{analysis}/{analysis}_qc_export.done"
+	log:	
+		basedir+"/{analysis}/log/QC_export_irods.log"
+	shell:
+		"rsync -Paz {input.QC} {input.QC_lab} {wildcards.export_dir}/{analysis}/ && touch {output} 2>&1 | tee -a {log}"
+		
+			

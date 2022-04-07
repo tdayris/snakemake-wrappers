@@ -1,0 +1,46 @@
+rule samplot_trio:
+	input:
+		tsv= "{basedir}/{analysis}/{prefix}/CNVnator/instanSV/{prefix}_cnvnator_2000.tsv",
+		bam = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.temp.bam", basedir=basedir, analysis=wildcards.analysis, prefix=prefix, index=wildcards.index),
+		bai = lambda wildcards: expand("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.temp.bam.bai",basedir=basedir, analysis=wildcards.analysis, prefix=prefix, index=wildcards.index),
+		folder = "{basedir}/{analysis}/{prefix}/CNVnator/samplot/"
+	output:
+		flag = "{basedir}/{analysis}/{prefix}/CNVnator/samplot_chr_{index}.done"
+	params:
+		samplot_options = config["Samplot_trio"]["OPTIONS"],
+		samples = config["general_informations"]["SAMPLES"]
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_samplot_trio_chr_{index}.log"
+	run:
+		chromosome = wildcards.index
+		sample = params.samples
+		bams = input.bam
+		options = params.samplot_options
+		family = []
+		bam_family = []
+		for k in sample:
+			family.append(k.split("_S")[0])
+			for b in bams:
+				if k == b.split("/")[-3]:
+					bam_family.append(b)
+		##
+		template = "samplot " + options +  " -n {trio} -b {bam} -o {out} -c {chr} -s {start_chr} -e {end_chr}"
+		##
+		with open(input.tsv, "r") as f:
+			for lines in f:
+				lines = lines.split("\t")
+				index = str(lines[1].split(":")[0])
+				if chromosome == index:
+					event = lines[0]
+					start = int(lines[1].split(":")[1].split("-")[0]) - 1
+					end = lines[1].split(":")[1].split("-")[1]
+					if event == "duplication":
+						name_event = "DUP"
+					else:
+						name_event = "DEL"
+					file_name = "_".join([name_event, index, str(start), end + ".png"])
+					file_name = "{basedir}/{analysis}/{prefix}/CNVnator/samplot/".format(basedir=wildcards.basedir, analysis=wildcards.analysis,prefix=wildcards.prefix) + file_name
+					cmd = template.format(trio=" ".join(family), bam=" ".join(bam_family), out=file_name, chr=index, start_chr=start, end_chr=end)
+					print(cmd)
+					shell(cmd)
+		shell("touch {output.flag}")

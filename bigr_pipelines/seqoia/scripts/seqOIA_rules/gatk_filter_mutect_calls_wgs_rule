@@ -1,0 +1,15 @@
+rule gatk_filter_mutect_calls_wgs:
+	input:
+		vcf = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wgs_mutect2.vcf",
+		idx = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wgs_mutect2.vcf.idx"
+	output:
+		vcf = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_somatic_wgs.vcf",
+		idx = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_somatic_wgs.vcf.idx"
+	resources: io=1
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_filter_mutect2_wgs.log"
+	params:
+		reference = config["general_informations"]["FASTA_FILE"],
+		filter_mutect2_options = config["gatk_filter_mutect2_wgs"]["OPTIONS"],
+	shell:
+		'java -Xmx7000m -Xms7000m -XX:ParallelGCThreads=2 -XX:+AggressiveHeap -jar /usr/share/java/gatk-package-4.1.0.0-local.jar FilterMutectCalls {params.filter_mutect2_options} -V {input.vcf} -L /data/annotations/Human/GRCh38/DB/custom/Twist_Bioscience/Merge_CORE-SPIKE_GRCh38.{wildcards.index}.merged.bed -O {output.vcf} -R {params.reference} 2>&1 | tee -a {log}'

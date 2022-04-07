@@ -1,0 +1,14 @@
+rule genomiser_wgs:
+	input:
+		vcf = "{basedir}/{analysis}/{analysis}_final_temp.vcf",
+		yml = "{basedir}/{analysis}/test-analysis-genome.yml",
+		properties = "application.properties"
+	output:
+		vcf = "{basedir}/{analysis}/genomiser/analyse_genomiser_FULL_PASS+ReMM+CADD.vcf",
+		html = "{basedir}/{analysis}/genomiser/analyse_genomiser_FULL_PASS+ReMM+CADD.html"
+	params:
+		database = config["genomiser"]["OPTIONS"]
+	log:
+		"{basedir}/{analysis}/log/genomiser/genomiser.log"
+	shell:
+		"java -Xms4g -Xmx8g -jar /usr/share/exomiser/exomiser-cli-11.0.0.jar --analysis {input.yml} --exomiser.data-directory={params.database} 2>&1 | tee -a {log}"	

@@ -1,0 +1,22 @@
+rule signature_mut_matrix:
+	input:
+		vcf = "{basedir}/{analysis}/{prefix}/sign_mut/{prefix}_concat.vcf",
+		py_file = expand("{script_dir}/signature_mutationelle_09072020.py", script_dir=script_dir),
+		output_folder = "{basedir}/{analysis}/{prefix}/sign_mut/output/plots"
+	output:
+		plots_SBS96 = "{basedir}/{analysis}/{prefix}/sign_mut/output/plots/SBS_96_plots_test_exome.pdf",
+		plots_ID83 = "{basedir}/{analysis}/{prefix}/sign_mut/output/plots/ID_83_plots_test_exome.pdf",
+		plots_DBS78 = "{basedir}/{analysis}/{prefix}/sign_mut/output/plots/DBS_78_plots_test_exome.pdf",
+		decomp_DBS78 = "{basedir}/{analysis}/{prefix}/sign_mut/Res/Deconvolution_DBS78_Decomposed/Signature_plotDBS_78_plots_Deconvolution_DBS78_Decomposed.pdf",
+		act_DBS78 = "{basedir}/{analysis}/{prefix}/sign_mut/Res/Deconvolution_DBS78_Decomposed/Deconvolution_DBS78_Decomposed_Activities_Plot_SBS78.pdf",
+		decomp_ID83 = "{basedir}/{analysis}/{prefix}/sign_mut/Res/Deconvolution_ID83_Decomposed/Signature_plotID_83_plots_Deconvolution_ID83_Decomposed.pdf",
+		act_ID83 = "{basedir}/{analysis}/{prefix}/sign_mut/Res/Deconvolution_ID83_Decomposed/Deconvolution_ID83_Decomposed_Activities_Plot_SBS83.pdf",
+		act_SB96 = "{basedir}/{analysis}/{prefix}/sign_mut/Res/Deconvolution_SB96_Decomposed/Deconvolution_SB96_Decomposed_Activities_Plot_SBS96.pdf",
+		decomp_SB96 = "{basedir}/{analysis}/{prefix}/sign_mut/Res/Deconvolution_SB96_Decomposed/Signature_plotSBS_96_plots_Deconvolution_SB96_Decomposed.pdf",
+	resources: io=10
+	params:
+		signature_mutationelle_options = config["signature_mutationelle"]["OPTIONS"]
+	log:
+		"{basedir}/{analysis}/log/sign_mut_generation.log"
+	shell:
+		"python3 {input.py_file} {params.signature_mutationelle_options} -i {input.vcf} -p {wildcards.prefix} 2>&1 | tee -a {log}"

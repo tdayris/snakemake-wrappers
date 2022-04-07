@@ -1,0 +1,26 @@
+rule json_export_cancer_wgs:
+	input:
+		vcf = "{export_dir}/{analysis}/{analysis}_final.vcf",
+		config = "{export_dir}/{analysis}/config/",
+		qc = "{export_dir}/{analysis}/{analysis}_qc_lab.csv",
+		tar_output = "{export_dir}/{analysis}/{analysis}.tar.gz",
+		script_python = lambda wildcards: expand("{script_dir}/json_export_creation.py", script_dir=script_dir),
+		bam_wgs = lambda wildcards: expand("{export_dir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.bam", export_dir=export_dir, analysis=wildcards.analysis, prefix = [wgs_constit,wes_tumor], index=index),
+		bai_wgs = lambda wildcards: expand("{export_dir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_markdup.bam.bai", export_dir=export_dir, analysis=wildcards.analysis, prefix = [wgs_constit,wes_tumor], index=index),
+		bam_wts = lambda wildcards: expand("{export_dir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_markdup.bam", export_dir=export_dir, analysis=wildcards.analysis, prefix = wts, index=index),
+		bai_wts = lambda wildcards: expand("{export_dir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wts_markdup.bam.bai", export_dir=export_dir, analysis=wildcards.analysis, prefix = wts, index=index)
+	priority: 40
+	output:
+		"{export_dir}/{analysis}/{analysis}.json"
+	log:	
+		basedir+"/{analysis}/log/json_export_irods.log"
+	params:
+		proband = config["general_informations"]["WGS-C"]["ID"].split("_S")[0],
+		pipeline_config = config["general_informations"]["PIPELINE_CONFIG"],
+		sequenceur = config["general_informations"]["WGS-C"]["SEQUENCEUR"],
+		run = config["general_informations"]["WGS-C"]["RUN"]
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ -B /mnt/beegfs/database/bioinfo/seqoia/original/annotations:/data/annotations /mnt/beegfs/software/seqoia/singularity/python3-bs4_4.5.3-1.sif bash -c "python3 {input.script_python} -v {input.vcf} -c {input.config} -q {input.qc} -tar {input.tar_output} -j {wildcards.export_dir}/{params.sequenceur}/{params.run}/json/{params.proband}.json -bam {input.bam_wgs} {input.bam_wts} -bai {input.bai_wts} {input.bai_wgs} -o {output} 2>&1 | tee -a {log}"
+		touch {output}
+		"""

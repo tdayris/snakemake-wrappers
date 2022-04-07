@@ -1,0 +1,21 @@
+rule star_fusion_inspector:
+	input:
+		tsv = "{basedir}/{analysis}/{sample}/star_fusion/fusion_merged_reciproque.txt",
+		R1 = "{basedir}/{analysis}/{sample}/star_fusion/{sample}_concat_R1.fastq",
+		R2 = "{basedir}/{analysis}/{sample}/star_fusion/{sample}_concat_R2.fastq"
+	output:
+		folder = "{basedir}/{analysis}/{sample}/star_fusion/fusion_inspector/",
+		tsv = "{basedir}/{analysis}/{sample}/star_fusion/fusion_inspector/{sample}.FusionInspector.fusions.abridged.tsv.coding_effect",
+		tsv_2 = "{basedir}/{analysis}/{sample}/star_fusion/fusion_inspector/{sample}.FusionInspector.fusions.tsv",
+		#tsv_3 = temp("{basedir}/{analysis}/{sample}/star_fusion/fusion_inspector/{sample}.FusionInspector.fusions.abridged.tsv")
+	resources: io=20
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}_star_fusion_inspector.log"
+	params:
+		star_fusion_options = config["star_fusion_inspector"]["OPTIONS"],
+		genome_dir = config["star_fusion_inspector"]["GENOME_DIR"],
+		run = config["general_informations"]["WTS"]["RUN"],
+		sequenceur = config["general_informations"]["WTS"]["SEQUENCEUR"]
+	run:
+		cmd = "/usr/local/src/STAR-Fusion/FusionInspector/FusionInspector {params.star_fusion_options} --left_fq {input.R1} --right_fq {input.R2} --genome_lib_dir {params.genome_dir} --fusions {input.tsv} --output_dir {output.folder} --out_prefix {wildcards.sample} 2>&1 | tee -a {log}"
+		shell(cmd)

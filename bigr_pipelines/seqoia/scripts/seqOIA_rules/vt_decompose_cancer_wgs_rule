@@ -1,0 +1,13 @@
+rule vt_decompose_cancer_wgs:
+	input:
+		"{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}.vcf"
+	output:
+		temp("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_VTD.vcf")
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_VTD.log"
+	params:
+		vt_decompose_options=config["vt_decompose"]["OPTIONS"]
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ /mnt/beegfs/software/seqoia/singularity/vt_0.5-1.sif bash -c "vt decompose {params.vt_decompose_options} {input} -o {output} 2>&1 | tee -a {log}"
+		"""

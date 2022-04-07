@@ -1,0 +1,21 @@
+rule bwa_mem_trio_wgs:
+	input:
+		flag = lambda wildcards: expand("{export_dir}/{sequenceur}/{run}/renaming.done",zip, export_dir=export_dir, sequenceur = config["general_informations"][str(wildcards.sample).split("_S")[0]]["SEQUENCEUR"], run = config["general_informations"][str(wildcards.sample).split("_S")[0]]["RUN"]),
+		R1 = lambda wildcards: expand("{export_dir}/{sequenceur}/{run}/fastq/{sample}_R1_001.fastq.gz", export_dir=export_dir, sequenceur = config["general_informations"][str(wildcards.sample).split("_S")[0]]["SEQUENCEUR"], run = config["general_informations"][str(wildcards.sample).split("_S")[0]]["RUN"], sample=wildcards.sample),
+		R2 = lambda wildcards: expand("{export_dir}/{sequenceur}/{run}/fastq/{sample}_R2_001.fastq.gz",export_dir=export_dir, sequenceur = config["general_informations"][str(wildcards.sample).split("_S")[0]]["SEQUENCEUR"], run = config["general_informations"][str(wildcards.sample).split("_S")[0]]["RUN"], sample=wildcards.sample)
+	output:
+		bam = "{basedir}/{analysis}/{sample}/{sample}_sorted.bam"
+	resources: io=2
+	priority: 50
+	log:
+		"{basedir}/{analysis}/log/{sample}/{sample}.bwa_mem.log"
+	params:
+		reference = config["general_informations"]["FASTA_FILE"],
+		bwa_mem_options = config["bwa_mem"]["OPTIONS"],
+		pl_rg = "ILLUMINA",
+		lb_rg = config["general_informations"]["TARGET_TYPE"],
+		pu_rg = config["general_informations"]["PLATEFORME UNIT"],
+		samtools_sort_options = config["samtools_sort"]["OPTIONS"],
+		tSM = lambda wildcards: str(wildcards.sample).split('_S')[0]
+	shell:
+		"set -o pipefail; bwa mem {params.bwa_mem_options} -R '@RG\\tID:{wildcards.sample}\\tPL:{params.pl_rg}\\tLB:{params.lb_rg}\\tPU:{params.pu_rg}\\tSM:{params.tSM}' {params.reference} {input.R1} {input.R2} | samtools sort {params.samtools_sort_options} -O bam -o {output.bam} 2>&1 | tee -a {log}"

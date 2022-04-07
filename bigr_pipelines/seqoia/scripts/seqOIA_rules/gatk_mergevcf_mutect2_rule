@@ -1,0 +1,14 @@
+rule gatk_mergevcf_mutect2:
+	input:
+		vcf_tumor_only = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_filter_tumor_only.vcf",
+		vcf_filtered = "{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_select_variant_somatic_wes.vcf",
+	output:
+		temp("{basedir}/{analysis}/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_merged.vcf")
+	log:
+		"{basedir}/{analysis}/log/{prefix}/chr_{index}/{prefix}_chr_{index}_wes_merged.log"
+	params:
+		gatk_mergevcf_options = config["gatk_mergevcf"]["OPTIONS"]
+	shell:
+		"""
+		singularity exec -B /mnt/beegfs/database/bioinfo/seqoia:/mnt/beegfs/database/bioinfo/seqoia -B /mnt/beegfs/scratch/:/mnt/beegfs/scratch/ /mnt/beegfs/software/seqoia/singularity/gatk_4.1.4.1-1.sif bash -c "java -Xmx11500m -Xms11500m -XX:ParallelGCThreads=4 -XX:+AggressiveHeap -jar /usr/share/java/gatk-package-4.1.4.1-local.jar MergeVcfs {params.gatk_mergevcf_options} -I {input.vcf_filtered} -I {input.vcf_tumor_only} -O {output} 2>&1 | tee -a {log}"
+		"""

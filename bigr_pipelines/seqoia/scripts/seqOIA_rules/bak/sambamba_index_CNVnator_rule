@@ -1,0 +1,11 @@
+rule sambamba_index_CNVnator:
+	input:
+		bam = "{basedir}/{analysis}/{prefix}/{prefix}_cnvnator_merged.bam",
+	output:
+		bai = "{basedir}/{analysis}/{prefix}/{prefix}_cnvnator_merged.bam.bai"
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_sambamba_index_cnvnator.log"
+	params:
+		sambamba_index_options = config["sambamba_index_genome"]["OPTIONS"]
+	shell:
+		"sambamba index {params.sambamba_index_options} {input.bam} 2>&1 | tee -a {log}"

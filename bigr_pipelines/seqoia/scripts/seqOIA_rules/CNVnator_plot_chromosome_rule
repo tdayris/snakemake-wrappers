@@ -1,0 +1,19 @@
+rule CNVnator_plot_chromosome:
+	input:
+		root = "{basedir}/{analysis}/{prefix}/CNVnator/{prefix}_cnvnator.root",
+		vcf = "{basedir}/{analysis}/{prefix}/CNVnator/{prefix}_cnvnator_2000.vcf",
+		coordinate = "/data/annotations/CNVnator/GRCh38/chr_coordinates/{index}.txt"
+	output:
+		png = "{basedir}/{analysis}/{prefix}/CNVnator/graphs/{prefix}_chr_{index}_cnvnator.png"
+	params:
+		his_cnvnator_options = config["CNVnator"]["HIS"],
+	log:
+		"{basedir}/{analysis}/log/{prefix}/{prefix}_cnvnator.log"
+	run:
+		coordinate = ""
+		with open(input.coordinate, "r") as f:
+			data = f.readlines()
+			coordinate = data[0].split("\n")[0]
+			print("coordinate :",coordinate)
+		cmd = "plotrdbaf.py -bs {params.his_cnvnator_options} -rdbs {params.his_cnvnator_options} -res {params.his_cnvnator_options} -o {output.png} -t \"{wildcards.prefix} RD+BAF {params.his_cnvnator_options} chromsome {wildcards.index}\"  {input.root} " + coordinate + " 2>&1 | tee -a {log}"
+		shell(cmd)

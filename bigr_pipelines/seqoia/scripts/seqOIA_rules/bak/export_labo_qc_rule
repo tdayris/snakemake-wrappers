@@ -1,0 +1,11 @@
+rule export_labo_qc:
+	input:
+		qc_json = lambda wildcards: expand("{export_dir}/{analysis}/{analysis}_qc_lab.json", export_dir = export_dir, analysis=analysis),
+		qc_csv = lambda wildcards: expand("{export_dir}/{analysis}/{analysis}_qc_lab.csv", export_dir = export_dir, analysis=analysis)
+	output:
+		json = "{export_dir}/export_labo/{analysis}_qc_lab.json",
+		csv = "{export_dir}/export_labo/{analysis}_qc_lab.csv"
+	log:
+		basedir+"/{analysis}/log/{analysis}_qc_lab_export_.log"
+	shell:
+		"ln -s {input.qc_json} {output.json} && ln -s {input.qc_csv} {output.csv} 2>&1 | tee -a {log}"
