@@ -189,7 +189,8 @@ sample = {
         "OPTIONS": "--smith-waterman FASTEST_AVAILABLE"
     },
     "general_informations": {
-        "ANALYSIS": "MR363",
+        #"ANALYSIS": "MR363",
+        "ANALYSIS": snakemake.wildcards['sample']
         "BIOINFO_ANALYSIS_DATE": "15022022",
         "CHR": {
             "AUTOSOME": [
