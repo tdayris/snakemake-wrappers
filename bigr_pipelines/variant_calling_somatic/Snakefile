@@ -118,14 +118,14 @@ rule all:
         ),
         qc="multiqc/variant_calling_somatic.html",
         #calling_result="final.vcf.list"
-        results=expand("pandas/filter/{how}/dp{dp}/{sample}.dp{dp}.tsv", 
-            how=["all", "census_only", "oncokb_only"] if config.get("ANMO", False) is True else ["all"], 
-            sample=design["Sample_id"].tolist(), 
+        results=expand("pandas/filter/{how}/dp{dp}/{sample}.dp{dp}.tsv",
+            how=["all", "census_only", "oncokb_only"] if config.get("ANMO", False) is True else ["all"],
+            sample=design["Sample_id"].tolist(),
             dp=["10", "40", "60"]
         ),
-        results_xl=expand("pandas/filter/{how}/dp{dp}/{sample}.dp{dp}.xlsx", 
-            how=["all", "census_only", "oncokb_only"] if config.get("ANMO", False) is True else ["all"], 
-            sample=design["Sample_id"].tolist(), 
+        results_xl=expand("pandas/filter/{how}/dp{dp}/{sample}.dp{dp}.xlsx",
+            how=["all", "census_only", "oncokb_only"] if config.get("ANMO", False) is True else ["all"],
+            sample=design["Sample_id"].tolist(),
             dp=["10", "40", "60"]
         )
     output:
@@ -840,7 +840,7 @@ Filter a bam over the capturekit bed file
 """
 rule samtools_filter_bed:
     input:
-        "sambamba/sort/{sample}_{status}.bam"
+        "sambamba/sort/{sample}_{status}.bam",
         fasta=config["genome"],
         fasta_idx=get_fai(config["genome"]),
         fasta_dict=get_dict(config["genome"]),

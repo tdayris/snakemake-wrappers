@@ -363,15 +363,38 @@ use rule gatk_compute_baserecalibration_table from gatk_bqsr_meta with:
 
 
 """
+This rule indexes a given bam file, using samtools index. Most of the time,
+fasta indexes are not explicitely requested by softwares, but they will crash
+if this index is missing.
+"""
+rule samtools_index_bam:
+    input:
+        "samtools/filter/{sample}.bam"
+    output:
+        "samtools/filter/{sample}.bam.bai"
+    message:
+        "Indexing {wildcards.sample}.bam with Samtools index"
+    threads: 20
+    resources:
+        mem_mb=lambda wildcards, attempt: min(attempt * 1024, 8192),
+        time_min=lambda wildcards, attempt: attempt * 30,
+        tmpdir="tmp"
+    log:
+        "samtools/intdex/{sample}/index.log"
+    wrapper:
+        "bio/samtools/index"
+
+
+"""
 Filter a bam over the capturekit bed file
 """
 rule samtools_filter_bed:
     input:
-        "sambamba/sort/{sample}.bam"
-        fasta=config["genome"],
-        fasta_idx=get_fai(config["genome"]),
-        fasta_dict=get_dict(config["genome"]),
-        bed=config["bed"]
+        "sambamba/sort/{sample}.bam",
+        fasta=config["ref"]["fasta"],
+        fasta_idx=get_fai(config["ref"]["fasta"]),
+        fasta_dict=get_dict(config["ref"]["fasta"]),
+        bed=config["ref"]["capture_kit_bed"]
     output:
         temp("samtools/filter/{sample}.bam")
     threads: 10
