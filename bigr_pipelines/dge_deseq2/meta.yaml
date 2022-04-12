@@ -43,3 +43,79 @@ notes: |
     * - ...
       - ...
       - ...
+
+
+  How doas it work ?
+
+  1. Salmon quantification
+
+  You name it! It's the salmon_quant pipeline itself. I won't copy-paste all
+  it explanations around here, click on salmon_quant on the left panel and see
+  you here right after.
+
+  2. Aggregation
+
+  Based on the GTF annotation, the correspondancy between trnascripts
+  identifiers and gene names is written in a text table. This will later be
+  used for annotations and results descriptions.
+
+  TXimport is used to aggregate trnascript counts into gene ones. It also takes
+  bootstraps into account and build a DESeqDataset object with statistical
+  formula and experimental design included.
+
+  3. DESeq2
+
+  DESeq2 is run over all factor combinations (1 condition vs 1 other), for every
+  single possible comparisons. We use ENSG annotations in this step to avoid
+  duplicates in gene names. This would raise errors and lead to errors in the
+  result interpretations.
+
+  If you have more than 2 factors, this step can return A LOT of results. And
+  by A LOT, I speak about combinations and interpolations. Example: with 2
+  factors (WT and KO) and 2 status (Treated and Untreated), then 6 comparisons
+  are computed. If you add a single batch effect, then up to 28 comparisons can
+  be computed. Most of the time, only one or two of them are usefull.
+
+  Look at the results names or filter them!
+
+  You may modify your config-file to auto-filter results. Note the head of your
+  config-file. It starts with `design: path: design.tsv`. On the same level as
+  `path` add a new key named `include_only` to include results with a given
+  list of words in it. Example: with 2 factors (WT and KO) and 2 status
+  (Treated and Untreated). It want only WT_Untreated to be the reference. Then,
+  I add `include_only: ['WT_Untreated']` in the config file.
+
+  You may wan to "combine" two columns in your design file. Use
+  `aggregate_col: [["factor1", "factor2"]]` to combine them. Example: with 2
+  factors (WT and KO) and 2 status (Treated and Untreated). I would write:
+  `aggregate_col: [["factor", "status"]]` on the same level as `path`.
+
+  4. Post processing: TSV
+
+  DESeq2 results are not usefull for a fellow biologists. They are annotated by
+  in-house scripts. Gene names are added, pvalues are filtered, counts are
+  merged and results are sorted around the two most asked ranks.
+
+  Differential expression satus is also written in full letters, as well as the
+  expression change.
+
+  5. Post processing: PNG
+
+  DESeq2 objects are not usefull for fellow biologists. Most of them do not use
+  R/Python on a daily basis and it is completely normal. Clustering, MAPlots,
+  Volcanoplots and many others are build and aggregated in a nice HTML page.
+
+  You may need special graphs over genes of interest. This may be to highlight
+  a differential expression or to understand why surch expression variation was
+  not statistically significant. Then use the key: `genes_of_interest` with a
+  list of genes on the same level as `design`.
+
+  6. Post processing: Quality controls
+
+  Additional quality controls are built for this pipeline. Most of them
+  are embedded in a HTML file with MultiQC. It also includes salmon_quant
+  quality controls!
+
+  Note that a MultiQC HTML report ships only the samples used in the comparison.
+  If a Sample should not belong to a given HTML report, then the design was
+  wrong to begin with...
