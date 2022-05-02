@@ -1,12 +1,26 @@
 rule test_seaborn_clustermap_genes:
     input:
-        counts = "table.tsv"
+        tsv = "table.tsv"
     output:
         png = "clustermap.png"
     log:
         "clustermap.log"
     params:
-        conditions = {"a": "CondA", "b": "CondB"},
+        # conditions = {"a": "CondA", "b": "CondB"},
+        conditions = {
+            "s897": "A",
+            "s929": "A",
+            "s921": "A",
+            "s931": "A",
+            "s933": "B",
+            "s943": "B",
+            "s948": "B",
+            "s954": "B",
+            "s967": "C",
+            "s971": "C",
+            "s974": "C",
+            "s980": "C",
+        },
         factor = "Condition_Test"
     wrapper:
         "master/bio/seaborn/clustermap_genes"
