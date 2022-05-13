@@ -878,6 +878,21 @@ def test_bedtools_sort():
 
 
 @skip_if_not_modified
+def test_bedtools_maskfasta():
+    run(
+        "bio/bedtools/maskfasta",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "masked.fasta"
+        ]
+    )
+
+
+@skip_if_not_modified
 def test_bedtools_intersect():
     run(
         "bio/bedtools/intersect",
