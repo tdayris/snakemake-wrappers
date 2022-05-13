@@ -845,6 +845,21 @@ def test_bedtools_genomecoveragebed():
 
 
 @skip_if_not_modified
+def test_bedtools_getfasta():
+    run(
+        "bio/bedtools/getfasta",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "sequences.fasta"
+        ]
+    )
+
+
+@skip_if_not_modified
 def test_bedtools_complement():
     run(
         "bio/bedtools/complement",

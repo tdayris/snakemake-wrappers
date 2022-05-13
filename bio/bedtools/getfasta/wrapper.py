@@ -24,8 +24,8 @@ shell(
     "bedtools getfasta "
     "-fi {snakemake.input.ref} "
     "-bed {snakemake.input.bed} "
-    "-fo {snakemake.output.bed} "
+    "-fo {snakemake.output[0]} "
     "{out_format} "
     "{extra} "
-    "{log"
+    "{log}"
 )
