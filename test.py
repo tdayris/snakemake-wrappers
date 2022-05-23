@@ -1420,7 +1420,7 @@ def test_bwa_mem2_index():
 @skip_if_not_modified
 def test_dragmap_build():
     run(
-        "bio/dragmap/build", 
+        "bio/dragmap/build",
         ["snakemake", "--cores", "1", "genome/hash_table.cfg", "--use-conda", "-F"],
     )
 
@@ -3863,6 +3863,13 @@ def test_msisensor_msi():
     run(
         "bio/msisensor/msi",
         ["snakemake", "--cores", "1", "--use-conda", "-F", "example.msi"],
+    )
+
+
+def test_tximeta_makelinkedtxome():
+    run(
+        "bio/tximeta/makelinkedtxome",
+        ["snakemake", "--cores", "1", "dummy.json", "-F", "--use-conda"],
     )
 
 
