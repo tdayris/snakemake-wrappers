@@ -190,7 +190,7 @@ sample = {
     },
     "general_informations": {
         #"ANALYSIS": "MR363",
-        "ANALYSIS": snakemake.wildcards['sample']
+        "ANALYSIS": snakemake.wildcards['sample'],
         "BIOINFO_ANALYSIS_DATE": "15022022",
         "CHR": {
             "AUTOSOME": [

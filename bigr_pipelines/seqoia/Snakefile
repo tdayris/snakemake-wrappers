@@ -86,9 +86,10 @@ wildcard_constraints:
 rule target:
     input:
         expand(
-            "data_{sample}/{sample}/{sample}_{datatype}_S1_L1_11",
+            "{sample}.flag",
+            #"data_{sample}/{sample}/{sample}_{datatype}_S1_L1_11",
             sample=sample_list,
-            datatype=datatypes
+            #datatype=datatypes
         )
 
 
@@ -144,6 +145,7 @@ rule prepare_sample_config:
         mem_mb=lambda wildcards, attempt: attempt * 512,
         time_min=lambda wildcards, attempt: attempt * 5,
         tmpdir="tmp"
+    group: "sample"
     # conda:
     #     "env/seqoia.yaml"
     group:
@@ -163,15 +165,18 @@ rule gather_wes_tumor:
     output:
         temp("data_{sample}/A00000/22NNNN_ANNNNN_NNNN_AXXXXXXXXX/fastq/{sample}_WES-T_S1_L1_11_R{stream}_001.fastq.gz")
     message:
-        "Gathering {wildcards.sample} fastq file (WES tumor {wildcards.stream})"
+        "Gathering {wildcards.sample} fastq file (WES-T tumor {wildcards.stream})"
     threads: 1
     resources:
         mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-        time_min=lambda wildcard, attempt: attempt * 45
+        time_min=lambda wildcard, attempt: attempt * 45,
+        tmpdir="tmp"
+    group: "sample"
     params:
-        input=lambda wildcards, output: wes_t[output[0]]
+        input=lambda wildcards, output: wes_t[output[0]],
+        datatype="WES-T"
     log:
-        "logs/bigr_copy/{sample}.{stream}.log"
+        "logs/bigr_copy/{sample}.WES-T.{stream}.log"
     wrapper:
         "bio/BiGR/copy"
 
@@ -180,15 +185,18 @@ rule gather_wes_normal:
     output:
         temp("data_{sample}/A00000/22NNNN_ANNNNN_NNNN_AXXXXXXXXX/fastq/{sample}_WGS-C_S1_L1_11_R{stream}_001.fastq.gz")
     message:
-        "Gathering {wildcards.sample} fastq file (WES normal {wildcards.stream})"
+        "Gathering {wildcards.sample} fastq file (WGS-C {wildcards.stream})"
     threads: 1
     resources:
         mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-        time_min=lambda wildcard, attempt: attempt * 45
+        time_min=lambda wildcard, attempt: attempt * 45,
+        tmpdir="tmp"
+    group: "sample"
     params:
-        input=lambda wildcards, output: wes_n[output[0]]
+        input=lambda wildcards, output: wes_n[output[0]],
+        datatype="WGS-C"
     log:
-        "logs/bigr_copy/{sample}.{stream}.log"
+        "logs/bigr_copy/{sample}.WGS-C.{stream}.log"
     wrapper:
         "bio/BiGR/copy"
 
@@ -197,15 +205,18 @@ rule gather_rna_tumoral:
     output:
         temp("data_{sample}/A00000/22NNNN_ANNNNN_NNNN_AXXXXXXXXX/fastq/{sample}_WTS_S1_L1_11_R{stream}_001.fastq.gz")
     message:
-        "Gathering {wildcards.sample} fastq file (RNA tumor {wildcards.stream})"
+        "Gathering {wildcards.sample} fastq file (WTS tumor {wildcards.stream})"
     threads: 1
     resources:
         mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-        time_min=lambda wildcard, attempt: attempt * 45
+        time_min=lambda wildcard, attempt: attempt * 45,
+        tmpdir="tmp"
+    group: "sample"
     params:
-        input=lambda wildcards, output: rna_t[output[0]]
+        input=lambda wildcards, output: rna_t[output[0]],
+        datatype="WTS"
     log:
-        "logs/bigr_copy/{sample}.{stream}.log"
+        "logs/bigr_copy/{sample}.WTS.{stream}.log"
     wrapper:
         "bio/BiGR/copy"
 
@@ -227,6 +238,7 @@ rule create_empty_files:
         mem_mb=lambda wildcards, attempt: attempt * 128,
         time_min=lambda wildcards, attempt: attempt * 2,
         tmpdir="tmp"
+    group: "sample"
     log:
         "logs/create_empty_files/{sample}.log"
     shell:
@@ -249,6 +261,57 @@ rule seqoia:
         sample_sheet="data_{sample}/sample_sheet/22NNNN_ANNNNN_NNNN_AXXXXXXXXX.csv",
         json="data_{sample}/A00000/22NNNN_ANNNNN_NNNN_AXXXXXXXXX/json/{sample}_WGS-C.json",
     output:
+        touch("{sample}.flag")
+        #fusion_inspector=directory("data_{sample}/{sample}/{sample}_WTS_S1/star_fusion/fusion_inspector/annotator"),
+        #logs=directory(expand(
+        #    "data_{sample}/{sample}/log/{sample}_{datatype}_S1_L1_11",
+        #    datatype=datatypes,
+        #    allow_missing=True
+        #)),
+        #datatype_dir=directory(expand(
+        #    "data_{sample}/{sample}/{sample}_{datatype}_S1_L1_11",
+        #    datatype=datatypes,
+        #    allow_missing=True
+        #)),
+        #charge_mut=directory("data_{sample}/{sample}/Charge_mutationnelle"),
+        #chrom_dirs=directory(expand(
+        #    "data_{sample}/{sample}/chr_{chromosome}",
+        #    chromosome=chromosome_list,
+        #    allow_missing=True
+        #)),
+        #fusion_dir=directory("data_{sample}/{sample}/Fusions"),
+        #export_data_status="data_{sample}/{sample}/export_data_tar.done",
+        #config_dir=directory("data_{sample}/{sample}/config"),
+        #mut_sig=directory("data_{sample}/{sample}/Signature_mutationelle"),
+        #sample_files=multiext(
+        #    "data_{sample}/{sample}/{sample}",
+        #    "_final_temp.vcf",
+        #    "_final.vcf",
+        #    "_importation_gleaves.done",
+        #    ".json",
+        #    "_name.vcf",
+        #    "_qc.csv",
+        #    "_qc_lab.csv",
+        #    "_qc_lab_temp.csv",
+        #    "_qc_validation.done",
+        #    ".tar.gz"
+        #)
+    message:
+        "Running SeqOIA single sample no WGS on {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        time_min=lambda wildcards, attempt: attempt * 60 * 10,
+        # mem_mb = 4096,
+        # time_min = 5,
+        tmpdir="tmp"
+    shadow: "minimal"
+    group: "sample"
+    params:
+        mk = "--parents --verbose",
+        ln = "--symbolic --force --relative",
+        snake_args = "--jobs 30 --rerun-incomplete --keep-going --max-jobs-per-second 1",
+        sbatch = "'sbatch -p {cluster.partition} -t {cluster.time} --cpus-per-task {cluster.cpu} --mem {cluster.mem} --exclude=n01,n02,n03,n04,n05,n06'",
         fusion_inspector=directory("data_{sample}/{sample}/{sample}_WTS_S1/star_fusion/fusion_inspector/annotator"),
         logs=directory(expand(
             "data_{sample}/{sample}/log/{sample}_{datatype}_S1_L1_11",
@@ -260,51 +323,23 @@ rule seqoia:
             datatype=datatypes,
             allow_missing=True
         )),
-        charge_mut=directory("data_{sample}/{sample}/Charge_mutationnelle"),
-        chrom_dirs=directory(expand(
-            "data_{sample}/{sample}/chr_{chromosome}",
-            chromosome=chromosome_list,
-            allow_missing=True
-        )),
-        fusion_dir=directory("data_{sample}/{sample}/Fusions"),
-        export_data_status="data_{sample}/{sample}/export_data_tar.done",
-        config_dir=directory("data_{sample}/{sample}/config"),
-        mut_sig=directory("data_{sample}/{sample}/Signature_mutationelle"),
-        sample_files=multiext(
-            "data_{sample}/{sample}/{sample}",
-            "_final_temp.vcf",
-            "_final.vcf",
-            "_importation_gleaves.done",
-            ".json",
-            "_name.vcf",
-            "_qc.csv",
-            "_qc_lab.csv",
-            "_qc_lab_temp.csv",
-            "_qc_validation.done",
-            ".tar.gz"
-        )
-    message:
-        "Running SeqOIA single sample no WGS on {wildcards.sample}"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
-        time_min=lambda wildcards, attempt: attempt * 60 * 10,
-        tmpdir="tmp"
-    params:
-        mk = "--parents --verbose",
-        ln = "--symbolic --force --relative",
-        snake_args = "--jobs 30 --rerun-incomplete --keep-going --max-jobs-per-second 1",
-        sbatch = "'sbatch -p {cluster.partition} -t {cluster.time} --cpus-per-task {cluster.cpu} --mem {cluster.mem} --exclude=n01,n02,n03,n04,n05,n06'"
-    shadow: "minimal"
     conda:
         "env/seqoia.yaml"
     log:
         "logs/seqOIA/{sample}.log"
     shell:
-        "mkdir {params.mk} {output.fusion_inspector} {output.logs} "
-        "{output.datatype_dir} data_{wildcards.sample}/sample_sheet/"
+        "mkdir {params.mk} {params.fusion_inspector} {params.logs} .snakemake "
+        # "mkdir {params.mk} {output.fusion_inspector} {output.logs} .snakemake "
+        "{params.datatype_dir} data_{wildcards.sample}/sample_sheet/"
+        # "{output.datatype_dir} data_{wildcards.sample}/sample_sheet/"
         "data_{wildcards.sample}/json/ > {log} 2>&1 && "
-        "tree >> {log} 2>&1 && "
+        "tree -a >> {log} 2>&1 && "
+        "pwd >> {log} 2>&1 && "
+        "snakemake --snakefile {input.snakefile} "
+        "--configfile {input.sample_config} "
+        "--cluster-config {input.pipeline_config} "
+        "--cluster {params.sbatch} "
+        "{params.snake_args} --unlock >> {log} 2>&1 && "
         "snakemake --snakefile {input.snakefile} "
         "--configfile {input.sample_config} "
         "--cluster-config {input.pipeline_config} "
