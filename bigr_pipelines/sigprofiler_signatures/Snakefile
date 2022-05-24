@@ -23,7 +23,7 @@ from messages import *
 from snakemake.utils import min_version
 min_version("6.0")
 
-default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
+default_config = read_yaml(worflow_source_dir / "config.yaml")
 configfile: get_config(default_config)
 design = get_design(os.getcwd(), search_vcf_files)
 design["Sample_id"] = design["Sample_id"].str.replace("-", "_")
@@ -51,7 +51,8 @@ ruleorder: sigprofiler_1_1_6_cohort_prepare > sigprofiler_1_1_6_prepare
 rule target:
     input:
         expand("{sample}/sigprofiler/results", sample=design["Sample_id"]),
-        "complete/sigprofiler/results"
+        "complete/sigprofiler/results",
+        expand("sigprofiler/{sigtype}.info.tsv", sigtype=config["sigtypes"])
 
 
 rule sigprofiler_1_1_6_prepare:
@@ -119,7 +120,8 @@ rule sigprofiler_1_1_6_run:
     params:
         org = organism,
         install = "--install" if install_genome is True else "",
-        rundir = lambda wildcards: f"{wildcards.sample}/sigprofiler"
+        rundir = lambda wildcards: f"{wildcards.sample}/sigprofiler",
+        # sigprofiler_script = workflow.source_path("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/sigprofiler_1.1.6.py")
     conda:
         "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/sigprofiler.p37.yaml"
     shell:
@@ -128,6 +130,81 @@ rule sigprofiler_1_1_6_run:
         "rm --force --verbose {params.rundir}/vcf/.snakemake_timestamp >> {log} 2>&1 && "
         "python3 {input.sigprofiler_script} {params.org} {params.rundir} {params.install} >> {log} 2>&1 "
 
+
+rule aggregate_refit:
+    input:
+        expand("{sample}/sigprofiler/results", sample=design["Sample_id"])
+    output:
+        pipe("sigprofiler/refit.{sigtype}.txt")
+    message:
+        "Aggregating refit data for all samples"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 256,
+        time_min=lambda wildcards, attempt: attempt * 10,
+        tmpdir="tmp"
+    log:
+        "logs/aggregate_refit/{sigtype}.log"
+    params:
+        extra="-n '1p;/Sample Name/!p'",
+        infile=lambda wildcards: " ".join([
+            f"{sample}/sigprofiler/results/{wildcards.sigtype}/Suggested_Solution/COSMIC_{wildcards.sigtype}_Decomposed_Solution/Solution_Stats/COSMIC_{wildcards.sigtype}_Samples_Stats_refit.txt" 
+            for sample in design["Sample_id"]
+        ])
+    shell:
+        "sed {params.extra} {params.infile} > {output} 2> {log}"
+
+
+rule aggregate_denovomap:
+    input:
+        expand("{sample}/sigprofiler/results", sample=design["Sample_id"])
+    output:
+        pipe("sigprofiler/denovomap.{sigtype}.txt")
+    message:
+        "Aggregating de-novo Cosmic-mapping data for all samples"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 256,
+        time_min=lambda wildcards, attempt: attempt * 10,
+        tmpdir="tmp"
+    log:
+        "logs/aggregate_denovomap/{sigtype}.log"
+    params:
+        extra="-n '1p;/De novo extracted, Global NMF Signatures/!p;s/, /\t/g'",
+        infile=lambda wildcards: " ".join([
+            f"{sample}/sigprofiler/results/{wildcards.sigtype}/Suggested_Solution/COSMIC_{wildcards.sigtype}_Decomposed_Solution/De_Novo_map_to_COSMIC_{wildcards.sigtype}.csv"
+            for sample in design["Sample_id"]
+        ])
+    shell:
+        "sed {params.extra} {params.infile} > {output} 2> {log}"
+
+
+rule paste_denovomap_refit:
+    input:
+        denovo="sigprofiler/denovomap.{sigtype}.txt",
+        refit="sigprofiler/refit.{sigtype}.txt"
+    output:
+        "sigprofiler/{sigtype}.info.tsv"
+    message: "Pasting refit and denovomaps"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 256,
+        time_min=lambda wildcards, attempt: attempt * 10,
+        tmpdir="tmp"
+    log:
+        "logs/aggregate_all/{sigtype}.log"
+    params:
+        ""
+    shell:
+        "paste {params} {input.refit} {input.denovo} > {output} 2> {log}"
+        
+#######################
+### OLD TESTS       ###
+### KEPT FOR LEGACY ###
+### DO NOT DELETE   ###
+### HOURS HAVE BEEN ###
+### WASTER THERE !  ###
+#######################
 
 rule sigprofiler_1_1_6_complete_run:
     input:

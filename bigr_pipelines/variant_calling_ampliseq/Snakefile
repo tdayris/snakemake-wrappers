@@ -179,18 +179,16 @@ module snpsift:
 
 use rule * from snpsift as snpsift_*
 
-
-
 rule annotate_vcf:
     input:
         design="design.tsv",
         config="config.yaml",
         calls=expand(
-            "meta_caller/calls/{sample}.vcf.gz",
+            "bcftools/annotate/{sample}.vcf.gz",
             sample=design["Sample_id"]
         ),
         calls_index=expand(
-            get_tbi("meta_caller/calls/{sample}.vcf.gz"),
+            get_tbi("bcftools/annotate/{sample}.vcf.gz"),
             sample=design["Sample_id"]
         ),
     output:
@@ -241,17 +239,21 @@ rule annotate_vcf:
 ###############################
 ### Region depth annotation ###
 ###############################
+
+
 coverage_variant_region_config = {
     "bed": config["ref"]["capture_kit_bed"],
-    "threads": config["threads"],
+    "threads": config.get("threads", 20),
     "bin_size": config.get(
         "deeptools", {"bin_size": 10}
     ).get("bin_size", 10)
 }
 
+
 module coverage_variant_region_meta:
     snakefile: "../../meta/bio/coverage_variant_region/test/Snakefile"
     config: coverage_variant_region_config
+
 
 use rule * from coverage_variant_region_meta
 
@@ -390,7 +392,7 @@ Filter a bam over the capturekit bed file
 """
 rule samtools_filter_bed:
     input:
-        "sambamba/sort/{sample}.bam",
+        aln="sambamba/sort/{sample}.bam",
         fasta=config["ref"]["fasta"],
         fasta_idx=get_fai(config["ref"]["fasta"]),
         fasta_dict=get_dict(config["ref"]["fasta"]),
@@ -403,7 +405,8 @@ rule samtools_filter_bed:
         time_min=lambda wildcards, attempt: attempt * 15,
         tmpdir="tmp"
     params:
-        extra="--bam --with-header"
+        extra="-bh",
+        position=""
     log:
         "logs/samtools/filter/{sample}.log"
     wrapper:

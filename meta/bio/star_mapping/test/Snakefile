@@ -1,6 +1,23 @@
+import sys
+
+worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+common = str(worflow_source_dir / "../common/python")
+sys.path.append(common)
+
+from dataframes import *
+from file_manager import *
+from files_linker import *
+from graphics import *
+from write_yaml import *
+from messages import message
+
+
 default_star_config = {
     "fasta": "/path/to/fasta",
-    "gtf": "/path/to/gtf"
+    "gtf": "/path/to/gtf",
+    "samtools_view_extra": "-bhq 10",
+    "star_index_extra": "",
+    "star_mapping_extra": ""
 }
 
 
@@ -11,15 +28,53 @@ except NameError:
     config = default_star_config
 
 
+def get_best_index():
+    """Return cached indexes if available"""
+    if config.get("salmon_index", None) is not None:
+        return config["salmon_index"]
+
+    args = (
+        config["fasta"],
+        config["gtf"],
+        config["star_index_extra"]
+    )
+
+    hg38_flamingo = (
+        "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta",
+        "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.gtf",
+        ""
+    )
+    hg19_flamingo = (
+        "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.main_chr.fa",
+        "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.gtf",
+        ""
+    )
+    mm10_flamingo = (
+        "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta",
+        "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.gtf",
+        ""
+    )
+
+    if args == hg38_flamingo:
+        return "star/index_hg38"
+    elif args == hg19_flamingo:
+        return "star/index_hg19"
+    elif args == mm10_flamingo:
+        return "star/index_mm10"
+
+    return "star/index"
+
+
 ########################
 ### Quality controls ###
 ########################
+
 rule picard_metrics:
     input:
         ref=config["fasta"],
         ref_dict=get_dict(config["fasta"]),
         ref_fai=get_fai(config["fasta"]),
-        bam="bam/star/{sample}.bam"
+        bam="bam/star/{sample}.bam",
         bai=get_bai("bam/star/{sample}.bam")
     output:
         "picard/alignment_summary/{sample}.summary.txt"
@@ -45,11 +100,11 @@ rule samtools_view:
         "Filtering, sorting and compressing {wildcards.sample}"
     threads: 10
     resources:
-        mem_mb=lambda: wildcards, threads: threads * 720,
-        time_min=lambda: wildcards, attempt: attempt * 30,
+        mem_mb=lambda wildcards, threads: threads * 720,
+        time_min=lambda wildcards, attempt: attempt * 30,
         tmpdir="tmp"
     params:
-        extra="-bhq 10"
+        extra=config.get("samtools_view_extra", "-bhq 10")
     log:
         "logs/samtools/view/{sample}.log"
     wrapper:
@@ -63,11 +118,11 @@ rule samtools_view:
 
 rule star_mapping:
     input:
-        fq1="reads/{sample}.1.fq.gz",
-        fq2="reads/{sample}.2.fq.gz",
-        index="star/index"
+        fq1="fastp/trimmed/pe/{sample}.1.fastq",
+        fq2="fastp/trimmed/pe/{sample}.2.fastq",
+        index=get_best_index()
     output:
-        pipe("star/{sample}/Aligned.out.sam"),
+        temp("star/{sample}/Aligned.out.sam"),
         tmp = temp(directory("star/tmp/{sample}.tmp"))
     message:
         "Mapping {wildcards.sample} to reference genome with STAR"
@@ -77,7 +132,8 @@ rule star_mapping:
         time_min=lambda wildcards, attempt: attempt * 60,
         tmpdir="tmp"
     params:
-        extra = (
+        extra = config.get(
+            "star_mapping_extra",
             " --outFilterType BySJout "
             " --outFilterMultimapNmax 20 "
             " --alignSJoverhangMin 8 "
@@ -99,7 +155,7 @@ rule star_mapping:
 
 rule star_index:
     input:
-        fasta = config["fasta"]
+        fasta = config["fasta"],
         gtf = config["gtf"]
     output:
         directory("star/index")
@@ -111,9 +167,78 @@ rule star_index:
         time_min=lambda wildcards, attempt: attempt * 45,
         tmpdir="tmp"
     params:
+        extra=config.get("star_index_extra", ""),
+        sjdbOverhang=config.get("sjdbOverhang", "100")
+    log:
+        "logs/star/index.log"
+    wrapper:
+        "bio/star/index"
+
+
+rule star_index_hg38:
+    input:
+        fasta = "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta",
+        gtf = "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.gtf"
+    output:
+        directory("star/index")
+    message:
+        "Indexing HG38 with STAR"
+    cache: True
+    threads: 20
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 5120 + 40960,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
+    params:
         extra="",
         sjdbOverhang="100"
     log:
         "logs/star/index.log"
+    wrapper:
+        "bio/star/index"
+
+
+rule star_index_hg19:
+    input:
+        fasta = "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.main_chr.fa",
+        gtf = "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.gtf"
+    output:
+        directory("star/index")
+    message:
+        "Indexing HG19 with STAR"
+    cache: True
+    threads: 20
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 5120 + 40960,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
+    params:
+        extra="",
+        sjdbOverhang="100"
+    log:
+        "logs/star/index.log"
+    wrapper:
+        "bio/star/index"
+
+
+rule star_index_mm10:
+    input:
+        fasta = "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta",
+        gtf = "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.gtf"
+    output:
+        directory("star/index_mm10")
+    message:
+        "Indexing MM10 with STAR"
+    cache: True
+    threads: 20
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 5120 + 40960,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
+    params:
+        extra="",
+        sjdbOverhang="100"
+    log:
+        "logs/star/index_mm10.log"
     wrapper:
         "bio/star/index"

@@ -26,32 +26,28 @@ logging.basicConfig(
     level=logging.DEBUG
 )
 
+
 # Build output directory if necessary
 if (outdir := basename(dirname(snakemake.output["png"]))) != "":
     makedirs(outdir)
     logging.debug(f"Directory: '{outdir}' created.")
 
-conditions = pandas.DataFrame.from_dict(
-    snakemake.params["conditions"],
-    orient="index"
-)
-cond_id = snakemake.params.get("factor", "Condition")
-conditions.columns = [cond_id]
-logging.debug("Head of the conditions dataframe:")
-logging.debug(conditions.head())
-
 # Load normalized counts
 data = pandas.read_csv(
-    snakemake.input["counts"],
+    snakemake.input["tsv"],
     sep="\t",
     header=0,
-    index_col=0
+    index_col=4
 )
 logging.debug("Head of the loaded data:")
-logging.debug(conditions.head())
+logging.debug(data.head())
 
-# Remove possible text annotations and validate
-data = data[list(data.select_dtypes(include=[numpy.number]).columns.values)]
+# Keep samples anntoated in "conditions" parameter
+conditions = snakemake.params["conditions"]
+sample_list = list(conditions.keys())
+condition_set = set(conditions.values())
+# data.set_index("Gene_Name", inplace=True)
+data = data[sample_list]
 
 # Create custom colormap for heatmap values
 cmap = seaborn.diverging_palette(
@@ -62,16 +58,19 @@ cmap = seaborn.diverging_palette(
 logging.info("Color palette built")
 
 # Create a categorical palette for samples identification
-cond_set = set(conditions[cond_id])
-colors = seaborn.husl_palette(len(cond_set), s=0.45)
+colors = seaborn.husl_palette(len(condition_set), s=0.45)
 cond_colors = {
-    str(cond): color for cond, color in zip(list(cond_set), list(colors))
+    str(cond): color for cond, color in zip(list(condition_set), list(colors))
 }
 sample_colors = {
-    sample: cond_colors[cond]
-    for sample, cond in zip(conditions.index, conditions[cond_id])
+    sample: cond_colors[conditions[sample]]
+    for sample in sample_list
 }
-logging.info("Color palette assigned to samples")
+logging.info(f"Color palette assigned to samples: {sample_colors}")
+conditions = pandas.DataFrame.from_dict(conditions, orient="index")
+cond_id = snakemake.params.get("factor", "Condition")
+conditions.columns = [cond_id]
+logging.info(conditions.head())
 
 # Sorry for that part, yet I could not manage to find any
 # other way to perform quicker multi-level indexing
@@ -88,12 +87,15 @@ data = (data.reset_index()
             .T)
 logging.info("Multi level indexing build")
 
-condition_colors = (pandas.Series(data.columns.get_level_values(cond_id),
-                                  index=data.columns)
-                          .map(cond_colors))
+condition_colors = (
+    pandas.Series(data.columns.get_level_values(cond_id), index=data.columns)
+          .map(cond_colors)
+)
 logging.info("Sample/Color mapped")
 
 # Build graph
+# data = data.corr()
+print(len(data.columns.tolist()) / 50)
 ax = seaborn.clustermap(
     data,
     cmap=cmap,
@@ -104,13 +106,14 @@ ax = seaborn.clustermap(
     ),
     method="average",
     metric="euclidean",
-    zscore=0,
+    # zscore=0,
+    standard_scale=0,
     row_cluster=(snakemake.params.get("row_cluster", True) is True),
     col_cluster=(snakemake.params.get("col_cluster", True) is True),
-    linewidths=0.5,
+    linewidths=0,
     figsize=(
-        min(15, int(len(data.columns.tolist())/50) * 10),
-        min(15, int(len(data.index.tolist())/50) * 10)
+        7 if len(data.columns.tolist()) <= 20 else 15,
+        7 if len(data.columns.tolist()) <= 100 else 25
     ),
     robust=(snakemake.params.get("robust", False) is True)
 )

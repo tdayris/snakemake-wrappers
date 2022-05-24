@@ -1,41 +1,10 @@
-from snakemake.utils import min_version
-min_version("6.0")
-
-default_salmon_config = {
-    "genome": "path/to/sequence.fasta",
-    "transcriptome": "path/to/transcriptome.fasta"
-}
-
-def get_best_index():
-    """Return cached indexes if available"""
-    if config.get("salmon_index", None) is not None:
-        return config["salmon_index"]
-
-    args = (config["transcriptome"], config["genome"], config["salmon_index_extra"])
-    hg38_flamingo = (
-        "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.cdna.fasta",
-        "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta",
-        "--keepDuplicates --gencode"
-    )
-    hg19_flamingo = (
-        "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/GRCh37.75.homo_sapiens.cdna.fasta",
-        "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.main_chr.fa",
-        "--keepDuplicates --gencode"
-    )
-    mm10_flamingo = (
-        "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.cdna.nopatch.fasta",
-        "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta",
-        "--keepDuplicates --gencode"
-    )
-
-    if args == hg38_flamingo:
-        return "salmon/index_hg38"
-    elif args == hg19_flamingo:
-        return "salmon/index_hg19"
-    elif args == mm10_flamingo:
-        return "salmon/index_mm10"
-
-    return "salmon/index"
+# example_salmon_config = {
+#     "genome": "path/to/sequence.fasta",
+#     "transcriptome": "path/to/transcriptome.fasta",
+#     "gentrome": "path/to/gentrome.fasta",
+#     "decoy": "/path/to/decoy.names.txt",
+#     "index": "path/to/salmon_index_dir"
+# }
 
 """
 This rule pseudo-map and quantifies your paired reads over the indexed
@@ -45,7 +14,7 @@ rule salmon_quant_paired:
     input:
         r1="fastp/trimmed/pe/{sample}.1.fastq",
         r2="fastp/trimmed/pe/{sample}.2.fastq",
-        index=get_best_index(),
+        index=config.get("index", "salmon/index"),
         gtf=config["gtf"]
     output:
         quant="salmon/pseudo_mapping/{sample}/quant.sf",
@@ -77,18 +46,18 @@ These rules are cached since it should be used only once per reference genome.
 """
 rule salmon_index:
     input:
-        sequences="salmon/decoy/gentrome.fasta",
-        decoys="salmon/decoy/decoy.txt"
+        sequences=config.get("gentrome", "salmon/decoy/gentrome.fasta"),
+        decoy=config.get("decoy", "salmon/decoy/decoy.txt")
     output:
         index=temp(directory("salmon/index"))
     message: "Indexing transcriptome/gentrome sequences with Salmon"
     threads: min(config.get("threads", 20), 20)
     resources:
         time_min=lambda wildcards, attempt, input: (
-            attempt * (120 if "decoys" in input.keys() else 45)
+            attempt * (120 if "decoy" in input.keys() else 45)
         ),
         mem_mb=lambda wildcards, attempt, input: (
-            attempt * (25600 if "decoys" in input.keys() else 10240)
+            attempt * (25600 if "decoy" in input.keys() else 10240)
         ),
         tmpdir="tmp"
     params:
@@ -99,151 +68,210 @@ rule salmon_index:
         "bio/salmon/index"
 
 
-rule salmon_index_hg38:
-    input:
-        sequences="salmon/decoy/gentrome.hg38.fasta",
-        decoys="salmon/decoy/gentrome.hg38.decoy",
-    output:
-        index=directory("salmon/index_hg38")
-    message: "Indexing transcriptome/gentrome sequences with Salmon"
-    threads: 20
-    cache: True
-    resources:
-        time_min=120,
-        mem_mb=25600,
-        tmpdir="tmp"
-    params:
-        extra="--keepDuplicates --gencode"
-    log:
-        "logs/salmon/index.hg38.log"
-    wrapper:
-        "bio/salmon/index"
-
-
-rule salmon_index_hg19:
-    input:
-        sequences="salmon/decoy/gentrome.hg19.fasta",
-        decoys="salmon/decoy/gentrome.hg19.decoy"
-    output:
-        index=directory("salmon/index_hg19")
-    message: "Indexing transcriptome/gentrome sequences with Salmon"
-    threads: 20
-    cache: True
-    resources:
-        time_min=120,
-        mem_mb=25600,
-        tmpdir="tmp"
-    params:
-        extra="--keepDuplicates --gencode"
-    log:
-        "logs/salmon/index.hg19.log"
-    wrapper:
-        "bio/salmon/index"
-
-
-rule salmon_index_mm10:
-    input:
-        sequences="salmon/decoy/gentrome.mm10.fasta",
-        decoys="salmon/decoy/gentrome.mm10.decoy"
-    output:
-        index=directory("salmon/index_mm10")
-    message: "Indexing transcriptome/gentrome sequences with Salmon"
-    threads: 20
-    cache: True
-    resources:
-        time_min=120,
-        mem_mb=25600,
-        tmpdir="tmp"
-    params:
-        extra="--keepDuplicates --gencode"
-    log:
-        "logs/salmon/index.mm10.log"
-    wrapper:
-        "bio/salmon/index"
-
 """
 This rule is optional in case you want to use decoy sequences within your
 transcriptome. See salmon documentation for more information.
 
 These rules are cached since it should be used only once per reference genome.
 """
-rule salmon_generate_decoy_sequence:
+rule awk_create_exons_mask:
+    input:
+        config["gtf"]
+    output:
+        temp("salmon/decoy/exons.bed")
+    message: "Building exons mask for decoy sequence identification"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 512,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/awk/mask_exons.log"
+    params:
+        begin='FS=OFS="\t"',
+        body=['if ($3=="exon") {{print $1,$4,$5}}']
+    wrapper:
+        "bio/awk"
+
+
+rule bedtools_mask_fasta:
+    input:
+        bed="salmon/decoy/exons.bed",
+        fasta=config["genome"]
+    output:
+        temp("salmon/decoy/reference.masked.genome.fasta")
+    message: "Masking genome sequences to aquire decoy"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/bedtools/maskfasta.log"
+    params:
+        extra=""
+    wrapper:
+        "bio/bedtools/maskfasta"
+
+
+rule mashmap_align_tx_to_masked_genome:
+    input:
+        fasta="salmon/decoy/reference.masked.genome.fasta",
+        query=config["transcriptome"]
+    output:
+        temp("salmon/decoy/mashmap.masked.out")
+    message: "Aligning transcriptome to genome"
+    threads: 20
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 82,
+        time_min=lambda wildcards, attempt: attempt * 60 * 3,
+        tmpdir="tmp"
+    log:
+        "logs/mashmap/mask.log"
+    params:
+        extra="--perc_identity 80 --segLength 500"
+    wrapper:
+        "bio/mashmap"
+
+
+rule awk_extract_intervals_from_mashmap:
+    input:
+        "salmon/decoy/mashmap.masked.out"
+    output:
+        temp("salmon/decoy/mashmap.masked.unsorted.bed")
+    message: "Extracting intervals from mashmap alignments"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 512,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        begin='FS=" "; OFS="\t"',
+        body=['print $6,$8,$9']
+    log:
+        "logs/awk/extract_intervals_from_mashmap.log"
+    wrapper:
+        "bio/awk"
+
+
+rule sort_bed_intervals:
+    input:
+        "salmon/decoy/mashmap.masked.unsorted.bed"
+    output:
+        temp("salmon/decoy/mashmap.masked.sorted.bed")
+    message: "Sorting extracted intervals"
+    threads: 5
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 4,
+        time_min=lambda wildcards, attempt: attempt * 40,
+        tmpdir="tmp"
+    params:
+        columns=["1,1", "2,2n"],
+        extra=""
+    log:
+        "logs/sort/masked.bed.log"
+    wrapper:
+        "bio/sort"
+
+
+rule bedtools_merge_intervals:
+    input:
+        "salmon/decoy/mashmap.masked.sorted.bed"
+    output:
+        temp("salmon/decoy/mashmap.masked.merged.bed")
+    message: "Merging the intervals"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        time_min=lambda wildcards, attempt: attempt * 30,
+        tmpdir="tmp"
+    log:
+        "logs/bedtools/merge/sorted_intevals.log"
+    params:
+        extra=""
+    wrapper:
+        "bio/bedtools/merge"
+
+
+rule bedtools_regenerate_relevant_sequences:
+    input:
+        fasta="salmon/decoy/reference.masked.genome.fasta",
+        bed="salmon/decoy/mashmap.masked.merged.bed"
+    message: "Extracting sequences from the genome"
+    output:
+        temp("salmon/decoy/genome.found.fasta")
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 3,
+        time_min=lambda wildcards, attempt: attempt * 45,
+        tmpdir="tmp"
+    log:
+        "logs/bedtools/getfasta.log"
+    params:
+        extra=""
+    wrapper:
+        "bio/bedtools/getfasta"
+
+
+rule awk_concatenate_decoy_sequences:
+    input:
+        "salmon/decoy/genome.found.fasta"
+    output:
+        temp("salmon/decoy/decoy.fasta")
+    message: "Concatenating to get decoy sequences"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 1.5,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/awk/concatenate_sequences.log"
+    params:
+        body=[
+            'a=$0',
+            'getline',
+            'split(a, b, ":")',
+            'r[b[1]] = r[b[1]]""$0'
+        ],
+        end='for (k in r) { print k"\\n"r[k] }'
+    wrapper:
+        "bio/awk"
+
+
+rule build_gentrome:
     input:
         transcriptome=config["transcriptome"],
-        genome=config["genome"]
+        decoy="salmon/decoy/decoy.fasta"
     output:
-        decoys=temp("salmon/decoy/decoys.txt"),
-        gentrome=temp("salmon/decoy/gentrome.fasta")
-    message: "Building gentrome and decoy sequences for Salmon"
-    threads: 2
+        "salmon/decoy/gentrome.fasta"
+    message: "Buiding gentrome sequences"
+    threads: 1
     resources:
-        time_min=lambda wildcards, attempt: min(attempt * 20, 30),
         mem_mb=lambda wildcards, attempt: attempt * 512,
+        time_min=lambda wildcards, attempt: attempt * 25,
         tmpdir="tmp"
     log:
-        "logs/salmon/decoys.log"
-    wrapper:
-        "bio/salmon/generate_decoy"
-
-
-rule salmon_generate_decoy_sequence_hg38:
-    input:
-        transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.cdna.fasta",
-        genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta"
-    output:
-        multiext("salmon/decoy/gentrome.hg38", ".decoy", ".fasta")
-    message: "Building gentrome and decoy sequences for Salmon"
-    threads: 2
-    cache: True
-    resources:
-        time_min=30,
-        mem_mb=512,
-        tmpdir="tmp"
+        "logs/cat/gentrome.log"
     params:
-        prefix="salmon/decoy/gentrome.hg38"
-    log:
-        "logs/salmon/decoys.hg38.log"
-    wrapper:
-        "bio/salmon/generate_decoy"
+        ""
+    shell:
+        "cat {input.transcriptome} {input.decoy} > {output} 2> {log}"
 
 
-rule salmon_generate_decoy_sequence_hg19:
+rule extract_decoy_id:
     input:
-        transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/GRCh37.75.homo_sapiens.cdna.fasta",
-        genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.main_chr.fa"
+        "salmon/decoy/decoy.fasta"
     output:
-        multiext("salmon/decoy/gentrome.hg19", ".decoy", ".fasta")
-    message: "Building gentrome and decoy sequences for Salmon"
-    threads: 2
-    cache: True
+        "salmon/decoy/decoy.txt"
+    message: "Extracting decoy sequences name"
+    threads: 1
     resources:
-        time_min=30,
-        mem_mb=512,
+        mem_mb=lambda wildcards, attempt: attempt * 512,
+        time_min=lambda wildcards, attempt: attempt * 15,
         tmpdir="tmp"
     log:
-        "logs/salmon/decoys.hg19.log"
+        "logs/grep/decoy.log"
     params:
-        prefix="salmon/decoy/gentrome.hg19"
-    wrapper:
-        "bio/salmon/generate_decoy"
-
-
-rule salmon_generate_decoy_sequence_mm10:
-    input:
-        transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.cdna.nopatch.fasta",
-        genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta"
-    output:
-        multiext("salmon/decoy/gentrome.mm10", ".decoys", ".fasta")
-    message: "Building gentrome and decoy sequences for Salmon"
-    threads: 2
-    cache: True
-    resources:
-        time_min=30,
-        mem_mb=512,
-        tmpdir="tmp"
-    log:
-        "logs/salmon/decoys.mm10.log"
-    params:
-        prefix="salmon/decoy/gentrome.mm10"
-    wrapper:
-        "bio/salmon/generate_decoy"
+        "-P '^>'"
+    shell:
+        "grep {params} {input} > {output} 2> {log}"
