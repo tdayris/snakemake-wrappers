@@ -38,35 +38,69 @@ comparisons = get_comparison_list(
     config.get("ranks.list.tsv", "ranks.list.tsv")
 )
 
-dbs = ["gomf", "ncg", "gocc", "gobp", "do", "dgn"]
-methods = ["gsea", "enrich"]
-plots = ["barplot", "dotplot", "heatplot", "upsetplot", "treeplot"]
+dbs = list(config.get("gmt", {}).keys()) + [
+    "NetworkCancerGenes",
+    "DiseaseOnt",
+    "DisGenNet"
+]
+
+ppis = list(config.get("ppi", {}).keys())
+all_dbs = dbs + ppis
+
+methods = ["enrich"] # ["gsea", "enrich"]
+plots = ["barplot", "dotplot", "upsetplot"] # "heatplot", "treeplot"]
+keytypes = ["ENSEMBL", "ENTREZID", "SYMBOL", "ENSEMBLPROT"] 
 
 
-ruleorder: enrichDO > enrichGO
-ruleorder: enrichDGN > enrichGO
-ruleorder: enrichNCG > enrichGO
+
+def plot_list():
+    results = []
+    for met in methods:
+        for comp in comparisons:
+            for plot in plots:
+                for db in dbs:
+                    if db in config["gmt"].keys():
+                        if config["gmt"][db].endswith(".entrez.gmt"):
+                            results.append(
+                                f"results/{comp}/{db}.ENTREZID/{plot}.{met}.png"
+                            )
+                        elif config["gmt"][db].endswith(".ENSG.gmt"):
+                            results.append(
+                                f"results/{comp}/{db}.ENSEMBL/{plot}.{met}.png"
+                            )
+                        elif config["gmt"][db].endswith(".symbols.gmt"):
+                            results.append(
+                                f"results/{comp}/{db}.SYMBOL/{plot}.{met}.png"
+                            )
+                    else:
+                        results.append(
+                                f"results/{comp}/{db}.ENTREZID/{plot}.{met}.png"
+                            )
+
+    for met in methods:
+        for comp in comparisons:
+            for plot in plots:
+                for ppi in ppis:
+                    results.append(f"results/{comp}/{ppi}.ENSEMBLPROT/{plot}.{met}.png")
+
+    return results
+
+
+ruleorder: enrichDO > enricherGMT
+ruleorder: enrichDGN > enricherGMT
+ruleorder: enrichNCG > enricherGMT
 
 wildcard_constraints:
     comparison=r"|".join(comparisons),
     method=r"|".join(methods),
-    db=r"|".join(dbs)
+    db=r"|".join(all_dbs),
+    keytype=r"|".join(keytypes),
+    ppi=r"|".join(ppis)
 
 
 rule target:
     input:
-        rds=expand(
-            "gene_lists/{comparison}.RDS",
-            comparison=comparisons
-        ),
-        png_enrich=expand(
-            "results/{comparison}/{plot}.{method}.{db}.png",
-            comparison=comparisons, plot=plots, method=methods[1], db=dbs[2:]
-        ),
-        png_go=expand(
-            "results/{comparison}/{plot}.{method}.{db}.png",
-            comparison=comparisons, plot=plots[1:3], method=methods[0], db=dbs[2:]
-        )
+        plot_list()
 
 
 
@@ -75,13 +109,29 @@ rule expand_rank_list:
         tsv=config.get("ranks.list.tsv", "ranks.list.tsv")
     output:
         tsv=expand(
-            "gene_lists/{comparison}.tsv",
+            "gene_lists/ENTREZID/{comparison}.tsv",
             comparison=comparisons
         ),
-        rds=expand(
-            "gene_lists/{comparison}.RDS",
+        entrez_rds=temp(expand(
+            "gene_lists/ENTREZID/{comparison}.RDS",
             comparison=comparisons
-        )
+        )),
+        symbol_rds=temp(expand(
+            "gene_lists/SYMBOL/{comparison}.RDS",
+            comparison=comparisons
+        )),
+        ensembl_rds=temp(expand(
+            "gene_lists/ENSEMBL/{comparison}.RDS",
+            comparison=comparisons
+        )),
+        protein_rds = temp(expand(
+            "gene_lists/ENSEMBLPROT/{comparison}.RDS",
+            comparison=comparisons
+        )),
+        universe = temp(expand(
+            "gene_lists/universe/{comparison}.RDS",
+            comparison=comparisons
+        ))
     message: "Expanding rank lists"
     threads: 1
     resources:
@@ -109,3 +159,4 @@ module clusterprofiler_meta:
 
 
 use rule * from clusterprofiler_meta
+
