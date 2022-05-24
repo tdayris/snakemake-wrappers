@@ -174,6 +174,11 @@ rule target:
             "results/{comparison}/deseq2_{content}_with_counts_{comparison}.tsv",
             comparison=output_prefixes,
             content=["complete_results", "sorted_on_pval", "sorted_on_fold_change"]
+        ),
+        gene_plots=expand(
+            "results/{comparison}/gene_plots/{gene}.png",
+            comparison=output_prefixes,
+            gene=config.get("genes_of_interest", ["ENSG00000141510"])
         )
         #consensus=expand(
         #    "consensusclusterplus/{comparison}",

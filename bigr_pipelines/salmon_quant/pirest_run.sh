@@ -3,6 +3,6 @@
 # This launcher is provided for piREST
 # It call the usual run.sh file with parameters
 
-genome=`cut -f4 design.tsv | grep -P "GRC" | sort | uniq | sed -P 's/"//g'`
+genome=`cut -f4 design.tsv | grep -P "GRC" | sort | uniq | sed 's/"//g'`
 
-bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh ${genome}"
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh "${genome}" --nt --rerun-incomplete
