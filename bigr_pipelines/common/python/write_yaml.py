@@ -1,9 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-__author__ = "Thibault Dayris"
-__copyright__ = "Copyright 2021, Thibault Dayris"
-__email__ = "thibault.dayris@gustaveroussy.fr"
-__license__ = "MIT"
 
 """
 This script contains functions to read and write yaml files from various object

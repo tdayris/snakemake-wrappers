@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 """
 This file contains function to perform files mapping between original name
 (hashed iRODS, biopath, ...) to normalized paths.

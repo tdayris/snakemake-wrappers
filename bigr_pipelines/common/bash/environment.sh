@@ -31,6 +31,6 @@ declare -x SNAKEMAKE_OUTPUT_CACHE="/mnt/beegfs/pipelines/snakemake-wrappers/bigr
 
 # Export previously defined variables to current environment
 export SNAKEMAKE_OUTPUT_CACHE CONDA_ENV_PATH
-mkdir --parents --verbose tmp
+mkdir --parents --verbose tmp/shadow
 
 message INFO "sourced: environment.sh"
