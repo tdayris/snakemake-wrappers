@@ -1,0 +1,18 @@
+rule gsea:
+    input:
+        rds = "gene_lists/{comparison}.RDS"
+        gmt = lambda wildcards: config["gmt"][wildcards.database]
+    output:
+        rds = temp("gsea/{database}/{comparison}/gsea.{database}.{comparison}.RDS"),
+        tsv = "results/gsea.{database}.{comparison}.tsv"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 3,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        extra = config.get("gsea_extra", {"gsea": ""}).get("gsea", "")
+    log:
+        "logs/gsea/{database}/{comparison}.log"
+    wrapper:
+        "bio/clusterProfiler/gseGMT"

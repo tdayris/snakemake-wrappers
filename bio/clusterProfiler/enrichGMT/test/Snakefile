@@ -1,0 +1,18 @@
+rule enricher:
+    input:
+        rds = "gene_lists/{comparison}.RDS"
+        gmt = lambda wildcards: config["gmt"][wildcards.database]
+    output:
+        rds = temp("enrich/{database}/{comparison}/enrich.{database}.{comparison}.RDS"),
+        tsv = "results/enrich.{database}.{comparison}.tsv"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 3,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        extra = config.get("enrich_extra", {"enricher": ""}).get("enricher", "")
+    log:
+        "logs/enricher/{database}/{comparison}.log"
+    wrapper:
+        "bio/clusterProfiler/enrichGMT"

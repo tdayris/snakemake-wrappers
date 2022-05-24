@@ -18,7 +18,7 @@ base::sink(log.file,type="message");
 # Handle enrichment
 base::library(package = "clusterProfiler", quietly = TRUE);
 # Handle graphics
-base::library(package = "Cairo", quietly = TRUE);
+# base::library(package = "Cairo", quietly = TRUE);
 base::library(package = "enrichplot", quietly = TRUE);
 
 enriched <- base::readRDS(

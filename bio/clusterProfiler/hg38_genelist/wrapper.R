@@ -22,10 +22,13 @@ get_parameter <- function(param_name, default_value) {
   return(res)
 }
 
-build_gene_list <- function(gene_frame, comparison_name) {
-  geneList <- gene_frame[, comparison_name];
-  base::names(geneList) <- gene_frame$ENTREZID;
-  geneList <- geneList[! is.nan(geneList)];
+build_gene_list <- function(gene_frame, comparison_name, keyid) {
+  tmp <- gene_frame[, c(comparison_name, keyid)];
+  tmp <- tmp[! is.na(tmp[, comparison_name]), ];
+  tmp <- tmp[! is.na(tmp[, keyid]), ];
+
+  geneList <- tmp[, comparison_name];
+  base::names(geneList) <- tmp[, keyid];
   geneList <- geneList[order(geneList, decreasing=TRUE)];
   return(geneList);
 }
@@ -42,41 +45,66 @@ tsv <- utils::read.table(
 gene_id_type <- get_parameter("gene_id_type", "ENSEMBL");
 base::message("Dataset and libraries loaded");
 
-if (gene_id_type == "SYMBOL") {
+if (! "ENSEMBL" %in% colnames(tsv)) {
+  base::message("Adding ENSEMBL keys to the gene table");
   tsv$ENSEMBL <- mapIds(
     org.Hs.eg.db,
-    keys=tsv[, gene_id_type],
+    keys=tsv$SYMBOL,
     colum='ENSEMBL',
-    keytype=gene_id_type,
+    keytype="SYMBOL",
     multiVals='first'
   );
 }
 
+ if (! "SYMBOL" %in% colnames(tsv)) {
+  base::message("Adding SYMBOL keys to the gene table");
+  tsv$SYMBOL <- mapIds(
+    org.Hs.eg.db,
+    keys=tsv$ENSEMBL,
+    colum='SYMBOL',
+    keytype="ENSEMBL",
+    multiVals='first'
+  );
+}
+
+base::message("Adding ENTREZID keys to the gene table ", gene_id_type);
 tsv$ENTREZID <- mapIds(
   org.Hs.eg.db,
-  keys=tsv[, gene_id_type],
+  keys=tsv$ENSEMBL,
   column="ENTREZID",
-  keytype=gene_id_type,
+  keytype="ENSEMBL",
   multiVals="first"
 );
 
+base::message("Adding ENSEMBLPROT keys to the gene table");
+tsv$ENSEMBLPROT <- mapIds(
+  org.Hs.eg.db,
+  keys=tsv$ENSEMBL,
+  column="ENSEMBLPROT",
+  keytype="ENSEMBL",
+  multiVals="first"
+);
+print(head(tsv))
+
 comparison_names <- base::colnames(tsv);
-comparison_names <- comparison_names[! comparison_names %in% c("SYMBOL", "ENSEMBL", "ENTREZID")];
+comparison_names <- comparison_names[! comparison_names %in% c("SYMBOL", "ENSEMBL", "ENTREZID", "ENSEMBLPROT")];
 nb_comparisons <- base::length(comparison_names);
-base::message("Comparison acquired");
+base::message("Comparison acquired, ", comparison_names);
 
 for (factor in 1:nb_comparisons) {
   base::message("Working on comparison:", comparison_names[factor])
-  geneList <- build_gene_list(
-    gene_frame=tsv,
-    comparison_name=comparison_names[factor]
-  );
 
   if ("tsv" %in% base::names(snakemake@output)) {
     file_path <- base::as.character(
       snakemake@output[["tsv"]][factor]
     );
     base::message("Saving TSV to ", file_path);
+
+    geneList <- build_gene_list(
+      gene_frame=tsv,
+      comparison_name=comparison_names[factor],
+      keyid="SYMBOL"
+    );
 
     utils::write.table(
       x=as.data.frame(geneList),
@@ -85,12 +113,87 @@ for (factor in 1:nb_comparisons) {
     );
   }
 
-  if ("rds" %in% base::names(snakemake@output)) {
+  if ("symbol_rds" %in% base::names(snakemake@output)) {
     rds_path <- base::as.character(
-      snakemake@output[["rds"]][factor]
+      snakemake@output[["symbol_rds"]][factor]
     );
-    base::message("Saving RDS to ", rds_path);
-    print(head(geneList))
+    base::message("Saving SYMBOLS to ", rds_path);
+
+    geneList <- build_gene_list(
+      gene_frame=tsv,
+      comparison_name=comparison_names[factor],
+      keyid="SYMBOL"
+    );
+
+    base::saveRDS(
+      object=geneList,
+      file=rds_path
+    );
+  }
+
+  if ("ensembl_rds" %in% base::names(snakemake@output)) {
+    rds_path <- base::as.character(
+      snakemake@output[["ensembl_rds"]][factor]
+    );
+    base::message("Saving ENSEMBL to ", rds_path);
+
+    geneList <- build_gene_list(
+      gene_frame=tsv,
+      comparison_name=comparison_names[factor],
+      keyid="ENSEMBL"
+    );
+
+    base::saveRDS(
+      object=geneList,
+      file=rds_path
+    );
+  }
+
+  if ("protein_rds" %in% base::names(snakemake@output)) {
+    rds_path <- base::as.character(
+      x=snakemake@output[["protein_rds"]][factor]
+    );
+    base::message("Saving Protein RDS to ", rds_path);
+
+    proteinList <- build_gene_list(
+      gene_frame=tsv,
+      comparison_name=comparison_names[factor],
+      keyid="ENSEMBLPROT"
+    );
+
+    base::saveRDS(
+      object=proteinList,
+      file=rds_path
+    );
+  }
+
+  if ("entrez_rds" %in% base::names(snakemake@output)) {
+    rds_path <- base::as.character(
+      x=snakemake@output[["entrez_rds"]][factor]
+    );
+    base::message("Saving Gene RDS to ", rds_path);
+
+    geneList <- build_gene_list(
+      gene_frame=tsv,
+      comparison_name=comparison_names[factor],
+      keyid="ENTREZID"
+    );
+
+    base::saveRDS(
+      object=geneList,
+      file=rds_path
+    );
+  }
+
+  if ("universe" %in% base::names(snakemake@output)) {
+    rds_path <- base::as.character(
+      x=snakemake@output[["universe"]][factor]
+    );
+    base::message("Saving universe to ", rds_path);
+
+    geneList <- tsv$ENTREZID;
+    names(geneList) <- tsv$SYMBOL;
+
     base::saveRDS(
       object=geneList,
       file=rds_path

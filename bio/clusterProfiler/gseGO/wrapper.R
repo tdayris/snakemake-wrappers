@@ -18,7 +18,7 @@ base::sink(log.file,type="message");
 base::library(package = "clusterProfiler", quietly = TRUE);
 # Loading databases
 base::library(package = "org.Hs.eg.db", quietly = TRUE);
-base::library(package = "org.Mm.eg.db", quietly = TRUE);
+# base::library(package = "org.Mm.eg.db", quietly = TRUE);
 
 # Loading input dataset
 geneList <- base::readRDS(

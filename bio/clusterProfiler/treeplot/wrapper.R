@@ -20,6 +20,24 @@ base::library(package = "clusterProfiler", quietly = TRUE);
 # Handle graphics
 # base::library(package = "Cairo", quietly = TRUE);
 base::library(package = "enrichplot", quietly = TRUE);
+base::library(package = "GOSemSim", quietly = TRUE);
+base::library(package = "org.Hs.eg.db", quietly = TRUE);
+base::library(package = "org.Mm.eg.db", quietly = TRUE);
+
+
+godata_extra <- "OrgDb='org.Hs.eg.db', ont='BP', keytype='ENTREZID'";
+if ("godata_extra" %in% base::names(snakemake@params)) {
+    godata_extra <- base::as.character(snakemake@params[["godata_extra"]]);
+}
+
+cmd <- base::paste0(
+    "GOSemSim::godata(",
+    godata_extra,
+    ")"
+);
+base::message(cmd)
+semdata <- base::eval(base::parse(text = cmd));
+base::message("Sementic database built");
 
 enriched <- base::readRDS(
   file = base::as.character(x = snakemake@input[["rds"]])
@@ -32,7 +50,7 @@ if ("gene_list" %in% base::names(snakemake@input)) {
   );
 }
 
-extra_paiwise_termism <- "x = enriched";
+extra_paiwise_termism <- "x = enriched, semData = semdata";
 if ("extra_paiwise_termism" %in% base::names(snakemake@params)) {
   extra_paiwise_termism <- base::paste(
     extra_paiwise_termism,
@@ -53,7 +71,7 @@ base::message("Libraries and input data loaded");
 
 # Build paiwise_termism command line
 command <- base::paste0(
-  "enrichplot::pairwise_termsim(",
+  "pairwise_termsim(",
   extra_paiwise_termism,
   ")"
 );
