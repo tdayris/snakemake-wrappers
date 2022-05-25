@@ -9,7 +9,7 @@
 # UNKNOWN with exit code 2
 # DIR_NOT_FOUND with exit code 3
 
-if [ -d "${1}" ] ; then
+if [ ! -d "${1}" ] ; then
     echo "DIR_NOT_FOUND"
     exit 3
 fi
