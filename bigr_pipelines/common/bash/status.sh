@@ -7,6 +7,14 @@
 # ON_GOING with exit code 0
 # DONE with exit code 0
 # UNKNOWN with exit code 2
+# DIR_NOT_FOUND with exit code 3
+
+if [ -d "${1}" ] ; then
+    echo "DIR_NOT_FOUND"
+    exit 3
+fi
+
+cd "${1}" || exit 3
 
 if [ -f "DONE" ] ; then
     echo "DONE"
