@@ -1,0 +1,186 @@
+from snakemake.utils import min_version
+from pathlib import Path
+from yaml import dump
+from typing import List
+min_version("6.0")
+
+import sys
+
+worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+common = str(worflow_source_dir / "../common/python")
+sys.path.append(common)
+
+from file_manager import *
+from files_linker import *
+from write_yaml import *
+from messages import message
+
+logging.basicConfig(
+    filename="snakemake.low_pass_wgs_copy_number.log",
+    filemode="w",
+    level=logging.DEBUG
+)
+
+default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
+
+configfile: get_config(default_config)
+
+design = get_design(os.getcwd(), search_fastq_pairs)
+
+reference_samples = design[design["Status"] == "Reference"]["Sample_id"]
+seeds = config.get("seeds", [123, 666, 42])
+nb_reads = config.get("nb_reads", [10000000])
+
+fastq_links = link_fq(
+    design.Sample_id,
+    design.Upstream_file,
+    design.Downstream_file
+)
+
+
+wildcard_constraints:
+    seed = r"|".join(map(str, seeds)),
+    n = r"|".join(map(str, nb_reads)),
+    sample = r"|".join(design["Sample_id"])
+
+
+rule target:
+    input: 
+        "wisecondorx/subset_reference.npz"
+        #bins = expand(
+        #    "wisecondorx/{sample}/{sample}_bins.bed",
+        #    sample=design["Sample_id"]
+        #)
+
+
+##############################
+### Copy number prediction ###
+##############################
+
+
+wisecondorx_config = {
+    "convert_extra": config["wisecondorx"]["convert_extra"],
+    "newref_extra": config["wisecondorx"]["newref_extra"],
+    "predict_extra": config["wisecondorx"]["predict_extra"],
+    "gender_extra": config["wisecondorx"]["gender_extra"],
+    "ref": config["ref"]["genome"],
+    "reference_samples": reference_samples,
+}
+
+
+module wisecondorx_meta:
+    snakefile: "../../meta/bio/wisecondorx/test/Snakefile"
+    config: wisecondorx_config
+
+
+use rule * from wisecondorx_meta
+
+
+use rule wisecondorx_convert as wisecondorx_subset_convert with:
+    input:
+        aln = "seqtk/bam/{sample}.{seed}.{n}.bam",
+        ref = config["ref"]["genome"]
+    output:
+        "wisecondorx/subset/{sample}.{seed}.{n}.npz"
+    log:
+        "logs/wisecondorx/subset/{sample}.{seed}.{n}.log"
+
+
+use rule wisecondorx_newref as wisecondorx_subset_newref with:
+    input:
+        aln = expand(
+            "wisecondorx/subset/{sample}.{seed}.{n}.npz",
+            sample=design["Sample_id"],
+            seed=seeds,
+            n=nb_reads
+        )
+    output:
+        "wisecondorx/subset_reference.npz"
+
+
+###############
+### Mapping ###
+###############
+
+
+bowtie2_config = {
+    "ref": config["ref"],
+    "bowtie2_build_extra": config["bowtie2"]["build_extra"],
+    "bowtie2_map_extra": config["bowtie2"]["map_extra"]
+}
+
+
+module bowtie2_meta:
+    snakefile: "../../meta/bio/bowtie2/test/Snakefile"
+    config: bowtie2_config
+
+
+use rule * from bowtie2_meta
+
+
+use rule bowtie2_map from bowtie2_meta as bowtie2_map_subsets with:
+    input:
+        samples=expand(
+            "seqtk/fastq/{sample}.{seed}.{n}.{stream}.fq.gz",
+            stream=[1, 2],
+            allow_missing=True
+        ),
+        genome_index=multiext(
+            "bowtie2/index/genome",
+            ".1.bt2", ".2.bt2", ".3.bt2", ".4.bt2", ".rev.1.bt2", ".rev.2.bt2"
+        )
+    output:
+       temp("seqtk/bam/{sample}.{seed}.{n}.bam")
+    log:
+        "logs/bowtie2/seqtk/{sample}.{seed}.{n}.log" 
+
+
+####################################
+### Fastq gathering and cleaning ###
+####################################
+
+
+rule subset_high_coverage_wgs:
+    input:
+        f1="reads/{sample}.1.fq.gz",
+        f2="reads/{sample}.2.fq.gz"
+    output:
+        f1=temp("seqtk/fastq/{sample}.{seed}.{n}.1.fq.gz"),
+        f2=temp("seqtk/fastq/{sample}.{seed}.{n}.2.fq.gz")
+    message: 
+        "Subsetting {wildcards.sample} using "
+        "seed = {wildcards.seed} and keeping "
+        "{wildcards.n} reads"
+    threads: 10
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 45,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 10,
+        tmpdir="tmp"
+    log:
+        "logs/seqtk/{sample}.{seed}.{n}.log"
+    params:
+        n=lambda wildcards: int(wildcards.n),
+        seed=lambda wildcards: int(wildcards.seed)
+    wrapper:
+        "bio/seqtk/subsample/pe"
+
+
+#################################################
+### Gather files from iRODS or mounting point ###
+#################################################
+
+rule bigr_copy:
+    output:
+        "reads/{sample}.{stream}.fq.gz"
+    message:
+        "Gathering {wildcards.sample} fastq file ({wildcards.stream})"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
+        time_min=lambda wildcard, attempt: attempt * 45
+    params:
+        input=lambda wildcards, output: fastq_links[output[0]]
+    log:
+        "logs/bigr_copy/{sample}.{stream}.log"
+    wrapper:
+        "bio/BiGR/copy"

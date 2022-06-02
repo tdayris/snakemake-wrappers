@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT) &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SNPEFF_SNPSIFT" href="snpeff_snpsift.html" />
+    <link rel="prev" title="SAREK ENHANCED" href="sarek_enhanced.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Snakemake Wrappers
+          </a>
+              <div class="version">
+                heads/Unofficial
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers and Pipelines</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../pipelines.html">BiGR Pipelines</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="WES_germline.html">WES_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCL2FASTQ (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="celltype_deconvolution_rnaseq.html">CELLTYPE_DECONVOLUTION_RNASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dge_deseq2.html">DGE_DESEQ2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_set_enrichment.html">GENE_SET_ENRICHMENT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low_pass_wgs_copy_number.html">LOW_PASS_WGS_COPY_NUMBER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sarek_enhanced.html">SAREK ENHANCED</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#used-wrappers">Used wrappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snakefile">Snakefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline.html">VARIANT_CALLING_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline_wes.html">VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_somatic.html">VARIANT_CALLING_SOMATIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_callling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_occurence_cohort.html">VARIANT_OCCURENCE_COHORT (UNDER DEVELOPMENT)</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Snakemake Wrappers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../pipelines.html">BiGR Pipelines</a> &raquo;</li>
+      <li>SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/bigr-pipelines/sigprofiler_signatures.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sigprofiler-signatures-under-development">
+<span id="id1"></span><h1>SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT)<a class="headerlink" href="#sigprofiler-signatures-under-development" title="Permalink to this headline"></a></h1>
+<p>Compute mutational signatures with SigProfiler</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
+<p>In order to run the pipeline, use the following commands</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Go to your working directory</span>
+
+<span class="nb">cd</span> /path/to/my/working/directory
+
+<span class="c1"># Build a design file (see below)</span>
+
+<span class="c1"># Copy/paste the following line</span>
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/run.sh
+</pre></div>
+</div>
+</section>
+<section id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline"></a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>(Annotated) VCF files (PBGZIP + TBI)</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>Signatures per sample</p></li>
+<li><p>Signature for complete cohort</p></li>
+</ul>
+</section>
+<section id="used-wrappers">
+<h2>Used wrappers<a class="headerlink" href="#used-wrappers" title="Permalink to this headline"></a></h2>
+<p>The following individual wrappers are used in this pipeline:</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">None</span></p></li>
+</ul>
+<p>Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.</p>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<p>Prerequisites:</p>
+<ul class="simple">
+<li><p>A TSV formatted design file, <em>named ‘design.tsv’</em> with the following columns:</p></li>
+</ul>
+</section>
+<section id="snakefile">
+<h2>Snakefile<a class="headerlink" href="#snakefile" title="Permalink to this headline"></a></h2>
+<p>The pipeline contains the following steps:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;snakemake.sigprofiler.log&quot;</span><span class="p">,</span>
+    <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+<span class="p">)</span>
+
+<span class="n">worflow_source_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">get_sources</span><span class="p">())))</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">worflow_source_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/&quot;</span><span class="p">)</span>
+<span class="n">common</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;../common/python&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">common</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">file_manager</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">files_linker</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">write_yaml</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">messages</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">min_version</span>
+<span class="n">min_version</span><span class="p">(</span><span class="s2">&quot;6.0&quot;</span><span class="p">)</span>
+
+<span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;config.hg38.yaml&quot;</span><span class="p">)</span>
+<span class="n">configfile</span><span class="p">:</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
+<span class="n">design</span> <span class="o">=</span> <span class="n">get_design</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">search_vcf_files</span><span class="p">)</span>
+<span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+
+<span class="n">install_genome</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="n">container</span><span class="p">:</span> <span class="s2">&quot;docker://continuumio/miniconda3:4.4.10&quot;</span>
+<span class="c1">#localrules: bigr_copy</span>
+
+<span class="n">samples_list</span> <span class="o">=</span> <span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+<span class="n">wildcard_constraints</span><span class="p">:</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">samples_list</span><span class="p">)</span>
+
+<span class="n">vcf_links</span> <span class="o">=</span> <span class="n">link_vcf</span><span class="p">(</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">,</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">Upstream_file</span>
+<span class="p">)</span>
+
+<span class="n">organism</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;genome_build&quot;</span><span class="p">:</span> <span class="s2">&quot;GRCh38&quot;</span><span class="p">})</span>
+                  <span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;genome_build&quot;</span><span class="p">,</span> <span class="s2">&quot;GRCh38&quot;</span><span class="p">))</span>
+
+<span class="n">rule</span> <span class="n">target</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expand</span><span class="p">(</span>
+            <span class="c1">#&quot;SigProfiler/{sample}/test/input/&quot;,</span>
+            <span class="c1">#&quot;SigProfiler/{sample}/Res/JOB_METADATA.txt&quot;,</span>
+            <span class="c1">#&quot;SigProfiler/{sample}/test/output&quot;,</span>
+            <span class="c1">#&quot;DBS/{sample}/test/output&quot;,</span>
+            <span class="c1">#&quot;ID/{sample}/test/output&quot;,</span>
+            <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/sigprofiler/output&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_list</span>
+        <span class="p">)</span>
+
+
+<span class="n">rule</span> <span class="n">sigprofiler_1_1_6_prepare</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;data_input/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/sigprofiler/vcf&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">time_min</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">30</span><span class="p">,</span>
+        <span class="n">tmpdir</span> <span class="o">=</span> <span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/SigProfiler/prepare/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">mk</span> <span class="o">=</span> <span class="s2">&quot;--parents --verbose&quot;</span><span class="p">,</span>
+        <span class="n">gz</span> <span class="o">=</span> <span class="s2">&quot;--stdout --force&quot;</span><span class="p">,</span>
+        <span class="n">cp</span> <span class="o">=</span> <span class="s2">&quot;--verbose&quot;</span><span class="p">,</span>
+        <span class="n">gr</span> <span class="o">=</span> <span class="s1">&#39;-vP &quot;^#&quot;&#39;</span><span class="p">,</span>
+        <span class="n">cut</span> <span class="o">=</span> <span class="s2">&quot;-f 1-5&quot;</span><span class="p">,</span>
+        <span class="n">sed</span> <span class="o">=</span> <span class="s2">&quot;&#39;/^chr/! s/^/chr/g&#39;&quot;</span><span class="p">,</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mk}</span><span class="s2"> </span><span class="si">{wildcards.sample}</span><span class="s2">/sigprofiler/vcf &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="c1"># &quot;cp {params.cp} {input.vcf} {wildcards.sample}/sigprofiler/vcf/{wildcards.sample}.vcf.gz &gt;&gt; {log} 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="c1"># &quot;gunzip {params.gz} {input.vcf} &gt; {wildcards.sample}/sigprofiler/vcf/{wildcards.sample}.vcf 2&gt;&gt; {log} &amp;&amp; &quot;</span>
+        <span class="s2">&quot;gunzip </span><span class="si">{params.gz}</span><span class="s2"> </span><span class="si">{input.vcf}</span><span class="s2"> | grep </span><span class="si">{params.gr}</span><span class="s2"> | cut </span><span class="si">{params.cut}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot;sed </span><span class="si">{params.sed}</span><span class="s2"> &gt; </span><span class="si">{wildcards.sample}</span><span class="s2">/sigprofiler/vcf/</span><span class="si">{wildcards.sample}</span><span class="s2">.vcf 2&gt;&gt; </span><span class="si">{log}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;tree &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1  &quot;</span>
+
+
+<span class="n">rule</span> <span class="n">sigprofiler_1_1_6_run</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/sigprofiler/vcf&quot;</span><span class="p">,</span>
+        <span class="n">sigprofiler_script</span> <span class="o">=</span> <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/sigprofiler_1.1.6.py&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">/sigprofiler/output&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">10</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">time_min</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">30</span><span class="p">,</span>
+        <span class="n">tmpdir</span> <span class="o">=</span> <span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/SigProfiler/run/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">org</span> <span class="o">=</span> <span class="n">organism</span><span class="p">,</span>
+        <span class="n">install</span> <span class="o">=</span> <span class="s2">&quot;--install&quot;</span> <span class="k">if</span> <span class="n">install_genome</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">rundir</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">/sigprofiler&quot;</span>
+    <span class="n">conda</span><span class="p">:</span>
+        <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/sigprofiler.p37.yaml&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="c1"># &quot;cd {params.rundir} &gt; {log} 2&gt;&amp;1 &amp;&amp; echo &#39;Moved to {params.rundir}&#39; &gt;&gt; {log} 2&gt;&amp;1 &amp;&amp; tree &gt;&gt; {log} 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;tree --all </span><span class="si">{params.rundir}</span><span class="s2"> &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;rm --force --verbose </span><span class="si">{params.rundir}</span><span class="s2">/vcf/.snakemake_timestamp &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;python3 </span><span class="si">{input.sigprofiler_script}</span><span class="s2"> </span><span class="si">{params.org}</span><span class="s2"> </span><span class="si">{params.rundir}</span><span class="s2"> </span><span class="si">{params.install}</span><span class="s2"> &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &quot;</span>
+
+
+
+<span class="n">rule</span> <span class="n">sigprofiler_single_sample_sbs</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;data_input/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">sigprofiler_script</span> <span class="o">=</span> <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/single_sample.py&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">outdir</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/output&quot;</span><span class="p">),</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/single_sample/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">conda</span><span class="p">:</span>
+        <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/single_sample_sigprofiler.yaml&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">mk</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;--parents --verbose SigProfiler/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">/test/&quot;</span><span class="p">,</span>
+        <span class="n">gz</span> <span class="o">=</span> <span class="s2">&quot;--stdout --force&quot;</span><span class="p">,</span>
+        <span class="n">org</span> <span class="o">=</span> <span class="n">organism</span><span class="p">,</span>
+        <span class="n">gr</span> <span class="o">=</span> <span class="s1">&#39;-vP &quot;^#&quot;&#39;</span><span class="p">,</span>
+        <span class="n">cut</span> <span class="o">=</span> <span class="s2">&quot;-f 1-5&quot;</span><span class="p">,</span>
+        <span class="n">sed</span> <span class="o">=</span> <span class="s2">&quot;&#39;/^chr/! s/^/chr/g&#39;&quot;</span><span class="p">,</span>
+        <span class="n">install</span> <span class="o">=</span> <span class="s2">&quot;--install&quot;</span> <span class="k">if</span> <span class="n">install_genome</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mk}</span><span class="s2"> &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;(gunzip </span><span class="si">{params.gz}</span><span class="s2"> </span><span class="si">{input.vcf}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot; grep </span><span class="si">{params.gr}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot; cut </span><span class="si">{params.cut}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot; sed </span><span class="si">{params.sed}</span><span class="s2"> ) &gt; </span><span class="si">{output.vcf}</span><span class="s2"> 2&gt;&gt; </span><span class="si">{log}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;python3 </span><span class="si">{input.sigprofiler_script}</span><span class="s2"> </span><span class="si">{output.vcf}</span><span class="s2"> </span><span class="si">{output.outdir}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; --organism </span><span class="si">{params.org}</span><span class="s2"> </span><span class="si">{params.install}</span><span class="s2"> &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &quot;</span>
+
+
+
+<span class="n">rule</span> <span class="n">sigprofiler_single_sample_dbs</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;data_input/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">sigprofiler_script</span> <span class="o">=</span> <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/single_sample.py&quot;</span><span class="p">,</span>
+        <span class="n">dbs</span> <span class="o">=</span> <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/conda/e31318e4e678218a151c58b51adefff7/lib/python3.7/site-packages/sigproSS/input/sigProfiler_DBS_signatures.csv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">outdir</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;DBS/</span><span class="si">{sample}</span><span class="s2">/test/output&quot;</span><span class="p">),</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;DBS/</span><span class="si">{sample}</span><span class="s2">/test/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/single_sample/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">conda</span><span class="p">:</span>
+        <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/single_sample_sigprofiler.yaml&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">mk</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;--parents --verbose DBS/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">/test/&quot;</span><span class="p">,</span>
+        <span class="n">gz</span> <span class="o">=</span> <span class="s2">&quot;--stdout --force&quot;</span><span class="p">,</span>
+        <span class="n">org</span> <span class="o">=</span> <span class="n">organism</span><span class="p">,</span>
+        <span class="n">gr</span> <span class="o">=</span> <span class="s1">&#39;-vP &quot;^#&quot;&#39;</span><span class="p">,</span>
+        <span class="n">cut</span> <span class="o">=</span> <span class="s2">&quot;-f 1-5&quot;</span><span class="p">,</span>
+        <span class="n">sed</span> <span class="o">=</span> <span class="s2">&quot;&#39;/^chr/! s/^/chr/g&#39;&quot;</span><span class="p">,</span>
+        <span class="n">install</span> <span class="o">=</span> <span class="s2">&quot;--install&quot;</span> <span class="k">if</span> <span class="n">install_genome</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mk}</span><span class="s2"> &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;(gunzip </span><span class="si">{params.gz}</span><span class="s2"> </span><span class="si">{input.vcf}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot; grep </span><span class="si">{params.gr}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot; cut </span><span class="si">{params.cut}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot; sed </span><span class="si">{params.sed}</span><span class="s2"> ) &gt; </span><span class="si">{output.vcf}</span><span class="s2"> 2&gt;&gt; </span><span class="si">{log}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;python3 </span><span class="si">{input.sigprofiler_script}</span><span class="s2"> </span><span class="si">{output.vcf}</span><span class="s2"> </span><span class="si">{output.outdir}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; --dbs </span><span class="si">{input.dbs}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; --organism </span><span class="si">{params.org}</span><span class="s2"> </span><span class="si">{params.install}</span><span class="s2"> &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &quot;</span>
+
+
+<span class="n">rule</span> <span class="n">sigprofiler_single_sample_id</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;data_input/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">sigprofiler_script</span> <span class="o">=</span> <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/single_sample.py&quot;</span><span class="p">,</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/conda/e31318e4e678218a151c58b51adefff7/lib/python3.7/site-packages/sigproSS/input/sigProfiler_ID_signatures.csv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">outdir</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;ID/</span><span class="si">{sample}</span><span class="s2">/test/output&quot;</span><span class="p">),</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;ID/</span><span class="si">{sample}</span><span class="s2">/test/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/single_sample/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">conda</span><span class="p">:</span>
+        <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/single_sample_sigprofiler.yaml&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">mk</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;--parents --verbose ID/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">/test/&quot;</span><span class="p">,</span>
+        <span class="n">gz</span> <span class="o">=</span> <span class="s2">&quot;--stdout --force&quot;</span><span class="p">,</span>
+        <span class="n">org</span> <span class="o">=</span> <span class="n">organism</span><span class="p">,</span>
+        <span class="n">gr</span> <span class="o">=</span> <span class="s1">&#39;-vP &quot;^#&quot;&#39;</span><span class="p">,</span>
+        <span class="n">cut</span> <span class="o">=</span> <span class="s2">&quot;-f 1-5&quot;</span><span class="p">,</span>
+        <span class="n">sed</span> <span class="o">=</span> <span class="s2">&quot;&#39;/^chr/! s/^/chr/g&#39;&quot;</span><span class="p">,</span>
+        <span class="n">install</span> <span class="o">=</span> <span class="s2">&quot;--install&quot;</span> <span class="k">if</span> <span class="n">install_genome</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mk}</span><span class="s2"> &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;(gunzip </span><span class="si">{params.gz}</span><span class="s2"> </span><span class="si">{input.vcf}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot; grep </span><span class="si">{params.gr}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot; cut </span><span class="si">{params.cut}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot; sed </span><span class="si">{params.sed}</span><span class="s2"> ) &gt; </span><span class="si">{output.vcf}</span><span class="s2"> 2&gt;&gt; </span><span class="si">{log}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;python3 </span><span class="si">{input.sigprofiler_script}</span><span class="s2"> </span><span class="si">{output.vcf}</span><span class="s2"> </span><span class="si">{output.outdir}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; --id </span><span class="si">{input.id}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; --organism </span><span class="si">{params.org}</span><span class="s2"> </span><span class="si">{params.install}</span><span class="s2"> &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &quot;</span>
+
+
+<span class="n">rule</span> <span class="n">sigprofiler_matrix_generator</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;data_input/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">sigprofiler_script</span> <span class="o">=</span> <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/matrix_generator.py&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+        <span class="n">data_input</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/input/&quot;</span><span class="p">),</span>
+        <span class="n">logs</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/logs&quot;</span><span class="p">),</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/output/</span><span class="si">{signatures}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">signatures</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;DBS&quot;</span><span class="p">,</span> <span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;SBS&quot;</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">],</span> <span class="n">sample</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">&quot;</span><span class="p">)),</span>
+        <span class="n">out_vcf</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/output/vcf_files/</span><span class="si">{signatures}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">signatures</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;DBS&quot;</span><span class="p">,</span> <span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;SNV&quot;</span><span class="p">],</span> <span class="n">sample</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">&quot;</span><span class="p">))</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Building substitution matrices with SigProfiler on </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">conda</span><span class="p">:</span>
+        <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/matrix_generator.yaml&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/sigprofiler/matrix_generator/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">mk</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;--parents --verbose SigProfiler/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">/test/&quot;</span><span class="p">,</span>
+        <span class="n">gz</span> <span class="o">=</span> <span class="s2">&quot;--stdout --force&quot;</span><span class="p">,</span>
+        <span class="n">org</span> <span class="o">=</span> <span class="n">organism</span><span class="p">,</span>
+        <span class="n">gr</span> <span class="o">=</span> <span class="s1">&#39;-vP &quot;^#&quot;&#39;</span><span class="p">,</span>
+        <span class="n">cut</span> <span class="o">=</span> <span class="s2">&quot;-f 1-5&quot;</span><span class="p">,</span>
+        <span class="n">sed</span> <span class="o">=</span> <span class="s2">&quot;&#39;/^chr/! s/^/chr/g&#39;&quot;</span><span class="p">,</span>
+        <span class="n">install</span> <span class="o">=</span> <span class="s2">&quot;--install&quot;</span> <span class="k">if</span> <span class="n">install_genome</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mk}</span><span class="s2"> &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;(gunzip </span><span class="si">{params.gz}</span><span class="s2"> </span><span class="si">{input.vcf}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot; grep </span><span class="si">{params.gr}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot; cut </span><span class="si">{params.cut}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot; sed </span><span class="si">{params.sed}</span><span class="s2"> ) &gt; </span><span class="si">{output.vcf}</span><span class="s2"> 2&gt;&gt; </span><span class="si">{log}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;python3 </span><span class="si">{input.sigprofiler_script}</span><span class="s2"> </span><span class="si">{output.vcf}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot; --organism </span><span class="si">{params.org}</span><span class="s2"> --sample-name </span><span class="si">{wildcards.sample}</span><span class="s2"> </span><span class="si">{params.install}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;&gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &quot;</span>
+
+
+<span class="n">rule</span> <span class="n">signature_extractor</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">matrices</span> <span class="o">=</span> <span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/input&quot;</span><span class="p">,</span>
+        <span class="n">logs</span> <span class="o">=</span> <span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/logs&quot;</span><span class="p">,</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/output/</span><span class="si">{signatures}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">signatures</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;DBS&quot;</span><span class="p">,</span> <span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;SBS&quot;</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">],</span> <span class="n">sample</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">&quot;</span><span class="p">),</span>
+        <span class="n">out_vcf</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/output/vcf_files/</span><span class="si">{signatures}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">signatures</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;DBS&quot;</span><span class="p">,</span> <span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;SNV&quot;</span><span class="p">],</span> <span class="n">sample</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{sample}</span><span class="s2">&quot;</span><span class="p">),</span>
+        <span class="n">sigprofiler_script</span> <span class="o">=</span> <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/signature_extractor.py&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">sbs</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/Res/SBS96/&quot;</span><span class="p">),</span>
+        <span class="n">dsb</span> <span class="o">=</span> <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/test/Res/DBS78/&quot;</span><span class="p">),</span>
+        <span class="n">job</span> <span class="o">=</span> <span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/Res/JOB_METADATA.txt&quot;</span><span class="p">,</span>
+        <span class="n">seeds</span> <span class="o">=</span> <span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/Res/Seeds.txt&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Extracting signatures in </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">10</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">7</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span>
+        <span class="c1">#gres=&quot;gpu:t4:1&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/sigprofiler/extractor/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">conda</span><span class="p">:</span>
+        <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/extractor.yaml&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;SigProfiler/</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">org</span> <span class="o">=</span> <span class="n">organism</span><span class="p">,</span>
+        <span class="n">install</span> <span class="o">=</span> <span class="s2">&quot;--install&quot;</span> <span class="k">if</span> <span class="n">install_genome</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;python3 </span><span class="si">{input.sigprofiler_script}</span><span class="s2"> </span><span class="si">{params.sig}</span><span class="s2">/test </span><span class="si">{params.sig}</span><span class="s2">/Res --threads </span><span class="si">{threads}</span><span class="s2"> --organism </span><span class="si">{params.org}</span><span class="s2"> </span><span class="si">{params.install}</span><span class="s2"> &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">sigprofiler_decompose</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">sbs</span> <span class="o">=</span> <span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/Res/SBS96/&quot;</span><span class="p">,</span>
+        <span class="n">dsb</span> <span class="o">=</span> <span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/Res/DBS78/&quot;</span><span class="p">,</span>
+        <span class="n">sigprofiler_script</span> <span class="o">=</span> <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/scripts/sigprofiler_decompose.py&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;SigProfiler/</span><span class="si">{sample}</span><span class="s2">/Res/SBS96/Deconvolution_SB96_DeNovo&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Decomposing sugnatures on </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/sigprofiler/decompose/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">organism</span> <span class="o">=</span> <span class="n">organism</span><span class="p">,</span>
+        <span class="n">rs</span> <span class="o">=</span> <span class="s2">&quot;--verbose --checksum --recursive --human-readable --update&quot;</span><span class="p">,</span>
+        <span class="n">mk</span> <span class="o">=</span> <span class="s2">&quot;--parents --verbose&quot;</span><span class="p">,</span>
+        <span class="n">install</span> <span class="o">=</span> <span class="s2">&quot;--install&quot;</span> <span class="k">if</span> <span class="n">install_genome</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">conda</span><span class="p">:</span>
+        <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/sigprofiler_signatures/env/extractor.yaml&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;rsync </span><span class="si">{params.rs}</span><span class="s2"> SigProfiler/</span><span class="si">{wildcards.sample}</span><span class="s2">/test/ </span><span class="si">{output}</span><span class="s2"> &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mk}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2">/Res/SBS96/Suggested_Solution/Decomposed_Solution/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mk}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2">/Res/SBS96/Suggested_Solution/De_Novo_Solution/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mk}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2">/Res/ID83/Suggested_Solution/Decomposed_Solution/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mk}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2">/Res/ID83/Suggested_Solution/De_Novo_Solution/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mk}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2">/Res/DBS78/Suggested_Solution/Decomposed_Solution/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mk}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2">/Res/DBS78/Suggested_Solution/De_Novo_Solution/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;python3 </span><span class="si">{input.sigprofiler_script}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2"> --organism </span><span class="si">{params.organism}</span><span class="s2"> --verbose </span><span class="si">{params.install}</span><span class="s2"> &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Thibault Dayris</p></li>
+<li><p>M boyba Diop</p></li>
+<li><p>Marc Deloger</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="sarek_enhanced.html" class="btn btn-neutral float-left" title="SAREK ENHANCED" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="snpeff_snpsift.html" class="btn btn-neutral float-right" title="SNPEFF_SNPSIFT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016, The Snakemake team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

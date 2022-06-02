@@ -61,7 +61,6 @@ dds <- DESeq2::DESeqDataSetFromTximport(
   design = formula
 );
 base::write("DESeqDataSet built.", stderr());
-saveRDS(dds, "my_dds.RDS")
 
 levels <- ("levels" %in% base::names(snakemake@params));
 factor <- ("factor" %in% base::names(snakemake@params));
@@ -77,7 +76,7 @@ if (levels & factor) {
   if ("ref_level" %in% base::names(snakemake@params)) {
       base::message("Ref level: ", snakemake@params[["ref_level"]]);
       dds[[factor]] <- stats::relevel(
-        dds[[factor]], 
+        dds[[factor]],
         ref = snakemake@params[["ref_level"]]
     );
   } else {
@@ -92,12 +91,11 @@ print(colData(dds));
 
 keep <- rowSums(counts(dds)) > count_filter;
 dds <- dds[keep, ];
-print(head(dds));
 
 if ("remove_zeros" %in% base::names(snakemake@params)) {
   keep <- rowSums(counts(dds)==0) < length(colnames(dds)) - 1;
-  print(head(keep))
   dds <- dds[keep, ];
+  base::write("Zeros have been removed", stderr());
 }
 print(head(dds));
 base::message("Low counts in DESeqDataSet were filtered.");

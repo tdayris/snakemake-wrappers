@@ -1,0 +1,18 @@
+rule wisecondorx_convert:
+    input:
+        aln = "bowtie2/map/{sample}.bam",
+        ref = config["ref"]
+    output:
+        "wisecondorx/convert/{sample}.npz"
+    message: "Converting reads {wildcards.sample} to NPZ"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        extra=config.get("convert_extra", "")
+    log:
+        "logs/wisecondorx/convert/{sample}.log"
+    wrapper:
+        "bio/wisecondorx/convert"

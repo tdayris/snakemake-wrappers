@@ -13,6 +13,7 @@ from write_yaml import *
 from messages import message
 
 from snakemake.utils import min_version
+from snakemake.shell import shell
 min_version("6.0")
 
 logging.basicConfig(
@@ -34,6 +35,20 @@ fastq_links = link_fq(
 
 configfile: config_path
 container: "docker://continuumio/miniconda3:4.4.10"
+    
+
+##################
+### Flag rules ###
+##################
+
+onsuccess:
+    shell("touch DONE && rm --force --verbose ON_GOING ERROR")
+
+onerror:
+    shell("touch ERROR && rm --force --verbose ON_GOING DONE")
+
+onstart:
+    shell("touch ON_GOING && rm --force --verbose ERROR DONE")
 
 
 ##################################

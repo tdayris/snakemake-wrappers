@@ -1,9 +1,9 @@
-.. _`Somatic TMB`:
+.. _`somatic_tmb`:
 
-SOMATIC TMB
+SOMATIC_TMB
 ===========
 
-Compute Tumor Molecular Burden
+Compute tumor mutational burden within somatic samples
 
 
 Example
@@ -93,7 +93,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     """
     rule compute_tmb:
         input:
-            igs = get_best_igs(), # "igs.yaml",
+            igs = get_best_igs(),
             samples = expand(
                 "tmb/{sample}.yaml", sample=config["sample_list"]
             )
@@ -132,8 +132,6 @@ The following individual wrappers are used in this meta-wrapper:
 
 * :ref:`bio/tmb/igs_estimation`
 
-* :ref:`bio/tmb/igs_estimation`
-
 * :ref:`bio/tmb/extract_somatic`
 
 * :ref:`bio/tmb/compute_tmb`
@@ -143,6 +141,13 @@ Please refer to each wrapper in above list for additional configuration paramete
 
 
 
+
+
+
+Notes
+-----
+
+Key names are parameters passed through the configurarion dictionnary
 
 
 

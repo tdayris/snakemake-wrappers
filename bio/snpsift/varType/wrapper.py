@@ -11,6 +11,7 @@ from snakemake_wrapper_utils.java import get_java_opts
 java_opts = get_java_opts(snakemake)
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 extra = snakemake.params.get("extra", "")
+min_threads = 1
 
 # Uncompression shall be done on user request
 incall = snakemake.input["call"]

@@ -108,7 +108,7 @@ The pipeline contains the following steps:
         sample_identifiers = [
             cel.name[:-len("_A.CEL")]
             for cel in config_path.parent.iterdir()
-            if cel.name.endswith("_A.CEL")
+            if cel.name.endswith(("_A.CEL", "_B.CEL"))
         ]
         # Update config file with sample names
         default_oncoscan_process_config["samples"] = sample_identifiers
@@ -121,13 +121,21 @@ The pipeline contains the following steps:
 
     # The configfile name is hard coded. It should be: "config.yaml"
     configfile: str(config_path)
-    ruleorder: eacon_annotate > post_process_eacon_annotate
+    # ruleorder: eacon_annotate > post_process_eacon_annotate
 
     module post_process_eacon:
         snakefile: "../../meta/bio/eacon_post_process/test/Snakefile"
         config: config
 
-    #print(config)
+
+    print(config)
+
+
+    wildcard_constraints:
+        ATchannel=r"A|B",
+        GCchannel=r"C|D",
+        sample=r"|".join(config["samples"])
+
 
     rule default_oncoscan_process_all:
         input:
@@ -152,7 +160,7 @@ The pipeline contains the following steps:
             )
 
     # Import all rules from the eacon_post_process meta wrapper
-    use rule * from post_process_eacon as post_process_*
+    use rule * from post_process_eacon
 
 
     use rule eacon_annotate from post_process_eacon with:
@@ -160,6 +168,7 @@ The pipeline contains the following steps:
             rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS",
             grd = "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/scripts/grd",
             ldb = "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/databases"
+
 
 
     rule eacon_oncoscan_process:
@@ -199,6 +208,12 @@ The pipeline contains the following steps:
         wrapper:
             "bio/eacon/oncoscan_process"
 
+    use rule eacon_oncoscan_process as eacon_oncoscan_process_bd with:
+        input:
+            ATChannelCel = "{sample}_B.CEL",
+            GCChannelCel = "{sample}_D.CEL"
+
+
 
     rule eacon_install:
         input:
@@ -215,7 +230,7 @@ The pipeline contains the following steps:
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/rcnorm_0.1.5.tar.gz"
             ],
             git_packages = [
-                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.79.0-1233-g75ee1b83d.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.79.0-1274-g1c3f62c3a.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_Chromosomes.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.cytoscan.2.4.0.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.oncoscan.2.4.0.tar.gz"

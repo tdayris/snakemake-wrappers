@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 """
 This file contains usefull functions for pandas dataframe managment
 """
@@ -19,7 +23,8 @@ def filter_df(df: pandas.DataFrame,
 
 def yield_comps(complete_design: pandas.DataFrame,
                 aggregate: Optional[list[str]] = None,
-                remove: Optional[list[str]] = None) \
+                remove: Optional[list[str]] = None,
+                contains: Optional[list[str]] = None) \
                 -> list[Union[pandas.DataFrame, list[str]]]:
     """
     Split a large design into simple ones and provide comparison information
@@ -51,9 +56,18 @@ def yield_comps(complete_design: pandas.DataFrame,
             # to provide user-understandable name ; so let us sort out the
             # levels and guess reference name.
             level, ref = sorted([l1, l2])
+            for level, ref in [[l1, l2], [l2, l1]]:
+               # Building humand readable design name
+               # Edit:
+               # All previous attempt to guess reference name failed. This is now
+               # me, not guessing anymore and doing all possible comparisons
+               # two by two.
+               try:
+                  if any(i in contains for i in [f"test_{level}", f"reference_{ref}"]):
+                     yield [col, f"test_{level}", f"reference_{ref}"]
+               except TypeError:
+                     yield [col, f"test_{level}", f"reference_{ref}"]
 
-            # Building humand readable design name
-            yield [col, level, ref]
 
 
 def yield_samples(complete_design: pandas.DataFrame,
@@ -83,16 +97,38 @@ def yield_samples(complete_design: pandas.DataFrame,
             # We need at least two levels to perfom a differential analysis
             continue
 
-
+        # print('aggregate:', aggregate)
+        # print('current_column:', col)
         for l1, l2 in itertools.combinations(levels, 2):
-            yield complete_design[complete_design[col].isin([l1, l2])].index.tolist()
+            # Edit:
+            # All previous attempt to guess reference name failed. This is now
+            # me, not guessing anymore and doing all possible comparisons
+            # two by two.
+            try:
+               if any(i in contains for i in [f"test_{l1}", f"reference_{l2}"]):
+                  yield complete_design[complete_design[col].isin([l1, l2])].index.tolist()
+                  yield complete_design[complete_design[col].isin([l1, l2])].index.tolist()
+            except TypeError:
+                  yield complete_design[complete_design[col].isin([l1, l2])].index.tolist()
+                  yield complete_design[complete_design[col].isin([l1, l2])].index.tolist()
+
 
 def relation_condition_sample(complete_design: pandas.DataFrame,
-                              factor: str) -> dict[str, str]:
+                              factor: str,
+                              test: Optional[str] = None,
+                              ref: Optional[str] = None) -> dict[str, str]:
     """
     From a design dataframe and a factor name, return the list of samples
     involved.
     """
-    return dict(
-        zip(complete_design.index.tolist(), complete_design[factor].tolist())
-    )
+    if (test is None) and (ref is None):
+        return dict(zip(
+            complete_design.index.tolist(),
+            complete_design[factor].tolist()
+        ))
+
+    ref = ref[len("reference_"):] if ref.startswith("reference_") else ref
+    test = test[len("test_"):] if test.startswith("test_") else test
+
+    filtered_design = complete_design[complete_design[factor].isin([ref, test])]
+    return dict(zip(filtered_design.index, filtered_design[factor]))

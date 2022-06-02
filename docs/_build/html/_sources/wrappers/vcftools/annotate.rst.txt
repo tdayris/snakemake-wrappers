@@ -14,7 +14,18 @@ This wrapper can be used in the following way:
 
 .. code-block:: python
 
-
+    rule test_vcftools:
+        input:
+            vcf = "/path/to/calls.vcf.gz",
+            annotation = "path/to/annotation.vcf",
+            description = "path/to/headers.txt"
+        output:
+            vcf = "path/to/output.vcf.gz"
+        threads: 4 # 3 threads if output is not gzipped
+        log:
+            "logs/vcftools/annotate.log"
+        wrapper:
+            "0.79.0-1274-g1c3f62c3a/bio/vcftools/annotate"
 
 Note that input, output and log file paths can be chosen freely.
 

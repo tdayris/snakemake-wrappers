@@ -43,11 +43,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "--keepDuplicates --gencode"
         )
 
-        if (config["transcriptome"], config["genome"]) == hg38_flamingo:
+        if args == hg38_flamingo:
             return "salmon/index_hg38"
-        elif (config["transcriptome"], config["genome"]) == hg19_flamingo:
+        elif args == hg19_flamingo:
             return "salmon/index_hg19"
-        elif (config["transcriptome"], config["genome"]) == mm10_flamingo:
+        elif args == mm10_flamingo:
             return "salmon/index_mm10"
 
         return "salmon/index"
@@ -69,8 +69,8 @@ This meta-wrapper can be used by integrating the following into your workflow:
         message: "Quantifying {wildcards.sample} with Salmon"
         threads: min(config.get("threads", 20), 20)
         resources:
-            time_min=lambda wildcards, attempt: attempt * 75,
-            mem_mb=lambda wildcards, attempt: attempt * 1024 * 12,
+            time_min=lambda wildcards, input, attempt: attempt * 45 * (input.size_mb / 10240),
+            mem_mb=lambda wildcards, input, attempt: attempt * 1024 * 10 * (input.size_mb / 10240),
             tmpdir="tmp"
         params:
             libType = config.get("salmon_libtype", "A"),
@@ -93,7 +93,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule salmon_index:
         input:
             sequences="salmon/decoy/gentrome.fasta",
-            decoys="salmon/decoy/decoys.txt"
+            decoys="salmon/decoy/decoy.txt"
         output:
             index=temp(directory("salmon/index"))
         message: "Indexing transcriptome/gentrome sequences with Salmon"
@@ -117,7 +117,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
     rule salmon_index_hg38:
         input:
             sequences="salmon/decoy/gentrome.hg38.fasta",
-            decoys="salmon/decoy/decoys.hg38.txt"
+            decoys="salmon/decoy/gentrome.hg38.decoy",
         output:
             index=directory("salmon/index_hg38")
         message: "Indexing transcriptome/gentrome sequences with Salmon"
@@ -135,19 +135,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "bio/salmon/index"
 
 
-    #use rule salmon_index as salmon_index_hg38 with:
-    #    input:
-    #        sequences="salmon/decoy/gentrome.hg38.fasta",
-    #        decoys="salmon/decoy/decoys.hg38.txt"
-    #    output:
-    #        index=directory("salmon/index_hg38")
-    #    log:
-    #        "logs/salmon/index.hg38.log"
-
     rule salmon_index_hg19:
         input:
             sequences="salmon/decoy/gentrome.hg19.fasta",
-            decoys="salmon/decoy/decoys.hg19.txt"
+            decoys="salmon/decoy/gentrome.hg19.decoy"
         output:
             index=directory("salmon/index_hg19")
         message: "Indexing transcriptome/gentrome sequences with Salmon"
@@ -164,19 +155,11 @@ This meta-wrapper can be used by integrating the following into your workflow:
         wrapper:
             "bio/salmon/index"
 
-    #use rule salmon_index as salmon_index_hg19 with:
-    #    input:
-    #        sequences="salmon/decoy/gentrome.hg19.fasta",
-    #        decoys="salmon/decoy/decoys.hg19.txt"
-    #    output:
-    #        index=directory("salmon/index_hg19")
-    #    log:
-    #        "logs/salmon/index.hg19.log"
 
     rule salmon_index_mm10:
         input:
             sequences="salmon/decoy/gentrome.mm10.fasta",
-            decoys="salmon/decoy/decoys.mm10.txt"
+            decoys="salmon/decoy/gentrome.mm10.decoy"
         output:
             index=directory("salmon/index_mm10")
         message: "Indexing transcriptome/gentrome sequences with Salmon"
@@ -192,17 +175,6 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/salmon/index.mm10.log"
         wrapper:
             "bio/salmon/index"
-
-    #use rule salmon_index as salmon_index_mm10 with:
-    #    input:
-    #        sequences="salmon/decoy/gentrome.mm10.fasta",
-    #        decoys="salmon/decoy/decoys.mm10.txt"
-    #    output:
-    #        index=directory("salmon/index_mm10")
-    #    log:
-    #        "logs/salmon/index.mm10.log"
-
-
 
     """
     This rule is optional in case you want to use decoy sequences within your
@@ -234,8 +206,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.cdna.fasta",
             genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta"
         output:
-            decoys="salmon/decoy/decoys.hg38.txt",
-            gentrome="salmon/decoy/gentrome.hg38.fasta"
+            multiext("salmon/decoy/gentrome.hg38", ".decoy", ".fasta")
         message: "Building gentrome and decoy sequences for Salmon"
         threads: 2
         cache: True
@@ -243,29 +214,20 @@ This meta-wrapper can be used by integrating the following into your workflow:
             time_min=30,
             mem_mb=512,
             tmpdir="tmp"
+        params:
+            prefix="salmon/decoy/gentrome.hg38"
         log:
             "logs/salmon/decoys.hg38.log"
         wrapper:
             "bio/salmon/generate_decoy"
 
 
-    #use rule salmon_generate_decoy_sequence as salmon_generate_decoy_sequence_hg38 with:
-    #    input:
-    #        transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.cdna.fasta",
-    #        genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta"
-    #    output:
-    #        decoys="salmon/decoy/decoys.hg38.txt",
-    #        gentrome="salmon/decoy/gentrome.hg38.fasta"
-    #    log:
-    #        "logs/salmon/decoys.hg38.log"
-
     rule salmon_generate_decoy_sequence_hg19:
         input:
             transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/GRCh37.75.homo_sapiens.cdna.fasta",
             genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.main_chr.fa"
         output:
-            decoys="salmon/decoy/decoys.hg19.txt",
-            gentrome="salmon/decoy/gentrome.hg19.fasta"
+            multiext("salmon/decoy/gentrome.hg19", ".decoy", ".fasta")
         message: "Building gentrome and decoy sequences for Salmon"
         threads: 2
         cache: True
@@ -275,26 +237,18 @@ This meta-wrapper can be used by integrating the following into your workflow:
             tmpdir="tmp"
         log:
             "logs/salmon/decoys.hg19.log"
+        params:
+            prefix="salmon/decoy/gentrome.hg19"
         wrapper:
             "bio/salmon/generate_decoy"
 
-    #use rule salmon_generate_decoy_sequence as salmon_generate_decoy_sequence_hg19 with:
-    #    input:
-    #        transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/GRCh37.75.homo_sapiens.cdna.fasta",
-    #        genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.main_chr.fa"
-    #    output:
-    #        decoys="salmon/decoy/decoys.hg19.txt",
-    #        gentrome="salmon/decoy/gentrome.hg19.fasta"
-    #    log:
-    #        "logs/salmon/decoys.hg19mm.log"
 
     rule salmon_generate_decoy_sequence_mm10:
         input:
             transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.cdna.nopatch.fasta",
             genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta"
         output:
-            decoys="salmon/decoy/decoys.mm10.txt",
-            gentrome="salmon/decoy/gentrome.mm10.fasta"
+            multiext("salmon/decoy/gentrome.mm10", ".decoys", ".fasta")
         message: "Building gentrome and decoy sequences for Salmon"
         threads: 2
         cache: True
@@ -304,20 +258,10 @@ This meta-wrapper can be used by integrating the following into your workflow:
             tmpdir="tmp"
         log:
             "logs/salmon/decoys.mm10.log"
+        params:
+            prefix="salmon/decoy/gentrome.mm10"
         wrapper:
             "bio/salmon/generate_decoy"
-
-    #use rule salmon_generate_decoy_sequence as salmon_generate_decoy_sequence_mm10 with:
-    #    input:
-    #        transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.cdna.nopatch.fasta",
-    #        genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta"
-    #    output:
-    #        decoys="salmon/decoy/decoys.mm10.txt",
-    #        gentrome="salmon/decoy/gentrome.mm10.fasta"
-    #    log:
-    #        "logs/salmon/decoys.mm10.log"
-
-
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

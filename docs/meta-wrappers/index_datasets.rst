@@ -140,6 +140,8 @@ The following individual wrappers are used in this meta-wrapper:
 
 * :ref:`bio/picard/createsequencedictionary`
 
+* :ref:`bio/samtools/index`
+
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
 

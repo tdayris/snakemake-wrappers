@@ -17,6 +17,17 @@ genome_input = snakemake.input["genome"]
 if genome_input.endswith(".gz"):
     genome_input = "<(gunzip -c {})".format(genome_input)
     min_threads += 1
+    
+decoy = (
+    f"{snakemake.params.get('prefix')}.decoy" 
+    if "prefix" in snakemake.params.keys() else snakemake.output[0]
+)
+
+gentrome = (
+    f"{snakemake.params.get('prefix')}.fasta" 
+    if "prefix" in snakemake.params.keys() else snakemake.output[1]
+)
+
 
 if snakemake.threads != min_threads:
     raise ValueError(
@@ -25,11 +36,11 @@ if snakemake.threads != min_threads:
 
 shell(
     "grep '^>' {genome_input} | cut -d ' ' -f 1 "
-    "> {snakemake.output[0]} {log}"
+    "> {decoy} {log}"
 )
 
 shell(
-    "sed -i.bak -e 's/>//g' {snakemake.output.decoys} {log} & "
+    "sed -i.bak -e 's/>//g' {decoy} {log} & "
     "cat {snakemake.input.transcriptome} {snakemake.input.genome} "
-    "> {snakemake.output[1]} {log} & wait"
+    "> {gentrome} {log} & wait"
 )

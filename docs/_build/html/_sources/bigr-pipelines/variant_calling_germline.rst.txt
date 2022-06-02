@@ -1,7 +1,7 @@
-.. _`Variant_Calling_Germline (under development)`:
+.. _`Variant_Calling_Germline`:
 
-VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)
-============================================
+VARIANT_CALLING_GERMLINE
+========================
 
 Perform Variant calling on Germline
 
@@ -611,8 +611,8 @@ The pipeline contains the following steps:
 
     rule sambamba_markduplicates:
         input:
-            bam="sambamba/sort/{sample}.bam",
-            bai=get_bai("sambamba/sort/{sample}.bam")
+            bam="samtools/filter/{sample}.bam",
+            bai=get_bai("samtools/filter/{sample}.bam")
         output:
             bam=temp("sambamba/markdup/{sample}.bam")
         message:
@@ -630,6 +630,32 @@ The pipeline contains the following steps:
             )
         wrapper:
             "bio/sambamba/markdup"
+
+
+
+    """
+    Filter a bam over the capturekit bed file
+    """
+    rule samtools_filter_bed:
+        input:
+            "sambamba/sort/{sample}.bam"
+            fasta=config["genome"],
+            fasta_idx=get_fai(config["genome"]),
+            fasta_dict=get_dict(config["genome"]),
+            bed=config["bed"]
+        output:
+            temp("samtools/filter/{sample}.bam")
+        threads: 10
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        params:
+            extra="--bam --with-header"
+        log:
+            "logs/samtools/filter/{sample}.log"
+        wrapper:
+            "bio/samtools/view"
 
 
     use rule sambamba_index from bwa_meta with:

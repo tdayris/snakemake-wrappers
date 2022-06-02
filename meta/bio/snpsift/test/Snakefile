@@ -55,7 +55,7 @@ rule snpsift_exac:
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-        time_min=lambda wildcards, attempt: attempt * 45,
+        time_min=lambda wildcards, attempt: attempt * 75,
         tmpdir="tmp"
     params:
         extra=config.get(
@@ -263,13 +263,13 @@ rule snpsift_dbsnp:
 
 rule snpsift_vartype:
     input:
-        vcf="snpeff/calls/{sample}.vcf.gz",
-        vcf_tbi="snpeff/calls/{sample}.vcf.gz.tbi"
+        call="snpeff/calls/{sample}.vcf",
+        #vcf_tbi="snpeff/calls/{sample}.vcf.gz.tbi"
     output:
-        vcf=temp("snpsift/vartype/{sample}.vcf")
+        call=temp("snpsift/vartype/{sample}.vcf")
     message:
         "Annotating variant types in {wildcards.sample}"
-    threads: 1
+    threads: 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
         time_min=lambda wildcards, attempt: attempt * 45,

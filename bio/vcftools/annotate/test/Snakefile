@@ -1,0 +1,12 @@
+rule test_vcftools:
+    input:
+        vcf = "/path/to/calls.vcf.gz",
+        annotation = "path/to/annotation.vcf",
+        description = "path/to/headers.txt"
+    output:
+        vcf = "path/to/output.vcf.gz"
+    threads: 4 # 3 threads if output is not gzipped
+    log:
+        "logs/vcftools/annotate.log"
+    wrapper:
+        "master/bio/vcftools/annotate"

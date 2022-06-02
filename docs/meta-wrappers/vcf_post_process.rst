@@ -429,6 +429,22 @@ The following individual wrappers are used in this meta-wrapper:
 
 * :ref:`bio/BiGR/rename_snpsift_maf_cols`
 
+* :ref:`bio/variantoccurence/annotate`
+
+* :ref:`bio/variantoccurence/chromosomes`
+
+* :ref:`bio/BiGR/fix_vcf`
+
+* :ref:`bio/BiGR/split_vcf_features`
+
+* :ref:`bio/BiGR/vcf_format_to_info`
+
+* :ref:`bio/gatk/varianteval`
+
+* :ref:`bio/gatk/variantfiltration`
+
+* :ref:`bio/sed`
+
 
 Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
 

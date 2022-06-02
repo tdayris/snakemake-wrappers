@@ -15,6 +15,7 @@ import logging
 import operator
 import pandas
 import numpy
+import re
 from typing import Any, Optional, Union
 
 
@@ -88,14 +89,18 @@ def combine_columns(dataframe: pandas.DataFrame,
 
 
 def prepare_int_conversion(value: Any) -> Any:
-    if isinstance(value, (int, float)):
+    if isinstance(value, (int, float)) or value.isnumeric():
         return value
     if value.upper() in ["", ".", "NA", "NAN", "#"]:
+        logging.warning(f"Could not convert {value} to int/float")
         return numpy.nan
     try:
+        value = value.strip(",").strip("|")
         if "|" in value:
-            return float(value.split("|")[-1])
-        return float(value.split(",")[-1])
+            logging.warning(f"Multiple values in {value}, the last one has been kept")
+            return float([i for i in value.split("|") if i != ""][-1])
+        logging.warning(f"Multiple values in {value}, the last one has been kept")
+        return float([i for i in value.split(",") if i != ""][-1])
     except ValueError:
         logging.error(f"Failed converting string to float {value}")
         return numpy.nan
@@ -171,6 +176,7 @@ if (convert_cols_type := snakemake.params.get("convert_cols_type", None)) is not
     logging.debug(f"The following type concersion are made: {convert_cols_type}")
     for column_name, new_type in convert_cols_type.items():
         if new_type in ["int", "float"]:
+            logging.info(f"Converting {column_name}")
             data[column_name] = [
                 prepare_int_conversion(i) for i in data[column_name]
             ]
@@ -202,13 +208,13 @@ if (filters := snakemake.params.get("full_line_filters", None)) is not None:
 if (not_contains := snakemake.params.get("not_contains", None)) is not None:
     for column, value in not_contains:
         logging.debug(f"Filtering out line in which {column} contains: {value}")
-        data = data[~data[column].str.contains(value)]
+        data = data[~data[column].str.contains(value, flags=re.IGNORECASE, regex=True)]
 
 
 if (contains := snakemake.params.get("contains", None)) is not None:
     for column, value in contains:
         logging.debug(f"Filtering in line in which {column} contains: {value}")
-        data = data[data[column].str.contains(value)]
+        data = data[data[column].str.contains(value, flags=re.IGNORECASE, regex=True)]
 
 
 if snakemake.params.get("dropna", False) is True:

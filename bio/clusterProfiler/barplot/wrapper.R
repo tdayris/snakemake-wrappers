@@ -24,6 +24,7 @@ base::library(package = "enrichplot", quietly = TRUE);
 enriched <- base::readRDS(
   file = base::as.character(x = snakemake@input[["rds"]])
 );
+print(head(enriched))
 
 barplot_extra <- "enriched";
 if ("barplot_extra" %in% base::names(snakemake@params)) {

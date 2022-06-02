@@ -1,0 +1,18 @@
+rule wisecondorx_gender:
+    input:
+        test = "wisecondorx/convert/{sample}.npz",
+        ref = "wisecondorx/reference.npz"
+    output:
+        "wisecondorx/convert/{sample}.gender.txt"
+    message: "Acessing gender of {wildcards.sample}"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        extra = config.get("gender_extra", "")
+    log:
+        "logs/wisecondorx/gender/{sample}.log"
+    wrapper:
+        "bio/wisecondorx/gender"

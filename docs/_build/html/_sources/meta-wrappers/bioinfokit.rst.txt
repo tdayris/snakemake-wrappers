@@ -256,11 +256,11 @@ The following individual wrappers are used in this meta-wrapper:
 
 * :ref:`bio/bioinfokit/pca`
 
+* :ref:`bio/bioinfokit/volcanoplot`
+
 * :ref:`bio/bioinfokit/heatmap`
 
 * :ref:`bio/bioinfokit/maplot`
-
-* :ref:`bio/bioinfokit/volcanoplot`
 
 * :ref:`bio/pandas/deseq2_merge`
 

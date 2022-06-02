@@ -11,7 +11,7 @@ input:
   - Fasta-formatted transcriptome sequence
   - GTF formatted genome annotation
 output:
-  - Salmon quantification
+  - Salmon quantification (Raw.genes.tsv + TMP.genes.tsv + TPM.transcripts.tsv)
   - MultiQC report handling Quality controls
   - Trimmed fastq files
 usage:
@@ -43,3 +43,69 @@ notes: |
     * - ...
       - ...
       - ...
+
+
+  Warning: If available, the salmon index passed in configuration will be used, wather you changed the command line arguments or not.
+
+
+  How does it work ?
+
+  1. Gathering Fastq files
+
+  This pipeline copies files from iRODS, or symlinks them. In your design file,
+  the `Sample_id` is used to rename your fastq file and make them all easily
+  recognisable. In case of iRODS copy, the checksum is automatically computed
+  and verified. In cas of a copy from cold to hot storage, then a checksum is
+  automatically computed and verified. Elsewise, a simple sylmink is done and
+  no control needs to be performed.
+
+  The column Upstream_file/Downstream_file identifies reads' streams.
+  If the sequencing was not oriented, then order does not matter.
+  Otherwise, make sure R1 reads are under Upstream_file, and R2 reads under
+  Downstream_file.
+
+  You may need to concatenate several fastq files into one single fastq file
+  for a given sample: in case of lane splitting, run splitting, and/or
+  resequencing. This may be done automatically! Under the corresponding column,
+  separate the multiple files by a comma (`,`).
+
+  2. Cleaning fastq files
+
+  These (concatenated?) fastq files are trimmed with fastp. By default, the
+  cleaning is a bit more relaxed than default fastp parameters. We're woring on
+  RNA-Seq with Salmon in this pipeline. No need to be very strict.
+
+  The running window has been increased to 6 nucleotides, the minimum mean read
+  quality was raised to 10. The unqualified percent limit was raised to 50% and
+  the maximum of N bases was raised to 7. The minimum length was lowered to 15.
+  Because we are trimming RNA-Seq, we analyse overrepresented sequences.
+
+  Nothing dramatic! Bad reads will be filtered later if needed.
+
+  By the way, FastQ Screen is used over the raw reads, since possible sequencing
+  artifacts are interesting in this step. Many genomes are tested, see section
+  5 to look at the results.
+
+  3. Genome indexation
+
+  In parallel of this trimming, a genome indexation is done for your analysis.
+  Taking your read length into account, we build an ideal index using decoy
+  sequences and best hash seed size for the selective alignment. Yes, you read
+  it, no more pseudo-mapping on transcriptome. We are doing selective alignment
+  over the decoy-aware gentrome! Welcome in 2019!
+
+  During this indexation step, duplicates are kept, since fellow biologists
+  always want all the targets to be tested.
+
+  4. Selective Alignment and Quantification
+
+  Salmon is used to run the selctive alignment. It modelise the possible GC
+  bias, initial sequence bias and positional bias, since we empirically always
+  see them on our quality controls.
+
+  Mappings are validated, and 100 bootstraps are done over the quantification.
+
+  5. Quality report
+
+  MultiQC is used to aggregate quality reports from Fastp and Salmon. Quite
+  handy, isn't it?

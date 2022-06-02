@@ -1,0 +1,357 @@
+from snakemake.utils import min_version
+min_version("6.0")
+
+default_clusterprofiler_config = {
+    "organism": "Hs",
+    "gsea_extra": {
+        "go": "pvalueCutoff = 1, pAdjustMethod = 'BH', by = 'DOSE'"
+    },
+    "barplot_extra": "",
+    "dotplot_extra": "",
+    "heatplot_extra": "",
+}
+
+"""
+The following rules will plot graphs on enriched/gsea objects
+"""
+rule barplot:
+    input:
+        rds = "{method}/{db}/{comparison}/{method}.{db}.{comparison}.{keytype}.RDS"
+    output:
+        png = "results/{comparison}/{db}.{keytype}/barplot.{method}.png"
+    message: "Barplot for {wildcards.comparison}, {wildcards.method}:{wildcards.db}"
+    threads: 1
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        tmpdir="tmp"
+    params:
+        barplot_extra=config.get("barplot_extra", "")
+    log:
+        "logs/barplot/{method}.{db}.{comparison}.{keytype}.log"
+    wrapper:
+        "bio/clusterProfiler/barplot"
+
+
+rule dotplot:
+    input:
+        rds = "{method}/{db}/{comparison}/{method}.{db}.{comparison}.{keytype}.RDS"
+    output:
+        png = "results/{comparison}/{db}.{keytype}/dotplot.{method}.png"
+    message: "Dotplot for {wildcards.comparison}, {wildcards.method}:{wildcards.db}"
+    threads: 1
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        tmpdir="tmp"
+    params:
+        dotplot_extra=config.get("dotplot_extra", "")
+    log:
+        "logs/dotplot/{method}.{db}.{comparison}.{keytype}.log"
+    wrapper:
+        "bio/clusterProfiler/dotplot"
+
+rule heatplot:
+    input:
+        rds = "{method}/{db}/{comparison}/{method}.{db}.{comparison}.{keytype}.RDS",
+        gene_list = "gene_lists/SYMBOL/{comparison}.RDS"
+    output:
+        png = "results/{comparison}/{db}.{keytype}/heatplot.{method}.png"
+    message: "Heatplot for {wildcards.comparison}, {wildcards.method}:{wildcards.db}"
+    threads: 1
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        tmpdir="tmp"
+    params:
+        heatpot_extra=config.get("heatplot_extra", "")
+    log:
+        "logs/heatplot/{method}.{db}.{comparison}.{keytype}.log"
+    wrapper:
+        "bio/clusterProfiler/heatplot"
+
+
+rule enrich_upsetplot:
+    input:
+        rds="{method}/{db}/{comparison}/{method}.{db}.{comparison}.{keytype}.RDS"
+    output:
+        png="results/{comparison}/{db}.{keytype}/upsetplot.{method}.png"
+    message: "Enrichplot for {wildcards.comparison}, {wildcards.method}:{wildcards.db}"
+    threads: 1
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        tmpdir="tmp"
+    params:
+        upsetplot_extra=config.get("upsetplot_extra", "n = 5")
+    log:
+        "logs/upsetplot/{method}.{db}.{comparison}.{keytype}.log"
+    wrapper:
+        "bio/clusterProfiler/upsetplot"
+
+
+rule pathview:
+    input:
+        genelist = "gene_lists/ENTREZID/{comparison}.RDS"
+    output:
+        png = "results/{comparison}/pathview.{pid}.png"
+    message: "Pathview for {wildcards.comparison}"
+    threads: 1
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        tmpdir="tmp"
+    params:
+        pathway_id=lambda wildcards: str(wildcards.pid)
+    log:
+        "logs/pathview/{comparison}.{pid}.log"
+    wrapper:
+        "bio/clusterProfiler/pathview"
+
+
+def godata_extra(org, db) -> str:
+    org = f"Org.{config['organism']}.eg.db"
+    ont = db[-2:].uppser()
+    return "OrgDb='{org}', keytype='ENTREZID', ont='{ont}'"
+
+
+rule treeplot:
+    input:
+        gene_list = "gene_lists/ENTREZID/{comparison}.RDS",
+        rds = "{method}/{db}/{comparison}/{method}.{db}.{comparison}.{keytype}.RDS",
+    output:
+        png = "results/{comparison}/{db}.{keytype}/treeplot.{method}.png"
+    threads: 1
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
+        tmpdir="tmp"
+    params:
+        extra_pairwise_termism = config.get("pairwise_termism_extra", "showCategory=20"),
+        extra_treeplot = config.get("treeplot_extra", "showCategory=20"),
+        godata_extra = lambda wildcards: f"OrgDb='org.Hs.eg.db', keytype='ENTREZID', ont='{wildcards.db[-2:]}'"
+    log:
+        "logs/treeplot/{comparison}.{db}.{method}.{keytype}.log"
+    wrapper:
+        "bio/clusterProfiler/treeplot"
+
+
+"""
+Disease Ontology analysis
+"""
+rule enrichDO:
+    input:
+        rds = "gene_lists/ENTREZID/{comparison}.RDS",
+        universe = "gene_lists/universe/{comparison}.RDS"
+    output:
+        rds = temp(
+            "enrich/DiseaseOnt/{comparison}/enrich.DiseaseOnt.{comparison}.ENTREZID.RDS"
+        ),
+        tsv = "results/{comparison}/DiseaseOnt.ENTREZID/enrich.{comparison}.tsv"
+    message: "Running enrichDO on {wildcards.comparison}"
+    threads: 1
+    resources:
+        time_min=lambda wildcards, input, attempt: attempt * 20,
+        mem_mb=lambda wildcards, input, attempt: attempt * 1024 * 3,
+        tmpdir="tmp"
+    params:
+        enrichDO_extra=config.get("enricher_extra", {"do": "pvalueCutoff = 1, qvalueCutoff = 1"}).get("do", "pvalueCutoff = 1, qvalueCutoff = 1"),
+        organism = config.get("organism", "Hs"),
+    log:
+        "logs/enrichdo/{comparison}.log"
+    wrapper:
+        "bio/clusterProfiler/enrichDO"
+
+
+"""
+DisGeNET analysis
+"""
+rule enrichDGN:
+    input:
+        rds = "gene_lists/ENTREZID/{comparison}.RDS",
+        universe = "gene_lists/universe/{comparison}.RDS"
+    output:
+        rds = temp(
+            "enrich/DisGenNet/{comparison}/enrich.DisGenNet.{comparison}.ENTREZID.RDS"
+        ),
+        tsv = "results/{comparison}/DisGenNet.ENTREZID/enrich.{comparison}.tsv"
+    message: "Running enrichDGN on {wildcards.comparison}"
+    threads: 1
+    resources:
+        time_min=lambda wildcards, input, attempt: attempt * 20,
+        mem_mb=lambda wildcards, input, attempt: attempt * 1024 * 3,
+        tmpdir="tmp"
+    params:
+        enrichDGN_extra=config.get("enricher_extra", {"dgn": "pvalueCutoff = 1, qvalueCutoff = 1"}).get("dgn", "pvalueCutoff = 1, qvalueCutoff = 1"),
+        organism = config.get("organism", "Hs"),
+    log:
+        "logs/enrichdgn/{comparison}.log"
+    wrapper:
+        "bio/clusterProfiler/enrichDGN"
+
+
+"""
+Network of Cancer Genes analysis
+"""
+rule enrichNCG:
+    input:
+        rds = "gene_lists/ENTREZID/{comparison}.RDS",
+        universe = "gene_lists/universe/{comparison}.RDS"
+    output:
+        rds = temp(
+            "enrich/NetworkCancerGenes/{comparison}/enrich.NetworkCancerGenes.{comparison}.ENTREZID.RDS"
+        ),
+        tsv = "results/{comparison}/NetworkCancerGenes.ENTREZID/enrich.{comparison}.tsv"
+    message: "Running enrichNCG on {wildcards.comparison}"
+    threads: 1
+    resources:
+        time_min=lambda wildcards, input, attempt: attempt * 20,
+        mem_mb=lambda wildcards, input, attempt: attempt * 1024 * 3,
+        tmpdir="tmp"
+    params:
+        enrichNCG_extra=config.get("enricher_extra",{"ncg": "pvalueCutoff = 1, qvalueCutoff = 1"}).get("ncg", "pvalueCutoff = 1, qvalueCutoff = 1"),
+        organism = config.get("organism", "Hs"),
+    log:
+        "logs/enrichncg/{comparison}.log"
+    wrapper:
+        "bio/clusterProfiler/enrichNCG"
+
+
+"""
+All GMT based analysis
+"""
+rule enricherGMT:
+    input:
+        rds = "gene_lists/{keytype}/{comparison}.RDS",
+        gmt = lambda wildcards: config["gmt"][wildcards.database],
+        universe = "gene_lists/universe/{comparison}.RDS"
+    output:
+        readable_rds = temp("enrich/{database}/{comparison}/enrich.{database}.{comparison}.{keytype}.RDS"),
+        readable_tsv = "results/{comparison}/{database}.{keytype}/enrich.{comparison}.{keytype}.tsv"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 3,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        extra = config.get("enricher_extra", {"enricher": "pvalueCutoff = 1, qvalueCutoff = 1"}).get("enricher", "pvalueCutoff = 1, qvalueCutoff = 1"),
+        org = config.get("organism", "Hs"),
+        keytype = "{keytype}"
+    log:
+        "logs/enricher/{database}/{comparison}.{keytype}.log"
+    wrapper:
+        "bio/clusterProfiler/enrichGMT"
+
+
+rule enricherTERMS:
+    input:
+        rds = "gene_lists/ENSEMBLPROT/{comparison}.RDS",
+        universe = "gene_lists/universe/{comparison}.RDS",
+        term_name = "gene_lists/term2name/{database}.tsv",
+        term_gene = "gene_lists/term2gene/{database}.tsv"
+    output:
+        readable_rds = temp("enrich/{database}/{comparison}/enrich.{database}.{comparison}.ENSEMBLPROT.RDS"),
+        readable_tsv = "results/{comparison}/{database}.ENSEMBLPROT/enrich.{comparison}.ENSEMBLPROT.tsv"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 3,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        extra = config.get("enricher_extra", {"enricher": "pvalueCutoff = 1, qvalueCutoff = 1"}).get("enricher", "pvalueCutoff = 1, qvalueCutoff = 1"),
+        org = config.get("organism", "Hs"),
+        keytype = "ENSEMBLPROT"
+    log:
+        "logs/enricher/{database}/{comparison}.ENSEMBLPROT.log"
+    wrapper:
+        "bio/clusterProfiler/enrichGMT"
+
+
+rule gsea:
+    input:
+        rds = "gene_lists/{keytype}/{comparison}.RDS",
+        gmt = lambda wildcards: config["gmt"][wildcards.database],
+        universe = "gene_lists/universe/{comparison}.RDS"
+    output:
+        readable_rds = temp("gsea/{database}/{comparison}/gsea.{database}.{comparison}.{keytype}.RDS"),
+        readable_tsv = "results/{comparison}/{database}.{keytype}/gsea.{comparison}.{keytype}.tsv"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 3,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    params:
+        extra = config.get("gsea_extra", {"gsea": ""}).get("gsea", ""),
+        org = config.get("organism", "Hs"),
+        keytype = "{keytype}"
+    log:
+        "logs/gsea/{database}/{comparison}.{keytype}.log"
+    wrapper:
+        "bio/clusterProfiler/gseGMT"
+
+
+###########################
+### Prepare annotations ###
+###########################
+
+# rule prepare_terms:
+#     input:
+#         lambda wildcards: config["ppi"][wildcards.database]
+#     output:
+#         term_name=temp("gene_lists/term2name/{database}.tsv"),
+#         term_gene=temp("gene_lists/term2gene/{database}.tsv")
+#     threads: 1
+#     resources:
+#         mem_mb = 128,
+#         time_min = 5,
+#         tmpdir = "tmp"
+#     log:
+#         "logs/terms/{database}.log"
+#     params:
+#         name = "-f1,3",
+#         gene = "-f3,4"
+#     shell:
+#         "cut {params.name} {input} > {output.term_name} 2> {log} && "
+#         "cut {params.gene} {input} > {output.term_gene} 2>> {log}"
+
+
+rule prepare_terms2gene:
+    input:
+        lambda wildcards: config["ppi"][wildcards.database]
+    output:
+        temp("gene_lists/term2gene/{database}.tsv")
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 512,
+        time_min=lambda wildcards, attempt: attempt * 5,
+        tmpdir="tmp"
+    params:
+        begin='FS="\t"',
+        body=['print $3 FS $1']
+    group:
+        "prepare_terms"
+    log:
+        "logs/awk/prepare_terms2gene/{database}.log"
+    wrapper:
+        "bio/awk"
+
+
+rule prepare_terms2name:
+    input:
+        lambda wildcards: config["ppi"][wildcards.database]
+    output:
+        temp("gene_lists/term2name/{database}.tsv")
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 512,
+        time_min=lambda wildcards, attempt: attempt * 5,
+        tmpdir="tmp"
+    params:
+        begin='FS="\t"',
+        body=['print $3 FS $4']
+    group:
+        "prepare_terms"
+    log:
+        "logs/awk/prepare_terms2name/{database}.log"
+    wrapper:
+        "bio/awk"

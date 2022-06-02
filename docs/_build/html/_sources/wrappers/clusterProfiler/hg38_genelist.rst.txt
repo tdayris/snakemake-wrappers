@@ -1,0 +1,199 @@
+.. _`bio/clusterProfiler/hg38_genelist`:
+
+HG38_GENELIST
+=============
+
+Create multiple Gene lists objects from a single TSV file
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_hg38_genelist:
+        input:
+            tsv = "path/to/genes.tsv"
+        output:
+            rds = "path/to/genelist.RDS",
+            tsv = "path/to/genelist.tsv"
+        params:
+            gene_id_type = "ENSEMBL"
+        log:
+            "logs/genelist.log"
+        wrapper:
+            "0.79.0-1274-g1c3f62c3a/bio/clusterProfiler/hg38_genelist"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconda:bioconductor-clusterprofiler=3.14.0``
+* ``bioconda:bioconductor-org.hs.eg.db=3.10.0``
+* ``bioconda:bioconductor-dose=3.12.0``
+
+Input/Output
+------------
+**Input:**
+
+* ``tsv``: Path to TSV formatted stat changes
+
+**Output:**
+
+* ``tsv``: List of TSV formatted stat changes, one per studied factor, with ENTREZID added and droped levels
+* ``rds``: List of RDS formatted genelist objects.
+
+
+
+
+Notes
+-----
+
+The format of the genelist object is available in R.
+`library(clusterProfiler); data(geneList, package="DOSE")`
+
+The input TSV file looks like:
+
+.. list-table:: Desgin file format
+  :widths: 33 33 33
+  :header-rows: 1
+
+  * - Ensembl_Gene_ID
+    - Comparinson1
+    - Optional comparison 2
+    - ...
+  * - ENSX000000XXXXXX
+    - FoldChange/PAdj
+    - FoldChange/PAdj
+    - ...
+  * - ENSX000000YYYYYY
+    - FoldChange/PAdj
+    - FoldChange/PAdj
+    - ...
+  * - ...
+    - ...
+    - ...
+    - ...
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #/usr/bin/env R
+
+    # Snakemake wrapper for biological translator
+
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt");
+    base::sink(log.file);
+    base::sink(log.file,type="message");
+
+    base::library(package = "AnnotationDbi", quietly = TRUE);
+    base::library(package="org.Hs.eg.db", quietly=TRUE);
+    base::library(package = "clusterProfiler", quietly = TRUE);
+    orgdb <- "org.Hs.eg.db";
+
+    get_parameter <- function(param_name, default_value) {
+      # Return the provided parameter or a default value otherwise
+      res <- default_value;
+      if (param_name %in% base::names(snakemake@params)) {
+        res <- base::as.character(x = snakemake@params[[param_name]]);
+      }
+      return(res)
+    }
+
+    build_gene_list <- function(gene_frame, comparison_name) {
+      geneList <- gene_frame[, comparison_name];
+      base::names(geneList) <- gene_frame$ENTREZID;
+      return(geneList);
+    }
+
+
+    # Loading input file
+    tsv <- utils::read.table(
+      file = base::as.character(x = snakemake@input[["tsv"]]),
+      header = TRUE,
+      sep = "\t",
+      stringsAsFactors = FALSE
+    );
+
+    gene_id_type <- get_parameter("gene_id_type", "ENSEMBL");
+    base::message("Dataset and libraries loaded");
+
+    tsv$ENTREZID <- mapIds(
+      org.Hs.eg.db,
+      keys=tsv[, gene_id_type],
+      column="ENTREZID",
+      keytype=gene_id_type,
+      multiVals="first"
+    )
+
+    comparison_names <- base::colnames(tsv);
+    comparison_names <- comparison_names[! comparison_names %in% c("ENSEMBL", "ENTREZID")];
+    nb_comparisons <- base::length(comparison_names);
+    base::message("Comparison acquired");
+
+    for (factor in 1:nb_comparisons) {
+      base::message("Working on comparison:", comparison_names[factor])
+      geneList <- build_gene_list(
+        gene_frame=tsv,
+        comparison_name=comparison_names[factor]
+      );
+
+      if ("tsv" %in% base::names(snakemake@output)) {
+        file_path <- base::as.character(
+          snakemake@output[["tsv"]][factor]
+        );
+        base::message("Saving TSV to ", file_path);
+
+        utils::write.table(
+          x=as.data.frame(geneList),
+          file=file_path,
+          sep="\t"
+        );
+      }
+
+      if ("rds" %in% base::names(snakemake@output)) {
+        rds_path <- base::as.character(
+          snakemake@output[["rds"]][factor]
+        );
+        base::message("Saving RDS to ", rds_path);
+        print(head(geneList))
+        base::saveRDS(
+          object=geneList,
+          file=rds_path
+        );
+      }
+    }
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    base::sink(type="message");
+    base::sink();
+
+
+.. |nl| raw:: html
+
+   <br>

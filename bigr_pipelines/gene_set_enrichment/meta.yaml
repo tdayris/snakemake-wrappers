@@ -1,0 +1,38 @@
+---
+name: gene_set_enrichment (Under development)
+description: Perform gene set enrichment analysis and produce wide range of graphs
+authors:
+  - Thibault Dayris
+input:
+  - A TSV-formatted text table with one line per gene, one column per factor of interest and a numerical value in each of them.
+  - An optional text file containing list of pathways of interest. Pathway names must be exact.
+output:
+  - Gene Set enrichment table
+  - multiple graphs
+notes: |
+  This pipeline can be used in "two times". First run the pipeline from the TSV input file, then look at the pathways of interest, then relaunch the pipeline to include focuced graphs and comparisons.
+
+  If only one comparison is provided in the input TSV file, then a single Gene set enrichment analysis is done. If more than one comparison is done, then each of them gets a separated gene set enrichment analysis.
+
+  The input TSV file looks like:
+
+  .. list-table:: Desgin file format
+    :widths: 33 33 33
+    :header-rows: 1
+
+    * - Ensembl_Gene_ID
+      - Comparinson1
+      - Optional comparison 2
+      - ...
+    * - ENSX000000XXXXXX
+      - FoldChange/PAdj
+      - FoldChange/PAdj
+      - ...
+    * - ENSX000000YYYYYY
+      - FoldChange/PAdj
+      - FoldChange/PAdj
+      - ...
+    * - ...
+      - ...
+      - ...
+      - ...

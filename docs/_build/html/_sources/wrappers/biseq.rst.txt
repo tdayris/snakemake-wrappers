@@ -14,7 +14,25 @@ This wrapper can be used in the following way:
 
 .. code-block:: python
 
-
+    rule test_biseq:
+        input:
+            bismark = ["path/to/bismark"],
+            coldata = "path/to/coldata.tsv"
+        output:
+            covboxplot = "path/to/covboxplot.png",
+            raw = "path/to/biseq.RDS",
+            clustersites = "path/to/clustered_sites.tsv",
+            smooth_covboxplot = "path/to/smoothed_covboxplot.png",
+            groupwise_scatterplot = "path/to/scatterplot.png",
+            beta = "path/to/beta.regression.tsv"
+        params:
+            perc_samples = 4/5,
+             min_sites = 20,
+             max_dist = 100,
+             bandwidth = 80,
+             grid_dist = None,
+             formula = "~group",
+             link = "probit"
 
 Note that input, output and log file paths can be chosen freely.
 

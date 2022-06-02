@@ -19,13 +19,13 @@ log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 begin = ""
 if (begin_instructions := join_awk_sections(snakemake.params.get("begin", []))) is not None:
-    begin = f"BEGIN{{{begin_instructions}}}"
+    begin = f'BEGIN{{{begin_instructions}}}'
 
 end = ""
 if (end_instructions := join_awk_sections(snakemake.params.get("end", []))) is not None:
-    end = f"END{{{end_instructions}}}"
+    end = f'END{{{end_instructions}}}'
 
-body = f"{{{join_awk_sections(snakemake.params.get('body', []))}}}"
+body = f'{{{join_awk_sections(snakemake.params.get("body", []))}}}'
 
 shell(
     "awk '{begin} {body} {end}' {snakemake.input} > {snakemake.output} {log}"

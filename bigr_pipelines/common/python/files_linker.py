@@ -1,7 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 """
 This file contains function to perform files mapping between original name
 (hashed iRODS, biopath, ...) to normalized paths.
 """
+
+import pandas
 
 from typing import Optional
 
@@ -88,3 +94,29 @@ def link_vcf(sample_names: list[str], files: list[str]) -> dict[str, str]:
         f"data_input/calls/{sample}.vcf.gz": file
         for file, sample in zip(files, sample_names)
     }
+
+
+def link_bed(design: pandas.DataFrame, bed: Optional[str] = None):
+    """
+    Build a dictionnary linking a sample name to a capturekit bed.
+
+    Since more than one capturekig may be used in a sequencing run,
+    this must be either implemented, or multiple instances of this
+    pipelines are being run simultaneously: once per capture kit used.
+
+    This is useless in a single-project single-captured analysis. So, yes,
+    useless for data analysts, but usefull for piREST and automated pipelines
+    """
+    bed_to_sample_link = {}
+    dataset_to_bed_path = {}
+    if "datasetIdBED" in design.columns:
+        for sample, sample_bed in zip(design["Sample_id", "datasetIdBED"]):
+            bed_to_sample_link[sample] = dataset_to_bed_path.get(
+                sample_bed,
+                sample_bed if sample_bed is not None else bed
+            )
+    else:
+        bed_to_sample_link = {
+            sample: bed for sample in design["Sample_id"]
+        }
+    return bed_to_sample_link

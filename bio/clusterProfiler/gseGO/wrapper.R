@@ -18,7 +18,7 @@ base::sink(log.file,type="message");
 base::library(package = "clusterProfiler", quietly = TRUE);
 # Loading databases
 base::library(package = "org.Hs.eg.db", quietly = TRUE);
-base::library(package = "org.Mm.eg.db", quietly = TRUE);
+# base::library(package = "org.Mm.eg.db", quietly = TRUE);
 
 # Loading input dataset
 geneList <- base::readRDS(
@@ -33,10 +33,10 @@ if ("organism" %in% base::names(snakemake@params)) {
 }
 
 extra <- "geneList, OrgDb = organism";
-if ("gseGO" %in% base::names(snakemake@params)) {
+if ("gseGO_extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
     extra,
-    snakemake@params[["gseGO"]],
+    snakemake@params[["gseGO_extra"]],
     sep = ", "
   )
 }

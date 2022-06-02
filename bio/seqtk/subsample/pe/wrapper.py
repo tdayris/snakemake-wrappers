@@ -10,7 +10,9 @@ from snakemake.shell import shell
 
 
 log = snakemake.log_fmt_shell()
-
+pigz_threads = snakemake.threads - 1
+if snakemake.threads <= 1:
+    raise ValueError("This wrapper requires at least two threads")
 
 shell(
     "( "
@@ -18,14 +20,14 @@ shell(
     "-s {snakemake.params.seed} "
     "{snakemake.input.f1} "
     "{snakemake.params.n} "
-    "| pigz -9 -p {snakemake.threads} "
+    "| pigz -p {pigz_threads} "
     "> {snakemake.output.f1} "
     "&& "
     "seqtk sample "
     "-s {snakemake.params.seed} "
     "{snakemake.input.f2} "
     "{snakemake.params.n} "
-    "| pigz -9 -p {snakemake.threads} "
+    "| pigz -p {pigz_threads} "
     "> {snakemake.output.f2} "
     ") {log} "
 )

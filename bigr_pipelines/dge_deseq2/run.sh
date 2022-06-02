@@ -12,7 +12,7 @@ source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/environment.sh"
 declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/dge_deseq2"
 export PIPELINE_PATH
 
-SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
+SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile_modularized.smk"
 CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
 PROFILE="slurm"
 SUMMARY=""

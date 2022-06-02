@@ -517,8 +517,8 @@ The pipeline contains the following steps:
 
     use rule gatk_apply_baserecalibrator from gatk_bqsr_meta with:
         input:
-            bam="sambamba/sort/{sample}.bam",
-            bam_index="sambamba/sort/{sample}.bam.bai",
+            bam="samtools/filter/{sample}.bam",
+            bam_index=get_bai("samtools/filter/{sample}.bam"),
             ref=config['ref']['fasta'],
             ref_idx=get_fai(config['ref']['fasta']),
             ref_dict=get_dict(config['ref']['fasta']),
@@ -527,8 +527,8 @@ The pipeline contains the following steps:
 
     use rule gatk_compute_baserecalibration_table from gatk_bqsr_meta with:
         input:
-            bam="sambamba/sort/{sample}.bam",
-            bam_index="sambamba/sort/{sample}.bam.bai",
+            bam="samtools/filter/{sample}.bam",
+            bam_index=get_bai("samtools/filter/{sample}.bam"),
             ref=config['ref']['fasta'],
             ref_idx=get_fai(config['ref']['fasta']),
             ref_dict=get_dict(config['ref']['fasta']),
@@ -539,6 +539,31 @@ The pipeline contains the following steps:
     ###################
     ### BWA MAPPING ###
     ###################
+
+
+    """
+    Filter a bam over the capturekit bed file
+    """
+    rule samtools_filter_bed:
+        input:
+            "sambamba/sort/{sample}.bam"
+            fasta=config["genome"],
+            fasta_idx=get_fai(config["genome"]),
+            fasta_dict=get_dict(config["genome"]),
+            bed=config["bed"]
+        output:
+            temp("samtools/filter/{sample}.bam")
+        threads: 10
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 2048,
+            time_min=lambda wildcards, attempt: attempt * 15,
+            tmpdir="tmp"
+        params:
+            extra="--bam --with-header"
+        log:
+            "logs/samtools/filter/{sample}.log"
+        wrapper:
+            "bio/samtools/view"
 
     module bwa_fixmate_meta:
         snakefile: "../../meta/bio/bwa_fixmate/test/Snakefile"
