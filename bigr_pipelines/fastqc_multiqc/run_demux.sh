@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
 
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/fastqc_multiqc/run.sh -p demux output/multiqc.html "$@"
+script_dir=$(dirname $0)
+script_dir=$(readlink -e "${script_dir}")
+
+bash "${script_dir}/run.sh" -p demux output/multiqc.html "$@"
