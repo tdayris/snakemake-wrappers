@@ -24,6 +24,7 @@ while [ "$#" -gt 0 ]; do
     -p|--profile) PROFILE="${2}"; shift 2;;
     --summary) SUMMARY="${2}"; shift 2;;
     --rulegraph) GRAPH="${2}"; shift 2;;
+    --mod) SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile_modularized.smk"; shift;;
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac
 done

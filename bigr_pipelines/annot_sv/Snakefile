@@ -41,6 +41,20 @@ vcf_links = link_vcf(
     design.Upstream_file
 )
 
+
+##################
+### Flag rules ###
+##################
+
+onsuccess:
+    shell("touch DONE && rm --force --verbose ON_GOING ERROR")
+
+onerror:
+    shell("touch ERROR && rm --force --verbose ON_GOING DONE")
+
+onstart:
+    shell("touch ON_GOING && rm --force --verbose ERROR DONE")
+
 rule target:
     input:
         expand("annot_sv/{sample}.census.tsv", sample=samples_list)

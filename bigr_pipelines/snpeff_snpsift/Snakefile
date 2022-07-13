@@ -48,7 +48,22 @@ last_vcf = (
 )
 
 
-rule all:
+
+##################
+### Flag rules ###
+##################
+
+onsuccess:
+    shell("touch DONE && rm --force --verbose ON_GOING ERROR")
+
+onerror:
+    shell("touch ERROR && rm --force --verbose ON_GOING DONE")
+
+onstart:
+    shell("touch ON_GOING && rm --force --verbose ERROR DONE")
+
+
+rule target_snpeff_snpsift:
     input:
         calls=expand(
             "snpsift/fixed/{sample}.vcf.gz",
@@ -436,35 +451,6 @@ rule vcftools_annotate_mistic:
     wrapper:
         "bio/vcftools/annotate"
 
-
-##########################
-## Splice AI annotation ##
-##########################
-
-
-rule splice_ai:
-    input:
-        vcf = "bigr/occurence_annotated/{sample}.vcf",
-        fasta = config["ref"]["fasta"]
-    output:
-        vcf = temp("splice_ai/annot/{sample}.vcf.gz")
-    message:
-        "Adding Splice Variant annotation to {wildcards.sample}"
-    threads: 10
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 2048 * 8,
-        time_min=lambda wildcards, attempt: attempt * 60 * 3,
-        tmpdir="tmp",
-        # gres="gpu:t4:1"
-    params:
-        annotation=config["params"].get("ncbi_build", "grch38").lower(),
-        piped = True
-    log:
-        "logs/splice_ai/{sample}.log"
-    wrapper:
-        "bio/spliceai"
-
-
 ########################################
 ## Compute occurence of each variant  ##
 ## within the complete cohort         ##
@@ -524,11 +510,40 @@ rule variant_occurence_per_chr:
         "logs/variant_occurence/{chr}.log"
     wrapper:
         "bio/variantoccurence/chromosomes"
+        
+        
+
+##########################
+## Splice AI annotation ##
+##########################
 
 
-#########################
-### snpeff annotation ###
-#########################
+rule splice_ai:
+    input:
+        vcf = "bigr/occurence_annotated/{sample}.vcf",
+        fasta = config["ref"]["fasta"]
+    output:
+        vcf = temp("splice_ai/annot/{sample}.vcf.gz")
+    message:
+        "Adding Splice Variant annotation to {wildcards.sample}"
+    threads: 10
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 2048 * 8,
+        time_min=lambda wildcards, attempt: attempt * 60 * 3,
+        tmpdir="tmp",
+        # gres="gpu:t4:1"
+    params:
+        annotation=config["params"].get("ncbi_build", "grch38").lower(),
+        piped = True
+    log:
+        "logs/splice_ai/{sample}.log"
+    wrapper:
+        "bio/spliceai"
+
+
+#################################
+### snpeff-snpsift annotation ###
+#################################
 
 snpeff_snpsift_config = {
     "ref": config["ref"],

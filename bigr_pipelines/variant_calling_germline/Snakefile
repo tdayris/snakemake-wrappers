@@ -42,7 +42,7 @@ fastq_links = link_fq(
     design.Downstream_file
 )
 
-rule all:
+rule target_germline_caller:
     input:
         calls=expand(
             "meta_caller/calls/{sample}.vcf.gz{index}",
@@ -59,7 +59,7 @@ rule all:
 ### Gather QC ###
 #################
 
-rule multiqc:
+rule multiqc_germline_caller:
     input:
         html=expand(
             "fastp/html/pe/{sample}.fastp.html",
@@ -195,54 +195,6 @@ use rule * from compress_index_vcf_meta as compress_index_vcf_*
 ### VCF annotation ###
 ######################
 
-# rule annotate_vcf:
-#     input:
-#         design="design.tsv",
-#         calls=expand(
-#             "mutect2/corrected/{sample}.vcf.gz", sample=design["Sample_id"]
-#         ),
-#         calls_index=expand(
-#             get_tbi("mutect2/corrected/{sample}.vcf.gz"),
-#             sample=design["Sample_id"]
-#         ),
-#     output:
-#         calls=temp(expand(
-#             "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz",
-#             sample=design["Sample_id"]
-#         )),
-#         calls_index=temp(expand(
-#             "snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz.tbi",
-#             sample=design["Sample_id"]
-#         )),
-#         table=temp(expand(
-#             "snpeff_snpsift/snpsift/extractFields/{sample}.tsv",
-#             sample=design["Sample_id"]
-#         )),
-#         html="snpeff_snpsift/multiqc/SnpEff_annotation.html",
-#         html_data=directory("snpeff_snpsift/multiqc/SnpEff_annotation_data")
-#     message:
-#         "Annotating VCF"
-#     threads: 2
-#     resources:
-#         mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
-#         time_min=lambda wildcards, attempt: attempt * 60 * 4,
-#         tmpdir="tmp"
-#     handover: True
-#     log:
-#         "logs/snpeff_snpsift_pipeline.log"
-#     params:
-#         mkdir="--parents --verbose",
-#         ln="--symbolic --force --relative --verbose",
-#         variant_dir="mutect2/corrected/",
-#         outdir="snpeff_snpsift",
-#         pipeline_path="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh"
-#     shell:
-#         "mkdir {params.mkdir} {params.outdir} > {log} 2>&1 && "
-#         "ln {params.ln} {input.config} {params.outdir} >> {log} 2>&1 && "
-#         "ln {params.ln} {params.variant_dir} {params.outdir} >> {log} 2>&1 && "
-#         "cd {params.outdir} && "
-#         "bash {params.pipeline_path} >> {log} 2>&1 && "
-#         "mv --force --verbose snpeff_snpsift/* . >> {log} 2>&1"
 
 rule snpeff_snpsift_pipeline:
     input:
@@ -288,8 +240,7 @@ rule snpeff_snpsift_pipeline:
         "cd {params.outdir} && "
         "bash {params.pipeline_path} {params.organism} | tee -a ${{OLDPWD}}/{log} 2>&1 && "
         "ln {params.ln} snpsift/ ${{OLDPWD}}/snpsift >> {log} 2>&1 && "
-        "ln {params.ln} snpeff/ ${{OLDPWD}}/snpsift >> {log} 2>&1 "
-
+        "ln {params.ln} snpeff/ ${{OLDPWD}}/snpsift >> {log} 2>&1  "
 
 
 #####################################
@@ -301,7 +252,7 @@ module metacaller_germline_meta:
     config: {"genome": config["ref"]["fasta"], "bed": config["ref"]["capture_kit_bed"]}
 
 
-use rule * from metacaller_germline_meta as *
+use rule * from metacaller_germline_meta as metacaller_germline_*
 
 
 ############################################################################
@@ -352,6 +303,7 @@ gatk_mutect2_germline_meta_config = {
 module gatk_mutect2_germline_meta:
     snakefile: "../../meta/bio/mutect2_germline/test/Snakefile"
     config: gatk_mutect2_germline_meta_config
+
 
 use rule * from gatk_mutect2_germline_meta
 
@@ -460,10 +412,10 @@ Filter a bam over the capturekit bed file
 rule samtools_filter_bed:
     input:
         "sambamba/sort/{sample}.bam",
-        fasta=config["genome"],
-        fasta_idx=get_fai(config["genome"]),
-        fasta_dict=get_dict(config["genome"]),
-        bed=config["bed"]
+        fasta=config["ref"]["fasta"],
+        fasta_idx=get_fai(config["ref"]["fasta"]),
+        fasta_dict=get_dict(config["ref"]["fasta"]),
+        bed=config["ref"]["capture_kit_bed"]
     output:
         temp("samtools/filter/{sample}.bam")
     threads: 10
@@ -472,7 +424,7 @@ rule samtools_filter_bed:
         time_min=lambda wildcards, attempt: attempt * 15,
         tmpdir="tmp"
     params:
-        extra="--bam --with-header"
+        extra="-bh"
     log:
         "logs/samtools/filter/{sample}.log"
     wrapper:

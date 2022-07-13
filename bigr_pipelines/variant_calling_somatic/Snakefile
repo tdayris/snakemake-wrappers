@@ -365,7 +365,7 @@ rule multiqc:
             status=["normal", "tumor"]
         ),
         snpeff=expand(
-            "snpeff_snpsift/csvstats/{sample}.genes.txt",
+            "snpeff_snpsift/snpeff/csvstats/{sample}.genes.txt",
             sample=design["Sample_id"]
         )
     output:
@@ -841,10 +841,10 @@ Filter a bam over the capturekit bed file
 rule samtools_filter_bed:
     input:
         "sambamba/sort/{sample}_{status}.bam",
-        fasta=config["genome"],
-        fasta_idx=get_fai(config["genome"]),
-        fasta_dict=get_dict(config["genome"]),
-        bed=config["bed"]
+        fasta=config["ref"]["fasta"],
+        fasta_idx=get_fai(config["ref"]["fasta"]),
+        fasta_dict=get_dict(config["ref"]["fasta"]),
+        bed=config["ref"]["capture_kit_bed"]
     output:
         temp("samtools/filter/{sample}_{status}.bam")
     threads: 10
@@ -853,7 +853,7 @@ rule samtools_filter_bed:
         time_min=lambda wildcards, attempt: attempt * 15,
         tmpdir="tmp"
     params:
-        extra="--bam --with-header"
+        extra="-h -h"
     log:
         "logs/samtools/filter/{sample}_{status}.log"
     wrapper:

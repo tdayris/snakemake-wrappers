@@ -37,7 +37,22 @@ fastq_links = link_fq(
 localrules: get_cibersort
 
 
-rule target:
+
+##################
+### Flag rules ###
+##################
+
+onsuccess:
+    shell("touch DONE && rm --force --verbose ON_GOING ERROR")
+
+onerror:
+    shell("touch ERROR && rm --force --verbose ON_GOING DONE")
+
+onstart:
+    shell("touch ON_GOING && rm --force --verbose ERROR DONE")
+
+
+rule target_celltype_deconvolution_rnaseq:
     input:
         graphs = expand(
             "{tool}/celltypes.{plot}.png",
@@ -243,7 +258,7 @@ rule xcell:
 
 rule subset_gene_counts:
     input:
-        table="salmon_quant/salmon/TPM.genes.tsv"
+        table="salmon/TPM.genes.tsv"
     output:
         table="immunedeconv/TPM.tsv"
     message:
@@ -269,30 +284,15 @@ rule subset_gene_counts:
         "bio/pandas/filter_table"
 
 
-rule run_salmon_pipeline:
-    input:
-        config = "config.yaml"
-    output:
-        qc = "salmon_quant/multiqc/MultiQC.html",
-        gene_counts = "salmon_quant/salmon/TPM.genes.tsv",
-        transcript_counts = "salmon_quant/salmon/TPM.transcripts.tsv",
-        results = directory("salmon_quant/results_to_upload")
-    message:
-        "Quantifying reads over the genome"
-    handover: True
-    priority: 10
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 2048,
-        time_min=lambda wildcards, attempt: attempt * 60 + 45,
-        tmpdir="tmp"
-    log:
-        "logs/salmon_quant_pipeline.log"
-    params:
-        ln = "--force --symbolic --relative",
-        mk = "--verbose --parents"
-    shell:
-        "mkdir {params.mk} salmon_quant && "
-        "ln {params.ln} design.tsv salmon_quant/design.tsv && "
-        "cd salmon_quant/ && "
-        "bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh"
+
+# #############################
+# ### Salmon quantification ###
+# #############################
+
+
+module salmon_quant_workflow:
+    snakefile: "../salmon_quant/Snakefile"
+    config: config
+
+
+use rule * from salmon_quant_workflow

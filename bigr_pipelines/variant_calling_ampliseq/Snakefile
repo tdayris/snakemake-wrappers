@@ -5,7 +5,9 @@ import sys
 from pathlib import Path
 
 worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
-common = str(worflow_source_dir / "../common/python")
+worflow_source_dir = Path("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/")
+common = str(worflow_source_dir / "common" / "python")
+print(common)
 sys.path.append(common)
 
 from file_manager import *
@@ -22,7 +24,7 @@ logging.basicConfig(
 )
 
 container: "docker://continuumio/miniconda3:4.4.10"
-localrules: bigr_copy
+localrules: bigr_copy_fq
 ruleorder: bwa_mem > bwa_fixmate_meta_bwa_mem
 
 
@@ -42,7 +44,7 @@ fastq_links = link_fq(
     design.Downstream_file
 )
 
-rule all:
+rule target_ampliseq:
     input:
         calls=expand(
             "snpsift/fixed/{sample}.vcf.gz{index}",
@@ -58,89 +60,9 @@ rule all:
 ### Gather QC ###
 #################
 
-rule multiqc:
-    input:
-        html=expand(
-            "fastp/html/pe/{sample}.fastp.html",
-            sample=design["Sample_id"]
-        ),
-        json=expand(
-            "fastp/json/pe/{sample}.fastp.json",
-            sample=design["Sample_id"]
-        ),
-        picard=expand(
-            "picard/alignment_summary/{sample}.summary.txt",
-            sample=design["Sample_id"]
-        ),
-        fastq_screen=expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
-            sample=design["Sample_id"],
-            stream=["1", "2"],
-            ext=["txt", "png"]
-        )
-    output:
-        report(
-            "multiqc/variant_calling_ampliseq.html",
-            caption="../common/reports/multiqc.rst",
-            category="Quality Controls"
-        )
-    message:
-        "Aggregating quality reports from SnpEff"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
-        time_min=lambda wildcards, attempt: attempt * 35
-    log:
-        "logs/multiqc.log"
-    wrapper:
-        "bio/multiqc"
 
-
-rule alignment_summary:
-    input:
-        bam="sambamba/sort/{sample}.bam",
-        bam_index="sambamba/sort/{sample}.bam.bai",
-        ref=config['ref']['fasta'],
-        ref_idx=get_fai(config['ref']['fasta']),
-        ref_dict=get_dict(config['ref']['fasta']),
-    output:
-        temp("picard/alignment_summary/{sample}.summary.txt")
-    message:
-        "Collecting alignment metrics on GATK recalibrated {wildcards.sample}"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020,
-        time_min=lambda wildcards, attempt: attempt * 45
-    log:
-        "logs/picard/alignment_summary/{sample}.log"
-    params:
-        "VALIDATION_STRINGENCY=LENIENT "
-        "METRIC_ACCUMULATION_LEVEL=null "
-        "METRIC_ACCUMULATION_LEVEL=SAMPLE"
-    wrapper:
-        "bio/picard/collectalignmentsummarymetrics"
-
-
-rule fastq_screen:
-    input:
-        "reads/{sample}.{stream}.fq.gz"
-    output:
-        txt=temp("fastq_screen/{sample}.{stream}.fastq_screen.txt"),
-        png=temp("fastq_screen/{sample}.{stream}.fastq_screen.png")
-    message:
-        "Assessing quality of {wildcards.sample}, {wildcards.stream}"
-    threads: config.get("threads", 20)
-    resources:
-        mem_mb=lambda wildcard, attempt: attempt * 1024 * 8,
-        time_min=lambda wildcard, attempt: attempt * 50
-    params:
-        fastq_screen_config=config["fastq_screen"],
-        subset=100000,
-        aligner='bowtie2'
-    log:
-        "logs/fastqscreen/{sample}.{stream}.log"
-    wrapper:
-        "bio/fastq_screen"
+# Already imported below
+# See rules/001.QC_Trimming.smk
 
 
 #################################
@@ -151,33 +73,12 @@ module compress_index_vcf_meta:
     snakefile: "../../meta/bio/compress_index_vcf/test/Snakefile"
     config: config
 
-use rule * from compress_index_vcf_meta as compress_index_vcf_*
+use rule * from compress_index_vcf_meta
 
 ######################
 ### VCF annotation ###
 ######################
 
-snpeff_snpsift_config = {
-    "ref": config["ref"],
-    **config["snpeff_snpsift"]
-}
-
-module snpeff_meta:
-    snakefile: "../../meta/bio/snpeff_annotate/test/Snakefile"
-    config: snpeff_snpsift_config
-
-use rule snpeff from snpeff_meta with:
-    input:
-        calls="meta_caller/calls/{sample}.vcf.gz",
-        calls_index=get_tbi("meta_caller/calls/{sample}.vcf.gz"),
-        db=config["ref"]["snpeff"]
-
-
-module snpsift:
-    snakefile: "../../meta/bio/snpsift/test/Snakefile"
-    config: snpeff_snpsift_config
-
-use rule * from snpsift as snpsift_*
 
 rule annotate_vcf:
     input:
@@ -211,7 +112,7 @@ rule annotate_vcf:
     threads: 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
-        time_min=lambda wildcards, attempt: attempt * 60 * 4,
+        time_min=lambda wildcards, attempt: attempt * 60 * 10,
         tmpdir="tmp"
     handover: True
     log:
@@ -224,7 +125,7 @@ rule annotate_vcf:
         pipeline_path=config.get(
             "snpeff_snpsift_run_path",
             "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh"
-        ),
+       ),
         organism = config["params"].get("organism", "hg38")
     shell:
         "mkdir {params.mkdir} {params.outdir}/data_input/calls/ > {log} 2>&1 && "
@@ -241,244 +142,61 @@ rule annotate_vcf:
 ###############################
 
 
-coverage_variant_region_config = {
-    "bed": config["ref"]["capture_kit_bed"],
-    "threads": config.get("threads", 20),
-    "bin_size": config.get(
-        "deeptools", {"bin_size": 10}
-    ).get("bin_size", 10)
-}
+include: "rules/007.region.depth.smk"
 
-
-module coverage_variant_region_meta:
-    snakefile: "../../meta/bio/coverage_variant_region/test/Snakefile"
-    config: coverage_variant_region_config
-
-
-use rule * from coverage_variant_region_meta
 
 #####################################
 ### Merge variant calling results ###
 #####################################
 
-module metacaller_germline_meta:
-    snakefile: "../../meta/bio/meta_caller_germline/test/Snakefile"
-    config: {"genome": config["ref"]["fasta"], "bed": config["ref"]["capture_kit_bed"]}
+include: "rules/006.metacaller.smk"
 
-
-use rule * from metacaller_germline_meta
-
-
-############################################################################
-### Correcting Mutect2 :                                                 ###
-### AS_FilterStatus: Number=1 and not Number=A which violates VCF format ###
-### AD becomes ADM: AD is reserved for Allele Depth, Mutect2 stores      ###
-###                 multiple information under "AD" field.               ###
-############################################################################
-
-rule correct_mutect2_vcf:
-    input:
-        "mutect2/filter_reheaded/{sample}.vcf.gz"
-    output:
-        temp("mutect2/corrected/{sample}.vcf")
-    message:
-        "Renaming reserved AD field and fixing AS_FilterStrand format error"
-        " on {wildcards.sample}"
-    threads: 3
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 256,
-        time_min=lambda wildcards, attempt: attempt * 20
-    log:
-        "logs/mutect2/correct_fields/{sample}.log"
-    params:
-        rename_ad="'s/=AD;/=ADM;/g'",
-        rename_ad_format="'s/:AD:/:ADM:/g'",
-        fix_as_filterstatus="'s/ID=AS_FilterStatus,Number=A/ID=AS_FilterStatus,Number=1/g'"
-    shell:
-        "(gunzip -c {input} | "
-        "sed {params.rename_ad} | "
-        "sed {params.rename_ad_format} | "
-        "sed {params.fix_as_filterstatus}) "
-        "> {output} 2> {log}"
 
 ###############################
 ### Variant calling Mutect2 ###
 ###############################
 
 
-module gatk_mutect2_germline_meta:
-    snakefile: "../../meta/bio/mutect2_germline/test/Snakefile"
-    config: {"genome": config["ref"]["fasta"], "known": config["ref"]["af_only"], "bed": config["ref"]["capture_kit_bed"], "dbsnp": config["ref"]["dbsnp"]}
+include: "rules/005.mutect2.smk"
 
-use rule * from gatk_mutect2_germline_meta as gatk_mutect2_germline_*
 
 ################################
 ### Variant Calling Varscan2 ###
 ################################
 
-module varscan2_germline_meta:
-    snakefile: "../../meta/bio/varscan2_germline/test/Snakefile"
-    config: {"genome": config["ref"]["fasta"], "bed": config["ref"]["capture_kit_bed"]}
 
-use rule * from varscan2_germline_meta as *
-
-use rule samtools_mpilup from varscan2_germline_meta with:
-    input:
-        bam="gatk/recal_bam/{sample}.bam",
-        reference_genome=config['ref']['fasta'],
-        reference_genome_idx=get_fai(config['ref']['fasta']),
+include: "rules/004.varscan.call.smk"
 
 
 ##############################
 ### GATK BAM RECALIBRATION ###
 ##############################
 
-module gatk_bqsr_meta:
-    snakefile: "../../meta/bio/gatk_bqsr/test/Snakefile"
-    config: {"threads": config["threads"], "genome": config["ref"]["fasta"], "dbsnp": config["ref"]["dbsnp"]}
+
+include: "rules/003.recalibration.smk"
 
 
-use rule gatk_apply_baserecalibrator from gatk_bqsr_meta with:
-    input:
-        bam="samtools/filter/{sample}.bam",
-        bam_index=get_bai("samtools/filter/{sample}.bam"),
-        ref=config['ref']['fasta'],
-        ref_idx=get_fai(config['ref']['fasta']),
-        ref_dict=get_dict(config['ref']['fasta']),
-        recal_table="gatk/recal_data_table/{sample}.grp"
+########################################
+### BWA MAPPING                      ###
+### Samtools fixmate                 ###
+### Samtools filter over capture kit ###
+### Samtools indexation              ###
+########################################
 
 
-use rule gatk_compute_baserecalibration_table from gatk_bqsr_meta with:
-    input:
-        bam="samtools/filter/{sample}.bam",
-        bam_index=get_bai("samtools/filter/{sample}.bam"),
-        ref=config['ref']['fasta'],
-        ref_idx=get_fai(config['ref']['fasta']),
-        ref_dict=get_dict(config['ref']['fasta']),
-        known=config['ref']['dbsnp'],
-        known_idx=get_tbi(config['ref']['dbsnp'])
-
-
-###################
-### BWA MAPPING ###
-###################
-
-
-"""
-This rule indexes a given bam file, using samtools index. Most of the time,
-fasta indexes are not explicitely requested by softwares, but they will crash
-if this index is missing.
-"""
-rule samtools_index_bam:
-    input:
-        "samtools/filter/{sample}.bam"
-    output:
-        "samtools/filter/{sample}.bam.bai"
-    message:
-        "Indexing {wildcards.sample}.bam with Samtools index"
-    threads: 20
-    resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 1024, 8192),
-        time_min=lambda wildcards, attempt: attempt * 30,
-        tmpdir="tmp"
-    log:
-        "samtools/intdex/{sample}/index.log"
-    wrapper:
-        "bio/samtools/index"
-
-
-"""
-Filter a bam over the capturekit bed file
-"""
-rule samtools_filter_bed:
-    input:
-        aln="sambamba/sort/{sample}.bam",
-        fasta=config["ref"]["fasta"],
-        fasta_idx=get_fai(config["ref"]["fasta"]),
-        fasta_dict=get_dict(config["ref"]["fasta"]),
-        bed=config["ref"]["capture_kit_bed"]
-    output:
-        temp("samtools/filter/{sample}.bam")
-    threads: 10
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 2048,
-        time_min=lambda wildcards, attempt: attempt * 15,
-        tmpdir="tmp"
-    params:
-        extra="-bh",
-        position=""
-    log:
-        "logs/samtools/filter/{sample}.log"
-    wrapper:
-        "bio/samtools/view"
-
-module bwa_fixmate_meta:
-    snakefile: "../../meta/bio/bwa_fixmate/test/Snakefile"
-    config: {"threads": config["threads"], "genome": config["ref"]["fasta"]}
-
-use rule * from bwa_fixmate_meta as bwa_fixmate_meta_*
-
-use rule bwa_mem from bwa_fixmate_meta with:
-    input:
-        reads=expand(
-            "fastp/trimmed/pe/{sample}.{stream}.fastq",
-            stream=["1", "2"],
-            allow_missing=True
-        ),
-        index=multiext(
-            "bwa_mem2/index/genome", ".0123", ".amb", ".ann", ".pac"
-        )
+include: "rules/002.mapping.smk"
 
 
 ############################
 ### FASTP FASTQ CLEANING ###
 ############################
 
-rule fastp_clean:
-    input:
-        sample=expand(
-            "reads/{sample}.{stream}.fq.gz",
-            stream=["1", "2"],
-            allow_missing=True
-        ),
-    output:
-        trimmed=expand(
-            "fastp/trimmed/pe/{sample}.{stream}.fastq",
-            stream=["1", "2"],
-            allow_missing=True
-        ),
-        html="fastp/html/pe/{sample}.fastp.html",
-        json=temp("fastp/json/pe/{sample}.fastp.json")
-    message: "Cleaning {wildcards.sample} with Fastp"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
-        time_min=lambda wildcard, attempt: attempt * 45
-    params:
-        adapters=config.get("fastp_adapters", None),
-        extra=config.get("fastp_extra", "")
-    log:
-        "logs/fastp/{sample}.log"
-    wrapper:
-        "bio/fastp"
+
+include: "rules/001.QC_Trimming.smk"
 
 
 #################################################
 ### Gather files from iRODS or mounting point ###
 #################################################
 
-rule bigr_copy:
-    output:
-        "reads/{sample}.{stream}.fq.gz"
-    message:
-        "Gathering {wildcards.sample} fastq file ({wildcards.stream})"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-        time_min=lambda wildcard, attempt: attempt * 45
-    params:
-        input=lambda wildcards, output: fastq_links[output[0]]
-    log:
-        "logs/bigr_copy/{sample}.{stream}.log"
-    wrapper:
-        "bio/BiGR/copy"
+include: "rules/000.bigr_copy.smk"

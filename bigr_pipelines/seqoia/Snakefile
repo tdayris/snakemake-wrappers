@@ -149,7 +149,7 @@ rule prepare_sample_config:
     # conda:
     #     "env/seqoia.yaml"
     group:
-        "Sample_Preparation"
+        "sample"
     log:
         "logs/prepare_config/{sample}.log"
     script:
@@ -306,7 +306,6 @@ rule seqoia:
         # time_min = 5,
         tmpdir="tmp"
     shadow: "minimal"
-    group: "sample"
     params:
         mk = "--parents --verbose",
         ln = "--symbolic --force --relative",
@@ -329,9 +328,9 @@ rule seqoia:
         "logs/seqOIA/{sample}.log"
     shell:
         "mkdir {params.mk} {params.fusion_inspector} {params.logs} .snakemake "
-        # "mkdir {params.mk} {output.fusion_inspector} {output.logs} .snakemake "
+        #"mkdir {params.mk} {output.fusion_inspector} {output.logs} .snakemake "
         "{params.datatype_dir} data_{wildcards.sample}/sample_sheet/"
-        # "{output.datatype_dir} data_{wildcards.sample}/sample_sheet/"
+        #"{output.datatype_dir} data_{wildcards.sample}/sample_sheet/"
         "data_{wildcards.sample}/json/ > {log} 2>&1 && "
         "tree -a >> {log} 2>&1 && "
         "pwd >> {log} 2>&1 && "

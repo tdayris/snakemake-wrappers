@@ -39,9 +39,9 @@ comparisons = get_comparison_list(
 )
 
 dbs = list(config.get("gmt", {}).keys()) + [
-    "NetworkCancerGenes",
-    "DiseaseOnt",
-    "DisGenNet"
+    #"NetworkCancerGenes",
+    #"DiseaseOnt",
+    #"DisGenNet"
 ]
 
 ppis = list(config.get("ppi", {}).keys())
@@ -49,47 +49,61 @@ all_dbs = dbs + ppis
 
 methods = ["enrich"] # ["gsea", "enrich"]
 plots = ["barplot", "dotplot", "upsetplot"] # "heatplot", "treeplot"]
-keytypes = ["ENSEMBL", "ENTREZID", "SYMBOL", "ENSEMBLPROT"] 
+keytypes = ["ENSEMBL", "ENTREZID", "SYMBOL", "ENSEMBLPROT"]
 
+db_key = {}
+for db in dbs:
+    if db in config["gmt"].keys():
+        if config["gmt"][db].endswith(".entrez.gmt"):
+                db_key[db] = "ENTREZID"
+            elif config["gmt"][db].endswith(".ENSG.gmt"):
+                db_key[db] = "ENSEMBL"
+            elif config["gmt"][db].endswith(".symbols.gmt"):
+                db_key[db] = "SYMBOL"
+        else:
+            db_key[db] = "ENTREZID"
 
 
 def plot_list():
     results = []
-    for met in methods:
-        for comp in comparisons:
+    key = None
+    
+    for db in dbs:        
+        results.append(
+            f"results/all_comparisons/{db}.{db_key[db]}.png"
+        )
+        for met in methods:
             for plot in plots:
-                for db in dbs:
-                    if db in config["gmt"].keys():
-                        if config["gmt"][db].endswith(".entrez.gmt"):
-                            results.append(
-                                f"results/{comp}/{db}.ENTREZID/{plot}.{met}.png"
-                            )
-                        elif config["gmt"][db].endswith(".ENSG.gmt"):
-                            results.append(
-                                f"results/{comp}/{db}.ENSEMBL/{plot}.{met}.png"
-                            )
-                        elif config["gmt"][db].endswith(".symbols.gmt"):
-                            results.append(
-                                f"results/{comp}/{db}.SYMBOL/{plot}.{met}.png"
-                            )
-                    else:
-                        results.append(
-                                f"results/{comp}/{db}.ENTREZID/{plot}.{met}.png"
-                            )
+                for comp in comparisons:
+                    results.append(
+                        f"results/{comp}/{db}.{db_key[db]}/{plot}.{met}.png"
+                    )
 
-    for met in methods:
-        for comp in comparisons:
+    for ppi in ppis:
+        results.append(
+            f"results/all_comparisons/{db}.ENSEMBLPROT.png"
+        )
+        for met in methods:
             for plot in plots:
-                for ppi in ppis:
+                for comp in comparisons:
                     results.append(f"results/{comp}/{ppi}.ENSEMBLPROT/{plot}.{met}.png")
 
     return results
+
+def tsv_list():
+    results = []
+    for comparison in comparisons:
+        for db in dbs:
+            results.append(
+                f"results/{comparison}/{db}.{db_key[db]}/enrich.{comparison}.{db_key[db]}.tsv"
+            )
 
 
 ruleorder: enrichDO > enricherGMT
 ruleorder: enrichDGN > enricherGMT
 ruleorder: enrichNCG > enricherGMT
 
+    
 wildcard_constraints:
     comparison=r"|".join(comparisons),
     method=r"|".join(methods),
@@ -159,4 +173,79 @@ module clusterprofiler_meta:
 
 
 use rule * from clusterprofiler_meta
+
+
+###########################################
+### Plot comparisons agains each others ###
+###########################################
+
+rule paired_dotplots:
+    input:
+        tsv = expand(
+            "results/{comparison}/{database}.{keytype}/enrich.{comparison}.{keytype}.tsv",
+            comparison=comparisons,
+            allow_missing=True
+        )
+    output:
+        png = "results/all_comparisons/{database}.{keytype}.png"
+    message: "Aggregating multiple comparison together"
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024 * 4,
+        time_min=lambda wildcards, attempt: attempt * 15,
+        tmpdir="tmp"
+    log:
+        "logs/paired_dotplot/{database}.{keytype}.log"
+    conda:
+        "envs/seaborn.yaml"
+    params:
+        comparisons=comparisons
+    script:
+        "scripts/relplot.py"
+        
+        
+#################
+### Big table ###
+#################
+
+rule concat_tables:
+    input:
+        tsv = tsv_list()
+    output:
+        temp("tmp/complete_table_wh.tsv")
+    message:
+        "Joining all TSV results"
+    threads: 1
+    resources:
+        mem_mb=256,
+        time_min=lambda wildcards, attempt * 5,
+        tmpdir="tmp"
+    log:
+        "logs/awk/concat.log"
+    params:
+        begin=['FS=OFS="\t"'],
+        body=["{if (NR==1) {print $0 FS FileName} else {print $0 FS FILENAME}}"]
+    wrapper:
+        "bio/awk"
+
+
+rule clean_headers:
+    input:
+        "tmp/complete_table_wh.tsv"
+    output:
+        "results/complete_table.tsv"
+    message: 
+        "Cleaning remaining headers in joint table"
+    threads: 1
+    resources:
+        mem_mb=256,
+        time_min=lambda wildcards, attempt * 5,
+        tmpdir="tmp"
+    log:
+        "logs/sed/concat.log"
+    params:
+        regex="1p;s/^ID\tDescri//g"
+    shell:
+        "sed {params.regex} {input} > {output} 2> {log}"
+        
 

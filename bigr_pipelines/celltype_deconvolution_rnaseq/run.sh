@@ -44,12 +44,12 @@ message CMD "conda_activate ${CONDA_ENV_PATH}"
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
 
 if [ "${SUMMARY}" != "" ]; then
-  message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --cache tx_to_gene salmon_index --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --summary ${SNAKE_ARGS[*]} > ${SUMMARY}"
-  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --cache salmon_index --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" --summary > "${SUMMARY}"
+  message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --summary ${SNAKE_ARGS[*]} > ${SUMMARY}"
+  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" --summary > "${SUMMARY}"
 elif [ "${GRAPH}" != "" ]; then
-  message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --cache tx_to_gene salmon_index --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --rulegraph ${SNAKE_ARGS[*]} | dot -T png > ${GRAPH}"
-  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --cache salmon_index --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" --rulegraph "${SNAKE_ARGS[@]}" | dot -T png > "${GRAPH}"
+  message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --rulegraph ${SNAKE_ARGS[*]} | dot -T png > ${GRAPH}"
+  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" --rulegraph "${SNAKE_ARGS[@]}" | dot -T png > "${GRAPH}"
 else
-  message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --cache tx_to_gene salmon_index --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} ${SNAKE_ARGS[*]}"
-  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --cache salmon_index --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" && message INFO "Deconvolution successful" || error_handling "${LINENO}" 2 "Error while running Deconvolution pipeline"
+  message CMD "snakemake -s ${SNAKEFILE_PATH} --configfile config.yaml --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} ${SNAKE_ARGS[*]}"
+  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" && message INFO "Deconvolution successful" || error_handling "${LINENO}" 2 "Error while running Deconvolution pipeline"
 fi
