@@ -24,9 +24,11 @@ if "fasta_idx" in snakemake.input.keys():
 bed = ""
 if "bed" in snakemake.input.keys():
     bed = f"-L {snakemake.input['bed']}"
+    
+position = snakemake.params.get("position", "")
 
 shell(
     "samtools view {snakemake.params.extra} {ref} {bed} {samtools_opts} "
     "-o {snakemake.output[0]} {aln} "
-    "{snakemake.params.position} {log}"
+    "{position} {log}"
 )

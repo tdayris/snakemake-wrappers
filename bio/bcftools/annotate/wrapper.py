@@ -14,7 +14,7 @@ if "info" in snakemake.input.keys():
     extra += f" --header-lines {snakemake.input.info}"
 
 shell(
-    "bcftools view {bcftools_opts} "
+    "bcftools annotate {bcftools_opts} "
     "{extra} "
     "--annotations {snakemake.input.annotation} "
     "{snakemake.input.calls} "
