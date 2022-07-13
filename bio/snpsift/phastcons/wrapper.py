@@ -12,11 +12,6 @@ extra = snakemake.params.get("extra", "")
 java_opts = get_java_opts(snakemake)
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
-# Using user-defined file if requested
-db = snakemake.input.get("phastcons", "")
-if db != "":
-    db = "-db {}".format(db)
-
 min_threads = 1
 
 # Uncompression shall be done on user request
@@ -51,7 +46,7 @@ if snakemake.threads < min_threads:
 shell(
     "SnpSift phastCons"  # Tool and its subcommand
     " {java_opts} {extra}"  # Extra parameters
-    " {db}"  # Path to annotation directory
+    " {snakemake.input.phastcons}"  # Path to annotation directory
     " {incall}"  # Path to input vcf file
     " {outcall}"  # Path to output vcf file
     " {log}"  # Logging behaviour

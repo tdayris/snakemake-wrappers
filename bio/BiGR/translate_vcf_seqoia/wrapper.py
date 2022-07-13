@@ -75,7 +75,7 @@ gleaves_fields = {
         "Mutect2_AF": f"{sample}_tumor_AF",
         "OLD_MULTIALLELIC": None,
         "OLD_VARIANT": None,
-        "PhastCons":  ,
+        "PhastCons": None ,
         "ReadPosRankSum": None,
         "RGQ": None,
         "varkdb_constit": None,

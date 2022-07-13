@@ -9,27 +9,31 @@
 # UNKNOWN with exit code 2
 # DIR_NOT_FOUND with exit code 3
 
+# Change
+
 if [ ! -d "${1}" ] ; then
     echo "DIR_NOT_FOUND"
-    exit 3
+    # exit 3
 fi
 
 cd "${1}" || exit 3
 
 if [ -f "DONE" ] ; then
     echo "DONE"
-    exit 0
+    # exit 0
 fi
 
 if [ -f "ERROR" ] ; then
     echo "ERROR"
-    exit 1
+    # exit 1
 fi
 
 if [ -f "ON_GOING" ] ; then
     echo "ON_GOING"
-    exit 0
+    # exit 0
 fi
 
 echo "UNKNOWN"
-exit 2
+# exit 2
+
+exit 0
