@@ -14,8 +14,8 @@ rule salmon_quant_paired:
     input:
         r1="fastp/trimmed/pe/{sample}.1.fastq",
         r2="fastp/trimmed/pe/{sample}.2.fastq",
-        index=config.get("index", "salmon/index"),
-        gtf=config["gtf"]
+        index=ancient(config.get("index", "salmon/index")),
+        gtf=ancient(config["gtf"])
     output:
         quant="salmon/pseudo_mapping/{sample}/quant.sf",
         lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",

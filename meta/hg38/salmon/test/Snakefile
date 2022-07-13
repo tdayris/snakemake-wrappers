@@ -1,0 +1,93 @@
+from snakemake.utils import min_version
+min_version("6.0")
+
+default_salmon_config = {
+    "genome": "path/to/sequence.fasta",
+    "transcriptome": "path/to/transcriptome.fasta"
+}
+
+"""
+This rule pseudo-map and quantifies your paired reads over the indexed
+reference.
+"""
+rule salmon_quant_paired:
+    input:
+        r1="reads/{sample}.1.fq.gz",
+        r2="reads/{sample}.2.fq.gz",
+        index="salmon/GRCh38.99.index",
+        gtf="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.gtf"
+    output:
+        quant="salmon/pseudo_mapping/{sample}/quant.sf",
+        lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
+        mapping=temp("salmon/bams/{sample}.bam")
+    message: "Quantifying {wildcards.sample} with Salmon"
+    threads: min(config.get("threads", 20), 20)
+    resources:
+        time_min=lambda wildcards, attempt: attempt * 60,
+        mem_mb=lambda wildcards, attempt: (
+            attempt * 5120 + 25600
+        ),
+        tmpdir="tmp"
+    params:
+        libType = "A",
+        extra = "--numBootstraps 100 --validateMappings --gcBias --seqBias --posBias"
+    log:
+        "logs/salmon/quant/{sample}.log"
+    wrapper:
+        "bio/salmon/quant"
+
+
+"""
+Index your transcriptome or gentrome file with Salmon in order to map your
+reads against this reference.
+
+This rule is cached since it should be used only once per reference genome.
+"""
+rule salmon_index:
+    input:
+        sequences="salmon/decoy/GRCh38.99.fasta",
+        decoys="salmon/decoy/GRCh38.99.txt"
+    output:
+        index=directory("salmon/GRCh38.99.index")
+    message: "Indexing transcriptome/gentrome sequences with Salmon"
+    cache: True
+    threads: min(config.get("threads", 20), 20)
+    resources:
+        time_min=lambda wildcards, attempt, input: (
+            attempt * (120 if "decoys" in input.keys() else 45)
+        ),
+        mem_mb=lambda wildcards, attempt, input: (
+            attempt * (25600 if "decoys" in input.keys() else 10240)
+        ),
+        tmpdir="tmp"
+    params:
+        extra="--keepDuplicates --gencode"
+    log:
+        "logs/salmon/index.log"
+    wrapper:
+        "bio/salmon/index"
+
+
+"""
+This rule is optional in case you want to use decoy sequences within your
+transcriptome. See salmon documentation for more information.
+
+This rule is cached since it should be used only once per reference genome.
+"""
+rule salmon_generate_decoy_sequence:
+    input:
+        transcriptome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.cdna.fasta",
+        genome="/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta"
+    output:
+        multiext("salmon/decoy/GRCh38.99", ".txt", ".fasta")
+    message: "Building gentrome and decoy sequences for Salmon"
+    cache: True
+    threads: 2
+    resources:
+        time_min=lambda wildcards, attempt: min(attempt * 20, 30),
+        mem_mb=lambda wildcards, attempt: attempt * 512,
+        tmpdir="tmp"
+    log:
+        "logs/salmon/decoys.log"
+    wrapper:
+        "bio/salmon/generate_decoy"

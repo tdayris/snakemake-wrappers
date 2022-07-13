@@ -1,0 +1,45 @@
+rule snpeff_snpsift_pipeline:
+    input:
+        calls=expand(
+            "meta_caller/calls/{sample}.vcf.gz{index}",
+            sample=design["Sample_id"].tolist(),
+            index=["", ".tbi"]
+        ),
+        config="config.yaml"
+    output:
+        snpeff_stats=expand(
+            "snpeff/report/{sample}.html",
+            sample=design["Sample_id"]
+        ),
+        snpeff_csvstats=expand(
+            "snpeff/csvstats/{sample}.csv",
+            sample=design["Sample_id"]
+        ),
+        fixed=expand(
+            "snpsift/fixed/{sample}.vcf.gz{index}",
+            sample=design["Sample_id"],
+            index=["", ".tbi"]
+        )
+    handover: True
+    shadow: 'shallow'
+    message: "Annotating VCF files"
+    params:
+        organism = config["params"].get("organism", "hg38"),
+        mkdir="--parents --verbose",
+        ln="--symbolic --force --relative --verbose",
+        variant_dir="mutect2/corrected/",
+        outdir="snpeff_snpsift",
+        pipeline_path=config.get(
+            "snpeff_snpsift_run_path",
+            "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh"
+        )
+    log:
+        "log/snpeff_snpsift_pipeline.log"
+    shell:
+        "mkdir {params.mkdir} {params.outdir}/data_input/calls/ > {log} 2>&1 && "
+        "ln {params.ln} {input.config} {params.outdir} >> {log} 2>&1 && "
+        "ln {params.ln} {params.variant_dir}/* {params.outdir}/data_input/calls/ >> {log} 2>&1 && "
+        "cd {params.outdir} && "
+        "bash {params.pipeline_path} {params.organism} | tee -a ${{OLDPWD}}/{log} 2>&1 && "
+        "ln {params.ln} snpsift/ ${{OLDPWD}}/snpsift >> {log} 2>&1 && "
+        "ln {params.ln} snpeff/ ${{OLDPWD}}/snpsift >> {log} 2>&1 "

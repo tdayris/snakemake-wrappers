@@ -125,7 +125,7 @@ rule varscan2_sample_list:
         "Building sample list for Varscan2 mpileup2cns"
     threads: 1
     resources:
-        mem_mb=128,
+        mem_mb=lambda wildcards, attempt: 1024 * 10 * attempt,
         time_min=2
     params:
         '"varscan2_{sample}_tumor\nvarscan2_{sample}_normal"'
