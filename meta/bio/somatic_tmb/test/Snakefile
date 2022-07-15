@@ -4,7 +4,8 @@ default_config = {
     "min_coverage": 10,
     "allele_depth_keyname": "AD",
     "bed": "/path/to/regions.bed",
-    "tmb_highness_threshold": 10
+    "tmb_highness_threshold": 10,
+    "sample_list": []
 }
 
 def get_best_igs():
@@ -80,7 +81,7 @@ rule compute_tmb:
     input:
         igs = get_best_igs(),
         samples = expand(
-            "tmb/{sample}.yaml", sample=design["Sample_id"]
+            "tmb/{sample}.yaml", sample=config["sample_list"]
         )
     output:
         tsv = "TMB.tsv"
