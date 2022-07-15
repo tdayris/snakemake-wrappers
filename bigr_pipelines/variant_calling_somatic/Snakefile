@@ -127,7 +127,8 @@ rule all:
             how=["all", "census_only", "oncokb_only"] if config.get("ANMO", False) is True else ["all"],
             sample=design["Sample_id"].tolist(),
             dp=["10", "40", "60"]
-        )
+        ),
+        "TMB.tsv"
     output:
         directory("results_to_upload")
     message:
@@ -454,6 +455,26 @@ module missensor_pro_meta:
     config: msi_sensor_config
 
 use rule * from missensor_pro_meta
+
+
+###########
+### TMB ###
+###########
+
+somatic_tmb_config = {
+    "min_coverage": config["tmb"].get("min_coverage"),
+    "tmb_highness_threshold": config["tmb"].get("tmb_highness_threshold", 10),
+    "allele_depth_keyname": config["tmb"].get("allele_depth_keyname", "AD"),
+    "bed": config["ref"]["capture_kit_bed"],
+}
+
+
+module somatic_tmb:
+    snakefile: "../../meta/bio/somatic_tmb/test/Snakefile"
+    config: somatic_tmb_config
+
+
+use rule * from somatic_tmb
 
 ##################
 ### CNV Facets ###
