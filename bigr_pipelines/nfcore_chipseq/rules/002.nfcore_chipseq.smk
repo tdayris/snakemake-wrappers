@@ -1,5 +1,5 @@
 ###############################
-### Prepare nf-core chipseq ###
+###   Run nf-core chipseq   ###
 ###############################
 
 
@@ -18,12 +18,14 @@ rule ncfore_chipseq_pipeline:
         tmpdir="tmp"
     envmodules:
         "java/12.0.2",
-        "nextflow/21.10.6",
+        "nextflow/20.11.0-edge",
         "singularity/3.6.3"
     params:
         pipeline="nf-core/chipseq",
         revision="1.2.2",
-        profile="conda"
+        profile="singularity",
+        genome="GRCh38",
+        igenomes_base=config["igenome_base"]
     handover: True
     log:
         "logs/nf-core/chipseq_pipeline.log"
