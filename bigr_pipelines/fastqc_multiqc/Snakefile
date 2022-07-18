@@ -1,9 +1,13 @@
 import sys
 from pathlib import Path
+from snakemake.utils import min_version
+min_version("7.0")
 
-worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
-common = str(worflow_source_dir / "../common/python")
+
+worflow_source_dir = Path(snakemake.workflow.srcdir("."))
+common = str(worflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
+
 
 from dataframes import *
 from file_manager import *
@@ -55,163 +59,22 @@ onstart:
 ### Gather all quality reports ###
 ##################################
 
-rule multiqc:
-    input:
-        fqc_zip=expand(
-            "fastqc/{sample}_{stream}_fastqc.zip",
-            sample=design["Sample_id"],
-            stream=["1", "2"]
-        ),
-        fqc_html=expand(
-            "fastqc/{sample}.{stream}.html",
-            sample=design["Sample_id"],
-            stream=["1", "2"]
-        ),
-        txt=expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.txt",
-            sample=design["Sample_id"],
-            stream=["1", "2"]
-        ),
-        png=expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.png",
-            sample=design["Sample_id"],
-            stream=["1", "2"]
-        )
-    output:
-        "multiqc/multiqc.html",
-        directory("multiqc/multiqc_data")
-    message:
-        "Gathering all quality reports in {output}"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcard, attempt: attempt * 2048,
-        time_min=lambda wildcard, attempt: attempt * 50,
-        tmpdir="tmp"
-    params:
-        "--flat"
-    log:
-        "logs/multiqc.log"
-    wrapper:
-        "bio/multiqc"
 
-
-#######################################################
-### Adding specific actions for BiGR demultiplexing ###
-#######################################################
-
-use rule multiqc as irods_complient with:
-    input:
-        fqc_zip=expand(
-            "fastqc/{sample}_{stream}_fastqc.zip",
-            sample=design["Sample_id"],
-            stream=["1", "2"]
-        ),
-        fqc_html=expand(
-            "fastqc/{sample}.{stream}.html",
-            sample=design["Sample_id"],
-            stream=["1", "2"]
-        ),
-        txt=expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.txt",
-            sample=design["Sample_id"],
-            stream=["1", "2"]
-        ),
-        png=expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.png",
-            sample=design["Sample_id"],
-            stream=["1", "2"]
-        ),
-        bcl_json="Stats.json"
-    output:
-        "output/multiqc.html",
-        directory("output/multiqc_data")
-    group:
-        "stats_inclusion"
-
-
-rule unzip_stats:
-    output:
-        temp("Stats.json")
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
-        tmpdir="tmp"
-    log:
-        "logs/unzipping.log"
-    group:
-        "stats_inclusion"
-    shell:
-        'unzip -n -d "${{PWD}}" '
-        'input/*/archive/*/unaligned/Stats/Stats.json.zip '
-        '> {log} 2>&1'
+include: "003.multiqc.smk"
 
 
 #########################################
 ### Assess quality of each fastq file ###
 #########################################
 
-rule fastqc:
-    input:
-        "reads/{sample}.{stream}.fq.gz"
-    output:
-        html=temp("fastqc/{sample}.{stream}.html"),
-        zip=temp("fastqc/{sample}_{stream}_fastqc.zip")
-    message:
-        "Assessing quality of {wildcards.sample}, ({wildcards.stream})"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 1024, 4096),
-        time_min=lambda wildcard, attempt: attempt * 50,
-        tmpdir="tmp"
-    params:
-        ""
-    log:
-        "logs/fastqc/{sample}.{stream}.log"
-    wrapper:
-        "bio/fastqc"
 
-
-rule fastq_screen:
-    input:
-        "reads/{sample}.{stream}.fq.gz"
-    output:
-        txt=temp("fastq_screen/{sample}.{stream}.fastq_screen.txt"),
-        png=temp("fastq_screen/{sample}.{stream}.fastq_screen.png")
-    message:
-        "Assessing quality of {wildcards.sample}, stream {wildcards.stream}"
-    threads: config.get("threads", 20)
-    resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
-        time_min=lambda wildcard, attempt: attempt * 50,
-        tmpdir="tmp"
-    params:
-        fastq_screen_config=config["fastq_screen"],
-        subset=100000,
-        aligner='bowtie2'
-    log:
-        "logs/fastq_screen/{sample}.{stream}.log"
-    wrapper:
-        "bio/fastq_screen"
+include: "001.fastqc.smk"
+include: "002.fastq_screen.smk"
 
 
 #################################################
 ### Gather files from iRODS or mounting point ###
 #################################################
 
-rule bigr_copy:
-    output:
-        "reads/{sample}.fq.gz"
-    message:
-        "Gathering {wildcards.sample} fastq file"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-        time_min=lambda wildcard, attempt: attempt * 45,
-        tmpdir="tmp"
-    params:
-        input=lambda wildcards, output: fastq_links[output[0]]
-    log:
-        "logs/bigr_copy/{sample}.log"
-    wrapper:
-        "bio/BiGR/copy"
+
+include: "rules/000.copy.smk"
