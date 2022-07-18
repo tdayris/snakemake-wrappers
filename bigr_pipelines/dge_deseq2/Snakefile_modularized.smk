@@ -1,7 +1,7 @@
 from snakemake.utils import min_version
 from pathlib import Path
 from yaml import dump
-min_version("6.0")
+min_version("7.0")
 
 import sys
 
@@ -91,8 +91,6 @@ samples_iterator = yield_samples(
     remove=config["design"].get("remove_col")
 )
 
-
-
 expected_pcas = [
     f"figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca/pca_{factor}_{axes}_{elipse}.png"
     for (factor, test, ref) in comparison_levels
@@ -176,114 +174,14 @@ rule target_dge_deseq:
 ##############################
 
 
-deseq2_post_process_config = {
-    "condition_dict": condition_dict,
-    "samples_per_prefixes": samples_per_prefixes,
-    "design": design.copy(),
-    "thresholds": config["thresholds"],
-    "genes_of_interest": config.get(
-        "genes_of_interest", ["ENSG00000141510"]
-    ),
-    "chromosomes": config["ref"].get(
-        "chromosomes",
-        list(range(24)) + ["MT", "X", "Y"] + list(map(str, range(24)))
-    )
-}
-
-
-module deseq2_post_process:
-    snakefile: "../../meta/bio/deseq2_post_process/test/Snakefile"
-    config: deseq2_post_process_config
-
-
-use rule * from deseq2_post_process
-
-
-use rule pandas_merge_salmon_tr from deseq2_post_process with:
-    input:
-        quant = expand(
-            "salmon/pseudo_mapping/{sample}/quant.sf",
-            sample=design.Sample_id.tolist()
-        ),
-        tx2gene = "tximport/transcripts2genes.tsv"
-
-
-use rule multiqc from deseq2_post_process with:
-    input:
-        txt=lambda wildcards: expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.txt",
-            sample=samples_per_prefixes[wildcards.comparison],
-            stream=["1", "2"]
-        ),
-        png=lambda wildcards: expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.png",
-            sample=samples_per_prefixes[wildcards.comparison],
-            stream=["1", "2"]
-        ),
-        salmon=lambda wildcards: expand(
-            "salmon/pseudo_mapping/{sample}/quant.sf",
-            sample=samples_per_prefixes[wildcards.comparison]
-        ),
-        html=lambda wildcards: expand(
-            "fastp/html/pe/{sample}.fastp.html",
-            sample=samples_per_prefixes[wildcards.comparison]
-        ),
-        json=lambda wildcards: expand(
-            "fastp/json/pe/{sample}.fastp.json",
-            sample=samples_per_prefixes[wildcards.comparison]
-        ),
-        config="multiqc/{comparison}/multiqc_config.yaml",
-        fqscreen=lambda wildcards: expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
-            stream=["1", "2"],
-            ext=["txt", "png"],
-            sample=samples_per_prefixes[wildcards.comparison]
-        ),
-        additional_plots = [
-            #temp("pairwise_scatterplot_mqc.png"),
-            #temp("clustermap_sample_mqc.png"),
-            "multiqc/{comparison}/clustermap_sample_mqc.png",
-            #"multiqc/{comparison}/clustermap_genes_mqc.png",
-            "multiqc/{comparison}/pca_plot_mqc.png",
-            "multiqc/{comparison}/volcanoplot_mqc.png",
-            "multiqc/{comparison}/distro_expr_mqc.png",
-            "multiqc/{comparison}/ma_plot_mqc.png",
-            "multiqc/{comparison}/distro_mu_mqc.png",
-            "multiqc/{comparison}/independent_filter_mqc.png",
-            "multiqc/{comparison}/inde_theta_filter_mqc.png",
-            "multiqc/{comparison}/pvalue_qc_mqc.png",
-            #temp("multiqc/{comparison}/clustermap_sample_mqc.png"),
-            #temp("pca_axes_correlation_mqc.png")
-        ]
+include: "rules/003.tximport_deseq2.smk"
 
 
 ###########################
 ### tximprot and DESeq2 ###
 ###########################
 
-deseq2_config = {
-    "gtf": config["ref"]["gtf"],
-    "design": config["design"],
-    "output_prefixes": output_prefixes,
-    "comparison_levels": comparison_levels,
-    "samples_per_prefixes": samples_per_prefixes
-}
-
-
-module tximport_deseq2:
-    snakefile: "../../meta/bio/tximport_deseq2/test/Snakefile"
-    config: deseq2_config
-
-
-use rule * from tximport_deseq2
-
-#use rule tximport from tximport_deseq2 with:
-#    input:
-#        quant=lambda wildcards: expand(
-#            "salmon/pseudo_mapping/{sample}/quant.sf",
-#            sample=samples_per_prefixes[wildcards.comparison]
-#        ),
-#        tx_to_gene="tximport/tx2gene.tsv"
+include: "rules/002.tximport_deseq2.smk"
 
 
 # #############################
@@ -291,9 +189,4 @@ use rule * from tximport_deseq2
 # #############################
 
 
-module salmon_quant_workflow:
-    snakefile: "../salmon_quant/Snakefile"
-    config: config
-
-
-use rule * from salmon_quant_workflow as salmon_quant_workflow_*
+include: "rules/001.salmon_quant_pipeline.smk"
