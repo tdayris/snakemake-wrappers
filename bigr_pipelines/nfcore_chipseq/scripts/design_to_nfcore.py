@@ -34,6 +34,10 @@ nxf_design = pandas.merge(
     how="left"
 )
 
+del nxf_design["Sample_id"]
+logging.debug(nxf_design.head())
+logging.debug(nxf_design.columns.tolist())
+
 nxf_design.to_csv(
     snakemake.output[0],
     sep=",",
