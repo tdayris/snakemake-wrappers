@@ -5,8 +5,8 @@ min_version("6.0")
 
 import sys
 
-worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
-common = str(worflow_source_dir / "../common/python")
+worflow_source_dir = Path(snakemake.workflow.srcdir("."))
+common = str(worflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
 
 from dataframes import *

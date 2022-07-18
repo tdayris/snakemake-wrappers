@@ -4,10 +4,8 @@ import pandas
 import sys
 from pathlib import Path
 
-worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
-worflow_source_dir = Path("/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/")
-common = str(worflow_source_dir / "common" / "python")
-print(common)
+worflow_source_dir = Path(snakemake.workflow.srcdir("."))
+common = str(worflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
 
 from file_manager import *
