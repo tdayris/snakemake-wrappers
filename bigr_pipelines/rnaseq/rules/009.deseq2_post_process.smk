@@ -95,6 +95,8 @@ rule zip_csv_report:
         "logs/rbt/csv-report/compress/{comparison}_{subset}.log",
     params:
         "-cvjf",
+    conda:
+        "envs/bash.yaml"
     shell:
         "tar {params} {output} {input}"
 

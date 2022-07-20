@@ -227,6 +227,8 @@ rule get_cibersort:
         "Gathering Cibersort requirements"
     log:
         "logs/cibersort.bin.log",
+    conda:
+        "envs/bash.yaml"
     params:
         rsync="--verbose --checksum --human-readable --partial --progress",
         chmod="u+x",
