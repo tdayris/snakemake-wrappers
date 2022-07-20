@@ -44,7 +44,11 @@ logging.info("Additional utils loaded")
 
 # Find and load configfile
 default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
+
+
 configfile: get_config(default_config=default_config)
+
+
 logging.info("Config file loaded")
 
 
@@ -130,6 +134,7 @@ streams = ["1", "2"]
 
 logging.info("Constraining wildcards...")
 
+
 wildcard_constraints:
     sample=r"|".join(sample_list),
     stream=r"|".join(streams),
@@ -146,7 +151,9 @@ wildcard_constraints:
 ############################
 
 # Memory and time reservation
-def get_resources_per_gb(wildcards, input, attempt, multiplier: int = 0, base: int = 0) -> int:
+def get_resources_per_gb(
+    wildcards, input, attempt, multiplier: int = 0, base: int = 0
+) -> int:
     """
     Return the amount of resources needed per GB of input.
 
@@ -166,6 +173,7 @@ def get_resources_per_gb(wildcards, input, attempt, multiplier: int = 0, base: i
         multiplier * attempt,
     )
 
+
 logging.info("Preparing memory calls...")
 # Explicit time reservations
 get_15min_per_attempt = functools.partial(get_resources_per_gb, multiplier=15)
@@ -179,4 +187,6 @@ get_1gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024)
 get_2gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 2)
 get_4gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 4)
 get_10gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 10)
-get_75gb_and_5gb_per_attempt = = functools.partial(get_resources_per_gb, multiplier=1024 * 5, base = 1024 * 75)
+get_75gb_and_5gb_per_attempt = functools.partial(
+    get_resources_per_gb, multiplier=1024 * 5, base=1024 * 75
+)
