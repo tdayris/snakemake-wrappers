@@ -3,7 +3,7 @@ rule bowtie2_map:
         sample=expand(
             "fastp/trimmed/{sample}.{stream}.fastq", sample=sample_list, stream=streams
         ),
-        idx=config["bowtie2"]["idx"],
+        idx=config["bowtie2"]["index"],
     output:
         temp("bowtie2/raw/{sample}.bam"),
     threads: 20
