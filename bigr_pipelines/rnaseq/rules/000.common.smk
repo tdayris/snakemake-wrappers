@@ -152,7 +152,7 @@ wildcard_constraints:
 
 # Memory and time reservation
 def get_resources_per_gb(
-    wildcards, input, attempt, multiplier: int = 0, base: int = 0
+    wildcards, input, attempt, multiplier: int = 1, base: int = 0
 ) -> int:
     """
     Return the amount of resources needed per GB of input.
@@ -168,9 +168,9 @@ def get_resources_per_gb(
     """
     return max(
         # Case there is 1gb or more in input
-        (input.size // 1_000_000_000) * attempt * multiplier,
+        ((input.size // 1_000_000_000) * attempt * multiplier) + base,
         # Case there is less than 1gb in input
-        multiplier * attempt,
+        (multiplier * attempt) + base,
     )
 
 
