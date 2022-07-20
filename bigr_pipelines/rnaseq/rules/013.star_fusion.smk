@@ -4,7 +4,7 @@ rule star_fusion:
         resource_lib=config["CTAT_resource_lib"],
     output:
         directory("star-fusions/{sample}/"),
-    threads: 20
+    threads: config.get("max_threads", 20)
     resources:
         mem_mb=get_20g_per_attempt,
         time_min=get_2h_per_attempt,

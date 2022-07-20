@@ -20,6 +20,7 @@ rule tximport:
         mem_mb=get_1gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 2
     params:
         extra=config["deseq2"].get(
             "tximport_extra",

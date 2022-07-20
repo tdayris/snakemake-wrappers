@@ -19,7 +19,7 @@ rule fastp_clean:
         ),
         html="fastp/html/{sample}.fastp.html",
         json="fastp/json/{sample}.fastp.json",
-    threads: config.get("max_threads", 5)
+    threads: min(config.get("max_threads", 5), 5)
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_45min_per_attempt,

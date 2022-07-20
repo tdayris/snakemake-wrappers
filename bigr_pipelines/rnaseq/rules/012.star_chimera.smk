@@ -15,6 +15,7 @@ rule star_align_chimera:
         mem_mb=get_75gb_and_5gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir="tmp",
+    retries: 2
     log:
         "logs/star/{sample}.log",
     params:
@@ -94,6 +95,7 @@ rule picard_collect_multiple_metrics_chimera:
         mem_mb=get_4gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 2
     log:
         "logs/picard/multiple_metrics/{sample}.chimera.log",
     params:
@@ -120,6 +122,7 @@ rule samtools_cram_chimera:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    retries: 2
     params:
         extra="",
     log:

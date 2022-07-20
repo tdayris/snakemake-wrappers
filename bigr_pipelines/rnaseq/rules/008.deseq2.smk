@@ -87,6 +87,7 @@ rule deseq2:
         mem_mb=get_2gb_per_attempt,
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
+    retries: 3
     params:
         contrast=lambda wildcards: contrasts[wildcards.comparison],
     log:
