@@ -244,22 +244,23 @@ include: "rules/009.deseq2_post_process.smk"
 
 rule deseq2_results:
     input:
-        salmon_quant=expand(
-            "salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=sample_list
+        salmon_quant=lambda wildcards: expand(
+            "salmon/pseudo_mapping/{sample}/quant.genes.sf", 
+            sample=samples_per_prefixes[wildcards.comparison]
         ),
         tpm_table=expand(
-            "salmon/Raw.genes.tsv",
+            "data_output/Quantification/Raw.genes.tsv",
             feature=["transcripts", "genes"],
         ),
-        raw_counts="salmon/Raw.genes.tsv",
-        fastp=expand(
+        raw_counts="data_output/Quantification/Raw.genes.tsv",
+        fastp=lambda wildcards: expand(
             "fastp/{ext}/{sample}.fastp.{ext}",
-            sample=sample_list,
+            sample=samples_per_prefixes[wildcards.comparison],
             ext=["html", "json"],
         ),
-        fastq_screen=expand(
+        fastq_screen=lambda wildcards: expand(
             "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
-            sample=sample_list,
+            sample=samples_per_prefixes[wildcards.comparison],
             stream=streams,
             ext=["txt", "png"],
         ),
@@ -276,7 +277,7 @@ rule deseq2_results:
         ],
     output:
         report(
-            "data_output/multiqc/MultiQC.DEseq2.html",
+            "data_output/Deseq2/{comparison}/MultiQC.DEseq2.html",
             caption=str(worflow_source_dir / "reports" / "multiqc.rst"),
             category="Quality Controls",
         ),
