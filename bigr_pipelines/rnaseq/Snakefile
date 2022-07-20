@@ -1,0 +1,46 @@
+
+####################################
+### General pipeline operations  ###
+####################################
+
+
+include: "rules/000.common.smk"
+
+
+##########################
+### Raw fastq handling ###
+##########################
+
+
+include: "rules/001.bigr_copy.smk"
+include: "rules/002.trimming.smk"
+include: "rules/003.fastq_screen.smk"
+
+
+#############################
+### Salmon quantification ###
+#############################
+
+"""
+If you need to run this pipeline and stop after a
+simple salmon quantification, use:
+--until salmon_quant_results
+"""
+include: "rules/004.salmon.smk"
+
+
+####################
+### Immunedeconv ###
+####################
+
+"""
+If you need to run this pipeline and stop after a
+simple immunedeconv, use:
+--until immunedeconv_results
+"""
+include: "rules/005.immunedeconv.smk"
+
+
+####################
+### Star mapping ###
+####################
