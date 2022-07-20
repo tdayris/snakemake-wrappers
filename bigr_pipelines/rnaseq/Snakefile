@@ -6,6 +6,26 @@
 include: "rules/000.common.smk"
 
 
+##################
+### Flag rules ###
+##################
+
+
+onsuccess:
+    shell("touch DONE && rm --force --verbose ON_GOING ERROR")
+    logging.info("RNA-Seq bulk pipeline ended without any error.")
+
+
+onerror:
+    shell("touch ERROR && rm --force --verbose ON_GOING DONE")
+    logging.error("RNA-Seq bulk pipeline failed.")
+
+
+onstart:
+    shell("touch ON_GOING && rm --force --verbose ERROR DONE")
+    logging.info("Starting RNA-Seq bulk pipeline.")
+
+
 ##########################
 ### Raw fastq handling ###
 ##########################
@@ -37,7 +57,7 @@ rule quality_control_results:
         ),
     output:
         report(
-            "multiqc/MultiQC.QC.html",
+            "data_output/multiqc/MultiQC.QC.html",
             caption=snakemake.workflow.source_path("reports/multiqc.rst"),
             category="Quality Controls",
         ),
@@ -96,7 +116,7 @@ rule salmon_quant_results:
         ),
     output:
         report(
-            "multiqc/MultiQC.Salmon.html",
+            "data_output/multiqc/MultiQC.Salmon.html",
             caption=snakemake.workflow.source_path("reports/multiqc.rst"),
             category="Quality Controls",
         ),
@@ -190,10 +210,9 @@ rule star_chimera_results:
         ),
     output:
         report(
-            "multiqc/MultiQC.Star.Chimera.html",
+            "data_output/multiqc/MultiQC.Star.Chimera.html",
             caption=snakemake.workflow.source_path("reports/multiqc.rst"),
             category="Quality Controls",
-            subcategory="Chimera",
         ),
     threads: 1
     resources:
@@ -257,7 +276,7 @@ rule deseq2_results:
         ],
     output:
         report(
-            "multiqc/MultiQC.DEseq2.html",
+            "data_output/multiqc/MultiQC.DEseq2.html",
             caption=snakemake.workflow.source_path("reports/multiqc.rst"),
             category="Quality Controls",
         ),
@@ -268,6 +287,6 @@ rule deseq2_results:
         tmpdir="tmp",
     retries: 2
     log:
-        "logs/multiqc.star.chimera.log",
+        "logs/multiqc.deseq2.log",
     wrapper:
         "bio/multiqc"
