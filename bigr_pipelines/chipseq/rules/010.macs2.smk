@@ -59,7 +59,7 @@ rule macs2_to_bed:
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/macs2/tobed/{sample}.narrow.log",
+        "logs/macs2/tobed/{sample}.{peaktype}.log",
     params:
         "'BEGIN{FS=\"\\t\"} {print $1 FS $2 FS $3 FS $4 FS . FS +}'",
     conda:
