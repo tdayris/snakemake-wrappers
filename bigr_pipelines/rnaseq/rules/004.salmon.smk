@@ -30,7 +30,7 @@ rule salmon_quant_paired:
 # count tables with human-readable gene names
 rule tx_to_gene:
     input:
-        gtf=config["ref"]["gtf"],
+        gtf=config["reference"]["gtf"],
     output:
         tx2gene=temp("salmon/tx2gene.tsv"),
         tx2gene_large=temp("salmon/tx2gene_with_positions.tsv"),
