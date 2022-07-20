@@ -57,3 +57,7 @@ design = get_design(dirpath=os.getcwd(), search_func=search_fastq_pairs)
 design.set_index("Sample_id", inplace=True)
 design["Sample_id"] = design.index.tolist()
 logging.info("Design file loaded")
+
+sample_list = design.index.tolist()
+peak_types = ["broadPeak", "narrowPeak"]
+streams = ["1", "2"]
