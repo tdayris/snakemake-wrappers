@@ -67,8 +67,8 @@ rule picard_collect_multiple_metrics_chimera:
     input:
         bam="star/{sample}/chimera/{sample}.bam",
         bai="star/{sample}/chimera/{sample}.bam.bai",
-        ref=config["reference"]["fasta"],
-        ref_idx=config["reference"]["fai"],
+        ref=config["reference"]["genome"],
+        ref_idx=config["reference"]["genome_index"],
     output:
         temp(
             multiext(
@@ -111,8 +111,8 @@ rule samtools_cram_chimera:
     input:
         "star/{sample}/chimera/{sample}.bam",
         bam_index="star/{sample}/chimera/{sample}.bam.bai",
-        ref=config["reference"]["fasta"],
-        ref_index=config["reference"]["fai"],
+        ref=config["reference"]["genome"],
+        ref_idx=config["reference"]["genome_index"],
     output:
         "star/{sample}/chimera/{sample}.cram",
     threads: min(config.get("max_threads", 2), 2)
