@@ -79,8 +79,8 @@ comparison_levels = list(
 # listed above
 samples_iterator = yield_samples(
     complete_design=design.copy(),
-    aggregate=config["design"].get("aggregate_col"),
-    remove=config["design"].get("remove_col"),
+    aggregate=config["deseq2"]["design"].get("aggregate_col"),
+    remove=config["deseq2"]["design"].get("remove_col"),
 )
 
 # A list containing all expected PCA at the end of DESeq2.
