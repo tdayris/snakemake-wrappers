@@ -96,7 +96,7 @@ logging.info("Preparing memory calls...")
 get_45min_per_attempt = functools.partial(get_resources_per_gb, multiplier=45)
 get_1h_per_attempt = functools.partial(get_resources_per_gb, multiplier=60)
 get_2h_per_attempt = functools.partial(get_resources_per_gb, multiplier=60 * 2)
-get_2h_per_attempt = functools.partial(get_resources_per_gb, multiplier=60 * 4)
+get_4h_per_attempt = functools.partial(get_resources_per_gb, multiplier=60 * 4)
 
 # Explicit memory reservation
 get_1gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024)
