@@ -4,8 +4,8 @@ rule salmon_quant_paired:
     input:
         r1="fastp/trimmed/{sample}.1.fastq",
         r2="fastp/trimmed/{sample}.2.fastq",
-        index=ancient(config["salmon"]["index"])),
-        gtf=ancient(config["reference"]["gtf"])
+        index=ancient(config["salmon"]["index"]),
+        gtf=ancient(config["reference"]["gtf"]),
     output:
         quant="salmon/pseudo_mapping/{sample}/quant.sf",
         lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
@@ -16,13 +16,12 @@ rule salmon_quant_paired:
         tmpdir="tmp",
     retries: 2
     params:
-        libType = config["salmon"].get("salmon_libtype", "A"),
-        extra = config["salmon"].get(
-            "salmon_quant_extra",
-            "--numBootstraps 100 --gcBias --seqBias --posBias"
-        )
+        libType=config["salmon"].get("salmon_libtype", "A"),
+        extra=config["salmon"].get(
+            "salmon_quant_extra", "--numBootstraps 100 --gcBias --seqBias --posBias"
+        ),
     log:
-        "logs/salmon/quant/{sample}.log"
+        "logs/salmon/quant/{sample}.log",
     wrapper:
         "bio/salmon/quant"
 
@@ -127,7 +126,9 @@ rule aggregate_transcript_counts:
     output:
         tsv=report(
             "salmon/TPM.transcripts.tsv",
-            caption=snakemake.workflow.source_path("reports/salmon.tpm.transcripts.rst"),
+        caption=snakemake.workflow.source_path(
+        "reports/salmon.tpm.transcripts.rst"
+            ),
             category="Counts",
         ),
     threads: 1
@@ -142,7 +143,7 @@ rule aggregate_transcript_counts:
         gencode=True,
         genes=False,
         index_label=True,
-        fillna="Unknown"
+        fillna="Unknown",
     log:
         "logs/aggregate/transcripts.log",
     wrapper:

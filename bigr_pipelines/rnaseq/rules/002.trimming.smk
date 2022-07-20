@@ -2,13 +2,12 @@
 This snakefile handles trimming and QC on raw fastq files
 """
 
+
 # Clean and check quality of Fastq files
 rule fastp_clean:
     input:
         sample=expand(
-            "data_input/{sample}.{stream}.fq.gz", 
-            stream=["1", "2"], 
-            allow_missing=True
+            "data_input/{sample}.{stream}.fq.gz", stream=["1", "2"], allow_missing=True
         ),
     output:
         trimmed=temp(

@@ -2,6 +2,7 @@
 This snakefile calls fastqc on raw fastq files
 """
 
+
 # Assess sample origin based on a wide range of potiential target genomes
 rule fastq_screen:
     input:

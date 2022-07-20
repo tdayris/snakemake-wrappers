@@ -1,6 +1,7 @@
-""""
+"""
 This Snakefile deals with IO from and to iRODS
-""""
+"""
+
 
 # Copy files on BiGR Flamingo
 # iRODS paths are accepted

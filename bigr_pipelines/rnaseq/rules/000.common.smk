@@ -39,14 +39,15 @@ from messages import message
 #####################
 
 # Save output stream in a file
-logging.basicConfig(
-    filename="snakemake.rnaseq.log", filemode="w", level=logging.DEBUG
-)
+logging.basicConfig(filename="snakemake.rnaseq.log", filemode="w", level=logging.DEBUG)
 
 
 # Find and load configfile
 default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
+
+
 configfile: get_config(default_config=default_config)
+
 
 # Load design file and duplicate sample id as row name
 design = get_design(dirpath=os.getcwd(), search_func=search_fastq_pairs)
@@ -64,19 +65,21 @@ fastq_links = link_fq(design.Sample_id, design.Upstream_file, design.Downstream_
 # A list that holds all comparisons made in DESeq2.
 # This is done in order to avoid checkpoints
 # This list contains: [(factor, test, ref), ...]
-comparison_levels = list(yield_comps(
-    complete_design=design,
-    aggregate=config["design"].get("aggregate_col"),
-    remove=config["design"].get("remove_col"),
-    contains=config["design"].get("include_only")
-))
+comparison_levels = list(
+    yield_comps(
+        complete_design=design,
+        aggregate=config["design"].get("aggregate_col"),
+        remove=config["design"].get("remove_col"),
+        contains=config["design"].get("include_only"),
+    )
+)
 
 # An iterator that holds all samples involved in the comparisons
 # listed above
 samples_iterator = yield_samples(
     complete_design=design.copy(),
     aggregate=config["design"].get("aggregate_col"),
-    remove=config["design"].get("remove_col")
+    remove=config["design"].get("remove_col"),
 )
 
 # A list containing all expected PCA at the end of DESeq2.
@@ -84,21 +87,22 @@ samples_iterator = yield_samples(
 expected_pcas = [
     f"figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca/pca_{factor}_{axes}_{elipse}.png"
     for (factor, test, ref) in comparison_levels
-    for axes in ["ax_1_ax_2", "ax_2_ax_3"] # , "ax_3_ax_4"]
+    for axes in ["ax_1_ax_2", "ax_2_ax_3"]  # , "ax_3_ax_4"]
     for elipse in ["with_elipse", "without_elipse"]
 ]
 
 # A dict containing sample levels for a given factor.
 condition_dict = {
-    f"DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}": relation_condition_sample(design.copy(), factor, test, ref)
+    f"DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}": relation_condition_sample(
+        design.copy(), factor, test, ref
+    )
     for factor, test, ref in comparison_levels
 }
 
 # A dict containing the list of samples used in DESeq2,
 # for a given comparison
 samples_per_prefixes = {
-    prefix: list(condition_dict[prefix].keys())
-    for prefix in output_prefixes
+    prefix: list(condition_dict[prefix].keys()) for prefix in output_prefixes
 }
 
 # Boolean: is there any batch effect to consider in DEseq2 ?
@@ -124,7 +128,7 @@ wildcard_constraints:
     test=r"|".join(map(str, [i[1] for i in comparison_levels])),
     ref=r"|".join(map(str, [i[2] for i in comparison_levels])),
     axes=r"|".join(axes_list),
-    elipse=r"|".join(elipsis_list)
+    elipse=r"|".join(elipsis_list),
 
 
 ############################
@@ -149,8 +153,9 @@ def get_resources_per_gb(wildcards, input, attempt, multiplier) -> int:
         # Case there is 1gb or more in input
         (input.size // 1_000_000_000) * attempt * multiplier,
         # Case there is less than 1gb in input
-        multiplier * attempt
+        multiplier * attempt,
     )
+
 
 # Explicit time reservations
 get_15min_per_attempt = functools.partial(get_resources_per_gb, multiplier=15)
