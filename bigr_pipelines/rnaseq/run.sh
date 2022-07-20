@@ -27,7 +27,7 @@ while [ "$#" -gt 0 ]; do
     --rulegraph) GRAPH="${2}"; shift 2;;
     # hg19|HG19|GRCh37) CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"; shift;;
     hg38|HG38|GRCh38) CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"; shift;;
-    mm10|MM10|GRCm38) CONFIG_PATH="${PIPELINE_PATH}/config.mm10.yaml"; shift;;
+    mm10|MM10|GRCm38) CONFIG_PATH="${PIPELINE_PATH}/config.mm10.yaml"; echo "Some operations are not available for mice datasets"; shift;;
     DESeq2|deseq2|DGE|dge) SNAKE_ARGS+=("--until deseq2_results"); shift;;
     salmon|Salmon|quant) SNAKE_ARGS+=("--until salmon_quant_results"); shift;;
     qc|QC) SNAKE_ARGS+=("--until quality_control_results"); shift;;
