@@ -17,7 +17,7 @@ rule fastq_screen:
         tmpdir="tmp",
     retries: 2
     params:
-        fastq_screen_config=config["fastq_screen"]["genomes"],
+        fastq_screen_config=config["fastq_screen"]["fastq_screen_config"],
         subset=config["fastq_screen"].get("subset", 100000),
         aligner=config["fastq_screen"].get("aligner", "bowtie2"),
     log:
