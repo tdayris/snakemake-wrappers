@@ -42,8 +42,9 @@ rule deseq2_dataset_from_tximport:
         "Formatting {wildcards.comparison} counts for DESeq2"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 3072, 20480),
-        time_min=lambda wildcards, attempt: attempt * 45,
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
     params:
         design=lambda wildcards: (
             f"~{contrasts[wildcards.comparison][0]}"
@@ -72,27 +73,20 @@ rule deseq2:
         dds="deseq2/{comparison}/dds.{comparison}.RDS",
     output:
         rds=temp("deseq2/{comparison}/wald.{comparison}.RDS"),
-        deseq2_tsv=report(
-            "deseq2/{comparison}/wald.{comparison}.tsv",
-            caption=deseq2_rst,
-            category="DESeq2 results",
-        ),
-        normalized_counts=report(
-            "deseq2/{comparison}/dst.{comparison}.tsv",
-            caption=normalized_counts_rst,
-            category="Normalized counts",
-        ),
+        deseq2_tsv=temp("deseq2/{comparison}/wald.{comparison}.tsv"),
+        normalized_counts=temp("deseq2/{comparison}/dst.{comparison}.tsv"),
         dst=temp("deseq2/{comparison}/dst.{comparison}.RDS"),
-        intermediar_values="deseq2/{comparison}/mcols.{comparison}.tsv",
-        assays_mu="deseq2/{comparison}/assays.mu.{comparison}.tsv",
-        filter_theta="deseq2/{comparison}/filter.theta.{comparison}.tsv",
-        metadata="deseq2/{comparison}/metadata.{comparison}.tsv",
+        intermediar_values=temp("deseq2/{comparison}/mcols.{comparison}.tsv"),
+        assays_mu=temp("deseq2/{comparison}/assays.mu.{comparison}.tsv"),
+        filter_theta=temp("deseq2/{comparison}/filter.theta.{comparison}.tsv"),
+        metadata=temp("deseq2/{comparison}/metadata.{comparison}.tsv"),
     message:
         "Running DESeq2 analysis for {wildcards.comparison}"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 2048,
-        time_min=lambda wildcards, attempt: attempt * 60,
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_1h_per_attempt,
+        tmpdir="tmp",
     params:
         contrast=lambda wildcards: contrasts[wildcards.comparison],
     log:

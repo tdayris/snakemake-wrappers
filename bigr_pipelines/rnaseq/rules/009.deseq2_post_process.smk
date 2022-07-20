@@ -15,20 +15,20 @@ rule deseq2_readable:
     output:
         complete=report(
             "data_output/DEseq2/{comparison}/Complete_{comparison}.tsv",
-            caption=snakemake.workflow.source_path("reports/009.gseapp_complete.rst"),
+            caption=str(worflow_source_dir / "reports" / "009.gseapp_complete.rst"),
             category="DEseq2",
             subcategory="{comparison}",
         ),
         fc_fc=report(
             "data_output/DEseq2/{comparison}/SortedOnLogFC_{comparison}.tsv",
-            caption=snakemake.workflow.source_path("reports/009.gseapp_fc_fc.rst"),
+            caption=str(worflow_source_dir / "reports" / "009.gseapp_fc_fc.rst"),
             category="DEseq2",
             subcategory="{comparison}",
         ),
         padj_fc=report(
             "data_output/DEseq2/{comparison}/SortedOnPadj_{comparison}.tsv",
             category="DESeq2",
-            caption=snakemake.workflow.source_path("reports/009.gseapp_padj_fc.rst"),
+            caption=str(worflow_source_dir / "reports" / "009.gseapp_padj_fc.rst"),
             subcategory="{comparison}",
         ),
     threads: 1
@@ -196,8 +196,8 @@ rule plot_deseq_genes:
             allow_missing=True,
         ),
         category="Gene Expression plots",
-        caption=snakemake.workflow.source_path(
-        "reports/009.gene_expression_plot.rst"
+        caption=str(
+        worflow_source_dir / "reports" / " 009.gene_expression_plot.rst"
             ),
             subcategory="{comparison}",
         ),

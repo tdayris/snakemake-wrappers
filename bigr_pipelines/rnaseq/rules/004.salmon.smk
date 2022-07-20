@@ -58,8 +58,8 @@ rule aggregate_raw_counts:
         tx2gene="salmon/tx2gene.tsv",
     output:
         tsv=report(
-            "salmon/Raw.genes.tsv",
-            caption=snakemake.workflow.source_path("reports/salmon.raw.genes.rst"),
+            "data_output/Quantification/Raw.genes.tsv",
+            caption=str(worflow_source_dir / "reports" / "salmon.raw.genes.rst"),
             category="Counts",
         ),
     threads: 1
@@ -92,8 +92,8 @@ rule aggregate_gene_counts:
         tx2gene="salmon/tx2gene.tsv",
     output:
         tsv=report(
-            "salmon/TPM.genes.tsv",
-            caption=snakemake.workflow.source_path("reports/salmon.tpm.genes.rst"),
+            "data_output/Quantification/TPM.genes.tsv",
+            caption=str(worflow_source_dir / "reports" / "salmon.tpm.genes.rst"),
             category="Counts",
         ),
     threads: 1
@@ -125,10 +125,8 @@ rule aggregate_transcript_counts:
         tx2gene="salmon/tx2gene.tsv",
     output:
         tsv=report(
-            "salmon/TPM.transcripts.tsv",
-        caption=snakemake.workflow.source_path(
-        "reports/salmon.tpm.transcripts.rst"
-            ),
+            "data_output/Quantification/TPM.transcripts.tsv",
+            caption=str(worflow_source_dir / "reports" / "salmon.tpm.transcripts.rst"),
             category="Counts",
         ),
     threads: 1

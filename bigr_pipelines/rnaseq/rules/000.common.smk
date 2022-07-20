@@ -22,7 +22,7 @@ min_version("7.5")
 import sys
 
 # My own libraries
-worflow_source_dir = Path(snakemake.workflow.srcdir("."))
+worflow_source_dir = Path(snakemake.workflow.srcdir(".."))
 print(worflow_source_dir.absolute())
 common = str(worflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
@@ -163,6 +163,7 @@ get_15min_per_attempt = functools.partial(get_resources_per_gb, multiplier=15)
 get_45min_per_attempt = functools.partial(get_resources_per_gb, multiplier=45)
 get_75min_per_attempt = functools.partial(get_resources_per_gb, multiplier=75)
 get_20min_per_attempt = functools.partial(get_resources_per_gb, multiplier=20)
+get_1h_per_attempt = functools.partial(get_resources_per_gb, multiplier=60)
 
 # Explicit memory reservation
 get_1gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024)
