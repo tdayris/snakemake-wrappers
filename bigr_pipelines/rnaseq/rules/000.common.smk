@@ -100,6 +100,13 @@ condition_dict = {
     for factor, test, ref in comparison_levels
 }
 
+# A list containing all DESeq2 comparison names
+# Stored as a list for futrther re-use
+output_prefixes = [
+    f"DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}"
+    for factor, test, ref in comparison_levels
+]
+
 # A dict containing the list of samples used in DESeq2,
 # for a given comparison
 samples_per_prefixes = {
