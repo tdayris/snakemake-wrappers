@@ -69,9 +69,9 @@ fastq_links = link_fq(design.Sample_id, design.Upstream_file, design.Downstream_
 comparison_levels = list(
     yield_comps(
         complete_design=design,
-        aggregate=config["design"].get("aggregate_col"),
-        remove=config["design"].get("remove_col"),
-        contains=config["design"].get("include_only"),
+        aggregate=config["deseq2"]["design"].get("aggregate_col"),
+        remove=config["deseq2"]["design"].get("remove_col"),
+        contains=config["deseq2"]["design"].get("include_only"),
     )
 )
 
