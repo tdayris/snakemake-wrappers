@@ -58,7 +58,7 @@ rule deeptools_plot_heatmap:
     input:
         "deeptools/matrix_files/{sample}.gz",
     output:
-        heatmap_img="deeptools/plot_heatmap/heatmap.png",
+        heatmap_img="deeptools/plot_heatmap/{sample}.heatmap.png",
     threads: 20
     resources:
         mem_mb=get_1gb_per_attempt,
