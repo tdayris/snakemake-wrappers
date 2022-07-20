@@ -52,8 +52,6 @@ configfile: get_config(default_config=default_config)
 logging.info("Config file loaded")
 
 
-
-
 # Load design file and duplicate sample id as row name
 design = get_design(dirpath=os.getcwd(), search_func=search_fastq_pairs)
 design.set_index("Sample_id", inplace=True)
@@ -68,10 +66,10 @@ logging.info("Design file loaded")
 # this is done in order to handle iRODS paths.
 logging.info("Building globals...")
 fastq_links = link_fq(
-    sample_names=design.Sample_id, 
-    r1_paths=design.Upstream_file, 
-    r2_paths=design.Downstream_file
-    prefix="data_input"
+    sample_names=design.Sample_id,
+    r1_paths=design.Upstream_file,
+    r2_paths=design.Downstream_file,
+    prefix="data_input",
 )
 
 sample_list = design.index.tolist()
