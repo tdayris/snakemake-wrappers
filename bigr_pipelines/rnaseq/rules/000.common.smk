@@ -23,7 +23,6 @@ import sys
 
 # My own libraries
 worflow_source_dir = Path(snakemake.workflow.srcdir(".."))
-print(worflow_source_dir.absolute())
 common = str(worflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
 
@@ -34,26 +33,26 @@ from graphics import *
 from write_yaml import *
 from messages import message
 
-
 #####################
 # Setup environment #
 #####################
 
 # Save output stream in a file
 logging.basicConfig(filename="snakemake.rnaseq.log", filemode="w", level=logging.DEBUG)
+logging.info("Additional utils loaded")
 
 
 # Find and load configfile
 default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
-
-
 configfile: get_config(default_config=default_config)
+logging.info("Config file loaded")
 
 
 # Load design file and duplicate sample id as row name
 design = get_design(dirpath=os.getcwd(), search_func=search_fastq_pairs)
 design.set_index("Sample_id", inplace=True)
 design["Sample_id"] = design.index.tolist()
+logging.info("Design file loaded")
 
 ##################################
 # Setup globals and fix wilcards #
@@ -61,11 +60,13 @@ design["Sample_id"] = design.index.tolist()
 
 # Links fastq paths provided by users and fastq paths used in this pipeline
 # this is done in order to handle iRODS paths.
+logging.info("Building globals...")
 fastq_links = link_fq(design.Sample_id, design.Upstream_file, design.Downstream_file)
 
 # A list that holds all comparisons made in DESeq2.
 # This is done in order to avoid checkpoints
 # This list contains: [(factor, test, ref), ...]
+logging.info("Building DESeq2 globals...")
 comparison_levels = list(
     yield_comps(
         complete_design=design,
@@ -127,6 +128,7 @@ elipsis_list = ["with_elipse", "without_elipse"]
 # Up/down stream reads, this pipeline takes only pair-ended libraries
 streams = ["1", "2"]
 
+logging.info("Constraining wildcards...")
 
 wildcard_constraints:
     sample=r"|".join(sample_list),
@@ -144,7 +146,7 @@ wildcard_constraints:
 ############################
 
 # Memory and time reservation
-def get_resources_per_gb(wildcards, input, attempt, multiplier) -> int:
+def get_resources_per_gb(wildcards, input, attempt, multiplier: int = 0, base: int = 0) -> int:
     """
     Return the amount of resources needed per GB of input.
 
@@ -164,7 +166,7 @@ def get_resources_per_gb(wildcards, input, attempt, multiplier) -> int:
         multiplier * attempt,
     )
 
-
+logging.info("Preparing memory calls...")
 # Explicit time reservations
 get_15min_per_attempt = functools.partial(get_resources_per_gb, multiplier=15)
 get_45min_per_attempt = functools.partial(get_resources_per_gb, multiplier=45)
@@ -177,3 +179,4 @@ get_1gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024)
 get_2gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 2)
 get_4gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 4)
 get_10gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 10)
+get_75gb_and_5gb_per_attempt = = functools.partial(get_resources_per_gb, multiplier=1024 * 5, base = 1024 * 75)
