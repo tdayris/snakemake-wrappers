@@ -52,11 +52,22 @@ configfile: get_config(default_config=default_config)
 logging.info("Config file loaded")
 
 
+
+
 # Load design file and duplicate sample id as row name
 design = get_design(dirpath=os.getcwd(), search_func=search_fastq_pairs)
 design.set_index("Sample_id", inplace=True)
 design["Sample_id"] = design.index.tolist()
 logging.info("Design file loaded")
+
+##################################
+# Setup globals and fix wilcards #
+##################################
+
+# Links fastq paths provided by users and fastq paths used in this pipeline
+# this is done in order to handle iRODS paths.
+logging.info("Building globals...")
+fastq_links = link_fq(design.Sample_id, design.Upstream_file, design.Downstream_file)
 
 sample_list = design.index.tolist()
 peak_types = ["broadPeak", "narrowPeak"]
