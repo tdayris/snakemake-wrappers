@@ -14,7 +14,8 @@ from typing import Optional
 def link_fq(
         sample_names: list[str],
         r1_paths: list[str],
-        r2_paths: Optional[list[str]] = None
+        r2_paths: Optional[list[str]] = None,
+        prefix: str = "reads"
     ) -> dict[str, str]:
     """
     Case r2 are provided:
@@ -34,8 +35,8 @@ def link_fq(
 
     link_dict = {}
     for sample, r1, r2 in zip(sample_names, r1_paths, r2_paths):
-        link_dict[f"reads/{sample}.1.fq.gz"] = r1
-        link_dict[f"reads/{sample}.2.fq.gz"] = r2
+        link_dict[f"{prefix}/{sample}.1.fq.gz"] = r1
+        link_dict[f"{prefix}/{sample}.2.fq.gz"] = r2
     return link_dict
 
 

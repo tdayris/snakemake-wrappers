@@ -67,7 +67,12 @@ logging.info("Design file loaded")
 # Links fastq paths provided by users and fastq paths used in this pipeline
 # this is done in order to handle iRODS paths.
 logging.info("Building globals...")
-fastq_links = link_fq(design.Sample_id, design.Upstream_file, design.Downstream_file)
+fastq_links = link_fq(
+    sample_names=design.Sample_id, 
+    r1_paths=design.Upstream_file, 
+    r2_paths=design.Downstream_file
+    prefix="data_input"
+)
 
 sample_list = design.index.tolist()
 peak_types = ["broadPeak", "narrowPeak"]
