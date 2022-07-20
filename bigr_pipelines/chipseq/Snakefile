@@ -11,21 +11,11 @@ include: "rules/011.deeptools.smk"
 
 rule target:
     input:
-        expand(
-            "samtools/view/{sample}.bam",
-            sample=sample_list
-        ),
-        expand(
-            "samtools/view/{sample}.bam.bai",
-            sample=sample_list
-        ),
+        expand("samtools/view/{sample}.bam", sample=sample_list),
+        expand("samtools/view/{sample}.bam.bai", sample=sample_list),
         expand(
             "macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed",
             peaktype=peak_types,
-            sample=sample_list
+            sample=sample_list,
         ),
-        expand(
-            "deeptools/bamcoverage/{sample}.bw",
-            sample=sample_list
-        ),
-        
+        expand("deeptools/bamcoverage/{sample}.bw", sample=sample_list),

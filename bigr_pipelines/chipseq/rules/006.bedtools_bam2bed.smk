@@ -3,16 +3,16 @@ rule bedtools_bamtobed:
         bam="samtools/view/{sample}.bam",
         bai="samtools/view/{sample}.bam.bai",
     output:
-        temp("bedtools/bamtobed/{sample}.bed")
+        temp("bedtools/bamtobed/{sample}.bed"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     log:
-        "bedtools/bam2bed/{sample}.log"
+        "bedtools/bam2bed/{sample}.log",
     params:
-        extra="-bedpe"
+        extra="-bedpe",
     conda:
         "envs/bedtools.yaml"
     shell:
@@ -21,18 +21,18 @@ rule bedtools_bamtobed:
 
 rule keep_pairs_from_same_chr:
     input:
-        "bedtools/bamtobed/{sample}.bed"
+        "bedtools/bamtobed/{sample}.bed",
     output:
-        temp("bedtools/awk/{sample}.bed")
+        temp("bedtools/awk/{sample}.bed"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     log:
-        "awk/bedtools/{sample}.log"
+        "awk/bedtools/{sample}.log",
     params:
-        extra="'$1==$4 && $6-$2 < 1000 {print $0}'"
+        extra="'$1==$4 && $6-$2 < 1000 {print $0}'",
     conda:
         "envs/awk.yaml"
     shell:
@@ -41,38 +41,38 @@ rule keep_pairs_from_same_chr:
 
 rule extract_fragments:
     input:
-        "bedtools/awk/{sample}.bed"
+        "bedtools/awk/{sample}.bed",
     output:
-        temp("bedtools/fragments/{sample}.unsorted.bed")
+        temp("bedtools/fragments/{sample}.unsorted.bed"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     log:
-        "cut/bedtools/{sample}.log"
+        "cut/bedtools/{sample}.log",
     params:
-        extra="-f 1,2,6"
+        extra="-f 1,2,6",
     conda:
         "envs/bash.yaml"
     shell:
         "cut {params.extra} {input} > {output} 2> {log}"
-    
+
 
 rule sort_fragments:
     input:
-        "bedtools/fragments/{sample}.unsorted.bed"
+        "bedtools/fragments/{sample}.unsorted.bed",
     output:
-        temp("bedtools/fragments/{sample}.bed")
+        temp("bedtools/fragments/{sample}.bed"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     log:
-        "cut/bedtools/{sample}.log"
+        "cut/bedtools/{sample}.log",
     params:
-        extra="-k1,1 -k2,2n -k3,3n"
+        extra="-k1,1 -k2,2n -k3,3n",
     conda:
         "envs/bash.yaml"
     shell:

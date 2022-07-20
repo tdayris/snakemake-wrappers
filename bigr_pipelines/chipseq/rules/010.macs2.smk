@@ -7,17 +7,17 @@ rule macs2_callpeak_narrow:
             "macs2/callpeak/narrowPeak/{sample}",
             "_peaks.xls",
             "_peaks.narrowPeak",
-            "_summits.bed"
-        )
+            "_summits.bed",
+        ),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_1h_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     log:
-        "macs2/callpeak/narrowPeak/{sample}.log"
+        "macs2/callpeak/narrowPeak/{sample}.log",
     params:
-        "-g 2652783500 -f BAMPE"
+        "-g 2652783500 -f BAMPE",
     wrapper:
         "bio/macs2/callpeak"
 
@@ -33,35 +33,35 @@ rule macs2_callpeak_broad:
             "_treat_pileup.bdg",
             "_control_lambda.bdg",
             "_peaks.broadPeak",
-            "_peaks.gappedPeak"
-        )
+            "_peaks.gappedPeak",
+        ),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_1h_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     log:
-        "logs/macs2/callpeak/broadPeak/{sample}.log"
+        "logs/macs2/callpeak/broadPeak/{sample}.log",
     params:
-        "-g 2652783500 -f BAMPE"
+        "-g 2652783500 -f BAMPE",
     wrapper:
         "bio/macs2/callpeak"
 
 
 rule macs2_to_bed:
     input:
-        "macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}"
+        "macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}",
     output:
-        protected("macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed")
+        protected("macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/macs2/tobed/{sample}.narrow.log"
+        "logs/macs2/tobed/{sample}.narrow.log",
     params:
-        "'BEGIN{FS=\"\\t\"} {print $1 FS $2 FS $3 FS $4 FS . FS +}'"
+        "'BEGIN{FS=\"\\t\"} {print $1 FS $2 FS $3 FS $4 FS . FS +}'",
     conda:
         "envs/bash.yaml"
     shell:

@@ -154,14 +154,14 @@ include: "rules/005.immunedeconv.smk"
 If you need to run this pipeline and stop after
 a simple star mapping for chimera and fusion reads,
 then use:
---until star_chimera_results
+--until star_fusion_results
 """
 
 
 include: "rules/012.star_chimera.smk"
 
 
-rule star_chimera_results:
+rule star_fusion_results:
     input:
         mappings=expand(
             "star/{sample}/chimera/{sample}.{ext}",
@@ -208,6 +208,10 @@ rule star_chimera_results:
             stream=streams,
             ext=["txt", "png"],
         ),
+        star_fusion=expand(
+            "star-fusions/{sample}/",
+            sample=sample_list
+        )
     output:
         report(
             "data_output/multiqc/MultiQC.Star.Chimera.html",
