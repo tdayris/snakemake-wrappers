@@ -63,6 +63,6 @@ rule macs2_to_bed:
     params:
         "'BEGIN{FS=\"\\t\"} {print $1 FS $2 FS $3 FS $4 FS . FS +}'",
     conda:
-        "envs/bash.yaml"
+        "../envs/bash.yaml"
     shell:
         "awk {params} {input} > {output} 2> {log}"

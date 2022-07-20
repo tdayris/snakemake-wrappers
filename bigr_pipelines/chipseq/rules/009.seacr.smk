@@ -15,6 +15,6 @@ rule seacr_callpeak:
         norm="norm",
         method=lambda wildcards: wildcards.mode,
     conda:
-        "envs/seacr.yaml"
+        "../envs/seacr.yaml"
     shell:
         "SEACR_1.3.sh {input.bg} {params.fdr} {params.norm} {wildcards.mode} seacr/{wildcards.sample} > {log} 2>&1"

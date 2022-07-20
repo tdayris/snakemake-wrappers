@@ -34,7 +34,7 @@ rule extract_fragment_length:
     params:
         extra="-F'\\t' 'function abs(x){return ((x < 0.0) ? -x : x)} {print abs($9)}'",
     conda:
-        "envs/bash.yaml"
+        "../envs/bash.yaml"
     shell:
         "awk {params.extra} {input} > {output} 2> {log}"
 
@@ -54,7 +54,7 @@ rule sort_fragment_length:
     params:
         extra="",
     conda:
-        "envs/bash.yaml"
+        "../envs/bash.yaml"
     shell:
         "sort {params.extra} {input} > {output} 2> {log}"
 
@@ -74,7 +74,7 @@ rule deduplicate_fragment_length:
     params:
         extra="-c",
     conda:
-        "envs/bash.yaml"
+        "../envs/bash.yaml"
     shell:
         "uniq {params.extra} {input} > {output} 2> {log}"
 

@@ -13,7 +13,7 @@ rule deeptools_bamcov:
     log:
         "logs/deeptools/bamcov/{sample}.log",
     conda:
-        "envs/deeptools.yaml"
+        "../envs/deeptools.yaml"
     params:
         extra=(
             "--binSize 1 "

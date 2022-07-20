@@ -54,7 +54,7 @@ rule extract_fragments:
     params:
         extra="-f 1,2,6",
     conda:
-        "envs/bash.yaml"
+        "../envs/bash.yaml"
     shell:
         "cut {params.extra} {input} > {output} 2> {log}"
 
@@ -74,6 +74,6 @@ rule sort_fragments:
     params:
         extra="-k1,1 -k2,2n -k3,3n",
     conda:
-        "envs/bash.yaml"
+        "../envs/bash.yaml"
     shell:
         "sort {params.extra} {input} > {output} 2> {log}"
