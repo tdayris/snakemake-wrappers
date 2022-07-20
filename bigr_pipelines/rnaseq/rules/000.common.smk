@@ -23,6 +23,7 @@ import sys
 
 # My own libraries
 worflow_source_dir = Path(snakemake.workflow.srcdir("."))
+print(worflow_source_dir.absolute())
 common = str(worflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
 
