@@ -7,7 +7,7 @@ rule bowtie2_map:
     threads: 20
     resources:
         mem_mb=get_75gand_5g_per_attempt,
-        time_min=get_2h_per_attempt,
+        time_min=get_4h_per_attempt,
         tmpdir="tmp"
     log:
         "logs/bowtie2/{sample}.log"

@@ -1,0 +1,31 @@
+include: "rules/000.common.smk"
+include: "rules/001.bigr_copy.smk"
+include: "rules/003.bowtie2.smk"
+include: "rules/004.sambamba.smk"
+include: "rules/005.samtools.smk"
+include: "rules/006.bedtools_bam2bed.smk"
+include: "rules/008.genomecov.smk"
+include: "rules/010.macs2.smk"
+include: "rules/011.deeptools.smk"
+
+
+rule target:
+    input:
+        expand(
+            "samtools/view/{sample}.bam",
+            sample=sample_list
+        ),
+        expand(
+            "samtools/view/{sample}.bam.bai",
+            sample=sample_list
+        ),
+        expand(
+            "macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed",
+            peaktype=peak_types,
+            sample=sample_list
+        ),
+        expand(
+            "deeptools/bamcoverage/{sample}.bw",
+            sample=sample_list
+        ),
+        
