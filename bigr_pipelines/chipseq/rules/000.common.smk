@@ -61,3 +61,46 @@ logging.info("Design file loaded")
 sample_list = design.index.tolist()
 peak_types = ["broadPeak", "narrowPeak"]
 streams = ["1", "2"]
+
+
+############################
+### Resource reservation ###
+############################
+
+# Memory and time reservation
+def get_resources_per_gb(
+    wildcards, input, attempt, multiplier: int = 1, base: int = 0
+) -> int:
+    """
+    Return the amount of resources needed per GB of input.
+
+    Parameters:
+    * wildcards: Snakemake signature requires this parameter.
+    * input: The input file
+    * attempt: The # of times the calling rule has been restarted
+    * multiplier: An arbitrary multiplier
+
+    Return:
+    (int) The amount of resources needed (mb, minutes, etc)
+    """
+    return max(
+        # Case there is 1gb or more in input
+        ((input.size // 1_000_000_000) * attempt * multiplier) + base,
+        # Case there is less than 1gb in input
+        (multiplier * attempt) + base,
+    )
+
+
+logging.info("Preparing memory calls...")
+# Explicit time reservations
+get_45min_per_attempt = functools.partial(get_resources_per_gb, multiplier=45)
+get_1h_per_attempt = functools.partial(get_resources_per_gb, multiplier=60)
+get_2h_per_attempt = functools.partial(get_resources_per_gb, multiplier=60 * 2)
+get_2h_per_attempt = functools.partial(get_resources_per_gb, multiplier=60 * 4)
+
+# Explicit memory reservation
+get_1gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024)
+get_2gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 2)
+get_75gb_and_5gb_per_attempt = functools.partial(
+    get_resources_per_gb, multiplier=1024 * 5, base=1024 * 75
+)
