@@ -5,7 +5,7 @@ This snakefile calls fastqc on raw fastq files
 # Assess sample origin based on a wide range of potiential target genomes
 rule fastq_screen:
     input:
-        "reads/{sample}.{stream}.fq.gz",
+        "data_input/{sample}.{stream}.fq.gz",
     output:
         txt=temp("fastq_screen/{sample}.{stream}.fastq_screen.txt"),
         png=temp("fastq_screen/{sample}.{stream}.fastq_screen.png"),

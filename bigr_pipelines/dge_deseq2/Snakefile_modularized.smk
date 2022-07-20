@@ -33,7 +33,6 @@ configfile: get_config(default_config)
 try:
     design = pandas.read_csv("design.tsv", sep="\t", header=0, index_col=0)
     design["Sample_id"] = design.index.tolist()
-    #design.set_index("Sample_id", inplace=True)
 except FileNotFoundError:
     logging.error(
         """A design file is required for this pipeline. It is a TSV with

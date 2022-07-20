@@ -1,4 +1,3 @@
-
 ####################################
 ### General pipeline operations  ###
 ####################################
@@ -11,10 +10,45 @@ include: "rules/000.common.smk"
 ### Raw fastq handling ###
 ##########################
 
-
+"""
+If you need to perform simple quality controls over
+your dataset, then use:
+--until quality_control_results
+"""
 include: "rules/001.bigr_copy.smk"
 include: "rules/002.trimming.smk"
 include: "rules/003.fastq_screen.smk"
+
+
+rule quality_control_results:
+    input:
+        fastp=expand(
+            "fastp/{ext}/{sample}.fastp.{ext}", 
+            sample=sample_list, 
+            ext=["html", "json"]
+        ),
+        fastq_screen=expand(
+            "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+            sample=sample_list,
+            stream=streams,
+            ext=["txt", "png"]
+        ),
+    output:
+        report(
+            "multiqc/MultiQC.QC.html",
+            caption=snakemake.workflow.source_path("reports/multiqc.rst"),
+            category="Quality Controls"
+        ),
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
+    retries: 2
+    log:
+        "logs/multiqc.salmon.log",
+    wrapper:
+        "bio/multiqc"
 
 
 #############################
@@ -26,7 +60,51 @@ If you need to run this pipeline and stop after a
 simple salmon quantification, use:
 --until salmon_quant_results
 """
+
 include: "rules/004.salmon.smk"
+
+"""
+This snakefile calls salmon and aggregates counts in human-readable tables
+"""
+
+# Call this fantom rule to access salmon quand only"
+rule salmon_quant_results:
+    input:
+        salmon_quant=expand(
+            "salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=sample_list
+        ),
+        tpm_table=expand(
+            "salmon/Raw.genes.tsv",
+            feature=["transcripts", "genes"],
+        ),
+        raw_counts="salmon/Raw.genes.tsv",
+        fastp=expand(
+            "fastp/{ext}/{sample}.fastp.{ext}", 
+            sample=sample_list, 
+            ext=["html", "json"]
+        ),
+        fastq_screen=expand(
+            "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+            sample=sample_list,
+            stream=streams,
+            ext=["txt", "png"]
+        ),
+    output:
+        report(
+            "multiqc/MultiQC.Salmon.html",
+            caption=snakemake.workflow.source_path("reports/multiqc.rst"),
+            category="Quality Controls",
+        ),
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
+    retries: 2
+    log:
+        "logs/multiqc.salmon.log",
+    wrapper:
+        "bio/multiqc"
 
 
 ####################
@@ -42,5 +120,138 @@ include: "rules/005.immunedeconv.smk"
 
 
 ####################
-### Star mapping ###
+### Star chimera ###
 ####################
+
+"""
+If you need to run this pipeline and stop after
+a simple star mapping for chimera and fusion reads,
+then use:
+--until star_chimera_results
+"""
+include: "rules/012.star_chimera.smk"
+
+rule star_chimera_results:
+    input:
+        mappings=expand(
+            "star/{sample}/chimera/{sample}.{ext}",
+            sample=sample_list,
+            ext=["bam", "cram"]
+        ),
+        cj=expand("star/{sample}/chimera/{sample}.Chimeric.out.junction", sample=sample_list),
+        sj=expand("star/{sample}/chimera/{sample}.SJ.out.tab", sample=sample_list),
+        log=expand("star/{sample}/chimera/{sample}.Log.out", sample=sample_list),
+        logp=expand("star/{sample}/chimera/{sample}.Log.progress.out", sample=sample_list),
+        logf=expand("star/{sample}/chimera/{sample}.Log.final.out", sample=sample_list),
+        picard=expand(
+            multiext(
+                "picard/stats/{sample}",
+                ".alignment_summary_metrics",
+                ".insert_size_metrics",
+                ".insert_size_histogram.pdf",
+                ".quality_distribution_metrics",
+                ".quality_distribution.pdf",
+                ".gc_bias.detail_metrics",
+                ".gc_bias.summary_metrics",
+                ".gc_bias.pdf",
+                ".rna_metrics",
+                ".bait_bias_detail_metrics",
+                ".bait_bias_summary_metrics",
+                ".error_summary_metrics",
+                ".pre_adapter_detail_metrics",
+                ".pre_adapter_summary_metrics",
+            ),
+            sample=sample_list
+        ),
+        fastp=expand(
+            "fastp/{ext}/{sample}.fastp.{ext}", 
+            sample=sample_list, 
+            ext=["html", "json"]
+        ),
+        fastq_screen=expand(
+            "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+            sample=sample_list,
+            stream=streams,
+            ext=["txt", "png"]
+        ),
+    output:
+        report(
+            "multiqc/MultiQC.Star.Chimera.html",
+            caption=snakemake.workflow.source_path("reports/multiqc.rst"),
+            category="Quality Controls",
+            subcategory="Chimera"
+        ),
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
+    retries: 2
+    log:
+        "logs/multiqc.star.chimera.log",
+    wrapper:
+        "bio/multiqc"
+
+
+##############
+### DESeq2 ###
+##############
+
+"""
+If you need to run this pipeline and stop after DESeq2,
+then use:
+--until deseq2_results
+"""
+
+include: "rules/007.tximport.smk"
+include: "rules/008.deseq2.smk"
+include: "rules/009.deseq2_post_process.smk"
+
+rule deseq2_results:
+    input:
+        salmon_quant=expand(
+            "salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=sample_list
+        ),
+        tpm_table=expand(
+            "salmon/Raw.genes.tsv",
+            feature=["transcripts", "genes"],
+        ),
+        raw_counts="salmon/Raw.genes.tsv",
+        fastp=expand(
+            "fastp/{ext}/{sample}.fastp.{ext}", 
+            sample=sample_list, 
+            ext=["html", "json"]
+        ),
+        fastq_screen=expand(
+            "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+            sample=sample_list,
+            stream=streams,
+            ext=["txt", "png"]
+        ),
+        config="multiqc/{comparison}/multiqc_config.yaml",
+        plots = [
+            "multiqc/{comparison}/pca_plot_mqc.png",
+            "multiqc/{comparison}/volcanoplot_mqc.png",
+            "multiqc/{comparison}/distro_expr_mqc.png",
+            "multiqc/{comparison}/distro_mu_mqc.png",
+            "multiqc/{comparison}/ma_plot_mqc.png",
+            "multiqc/{comparison}/independent_filter_mqc.png",
+            "multiqc/{comparison}/inde_theta_filter_mqc.png",
+            "multiqc/{comparison}/pvalue_qc_mqc.png"
+        ]
+    output:
+        report(
+            "multiqc/MultiQC.DEseq2.html",
+            caption=snakemake.workflow.source_path("reports/multiqc.rst"),
+            category="Quality Controls"
+        ),
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
+    retries: 2
+    log:
+        "logs/multiqc.star.chimera.log",
+    wrapper:
+        "bio/multiqc"ut:
