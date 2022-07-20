@@ -7,7 +7,7 @@ and sample names.
 
 rule split_design:
     input:
-        design=config["design"]["path"],
+        design=config["design"],
     output:
         expand("deseq2/designs/{comparison}.tsv", comparison=output_prefixes),
     message:
