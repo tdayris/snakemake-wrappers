@@ -105,7 +105,7 @@ def get_resources_per_gb(
     """
     return max(
         # Case there is 1gb or more in input
-        ((input.size // 1_000_000_000) * attempt * multiplier) + base,
+        # ((input.size // 1_000_000_000) * attempt * multiplier) + base,
         # Case there is less than 1gb in input
         (multiplier * attempt) + base,
     )
