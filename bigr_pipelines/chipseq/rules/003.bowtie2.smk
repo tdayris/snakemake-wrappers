@@ -16,7 +16,6 @@ rule bowtie2_map:
     params:
         extra=(
             "--end-to-end "
-            "--very-sensitive "
             "--no-unal "
             "--no-mixed "
             "--no-discordant "
@@ -33,7 +32,7 @@ rule sambamba_sort:
         mapping="bowtie2/raw/{sample}.bam"
     output:
         mapping=temp("bowtie2/sorted/{sample}.bam")
-    threads: 20
+    threads: 5
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_45min_per_attempt,

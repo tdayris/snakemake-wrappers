@@ -4,7 +4,7 @@ rule sambamba_markdup:
         "bowtie2/sorted/{sample}.bam.bai",
     output:
         temp("sambamba/markdup/{sample}.bam"),
-    threads: 20
+    threads: 8
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
@@ -12,7 +12,7 @@ rule sambamba_markdup:
     log:
         "logs/sambamba/{sample}.bwa.log",
     params:
-        "--remove-duplicates",
+        extra="--remove-duplicates",
     wrapper:
         "bio/sambamba/markdup"
 
