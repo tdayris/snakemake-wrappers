@@ -29,19 +29,20 @@ rule bowtie2_map:
 
 rule sambamba_sort:
     input:
-        mapping="bowtie2/raw/{sample}.bam"
+        mapping="bowtie2/raw/{sample}.bam",
     output:
-        mapping=temp("bowtie2/sorted/{sample}.bam")
+        mapping=temp("bowtie2/sorted/{sample}.bam"),
     threads: 5
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
-    shadow: "shallow"
+    shadow:
+        "shallow"
     log:
-        "logs/sambamba/sort/{sample}.bwa.log"
+        "logs/sambamba/sort/{sample}.bwa.log",
     params:
-        ""
+        "",
     wrapper:
         "bio/sambamba/sort"
 
