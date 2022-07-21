@@ -1,6 +1,6 @@
 rule bigr_copy:
     output:
-        "reads/{status}/{sample}.{stream}.fq.gz"
+        "reads/{status}/{sample}.{stream}.fq.gz",
     message:
         "Gathering {wildcards.status} {wildcards.sample} fastq files "
         "({wildcards.stream})"
@@ -8,10 +8,10 @@ rule bigr_copy:
     resources:
         mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
         time_min=lambda wildcard, attempt: attempt * 45,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        input=lambda w, output: fastq_links[w.status][output[0]]
+        input=lambda w, output: fastq_links[w.status][output[0]],
     log:
-        "logs/bigr_copy/{status}/{sample}.{stream}.log"
+        "logs/bigr_copy/{status}/{sample}.{stream}.log",
     wrapper:
         "bio/BiGR/copy"

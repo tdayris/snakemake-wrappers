@@ -4,17 +4,17 @@ rule samtools_filter_bed:
         fasta=config["ref"]["fasta"],
         fasta_idx=get_fai(config["ref"]["fasta"]),
         fasta_dict=get_dict(config["ref"]["fasta"]),
-        bed=config["ref"]["capture_kit_bed"]
+        bed=config["ref"]["capture_kit_bed"],
     output:
-        temp("samtools/filter/{sample}_{status}.bam")
+        temp("samtools/filter/{sample}_{status}.bam"),
     threads: 10
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 2048,
         time_min=lambda wildcards, attempt: attempt * 15,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        extra="-h -h"
+        extra="-h -h",
     log:
-        "logs/samtools/filter/{sample}_{status}.log"
+        "logs/samtools/filter/{sample}_{status}.log",
     wrapper:
         "bio/samtools/view"
