@@ -1,6 +1,7 @@
 rule sambamba_markdup:
     input:
-        "bowtie2/raw/{sample}.bam" "bowtie2/raw/{sample}.bam.bai",
+        "bowtie2/raw/{sample}.bam",
+        "bowtie2/raw/{sample}.bam.bai",
     output:
         temp("sambamba/markdup/{sample}.bam"),
     threads: 5
