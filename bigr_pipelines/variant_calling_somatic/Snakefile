@@ -337,6 +337,8 @@ use rule * from vcf_post_process
 ### Gather QC ###
 #################
 
+# include: 016 & 017
+
 rule multiqc:
     input:
         html=expand(
@@ -547,6 +549,8 @@ rule cnv_facets:
 #################################
 ### FINAL VCF FILE INDEXATION ###
 #################################
+
+# include: "rules/019.tabix.smk"
 
 module compress_index_vcf_meta:
     snakefile: "../../meta/bio/compress_index_vcf/test/Snakefile"
@@ -777,6 +781,8 @@ rule correct_mutect2_vcf:
 ### Variant calling Mutect2 ###
 ###############################
 
+# include: 009.gatk.mutect2.smk
+
 gatk_mutect2_somatic_config = {
     "genome": config["ref"]["fasta"],
     "known": config["ref"]["af_only"],
@@ -799,6 +805,8 @@ use rule * from gatk_mutect2_somatic_meta
 ### Variant Calling Varscan2 ###
 ################################
 
+# include: 008.varscan.smk
+
 varscan2_somatic_config = {
     "genome": config["ref"]["fasta"],
     "bed": config["ref"]["capture_kit_bed"]
@@ -814,6 +822,8 @@ use rule * from varscan2_somatic_meta
 ##############################
 ### GATK BAM RECALIBRATION ###
 ##############################
+
+# include: 007.gatk.recal.smk
 
 gatk_bqsr_config = {
     "threads": config["threads"],
@@ -873,58 +883,20 @@ use rule gatk_compute_baserecalibration_table from gatk_bqsr_meta with:
 ### Deduplicating ###
 #####################
 
-rule sambamba_markduplicates:
-    input:
-        bam="samtools/filter/{sample}_{status}.bam",
-        bai=get_bai("samtools/filter/{sample}_{status}.bam")
-    output:
-        bam=temp("sambamba/markdup/{sample}_{status}.bam")
-    message:
-        "Removing duplicates on {wildcards.sample} ({wildcards.status})"
-    threads: 10
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 10240,
-        time_min=lambda wildcards, attempt: attempt * 45,
-        tmpdir="tmp"
-    log:
-        "logs/sambamba/markduplicates/{sample}_{status}.log"
-    params:
-        extra = config.get(
-            "sambamba", {"markdup": "--remove-duplicates"}
-        ).get("markdup", "--remove-duplicates")
-    wrapper:
-        "bio/sambamba/markdup"
-
-
+include: "rules/006.sambamba.markdup.smk"
 
 """
 Filter a bam over the capturekit bed file
 """
-rule samtools_filter_bed:
-    input:
-        "sambamba/sort/{sample}_{status}.bam",
-        fasta=config["ref"]["fasta"],
-        fasta_idx=get_fai(config["ref"]["fasta"]),
-        fasta_dict=get_dict(config["ref"]["fasta"]),
-        bed=config["ref"]["capture_kit_bed"]
-    output:
-        temp("samtools/filter/{sample}_{status}.bam")
-    threads: 10
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 2048,
-        time_min=lambda wildcards, attempt: attempt * 15,
-        tmpdir="tmp"
-    params:
-        extra="-h -h"
-    log:
-        "logs/samtools/filter/{sample}_{status}.log"
-    wrapper:
-        "bio/samtools/view"
+
+include: "rules/005.samtools.filter.smk"
 
 
 ###################
 ### BWA MAPPING ###
 ###################
+
+# include: 003.bwa.fixmate.smk
 
 module bwa_fixmate_meta:
     snakefile: "../../meta/bio/bwa_fixmate/test/Snakefile"
@@ -1005,39 +977,6 @@ use rule bwa_mem from bwa_fixmate_meta with:
     log:
         "logs/bwa_mem2/mem/{sample}.{status}.log"
 
-# rule bwa_samblaster_sambamba:
-#     input:
-#         reads=expand(
-#             "fastp/trimmed/pe/{sample}_{status}.{stream}.fastq",
-#             stream=["1", "2"],
-#             allow_missing=True
-#         ),
-#         index=get_best_bwa_index()
-#     output:
-#         bam=temp("bwa_mem2/mem/{sample}_{status}.bam")
-#     message:
-#         "Mapping {wildcards.status} {wildcards.sample} with BWA, removing "
-#         "duplicates with Samblaster, sorting and filtering with Sambamba."
-#     threads:
-#         min(config.get("threads", 20), 20)
-#     threads: 1
-#     resources:
-#         mem_mb=lambda wildcards, attempt: attempt * 6144 + 61440,
-#         time_min=lambda wildcards, attempt: attempt * 120,
-#         tmpdir="tmp"
-#     shadow: "shallow"
-#     params:
-#         index=get_best_bwa_index()[0].split('.')[0],
-#         extra=lambda wildcards: f"-R '@RG\tID:{wildcards.sample}_{wildcards.status}\tSM:{wildcards.sample}_{wildcards.status}\tPU:{wildcards.sample}_{wildcards.status}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
-#         sort_extra=config.get("sambamba", {"sort_extra": ""}).get("sort_extra", ""),
-#         samblaster_extra=config.get("samblaster", {"extra": ""}).get("extra", ""),
-#         sambamba_view_extra=config.get("sambamba", {"view_extra": "-h"}).get("view_extra", "-h")
-#     log:
-#         "logs/bwa_samblaster_sambamba/{sample}_{status}.log"
-#
-
-
-
 
 use rule bwa_index from bwa_fixmate_meta with:
     input:
@@ -1055,62 +994,22 @@ use rule bwa_index_mm10 from bwa_fixmate_meta
 ### FASTP FASTQ CLEANING ###
 ############################
 
-rule fastp_clean:
-    input:
-        sample=expand(
-            "reads/{status}/{sample}.{stream}.fq.gz",
-            stream=["1", "2"],
-            allow_missing=True
-        ),
-    output:
-        trimmed=temp(expand(
-            "fastp/trimmed/pe/{sample}_{status}.{stream}.fastq",
-            stream=["1", "2"],
-            allow_missing=True
-        )),
-        html="fastp/html/pe/{sample}_{status}.fastp.html",
-        json="fastp/json/pe/{sample}_{status}.fastp.json"
-    message: "Cleaning {wildcards.status} {wildcards.sample} with Fastp"
-    threads: 10
-    resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 4096, 15360),
-        time_min=lambda wildcard, attempt: attempt * 45,
-        tmpdir="tmp"
-    params:
-        adapters=config.get("fastp_adapters", None),
-        extra=config.get("fastp_extra", "")
-    log:
-        "logs/fastp/{sample}.{status}.log"
-    wrapper:
-        "bio/fastp"
+include: "rules/002.fastp.trimming.smk"
 
 
 #################################################
 ### Gather files from iRODS or mounting point ###
 #################################################
 
-rule bigr_copy:
-    output:
-        "reads/{status}/{sample}.{stream}.fq.gz"
-    message:
-        "Gathering {wildcards.status} {wildcards.sample} fastq files "
-        "({wildcards.stream})"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-        time_min=lambda wildcard, attempt: attempt * 45,
-        tmpdir="tmp"
-    params:
-        input=lambda w, output: fastq_links[w.status][output[0]]
-    log:
-        "logs/bigr_copy/{status}/{sample}.{stream}.log"
-    wrapper:
-        "bio/BiGR/copy"
+
+include: "rules/001.bigr_copy.smk"
 
 
 ###########################
 ### Datasets indexation ###
 ###########################
+
+# include: 004.sambamba.index.smk
 
 index_datasets_config = {
     "genome": config["ref"]["fasta"]
