@@ -8,8 +8,8 @@ rule bowtie2_map:
         temp("bowtie2/raw/{sample}.bam"),
     threads: 20
     resources:
-        mem_mb=get_8gb_per_attempt,
-        time_min=get_4h_per_attempt,
+        mem_mb=lambda wildcards, input, attempt: get_8gb_per_attempt(wilcards, input.sample, attempt),
+        time_min=lambda wildcards, input, attempt: get_4h_per_attempt(wilcards, input.sample, attempt),
         tmpdir="tmp",
     log:
         "logs/bowtie2/{sample}.log",
