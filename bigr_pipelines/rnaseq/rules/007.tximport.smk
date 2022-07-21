@@ -13,8 +13,6 @@ rule tximport:
         tx_to_gene="salmon/tx2gene.tsv",
     output:
         txi=temp("tximport/txi.{comparison}.RDS"),
-    message:
-        "Importing counts in DESeq2 for {wildcards.comparison}"
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,

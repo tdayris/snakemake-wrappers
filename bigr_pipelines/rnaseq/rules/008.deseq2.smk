@@ -80,8 +80,6 @@ rule deseq2:
         assays_mu=temp("deseq2/{comparison}/assays.mu.{comparison}.tsv"),
         filter_theta=temp("deseq2/{comparison}/filter.theta.{comparison}.tsv"),
         metadata=temp("deseq2/{comparison}/metadata.{comparison}.tsv"),
-    message:
-        "Running DESeq2 analysis for {wildcards.comparison}"
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
