@@ -16,7 +16,7 @@ rule deeptools_bamcov:
         "../envs/deeptools.yaml"
     params:
         extra=(
-            "--binSize 1 "
+            "--binSize 10 "
             "--effectiveGenomeSize 2652783500 "
             "--normalizeUsing RPKM "
             "--skipNonCoveredRegions "
@@ -48,10 +48,7 @@ rule deeptools_fingerprint:
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
     params:
-        "--extendReads "
-        "--centerReads "
-        "--skipZeros "
-        "--verbose "
+        "--extendReads " "--centerReads " "--skipZeros " "--verbose ",
     wrapper:
         "bio/deeptools/plotfingerprint"
 
