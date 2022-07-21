@@ -77,6 +77,12 @@ peak_types = ["broadPeak", "narrowPeak"]
 streams = ["1", "2"]
 
 
+wildcard_constraints:
+    sample=r"|".join(sample_list),
+    stream=r"|".join(streams),
+    peaktype=r"|".join(peak_types),
+
+
 ############################
 ### Resource reservation ###
 ############################

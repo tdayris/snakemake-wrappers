@@ -14,7 +14,15 @@ rule bowtie2_map:
     log:
         "logs/bowtie2/{sample}.log",
     params:
-        extra="--end-to-end --very-sensitive --no-unal --no-mixed --no-discordant --phred33 -I 10 -X 700",
+        extra=(
+            "--end-to-end "
+            "--very-sensitive "
+            "--no-unal "
+            "--no-mixed "
+            "--no-discordant "
+            "--phred33 "
+            "-I 10 -X 700"
+        ),
     wrapper:
         "bio/bowtie2/align"
 
