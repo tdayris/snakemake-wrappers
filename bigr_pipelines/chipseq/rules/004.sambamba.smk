@@ -1,7 +1,7 @@
 rule sambamba_markdup:
     input:
-        "bowtie2/raw/{sample}.bam",
-        "bowtie2/raw/{sample}.bam.bai",
+        "bowtie2/sorted/{sample}.bam",
+        "bowtie2/sorted/{sample}.bam.bai",
     output:
         temp("sambamba/markdup/{sample}.bam"),
     threads: 5
@@ -17,7 +17,7 @@ rule sambamba_markdup:
         "bio/sambamba/markdup"
 
 
-rule samtools_index_sambamba:
+rule sambamba_index_sambamba:
     input:
         "sambamba/markdup/{sample}.bam",
     output:
@@ -28,8 +28,8 @@ rule samtools_index_sambamba:
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "log/samtools/{sample}.index.bwa.log",
+        "logs/sambamba/{sample}.index.bwa.log",
     params:
         extra="",
     wrapper:
-        "bio/samtools/index"
+        "bio/sambamba/index"

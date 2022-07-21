@@ -19,7 +19,7 @@ rule samtools_view_filter:
         "bio/samtools/view"
 
 
-rule samtools_index_filtered:
+rule sambamba_index_filtered:
     input:
         "samtools/view/{sample}.bam",
     output:
@@ -30,8 +30,8 @@ rule samtools_index_filtered:
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "log/samtools/{sample}.index.bwa.log",
+        "log/sambamba/{sample}.index.bwa.log",
     params:
         extra="",
     wrapper:
-        "bio/samtools/index"
+        "bio/sambamba/index"
