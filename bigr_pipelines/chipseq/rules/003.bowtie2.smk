@@ -8,8 +8,8 @@ rule bowtie2_map:
         temp("bowtie2/raw/{sample}.bam"),
     threads: 20
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 8,
-        time_min=lambda wildcards, attempt: attempt * 60 * 1.5,
+        mem_mb=get_8gb_per_attempt,
+        time_min=get_4h_per_attempt,
         tmpdir="tmp",
     log:
         "logs/bowtie2/{sample}.log",
@@ -23,6 +23,7 @@ rule bowtie2_map:
             "--phred33 "
             "-I 10 -X 700"
         ),
+        index=config["bowtie2"]["index"],
     wrapper:
         "bio/bowtie2/align"
 
