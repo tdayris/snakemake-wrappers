@@ -588,11 +588,11 @@ rule annotate_vcf:
         design="design.tsv",
         config="snpeff_snpsift/config.yaml",
         calls=expand(
-            "snpeff_snpsift/data_input/{sample}.vcf.gz",
+            "snpeff_snpsift/data_input/calls/{sample}.vcf.gz",
             sample=design["Sample_id"]
         ),
         calls_index=expand(
-            get_tbi("snpeff_snpsift/data_input/{sample}.vcf.gz"),
+            get_tbi("snpeff_snpsift/data_input/calls/{sample}.vcf.gz"),
             sample=design["Sample_id"]
         ),
     output:
@@ -700,8 +700,8 @@ rule create_snpeff_snpfit_data_input_dir:
         vcf="mutect2/corrected/{sample}.vcf.gz",
         tbi=get_tbi("mutect2/corrected/{sample}.vcf.gz"),
     output:
-        vcf=temp("snpeff_snpsift/data_input/{sample}.vcf.gz"),
-        tbi=temp("snpeff_snpsift/data_input/{sample}.vcf.gz.tbi"),
+        vcf=temp("snpeff_snpsift/data_input/calls/{sample}.vcf.gz"),
+        tbi=temp("snpeff_snpsift/data_input/calls/{sample}.vcf.gz.tbi"),
     threads: 1
     resources:
         mem_mb=1024,
