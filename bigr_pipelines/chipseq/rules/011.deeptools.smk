@@ -33,6 +33,30 @@ rule deeptools_bamcov:
         "> {log} 2>&1"
 
 
+rule deeptools_fingerprint:
+    input:
+        bam=expand("samtools/view/{sample}.bam", sample=sample_list),
+        bai=expand("samtools/view/{sample}.bam.bai", sample=sample_list),
+        blacklist=config["reference"]["blacklist"],
+    output:
+        fingerprint="deeptools/plot_fingerprint/plot_fingerprint.png",
+        counts="deeptools/plot_fingerprint/raw_counts.tab",
+        qc_metrics="deeptools/plot_fingerprint/qc_metrics.txt",
+    threads: 20
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_1h_per_attempt,
+        tmpdir="tmp",
+    params:
+        lambda wildcards, input: "--extendReads "
+        "--centerReads "
+        "--skipZeros "
+        f"--blackListFileName {input.blacklist} "
+        "--verbose ",
+    wrapper:
+        "bio/deeptools/plotfingerprint"
+
+
 rule deeptools_compute_matrix:
     input:
         bed="macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed",
