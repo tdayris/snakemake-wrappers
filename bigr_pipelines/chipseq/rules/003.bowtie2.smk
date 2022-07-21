@@ -1,7 +1,7 @@
 rule bowtie2_map:
     input:
         sample=expand(
-            "fastp/trimmed/{sample}.{stream}.fastq", sample=sample_list, stream=streams
+            "fastp/trimmed/{sample}.{stream}.fastq", stream=streams, allow_missing=True
         ),
         idx=config["bowtie2"]["index"],
     output:
