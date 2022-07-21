@@ -585,13 +585,13 @@ use rule pbgzip_compress from compress_index_vcf_meta as si_pbgzip with:
 rule annotate_vcf:
     input:
         design="design.tsv",
-        config="config.yaml",
+        config="snpeff_snpsift/config.yaml",
         calls=expand(
-            "mutect2/corrected/{sample}.vcf.gz",
+            "snpeff_snpsift/data_input/{sample}.vcf.gz",
             sample=design["Sample_id"]
         ),
         calls_index=expand(
-            get_tbi("mutect2/corrected/{sample}.vcf.gz"),
+            get_tbi("snpeff_snpsift/data_input/{sample}.vcf.gz"),
             sample=design["Sample_id"]
         ),
     output:
@@ -668,7 +668,7 @@ rule annotate_vcf:
             "snpeff_snpsift/snpsift/fixed/{sample}.{ext}",
             sample=design["Sample_id"],
             ext=["vcf", "vcf.gz", "vcf.gz.tbi"]
-        ))
+        )),
         #results=directory("snpeff_snpsift/results_to_upload")
     message:
         "Annotating VCF"
@@ -681,9 +681,6 @@ rule annotate_vcf:
     log:
         "logs/snpeff_snpsift_pipeline.log"
     params:
-        mkdir="--parents --verbose",
-        ln="--symbolic --force --relative --verbose",
-        variant_dir="mutect2/corrected/",
         outdir="snpeff_snpsift",
         pipeline_path=config.get(
             "snpeff_snpsift_run_path",
@@ -692,11 +689,48 @@ rule annotate_vcf:
         smk="--nt",
         organism = config["params"].get("organism", "hg38")
     shell:
-        "mkdir {params.mkdir} {params.outdir}/data_input > {log} 2>&1 && "
-        "ln {params.ln} {input.config} {params.outdir} >> {log} 2>&1 && "
-        "ln {params.ln} {params.variant_dir}/ {params.outdir}/data_input/calls >> {log} 2>&1 && "
         "cd {params.outdir} && "
         "bash {params.pipeline_path} {params.organism} {params.smk} | tee -a ${{OLDPWD}}/{log} 2>&1"
+
+
+
+rule create_snpeff_snpfit_data_input_dir:
+    input:
+        vcf="mutect2/corrected/{sample}.vcf.gz",
+        tbi=get_tbi("mutect2/corrected/{sample}.vcf.gz"),
+    output:
+        vcf=temp("snpeff_snpsift/data_input/{sample}.vcf.gz"),
+        tbi=temp("snpeff_snpsift/data_input/{sample}.vcf.gz.tbi"),
+    threads: 1
+    resources:
+        mem_mb=1024,
+        time_min=5,
+        tmpdir="tmp"
+    log:
+        "logs/link/snpeff_snpsift/{sample}.log"
+    params:
+        "--symbolic --force --relative --verbose"
+    shell:
+        "ln {params} {input.vcf} {output.vcf} > {log} 2>&1 && "
+        "ln {params} {input.tbi} {output.tbi} >> {log} 2>&1 "
+
+
+rule create_snpeff_snpfit_config:
+    input:
+        "config.yaml"
+    output:
+        temp("snpeff_snpsift/config.yaml")
+    threads: 1
+    resources:
+        mem_mb=1024,
+        time_min=5,
+        tmpdir="tmp"
+    log:
+        "logs/link/snpeff_snpsift/config.log"
+    params:
+        "--symbolic --force --relative --verbose"
+    shell:
+        "ln {params} {input} {output} > {log} 2>&1 && "
 
 
 #####################################
