@@ -61,7 +61,7 @@ rule macs2_to_bed:
     log:
         "logs/macs2/tobed/{sample}.{peaktype}.log",
     params:
-        "'BEGIN{FS=\"\\t\"} {print $1 FS $2 FS $3 FS $4 FS . FS +}'",
+        "'BEGIN{FS=\"\\t\"} {print $1 FS $2 FS $3 FS $4 FS \".\" FS +}'",
     conda:
         "../envs/bash.yaml"
     shell:
