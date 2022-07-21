@@ -30,12 +30,12 @@ rule bowtie2_map:
 
 rule sambamba_sort:
     input:
-        "bowtie2/raw/{sample}.bam"
+        mapping="bowtie2/raw/{sample}.bam"
     output:
-        temp("bowtie2/sorted/{sample}.bam")
-    threads: 8
+        mapping=temp("bowtie2/sorted/{sample}.bam")
+    threads: 20
     resources:
-        mem_mb=get_8gb_per_attempt,
+        mem_mb=get_10gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     shadow: "shallow"
@@ -52,7 +52,7 @@ rule sambamba_index_bwa:
         "bowtie2/sorted/{sample}.bam",
     output:
         temp("bowtie2/sorted/{sample}.bam.bai"),
-    threads: 4
+    threads: 8
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,

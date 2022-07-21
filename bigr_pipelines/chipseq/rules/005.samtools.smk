@@ -6,7 +6,7 @@ rule samtools_view_filter:
         ref_idx=config["reference"]["genome_index"],
     output:
         protected("samtools/view/{sample}.bam"),
-    threads: 4
+    threads: 8
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_2h_per_attempt,
@@ -24,7 +24,7 @@ rule sambamba_index_filtered:
         "samtools/view/{sample}.bam",
     output:
         protected("samtools/view/{sample}.bam.bai"),
-    threads: 4
+    threads: 8
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,

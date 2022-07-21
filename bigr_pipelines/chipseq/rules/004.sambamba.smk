@@ -4,7 +4,7 @@ rule sambamba_markdup:
         "bowtie2/sorted/{sample}.bam.bai",
     output:
         temp("sambamba/markdup/{sample}.bam"),
-    threads: 5
+    threads: 20
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
@@ -22,7 +22,7 @@ rule sambamba_index_sambamba:
         "sambamba/markdup/{sample}.bam",
     output:
         temp("sambamba/markdup/{sample}.bam.bai"),
-    threads: 4
+    threads: 8
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
