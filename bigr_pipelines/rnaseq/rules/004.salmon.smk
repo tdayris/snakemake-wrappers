@@ -8,6 +8,7 @@ rule salmon_quant_paired:
         gtf=ancient(config["reference"]["gtf"]),
     output:
         quant="salmon/pseudo_mapping/{sample}/quant.sf",
+        quant_genes="salmon/pseudo_mapping/{sample}/quant.genes.sf",
         lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
     threads: config.get("max_threads", 20)
     resources:
