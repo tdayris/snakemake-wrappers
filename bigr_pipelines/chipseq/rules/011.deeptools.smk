@@ -48,7 +48,7 @@ rule deeptools_fingerprint:
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
     params:
-        "--extendReads " "--centerReads " "--skipZeros " "--verbose ",
+        "--extendReads --centerReads --skipZeros --verbose ",
     wrapper:
         "bio/deeptools/plotfingerprint"
 
