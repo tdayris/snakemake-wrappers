@@ -131,6 +131,8 @@ axes_list = ["ax_1_ax_2", "ax_2_ax_3", "ax_3_ax_4"]
 elipsis_list = ["with_elipse", "without_elipse"]
 # Up/down stream reads, this pipeline takes only pair-ended libraries
 streams = ["1", "2"]
+# Features types
+features = ["gene", "transcript"]
 
 logging.info("Constraining wildcards...")
 
@@ -144,6 +146,7 @@ wildcard_constraints:
     ref=r"|".join(map(str, [i[2] for i in comparison_levels])),
     axes=r"|".join(axes_list),
     elipse=r"|".join(elipsis_list),
+    feature=r"|".join(features)
 
 
 ############################

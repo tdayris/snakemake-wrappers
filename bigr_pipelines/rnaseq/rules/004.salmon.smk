@@ -1,6 +1,6 @@
 # This rule pseudo-map and quantifies your paired reads over the indexed
 # reference.
-rule salmon_quant_paired:
+rule salmon_quant:
     input:
         r1="fastp/trimmed/{sample}.1.fastq",
         r2="fastp/trimmed/{sample}.2.fastq",

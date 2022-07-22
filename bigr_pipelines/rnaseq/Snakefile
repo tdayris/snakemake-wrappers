@@ -99,7 +99,7 @@ rule salmon_quant_results:
             "salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=sample_list
         ),
         tpm_table=expand(
-            "data_output/Quantification/Raw.genes.tsv",
+            "data_output/Quantification/TPM.{feature}.tsv",
             feature=["transcripts", "genes"],
         ),
         raw_counts="data_output/Quantification/Raw.genes.tsv",
@@ -253,7 +253,7 @@ rule deseq2_results:
             sample=samples_per_prefixes[wildcards.comparison],
         ),
         tpm_table=expand(
-            "data_output/Quantification/Raw.genes.tsv",
+            "data_output/Quantification/TPM.{feature}.tsv",
             feature=["transcripts", "genes"],
         ),
         raw_counts="data_output/Quantification/Raw.genes.tsv",
