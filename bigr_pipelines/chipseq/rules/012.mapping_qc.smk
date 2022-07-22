@@ -1,7 +1,7 @@
 rule collect_multiple_metrics:
     input:
-        bam="bowtie2/raw/{sample}.bam",
-        bai="bowtie2/raw/{sample}.bam.bai",
+        bam="bowtie2/sorted/{sample}.bam",
+        bai="bowtie2/sorted/{sample}.bam.bai",
         ref=config["reference"]["genome"],
         ref_idx=config["reference"]["genome_index"],
         ref_dict=config["reference"]["genome_dict"],
