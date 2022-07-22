@@ -27,8 +27,6 @@ rule collect_multiple_metrics:
         # optional parameters
         # REF_FLAT is required if RnaSeqMetrics are used
         extra=(
-            "--VALIDATION_STRINGENCY LENIENT "
-            "--METRIC_ACCUMULATION_LEVEL null "
             "--METRIC_ACCUMULATION_LEVEL SAMPLE "
         ),
     wrapper:
