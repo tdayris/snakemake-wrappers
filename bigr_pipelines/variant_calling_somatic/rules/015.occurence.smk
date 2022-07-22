@@ -33,7 +33,7 @@ rule concatenate_per_chr_information:
 
 rule variant_occurence_per_chr:
     input:
-        calls=expand("snpsift/vartype/{sample}.vcf", sample=samples_list),
+        calls=expand("snpsift/vartype/{sample}.vcf", sample=sample_list),
     output:
         txt=temp("bigr/occurence/{chr}.txt"),
     threads: 7
