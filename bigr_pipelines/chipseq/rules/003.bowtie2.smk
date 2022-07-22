@@ -58,7 +58,7 @@ rule sambamba_index_bwa:
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/sambamba/{sample}.index.bwa.log",
+        "logs/sambamba/{sample}.index.bwa.{status}.log",
     params:
         extra="",
     wrapper:
