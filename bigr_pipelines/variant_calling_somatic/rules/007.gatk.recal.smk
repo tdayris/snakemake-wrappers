@@ -12,7 +12,7 @@ gatk_bqsr_config = {
 module gatk_bqsr_meta:
     snakefile:
         str(
-            worflow_source_dir
+            workflow_source_dir
             / ".."
             / ".."
             / "meta"

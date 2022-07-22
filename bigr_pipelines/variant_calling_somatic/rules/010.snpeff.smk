@@ -4,7 +4,7 @@ snpeff_snpsift_config = {"ref": config["ref"], **config["snpeff_snpsift"]}
 module snpeff_meta:
     snakefile:
         str(
-            worflow_source_dir
+            workflow_source_dir
             / ".."
             / ".."
             / "meta"

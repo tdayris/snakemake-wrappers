@@ -5,8 +5,8 @@ import pandas
 import sys
 from pathlib import Path
 
-worflow_source_dir = Path(snakemake.workflow.srcdir(".."))
-common = str(worflow_source_dir / ".." / "common" / "python")
+workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
+common = str(workflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
 
 from file_manager import *
@@ -35,7 +35,7 @@ ruleorder: mutect2_somatic > tabix_index
 ruleorder: create_snpeff_snpfit_data_input_dir > tabix_index
 
 
-default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
+default_config = read_yaml(workflow_source_dir / "config.hg38.yaml")
 
 
 configfile: get_config(default_config)

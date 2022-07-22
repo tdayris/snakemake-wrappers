@@ -2,7 +2,7 @@
 module compress_index_vcf_meta:
     snakefile:
         str(
-            worflow_source_dir
+            workflow_source_dir
             / ".."
             / ".."
             / "meta"

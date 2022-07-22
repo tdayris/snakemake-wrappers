@@ -9,7 +9,7 @@ msi_sensor_config = {
 module missensor_pro_meta:
     snakefile:
         str(
-            worflow_source_dir
+            workflow_source_dir
             / ".."
             / ".."
             / "meta"

@@ -1,7 +1,7 @@
 module snpsift:
     snakefile:
         str(
-            worflow_source_dir
+            workflow_source_dir
             / ".."
             / ".."
             / "meta"

@@ -1,7 +1,7 @@
 module bwa_fixmate_meta:
     snakefile:
         str(
-            worflow_source_dir
+            workflow_source_dir
             / ".."
             / ".."
             / "meta"

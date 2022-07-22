@@ -11,7 +11,7 @@ gatk_mutect2_somatic_config = {
 module gatk_mutect2_somatic_meta:
     snakefile:
         str(
-            worflow_source_dir
+            workflow_source_dir
             / ".."
             / ".."
             / "meta"

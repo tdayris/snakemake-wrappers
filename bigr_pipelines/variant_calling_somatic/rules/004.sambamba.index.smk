@@ -4,7 +4,7 @@ index_datasets_config = {"genome": config["ref"]["fasta"]}
 module index_datasets:
     snakefile:
         str(
-            worflow_source_dir
+            workflow_source_dir
             / ".."
             / ".."
             / "meta"

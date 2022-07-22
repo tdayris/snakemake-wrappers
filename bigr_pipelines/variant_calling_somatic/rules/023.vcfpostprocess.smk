@@ -12,7 +12,7 @@ vcf_post_process_config = {
 module vcf_post_process:
     snakefile:
         str(
-            worflow_source_dir
+            workflow_source_dir
             / ".."
             / ".."
             / "meta"

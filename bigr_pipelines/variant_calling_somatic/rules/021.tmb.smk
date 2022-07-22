@@ -10,7 +10,7 @@ somatic_tmb_config = {
 module somatic_tmb:
     snakefile:
         str(
-            worflow_source_dir
+            workflow_source_dir
             / ".."
             / ".."
             / "meta"
