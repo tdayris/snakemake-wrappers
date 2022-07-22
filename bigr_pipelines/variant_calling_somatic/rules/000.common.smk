@@ -48,17 +48,18 @@ design.dropna(inplace=True)
 
 design.index = design["Sample_id"]
 # design.drop(index="s070", inplace=True)
+sample_list = design["Sample_id"]
 
 
 wildcard_constraints:
-    sample=r"|".join(design["Sample_id"]),
+    sample=r"|".join(sample_list),
     stream=r"1|2|R1|R2",
     status=r"normal|tumor",
     content=r"snp|indel",
 
 
 fastq_links = link_fq_somatic(
-    sample_names=design.Sample_id,
+    sample_names=sample_list,
     n1_paths=design.Upstream_file_normal,
     t1_paths=design.Upstream_file_tumor,
     n2_paths=design.Downstream_file_normal,
@@ -71,6 +72,7 @@ last_vcf = (
     if config["params"]["ncbi_build"] != "mm10"
     else "snpsift/dbsnp/{sample}.vcf"
 )
+
 
 
 ruleorder: fix_annotation_for_gatk > pbgzip_compress
