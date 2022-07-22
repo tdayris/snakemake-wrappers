@@ -65,6 +65,13 @@ fastq_links = link_fq_somatic(
     t2_paths=design.Downstream_file_tumor,
 )
 
+# Handle mouse missing databases
+last_vcf = (
+    "bigr/cancer_gene_census/{sample}.vcf"
+    if config["params"]["ncbi_build"] != "mm10"
+    else "snpsift/dbsnp/{sample}.vcf"
+)
+
 
 ruleorder: fix_annotation_for_gatk > pbgzip_compress
 ruleorder: gatk_variant_filtration > pbgzip_compress
