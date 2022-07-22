@@ -35,8 +35,8 @@ rule deeptools_bamcov:
 
 rule deeptools_fingerprint:
     input:
-        bam=expand("samtools/view/{sample}.bam", sample=sample_list),
-        bai=expand("samtools/view/{sample}.bam.bai", sample=sample_list),
+        bam_files=expand("samtools/view/{sample}.bam", sample=sample_list),
+        bam_idx=expand("samtools/view/{sample}.bam.bai", sample=sample_list),
         blacklist=config["reference"]["blacklist"],
     output:
         fingerprint="deeptools/plot_fingerprint/plot_fingerprint.png",
@@ -55,11 +55,19 @@ rule deeptools_fingerprint:
 
 rule deeptools_compute_matrix:
     input:
-        bed="macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed",
-        bigwig="deeptools/bamcoverage/{sample}.bw",
+        bed=expand(
+            "macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed",
+            sample=sample_list,
+            allow_missing=True
+        ),
+        bigwig=expand(
+            "deeptools/bamcoverage/{sample}.bw",
+            sample=sample_list,
+            allow_missing=True
+        ),
         blacklist=config["reference"]["blacklist"],
     output:
-        matrix_gz=temp("deeptools/matrix_files/{sample}.gz"),
+        matrix_gz=temp("deeptools/matrix_files/{peaktype}.gz"),
     threads: 20
     resources:
         mem_mb=get_4gb_per_attempt,
@@ -76,17 +84,23 @@ rule deeptools_compute_matrix:
 
 rule deeptools_plot_heatmap:
     input:
-        "deeptools/matrix_files/{sample}.gz",
+        "deeptools/matrix_files/{peaktype}.gz",
     output:
-        heatmap_img="deeptools/plot_heatmap/{sample}.heatmap.png",
+        heatmap_img="deeptools/plot_heatmap/{peaktype}.heatmap.png",
+        regions="deeptools/plot_heatmap/{peaktype}.heatmap_regions.bed",
+        heatmap_matrix="deeptools/plot_heatmap/{peaktype}.heatmap_matrix.tab"
     threads: 20
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/deeptools/heatmap/{sample}.log",
+        "logs/deeptools/heatmap/{peaktype}.log",
     params:
         " --kmeans ",
     wrapper:
         "bio/deeptools/plotheatmap"
+
+
+rule deeptools_plot_profile:
+    input:
