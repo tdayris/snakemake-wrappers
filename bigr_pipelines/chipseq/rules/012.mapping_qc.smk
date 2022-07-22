@@ -27,7 +27,8 @@ rule collect_multiple_metrics:
         # optional parameters
         # REF_FLAT is required if RnaSeqMetrics are used
         extra=(
-            "--METRIC_ACCUMULATION_LEVEL SAMPLE "
+            "METRIC_ACCUMULATION_LEVEL SAMPLE "
+            "ASSUME_SORTED=true "
         ),
     wrapper:
         "bio/picard/collectmultiplemetrics"
