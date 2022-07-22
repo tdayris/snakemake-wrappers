@@ -48,21 +48,21 @@ rule oncokb_annotate:
 ####################
 
 
-rule format_to_info:
-    input:
-        call="vcftools/mane/{sample}.vcf.gz",
-    output:
-        call="bigr/format_to_info/{sample}.vcf",
-    message:
-        "Annotating {wildcards.sample} with clear Format descriptions"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
-        tmpdir="tmp",
-    log:
-        "logs/bigr/format_to_info/{sample}.log",
-    params:
-        extra="",
-    wrapper:
-        "bio/BiGR/vcf_format_to_info"
+# rule format_to_info:
+#     input:
+#         call="vcftools/mane/{sample}.vcf.gz",
+#     output:
+#         call="bigr/format_to_info/{sample}.vcf",
+#     message:
+#         "Annotating {wildcards.sample} with clear Format descriptions"
+#     threads: 1
+#     resources:
+#         mem_mb=lambda wildcards, attempt: attempt * 1024,
+#         time_min=lambda wildcards, attempt: attempt * 15,
+#         tmpdir="tmp",
+#     log:
+#         "logs/bigr/format_to_info/{sample}.log",
+#     params:
+#         extra="",
+#     wrapper:
+#         "bio/BiGR/vcf_format_to_info"
