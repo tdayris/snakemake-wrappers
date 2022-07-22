@@ -2,7 +2,7 @@ rule multiqc_report:
     input:
         picard=[
             multiext(
-                f"stats/{sample}",
+                f"picard/stats/{sample}",
                 ".alignment_summary_metrics",
                 ".insert_size_metrics",
                 ".insert_size_histogram.pdf",

@@ -7,7 +7,7 @@ rule collect_multiple_metrics:
         ref_dict=config["reference"]["genome_dict"],
     output:
         multiext(
-            "stats/{sample}",
+            "picard/stats/{sample}",
             ".alignment_summary_metrics",
             ".insert_size_metrics",
             ".insert_size_histogram.pdf",
