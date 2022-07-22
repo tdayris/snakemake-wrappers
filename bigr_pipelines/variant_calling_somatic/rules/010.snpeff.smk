@@ -19,6 +19,6 @@ module snpeff_meta:
 
 use rule snpeff from snpeff_meta with:
     input:
-        calls="data_input/calls/{sample}.vcf.gz",
-        calls_index="data_input/calls/{sample}.vcf.gz.tbi",
+        calls="bcftools/mutect2/{sample}.vcf.gz",
+        calls_index=get_tbi("bcftools/mutect2/{sample}.vcf.gz"),
         db=config["ref"]["snpeff"],

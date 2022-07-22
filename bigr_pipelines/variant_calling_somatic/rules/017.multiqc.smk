@@ -28,7 +28,7 @@ rule multiqc:
             status=["normal", "tumor"],
         ),
         snpeff=expand(
-            "snpeff_snpsift/snpeff/csvstats/{sample}.genes.txt",
+            "snpeff/csvstats/{sample}.genes.txt",
             sample=design["Sample_id"],
         ),
     output:
