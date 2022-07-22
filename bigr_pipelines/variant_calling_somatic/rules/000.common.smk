@@ -5,7 +5,7 @@ import pandas
 import sys
 from pathlib import Path
 
-worflow_source_dir = Path(snakemake.workflow.srcdir("."))
+worflow_source_dir = Path(snakemake.workflow.srcdir(".."))
 common = str(worflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
 
