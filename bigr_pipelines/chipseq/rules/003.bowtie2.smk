@@ -49,16 +49,16 @@ rule sambamba_sort:
 
 rule sambamba_index_bwa:
     input:
-        "bowtie2/{status}/{sample}.bam",
+        "bowtie2/sorted/{sample}.bam",
     output:
-        temp("bowtie2/{status}/{sample}.bam.bai"),
+        temp("bowtie2/sorted/{sample}.bam.bai"),
     threads: 8
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/sambamba/{sample}.index.bwa.{status}.log",
+        "logs/sambamba/{sample}.index.bwa.log",
     params:
         extra="",
     wrapper:
