@@ -70,10 +70,11 @@ rule rbt_csv_report:
     log:
         "logs/rbt/csv-report/{comparison}.{content}.log",
     params:
-        '--separator "\\t" '
-        "--sort-column stat_change "
-        "--sort-order ascending "
-        "--rows-per-page 50",
+        config["rbt"].get(
+            "csv_extra", 
+            '--separator "\\t" --sort-column stat_change '
+            '--sort-order ascending --rows-per-page 50'
+        ),
     wrapper:
         "bio/rbt/csvreport"
 
@@ -94,7 +95,7 @@ rule zip_csv_report:
     log:
         "logs/rbt/csv-report/compress/{comparison}_{subset}.log",
     params:
-        "-cvjf",
+        config["rbt"].get("zip_extra", "--create --version --bzip2 --file"),
     conda:
         "envs/bash.yaml"
     shell:
@@ -159,16 +160,16 @@ rule multiqc_config:
     log:
         "logs/multiqc/config.{factor}.{test}.{ref}.log",
     params:
-        title="Differentiel Gene Expression",
+        title=config["multiqc"].get("title", "Differentiel Gene Expression"),
         subtitle="Comparing {factor}: {test} VS {ref} ",
         intro_text="This differential analysis covers {test} vs {ref}. {ref} is the reference. A fold change of 1.5 for the gene XXX means XXX is 1.5 times more expressed in {test} than in {ref}, and this difference is significative when pvalue is low (lower than 0.05).",
-        report_comment="This report has been made at Gustave Roussy.",
+        report_comment=config["multiqc"].get("report_comment", "This report has been made at Gustave Roussy."),
         show_analysis_paths=False,
         show_analysis_time=True,
         report_header_info=[
-            {"Contact E-mail": "bigr@gustaveroussy.fr"},
-            {"Application Type": "RNA-seq"},
-            {"Project Type": "Application"},
+            {"Contact E-mail": config["multiqc"].get("email", "bigr@gustaveroussy.fr")},
+            {"Application Type": config["multiqc"].get("application_type", "RNA-seq")},
+            {"Project Type": config["multiqc"].get("project_type", "Application")},
         ],
     wrapper:
         "bio/BiGR/multiqc_rnaseq_report"

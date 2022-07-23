@@ -24,6 +24,7 @@ rule tximport:
             "tximport_extra",
             "type='salmon', ignoreTxVersion=TRUE, ignoreAfterBar=TRUE",
         ),
+        sample_names=lambda wildcards: samples_per_prefixes[wildcards.comparison],
     log:
         "logs/tximport/{comparison}.log",
     wrapper:

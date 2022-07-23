@@ -55,7 +55,7 @@ rule deseq2_dataset_from_tximport:
         factor=lambda wildcards: contrasts[wildcards.comparison][0],
         ref_level=lambda wildcards: contrasts[wildcards.comparison][-1],
         remove_zeros=True,
-        count_filter=5,
+        count_filter=0.01,
     log:
         "logs/deseq2/deseq2_dataset_from_tximport/{comparison}.log",
     wrapper:

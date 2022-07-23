@@ -146,7 +146,7 @@ wildcard_constraints:
     ref=r"|".join(map(str, [i[2] for i in comparison_levels])),
     axes=r"|".join(axes_list),
     elipse=r"|".join(elipsis_list),
-    feature=r"|".join(features)
+    feature=r"|".join(features),
 
 
 ############################
