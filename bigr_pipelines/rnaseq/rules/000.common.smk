@@ -133,6 +133,8 @@ elipsis_list = ["with_elipse", "without_elipse"]
 streams = ["1", "2"]
 # Features types
 features = ["gene", "transcript"]
+# Type of mapping performed by the pipepline
+maptypes = ["variants", "chimera"]
 
 logging.info("Constraining wildcards...")
 
@@ -147,6 +149,7 @@ wildcard_constraints:
     axes=r"|".join(axes_list),
     elipse=r"|".join(elipsis_list),
     feature=r"|".join(features),
+    maptype=r"|".join(maptypes),
 
 
 ############################

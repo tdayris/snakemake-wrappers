@@ -1,13 +1,13 @@
 rule collect_multiple_metrics:
     input:
-        bam="star/{sample}/chimera/{sample}.bam",
-        bai="star/{sample}/chimera/{sample}.bam.bai",
+        bam="star/{sample}/{maptype}/{sample}.bam",
+        bai="star/{sample}/{maptype}/{sample}.bam.bai",
         ref=config["reference"]["genome"],
         ref_idx=config["reference"]["genome_index"],
         ref_dict=config["reference"]["genome_dict"],
     output:
         multiext(
-            "picard/stats/{sample}",
+            "picard/stats/{sample}.{maptype}",
             ".alignment_summary_metrics",
             ".insert_size_metrics",
             ".insert_size_histogram.pdf",
@@ -22,7 +22,7 @@ rule collect_multiple_metrics:
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/picard/multiple_metrics/{sample}.log",
+        "logs/picard/multiple_metrics/{sample}.{maptype}.log",
     params:
         # optional parameters
         # REF_FLAT is required if RnaSeqMetrics are used
