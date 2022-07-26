@@ -176,6 +176,8 @@ then use:
 
 
 include: "rules/012.star_chimera.smk"
+include: "rules/013.star_fusion.smk"
+include: "rules/011.mapping_qc.smk"
 
 
 rule star_fusion_results:
@@ -196,7 +198,7 @@ rule star_fusion_results:
         logf=expand("star/{sample}/chimera/{sample}.Log.final.out", sample=sample_list),
         picard=[
             multiext(
-                f"picard/stats/{sample}",
+                f"picard/stats/{sample}.chimera",
                 ".alignment_summary_metrics",
                 ".insert_size_metrics",
                 ".insert_size_histogram.pdf",
