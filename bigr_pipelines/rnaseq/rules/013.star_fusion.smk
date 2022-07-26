@@ -1,7 +1,7 @@
 rule star_fusion:
     input:
         junctions="star/{sample}/{sample}.Chimeric.out.junction",
-        resource_lib=config["CTAT_resource_lib"],
+        resource_lib=config["star_fusion"]["CTAT_resource_lib"],
     output:
         directory("star-fusions/{sample}/"),
     threads: config.get("max_threads", 20)
@@ -12,7 +12,7 @@ rule star_fusion:
     log:
         "logs/star-fusion/{sample}.log",
     params:
-        extra="--FusionInspector inspect",
+        extra=config["star_fusion"].get("extra", "--FusionInspector inspect"),
     conda:
         "envs/fusions.yaml"
     shell:
