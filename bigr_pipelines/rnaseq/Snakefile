@@ -187,6 +187,10 @@ rule star_fusion_results:
             sample=sample_list,
             ext=["bam", "bam.bai"],
         ),
+        cram=expand(
+            "data_output/Mapping/chimera/{sample}.cram",
+            sample=sample_list
+        ),
         cj=expand(
             "star/{sample}/chimera/{sample}.Chimeric.out.junction", sample=sample_list
         ),
@@ -212,7 +216,7 @@ rule star_fusion_results:
                 ".bait_bias_summary_metrics",
                 ".error_summary_metrics",
                 ".pre_adapter_detail_metrics",
-                ".pre_adapter_summary_metrics",
+                ".pre_adapter_summary_metrics"
             )
             for sample in sample_list
         ],
