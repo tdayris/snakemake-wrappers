@@ -10,7 +10,7 @@ This rule makes the DEseq2 results human-readable
 rule deseq2_readable:
     input:
         tsv="deseq2/{comparison}/wald.{comparison}.tsv",
-        gene2gene="tximport/gene2gene.tsv",
+        gene2gene="salmon/gene2gene.tsv",
         dst="deseq2/{comparison}/dst.{comparison}.tsv",
     output:
         complete=report(
@@ -196,7 +196,7 @@ rule plot_deseq_genes:
         intermediar="deseq2/{comparison}/mcols.{comparison}.tsv",
         dst="deseq2/{comparison}/dst.{comparison}.tsv",
         assays="deseq2/{comparison}/assays.mu.{comparison}.tsv",
-        gene2gene="tximport/gene2gene.tsv",
+        gene2gene="salmon/gene2gene.tsv",
         metadata="deseq2/{comparison}/metadata.{comparison}.tsv",
         filter_theta="deseq2/{comparison}/filter.theta.{comparison}.tsv",
     output:
