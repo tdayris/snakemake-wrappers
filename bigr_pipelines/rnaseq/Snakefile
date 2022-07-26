@@ -178,6 +178,7 @@ then use:
 include: "rules/011.mapping_qc.smk"
 include: "rules/012.star_chimera.smk"
 include: "rules/013.star_fusion.smk"
+include: "rules/019.rseqc.smk"
 
 
 rule star_fusion_results:
@@ -232,6 +233,11 @@ rule star_fusion_results:
             ext=["txt", "png"],
         ),
         star_fusion=expand("star-fusions/{sample}/", sample=sample_list),
+        read_distribution=expand("rseqc/read_distribution/chimera/{sample}.read_distribution.tsv", sample=sample_list),
+        tin=expand("rseqc/tin/chimera/{sample}.summary.txt", sample=sample_list),
+        bam_stat=expand("rseqc/bam_stat/chimera/{sample}.txt", sample=sample_list),
+        genebosycov=expand("rseqc/gene_body_coverage/chimera/{sample}.geneBodyCoverage.{ext}", sample=sample_list, ext=["txt", "pdf"]),
+        junctype=expand("rseqc/junction_annotation/chimera/{sample}.{ext}", sample=sample_list, ext=["txt", "pdf"]),
     output:
         report(
             "data_output/multiqc/MultiQC.Star.Chimera.html",
