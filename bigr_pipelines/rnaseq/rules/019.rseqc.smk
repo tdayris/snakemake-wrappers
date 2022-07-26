@@ -38,7 +38,7 @@ rule rseqc_tin:
     conda:
         "envs/rseqc.yaml"
     params:
-        extra=config["rseqc"].get("tin", ""),
+        extra=config["rseqc"].get("tin", "--sample-size 100 --minCov 10"),
     shell:
         "tin.py "
         "--input {input.bam} "
@@ -63,7 +63,7 @@ rule rseqc_bam_stat:
     conda:
         "envs/rseqc.yaml"
     params:
-        extra=config["rseqc"].get("bam_stat", "--mapq 3"),
+        extra=config["rseqc"].get("bam_stat", "--mapq 30"),
     shell:
         "bam_stat.py --input-file {input.bam} > {output} 2> {log}"
 
@@ -86,7 +86,7 @@ rule rseqc_gene_body_coverage:
     conda:
         "envs/rseqc.yaml"
     params:
-        extra=config["rseqc"].get("bam_stat", "--format pdf"),
+        extra=config["rseqc"].get("gene_body", "--format pdf"),
         prefix=lambda wildcards: f"rseqc/gene_body_coverage/{wildcards.maptype}/{wildcards.sample}.geneBodyCoverage",
     shell:
         "geneBody_coverage.py "
@@ -115,7 +115,7 @@ rule rseqc_junction_annotation:
     conda:
         "envs/rseqc.yaml"
     params:
-        extra=config["rseqc"].get("bam_stat", "--mapq 30 --min-intron 50"),
+        extra=config["rseqc"].get("junction_annotation", "--mapq 30 --min-intron 50"),
         prefix=lambda wildcards: f"rseqc/junction_annotation/{wildcards.maptype}/{wildcards.sample}",
     shell:
         "junction_annotation.py "
