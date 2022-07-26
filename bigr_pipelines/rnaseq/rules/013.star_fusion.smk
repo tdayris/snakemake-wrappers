@@ -1,6 +1,6 @@
 rule star_fusion:
     input:
-        junctions="star/{sample}/{sample}.Chimeric.out.junction",
+        junctions="star/{sample}/chimera/{sample}.Chimeric.out.junction",
         resource_lib=config["star_fusion"]["CTAT_resource_lib"],
     output:
         directory("star-fusions/{sample}/"),
