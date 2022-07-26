@@ -47,13 +47,13 @@ rule deseq2_dataset_from_tximport:
         tmpdir="tmp",
     params:
         design=lambda wildcards: (
-            f"~{contrasts[wildcards.comparison][0]}"
+            f"~{condition_dict[wildcards.comparison][0]}"
             if (batch_effect is False) or wildcards.comparison == "BatchEffect"
-            else f"~BatchEffect+{contrasts[wildcards.comparison][0]}"
+            else f"~BatchEffect+{condition_dict[wildcards.comparison][0]}"
         ),
-        levels=lambda wildcards: contrasts[wildcards.comparison][1:],
-        factor=lambda wildcards: contrasts[wildcards.comparison][0],
-        ref_level=lambda wildcards: contrasts[wildcards.comparison][-1],
+        levels=lambda wildcards: condition_dict[wildcards.comparison][1:],
+        factor=lambda wildcards: condition_dict[wildcards.comparison][0],
+        ref_level=lambda wildcards: condition_dict[wildcards.comparison][-1],
         remove_zeros=True,
         count_filter=0.01,
     log:
@@ -87,7 +87,7 @@ rule deseq2:
         tmpdir="tmp",
     retries: 3
     params:
-        contrast=lambda wildcards: contrasts[wildcards.comparison],
+        contrast=lambda wildcards: condition_dict[wildcards.comparison],
     log:
         "logs/deseq2/deseq/{comparison}.log",
     wrapper:

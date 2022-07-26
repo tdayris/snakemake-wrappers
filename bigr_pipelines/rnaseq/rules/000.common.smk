@@ -105,11 +105,6 @@ condition_dict = {
     for factor, test, ref in comparison_levels
 }
 
-contrasts = dict(zip(
-    config["output_prefixes"],
-    config["comparison_levels"]
-))
-
 # A list containing all DESeq2 comparison names
 # Stored as a list for futrther re-use
 output_prefixes = [
