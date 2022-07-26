@@ -22,8 +22,8 @@ min_version("7.5")
 import sys
 
 # My own libraries
-worflow_source_dir = Path(snakemake.workflow.srcdir(".."))
-common = str(worflow_source_dir / ".." / "common" / "python")
+workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
+common = str(workflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
 
 from dataframes import *
@@ -43,7 +43,7 @@ logging.info("Additional utils loaded")
 
 
 # Find and load configfile
-default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
+default_config = read_yaml(workflow_source_dir / "config.hg38.yaml")
 
 
 configfile: get_config(default_config=default_config)

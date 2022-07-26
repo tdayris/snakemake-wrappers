@@ -7,19 +7,19 @@ rule muterc2_filter:
         contamination="summary/{sample}_calculate_contamination.table",
         bam="sambamba/sort/{sample}.bam",
         bam_index=get_bai("sambamba/sort/{sample}.bam"),
-        f1r2="gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz"
+        f1r2="gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz",
     output:
-        vcf=temp("mutect2/filter/{sample}.vcf.gz")
+        vcf=temp("mutect2/filter/{sample}.vcf.gz"),
     message:
         "Filtering Mutect2 calls for {wildcards.sample}"
     threads: 1
     resources:
         time_min=get_45min_per_attempt,
         mem_mb=get_8gb_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        extra=config["gatk"].get("filtermutectcalls", "")
+        extra=config["gatk"].get("filtermutectcalls", ""),
     log:
-        "logs/mutect2/filter/{sample}.log"
+        "logs/mutect2/filter/{sample}.log",
     wrapper:
         "bio/gatk/filtermutectcalls"

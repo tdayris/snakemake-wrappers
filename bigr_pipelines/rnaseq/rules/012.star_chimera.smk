@@ -20,9 +20,9 @@ rule star_align_chimera:
         "logs/star/{sample}.log",
     params:
         extra=config["star"].get(
-            "chimera_extra", 
-            (
-                "--outReadsUnmapped None "
+            "chimera_extra",
+        (
+        "--outReadsUnmapped None "
                 "--twopassMode Basic "
                 "--outSAMstrandField intronMotif "
                 "--outSAMunmapped Within "
@@ -45,6 +45,6 @@ rule star_align_chimera:
                 "--alignSplicedMateMapLminOverLmate 0 "
                 "--alignSplicedMateMapLmin 30 "
             ),
-        )
+        ),
     wrapper:
         "bio/star/align"

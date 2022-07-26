@@ -20,9 +20,9 @@ rule star_align_variants:
         "logs/star/{sample}.log",
     params:
         extra=config["star"].get(
-            "variant_extra", 
-            (
-                "--outFilterType BySJout "
+            "variant_extra",
+        (
+        "--outFilterType BySJout "
                 "--outFilterMultimapNmax 20 "
                 "--alignSJoverhangMin 8 "
                 "--alignSJDBoverhangMin 1 "
@@ -33,7 +33,7 @@ rule star_align_variants:
                 "--alignMatesGapMax 1000000 "
                 "--outSAMattributes All "
                 "--twopassMode Basic "
-            )
+            ),
         ),
     wrapper:
         "bio/star/align"

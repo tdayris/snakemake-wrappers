@@ -60,7 +60,7 @@ rule aggregate_raw_counts:
     output:
         tsv=report(
             "data_output/Quantification/Raw.genes.tsv",
-            caption=str(worflow_source_dir / "reports" / "salmon.raw.genes.rst"),
+            caption=str(workflow_source_dir / "reports" / "salmon.raw.genes.rst"),
             category="Counts",
         ),
     threads: 1
@@ -94,7 +94,7 @@ rule aggregate_gene_counts:
     output:
         tsv=report(
             "data_output/Quantification/TPM.genes.tsv",
-            caption=str(worflow_source_dir / "reports" / "salmon.tpm.genes.rst"),
+            caption=str(workflow_source_dir / "reports" / "salmon.tpm.genes.rst"),
             category="Counts",
         ),
     threads: 1
@@ -127,7 +127,9 @@ rule aggregate_transcript_counts:
     output:
         tsv=report(
             "data_output/Quantification/TPM.transcripts.tsv",
-            caption=str(worflow_source_dir / "reports" / "salmon.tpm.transcripts.rst"),
+        caption=str(
+        workflow_source_dir / "reports" / "salmon.tpm.transcripts.rst"
+            ),
             category="Counts",
         ),
     threads: 1

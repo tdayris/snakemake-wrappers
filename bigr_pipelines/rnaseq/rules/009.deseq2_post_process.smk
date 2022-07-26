@@ -15,20 +15,20 @@ rule deseq2_readable:
     output:
         complete=report(
             "data_output/DEseq2/{comparison}/Complete_{comparison}.tsv",
-            caption=str(worflow_source_dir / "reports" / "009.gseapp_complete.rst"),
+            caption=str(workflow_source_dir / "reports" / "009.gseapp_complete.rst"),
             category="DEseq2",
             subcategory="{comparison}",
         ),
         fc_fc=report(
             "data_output/DEseq2/{comparison}/SortedOnLogFC_{comparison}.tsv",
-            caption=str(worflow_source_dir / "reports" / "009.gseapp_fc_fc.rst"),
+            caption=str(workflow_source_dir / "reports" / "009.gseapp_fc_fc.rst"),
             category="DEseq2",
             subcategory="{comparison}",
         ),
         padj_fc=report(
             "data_output/DEseq2/{comparison}/SortedOnPadj_{comparison}.tsv",
             category="DESeq2",
-            caption=str(worflow_source_dir / "reports" / "009.gseapp_padj_fc.rst"),
+            caption=str(workflow_source_dir / "reports" / "009.gseapp_padj_fc.rst"),
             subcategory="{comparison}",
         ),
     threads: 1
@@ -71,9 +71,9 @@ rule rbt_csv_report:
         "logs/rbt/csv-report/{comparison}.{content}.log",
     params:
         config["rbt"].get(
-            "csv_extra", 
-            '--separator "\\t" --sort-column stat_change '
-            '--sort-order ascending --rows-per-page 50'
+            "csv_extra",
+        '--separator "\\t" --sort-column stat_change '
+            "--sort-order ascending --rows-per-page 50",
         ),
     wrapper:
         "bio/rbt/csvreport"
@@ -163,11 +163,17 @@ rule multiqc_config:
         title=config["multiqc"].get("title", "Differentiel Gene Expression"),
         subtitle="Comparing {factor}: {test} VS {ref} ",
         intro_text="This differential analysis covers {test} vs {ref}. {ref} is the reference. A fold change of 1.5 for the gene XXX means XXX is 1.5 times more expressed in {test} than in {ref}, and this difference is significative when pvalue is low (lower than 0.05).",
-        report_comment=config["multiqc"].get("report_comment", "This report has been made at Gustave Roussy."),
+        report_comment=config["multiqc"].get(
+            "report_comment", "This report has been made at Gustave Roussy."
+        ),
         show_analysis_paths=False,
         show_analysis_time=True,
         report_header_info=[
-            {"Contact E-mail": config["multiqc"].get("email", "bigr@gustaveroussy.fr")},
+            {
+                "Contact E-mail": config["multiqc"].get(
+        "email", "bigr@gustaveroussy.fr"
+                )
+            },
             {"Application Type": config["multiqc"].get("application_type", "RNA-seq")},
             {"Project Type": config["multiqc"].get("project_type", "Application")},
         ],
@@ -204,7 +210,7 @@ rule plot_deseq_genes:
         ),
         category="Gene Expression plots",
         caption=str(
-        worflow_source_dir / "reports" / " 009.gene_expression_plot.rst"
+        workflow_source_dir / "reports" / " 009.gene_expression_plot.rst"
             ),
             subcategory="{comparison}",
         ),
