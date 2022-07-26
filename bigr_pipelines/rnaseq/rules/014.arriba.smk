@@ -13,7 +13,7 @@ rule arriba:
     resources:
         mem_mb=get_20gb_per_attempt,
         time_min=get_1h_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
         blacklist=config["arriba"]["blacklist"],
         extra=config["arriba"].get("extra", ""),

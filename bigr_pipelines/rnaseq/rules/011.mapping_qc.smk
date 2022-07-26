@@ -23,7 +23,7 @@ rule collect_multiple_metrics:
                 ".bait_bias_summary_metrics",
                 ".error_summary_metrics",
                 ".pre_adapter_detail_metrics",
-                ".pre_adapter_summary_metrics"
+                ".pre_adapter_summary_metrics",
             )
         ),
     resources:

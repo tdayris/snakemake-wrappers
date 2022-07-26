@@ -4,22 +4,22 @@
 """
 Build orientation model from f1r2 counts made in Mutect2
 """
+
+
 rule learn_read_orientation_model:
     input:
-        f1r2="mutect2/f1r2/{sample}.tar.gz"
+        f1r2="mutect2/f1r2/{sample}.tar.gz",
     output:
-        temp("gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz")
-    message:
-        "Build model over orientation bias on {wildcards.sample}"
+        temp("gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz"),
     threads: 1
     resources:
         mem_mb=get_8gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        extra=config["gatk"].get("learn_read_orientation_model", "")
+        extra=config["gatk"].get("learn_read_orientation_model", ""),
     log:
-        "logs/gatk/learnreadorientationmodel/{sample}.log"
+        "logs/gatk/learnreadorientationmodel/{sample}.log",
     wrapper:
         "bio/gatk/learnreadorientationmodel"
 
@@ -32,20 +32,22 @@ rule learn_read_orientation_model:
 """
 Estimate possible contaminations
 """
+
+
 rule calculate_contamination:
     input:
-        summary="gatk/getpileupsummaries/{sample}_getpileupsummaries.table"
+        summary="gatk/getpileupsummaries/{sample}_getpileupsummaries.table",
     output:
-        table=temp("summary/{sample}_calculate_contamination.table")
+        table=temp("summary/{sample}_calculate_contamination.table"),
     threads: 1
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        extra=config["gatk"].get("calculate_contamination", "")
+        extra=config["gatk"].get("calculate_contamination", ""),
     log:
-        "logs/gatk/CalculateContamination/{sample}.log"
+        "logs/gatk/CalculateContamination/{sample}.log",
     wrapper:
         "bio/gatk/calculatecontamination"
 
@@ -53,23 +55,25 @@ rule calculate_contamination:
 """
 Summarize the read support over known variants
 """
+
+
 rule get_pileup_summaries:
     input:
         bam="sambamba/sort/{sample}.bam",
         bam_index=get_bai("sambamba/sort/{sample}.bam"),
         intervals=config["reference"]["capturekit_bed"],
         variants=config["reference"]["dbsnp"],
-        variants_index=config["reference"]["dbsnp_tbi"]
+        variants_index=config["reference"]["dbsnp_tbi"],
     output:
-        table=temp("gatk/getpileupsummaries/{sample}_getpileupsummaries.table")
+        table=temp("gatk/getpileupsummaries/{sample}_getpileupsummaries.table"),
     threads: 1
     resources:
-        mem_mb=get_6gb_per_attempt
+        mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        extra=config["gatk"].get("pileup_summaries", "")
+        extra=config["gatk"].get("pileup_summaries", ""),
     log:
-        "logs/gatk/GetPileupSummaries/{sample}.log"
+        "logs/gatk/GetPileupSummaries/{sample}.log",
     wrapper:
         "bio/gatk/getpileupsummaries"
