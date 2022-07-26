@@ -112,6 +112,9 @@ output_prefixes = [
     for factor, test, ref in comparison_levels
 ]
 
+# A dict containing comparison names and factors/levels
+contrasts = dict(zip(output_prefixes, comparison_levels))
+
 # A dict containing the list of samples used in DESeq2,
 # for a given comparison
 samples_per_prefixes = {
