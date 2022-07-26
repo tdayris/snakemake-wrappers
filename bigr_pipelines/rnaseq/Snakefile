@@ -188,10 +188,7 @@ rule star_fusion_results:
             sample=sample_list,
             ext=["bam", "bam.bai"],
         ),
-        cram=expand(
-            "data_output/Mapping/chimera/{sample}.cram",
-            sample=sample_list
-        ),
+        cram=expand("data_output/Mapping/chimera/{sample}.cram", sample=sample_list),
         cj=expand(
             "star/{sample}/chimera/{sample}.Chimeric.out.junction", sample=sample_list
         ),
@@ -217,7 +214,7 @@ rule star_fusion_results:
                 ".bait_bias_summary_metrics",
                 ".error_summary_metrics",
                 ".pre_adapter_detail_metrics",
-                ".pre_adapter_summary_metrics"
+                ".pre_adapter_summary_metrics",
             )
             for sample in sample_list
         ],
@@ -233,11 +230,22 @@ rule star_fusion_results:
             ext=["txt", "png"],
         ),
         star_fusion=expand("star-fusions/{sample}/", sample=sample_list),
-        read_distribution=expand("rseqc/read_distribution/chimera/{sample}.read_distribution.tsv", sample=sample_list),
+        read_distribution=expand(
+            "rseqc/read_distribution/chimera/{sample}.read_distribution.tsv",
+            sample=sample_list,
+        ),
         tin=expand("rseqc/tin/chimera/{sample}.summary.txt", sample=sample_list),
         bam_stat=expand("rseqc/bam_stat/chimera/{sample}.txt", sample=sample_list),
-        genebosycov=expand("rseqc/gene_body_coverage/chimera/{sample}.geneBodyCoverage.{ext}", sample=sample_list, ext=["txt", "pdf"]),
-        junctype=expand("rseqc/junction_annotation/chimera/{sample}.{ext}", sample=sample_list, ext=["txt", "pdf"]),
+        genebosycov=expand(
+            "rseqc/gene_body_coverage/chimera/{sample}.geneBodyCoverage.{ext}",
+            sample=sample_list,
+            ext=["txt", "pdf"],
+        ),
+        junctype=expand(
+            "rseqc/junction_annotation/chimera/{sample}.{ext}",
+            sample=sample_list,
+            ext=["txt", "pdf"],
+        ),
     output:
         report(
             "data_output/multiqc/MultiQC.Star.Chimera.html",
