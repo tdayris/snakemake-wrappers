@@ -1,7 +1,9 @@
 rule arriba:
     input:
-        bam="star/{sample}/{sample}.bam",
+        bam="star/{sample}/chimera/{sample}.bam",
+        bam_index="star/{sample}/chimera/{sample}.bam.bai",
         genome=config["reference"]["genome"],
+        genome_index=config["reference"]["genome_index"],
         annotation=config["reference"]["gtf"],
         blacklist=config["arriba"]["blacklist"],
     output:
