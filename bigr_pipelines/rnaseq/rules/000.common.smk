@@ -69,7 +69,7 @@ fastq_links = link_fq(
     sample_names=design.Sample_id, 
     r1_paths=design.Upstream_file, 
     r2_paths=design.Downstream_file, 
-    prefix="data_input/"
+    prefix="data_input"
 )
 
 # A list that holds all comparisons made in DESeq2.
