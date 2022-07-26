@@ -1,0 +1,126 @@
+rule rseqc_read_distribution:
+    input:
+        bam="star/{sample}/{maptype}/{sample}.bam",
+        bai="star/{sample}/{maptype}/{sample}.bam.bai",
+        refgene=config["reference"]["refgene_model"]
+    output:
+        temp("rseqc/read_distribution/{maptype}/{sample}.read_distribution.tsv")
+    threads: 1
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/rseqc/read_distribution/{sample}.{maptype}.log"
+    conda:
+        "envs/rseqc.yaml"
+    shell:
+        "read_distribution.py "
+        "--input-file {input.bam} "
+        "--refgene {input.refgene} "
+        "> {output} 2> {log} "
+
+
+rule rseqc_tin:
+    input:
+        bam="star/{sample}/{maptype}/{sample}.bam",
+        bai="star/{sample}/{maptype}/{sample}.bam.bai",
+        refgene=config["reference"]["refgene_model"]
+    output:
+        temp("rseqc/tin/{maptype}/{sample}.summary.txt")
+    threads: 1
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/rseqc/tin/{sample}.{maptype}.log"
+    conda:
+        "envs/rseqc.yaml"
+    params:
+        extra=config["rseqc"].get("tin", "")
+    shell:
+        "tin.py "
+        "--input {input.bam} "
+        "--refgene {input.refgene} "
+        "{params.extra} "
+        "> {output} 2> {log} "
+
+
+rule rseqc_bam_stat:
+    input:
+        bam="star/{sample}/{maptype}/{sample}.bam",
+        bai="star/{sample}/{maptype}/{sample}.bam.bai",
+    output:
+        temp("rseqc/bam_stat/{maptype}/{sample}.txt")
+    threads: 1
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/rseqc/bam_stat/{sample}.{maptype}.log"
+    conda:
+        "envs/rseqc.yaml"
+    params:
+        extra=config["rseqc"].get("bam_stat", "--mapq 3")
+    shell:
+        "bam_stat.py --input-file {input.bam} > {output} 2> {log}"
+
+
+rule rseqc_gene_body_coverage:
+    input:
+        bam="star/{sample}/{maptype}/{sample}.bam",
+        bai="star/{sample}/{maptype}/{sample}.bam.bai",
+        refgene=config["reference"]["refgene_model"]
+    output:
+        txt=temp("rseqc/gene_body_coverage/{maptype}/{sample}.geneBodyCoverage.txt")
+        pdf=temp("rseqc/gene_body_coverage/{maptype}/{sample}.geneBodyCoverage.pdf")
+    threads: 1
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/rseqc/gene_body_coverage/{sample}.{maptype}.log"
+    conda:
+        "envs/rseqc.yaml"
+    params:
+        extra=config["rseqc"].get("bam_stat", "--format pdf"),
+        prefix=lambda wildcards: f"rseqc/gene_body_coverage/{wildcards.maptype}/{wildcards.sample}.geneBodyCoverage"
+    shell:
+        "geneBody_coverage.py "
+        "--input {input.bam} "
+        "--refgene {input.refgene} "
+        "--out-prefix {params.prefix} "
+        "{params.extra} "
+        "> {log} 2>&1 "
+
+
+rule rseqc_junction_annotation:
+    input:
+        bam="star/{sample}/{maptype}/{sample}.bam",
+        bai="star/{sample}/{maptype}/{sample}.bam.bai",
+        refgene=config["reference"]["refgene_model"]
+    output:
+        txt=temp("rseqc/junction_annotation/{maptype}/{sample}.txt")
+        pdf=temp("rseqc/junction_annotation/{maptype}/{sample}.pdf")
+    threads: 1
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/rseqc/junction_annotation/{sample}.{maptype}.log"
+    conda:
+        "envs/rseqc.yaml"
+    params:
+        extra=config["rseqc"].get("bam_stat", "--mapq 30 --min-intron 50"),
+        prefix=lambda wildcards: f"rseqc/junction_annotation/{wildcards.maptype}/{wildcards.sample}"
+    shell:
+        "junction_annotation.py "
+        "--input-file {input.bam} "
+        "--refgene {input.refgene} "
+        "--out-prefix {params.prefix} "
+        "{params.extra} "
+        "> {log} 2>&1 "
