@@ -13,7 +13,7 @@ rule rseqc_read_distribution:
     log:
         "logs/rseqc/read_distribution/{sample}.{maptype}.log",
     conda:
-        "envs/rseqc.yaml"
+        str(workflow_source_dir / "envs" / "rseqc.yaml")
     shell:
         "read_distribution.py "
         "--input-file {input.bam} "
@@ -36,7 +36,7 @@ rule rseqc_tin:
     log:
         "logs/rseqc/tin/{sample}.{maptype}.log",
     conda:
-        "envs/rseqc.yaml"
+        str(workflow_source_dir / "envs" / "rseqc.yaml")
     params:
         extra=config["rseqc"].get("tin", "--sample-size 100 --minCov 10"),
     shell:
@@ -61,7 +61,7 @@ rule rseqc_bam_stat:
     log:
         "logs/rseqc/bam_stat/{sample}.{maptype}.log",
     conda:
-        "envs/rseqc.yaml"
+        str(workflow_source_dir / "envs" / "rseqc.yaml")
     params:
         extra=config["rseqc"].get("bam_stat", "--mapq 30"),
     shell:
@@ -84,7 +84,7 @@ rule rseqc_gene_body_coverage:
     log:
         "logs/rseqc/gene_body_coverage/{sample}.{maptype}.log",
     conda:
-        "envs/rseqc.yaml"
+        str(workflow_source_dir / "envs" / "rseqc.yaml")
     params:
         extra=config["rseqc"].get("gene_body", "--format pdf"),
         prefix=lambda wildcards: f"rseqc/gene_body_coverage/{wildcards.maptype}/{wildcards.sample}.geneBodyCoverage",
@@ -113,7 +113,7 @@ rule rseqc_junction_annotation:
     log:
         "logs/rseqc/junction_annotation/{sample}.{maptype}.log",
     conda:
-        "envs/rseqc.yaml"
+        str(workflow_source_dir / "envs" / "rseqc.yaml")
     params:
         extra=config["rseqc"].get("junction_annotation", "--mapq 30 --min-intron 50"),
         prefix=lambda wildcards: f"rseqc/junction_annotation/{wildcards.maptype}/{wildcards.sample}",
