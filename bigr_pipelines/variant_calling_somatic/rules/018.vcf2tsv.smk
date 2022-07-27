@@ -117,4 +117,7 @@ rule gatk_variant_filtration:
         log:
             "logs/gatk/variant_filtration/{sample}.log"
         params:
-            filters=config["gatk"].get("filters", {"DepthBelow10X": "DP < 10"})
+            filters=config["gatk"].get("filters", {"DepthBelow10X": "DP < 10"}),
+            extra="--create-output-variant-index --create-output-variant-md5",
+        wrapper:
+            "bio/gatk/variantfiltration"
