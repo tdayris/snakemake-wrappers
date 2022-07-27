@@ -47,9 +47,6 @@ def get_headers(cols: list[str], description: dict[str, Any]) -> str:
         f"""##INFO=<ID=OncoKB_{key},Number={value["nb"]},Type={value["type"]},Description="{value["desc"]}">\n"""
         for key, value in description.items()
     ]
-    headers.append(
-        """##FILTER=<ID=ExistsInOncoKB,Description="Transcript exists in OncoKB">\n"""
-    )
     return "".join(headers)
 
 
@@ -69,16 +66,6 @@ def dict_to_info(annot: dict[str, Any]) -> str:
                     "___..n|.___"
                 )
             )
-            # value = (str(value).replace("-", "_")
-            #                    .replace("/", "_")
-            #                    .replace("\\", "_")
-            #                    .replace(' ', '_')
-            #                    .replace("(", "")
-            #                    .replace(")", "")
-            #                    .replace("#", "nb")
-            #                    .replace("\t", "_")
-            #                    .replace(",", "|")
-            #                    .replace(";", "_"))
             res.append(f"OncoKB_{key}={value}")
 
     return ";".join(res)
@@ -106,10 +93,6 @@ def annotate(line: str, csv: pandas.DataFrame) -> str:
             else:
                 chomp[7] += f";{annot}"
 
-            if chomp[6] in [".", "", "PASS"]:
-                chomp[6] = "ExistsInOncoKB"
-            else:
-                chomp[6] += ";ExistsInOncoKB"
             line = "\t".join(chomp) + "\n"
         except KeyError:
             logging.warning(f"No annotation for {ensembl_transcript} from {line}")
