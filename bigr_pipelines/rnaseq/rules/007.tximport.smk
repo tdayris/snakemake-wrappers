@@ -10,7 +10,7 @@ rule tximport:
             "salmon/pseudo_mapping/{sample}/quant.sf",
             sample=samples_per_prefixes[wildcards.comparison],
         ),
-        tx_to_gene="salmon/tx2gene.tsv",
+        tx_to_gene="salmon/tx2gene_small.tsv",
     output:
         txi=temp("tximport/txi.{comparison}.RDS"),
     threads: 1
