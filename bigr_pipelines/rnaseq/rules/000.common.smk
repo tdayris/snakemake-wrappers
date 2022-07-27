@@ -66,10 +66,10 @@ logging.info("Design file loaded")
 # this is done in order to handle iRODS paths.
 logging.info("Building globals...")
 fastq_links = link_fq(
-    sample_names=design.Sample_id, 
-    r1_paths=design.Upstream_file, 
-    r2_paths=design.Downstream_file, 
-    prefix="data_input"
+    sample_names=design.Sample_id,
+    r1_paths=design.Upstream_file,
+    r2_paths=design.Downstream_file,
+    prefix="data_input",
 )
 
 # A list that holds all comparisons made in DESeq2.
@@ -182,7 +182,7 @@ def get_resources_per_gb(
     """
     return max(
         # Case there is 1gb or more in input
-        #((input.size // 10_000_000_000) * attempt * multiplier) + base,
+        # ((input.size // 10_000_000_000) * attempt * multiplier) + base,
         1,
         # Case there is less than 1gb in input
         (multiplier * attempt) + base,

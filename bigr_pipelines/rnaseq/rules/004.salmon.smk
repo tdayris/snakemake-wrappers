@@ -33,7 +33,7 @@ rule tx_to_gene:
     input:
         gtf=config["reference"]["gtf"],
     output:
-        tx2gene_small=temp("salmon/tx2gene_small.tsv")
+        tx2gene_small=temp("salmon/tx2gene_small.tsv"),
         tx2gene=temp("salmon/tx2gene.tsv"),
         tx2gene_large=temp("salmon/tx2gene_with_positions.tsv"),
         gene2gene=temp("salmon/gene2gene.tsv"),
