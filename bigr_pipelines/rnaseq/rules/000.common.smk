@@ -173,7 +173,7 @@ def get_resources_per_gb(
 
     Parameters:
     * wildcards: Snakemake signature requires this parameter.
-    * input: The input file
+    * input: The input file list
     * attempt: The # of times the calling rule has been restarted
     * multiplier: An arbitrary multiplier
 
@@ -182,9 +182,10 @@ def get_resources_per_gb(
     """
     return max(
         # Case there is 1gb or more in input
-        ((input.size // 1_000_000_000) * attempt * multiplier) + base,
+        #((input.size // 1_000_000_000) * attempt * multiplier) + base,
         # Case there is less than 1gb in input
         (multiplier * attempt) + base,
+        1
     )
 
 
