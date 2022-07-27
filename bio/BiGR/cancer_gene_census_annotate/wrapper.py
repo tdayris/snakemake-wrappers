@@ -95,6 +95,7 @@ def annotate(line: str, tsv: pandas.DataFrame) -> str:
     except IndexError:
         #logging.error(f"Could not find SnpEff annotation in: {line}")
         pass
+    
     else:
         try:
             annot = dict_to_info(tsv.loc[gene_name].to_dict())
