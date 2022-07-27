@@ -22,27 +22,34 @@ rule multiqc:
             ext=["txt", "png"],
             status=["normal", "tumor"],
         ),
-        picard_summary=expand(
-            "picard/alignment_summary/{sample}_{status}.summary.txt",
-            sample=design["Sample_id"],
-            status=["normal", "tumor"],
-        ),
-        snpeff=expand(
-            "snpeff/csvstats/{sample}.genes.txt",
-            sample=design["Sample_id"],
-        ),
+        picard=[
+            multiext(
+                "picard/stats/{sample}.{cleaning}",
+                ".alignment_summary_metrics",
+                ".insert_size_metrics",
+                ".insert_size_histogram.pdf",
+                ".quality_distribution_metrics",
+                ".quality_distribution.pdf",
+                ".gc_bias.detail_metrics",
+                ".gc_bias.summary_metrics",
+                ".gc_bias.pdf",
+                ".bait_bias_detail_metrics",
+                ".bait_bias_summary_metrics",
+                ".error_summary_metrics",
+                ".pre_adapter_detail_metrics",
+                ".pre_adapter_summary_metrics",
+            )
+            for cleaning in cleaning_status
+            for sample in sample_list
+        ],
+        snpeff_reports=expand("snpeff/report/{sample}.html", sample=sample_list),
+        csvstats=expand("snpeff/csvstats/{sample}.csv", sample=sample_list),
     output:
-        report(
-            "multiqc/variant_calling_somatic.html",
-            caption="../common/reports/multiqc.rst",
-            category="Quality Controls",
-        ),
-    message:
-        "Aggregating quality reports from SnpEff"
+        "multiqc/Somatic_Variant_Calling.html",
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 1536, 10240),
-        time_min=lambda wildcards, attempt: attempt * 35,
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/multiqc.log",

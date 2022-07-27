@@ -1,19 +1,17 @@
 rule extractfields:
     input:
         call="snpsift/fixed/{sample}.vcf.gz",
-        call_index=get_tbi("snpsift/fixed/{sample}.vcf.gz"),
+        call_index="snpsift/fixed/{sample}.vcf.gz.tbi",
     output:
         tsv="snpsift/extractFields/{sample}.tsv",
-    message:
-        "Making {wildcards.sample} annotated VCF readable"
     threads: 2
     resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
-        time_min=lambda wildcards, attempt: attempt * 20,
+        mem_mb=get_6gb_per_attempt,
+        time_min=get_20min_per_attempt,
     log:
         "logs/snpsift/extractAllFields/{sample}.log",
     params:
-        extra="-s ';' -e '.'",
+        extra=config["snpsift"].get("extract_all_fields", "-s ';' -e '.'"),
     wrapper:
         "bio/snpsift/extractAllFields"
 
@@ -23,18 +21,18 @@ rule fix_vcf:
         vcf=last_vcf,
     output:
         vcf=temp("snpsift/fixed/{sample}.vcf"),
-    message:
-        "Removing empty fields, trailing ';' and non-canonical chromosomes "
-        "for {wildcards.sample}"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_15min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/bigr_scripts/fix_vcf/{sample}.log",
     params:
-        default_chr=config["params"]["chr"],
-        remove_non_conventional_chromosomes=True,
+        default_chr=config["reference"]["chr"],
+        remove_non_conventional_chromosomes=config["bigr_additionals"].get(
+            "remove_non_conventional_chromosomes"
+            True,
+        )
     wrapper:
         "bio/BiGR/fix_vcf"

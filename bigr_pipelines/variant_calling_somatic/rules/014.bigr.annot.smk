@@ -1,3 +1,8 @@
+#############################
+### GLeaves compatibility ###
+#############################
+
+
 ###################################
 ### OncoKB and CancerGeneCensus ###
 ### Custom annotations          ###
@@ -7,15 +12,13 @@
 rule cancer_gene_census_annotate:
     input:
         vcf="bigr/oncokb/{sample}.vcf",
-        cgc=config["ref"]["cancer_census"],
+        cgc=config["reference"]["cancer_census"],
     output:
         vcf=temp("bigr/cancer_gene_census/{sample}.vcf"),
-    message:
-        "Adding CancerGeneCensus annotation in {wildcards.sample}"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 5,
-        time_min=lambda wildcards, attempt: attempt * 25,
+        mem_mb=get_6gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/bigr/cancer_gene_census_annotate/{sample}.log",
@@ -25,17 +28,14 @@ rule cancer_gene_census_annotate:
 
 rule oncokb_annotate:
     input:
-        #vcf="snpsift/clinvar/{sample}.vcf",
         vcf="bigr/format_to_info/{sample}.vcf",
-        oncokb=config["ref"]["oncokb"],
+        oncokb=config["reference"]["oncokb"],
     output:
         vcf=temp("bigr/oncokb/{sample}.vcf"),
-    message:
-        "Adding OncoKB annotation in {wildcards.sample}"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 6,
-        time_min=lambda wildcards, attempt: attempt * 35,
+        mem_mb=get_6gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/bigr/oncokb/{sample}.log",
@@ -48,21 +48,19 @@ rule oncokb_annotate:
 ####################
 
 
-# rule format_to_info:
-#     input:
-#         call="vcftools/mane/{sample}.vcf.gz",
-#     output:
-#         call="bigr/format_to_info/{sample}.vcf",
-#     message:
-#         "Annotating {wildcards.sample} with clear Format descriptions"
-#     threads: 1
-#     resources:
-#         mem_mb=lambda wildcards, attempt: attempt * 1024,
-#         time_min=lambda wildcards, attempt: attempt * 15,
-#         tmpdir="tmp",
-#     log:
-#         "logs/bigr/format_to_info/{sample}.log",
-#     params:
-#         extra="",
-#     wrapper:
-#         "bio/BiGR/vcf_format_to_info"
+rule format_to_info:
+    input:
+        call="vcftools/mane/{sample}.vcf.gz",
+    output:
+        call=temp("bigr/format_to_info/{sample}.vcf"),
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
+        tmpdir="tmp",
+    log:
+        "logs/bigr/format_to_info/{sample}.log",
+    params:
+        extra=config["bigr_additionals"].get("format_to_info", ""),
+    wrapper:
+        "bio/BiGR/vcf_format_to_info"

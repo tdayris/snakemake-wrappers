@@ -13,7 +13,7 @@ rule samtools_filter_bed:
         time_min=lambda wildcards, attempt: attempt * 15,
         tmpdir="tmp",
     params:
-        extra="-h -h",
+        extra=config["samtools"].get("view_filter", "-h -q 5"),
     log:
         "logs/samtools/filter/{sample}_{status}.log",
     wrapper:
