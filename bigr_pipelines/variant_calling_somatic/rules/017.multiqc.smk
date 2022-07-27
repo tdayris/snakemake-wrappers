@@ -45,7 +45,7 @@ rule multiqc:
         snpeff_reports=expand("snpeff/report/{sample}.html", sample=sample_list),
         csvstats=expand("snpeff/csvstats/{sample}.csv", sample=sample_list),
     output:
-        "multiqc/Somatic_Variant_Calling.html",
+        protected("data_output/MultiQC/Somatic_Variant_Calling.html"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
