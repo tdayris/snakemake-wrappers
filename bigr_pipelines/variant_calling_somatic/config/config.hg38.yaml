@@ -1,5 +1,48 @@
 max_threads: 20
 
+table_cols:
+  - Chromosome
+  - Start_Position
+  - Variant_ID
+  - SYMBOL
+  - Reference_Allele
+  - Tumor_Seq_Allele1
+  - Mutect2_Read_depth
+  - Tumor_Seq_Allele2
+  - HGVSc
+  - HGVSp
+  - VarOcc
+  - BIOTYPE
+  - IMPACT
+  - Variant_Classification
+  - Mutect2_Read_depth
+  - Mutect2_Allele_Frequency
+  - Variant_Type
+  - Tumor_Sample_Barcode
+  - dbSNP_Pubmed
+  - dbSNP_Clinical_Diagnostic_Assay
+  - dbNSFP_ExAC_AlleleFrequency
+  - Kaviar_Allele_Frequency
+  - MSigDb_Pathways
+  - dbNSFP_Polyphen2_HDIV_pred
+  - dbNSFP_SIFT_pred
+  - dbNSFP_FATHMM_pred
+  - dbNSFP_ClinPred_score
+  - dbNSFP_MutationTaster_pred
+  - dbNSFP_MutationAssessor_pred
+  - dbNSFP_MetaLR_pred
+  - dbNSFP_LIST_S2_pred
+  - dbNSFP_LRT_pred
+  - dbNSFP_BayesDel_noAF_pred
+  - dbNSFP_Aloft_pred
+  - Transcript_ID
+  - Gene
+  - Feature
+  - Filter
+  - Center
+  - Hugo_Symbol
+  - End_Position
+
 reference:
   ncbi_build: grch38
   fasta: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta
@@ -89,6 +132,15 @@ gatk:
   get_pileup_summaries: ""
   calculate_contamination: ""
   filter_mutect_calls: --create-output-variant-index --min-median-mapping-quality 35
+  gatk_filters:
+    DepthBelow10X: "DP < 10"
+    BelowQualByDepth: "QD <= 2.0"
+    BelowBaseQuality: "QUAL < 30.0"
+    AboveFisherStrandBias: "FS > 60.0"
+    AboveStrandOddsRatio: "SOR > 3.0"
+    BelowMappingQuality: "MQ < 35.0"
+    BelowMQRankSum: "MQRankSum < -12.5"
+    BelowReadPosRankSum: "ReadPosRankSum < -8.0"
 
 
 bcftools:
