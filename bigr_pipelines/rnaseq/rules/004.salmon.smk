@@ -13,7 +13,7 @@ rule salmon_quant:
     threads: config.get("max_threads", 20)
     resources:
         time_min=get_45min_per_attempt,
-        mem_mb=get_10gb_per_attempt,
+        mem_mb=get_15gb_per_attempt,
         tmpdir="tmp",
     retries: 2
     params:
