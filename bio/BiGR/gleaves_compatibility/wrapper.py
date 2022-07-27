@@ -209,6 +209,9 @@ def annotate(line: str) -> str:
     elif new_annotations != "":
         line[7] += ";"
         line[7] += new_annotations
+
+    if line[6] == ".":
+        line[6] = "PASS"
     
     return "\t".join(line) + "\n"
 
