@@ -8,8 +8,6 @@ Annotate VCF with fields dedicated to GLeaves
 import datetime
 import gzip
 import logging
-import numpy
-import re
 
 from scipy.stats import hypergeom as hg
 from typing import Any
@@ -66,6 +64,8 @@ headers_description = {
     "SBP": {"nb": "1", "type": "Float", "desc": "Background noise estimated using Fisher's exact test"},
     "SBM": {"nb": "1", "type": "Float", "desc": "Background noise estimated by the symmetric odds ratio test"},
     "BKG": {"nb": "1", "type": "String", "desc": "Variant quality (LCL : Likely Clean (BRE [0-20%]); PCL : Probably Clean (BRE [20%-30%]); PNO : Probably Noisy (BRE [30%-50%]); LNO : Likely Noisy (BRE > 80%)"},
+    "OLD_MULTIALLELIC": {"nb": "1", "type": "String", "desc": "Original chr:pos:ref:alt encoding"},
+    "OLD_VARIANT": {"nb": "1", "type": "String", "desc": "Original chr:pos:ref:alt encoding"}
 }
 
 
