@@ -54,9 +54,9 @@ This rule creates HTML reports from DESeq2 results
 
 rule rbt_csv_report:
     input:
-        "deseq2/{comparison}/{comparison}.{content}.tsv",
+        "data_output/DEseq2/{comparison}/Complete_{comparison}.tsv",
     output:
-        directory("data_output/DEseq2/{comparison}/{comparison}.{content}/"),
+        directory("rbt/csvreport/{comparison}/Complete_html_table/"),
     message:
         "Making DESeq2 results readable and searchable"
     threads: 1
@@ -81,9 +81,9 @@ rule rbt_csv_report:
 
 rule zip_csv_report:
     input:
-        "rbt/csv-report/{comparison}/html_table_deseq2_{subset}",
+        "rbt/csvreport/{comparison}/Complete_html_table/",
     output:
-        "data_output/DESeq2/{comparison}/html_table_deseq2_{subset}.tar.bz2",
+        "data_output/DESeq2/{comparison}/Complete_html_table.tar.bz2",
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
@@ -204,7 +204,7 @@ rule plot_deseq_genes:
         log_mu="figures/{comparison}/log_counts/log_mu.{comparison}.png",
         gene_plots=report(
             expand(
-                "results/{comparison}/gene_plots/{gene}.png",
+                "data_output/DEseq2/{comparison}/gene_plots/{gene}.png",
             gene=config.get("genes_of_interest", ["ENSG00000141510"]),
             allow_missing=True,
         ),
