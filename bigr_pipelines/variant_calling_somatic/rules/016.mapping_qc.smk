@@ -78,7 +78,7 @@ rule collect_multiple_metrics_cleaned:
 
 rule fastq_screen:
     input:
-        "reads/{status}/{sample}.{stream}.fq.gz",
+        "fastp/trimmed/{sample}_{status}.{stream}.fastq",
     output:
         txt=temp("fastq_screen/{sample}.{stream}.{status}.fastq_screen.txt"),
         png=temp("fastq_screen/{sample}.{stream}.{status}.fastq_screen.png"),
