@@ -79,7 +79,7 @@ def link_fq_somatic(
 
     if t2_paths is None:
         for sample, t1 in zip(sample_names, t1_paths):
-            result["tumor"][f"{prefix}/tumor/{sample}.fq.gz"] = t1
+            link_dict["tumor"][f"{prefix}/tumor/{sample}.fq.gz"] = t1
     else:
         for sample, t1, t2 in zip(sample_names, t1_paths, t2_paths):
             link_dict["tumor"][f"{prefix}/tumor/{sample}.1.fq.gz"] = t1
