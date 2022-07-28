@@ -31,11 +31,8 @@ localrules:
     bigr_copy,
 
 
-ruleorder: sambamba_index_bam > sambamba_index
 ruleorder: gatk_filter_mutect_calls > tabix_index
 ruleorder: mutect2_somatic > tabix_index
-ruleorder: create_snpeff_snpfit_data_input_dir > tabix_index
-ruleorder: fix_annotation_for_gatk > pbgzip_compress
 ruleorder: gatk_variant_filtration > pbgzip_compress
 
 
