@@ -3,6 +3,7 @@ import logging
 import os
 import pandas
 import sys
+import functools
 from pathlib import Path
 
 workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
