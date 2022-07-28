@@ -305,14 +305,14 @@ rule deseq2_results:
         deseq2_results=expand(
             "data_output/DEseq2/{comparison}/{content}_{comparison}.tsv",
             content=content_list,
-            allow_missing=True
+            allow_missing=True,
         ),
         config="multiqc/{comparison}/multiqc_config.yaml",
         gene_plot=expand(
             "data_output/DEseq2/{comparison}/gene_plots/{gene}.png",
             gene=config.get("genes_of_interest", ["ENSG00000141510"]),
             allow_missing=True,
-        )
+        ),
         plots=[
             "multiqc/{comparison}/pca_plot_mqc.png",
             "multiqc/{comparison}/volcanoplot_mqc.png",
@@ -323,7 +323,7 @@ rule deseq2_results:
             "multiqc/{comparison}/inde_theta_filter_mqc.png",
             "multiqc/{comparison}/pvalue_qc_mqc.png",
         ],
-        deseq_rbt="data_output/DESeq2/{comparison}/Complete_html_table.tar.bz2"
+        deseq_rbt="data_output/DESeq2/{comparison}/Complete_html_table.tar.bz2",
     output:
         report(
             "data_output/Deseq2/{comparison}/MultiQC.DEseq2.html",
