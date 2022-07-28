@@ -42,7 +42,6 @@ rule multiqc:
             for cleaning in cleaning_status
             for sample in sample_list
         ],
-        snpeff_reports=expand("snpeff/report/{sample}.html", sample=sample_list),
         csvstats=expand("snpeff/csvstats/{sample}.csv", sample=sample_list),
     output:
         protected("data_output/MultiQC/Somatic_Variant_Calling.html"),

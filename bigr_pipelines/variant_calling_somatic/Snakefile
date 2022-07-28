@@ -1,66 +1,15 @@
 include: "rules/000.common.smk"
 
 
-# rule all:
-#     input:
-#         facets=expand(
-#             "facets/{sample}/{sample}.{ext}",
-#             sample=design["Sample_id"].tolist(),
-#             ext=["vcf.gz", "cnv.png", "cov.pdf", "spider.pdf", "csv.gz"],
-#         ),
-#         calls=expand("snpsift/fixed/{sample}.vcf.gz", sample=design["Sample_id"]),
-#         calls_index=expand(
-#             "snpsift/fixed/{sample}.vcf.gz.tbi", sample=design["Sample_id"]
-#         ),
-#         table=expand("snpsift/extractFields/{sample}.tsv", sample=design["Sample_id"]),
-#         r=expand("msisensor/{sample}/{sample}.msi", sample=design["Sample_id"].tolist()),
-#         qc="multiqc/variant_calling_somatic.html",
-#         results=expand(
-#             "pandas/filter/{how}/dp{dp}/{sample}.dp{dp}.tsv",
-#             how=["all", "census_only", "oncokb_only"]
-#             if config.get("ANMO", False) is True
-#             else ["all"],
-#             sample=design["Sample_id"].tolist(),
-#             dp=["10", "40", "60"],
-#         ),
-#         results_xl=expand(
-#             "pandas/filter/{how}/dp{dp}/{sample}.dp{dp}.xlsx",
-#             how=["all", "census_only", "oncokb_only"]
-#             if config.get("ANMO", False) is True
-#             else ["all"],
-#             sample=design["Sample_id"].tolist(),
-#             dp=["10", "40", "60"],
-#         ),
-#         tmb="TMB.tsv",
-#     output:
-#         directory("results_to_upload"),
-#     message:
-#         "Finishing the WES Somatic Variant Calling"
-#     threads: 1
-#     resources:
-#         mem_mb=lambda wildcards, attempt: attempt * 768,
-#         time_min=lambda wildcards, attempt: attempt * 45,
-#         tmpdir="tmp",
-#     log:
-#         "logs/resultdir.log",
-#     params:
-#         mk="--parents --verbose",
-#         rs="--checksum --verbose --human-readable",
-#         dirlist=" ".join(
-#             [
-#                 f"results_to_upload/{content}"
-#                 for content in ["msi", "tmb", "vcf", "tsv", "xlsx", "cnv", "qc"]
-#             ]
-#         ),
-#     shell:
-#         "mkdir {params.mk} {params.dirlist} > {log} 2>&1 && "
-#         "rsync {params.rs} {input.msisensor} {output}/msi/ >> {log} 2>&1 && "
-#         "rsync {params.rs} {input.results} {output}/tsv/ >> {log} 2>&1 && "
-#         "rsync {params.rs} {input.results} {output}/xlsx/ >> {log} 2>&1 && "
-#         "rsync {params.rs} {input.facets} {output}/cnv/ >> {log} 2>&1 && "
-#         "rsync {params.rs} {input.calls} {input.calls_index} {output}/vcf/ >> {log} 2>&1 && "
-#         "rsync {params.rs} {input.html} {input.qc} {output}/qc/ >> {log} 2>&1 "
-
+rule target:
+    input:
+        multiqc="data_output/MultiQC/Somatic_Variant_Calling.html",
+        vcfs=expand("data_output/VCF/{sample}.vcf.gz", sample=sample_list),
+        vcf_tbis=expand("data_output/VCF/{sample}.vcf.gz.tbi", sample=sample_list),
+        vcf_xlsx=expand("data_output/XLSX/{sample}.xlsx", sample=sample_list),
+        vcf_tsv=expand("data_output/TSV/{sample}.tsv", sample=sample_list),
+        tmb="data_output/TMB.tsv",
+        cnv=expand("data_output/CNV/{sample}.tsv", sample=sample_list),
 
 ###############################
 ### TSV and Xlsx formatting ###
