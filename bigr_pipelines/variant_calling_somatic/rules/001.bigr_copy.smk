@@ -1,6 +1,6 @@
 rule bigr_copy:
     output:
-        "reads/{status}/{sample}.{stream}.fq.gz",
+        temp("reads/{status}/{sample}.{stream}.fq.gz"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
