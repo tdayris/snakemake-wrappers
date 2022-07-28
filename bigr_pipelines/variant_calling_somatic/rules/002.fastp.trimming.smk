@@ -8,7 +8,7 @@ rule fastp_clean:
     output:
         trimmed=temp(
             expand(
-                "fastp/trimmed/pe/{sample}_{status}.{stream}.fastq",
+                "fastp/trimmed/{sample}_{status}.{stream}.fastq",
                 stream=["1", "2"],
                 allow_missing=True,
             )
