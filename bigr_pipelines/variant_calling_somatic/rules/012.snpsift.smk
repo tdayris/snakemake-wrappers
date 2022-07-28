@@ -204,7 +204,7 @@ rule snpsift_dbsnp:
     log:
         "logs/snpsift/dbsnp/{sample}.log",
     params:
-        extra=config["dbsnp"].get("dbsnp", "-name 'dbSNP_' -tabix -noDownload -noLog"),
+        extra=config["snpsift"].get("dbsnp", "-name 'dbSNP_' -tabix -noDownload -noLog"),
     wrapper:
         "bio/snpsift/annotate"
 
