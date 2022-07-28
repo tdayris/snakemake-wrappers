@@ -3,7 +3,6 @@
 
 import functools
 
-logging.info("Preparing memory calls...")
 
 # Memory and time reservation
 def get_resources_per_gb(
