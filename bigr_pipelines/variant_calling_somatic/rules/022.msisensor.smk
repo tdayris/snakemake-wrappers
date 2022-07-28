@@ -5,7 +5,7 @@ rule msisensor_pro_msi:
         normal_idx="sambamba/markdup/{sample}_normal.bam.bai",
         tumor="sambamba/markdup/{sample}_tumor.bam",
         tumor_idx="sambamba/markdup/{sample}_tumor.bam.bai",
-        bed=config["reference"]["bed"],
+        bed=config["reference"]["capture_kit_bed"],
     output:
         temp(
             multiext(
