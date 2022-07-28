@@ -8,7 +8,7 @@ rule collect_multiple_metrics_raw:
     output:
         temp(
             multiext(
-                "picard/stats/{sample}.raw",
+                "picard/stats/{sample}_{status}.raw",
                 ".alignment_summary_metrics",
                 ".insert_size_metrics",
                 ".insert_size_histogram.pdf",
@@ -47,7 +47,7 @@ rule collect_multiple_metrics_cleaned:
     output:
         temp(
             multiext(
-                "picard/stats/{sample}.cleaned",
+                "picard/stats/{sample}_{status}.cleaned",
                 ".alignment_summary_metrics",
                 ".insert_size_metrics",
                 ".insert_size_histogram.pdf",
@@ -82,9 +82,6 @@ rule fastq_screen:
     output:
         txt=temp("fastq_screen/{sample}.{stream}.{status}.fastq_screen.txt"),
         png=temp("fastq_screen/{sample}.{stream}.{status}.fastq_screen.png"),
-    message:
-        "Assessing quality of {wildcards.sample}, {wildcards.stream}"
-        " (considering {wildcards.status})"
     threads: config.get("threads", 20)
     resources:
         mem_mb=get_8gb_per_attempt,

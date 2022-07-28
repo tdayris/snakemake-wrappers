@@ -24,7 +24,7 @@ rule multiqc:
         ),
         picard=[
             multiext(
-                f"picard/stats/{sample}.{cleaning}",
+                f"picard/stats/{sample}_{status}.{cleaning}",
                 ".alignment_summary_metrics",
                 ".insert_size_metrics",
                 ".insert_size_histogram.pdf",
@@ -41,6 +41,7 @@ rule multiqc:
             )
             for cleaning in cleaning_status
             for sample in sample_list
+            for status in status_list
         ],
         csvstats=expand("snpeff/csvstats/{sample}.csv", sample=sample_list),
     output:
