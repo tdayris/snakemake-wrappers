@@ -196,7 +196,7 @@ rule plot_deseq_genes:
         intermediar="deseq2/{comparison}/mcols.{comparison}.tsv",
         dst="deseq2/{comparison}/dst.{comparison}.tsv",
         assays="deseq2/{comparison}/assays.mu.{comparison}.tsv",
-        gene2gene="salmon/gene2gene.tsv",
+        gene2gene="salmon/gene2gene_with_chr.tsv",
         metadata="deseq2/{comparison}/metadata.{comparison}.tsv",
         filter_theta="deseq2/{comparison}/filter.theta.{comparison}.tsv",
     output:

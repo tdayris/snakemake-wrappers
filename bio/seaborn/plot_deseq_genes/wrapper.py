@@ -9,7 +9,6 @@ import logging
 import matplotlib
 import matplotlib.pyplot
 import numpy
-import os.path
 import pandas
 import seaborn
 
