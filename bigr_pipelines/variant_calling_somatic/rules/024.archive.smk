@@ -3,7 +3,7 @@ rule archive_list:
         expand("data_output/archive/VCF/{sample}.bcf", sample=sample_list),
         expand("data_output/archive/TSV/{sample}.tsv.gz", sample=sample_list),
         expand("data_output/archive/CNV/{sample}.tsv.gz", sample=sample_list),
-        "data_output/archive/TMB.tsv",
+        expand("data_output/archive/{content}.tsv", content=["TMB", "MSI"]),
         "data_output/archive/Somatic_Variant_Calling.html.gz",
         expand("data_output/archive/{sample}_{status}.cram", sample=sample_list, status=statue),
 
