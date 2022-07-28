@@ -30,7 +30,7 @@ rule collect_multiple_metrics_raw:
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/picard/multiple_metrics/{sample}.raw.log",
+        "logs/picard/multiple_metrics/{sample}.{status}.raw.log",
     params:
         extra=config["picard"].get("collect_multiple_metrics", ""),
     wrapper:
@@ -69,7 +69,7 @@ rule collect_multiple_metrics_cleaned:
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/picard/multiple_metrics/{sample}.cleaned.log",
+        "logs/picard/multiple_metrics/{sample}.{status}.cleaned.log",
     params:
         extra=config["picard"].get("collect_multiple_metrics", ""),
     wrapper:
