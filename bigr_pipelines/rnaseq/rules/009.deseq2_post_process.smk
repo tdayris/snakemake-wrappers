@@ -54,9 +54,9 @@ This rule creates HTML reports from DESeq2 results
 
 rule rbt_csv_report:
     input:
-        "data_output/DEseq2/{comparison}/Complete_{comparison}.tsv",
+        "data_output/DEseq2/{comparison}/{content}_{comparison}.tsv",
     output:
-        directory("rbt/csvreport/{comparison}/Complete_html_table/"),
+        directory("rbt/csvreport/{comparison}/{content}_html_table/"),
     message:
         "Making DESeq2 results readable and searchable"
     threads: 1
@@ -81,9 +81,9 @@ rule rbt_csv_report:
 
 rule zip_csv_report:
     input:
-        "rbt/csvreport/{comparison}/Complete_html_table/",
+        "rbt/csvreport/{comparison}/{content}_html_table/",
     output:
-        "data_output/DESeq2/{comparison}/Complete_html_table.tar.bz2",
+        "data_output/DESeq2/{comparison}/{content}_html_table.tar.bz2",
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
@@ -93,7 +93,7 @@ rule zip_csv_report:
     group:
         "csv_report"
     log:
-        "logs/rbt/csv-report/compress/{comparison}_{subset}.log",
+        "logs/rbt/csv-report/compress/{comparison}.{content}.log",
     params:
         config["rbt"].get("zip_extra", "--create --version --bzip2 --file"),
     conda:
