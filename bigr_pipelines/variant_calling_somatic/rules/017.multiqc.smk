@@ -24,7 +24,7 @@ rule multiqc:
         ),
         picard=[
             multiext(
-                "picard/stats/{sample}.{cleaning}",
+                f"picard/stats/{sample}.{cleaning}",
                 ".alignment_summary_metrics",
                 ".insert_size_metrics",
                 ".insert_size_histogram.pdf",
