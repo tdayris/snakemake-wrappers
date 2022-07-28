@@ -57,7 +57,7 @@ design.index = design["Sample_id"]
 
 sample_list = design["Sample_id"].tolist()
 streams = ["1", "2"]
-statue = ["normal", "tumor"]
+status_list = ["normal", "tumor"]
 content = ["snp", "indel"]
 
 
@@ -81,7 +81,7 @@ last_vcf = (
 wildcard_constraints:
     sample=r"|".join(sample_list),
     stream=r"|".join(streams),
-    status=r"|".join(status),
+    status=r"|".join(status_list),
     content=r"|".join(content),
 
 
