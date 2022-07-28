@@ -2,9 +2,9 @@ rule collect_multiple_metrics_raw:
     input:
         bam="bwa_mem2/sorted/{sample}_{status}.bam",
         bai="bwa_mem2/sorted/{sample}_{status}.bam.bai",
-        ref=config["reference"]["genome"],
-        ref_idx=config["reference"]["genome_index"],
-        ref_dict=config["reference"]["genome_dict"],
+        ref=config["reference"]["fasta"],
+        ref_idx=config["reference"]["fasta_index"],
+        ref_dict=config["reference"]["fasta_dict"],
     output:
         temp(
             multiext(
@@ -41,9 +41,9 @@ rule collect_multiple_metrics_cleaned:
     input:
         bam="sambamba/markdup/{sample}_{status}.bam",
         bai="sambamba/markdup/{sample}_{status}.bam.bai",
-        ref=config["reference"]["genome"],
-        ref_idx=config["reference"]["genome_index"],
-        ref_dict=config["reference"]["genome_dict"],
+        ref=config["reference"]["fasta"],
+        ref_idx=config["reference"]["fasta_index"],
+        ref_dict=config["reference"]["fasta_dict"],
     output:
         temp(
             multiext(
