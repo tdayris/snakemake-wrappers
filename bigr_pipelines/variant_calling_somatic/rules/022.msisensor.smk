@@ -27,3 +27,22 @@ rule msisensor_pro_msi:
         extra = config["msisensor"].get("extra", "")
     wrapper:
         "bio/msisensor_pro/msi"
+
+
+rule msi_results:
+    input:
+        expand("msisensor/{sample}/{sample}.msi", sample=sample_list)
+    output:
+        protected("data_output/MSI.tsv")
+    threads: 1
+    resources:
+        mem_mb=get_5gb_per_attempt,
+        time_min=get_15min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/msisensor/table.log"
+    params:
+        stability=config["msisensor"].get("stability_threshold", 20),
+        sample_list=sample_list
+    wrapper:
+        "bio/BiGR/msisensor_table"
