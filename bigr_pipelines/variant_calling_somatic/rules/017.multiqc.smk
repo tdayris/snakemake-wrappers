@@ -3,24 +3,24 @@ rule multiqc:
         html=expand(
             "fastp/html/pe/{sample}_{status}.fastp.html",
             sample=design["Sample_id"],
-            status=["normal", "tumor"],
+            status=status_list,
         ),
         json=expand(
             "fastp/json/pe/{sample}_{status}.fastp.json",
             sample=design["Sample_id"],
-            status=["normal", "tumor"],
+            status=status_list,
         ),
         sambamba_metrics=expand(
             "sambamba/markdup/{sample}_{status}.bam",
             sample=design["Sample_id"],
-            status=["normal", "tumor"],
+            status=status_list,
         ),
         fastq_screen=expand(
             "fastq_screen/{sample}.{stream}.{status}.fastq_screen.{ext}",
             sample=design["Sample_id"],
-            stream=["1", "2"],
+            stream=streams,
             ext=["txt", "png"],
-            status=["normal", "tumor"],
+            status=status_list,
         ),
         picard=[
             multiext(

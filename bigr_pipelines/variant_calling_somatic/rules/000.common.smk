@@ -60,6 +60,7 @@ sample_list = design["Sample_id"].tolist()
 streams = ["1", "2"]
 status_list = ["normal", "tumor"]
 content = ["snp", "indel"]
+cleaning_status = ["raw", "cleaned"]
 
 
 fastq_links = link_fq_somatic(
@@ -84,6 +85,7 @@ wildcard_constraints:
     stream=r"|".join(streams),
     status=r"|".join(status_list),
     content=r"|".join(content),
+    cleaning=r"|".join(cleaning_status),
 
 
 ############################
