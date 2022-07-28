@@ -2,7 +2,7 @@ rule star_align_chimera:
     input:
         fq1="fastp/trimmed/{sample}.1.fastq",
         fq2="fastp/trimmed/{sample}.2.fastq",
-        index=config["star"]["index"],
+        idx=config["star"]["index"],
     output:
         chim_junc=temp("star/{sample}/chimera/{sample}.Chimeric.out.junction"),
         bam=temp("star/{sample}/chimera/{sample}.bam"),
@@ -19,6 +19,7 @@ rule star_align_chimera:
     log:
         "logs/star/{sample}.log",
     params:
+        idx=config["star"]["index"],
         extra=config["star"].get(
             "chimera_extra",
         (
