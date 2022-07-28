@@ -15,9 +15,7 @@ rule gatk_apply_baserecalibrator:
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
     params:
-        extra=config["gatk"].get(
-            "apply_base_recal", "--create-output-bam-index"
-        ),
+        extra=config["gatk"].get("apply_base_recal", "--create-output-bam-index"),
     log:
         "logs/gatk/applybqsr/{sample}.{status}.log",
     wrapper:
@@ -39,10 +37,10 @@ rule gatk_compute_baserecalibration_table:
     resources:
         mem_mb=get_8gb_per_attempt,
         time_min=get_2h_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     log:
         "logs/gatk3/compute_bqsr/{sample}.{status}.log",
     params:
-        extra=config["gatk"].get("base_recalibrator")
+        extra=config["gatk"].get("base_recalibrator"),
     wrapper:
         "bio/gatk/baserecalibrator"

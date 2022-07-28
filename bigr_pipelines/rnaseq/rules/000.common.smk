@@ -143,6 +143,8 @@ streams = ["1", "2"]
 features = ["gene", "transcript"]
 # Type of mapping performed by the pipepline
 maptypes = ["variants", "chimera"]
+# DEseq2 results content list
+content_list = ["SortedOnLogFC", "SortedOnPadj", "Complete"]
 
 logging.info("Constraining wildcards...")
 
@@ -158,6 +160,7 @@ wildcard_constraints:
     elipse=r"|".join(elipsis_list),
     feature=r"|".join(features),
     maptype=r"|".join(maptypes),
+    content=r"|".join(content_list),
 
 
 ############################

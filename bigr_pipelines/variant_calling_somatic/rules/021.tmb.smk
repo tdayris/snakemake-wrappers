@@ -34,7 +34,6 @@ use rule extract_somatic_mutations from somatic_tmb with:
         vcf="snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz",
 
 
-
 use rule compute_tmb from somatic_tmb with:
     output:
         tsv=protected("data_output/TMB.tsv"),
