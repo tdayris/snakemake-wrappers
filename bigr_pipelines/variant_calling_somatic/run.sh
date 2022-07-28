@@ -15,7 +15,7 @@ export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 
 SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
 CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"
-SNAKE_ARGS=()
+SNAKE_ARGS=("--cache estimate_igs_sureselect_v5")
 PROFILE="slurm"
 SUMMARY=""
 GRAPH=""
