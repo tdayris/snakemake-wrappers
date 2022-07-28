@@ -28,7 +28,8 @@ rule split_multiallelic_mutect2:
     input:
         call="mutect2/filter/{sample}.vcf.gz",
         idx=get_tbi("mutect2/filter/{sample}.vcf.gz"),
-        fasta=config["genome"],
+        fasta=config["reference"]["fasta"],
+        fasta_idx=config["reference"]["fasta_idx"]
     output:
         "bcftools/mutect2/{sample}.vcf.gz",
     threads: 2
