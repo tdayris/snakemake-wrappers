@@ -34,6 +34,7 @@ localrules:
 ruleorder: gatk_filter_mutect_calls > tabix_index
 ruleorder: mutect2_somatic > tabix_index
 ruleorder: gatk_variant_filtration > pbgzip_compress
+ruleorder: gleaves_compatibility > tabix_index
 
 
 ########################
