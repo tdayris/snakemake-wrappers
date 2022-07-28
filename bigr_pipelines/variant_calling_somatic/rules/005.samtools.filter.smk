@@ -1,10 +1,10 @@
 rule samtools_filter_bed:
     input:
         "sambamba/sort/{sample}_{status}.bam",
-        fasta=config["ref"]["fasta"],
-        fasta_idx=get_fai(config["ref"]["fasta"]),
-        fasta_dict=get_dict(config["ref"]["fasta"]),
-        bed=config["ref"]["capture_kit_bed"],
+        fasta=config["reference"]["fasta"],
+        fasta_idx=get_fai(config["reference"]["fasta"]),
+        fasta_dict=get_dict(config["reference"]["fasta"]),
+        bed=config["reference"]["capture_kit_bed"],
     output:
         temp("samtools/filter/{sample}_{status}.bam"),
     threads: 10

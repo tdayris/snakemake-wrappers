@@ -1,7 +1,7 @@
 rule snpsift_gwascat:
     input:
         call="snpsift/dbvar/{sample}.vcf",
-        gwascat=config["ref"]["gwascat"],
+        gwascat=config["reference"]["gwascat"],
     output:
         call=temp("snpsift/gwascat/{sample}.vcf"),
     message:
@@ -129,8 +129,8 @@ rule snpsift_dbnsfp:
 rule snpsift_cosmic:
     input:
         call="snpsift/kaviar/{sample}.vcf",
-        database=config["ref"]["cosmic"],
-        database_idx=config["ref"]["cosmic_tbi"],
+        database=config["reference"]["cosmic"],
+        database_idx=config["reference"]["cosmic_tbi"],
     output:
         call=temp("snpsift/cosmic/{sample}.vcf"),
     threads: 1
@@ -151,8 +151,8 @@ rule snpsift_cosmic:
 rule snpsift_kaviar:
     input:
         call="snpsift/gmt/{sample}.vcf",
-        database=config["ref"]["kaviar"],
-        database_idx=config["ref"]["kaviar_tbi"],
+        database=config["reference"]["kaviar"],
+        database_idx=config["reference"]["kaviar_tbi"],
     output:
         call=temp("snpsift/kaviar/{sample}.vcf"),
     message:

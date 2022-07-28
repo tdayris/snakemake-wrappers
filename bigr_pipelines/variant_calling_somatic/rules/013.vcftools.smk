@@ -38,7 +38,7 @@ rule vcftools_annotate_mane:
     input:
         vcf="vcftools/revel/{sample}.vcf.gz",
         vcf_tbi="vcftools/revel/{sample}.vcf.gz.tbi",
-        annotation=config["ref"]["mane"],
+        annotation=config["reference"]["mane"],
         description="mane/description.txt",
     output:
         vcf=temp("vcftools/mane/{sample}.vcf.gz"),
@@ -92,7 +92,7 @@ rule vcftools_annotate_revel:
     input:
         vcf="vcftools/mistic/{sample}.vcf.gz",
         vcf_tbi="vcftools/mistic/{sample}.vcf.gz.tbi",
-        annotation=config["ref"]["revel"],
+        annotation=config["reference"]["revel"],
         description="revel/description.txt",
     output:
         vcf=temp("vcftools/revel/{sample}.vcf.gz"),
