@@ -5,7 +5,7 @@ rule star_align_variants:
         idx=config["star"]["index"],
     output:
         chim_junc=temp("star/{sample}/variants/{sample}.Chimeric.out.junction"),
-        bam=temp("star/{sample}/variants/{sample}.bam"),
+        sam=temp("star/{sample}/variants/{sample}.sam"),
         sj=temp("star/{sample}/variants/{sample}.SJ.out.tab"),
         log=temp("star/{sample}/variants/{sample}.Log.out"),
         log_progress=temp("star/{sample}/variants/{sample}.Log.progress.out"),
@@ -38,3 +38,24 @@ rule star_align_variants:
         ),
     wrapper:
         "bio/star/align"
+
+
+
+rule sambamba_sort_star:
+    input:
+        mapping="star/{sample}/{maptypes}/{sample}.sam"
+    output:
+        mapping=temp("star/{sample}/{maptypes/{sample}.bam")
+    threads: min(config.get("max_threads", 20), 10)
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_90min_per_attempt,
+        tmpdir="tmp",
+    shadow:
+        "shallow"
+    params:
+        extra=config["sambamba"].get("sort_extra", ""),
+    log:
+        "logs/star/sort/{sample}.{maptypes}.log",
+    wrapper:
+        "bio/sambamba/sort"
