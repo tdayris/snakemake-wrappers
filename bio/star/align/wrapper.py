@@ -7,6 +7,7 @@ __license__ = "MIT"
 import os
 import tempfile
 from snakemake.shell import shell
+from snakemake.utils import makedirs
 
 extra = snakemake.params.get("extra", "")
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
@@ -42,6 +43,8 @@ if not index:
     index = snakemake.params.get("idx", "")
 
 with tempfile.TemporaryDirectory() as tmpdir:
+    makedirs(f"{tmpdir}/temp/")
+
     shell(
         "STAR "
         " --runThreadN {snakemake.threads}"
