@@ -89,8 +89,8 @@ rule cram_mapping:
     input:
         aln="data_output/BAM/{sample}_{status}.bam",
         aln_idx="data_output/BAM/{sample}_{status}.bam.bai",
-        fasta=config["reference"]["genome"],
-        fasta_idx=config["reference"]["genome_index"],
+        fasta=config["reference"]["fasta"],
+        fasta_idx=config["reference"]["fasta_index"],
         bed=config["reference"]["capture_kit_bed"],
     output:
         "data_output/archive/{sample}_{status}.cram",
