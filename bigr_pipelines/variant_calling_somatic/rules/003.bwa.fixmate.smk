@@ -69,7 +69,6 @@ rule samtools_fixmate:
         "bio/samtools/fixmate"
 
 
-r
 rule sambamba_view_raw_bwa:
     input:
         mapping="bwa_mem2/mem/{sample}_{status}.sam"
@@ -81,7 +80,7 @@ rule sambamba_view_raw_bwa:
         time_min=get_35min_per_attempt,
         tmpdir="tmp"
     log:
-        "logs/sambamba/view/{sample}.{maptype}.raw_star.bam"
+        "logs/sambamba/view/{sample}.{status}.raw_star.bam"
     params:
         extra=config["sambamba"].get("index_extra", "")
     wrapper:
@@ -102,9 +101,9 @@ rule sambamba_sort_raw_bwa:
     shadow:
         "shallow"
     params:
-        extra=config["sambamba"].get("sort_extra", ""),
+        extra="--sort-by-name"
     log:
-        "logs/star/sort/{sample}.{maptypes}.log",
+        "logs/star/sort/{sample}.{status}.log",
     wrapper:
         "bio/sambamba/sort"
 
