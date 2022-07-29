@@ -226,7 +226,7 @@ def time_to_minutes(time):
     return minutes
 
 
-def set_partition(time):
+def set_partition(time: int) -> str:
     if time < 360:
         return "shortq"
     elif 360 <= time < 1440:
@@ -235,7 +235,7 @@ def set_partition(time):
         return "longq"
     elif 10080 <= time < 86400:
         return "verylongq"
-    else:
-        raise ValueError(
-            "Too much time requested: {}".format(str(time))
-        )
+
+    raise ValueError(
+        "Too much time requested: {}".format(str(time))
+    )
