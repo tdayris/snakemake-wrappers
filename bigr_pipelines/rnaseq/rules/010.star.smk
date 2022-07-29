@@ -25,6 +25,7 @@ rule star_align_variants:
             "variant_extra",
         (
         "--outFilterType BySJout "
+                "--outSAMtype BAM SortedByCoordinate "
                 "--quantMode GeneCounts "
                 "--outFilterMultimapNmax 20 "
                 "--alignSJoverhangMin 8 "

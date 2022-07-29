@@ -28,6 +28,7 @@ rule star_align_chimera:
                 "--quantMode GeneCounts "
                 "--twopassMode Basic "
                 "--outSAMstrandField intronMotif "
+                "--outSAMtype BAM SortedByCoordinate "
                 "--outSAMunmapped Within "
                 "--chimSegmentMin 12 "
                 "--chimJunctionOverhangMin 8 "
