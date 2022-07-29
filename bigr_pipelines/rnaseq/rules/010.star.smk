@@ -41,22 +41,26 @@ rule star_align_variants:
 
 
 
-rule sambamba_view_star:
+rule samtools_view_star:
     input:
-        mapping="star/{sample}/{maptype}/{sample}.sam"
+        "star/{sample}/{maptype}/{sample}.sam",
+        fasta=config["reference"]["fasta"],
+        fasta_idx=get_fai(config["reference"]["fasta"]),
+        fasta_dict=get_dict(config["reference"]["fasta"]),
+        bed=config["reference"]["capture_kit_bed"],
     output:
-        temp("star/{sample}/{maptype}/{sample}.unsorted.bam")
+        temp("samtools/filter/{sample}_{status}.bam"),
     threads: min(config.get("max_threads", 20), 10)
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp"
-    log:
-        "logs/sambamba/view/{sample}.{maptype}.raw_star.bam"
+        tmpdir="tmp",
     params:
-        extra=config["sambamba"].get("index_extra", "")
+        extra="-h",
+    log:
+        "logs/sambamba/view/{sample}.{maptype}.raw_star.log"
     wrapper:
-        "bio/sambamba/view"
+        "bio/samtools/view"
 
 
 
