@@ -8,7 +8,7 @@ rule archive_list:
         expand(
             "data_output/archive/{sample}_{status}.cram",
             sample=sample_list,
-            status=statue,
+            status=status_list,
         ),
 
 
