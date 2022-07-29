@@ -19,7 +19,7 @@ rule tabix_index:
         "bio/tabix"
 
 
-"""
+""" 
 This rule compress a provided VCF file with pbgzip
 """
 rule pbgzip_compress:
