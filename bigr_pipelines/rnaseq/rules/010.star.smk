@@ -10,7 +10,6 @@ rule star_align_variants:
         log=temp("star/{sample}/variants/{sample}.Log.out"),
         log_progress=temp("star/{sample}/variants/{sample}.Log.progress.out"),
         log_final=temp("star/{sample}/variants/{sample}.Log.final.out"),
-        reads_per_gene=temp("star/{sample}/variants/{sample}.counts.tsv")
     threads: min(config.get("max_threads", 20), 20)
     resources:
         mem_mb=get_75gb_and_5gb_per_attempt,
@@ -25,8 +24,6 @@ rule star_align_variants:
             "variant_extra",
         (
         "--outFilterType BySJout "
-                "--outSAMtype BAM SortedByCoordinate "
-                "--quantMode GeneCounts "
                 "--outFilterMultimapNmax 20 "
                 "--alignSJoverhangMin 8 "
                 "--alignSJDBoverhangMin 1 "
@@ -35,7 +32,7 @@ rule star_align_variants:
                 "--alignIntronMin 20 "
                 "--alignIntronMax 1000000 "
                 "--alignMatesGapMax 1000000 "
-                "--outSAMattributes All "
+                "--outSAMattributes Standard "
                 "--twopassMode Basic "
             ),
         ),

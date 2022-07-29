@@ -10,7 +10,6 @@ rule star_align_chimera:
         log=temp("star/{sample}/chimera/{sample}.Log.out"),
         log_progress=temp("star/{sample}/chimera/{sample}.Log.progress.out"),
         log_final=temp("star/{sample}/chimera/{sample}.Log.final.out"),
-        reads_per_gene=temp("star/{sample}/chimera/{sample}.counts.tsv")
     threads: config.get("max_threads", 20)
     resources:
         mem_mb=get_75gb_and_5gb_per_attempt,
@@ -25,10 +24,8 @@ rule star_align_chimera:
             "chimera_extra",
         (
         "--outReadsUnmapped None "
-                "--quantMode GeneCounts "
                 "--twopassMode Basic "
                 "--outSAMstrandField intronMotif "
-                "--outSAMtype BAM SortedByCoordinate "
                 "--outSAMunmapped Within "
                 "--chimSegmentMin 12 "
                 "--chimJunctionOverhangMin 8 "
@@ -38,7 +35,7 @@ rule star_align_chimera:
                 "--alignIntronMax 100000 "
                 "--alignSJstitchMismatchNmax 5 -1 5 5 "
                 "--outSAMattrRGline ID:GRPundef "
-                "--outSAMattributes All "
+                "--outSAMattributes Standard "
                 "--chimMultimapScoreRange 3 "
                 "--chimScoreJunctionNonGTAG -4 "
                 "--chimMultimapNmax 20 "
