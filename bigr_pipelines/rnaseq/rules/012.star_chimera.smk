@@ -10,6 +10,7 @@ rule star_align_chimera:
         log=temp("star/{sample}/chimera/{sample}.Log.out"),
         log_progress=temp("star/{sample}/chimera/{sample}.Log.progress.out"),
         log_final=temp("star/{sample}/chimera/{sample}.Log.final.out"),
+        reads_per_gene=temp("star/{sample}/chimera/{sample}.counts.tsv")
     threads: config.get("max_threads", 20)
     resources:
         mem_mb=get_75gb_and_5gb_per_attempt,
@@ -24,6 +25,7 @@ rule star_align_chimera:
             "chimera_extra",
         (
         "--outReadsUnmapped None "
+                "--quantMode GeneCounts "
                 "--twopassMode Basic "
                 "--outSAMstrandField intronMotif "
                 "--outSAMunmapped Within "
