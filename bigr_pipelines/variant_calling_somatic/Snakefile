@@ -12,6 +12,13 @@ rule target:
         cnv=expand("data_output/CNV/{sample}.tsv", sample=sample_list),
 
 
+#####################
+### Final archive ###
+#####################
+
+include: "024.archive.smk"
+
+
 ###############################
 ### TSV and Xlsx formatting ###
 ###############################
@@ -51,6 +58,7 @@ include: "rules/021.tmb.smk"
 
 
 include: "rules/020.cnv_facets.smk"
+include: "rules/023.annot_sv.smk"
 
 
 ###########################
@@ -72,18 +80,6 @@ include: "rules/015.occurence.smk"
 include: "rules/011.spliceai.smk"
 include: "rules/013.vcftools.smk"
 include: "rules/014.bigr.annot.smk"
-
-
-#####################################
-### Merge variant calling results ###
-#####################################
-
-# module metacaller_somatic_meta:
-#     snakefile: "../../meta/bio/meta_caller_somatic/test/Snakefile"
-#     config: {"genome": config["ref"]["fasta"], "bed": config["ref"]["capture_kit_bed"]}
-#
-#
-# use rule * from metacaller_somatic_meta as *
 
 
 ############################################################################
