@@ -43,9 +43,9 @@ rule star_align_variants:
 
 rule sambamba_view_star:
     input:
-        mapping="star/{sample}/{maptypes}/{sample}.sam"
+        mapping="star/{sample}/{maptype}/{sample}.sam"
     output:
-        temp("star/{sample}/{maptypes}/{sample}.unsorted.bam")
+        temp("star/{sample}/{maptype}/{sample}.unsorted.bam")
     threads: min(config.get("max_threads", 20), 10)
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -62,9 +62,9 @@ rule sambamba_view_star:
 
 rule sambamba_sort_star:
     input:
-        mapping="star/{sample}/{maptypes}/{sample}.unsorted.bam"
+        mapping="star/{sample}/{maptype}/{sample}.unsorted.bam"
     output:
-        mapping=temp("star/{sample}/{maptypes}/{sample}.bam")
+        mapping=temp("star/{sample}/{maptype}/{sample}.bam")
     threads: min(config.get("max_threads", 20), 10)
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -75,6 +75,6 @@ rule sambamba_sort_star:
     params:
         extra=config["sambamba"].get("sort_extra", ""),
     log:
-        "logs/star/sort/{sample}.{maptypes}.log",
+        "logs/star/sort/{sample}.{maptype}.log",
     wrapper:
         "bio/sambamba/sort"
