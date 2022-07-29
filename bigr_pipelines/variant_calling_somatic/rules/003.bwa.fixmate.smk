@@ -69,11 +69,49 @@ rule samtools_fixmate:
         "bio/samtools/fixmate"
 
 
+r
+rule sambamba_view_raw_bwa:
+    input:
+        mapping="bwa_mem2/mem/{sample}_{status}.sam"
+    output:
+        temp("bwa_mem2/mem/{sample}_{status}.unsorted.sam")
+    threads: min(config.get("max_threads", 20), 10)
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_35min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/sambamba/view/{sample}.{maptype}.raw_star.bam"
+    params:
+        extra=config["sambamba"].get("index_extra", "")
+    wrapper:
+        "bio/sambamba/view"
+
+
+
+rule sambamba_sort_raw_bwa:
+    input:
+        mapping="bwa_mem2/mem/{sample}_{status}.unsorted.sam"
+    output:
+        mapping=temp("bwa_mem2/mem/{sample}_{status}.bam")
+    threads: min(config.get("max_threads", 20), 10)
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_90min_per_attempt,
+        tmpdir="tmp",
+    shadow:
+        "shallow"
+    params:
+        extra=config["sambamba"].get("sort_extra", ""),
+    log:
+        "logs/star/sort/{sample}.{maptypes}.log",
+    wrapper:
+        "bio/sambamba/sort"
+
+
 """
 This rule maps your reads against the indexed reference with BWA.
 """
-
-
 rule bwa_mem:
     input:
         reads=expand(
@@ -83,7 +121,7 @@ rule bwa_mem:
         ),
         index=config["reference"]["bwa_index"],
     output:
-        temp("bwa_mem2/mem/{sample}_{status}.bam"),
+        temp("bwa_mem2/mem/{sample}_{status}.sam"),
     threads: config.get("max_threads", 20)
     resources:
         mem_mb=get_75gb_and_2gb_per_attempt,

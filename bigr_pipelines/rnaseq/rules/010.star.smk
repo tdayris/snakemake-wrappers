@@ -41,7 +41,7 @@ rule star_align_variants:
 
 
 
-rule sambamba_view:
+rule sambamba_view_star:
     input:
         mapping="star/{sample}/{maptypes}/{sample}.sam"
     output:
