@@ -45,7 +45,7 @@ rule sambamba_sort_star:
     input:
         mapping="star/{sample}/{maptypes}/{sample}.sam"
     output:
-        mapping=temp("star/{sample}/{maptypes/{sample}.bam")
+        mapping=temp("star/{sample}/{maptypes}/{sample}.bam")
     threads: min(config.get("max_threads", 20), 10)
     resources:
         mem_mb=get_2gb_per_attempt,
