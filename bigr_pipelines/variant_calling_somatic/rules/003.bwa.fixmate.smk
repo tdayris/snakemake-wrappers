@@ -86,7 +86,7 @@ rule bwa_mem:
         temp("bwa_mem2/mem/{sample}_{status}.bam"),
     threads: config.get("max_threads", 20)
     resources:
-        mem_mb=get_75gb_and_5gb_per_attempt,
+        mem_mb=get_75gb_and_2gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
     shadow:
