@@ -31,7 +31,7 @@ use rule estimate_igs_sureselect_v5 from somatic_tmb
 
 use rule extract_somatic_mutations from somatic_tmb with:
     input:
-        vcf="snpeff_snpsift/snpsift/fixed/{sample}.vcf.gz",
+        vcf="snpsift/fixed/{sample}.vcf.gz",
 
 
 use rule compute_tmb from somatic_tmb with:

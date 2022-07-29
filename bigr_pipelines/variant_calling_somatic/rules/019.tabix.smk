@@ -1,42 +1,41 @@
-
-module compress_index_vcf_meta:
-    snakefile:
-        str(
-            workflow_source_dir
-            / ".."
-            / ".."
-            / "meta"
-            / "bio"
-            / "compress_index_vcf"
-            / "test"
-            / "Snakefile"
-        )
-    config:
-        config
-
-
-use rule * from compress_index_vcf_meta
-
-
-use rule tabix_index from compress_index_vcf_meta as snp_indel_tabix_index with:
+"""
+This rule indexes the pbgzipped vcf file
+"""
+rule tabix_index:
     input:
-        "{tool}/{subcommand}/{sample}.{content}.vcf.gz",
+        "{tool}/{subcommand}/{sample}.vcf.gz"
     output:
-        "{tool}/{subcommand}/{sample}.{content}.vcf.gz.tbi",
-    message:
-        "Indexing {wildcards.sample} (from somatic varscan "
-        "{wildcards.content}) with tabix."
+        "{tool}/{subcommand}/{sample}.vcf.gz.tbi"
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    params:
+        "-p vcf"
     log:
-        "logs/{tool}/{subcommand}/tabix/index/{sample}.{content}.log",
+        "logs/{tool}/{subcommand}/tabix/index/{sample}.log"
+    wrapper:
+        "bio/tabix"
 
 
-use rule pbgzip_compress from compress_index_vcf_meta as si_pbgzip with:
+"""
+This rule compress a provided VCF file with pbgzip
+"""
+rule pbgzip_compress:
     input:
-        "{tool}/{subcommand}/{sample}.{content}.vcf",
+        "{tool}/{subcommand}/{sample}.vcf"
     output:
-        "{tool}/{subcommand}/{sample}.{content}.vcf.gz",
-    message:
-        "Compressnig {wildcards.sample} (from somatic varscan "
-        "{wildcards.content}) with pbgzip."
+        "{tool}/{subcommand}/{sample}.vcf.gz"
+    threads:
+        1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_1h_per_attempt,
+        tmpdir="tmp"
+    params:
+        ""
     log:
-        "logs/{tool}/{subcommand}/pgbzip/varcsanc2/{sample}.{content}.log",
+        "logs/{tool}/{subcommand}/pbgzip/{sample}.log"
+    wrapper:
+        "bio/bcftools/view"
