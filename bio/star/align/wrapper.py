@@ -43,8 +43,6 @@ if not index:
     index = snakemake.params.get("idx", "")
 
 with tempfile.TemporaryDirectory() as tmpdir:
-    makedirs(f"{tmpdir}/temp/")
-
     shell(
         "STAR "
         " --runThreadN {snakemake.threads}"
