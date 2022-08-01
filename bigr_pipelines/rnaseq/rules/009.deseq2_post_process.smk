@@ -97,7 +97,7 @@ rule zip_csv_report:
     params:
         config["rbt"].get("zip_extra", "--create --version --bzip2 --file"),
     conda:
-        "envs/bash.yaml"
+        str(workflow_source_dir / "envs" / "bash.yaml")
     shell:
         "tar {params} {output} {input}"
 
