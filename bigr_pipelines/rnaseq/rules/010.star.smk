@@ -44,9 +44,9 @@ rule star_align_variants:
 rule samtools_view_star:
     input:
         "star/{sample}/{maptype}/{sample}.sam",
-        fasta=config["reference"]["fasta"],
-        fasta_idx=get_fai(config["reference"]["fasta"]),
-        fasta_dict=get_dict(config["reference"]["fasta"]),
+        fasta=config["reference"]["genome"],
+        fasta_idx=config["reference"]["genome_index"]),
+        fasta_dict=config["reference"]["genome_dict"]),
         bed=config["reference"]["capture_kit_bed"],
     output:
         temp("samtools/filter/{sample}_{status}.bam"),
