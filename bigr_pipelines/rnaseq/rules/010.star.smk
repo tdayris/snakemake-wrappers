@@ -49,7 +49,7 @@ rule samtools_view_star:
         fasta_dict=config["reference"]["genome_dict"],
         bed=config["reference"]["capture_kit_bed"],
     output:
-        temp("samtools/filter/{sample}_{maptype}.bam"),
+        temp("samtools/filter/{sample}_{maptype}.unsorted.bam"),
     threads: min(config.get("max_threads", 20), 10)
     resources:
         mem_mb=get_2gb_per_attempt,
