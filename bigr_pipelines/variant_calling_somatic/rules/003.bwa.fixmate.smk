@@ -86,7 +86,7 @@ rule samtools_view_bwa:
     params:
         extra="-h",
     log:
-        "logs/sambamba/view/{sample}.{maptype}.raw_star.log"
+        "logs/sambamba/view/{sample}.{status}.raw_star.log"
     wrapper:
         "bio/samtools/view"
 
