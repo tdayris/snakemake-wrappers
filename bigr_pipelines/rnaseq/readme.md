@@ -10,9 +10,9 @@ This pipeline aims to perform classical RNASeq-bulk analyses:
 1. [Quantification](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#quantification)
 1. [Differential Gene Expression](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#differential-gene-expression)
 1. [Aggregate factors](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#aggregate-factors)
-1. [Ignore factors]()
-1. [Perform only a subset of DGE]
-1. Fusion
+1. [Ignore factors](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#ignore-factors)
+1. [Perform only a subset of DGE](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#perform-only-a-subset-of-dge)
+1. [Fusion]() Under construction
 
 
 Each subsection can be selected one by one, or the whole pipeline may be executed.
