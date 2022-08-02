@@ -70,9 +70,9 @@ This file describes all optional parameters set in the pipeline.
 Possible edition:
 1. You may want to modify the list of genes of interest by adding a list after the provided example. 
 1. You may change the path to your design file by changing the default `design: design.tsv`.
-1. You may want to analyse two factors as together (see: aggregate factors, TODO)
-1. You may want to ignore factors present in your design file (see ignore factors, TODO)
-1. You may want to run a subset of possible DGE (see subset DGE, TODO)
+1. You may want to analyse two factors as together (see: [aggregate factors](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#aggregate-factors))
+1. You may want to ignore factors present in your design file (see [ignore factors](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#ignore-factors))
+1. You may want to run a subset of possible DGE (see [subset DGE](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#perform-only-a-subset-of-dge))
 
 Do not change command line parameters if you do not know what you are doing. Do not set neither threading, temporary files, memory managment, nor IO files in command line. This has already been done by the pipeline.
 
@@ -393,7 +393,7 @@ deseq2:
               - Status
 ```
 
-It will have the very same consequences as described in [solution 1](TODO) above. Please, note that the new factor will be named `Treatment_Status`. You cannot rename factors with this solution.
+It will have the very same consequences as described in [solution 1](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#solution-1) above. Please, note that the new factor will be named `Treatment_Status`. You cannot rename factors with this solution.
 
 # Ignore factors
 
@@ -439,7 +439,7 @@ deseq2:
             - Status
 ```
 
-It will have the very same consequences as described in [solution 1](TODO) above.
+It will have the very same consequences as described in [solution 1](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#solution-1-1) above.
 
 
 ## Perform only a subset of DGE
