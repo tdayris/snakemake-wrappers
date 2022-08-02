@@ -67,18 +67,3 @@ rule sambamba_sort_star:
         "logs/star/sort/{sample}.{maptype}.log",
     wrapper:
         "bio/sambamba/sort"
-
-
-rule picard_addorreplacegroup:
-    input:
-        "star/{sample}/{maptype}/{sample}.bam"
-    output:
-        "picard/{sample}/{maptype}/{sample}.bam"
-    threads: 1
-    resources:
-        time_min=get_15min_per_attempt,
-        mem_mb=get_2gb_per_attempt,
-        tmpdir="tmp"
-    log:
-        "logs/picard/addorreplacegroup/{sample}.log"
-    
