@@ -226,7 +226,7 @@ rule plot_deseq_genes:
     params:
         condition_dict=lambda wildcards: condition_dict[wildcards.comparison],
         gene_list=config.get("genes_of_interest", ["ENSG00000141510"]),
-        gene_plots_prefix=lambda wildcards: f"results/{wildcards.comparison}/gene_plots/",
+        gene_plots_prefix=lambda wildcards: f"data_output/DEseq2/{comparison}/gene_plots/",
         comparison=lambda wildcards: wildcards.comparison,
         chromosomes=config["reference"].get(
             "chromosomes",
