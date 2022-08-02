@@ -24,7 +24,7 @@ while [ "$#" -gt 0 ]; do
   case "${1}" in
     -p|--profile) PROFILE="${2}"; shift 2;;
     --summary) SUMMARY="${2}"; shift 2;;
-    --rulegraph) GRAPH="${2}"; shift 2;;
+    --rulegraph|--dag) GRAPH="${2}"; shift 2;;
     # hg19|HG19|GRCh37) CONFIG_PATH="${PIPELINE_PATH}/config.hg19.yaml"; shift;;
     hg38|HG38|GRCh38) CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"; shift;;
     mm10|MM10|GRCm38) CONFIG_PATH="${PIPELINE_PATH}/config.mm10.yaml"; echo "Some operations are not available for mice datasets"; shift;;
