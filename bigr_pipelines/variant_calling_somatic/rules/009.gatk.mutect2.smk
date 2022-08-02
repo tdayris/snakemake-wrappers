@@ -178,8 +178,8 @@ rule mutect2_somatic:
         map_idx="sambamba/markdup/{sample}_normal.bam.bai",
         tumor="sambamba/markdup/{sample}_tumor.bam",
         tumor_idx="sambamba/markdup/{sample}_tumor.bam.bai",
-        germline=config["reference"]["dbsnp"],
-        germline_tbi=config["reference"]["dbsnp_tbi"],
+        germline=config["reference"]["af_only"],
+        germline_tbi=config["reference"]["af_only_tbi"],
         intervals=config["reference"]["capture_kit_bed"],
     output:
         vcf=temp("mutect2/call/{sample}.vcf.gz"),
