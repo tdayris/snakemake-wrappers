@@ -83,7 +83,7 @@ rule zip_csv_report:
     input:
         "rbt/csvreport/{comparison}/{content}_html_table/",
     output:
-        "data_output/DESeq2/{comparison}/{content}_html_table.tar.bz2",
+        "data_output/DEseq2/{comparison}/{content}_html_table.tar.bz2",
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
