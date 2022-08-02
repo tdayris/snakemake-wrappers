@@ -95,11 +95,11 @@ rule zip_csv_report:
     log:
         "logs/rbt/csv-report/compress/{comparison}.{content}.log",
     params:
-        config["rbt"].get("zip_extra", "--create --version --bzip2 --file"),
+        config["rbt"].get("zip_extra", "--create --version --bzip2 --file="),
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     shell:
-        "tar {params} {output} {input} > {log} 2>&1 "
+        "tar {params}{output} {input} > {log} 2>&1 "
 
 
 ################
