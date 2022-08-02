@@ -2,13 +2,13 @@
 
 This pipeline aims to perform classical RNASeq-bulk analyses:
 
-1. TLDR
-1. design.tsv file
-1. config.yaml file
-1. Classical use
-1. Quality controls
-1. Quantification
-1. Differential Gene Expression
+1. [TLDR](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#tldr-run-this-pipeline)
+1. [design.tsv file](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#design-file)
+1. [config.yaml file](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#configyaml)
+1. [Classical use](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#classical-use)
+1. [Quality controls](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#quality-controls)
+1. [Quantification](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#quantification)
+1. [Differential Gene Expression](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#differential-gene-expression)
 1. Aggregate factors
 1. Ignore factors and/or levels
 1. Perform only a subset of DGE
@@ -38,19 +38,13 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
 The design file contains a description of your samples and experimental design. It should look like:
 
 | Sample_id | Upstream_file      | Downstream_file   | {ConditionA}   | {ConditionB} | ... |
-+===========+====================+===================+================+==============+=====+
+|-----------|--------------------|-------------------|----------------|--------------|-----|
 | Sample1   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | BatchA       | ... |
-+-----------+--------------------+-------------------+----------------+--------------+-----+
-| Sample1   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | BatchB       | ... |
-+-----------+--------------------+-------------------+----------------+--------------+-----+
-| Sample1   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | BatchA       | ... |
-+-----------+--------------------+-------------------+----------------+--------------+-----+
-| Sample1   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | BatchB       | ... |
-+-----------+--------------------+-------------------+----------------+--------------+-----+
-| Sample1   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | BatchA       | ... |
-+-----------+--------------------+-------------------+----------------+--------------+-----+
-| Sample1   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | BatchB       | ... |
-+-----------+--------------------+-------------------+----------------+--------------+-----+
+| Sample2   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | BatchB       | ... |
+| Sample3   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | BatchA       | ... |
+| Sample4   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | BatchB       | ... |
+| Sample5   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | BatchA       | ... |
+| Sample6   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | BatchB       | ... |
 
 `ConditionA` and `ConditionB` are exemple names. Put the name of your own conditions instead of ConditionA and ConditionB. Add as many conditions as you with below. Keep in mind that _all_ possible comparisons will be done (using `~{condition_name}`, see below for accounting batch effects).
 
@@ -312,3 +306,184 @@ data_output/
     ├── TPM.genes.tsv
     └── TPM.transcripts.tsv
 ```
+
+
+## Aggregate factors
+
+### Problem
+
+Consider the following design:
+
+| Sample_id | Upstream_file      | Downstream_file   | Treatment      | Status       |
+|-----------|--------------------|-------------------|----------------|--------------|
+| Sample1   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Diseased     |
+| Sample2   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Relapse      |
+| Sample3   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Diseased     |
+| Sample4   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Relapse      |
+| Sample5   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Relapse      |
+| Sample6   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Diseased     |
+| Sample7   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Relapse      |
+| Sample8   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Diseased     |
+
+It will produce the following comparisons:
+
+DEseq2/
+    ├── DGE_considering_factor_ConditionA_comparing_test_Untreated_vs_reference_Treated
+    ├── DGE_considering_factor_ConditionB_comparing_test_Relapse_vs_reference_Diseased
+    ├── DGE_considering_factor_ConditionA_comparing_test_Treated_vs_reference_Untreated
+    └── DGE_considering_factor_ConditionB_comparing_test_Diseased_vs_reference_Relapse
+
+Let us imagine we are interested in the effect of the treatement itself, AND the effect of the treatment on sample under "relapse" in relation to sample on relapse but without treatement.
+
+
+### Solution 1
+
+The first easy solution is to create an additional column, called as you wish (lets say Treatment_On_Relapse) and concatenate the two columns values. As a result, the design would be:
+
+| Sample_id | Upstream_file      | Downstream_file   | Treatment      | Status       | Treatment_On_Relapse   |
+|-----------|--------------------|-------------------|----------------|--------------|------------------------|
+| Sample1   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Diseased     | Treated_Diseased       |
+| Sample2   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Relapse      | Treated_Relapse        |
+| Sample3   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Diseased     | Treated_Diseased       |
+| Sample4   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Relapse      | Treated_Relapse        |
+| Sample5   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Relapse      | Untreated_Relapse      |
+| Sample6   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Diseased     | Untreated_Diseased     |
+| Sample7   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Relapse      | Untreated_Relapse      |
+| Sample8   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Diseased     | Untreated_Diseased     |
+
+Now, the pipeline will produce the following results:
+
+DEseq2/
+    ├── DGE_considering_factor_ConditionA_comparing_test_Untreated_vs_reference_Treated
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Relapse_vs_reference_Treated_Diseased
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Relapse_vs_reference_Treated_Diseased
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Diseased_vs_reference_Treated_Diseased
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Relapse_vs_reference_Untreated_Diseased
+    ├── DGE_considering_factor_ConditionB_comparing_test_Relapse_vs_reference_Diseased
+    ├── DGE_considering_factor_ConditionA_comparing_test_Treated_vs_reference_Untreated
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Diseased_vs_reference_Treated_Relapse
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Diseased_vs_reference_Untreated_Relapse
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Diseased_vs_reference_Untreated_Diseased
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Diseased_vs_reference_Untreated_Relapse
+    └── DGE_considering_factor_ConditionB_comparing_test_Diseased_vs_reference_Relapse
+
+You do have the levels you are interested in.
+
+### Solution 2
+
+Within the `config.yaml` file, modify the value of 
+
+```{yaml}
+deseq2: 
+    design: 
+        columns_to_aggregate: null
+```
+
+to:
+
+```{yaml}
+deseq2: 
+    design: 
+        columns_to_aggregate:
+            - - Treatment
+              - Status
+```
+
+It will have the very same consequences as described in [solution 1](TODO) above. Please, note that the new factor will be named `Treatment_Status`. You cannot rename factors with this solution.
+
+1. Ignore factors
+
+### Problem
+
+Sometimes, factors are not interesting anymore (not relevant in PCA, loss of interest by project research investigator, ...). We want this pipeline to ignore this factor. Consider the following `design.tsv`:
+
+
+| Sample_id | Upstream_file      | Downstream_file   | Treatment      | Status       |
+|-----------|--------------------|-------------------|----------------|--------------|
+| Sample1   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Diseased     |
+| Sample2   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Relapse      |
+| Sample3   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Diseased     |
+| Sample4   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Relapse      |
+| Sample5   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Relapse      |
+| Sample6   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Diseased     |
+| Sample7   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Relapse      |
+| Sample8   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Diseased     |
+
+
+Let's pretend we want to ignore the sample status Diseased/Relapse.
+
+### Solution 1
+
+Remove this column from your design. Then the pipeline won't be aware of it and will not consider this factor anymore.
+
+### Solution 2
+
+Within the `config.yaml` file, modify the value of 
+
+```{yaml}
+deseq2: 
+    design: 
+        columns_to_ignore: null
+```
+
+to:
+
+```{yaml}
+deseq2: 
+    design: 
+        columns_to_ignore:
+            - Status
+```
+
+It will have the very same consequences as described in [solution 1](TODO) above.
+
+
+1. Perform only a subset of DGE
+
+
+### Problem
+
+Sometimes, we are not interested in all possible comparisons. For instance, the should be only one reference through all the comparisons. Let us consider the following `design.tsv`:
+
+| Sample_id | Upstream_file      | Downstream_file   | Treatment      | Status       |
+|-----------|--------------------|-------------------|----------------|--------------|
+| Sample1   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Diseased     |
+| Sample2   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Relapse      |
+| Sample3   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Diseased     |
+| Sample4   | /path/file.1.fq.gz |/path/file.2.fq.gz | Treated        | Relapse      |
+| Sample5   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Relapse      |
+| Sample6   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Diseased     |
+| Sample7   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Relapse      |
+| Sample8   | /path/file.1.fq.gz |/path/file.2.fq.gz | Untreated      | Diseased     |
+
+We want "Untreated" level within "Treatment" factor to always be a reference level. We also want "Untreated_Relapse" to be our reference while comparing Treatment/Status interactions.
+
+### Solution
+
+Within the `config.yaml` file, modify the value of 
+
+```{yaml}
+deseq2: 
+    design: 
+        columns_to_aggregate: null
+        include_only: null
+```
+
+to:
+
+```{yaml}
+deseq2: 
+    design: 
+        columns_to_aggregate:
+            - - Treatment
+              - Status
+        include_only:
+            - _reference_Untreated_Relapse
+            - _reference_Untreated
+```
+
+Now, the pipeline will produce the following results:
+
+DEseq2/
+    ├── DGE_considering_factor_ConditionA_comparing_test_Treated_vs_reference_Untreated
+    └── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Diseased_vs_reference_Untreated_Relapse
