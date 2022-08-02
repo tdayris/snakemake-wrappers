@@ -9,9 +9,9 @@ This pipeline aims to perform classical RNASeq-bulk analyses:
 1. [Quality controls](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#quality-controls)
 1. [Quantification](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#quantification)
 1. [Differential Gene Expression](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#differential-gene-expression)
-1. Aggregate factors
-1. Ignore factors and/or levels
-1. Perform only a subset of DGE
+1. [Aggregate factors](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#aggregate-factors)
+1. [Ignore factors]()
+1. [Perform only a subset of DGE]
 1. Fusion
 
 
@@ -327,11 +327,13 @@ Consider the following design:
 
 It will produce the following comparisons:
 
+```
 DEseq2/
     ├── DGE_considering_factor_ConditionA_comparing_test_Untreated_vs_reference_Treated
     ├── DGE_considering_factor_ConditionB_comparing_test_Relapse_vs_reference_Diseased
     ├── DGE_considering_factor_ConditionA_comparing_test_Treated_vs_reference_Untreated
     └── DGE_considering_factor_ConditionB_comparing_test_Diseased_vs_reference_Relapse
+```
 
 Let us imagine we are interested in the effect of the treatement itself, AND the effect of the treatment on sample under "relapse" in relation to sample on relapse but without treatement.
 
@@ -353,6 +355,7 @@ The first easy solution is to create an additional column, called as you wish (l
 
 Now, the pipeline will produce the following results:
 
+```
 DEseq2/
     ├── DGE_considering_factor_ConditionA_comparing_test_Untreated_vs_reference_Treated
     ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Relapse_vs_reference_Treated_Diseased
@@ -366,6 +369,7 @@ DEseq2/
     ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Diseased_vs_reference_Untreated_Diseased
     ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Diseased_vs_reference_Untreated_Relapse
     └── DGE_considering_factor_ConditionB_comparing_test_Diseased_vs_reference_Relapse
+```
 
 You do have the levels you are interested in.
 
@@ -391,7 +395,7 @@ deseq2:
 
 It will have the very same consequences as described in [solution 1](TODO) above. Please, note that the new factor will be named `Treatment_Status`. You cannot rename factors with this solution.
 
-1. Ignore factors
+# Ignore factors
 
 ### Problem
 
@@ -438,7 +442,7 @@ deseq2:
 It will have the very same consequences as described in [solution 1](TODO) above.
 
 
-1. Perform only a subset of DGE
+## Perform only a subset of DGE
 
 
 ### Problem
@@ -484,6 +488,8 @@ deseq2:
 
 Now, the pipeline will produce the following results:
 
+```
 DEseq2/
     ├── DGE_considering_factor_ConditionA_comparing_test_Treated_vs_reference_Untreated
     └── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Diseased_vs_reference_Untreated_Relapse
+```
