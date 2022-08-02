@@ -5,7 +5,6 @@ rule collect_multiple_metrics:
         ref=config["reference"]["genome"],
         ref_idx=config["reference"]["genome_index"],
         ref_dict=config["reference"]["genome_dict"],
-        refflat=config["reference"]["refflat"],
     output:
         temp(
             multiext(
@@ -18,7 +17,6 @@ rule collect_multiple_metrics:
                 ".gc_bias.detail_metrics",
                 ".gc_bias.summary_metrics",
                 ".gc_bias.pdf",
-                ".rna_metrics",
                 ".bait_bias_detail_metrics",
                 ".bait_bias_summary_metrics",
                 ".error_summary_metrics",
@@ -33,7 +31,7 @@ rule collect_multiple_metrics:
     log:
         "logs/picard/multiple_metrics/{sample}.{maptype}.log",
     params:
-        extra=lambda wildcards, input: f"REF_FLAT {input.refflat} {config['picard'].get('extra', '')}",
+        extra=config['picard'].get('extra', ''),
     wrapper:
         "bio/picard/collectmultiplemetrics"
 
