@@ -67,7 +67,7 @@ rule samtools_cram:
     threads: min(config.get("max_threads", 2), 2)
     resources:
         mem_mb=get_1gb_per_attempt,
-        time_min=get_15min_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp",
     retries: 2
     params:
