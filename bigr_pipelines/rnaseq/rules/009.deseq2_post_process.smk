@@ -99,7 +99,7 @@ rule zip_csv_report:
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     shell:
-        "tar {params} {output} {input}"
+        "tar {params} {output} {input} > {log} 2>&1 "
 
 
 ################
