@@ -188,10 +188,7 @@ rule star_fusion_results:
             sample=sample_list,
             ext=["bam", "bam.bai"],
         ),
-        cram=expand(
-            "data_output/Mapping/chimera/{sample}.cram",
-            sample=sample_list
-        ),
+        cram=expand("data_output/Mapping/chimera/{sample}.cram", sample=sample_list),
         cj=expand(
             "star/{sample}/chimera/{sample}.Chimeric.out.junction", sample=sample_list
         ),
@@ -212,12 +209,11 @@ rule star_fusion_results:
                 ".gc_bias.detail_metrics",
                 ".gc_bias.summary_metrics",
                 ".gc_bias.pdf",
-                ".rna_metrics",
                 ".bait_bias_detail_metrics",
                 ".bait_bias_summary_metrics",
                 ".error_summary_metrics",
                 ".pre_adapter_detail_metrics",
-                ".pre_adapter_summary_metrics"
+                ".pre_adapter_summary_metrics",
             )
             for sample in sample_list
         ],
@@ -233,11 +229,22 @@ rule star_fusion_results:
             ext=["txt", "png"],
         ),
         star_fusion=expand("star-fusions/{sample}/", sample=sample_list),
-        read_distribution=expand("rseqc/read_distribution/chimera/{sample}.read_distribution.tsv", sample=sample_list),
+        read_distribution=expand(
+            "rseqc/read_distribution/chimera/{sample}.read_distribution.tsv",
+            sample=sample_list,
+        ),
         tin=expand("rseqc/tin/chimera/{sample}.summary.txt", sample=sample_list),
         bam_stat=expand("rseqc/bam_stat/chimera/{sample}.txt", sample=sample_list),
-        genebosycov=expand("rseqc/gene_body_coverage/chimera/{sample}.geneBodyCoverage.{ext}", sample=sample_list, ext=["txt", "pdf"]),
-        junctype=expand("rseqc/junction_annotation/chimera/{sample}.{ext}", sample=sample_list, ext=["txt", "pdf"]),
+        genebosycov=expand(
+            "rseqc/gene_body_coverage/chimera/{sample}.geneBodyCoverage.{ext}",
+            sample=sample_list,
+            ext=["txt", "pdf"],
+        ),
+        junctype=expand(
+            "rseqc/junction_annotation/chimera/{sample}.{ext}",
+            sample=sample_list,
+            ext=["txt", "pdf"],
+        ),
     output:
         report(
             "data_output/multiqc/MultiQC.Star.Chimera.html",
@@ -294,7 +301,17 @@ rule deseq2_results:
             stream=streams,
             ext=["txt", "png"],
         ),
+        deseq2_results=expand(
+            "data_output/DEseq2/{comparison}/{content}_{comparison}.tsv",
+            content=content_list,
+            allow_missing=True,
+        ),
         config="multiqc/{comparison}/multiqc_config.yaml",
+        gene_plot=expand(
+            "data_output/DEseq2/{comparison}/gene_plots/{gene}.png",
+            gene=config.get("genes_of_interest", ["ENSG00000141510"]),
+            allow_missing=True,
+        ),
         plots=[
             "multiqc/{comparison}/pca_plot_mqc.png",
             "multiqc/{comparison}/volcanoplot_mqc.png",
@@ -305,6 +322,7 @@ rule deseq2_results:
             "multiqc/{comparison}/inde_theta_filter_mqc.png",
             "multiqc/{comparison}/pvalue_qc_mqc.png",
         ],
+        deseq_rbt="data_output/DESeq2/{comparison}/Complete_html_table.tar.bz2",
     output:
         report(
             "data_output/Deseq2/{comparison}/MultiQC.DEseq2.html",
@@ -321,3 +339,10 @@ rule deseq2_results:
         "logs/multiqc.deseq2/{comparison}.log",
     wrapper:
         "bio/multiqc"
+
+
+#######################
+### Variant Calling ###
+#######################
+
+include: "rules/010.star.smk"

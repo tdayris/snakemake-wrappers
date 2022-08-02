@@ -1,64 +1,46 @@
-gatk_bqsr_config = {
-    "threads": config["threads"],
-    "genome": config["ref"]["fasta"],
-    "dbsnp": config["ref"]["dbsnp"],
-    "base_recal_extra": "",
-    "apply_base_recal_extra": config.get(
-        "gatk", {"apply_base_recal_extra": "--create-output-bam-index"}
-    ).get("apply_base_recal_extra", "--create-output-bam-index"),
-}
-
-
-module gatk_bqsr_meta:
-    snakefile:
-        str(
-            workflow_source_dir
-            / ".."
-            / ".."
-            / "meta"
-            / "bio"
-            / "gatk_bqsr"
-            / "test"
-            / "Snakefile"
-        )
-    config:
-        gatk_bqsr_config
-
-
-use rule gatk_apply_baserecalibrator from gatk_bqsr_meta with:
+rule gatk_apply_baserecalibrator:
     input:
         bam="sambamba/markdup/{sample}_{status}.bam",
         bam_index=get_bai("sambamba/markdup/{sample}_{status}.bam"),
-        ref=config["ref"]["fasta"],
-        ref_idx=get_fai(config["ref"]["fasta"]),
-        ref_dict=get_dict(config["ref"]["fasta"]),
+        ref=config["reference"]["fasta"],
+        ref_idx=config["reference"]["fasta_index"],
+        ref_dict=config["reference"]["fasta_dict"],
         recal_table="gatk/recal_data_table/{sample}_{status}.grp",
     output:
-        bam="gatk/recal_bam/{sample}_{status}.bam",
-        bai=get_bai("gatk/recal_bam/{sample}_{status}.bam"),
-    message:
-        "Applying BQSR on {wildcards.status} {wildcards.sample} with GATK"
+        bam=protected("data_output/BAM/{sample}_{status}.bam"),
+        bai=protected("data_output/BAM/{sample}_{status}.bam.bai"),
+    threads: 1
+    resources:
+        mem_mb=get_8gb_per_attempt,
+        time_min=get_1h_per_attempt,
+        tmpdir="tmp",
     params:
-        extra=config.get(
-            "gatk", {"apply_base_recal_extra", "--create-output-bam-index"}
-        ).get("apply_base_recal_extra", "--create-output-bam-index"),
+        extra=config["gatk"].get("apply_base_recal", "--create-output-bam-index"),
     log:
         "logs/gatk/applybqsr/{sample}.{status}.log",
+    wrapper:
+        "bio/gatk/applybqsr"
 
 
-use rule gatk_compute_baserecalibration_table from gatk_bqsr_meta with:
+rule gatk_compute_baserecalibration_table:
     input:
         bam="sambamba/markdup/{sample}_{status}.bam",
         bam_index=get_bai("sambamba/markdup/{sample}_{status}.bam"),
-        ref=config["ref"]["fasta"],
-        ref_idx=get_fai(config["ref"]["fasta"]),
-        ref_dict=get_dict(config["ref"]["fasta"]),
-        known=config["ref"]["dbsnp"],
-        known_idx=get_tbi(config["ref"]["dbsnp"]),
+        ref=config["reference"]["fasta"],
+        ref_idx=config["reference"]["fasta_index"],
+        ref_dict=config["reference"]["fasta_dict"],
+        known=config["reference"]["dbsnp"],
+        known_idx=config["reference"]["dbsnp_tbi"],
     output:
         recal_table=temp("gatk/recal_data_table/{sample}_{status}.grp"),
-    message:
-        "Compute BQSR table from {wildcards.status} {wildcards.sample} "
-        "with GATK"
+    threads: 1
+    resources:
+        mem_mb=get_8gb_per_attempt,
+        time_min=get_2h_per_attempt,
+        tmpdir="tmp",
     log:
         "logs/gatk3/compute_bqsr/{sample}.{status}.log",
+    params:
+        extra=config["gatk"].get("base_recalibrator"),
+    wrapper:
+        "bio/gatk/baserecalibrator"

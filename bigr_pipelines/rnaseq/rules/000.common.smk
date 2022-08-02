@@ -31,6 +31,7 @@ from file_manager import *
 from files_linker import *
 from graphics import *
 from write_yaml import *
+from reservation import *
 from messages import message
 
 #####################
@@ -65,7 +66,12 @@ logging.info("Design file loaded")
 # Links fastq paths provided by users and fastq paths used in this pipeline
 # this is done in order to handle iRODS paths.
 logging.info("Building globals...")
-fastq_links = link_fq(design.Sample_id, design.Upstream_file, design.Downstream_file)
+fastq_links = link_fq(
+    sample_names=design.Sample_id,
+    r1_paths=design.Upstream_file,
+    r2_paths=design.Downstream_file,
+    prefix="data_input",
+)
 
 # A list that holds all comparisons made in DESeq2.
 # This is done in order to avoid checkpoints
@@ -112,6 +118,9 @@ output_prefixes = [
     for factor, test, ref in comparison_levels
 ]
 
+# A dict containing comparison names and factors/levels
+contrasts = dict(zip(output_prefixes, comparison_levels))
+
 # A dict containing the list of samples used in DESeq2,
 # for a given comparison
 samples_per_prefixes = {
@@ -135,6 +144,8 @@ streams = ["1", "2"]
 features = ["gene", "transcript"]
 # Type of mapping performed by the pipepline
 maptypes = ["variants", "chimera"]
+# DEseq2 results content list
+content_list = ["SortedOnLogFC", "SortedOnPadj", "Complete"]
 
 logging.info("Constraining wildcards...")
 
@@ -150,55 +161,4 @@ wildcard_constraints:
     elipse=r"|".join(elipsis_list),
     feature=r"|".join(features),
     maptype=r"|".join(maptypes),
-
-
-############################
-### Resource reservation ###
-############################
-
-# Memory and time reservation
-def get_resources_per_gb(
-    wildcards, input, attempt, multiplier: int = 1, base: int = 0
-) -> int:
-    """
-    Return the amount of resources needed per GB of input.
-
-    Parameters:
-    * wildcards: Snakemake signature requires this parameter.
-    * input: The input file
-    * attempt: The # of times the calling rule has been restarted
-    * multiplier: An arbitrary multiplier
-
-    Return:
-    (int) The amount of resources needed (mb, minutes, etc)
-    """
-    return max(
-        # Case there is 1gb or more in input
-        ((input.size // 1_000_000_000) * attempt * multiplier) + base,
-        # Case there is less than 1gb in input
-        (multiplier * attempt) + base,
-    )
-
-
-logging.info("Preparing memory calls...")
-# Explicit time reservations
-get_15min_per_attempt = functools.partial(get_resources_per_gb, multiplier=15)
-get_45min_per_attempt = functools.partial(get_resources_per_gb, multiplier=45)
-get_75min_per_attempt = functools.partial(get_resources_per_gb, multiplier=75)
-get_20min_per_attempt = functools.partial(get_resources_per_gb, multiplier=20)
-get_1h_per_attempt = functools.partial(get_resources_per_gb, multiplier=60)
-get_2h_per_attempt = functools.partial(get_resources_per_gb, multiplier=60 * 2)
-get_5h_per_attempt = functools.partial(get_resources_per_gb, multiplier=60 * 5)
-get_90min_per_attempt = functools.partial(get_resources_per_gb, multiplier=90)
-
-# Explicit memory reservation
-get_1gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024)
-get_2gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 2)
-get_4gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 4)
-get_6gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 6)
-get_8gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 8)
-get_10gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 10)
-get_20gb_per_attempt = functools.partial(get_resources_per_gb, multiplier=1024 * 20)
-get_75gb_and_5gb_per_attempt = functools.partial(
-    get_resources_per_gb, multiplier=1024 * 5, base=1024 * 75
-)
+    content=r"|".join(content_list),

@@ -13,13 +13,8 @@ from snakemake.shell import shell
 
 # Extract arguments.
 extra = snakemake.params.get("extra", "")
-threads = snakemake.threads - 1
 
-sort = snakemake.params.get("sort", "none")
-sort_order = snakemake.params.get("sort_order", "coordinate")
-sort_extra = snakemake.params.get("sort_extra", "")
-
-log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 # Check inputs/arguments.
 if not isinstance(snakemake.input.reads, str) and len(snakemake.input.reads) not in {
@@ -28,46 +23,13 @@ if not isinstance(snakemake.input.reads, str) and len(snakemake.input.reads) not
 }:
     raise ValueError("input must have 1 (single-end) or 2 (paired-end) elements")
 
-if sort_order not in {"coordinate", "queryname"}:
-    raise ValueError("Unexpected value for sort_order ({})".format(sort_order))
 
-# Determine which pipe command to use for converting to bam or sorting.
-if sort == "none":
-
-    # Simply convert to bam using samtools view.
-    pipe_cmd = "samtools view -Sbh -o {snakemake.output[0]} -"
-
-elif sort == "samtools":
-
-    # Sort alignments using samtools sort.
-    pipe_cmd = "samtools sort {sort_extra} -o {snakemake.output[0]} -"
-
-    # Add name flag if needed.
-    if sort_order == "queryname":
-        sort_extra += " -n"
-
-    prefix = path.splitext(snakemake.output[0])[0]
-    sort_extra += " -T " + prefix + ".tmp"
-
-elif sort == "picard":
-
-    # Sort alignments using picard SortSam.
-    pipe_cmd = (
-        "picard SortSam {sort_extra} INPUT=/dev/stdin"
-        " OUTPUT={snakemake.output[0]} SORT_ORDER={sort_order}"
-    )
-
-else:
-    raise ValueError("Unexpected value for params.sort ({})".format(sort))
 
 shell(
-    "(bwa-mem2 mem"
-    " -t {threads}"
+    "bwa-mem2 mem"
+    " -t {snakemake.threads}"
     " {extra}"
     " {snakemake.params.index}"
     " {snakemake.input.reads}"
-    " | " + pipe_cmd + ") {log}"
+    " > {snakemake.output[0]} {log}"
 )
-
-# Checking VCF format in search for truncated files
-shell(" ( echo 'Removing {snakemake.output[0]} if it s truncated.' ; ( samtools view {snakemake.output[0]} | tail ) || rm --verbose {snakemake.output[0]} ) {log} ")

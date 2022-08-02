@@ -6,13 +6,13 @@
 rule additional_headers_mane:
     output:
         temp("mane/description.txt"),
-    message:
-        "Building annotation headers for MANE"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 128,
-        time_min=lambda wildcards, attempt: attempt * 2,
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    group:
+        "additional_headers"
     log:
         "logs/mane/description.log",
     params:
@@ -37,26 +37,26 @@ rule additional_headers_mane:
 rule vcftools_annotate_mane:
     input:
         vcf="vcftools/revel/{sample}.vcf.gz",
-        annotation=config["ref"]["mane"],
+        vcf_tbi="vcftools/revel/{sample}.vcf.gz.tbi",
+        annotation=config["reference"]["mane"],
         description="mane/description.txt",
     output:
         vcf=temp("vcftools/mane/{sample}.vcf.gz"),
-    message:
-        "Annotating {wildcards.sample} with MANE database, using VCFTools"
     threads: 4
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/vcftools/annotate/{sample}.mane.log",
     params:
-        extra=(
-            "--columns INFO/MANE_NCBI_GeneID,INFO/MANE_Ensembl_Gene,"
+        extra=config["vcftools"].get(
+            "mane",
+        "--columns INFO/MANE_NCBI_GeneID,INFO/MANE_Ensembl_Gene,"
             "INFO/MANE_HGNC_ID,INFO/MANE_symbol,INFO/MANE_name,"
             "INFO/MANE_RefSeq_nuc,INFO/MANE_RefSeq_prot,INFO/MANE_Ensembl_nuc,"
             "INFO/MANE_Ensembl_prot,INFO/MANE_MANE_status,CHROM,FROM,TO,"
-            "INFO/MANE_chr_strand"
+            "INFO/MANE_chr_strand",
         ),
     wrapper:
         "bio/vcftools/annotate"
@@ -70,13 +70,13 @@ rule vcftools_annotate_mane:
 rule additional_headers_revel:
     output:
         temp("revel/description.txt"),
-    message:
-        "Building annotation headers for REVEL"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 128,
-        time_min=lambda wildcards, attempt: attempt * 2,
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    group:
+        "additional_headers"
     log:
         "logs/mane/description.log",
     params:
@@ -91,24 +91,24 @@ rule additional_headers_revel:
 rule vcftools_annotate_revel:
     input:
         vcf="vcftools/mistic/{sample}.vcf.gz",
-        annotation=config["ref"]["revel"],
+        vcf_tbi="vcftools/mistic/{sample}.vcf.gz.tbi",
+        annotation=config["reference"]["revel"],
         description="revel/description.txt",
     output:
         vcf=temp("vcftools/revel/{sample}.vcf.gz"),
-    message:
-        "Annotating {wildcards.sample} with REVEL database, using VCFTools"
     threads: 4
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/vcftools/annotate/{sample}.revel.log",
     params:
-        extra=(
-            "--columns CHROM,POS,-,REF,ALT,INFO/REVEL_aaref,INFO/REVEL_aaalt,INFO/REVEL,INFO/REVEL_Ensembl_transcriptid"
-            if config["params"]["ncbi_build"] == "GRCh38"
-            else "--columns CHROM,-,POS,REF,ALT,INFO/AAREF,INFO/AAALT,INFO/REVEL,INFO/REVEL_Ensembl_transcriptid"
+        extra=config["vcftools"].get(
+            "revel",
+        "--columns CHROM,POS,-,REF,ALT,INFO/REVEL_aaref,INFO/REVEL_aaalt,INFO/REVEL,INFO/REVEL_Ensembl_transcriptid"
+            if config["reference"]["ncbi_build"].lower() == "grch38"
+            else "--columns CHROM,-,POS,REF,ALT,INFO/AAREF,INFO/AAALT,INFO/REVEL,INFO/REVEL_Ensembl_transcriptid",
         ),
     wrapper:
         "bio/vcftools/annotate"
@@ -122,13 +122,13 @@ rule vcftools_annotate_revel:
 rule additional_headers_mistic:
     output:
         temp("mistic/description.txt"),
-    message:
-        "Building annotation headers for REVEL"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 128,
-        time_min=lambda wildcards, attempt: attempt * 2,
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    group:
+        "additional_headers"
     log:
         "logs/mane/description.log",
     params:
@@ -140,21 +140,22 @@ rule additional_headers_mistic:
 
 rule vcftools_annotate_mistic:
     input:
-        vcf="splice_ai/annot/{sample}.vcf.gz",
-        annotation=config["ref"]["mistic"],
+        vcf="snpsift/gwascat/{sample}.vcf.gz",
+        vcf_tbi="snpsift/gwascat/{sample}.vcf.gz.tbi",
+        annotation=config["reference"]["mistic"],
         description="mistic/description.txt",
     output:
         vcf=temp("vcftools/mistic/{sample}.vcf.gz"),
-    message:
-        "Annotating {wildcards.sample} with MISTIC database, using VCFTools"
     threads: 4
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_min=lambda wildcards, attempt: attempt * 15,
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/vcftools/annotate/{sample}.mistic.log",
     params:
-        extra=("--columns CHROM,POS,REF,ALT,INFO/MISTIC_score,INFO/MISTIC_pred"),
+        extra=config["vcftools"].get(
+            "mistic", "--columns CHROM,POS,REF,ALT,INFO/MISTIC_score,INFO/MISTIC_pred"
+        ),
     wrapper:
         "bio/vcftools/annotate"

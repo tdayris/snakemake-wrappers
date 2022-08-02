@@ -54,9 +54,9 @@ This rule creates HTML reports from DESeq2 results
 
 rule rbt_csv_report:
     input:
-        "deseq2/{comparison}/{comparison}.{content}.tsv",
+        "data_output/DEseq2/{comparison}/{content}_{comparison}.tsv",
     output:
-        directory("data_output/DEseq2/{comparison}/{comparison}.{content}/"),
+        directory("rbt/csvreport/{comparison}/{content}_html_table/"),
     message:
         "Making DESeq2 results readable and searchable"
     threads: 1
@@ -81,9 +81,9 @@ rule rbt_csv_report:
 
 rule zip_csv_report:
     input:
-        "rbt/csv-report/{comparison}/html_table_deseq2_{subset}",
+        "rbt/csvreport/{comparison}/{content}_html_table/",
     output:
-        "data_output/DESeq2/{comparison}/html_table_deseq2_{subset}.tar.bz2",
+        "data_output/DESeq2/{comparison}/{content}_html_table.tar.bz2",
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
@@ -93,11 +93,11 @@ rule zip_csv_report:
     group:
         "csv_report"
     log:
-        "logs/rbt/csv-report/compress/{comparison}_{subset}.log",
+        "logs/rbt/csv-report/compress/{comparison}.{content}.log",
     params:
         config["rbt"].get("zip_extra", "--create --version --bzip2 --file"),
     conda:
-        "envs/bash.yaml"
+        str(workflow_source_dir / "envs" / "bash.yaml")
     shell:
         "tar {params} {output} {input}"
 
@@ -196,7 +196,7 @@ rule plot_deseq_genes:
         intermediar="deseq2/{comparison}/mcols.{comparison}.tsv",
         dst="deseq2/{comparison}/dst.{comparison}.tsv",
         assays="deseq2/{comparison}/assays.mu.{comparison}.tsv",
-        gene2gene="salmon/gene2gene.tsv",
+        gene2gene="salmon/gene2gene_with_chr.tsv",
         metadata="deseq2/{comparison}/metadata.{comparison}.tsv",
         filter_theta="deseq2/{comparison}/filter.theta.{comparison}.tsv",
     output:
@@ -204,7 +204,7 @@ rule plot_deseq_genes:
         log_mu="figures/{comparison}/log_counts/log_mu.{comparison}.png",
         gene_plots=report(
             expand(
-                "results/{comparison}/gene_plots/{gene}.png",
+                "data_output/DEseq2/{comparison}/gene_plots/{gene}.png",
             gene=config.get("genes_of_interest", ["ENSG00000141510"]),
             allow_missing=True,
         ),

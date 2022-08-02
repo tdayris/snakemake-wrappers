@@ -55,9 +55,16 @@ rbt:
 # Star patameters
 star:
   index: /mnt/beegfs/database/bioinfo/Index_DB/STAR/GRCm38
-  chimera_extra: --outReadsUnmapped None --twopassMode Basic --outSAMstrandField intronMotif --outSAMunmapped Within --chimSegmentMin 12 --chimJunctionOverhangMin 8 --chimOutJunctionFormat 1 --alignSJDBoverhangMin 10 --alignMatesGapMax 100000 --alignIntronMax 100000 --alignSJstitchMismatchNmax 5 -1 5 5 --outSAMattrRGline ID:GRPundef --outSAMattributes All --chimMultimapScoreRange 3 --chimScoreJunctionNonGTAG -4 --chimMultimapNmax 20 --chimNonchimScoreDropMin 10 --peOverlapNbasesMin 12 --peOverlapMMp 0.1 --alignInsertionFlush Right --alignSplicedMateMapLminOverLmate 0 --alignSplicedMateMapLmin 30
-  variant_extra: --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverReadLmax 0.04 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMattributes All --twopassMode Basic
+  chimera_extra: --outReadsUnmapped None --twopassMode Basic --outSAMstrandField intronMotif --outSAMunmapped Within --chimSegmentMin 12 --chimJunctionOverhangMin 8 --chimOutJunctionFormat 1 --alignSJDBoverhangMin 10 --alignMatesGapMax 100000 --alignIntronMax 100000 --alignSJstitchMismatchNmax 5 -1 5 5 --outSAMattrRGline ID:GRPundef --outSAMattributes Standard --chimMultimapScoreRange 3 --chimScoreJunctionNonGTAG -4 --chimMultimapNmax 20 --chimNonchimScoreDropMin 10 --peOverlapNbasesMin 12 --peOverlapMMp 0.1 --alignInsertionFlush Right --alignSplicedMateMapLminOverLmate 0 --alignSplicedMateMapLmin 30
+  variant_extra: --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverReadLmax 0.04 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMattributes Standard --twopassMode Basic
 
+
+# Quality controls
+rseqc:
+  tin: --sample-size 100 --minCov 10
+  bam_stat: --mapq 30
+  gene_body: --format pdf
+  junction_annotation: --mapq 30 
 
 # Samtools extra parameters
 # Be careful with parameters, do not break compatibility
@@ -68,13 +75,24 @@ samtools:
 
 # Star-fusion parameters and database
 star_fusion:
-  CTAT_resource_lib: /mnt/beegfs/database/bioinfo/Index_DB/CTAT_Resource_Lib/GRCh38_gencode_v37/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play.tar.gz
+  CTAT_resource_lib: /mnt/beegfs/database/bioinfo/Index_DB/CTAT_Resource_Lib/GRCh38_gencode_v37/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play
   extra: --FusionInspector inspect
+
+
+# Quality controls with Picard
+picard:
+  extra: ""
 
 
 # Arriba fusion detection
 arriba:
   extra: ""
+
+
+
+# Sambamba optional parameters
+sambamba:
+  sort: ""
 
 
 # GATK parameters
@@ -148,9 +166,13 @@ reference:
   genome_dict: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.dict
   genome_index: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta.fai
   refflat: /mnt/beegfs/database/bioinfo/Index_DB/refFlat/GRCm38/refFlat.txt.gz
-  dbsnp: null
-  dbsnp_tbi: null
-  capturekit_bed: null
+  refgene_model: /mnt/beegfs/database/bioinfo/Index_DB/refgene/bed12/GRCm38/GRCm38.nochr.bed12
+  capture_kit_bed: /mnt/beegfs/database/bioinfo/Index_DB/captureKitDesigns/hg38/v5/sureselect_v5.padded.nochr.bed
+  af_only: null
+  af_only_tbi: null
+  dbsnp: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.all.vcf.gz
+  dbsnp_tbi: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.all.vcf.gz.tbi
+  capturekit_bed: /mnt/beegfs/database/bioinfo/Index_DB/captureKitDesigns/mm10/v1/mm9_sureselect_v1.padded.bed
   chromosomes:
     - 1
     - 2

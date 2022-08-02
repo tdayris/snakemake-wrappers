@@ -2,10 +2,10 @@ rule star_align_chimera:
     input:
         fq1="fastp/trimmed/{sample}.1.fastq",
         fq2="fastp/trimmed/{sample}.2.fastq",
-        index=config["star"]["index"],
+        idx=config["star"]["index"],
     output:
         chim_junc=temp("star/{sample}/chimera/{sample}.Chimeric.out.junction"),
-        bam=temp("star/{sample}/chimera/{sample}.bam"),
+        sam=temp("star/{sample}/chimera/{sample}.sam"),
         sj=temp("star/{sample}/chimera/{sample}.SJ.out.tab"),
         log=temp("star/{sample}/chimera/{sample}.Log.out"),
         log_progress=temp("star/{sample}/chimera/{sample}.Log.progress.out"),
@@ -19,32 +19,7 @@ rule star_align_chimera:
     log:
         "logs/star/{sample}.log",
     params:
-        extra=config["star"].get(
-            "chimera_extra",
-        (
-        "--outReadsUnmapped None "
-                "--twopassMode Basic "
-                "--outSAMstrandField intronMotif "
-                "--outSAMunmapped Within "
-                "--chimSegmentMin 12 "
-                "--chimJunctionOverhangMin 8 "
-                "--chimOutJunctionFormat 1 "
-                "--alignSJDBoverhangMin 10 "
-                "--alignMatesGapMax 100000 "
-                "--alignIntronMax 100000 "
-                "--alignSJstitchMismatchNmax 5 -1 5 5 "
-                "--outSAMattrRGline ID:GRPundef "
-                "--outSAMattributes All "
-                "--chimMultimapScoreRange 3 "
-                "--chimScoreJunctionNonGTAG -4 "
-                "--chimMultimapNmax 20 "
-                "--chimNonchimScoreDropMin 10 "
-                "--peOverlapNbasesMin 12 "
-                "--peOverlapMMp 0.1 "
-                "--alignInsertionFlush Right "
-                "--alignSplicedMateMapLminOverLmate 0 "
-                "--alignSplicedMateMapLmin 30 "
-            ),
-        ),
+        idx=config["star"]["index"],
+        extra=lambda wildcards: f"--outSAMattrRGline '@RG\tID:{wildcards.sample}\tSM:{wildcards.sample}\tPU:{wildcards.sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' {config['star'].get('chimera_extra')}",
     wrapper:
         "bio/star/align"

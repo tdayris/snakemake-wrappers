@@ -1,0 +1,218 @@
+max_threads: 20
+
+table_cols:
+  - Chromosome
+  - Start_Position
+  - Variant_ID
+  - SYMBOL
+  - Reference_Allele
+  - Tumor_Seq_Allele1
+  - Mutect2_Read_depth
+  - Tumor_Seq_Allele2
+  - HGVSc
+  - HGVSp
+  - VarOcc
+  - BIOTYPE
+  - IMPACT
+  - Variant_Classification
+  - Mutect2_Read_depth
+  - Mutect2_Allele_Frequency
+  - Variant_Type
+  - Tumor_Sample_Barcode
+  - Transcript_ID
+  - Gene
+  - Feature
+  - Filter
+  - Center
+  - End_Position
+
+reference:
+  ncbi_build: GRCm38
+  fasta: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta
+  fasta_index: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta.fai
+  fasta_dict: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.dict
+  capture_kit_bed: /mnt/beegfs/database/bioinfo/Index_DB/captureKitDesigns/mm10/v1/sureselect_v1.padded.mm9Tomm10_unmapped.bed
+  af_only: null
+  af_only_tbi: null
+  dbsnp: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.all.vcf.gz
+  dbsnp_tbi: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.all.vcf.gz.tbi
+  snpeff: /mnt/beegfs/database/bioinfo/Index_DB/SnpEff/GRCm38.86
+  gmt: null
+  kaviar: null
+  kaviar_tbi: null
+  cosmic: null
+  cosmic_tbi: null
+  dbnsfp: null
+  clinvar: null
+  clinvar_tbi: null
+  gnomad: null
+  gnomad_tbi: null
+  exac: null
+  exac_tbi: null
+  dbvar: null
+  dbvar_tbi: null
+  gwascat: null
+  mane: null
+  revel: null
+  mistic: null
+  cancer_census: null
+  oncokb: null
+  bwa_index: 
+    - /mnt/beegfs/database/bioinfo/Index_DB/BWA/2.2.1/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta.0123
+    - /mnt/beegfs/database/bioinfo/Index_DB/BWA/2.2.1/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta.amb
+    - /mnt/beegfs/database/bioinfo/Index_DB/BWA/2.2.1/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta.ann
+    - /mnt/beegfs/database/bioinfo/Index_DB/BWA/2.2.1/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta.bwt.2bit.64
+    - /mnt/beegfs/database/bioinfo/Index_DB/BWA/2.2.1/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta.pac
+  msi_scan: /mnt/beegfs/database/bioinfo/Index_DB/GRCm38.99/GRCm38.99.msi.list
+  chr:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 17
+    - 18
+    - 19
+    - 20
+    - 21
+    - 22
+    - X
+    - Y
+    - MT
+
+
+fastp:
+  fastp_adapters: null
+  fastp_extra: ""
+
+
+samtools:
+  fixmate_extra: -cmr
+  view_filter: -h -q 5
+
+
+sambamba:
+  index_extra: ""
+  sort_extra: ""
+  markdup_extra: --remove-duplicates
+
+
+picard:
+  collect_multiple_metrics: ""
+
+
+gatk:
+  apply_base_recal: --create-output-bam-index
+  base_recalibrator: ""
+  mutect2_extra: --create-output-variant-index --max-reads-per-alignment-start 0 --disable-read-filter MateOnSameContigOrNoMappedMateReadFilter --annotation AlleleFraction --annotation AllelePseudoDepth --annotation --annotation AS_BaseQualityRankSumTest --annotation AS_FisherStrand --annotation AS_InbreedingCoeff --annotation --annotation AS_MappingQualityRankSumTest --annotation AS_QualByDepth --annotation AS_ReadPosRankSumTest --annotation AS_RMSMappingQuality --annotation --annotation AS_StrandBiasMutectAnnotation --annotation AS_StrandOddsRatio --annotation AssemblyComplexity --annotation BaseQuality --annotation --annotation BaseQualityHistogram --annotation BaseQualityRankSumTest --annotation ChromosomeCounts --annotation ClippingRankSumTest --annotation --annotation CountNs --annotation Coverage --annotation DepthPerAlleleBySample --annotation DepthPerSampleHC --annotation ExcessHet --annotation --annotation FeaturizedReadSets --annotation FisherStrand --annotation FragmentDepthPerAlleleBySample --annotation FragmentLength --annotation --annotation GenotypeSummaries --annotation InbreedingCoeff --annotation LikelihoodRankSumTest --annotation MappingQuality --annotation --annotation MappingQualityRankSumTest --annotation MappingQualityZero --annotation OrientationBiasReadCounts --annotation --annotation OriginalAlignment --annotation PossibleDeNovo --annotation QualByDepth --annotation ReadPosition --annotation ReadPosRankSumTest --annotation --annotation ReferenceBases --annotation RMSMappingQuality --annotation SampleList --annotation StrandBiasBySample --annotation StrandOddsRatio --annotation --annotation TandemRepeat --annotation UniqueAltReadCountPossible
+  learn_read_orientation_model: ""
+  get_pileup_summaries: ""
+  calculate_contamination: ""
+  filter_mutect_calls: --create-output-variant-index --min-median-mapping-quality 35
+  gatk_filters:
+    DepthBelow10X: "DP < 10"
+    BelowQualByDepth: "QD <= 2.0"
+    BelowBaseQuality: "QUAL < 30.0"
+    AboveFisherStrandBias: "FS > 60.0"
+    AboveStrandOddsRatio: "SOR > 3.0"
+    BelowMappingQuality: "MQ < 35.0"
+    BelowMQRankSum: "MQRankSum < -12.5"
+    BelowReadPosRankSum: "ReadPosRankSum < -8.0"
+
+
+bcftools:
+  split_multiallelic: -m -both --check-ref w
+
+
+snpeff:
+  extra: -nodownload -noLog
+
+
+snpsift:
+  dbsnp: -name 'dbSNP_' -tabix -noDownload -noLog
+  kaviar: -name 'Kaviar_' -tabix -noDownload -noLog
+  cosmic: -name 'cosmic_' -tabix -noDownload -noLog
+  dbnsfp: -noDownload -noLog -n -f 'hg18_chr,hg18_pos(1-based)'
+  clinvar: -name 'clinvar_' -tabix -noDownload -noLog
+  gnomad: -name 'gnomad_' -tabix -noDownload -noLog
+  exac: -name 'gnomAD_exomes_' -tabix -noDownload -noLog
+  dbvar: -name 'dbVar_' -tabix -noDownload -noLog
+  extract_all_fields: -s ';' -e '.'
+
+
+bigr_additionals:
+  remove_non_conventional_chromosomes: true
+  format_to_info: ""
+
+
+vcftools:
+  mane: --columns INFO/MANE_NCBI_GeneID,INFO/MANE_Ensembl_Gene,INFO/MANE_HGNC_ID,INFO/MANE_symbol,INFO/MANE_name,INFO/MANE_RefSeq_nuc,INFO/MANE_RefSeq_prot,INFO/MANE_Ensembl_nuc,INFO/MANE_Ensembl_prot,INFO/MANE_MANE_status,CHROM,FROM,TO,INFO/MANE_chr_strand
+  revel: --columns CHROM,POS,-,REF,ALT,INFO/REVEL_aaref,INFO/REVEL_aaalt,INFO/REVEL,INFO/REVEL_Ensembl_transcriptid
+  mistic: --columns CHROM,POS,REF,ALT,INFO/MISTIC_score,INFO/MISTIC_pred
+
+
+cnv_facets:
+  extra: --snp-count-orphans --gbuild mm10 --nbhd-snp 250
+
+
+msisensor:
+  extra: ""
+  stability_threshold: 3.5
+
+
+annot_sv:
+  install_dir: /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/annot_sv/source/AnnotSV/
+  extra: -annotationMode both -snvIndelPASS 1 -tx ENSEMBL -SVinputInfo 0
+
+
+tmb:
+  min_coverage: 10
+  tmb_highness_threshold: 10
+  allele_depth_keyname: AD
+
+
+fastq_screen:
+  database:
+    Contaminants:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Adapters/Contaminants
+    AThaliana:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Arabidopsis/Arabidopsis_thaliana.TAIR10
+    Drosophila:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Drosophila/BDGP6
+    Ecoli:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/E_coli/Ecoli
+    Human:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Human/Homo_sapiens.GRCh38
+    Lambda:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Lambda/Lambda
+    Mitochondria:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Mitochondria/mitochondria
+    Mouse:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Mouse/Mus_musculus.GRCm38
+    PhiX:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/PhiX/phi_plus_SNPs
+    Rat:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Rat/Rnor_6.0
+    rRNA:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/rRNA/GRCm38_rRNA
+    Vectors:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Vectors/Vectors
+    Worm:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Worm/Caenorhabditis_elegans.WBcel235
+    Yeast:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Yeast/Saccharomyces_cerevisiae.R64-1-1
+    SalmoSalar:
+      bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/SalmoSalar/Salmo_salar.ICSASG_v2
+  aligner_paths:
+    bowtie2: bowtie2

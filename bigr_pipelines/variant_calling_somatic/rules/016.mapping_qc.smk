@@ -1,43 +1,91 @@
-rule alignment_summary:
+rule collect_multiple_metrics_raw:
     input:
-        bam="sambamba/sort/{sample}_{status}.bam",
-        bam_index=get_bai("sambamba/sort/{sample}_{status}.bam"),
-        ref=config["ref"]["fasta"],
-        ref_idx=get_fai(config["ref"]["fasta"]),
-        ref_dict=get_dict(config["ref"]["fasta"]),
+        bam="bwa_mem2/sorted/{sample}_{status}.bam",
+        bai="bwa_mem2/sorted/{sample}_{status}.bam.bai",
+        ref=config["reference"]["fasta"],
+        ref_idx=config["reference"]["fasta_index"],
+        ref_dict=config["reference"]["fasta_dict"],
     output:
-        temp("picard/alignment_summary/{sample}_{status}.summary.txt"),
-    message:
-        "Collecting alignment metrics on GATK recalibrated {wildcards.sample}"
-        " (considering {wildcards.status})"
+        temp(
+            multiext(
+                "picard/stats/{sample}_{status}.raw",
+                ".alignment_summary_metrics",
+                ".insert_size_metrics",
+                ".insert_size_histogram.pdf",
+                ".quality_distribution_metrics",
+                ".quality_distribution.pdf",
+                ".gc_bias.detail_metrics",
+                ".gc_bias.summary_metrics",
+                ".gc_bias.pdf",
+                ".bait_bias_detail_metrics",
+                ".bait_bias_summary_metrics",
+                ".error_summary_metrics",
+                ".pre_adapter_detail_metrics",
+                ".pre_adapter_summary_metrics",
+            )
+        ),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020,
-        time_min=lambda wildcards, attempt: attempt * 45,
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_1h_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/picard/alignment_summary/{sample}_{status}.log",
+        "logs/picard/multiple_metrics/{sample}.{status}.raw.log",
     params:
-        "VALIDATION_STRINGENCY=LENIENT "
-        "METRIC_ACCUMULATION_LEVEL=null "
-        "METRIC_ACCUMULATION_LEVEL=SAMPLE",
+        extra=config["picard"].get("collect_multiple_metrics", ""),
     wrapper:
-        "bio/picard/collectalignmentsummarymetrics"
+        "bio/picard/collectmultiplemetrics"
+
+
+rule collect_multiple_metrics_cleaned:
+    input:
+        bam="sambamba/markdup/{sample}_{status}.bam",
+        bai="sambamba/markdup/{sample}_{status}.bam.bai",
+        ref=config["reference"]["fasta"],
+        ref_idx=config["reference"]["fasta_index"],
+        ref_dict=config["reference"]["fasta_dict"],
+    output:
+        temp(
+            multiext(
+                "picard/stats/{sample}_{status}.cleaned",
+                ".alignment_summary_metrics",
+                ".insert_size_metrics",
+                ".insert_size_histogram.pdf",
+                ".quality_distribution_metrics",
+                ".quality_distribution.pdf",
+                ".gc_bias.detail_metrics",
+                ".gc_bias.summary_metrics",
+                ".gc_bias.pdf",
+                ".bait_bias_detail_metrics",
+                ".bait_bias_summary_metrics",
+                ".error_summary_metrics",
+                ".pre_adapter_detail_metrics",
+                ".pre_adapter_summary_metrics",
+            )
+        ),
+    threads: 1
+    resources:
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_1h_per_attempt,
+        tmpdir="tmp",
+    log:
+        "logs/picard/multiple_metrics/{sample}.{status}.cleaned.log",
+    params:
+        extra=config["picard"].get("collect_multiple_metrics", ""),
+    wrapper:
+        "bio/picard/collectmultiplemetrics"
 
 
 rule fastq_screen:
     input:
-        "reads/{status}/{sample}.{stream}.fq.gz",
+        "fastp/trimmed/{sample}_{status}.{stream}.fastq",
     output:
         txt=temp("fastq_screen/{sample}.{stream}.{status}.fastq_screen.txt"),
         png=temp("fastq_screen/{sample}.{stream}.{status}.fastq_screen.png"),
-    message:
-        "Assessing quality of {wildcards.sample}, {wildcards.stream}"
-        " (considering {wildcards.status})"
     threads: config.get("threads", 20)
     resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 1024 * 8, 20480),
-        time_min=lambda wildcard, attempt: attempt * 75,
+        mem_mb=get_8gb_per_attempt,
+        time_min=get_75min_per_attempt,
         tmpdir="tmp",
     params:
         fastq_screen_config=config["fastq_screen"],

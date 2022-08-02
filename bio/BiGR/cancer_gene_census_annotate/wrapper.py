@@ -44,9 +44,6 @@ def get_headers(cols: list[str], description: dict[str, Any]) -> str:
         f"""##INFO=<ID=CancerGeneCensus_{key},Number={value["nb"]},Type={value["type"]},Description="{value["desc"]}">\n"""
         for key, value in description.items()
     ]
-    headers.append(
-        """##FILTER=<ID=ExistsInCancerGeneCensus,Description="Transcript exists in Cancer Gene Census">\n"""
-    )
     return "".join(headers)
 
 
@@ -66,16 +63,6 @@ def dict_to_info(annot: dict[str, Any]) -> str:
                     "___..n|.___"
                 )
             )
-            # value = (str(value).replace("-", "_")
-            #                    .replace("/", "_")
-            #                    .replace("\\", "_")
-            #                    .replace(' ', '_')
-            #                    .replace("(", "")
-            #                    .replace(")", "")
-            #                    .replace("#", "nb")
-            #                    .replace("\t", "_")
-            #                    .replace(",", "|")
-            #                    .replace(";", "_"))
             res.append(f"CancerGeneCensus_{key}={value}")
 
     return ";".join(res)
@@ -95,6 +82,7 @@ def annotate(line: str, tsv: pandas.DataFrame) -> str:
     except IndexError:
         #logging.error(f"Could not find SnpEff annotation in: {line}")
         pass
+    
     else:
         try:
             annot = dict_to_info(tsv.loc[gene_name].to_dict())
@@ -104,10 +92,6 @@ def annotate(line: str, tsv: pandas.DataFrame) -> str:
             else:
                 chomp[7] += f";{annot}"
 
-            if chomp[6] in [".", "", "PASS"]:
-                chomp[6] = "ExistsInCanceGeneCensus"
-            else:
-                chomp[6] += ";ExistsInCancerGeneCensus"
             line = "\t".join(chomp) + "\n"
             logging.info(f"Annotation found for {gene_name} from {line}")
         except KeyError:

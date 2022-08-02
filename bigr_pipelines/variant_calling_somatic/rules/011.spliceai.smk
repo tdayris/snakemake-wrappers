@@ -1,18 +1,17 @@
 rule splice_ai:
     input:
-        vcf="bigr/occurence_annotated/{sample}.vcf",
-        fasta=config["ref"]["fasta"],
+        vcf="snpeff/calls/{sample}.vcf",
+        fasta=config["reference"]["fasta"],
+        fasta_index=config["reference"]["fasta_index"],
     output:
         vcf=temp("splice_ai/annot/{sample}.vcf.gz"),
-    message:
-        "Adding Splice Variant annotation to {wildcards.sample}"
-    threads: 10
+    threads: config.get("max_threads", 20)
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 2048 * 8,
-        time_min=lambda wildcards, attempt: attempt * 60 * 3,
+        mem_mb=get_8gb_per_attempt,
+        time_min=get_3h_per_attempt,
         tmpdir="tmp",
     params:
-        annotation=config["params"].get("ncbi_build", "grch38").lower(),
+        annotation=config["reference"].get("ncbi_build", "grch38").lower(),
         piped=True,
     log:
         "logs/splice_ai/{sample}.log",

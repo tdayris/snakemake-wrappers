@@ -13,7 +13,7 @@ rule salmon_quant:
     threads: config.get("max_threads", 20)
     resources:
         time_min=get_45min_per_attempt,
-        mem_mb=get_10gb_per_attempt,
+        mem_mb=get_15gb_per_attempt,
         tmpdir="tmp",
     retries: 2
     params:
@@ -33,6 +33,7 @@ rule tx_to_gene:
     input:
         gtf=config["reference"]["gtf"],
     output:
+        tx2gene_small=temp("salmon/tx2gene_small.tsv"),
         tx2gene=temp("salmon/tx2gene.tsv"),
         tx2gene_large=temp("salmon/tx2gene_with_positions.tsv"),
         gene2gene=temp("salmon/gene2gene.tsv"),
