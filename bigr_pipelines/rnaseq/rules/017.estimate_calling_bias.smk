@@ -62,8 +62,8 @@ rule get_pileup_summaries:
         bam="sambamba/sort/{sample}.bam",
         bam_index=get_bai("sambamba/sort/{sample}.bam"),
         intervals=config["reference"]["capturekit_bed"],
-        variants=config["reference"]["dbsnp"],
-        variants_index=config["reference"]["dbsnp_tbi"],
+        variants=config["reference"]["af_only"],
+        variants_index=config["reference"]["af_only"],
     output:
         table=temp("gatk/getpileupsummaries/{sample}_getpileupsummaries.table"),
     threads: 1

@@ -10,8 +10,8 @@ rule mutect2_germline:
         fasta_dict=config["reference"]["genome_dict"],
         map="sambamba/sort/{sample}.bam",
         map_index=get_bai("sambamba/sort/{sample}.bam"),
-        germline=config["reference"]["dbsnp"],
-        germline_tbi=config["reference"]["dbsnp_tbi"],
+        germline=config["reference"]["af_only"],
+        germline_tbi=config["reference"]["af_only"],
         intervals=config["reference"]["capturekit_bed"],
     output:
         vcf=temp("mutect2/call/{sample}.vcf.gz"),
