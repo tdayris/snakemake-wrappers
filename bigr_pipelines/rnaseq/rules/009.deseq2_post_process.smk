@@ -10,7 +10,7 @@ This rule makes the DEseq2 results human-readable
 rule deseq2_readable:
     input:
         tsv="deseq2/{comparison}/wald.{comparison}.tsv",
-        gene2gene="salmon/gene2gene.tsv",
+        gene2gene="salmon/gene2gene_with_chr.tsv",
         dst="deseq2/{comparison}/dst.{comparison}.tsv",
     output:
         complete=report(
