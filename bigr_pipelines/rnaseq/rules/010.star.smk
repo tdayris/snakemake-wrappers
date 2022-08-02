@@ -20,22 +20,7 @@ rule star_align_variants:
         "logs/star/{sample}.log",
     params:
         idx=config["star"]["index"],
-        extra=config["star"].get(
-            "variant_extra",
-        (
-        "--outFilterType BySJout "
-                "--outFilterMultimapNmax 20 "
-                "--alignSJoverhangMin 8 "
-                "--alignSJDBoverhangMin 1 "
-                "--outFilterMismatchNmax 999 "
-                "--outFilterMismatchNoverReadLmax 0.04 "
-                "--alignIntronMin 20 "
-                "--alignIntronMax 1000000 "
-                "--alignMatesGapMax 1000000 "
-                "--outSAMattributes Standard "
-                "--twopassMode Basic "
-            ),
-        ),
+        extra=lambda wildcards: f"--outSAMattrRGline '@RG\tID:{wildcards.sample}\tSM:{wildcards.sample}\tPU:{wildcards.sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' {config['star'].get('variant_extra')}",
     wrapper:
         "bio/star/align"
 
@@ -82,3 +67,18 @@ rule sambamba_sort_star:
         "logs/star/sort/{sample}.{maptype}.log",
     wrapper:
         "bio/sambamba/sort"
+
+
+rule picard_addorreplacegroup:
+    input:
+        "star/{sample}/{maptype}/{sample}.bam"
+    output:
+        "picard/{sample}/{maptype}/{sample}.bam"
+    threads: 1
+    resources:
+        time_min=get_15min_per_attempt,
+        mem_mb=get_2gb_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/picard/addorreplacegroup/{sample}.log"
+    

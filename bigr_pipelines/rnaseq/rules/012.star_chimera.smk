@@ -20,32 +20,6 @@ rule star_align_chimera:
         "logs/star/{sample}.log",
     params:
         idx=config["star"]["index"],
-        extra=config["star"].get(
-            "chimera_extra",
-        (
-        "--outReadsUnmapped None "
-                "--twopassMode Basic "
-                "--outSAMstrandField intronMotif "
-                "--outSAMunmapped Within "
-                "--chimSegmentMin 12 "
-                "--chimJunctionOverhangMin 8 "
-                "--chimOutJunctionFormat 1 "
-                "--alignSJDBoverhangMin 10 "
-                "--alignMatesGapMax 100000 "
-                "--alignIntronMax 100000 "
-                "--alignSJstitchMismatchNmax 5 -1 5 5 "
-                "--outSAMattrRGline ID:GRPundef "
-                "--outSAMattributes Standard "
-                "--chimMultimapScoreRange 3 "
-                "--chimScoreJunctionNonGTAG -4 "
-                "--chimMultimapNmax 20 "
-                "--chimNonchimScoreDropMin 10 "
-                "--peOverlapNbasesMin 12 "
-                "--peOverlapMMp 0.1 "
-                "--alignInsertionFlush Right "
-                "--alignSplicedMateMapLminOverLmate 0 "
-                "--alignSplicedMateMapLmin 30 "
-            ),
-        ),
+        extra=lambda wildcards: f"--outSAMattrRGline '@RG\tID:{wildcards.sample}\tSM:{wildcards.sample}\tPU:{wildcards.sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' {config['star'].get('chimera_extra')}",
     wrapper:
         "bio/star/align"
