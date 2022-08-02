@@ -30,6 +30,7 @@ while [ "$#" -gt 0 ]; do
     mm10|MM10|GRCm38) CONFIG_PATH="${PIPELINE_PATH}/config.mm10.yaml"; echo "Some operations are not available for mice datasets"; shift;;
     DESeq2|deseq2|DGE|dge) SNAKE_ARGS+=("--until deseq2_results"); shift;;
     salmon|Salmon|quant) SNAKE_ARGS+=("--until salmon_quant_results"); shift;;
+    fusions|fusion) SNAKE_ARGS+=("--until star_fusion_results"); shift;;
     qc|QC) SNAKE_ARGS+=("--until quality_control_results"); shift;;
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac
