@@ -1,6 +1,9 @@
 [![Snakemake](https://img.shields.io/badge/snakemake-≥5.7.0-brightgreen.svg)](https://snakemake.readthedocs.io)
 [![GitHub actions status](https://github.com/snakemake/snakemake-wrappers/workflows/Tests/badge.svg?branch=master)](https://github.com/snakemake/snakemake-wrappers/actions?query=branch%3Amaster+workflow%3ATests)
 
+# RNA-Seq bulk
+
+[See documentation](https://github.com/tdayris/snakemake-wrappers/blob/Unofficial/bigr_pipelines/rnaseq/readme.md)
 
 # The Snakemake Wrapper Repository
 
