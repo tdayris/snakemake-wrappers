@@ -134,7 +134,7 @@ rule bwa_mem:
         "shallow"
     params:
         index=lambda wildcards, input: os.path.splitext(input["index"][0])[0],
-        extra=r"-R '@RG\tID:{sample}\tSM:{sample}\tPU:{sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
+        extra=r"-R '@RG\tID:{sample}_{status}\tSM:{sample}_{status}\tPU:{sample}_{status}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
         sort="samtools",
         sort_order="queryname",
         sort_extra="-m 1536M",
