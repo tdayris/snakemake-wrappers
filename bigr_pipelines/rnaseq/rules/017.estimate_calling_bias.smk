@@ -59,8 +59,8 @@ Summarize the read support over known variants
 
 rule get_pileup_summaries:
     input:
-        bam="sambamba/sort/{sample}.bam",
-        bam_index=get_bai("sambamba/sort/{sample}.bam"),
+        bam="gatk/splitncigarreads/{sample}.bam",
+        bam_index="gatk/splitncigarreads/{sample}.bam.bai",
         intervals=config["reference"]["capturekit_bed"],
         variants=config["reference"]["af_only"],
         variants_index=config["reference"]["af_only"],

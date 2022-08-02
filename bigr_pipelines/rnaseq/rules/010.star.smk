@@ -67,3 +67,29 @@ rule sambamba_sort_star:
         "logs/star/sort/{sample}.{maptype}.log",
     wrapper:
         "bio/sambamba/sort"
+
+
+rule gatk_split_n_cigar_reads:
+    input:
+        bam="star/{sample}/{maptype}/{sample}.bam",
+        bai="star/{sample}/{maptype}/{sample}.bam.bai",
+        ref=config["reference"]["genome"],
+        ref_idx=config["reference"]["genome_index"],
+        ref_dict=config["reference"]["genome_dict"],
+        bed=config["reference"]["capture_kit_bed"],
+    output:
+        bam=temp("gatk/splitncigarreads/{sample}.bam"),
+        bai=temp("gatk/splitncigarreads/{sample}.bam.bai"),
+    threads: 1
+    resources:
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/gatk/splitncigarreads/{sample}.log"
+    params:
+        extra=config["gatk"].get("splitncigarreads_extra", "--create-output-bam-index")
+    conda:
+        str(workflow_source_dir / "envs" / "gatk.yaml")
+    shell:
+        "gatk SplitNCigarReads -R {input.ref} -I {input.bam} -O {output.bam} {extra} > {log} 2>&1"

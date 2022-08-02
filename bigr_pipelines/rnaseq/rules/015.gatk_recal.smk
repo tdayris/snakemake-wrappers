@@ -28,8 +28,8 @@ This rule applies the BQSR to the mapped reads
 
 rule gatk_apply_baserecalibrator:
     input:
-        bam="star/{sample}/variants/{sample}.bam",
-        bam_index="star/{sample}/variants/{sample}.bam.bai",
+        bam="gatk/splitncigarreads/{sample}.bam",
+        bam_index="gatk/splitncigarreads/{sample}.bam.bai",
         ref=config["reference"]["genome"],
         ref_idx=config["reference"]["genome_index"],
         ref_dict=config["reference"]["genome_dict"],
@@ -56,8 +56,8 @@ This rule computes BQSR on mapped reads, given a knoledge database
 
 rule gatk_compute_baserecalibration_table:
     input:
-        bam="star/{sample}/variants/{sample}.bam",
-        bam_index="star/{sample}/variants/{sample}.bam.bai",
+        bam="gatk/splitncigarreads/{sample}.bam",
+        bam_index="gatk/splitncigarreads/{sample}.bam.bai",
         ref=config["reference"]["genome"],
         ref_idx=config["reference"]["genome_index"],
         ref_dict=config["reference"]["genome_dict"],

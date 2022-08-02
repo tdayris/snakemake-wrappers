@@ -1,17 +1,15 @@
 rule muterc2_filter:
     input:
         vcf="mutect2/call/{sample}.vcf.gz",
-        ref=config["genome"],
-        fasta_index=get_fai(config["genome"]),
-        fasta_dict=get_dict(config["genome"]),
+        ref=config["reference"]["genome"],
+        fasta_index=config["reference"]["genome_index"],
+        fasta_dict=config["reference"]["genome_dict"],
         contamination="summary/{sample}_calculate_contamination.table",
-        bam="sambamba/sort/{sample}.bam",
-        bam_index=get_bai("sambamba/sort/{sample}.bam"),
+        bam="gatk/splitncigarreads/{sample}.bam",
+        bam_index="gatk/splitncigarreads/{sample}.bam.bai",
         f1r2="gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz",
     output:
         vcf=temp("mutect2/filter/{sample}.vcf.gz"),
-    message:
-        "Filtering Mutect2 calls for {wildcards.sample}"
     threads: 1
     resources:
         time_min=get_45min_per_attempt,
