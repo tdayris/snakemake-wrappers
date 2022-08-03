@@ -8,6 +8,7 @@ rule sambamba_index_bam:
         mem_mb=get_4gb_per_attempt,
         time_min=get_20min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "sambamba/index/{tool}_{subcommand}/{sample}_{status}.log",
     params:

@@ -10,7 +10,8 @@ rule tabix_index:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
+    retries: 2
     params:
         "-p vcf"
     log:
@@ -32,7 +33,8 @@ rule pbgzip_compress:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_1h_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
+    retries: 2
     params:
         ""
     log:

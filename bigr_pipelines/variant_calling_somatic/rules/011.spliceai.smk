@@ -10,6 +10,7 @@ rule splice_ai:
         mem_mb=get_8gb_per_attempt,
         time_min=get_3h_per_attempt,
         tmpdir="tmp",
+    retries: 2
     params:
         annotation=config["reference"].get("ncbi_build", "grch38").lower(),
         piped=True,

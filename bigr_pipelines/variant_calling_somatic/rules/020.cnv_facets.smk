@@ -16,6 +16,7 @@ rule cnv_facets:
         mem_mb=get_30gb_and_10gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
+    retries: 2
     params:
         extra=config["cnv_facets"].get(
             "extra", "--snp-count-orphans --gbuild hg38 --nbhd-snp 250"

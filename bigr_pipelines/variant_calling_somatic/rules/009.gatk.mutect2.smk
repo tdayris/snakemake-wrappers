@@ -14,6 +14,7 @@ rule correct_mutect2_vcf:
         mem_mb=get_1gb_per_attempt,
         time_min=get_20min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/mutect2/correct_fields/{sample}.log",
     params:
@@ -38,6 +39,7 @@ rule split_multiallelic_mutect2:
         mem_mb=get_8gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config["bcftools"].get("split_multiallelic", "-m -both --check-ref w"),
     log:
@@ -70,6 +72,7 @@ rule gatk_filter_mutect_calls:
         mem_mb=get_8gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 2
     params:
         extra=config["gatk"].get(
             "filter_mutect_calls",
@@ -100,6 +103,7 @@ rule calculate_tumor_contamination:
         mem_mb=get_8gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config["gatk"].get("calculate_contamination", ""),
     log:
@@ -129,6 +133,7 @@ rule get_pileup_summaries:
         mem_mb=get_8gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config["gatk"].get("get_pileup_summaries", ""),
     log:
@@ -152,6 +157,7 @@ rule gatk_learn_read_orientation_model:
         time_min=get_1h_per_attempt,
         mem_mb=get_8gb_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config["gatk"].get("learn_read_orientation_model", ""),
     log:
@@ -190,6 +196,7 @@ rule mutect2_somatic:
         time_min=get_5h_per_attempt,
         mem_mb=get_8gb_per_attempt,
         tmpdir="tmp",
+    retries: 3
     params:
         extra=lambda wildcards, output: (
             f"{config['gatk'].get('mutect2', '')} "

@@ -9,6 +9,7 @@ rule variant_occurence_annotate:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    retries: 2
     log:
         "logs/variant_occurence/uncompress/{sample}.log",
     wrapper:
@@ -25,6 +26,7 @@ rule concatenate_per_chr_information:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/variant_occurence/all.log",
     shell:
@@ -41,6 +43,7 @@ rule variant_occurence_per_chr:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/variant_occurence/{chr}.log",
     wrapper:

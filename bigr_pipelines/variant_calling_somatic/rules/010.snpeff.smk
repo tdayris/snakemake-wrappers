@@ -12,6 +12,7 @@ rule snpeff:
         mem_mb=get_8gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config["snpeff"].get("extra", "-nodownload -noLog"),
     log:

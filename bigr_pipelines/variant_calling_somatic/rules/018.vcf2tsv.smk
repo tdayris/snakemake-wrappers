@@ -9,6 +9,7 @@ rule filter_tsv:
         mem_mb=get_8gb_per_attempt,
         time_min=get_20min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         drop_duplicated_lines=True,
         contains=[["Filter", "PASS"]],
@@ -46,6 +47,8 @@ rule extractfields:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_20min_per_attempt,
+        tmpdir="tmp"
+    retries: 1
     log:
         "logs/snpsift/extractAllFields/{sample}.log",
     params:
@@ -64,6 +67,7 @@ rule fix_vcf:
         mem_mb=get_10gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/bigr_scripts/fix_vcf/{sample}.log",
     params:
@@ -87,6 +91,7 @@ rule gleaves_compatibility:
         mem_mb=get_1gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/BiGR/gleaves_compatibility/{sample}.log",
     wrapper:
@@ -108,6 +113,7 @@ rule gatk_variant_filtration:
         mem_mb=get_8gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 2
     log:
         "logs/gatk/variant_filtration/{sample}.log",
     params:

@@ -15,6 +15,7 @@ rule sambamba_sort_coordinate:
         mem_mb=get_2gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir="tmp",
+    retries: 2
     shadow:
         "shallow"
     params:
@@ -35,6 +36,7 @@ rule sambamba_sort_raw:
         mem_mb=get_2gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir="tmp",
+    retries: 2
     shadow:
         "shallow"
     params:
@@ -61,6 +63,7 @@ rule samtools_fixmate:
         mem_mb=get_4gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         config["samtools"].get("fixmate_extra", "-cmr"),
     log:
@@ -83,6 +86,7 @@ rule samtools_view_bwa:
         mem_mb=get_2gb_per_attempt,
         time_min=get_35min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra="-h",
     log:
@@ -102,6 +106,7 @@ rule sambamba_sort_raw_bwa:
         mem_mb=get_2gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir="tmp",
+    retries: 2
     shadow:
         "shallow"
     params:
@@ -130,6 +135,7 @@ rule bwa_mem:
         mem_mb=get_75gb_and_2gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
+    retries: 2
     shadow:
         "shallow"
     params:

@@ -1,40 +1,68 @@
-somatic_tmb_config = {
-    "min_coverage": config["tmb"].get("min_coverage", 10),
-    "tmb_highness_threshold": config["tmb"].get("tmb_highness_threshold", 20),
-    "allele_depth_keyname": config["tmb"].get("allele_depth_keyname", "AD"),
-    "bed": config["reference"]["capture_kit_bed"],
-    "sample_list": design["Sample_id"],
-}
+"""
+Compute Itegrated Genome Size from the capture kit bed
+"""
+rule estimate_igs:
+    input:
+        bed = config["reference"]["capture_kit_bed"]
+    output:
+        yaml = temp("igs.yaml")
+    threads: 1
+    resources:
+        mem_mb=get_5gb_per_attempt,
+        time_min=get_15min_per_attempt,
+        tmpdir="tmp",
+    retries: 1
+    log:
+        "logs/igs_estimation.log"
+    wrapper:
+        "bio/tmb/igs_estimation"
 
 
-module somatic_tmb:
-    snakefile:
-        str(
-            workflow_source_dir
-            / ".."
-            / ".."
-            / "meta"
-            / "bio"
-            / "somatic_tmb"
-            / "test"
-            / "Snakefile"
-        )
-    config:
-        somatic_tmb_config
 
-
-use rule estimate_igs from somatic_tmb
-
-
-use rule estimate_igs_sureselect_v5 from somatic_tmb
-
-
-use rule extract_somatic_mutations from somatic_tmb with:
+"""
+Compute statistics over somatic mutations' coverage
+"""
+rule extract_somatic_mutations:
     input:
         vcf="data_output/VCF/{sample}.vcf.gz",
         vcf_tbi="data_output/VCF/{sample}.vcf.gz.tbi",
-
-
-use rule compute_tmb from somatic_tmb with:
     output:
-        tsv=protected("data_output/TMB.tsv"),
+        yaml = temp("tmb/{sample}.yaml")
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
+        tmpdir="tmp",
+    retries: 1
+    log:
+        "logs/extract_somatic_mutations/{sample}.log"
+    params:
+        filter_in = config.get("filter_in", []),
+        filter_out = config.get("filter_out", []),
+        min_coverage = config["tmb"].get("min_coverage", 10),
+        allele_depth = config["tmb"].get("allele_depth_keyname", "AD")
+    wrapper:
+        "bio/tmb/extract_somatic"
+
+
+"""
+Compute Tumor Molecular Burden from previous indexes and stats
+"""
+rule compute_tmb:
+    input:
+        igs = get_best_igs(),
+        samples = expand("tmb/{sample}.yaml", sample=sample_list)
+    output:
+        tsv = protected("data_output/TMB.tsv")
+    threads: 1
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_15min_per_attempt,
+        tmpdir="tmp",
+    retries: 2
+    log:
+        "logs/tmb.log"
+    params:
+        high_threshold = config["tmb"].get("tmb_highness_threshold", 20)
+    wrapper:
+        "bio/tmb/compute_tmb"

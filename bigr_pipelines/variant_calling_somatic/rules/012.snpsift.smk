@@ -8,9 +8,10 @@ rule snpsift_gwascat:
         "Annotating {wildcards.sample} with GWAS Catalog"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-        time_min=lambda wildcards, attempt: attempt * 45,
+        mem_mb=get_6gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config.get("snpsift_gwascat", "-noDownload -noLog"),
     log:
@@ -31,6 +32,7 @@ rule snpsift_dbvar:
         mem_mb=get_20gb_and_10gb_per_attempt,
         time_min=get_5h_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config["snpsift"].get("dbvar", "-name 'dbVar_' -tabix -noDownload -noLog"),
     log:
@@ -51,6 +53,7 @@ rule snpsift_exac:
         mem_mb=get_6gb_per_attempt,
         time_min=get_75min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config["snpsift"].get(
             "exac", "-name 'gnomAD_exomes_' -tabix -noDownload -noLog"
@@ -73,6 +76,7 @@ rule snpsift_gnomad:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config["snpsift"].get(
             "gnomad", "-name 'gnomad_' -tabix -noDownload -noLog"
@@ -95,6 +99,7 @@ rule snpsift_clinvar:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config["snpsift"].get(
             "clinvar", "-name 'clinvar_' -tabix -noDownload -noLog"
@@ -116,6 +121,7 @@ rule snpsift_dbnsfp:
         mem_mb=get_20gb_and_10gb_per_attempt,
         time_min=lambda wildcards, attempt: attempt * 45,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config["snpsift"].get(
             "dbnsfp", "-noDownload -noLog -n -f 'hg18_chr,hg18_pos(1-based)'"
@@ -138,6 +144,7 @@ rule snpsift_cosmic:
         mem_mb=get_6gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config["snpsift"].get(
             "cosmic", "-name 'cosmic_' -tabix -noDownload -noLog"
@@ -162,6 +169,7 @@ rule snpsift_kaviar:
         mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
         time_min=lambda wildcards, attempt: attempt * 45,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/snpsift/kaviar/{sample}.log",
     params:
@@ -183,6 +191,7 @@ rule snpsift_gmt:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/snpsift/gmt/{sample}.log",
     wrapper:
@@ -201,6 +210,7 @@ rule snpsift_dbsnp:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/snpsift/dbsnp/{sample}.log",
     params:
@@ -220,6 +230,7 @@ rule snpsift_vartype:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/snpsift/varType/{sample}.log",
     wrapper:

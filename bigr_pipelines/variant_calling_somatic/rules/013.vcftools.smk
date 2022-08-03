@@ -47,6 +47,7 @@ rule vcftools_annotate_mane:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/vcftools/annotate/{sample}.mane.log",
     params:
@@ -101,6 +102,7 @@ rule vcftools_annotate_revel:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/vcftools/annotate/{sample}.revel.log",
     params:
@@ -151,6 +153,7 @@ rule vcftools_annotate_mistic:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/vcftools/annotate/{sample}.mistic.log",
     params:

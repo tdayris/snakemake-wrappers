@@ -87,6 +87,7 @@ rule fastq_screen:
         mem_mb=get_8gb_per_attempt,
         time_min=get_75min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         fastq_screen_config=config["fastq_screen"],
         subset=100000,
