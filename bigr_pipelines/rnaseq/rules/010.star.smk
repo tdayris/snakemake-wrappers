@@ -40,6 +40,7 @@ rule samtools_view_star:
         mem_mb=get_2gb_per_attempt,
         time_min=get_35min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra="-h",
     log:
@@ -59,6 +60,7 @@ rule sambamba_sort_star:
         mem_mb=get_2gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir="tmp",
+    retries: 2
     shadow:
         "shallow"
     params:
@@ -84,7 +86,8 @@ rule gatk_split_n_cigar_reads:
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
+    retries: 1
     log:
         "logs/gatk/splitncigarreads/{sample}.log"
     params:

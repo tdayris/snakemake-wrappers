@@ -15,6 +15,7 @@ rule muterc2_filter:
         time_min=get_45min_per_attempt,
         mem_mb=get_8gb_per_attempt,
         tmpdir="tmp",
+    retries: 2
     params:
         extra=config["gatk"].get("filtermutectcalls", ""),
     log:

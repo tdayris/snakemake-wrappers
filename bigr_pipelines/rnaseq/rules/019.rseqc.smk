@@ -10,6 +10,7 @@ rule rseqc_read_distribution:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/rseqc/read_distribution/{sample}.{maptype}.log",
     conda:
@@ -33,6 +34,7 @@ rule rseqc_tin:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/rseqc/tin/{sample}.{maptype}.log",
     conda:
@@ -58,6 +60,7 @@ rule rseqc_bam_stat:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/rseqc/bam_stat/{sample}.{maptype}.log",
     conda:
@@ -81,6 +84,7 @@ rule rseqc_gene_body_coverage:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/rseqc/gene_body_coverage/{sample}.{maptype}.log",
     conda:
@@ -110,6 +114,7 @@ rule rseqc_junction_annotation:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/rseqc/junction_annotation/{sample}.{maptype}.log",
     conda:

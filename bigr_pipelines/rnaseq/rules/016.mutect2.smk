@@ -21,6 +21,7 @@ rule mutect2_germline:
         time_min=get_5h_per_attempt,
         mem_mb=get_10gb_per_attempt,
         tmpdir="tmp",
+    retries: 3
     params:
         extra=config["gatk"].get(
             "mutect2",

@@ -14,6 +14,7 @@ rule arriba:
         mem_mb=get_20gb_per_attempt,
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         blacklist=config["arriba"]["blacklist"],
         extra=config["arriba"].get("extra", ""),

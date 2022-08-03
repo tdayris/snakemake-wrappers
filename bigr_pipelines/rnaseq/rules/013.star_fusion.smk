@@ -9,6 +9,7 @@ rule star_fusion:
         mem_mb=get_20gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
+    retries: 2
     log:
         "logs/star-fusion/{sample}.log",
     params:

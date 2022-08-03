@@ -13,6 +13,7 @@ rule samtools_index_gatk:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         extra=config["samtools"].get("index_extra", ""),
     log:
@@ -41,6 +42,7 @@ rule gatk_apply_baserecalibrator:
         mem_mb=get_4gb_per_attempt,
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
+    retries: 2
     log:
         "logs/gatk/applybqsr/{sample}.log",
     params:
@@ -70,6 +72,7 @@ rule gatk_compute_baserecalibration_table:
         mem_mb=get_4gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
+    retries: 2
     log:
         "logs/gatk3/compute_bqsr/{sample}.log",
     params:
