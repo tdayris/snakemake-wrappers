@@ -50,7 +50,7 @@ Compute Tumor Molecular Burden from previous indexes and stats
 """
 rule compute_tmb:
     input:
-        igs = temp("igs.yaml"),
+        igs = "igs.yaml",
         samples = expand("tmb/{sample}.yaml", sample=sample_list)
     output:
         tsv = protected("data_output/TMB.tsv")
