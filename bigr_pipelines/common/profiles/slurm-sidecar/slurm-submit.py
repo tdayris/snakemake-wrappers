@@ -5,7 +5,6 @@ Snakemake SLURM submit script.
 import json
 import logging
 import os
-import sys
 
 import requests
 from snakemake.utils import read_job_properties
@@ -34,7 +33,7 @@ def register_with_sidecar(jobid):
 
 # cookiecutter arguments
 # SBATCH_DEFAULTS = "--account ${USER}"
-CLUSTER = "--cluster flamingo"
+CLUSTER = f"--user={os.environ.get('USER')}"
 # CLUSTER_CONFIG = "flamingo.yaml"
 
 RESOURCE_MAPPING = {
