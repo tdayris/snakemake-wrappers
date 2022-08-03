@@ -9,6 +9,9 @@ import os
 import requests
 from snakemake.utils import read_job_properties
 
+script_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(common)
+
 import slurm_utils
 
 logger = logging.getLogger(__name__)
