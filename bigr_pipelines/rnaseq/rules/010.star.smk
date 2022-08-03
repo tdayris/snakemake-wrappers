@@ -20,7 +20,7 @@ rule star_align_variants:
         "logs/star/{sample}.log",
     params:
         idx=config["star"]["index"],
-        extra=lambda wildcards: f"--outSAMattrRGline 'ID:{wildcards.sample}\tSM:{wildcards.sample}\tPU:{wildcards.sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' {config['star'].get('variant_extra')}",
+        extra=lambda wildcards: f"--outSAMattrRGline 'ID:{wildcards.sample}\tSM:{wildcards.sample}\tPU:{wildcards.sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:STAR' {config['star'].get('variant_extra')}",
     wrapper:
         "bio/star/align"
 
