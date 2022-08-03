@@ -17,6 +17,7 @@ rule split_design:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     log:
         "logs/deseq2/split_design.log",
     params:
@@ -45,6 +46,7 @@ rule deseq2_dataset_from_tximport:
         mem_mb=get_4gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
+    retries: 1
     params:
         design=lambda wildcards: (
             f"~{contrasts[wildcards.comparison][0]}"
