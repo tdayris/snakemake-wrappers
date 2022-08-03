@@ -22,7 +22,7 @@ if DEBUG:
 
 def get_status_direct(jobid):
     """Get status directly from sacct/scontrol"""
-    cluster = "--cluster flamingo"
+    cluster = ""
     for i in range(STATUS_ATTEMPTS):
         try:
             sacct_res = sp.check_output(shlex.split(f"sacct {cluster} -P -b -j {jobid} -n"))

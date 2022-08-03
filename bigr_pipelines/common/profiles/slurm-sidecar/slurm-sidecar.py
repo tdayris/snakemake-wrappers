@@ -108,7 +108,7 @@ class PollSqueueThread(threading.Thread):
 
     def _get_state_sacct(self, jobid):
         """Implement retrieving state via sacct for resuming jobs."""
-        cluster = "--cluster flamingo"
+        cluster = ""
         cmd = ["sacct", "-P", "-b", "-j", jobid, "-n"]
         if cluster:
             cmd.append(cluster)
@@ -137,7 +137,7 @@ class PollSqueueThread(threading.Thread):
 
     def _call_squeue(self, allow_failure=True):
         """Run the call to ``squeue``"""
-        cluster = "--cluster flamingo"
+        cluster = ""
         try_num = 0
         cmd = [SQUEUE_CMD, "--me", "--format=%i,%T", "--state=all"]
         if cluster:
