@@ -5,7 +5,7 @@ rule star_align_chimera:
         idx=config["star"]["index"],
     output:
         chim_junc=temp("star/{sample}/chimera/{sample}.Chimeric.out.junction"),
-        sam=temp("star/{sample}/chimera/{sample}.sam"),
+        bam=temp("star/{sample}/chimera/{sample}.unsorted.bam"),
         sj=temp("star/{sample}/chimera/{sample}.SJ.out.tab"),
         log=temp("star/{sample}/chimera/{sample}.Log.out"),
         log_progress=temp("star/{sample}/chimera/{sample}.Log.progress.out"),
