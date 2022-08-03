@@ -62,8 +62,7 @@ sbatch_options = {}
 # sbatch_options.update(cluster_config["__default__"])
 
 # 3) Convert resources (no unit conversion!) and threads
-# Assume all submissions are already in proper unit
-# sbatch_options.update(slurm_utils.convert_job_properties(job_properties, RESOURCE_MAPPING))
+sbatch_options.update(slurm_utils.convert_job_properties(job_properties, RESOURCE_MAPPING))
 
 # 4) cluster_config for particular rule
 # Ignore cluster config
