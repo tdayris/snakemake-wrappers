@@ -5,12 +5,13 @@ Snakemake SLURM submit script.
 import json
 import logging
 import os
+import sys
 
 import requests
 from snakemake.utils import read_job_properties
 
 script_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(common)
+sys.path.append(script_path)
 
 import slurm_utils
 
