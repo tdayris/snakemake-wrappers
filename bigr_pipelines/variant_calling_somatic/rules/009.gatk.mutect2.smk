@@ -118,8 +118,8 @@ rule get_pileup_summaries:
         bam="sambamba/markdup/{sample}_{status}.bam",
         bam_index=get_bai("sambamba/markdup/{sample}_{status}.bam"),
         intervals=config["reference"]["capture_kit_bed"],
-        variants=config["reference"]["dbsnp"],
-        variants_index=config["reference"]["dbsnp_tbi"],
+        variants=config["reference"]["af_only"],
+        variants_index=config["reference"]["af_only_tbi"],
     output:
         table=temp("gatk/getpileupsummaries/{sample}_{status}_getpileupsummaries.table"),
     group:
