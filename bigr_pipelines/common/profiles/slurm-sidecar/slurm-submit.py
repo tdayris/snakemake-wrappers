@@ -78,6 +78,16 @@ sbatch_options = slurm_utils.format_values(sbatch_options, job_properties)
 if "partition" not in sbatch_options.keys():
     sbatch_options["partition"] = slurm_utils.set_partition(sbatch_options.get("time_min", 0))
 
+if not "output" in sbatch_options.keys():
+    sbatch_options["output"] = "logs/slurm/slurm-%x-%j-%N.out"
+
+if not "error" in sbatch_options.keys():
+    sbatch_options["error"] = "logs/slurm/slurm-%x-%j-%N.err"
+
+if not "mail_type" in sbatch_options.keys():
+    sbatch_options["mail_type"] = "END,FAIL"
+    sbatch_options["mail_user"] = "thibault.dayris@gustaveroussy.fr"
+
 # ensure sbatch output dirs exist
 for o in ("output", "error"):
     slurm_utils.ensure_dirs_exist(sbatch_options[o]) if o in sbatch_options else None
