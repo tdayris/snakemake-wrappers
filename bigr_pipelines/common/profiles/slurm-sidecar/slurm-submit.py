@@ -84,10 +84,6 @@ if not "output" in sbatch_options.keys():
 if not "error" in sbatch_options.keys():
     sbatch_options["error"] = "logs/slurm/slurm-%x-%j-%N.err"
 
-if not "mail_type" in sbatch_options.keys():
-    sbatch_options["mail_type"] = "END,FAIL"
-    sbatch_options["mail_user"] = "thibault.dayris@gustaveroussy.fr"
-
 # ensure sbatch output dirs exist
 for o in ("output", "error"):
     slurm_utils.ensure_dirs_exist(sbatch_options[o]) if o in sbatch_options else None
