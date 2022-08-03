@@ -77,7 +77,7 @@ sbatch_options = {}
 # 6) Format pattern in snakemake style
 sbatch_options = slurm_utils.format_values(sbatch_options, job_properties)
 if "partition" not in sbatch_options.keys():
-    sbatch_options["partition"] = slurm_utils.get_partition(sbatch_options.get("time_min", 0))
+    sbatch_options["partition"] = slurm_utils.set_partition(sbatch_options.get("time_min", 0))
 
 # ensure sbatch output dirs exist
 for o in ("output", "error"):
