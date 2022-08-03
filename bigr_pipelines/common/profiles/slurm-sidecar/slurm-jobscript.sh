@@ -4,4 +4,4 @@
 hostname
 date
 
-{exec_job}
+/usr/bin/time -v {exec_job}
