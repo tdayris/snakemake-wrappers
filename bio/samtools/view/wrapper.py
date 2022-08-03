@@ -16,10 +16,10 @@ if aln is None:
 
 ref = ""
 if "fasta" in snakemake.input.keys():
-    ref = f"--reference {snakemake.input['fasta']}"
+    ref = f"-T {snakemake.input['fasta']}"
 
 if "fasta_idx" in snakemake.input.keys():
-    ref += f" --reference {snakemake.input['fasta_idx']}"
+    ref += f" -t {snakemake.input['fasta_idx']}"
 
 bed = ""
 if "bed" in snakemake.input.keys():
