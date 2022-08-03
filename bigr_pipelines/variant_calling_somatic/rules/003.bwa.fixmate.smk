@@ -90,17 +90,16 @@ rule samtools_view_bwa:
     params:
         extra="-h",
     log:
-        "logs/sambamba/view/{sample}.{status}.raw_star.log"
+        "logs/sambamba/view/{sample}.{status}.raw_star.log",
     wrapper:
         "bio/samtools/view"
 
 
-
 rule sambamba_sort_raw_bwa:
     input:
-        mapping="bwa_mem2/mem/{sample}_{status}.unsorted.bam"
+        mapping="bwa_mem2/mem/{sample}_{status}.unsorted.bam",
     output:
-        mapping=temp("bwa_mem2/mem/{sample}_{status}.bam")
+        mapping=temp("bwa_mem2/mem/{sample}_{status}.bam"),
     threads: min(config.get("max_threads", 20), 10)
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -110,7 +109,7 @@ rule sambamba_sort_raw_bwa:
     shadow:
         "shallow"
     params:
-        extra="--sort-by-name"
+        extra="--sort-by-name",
     log:
         "logs/star/sort/{sample}.{status}.log",
     wrapper:
@@ -120,6 +119,8 @@ rule sambamba_sort_raw_bwa:
 """
 This rule maps your reads against the indexed reference with BWA.
 """
+
+
 rule bwa_mem:
     input:
         reads=expand(

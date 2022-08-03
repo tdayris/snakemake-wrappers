@@ -32,7 +32,7 @@ rule collect_multiple_metrics:
     log:
         "logs/picard/multiple_metrics/{sample}.{maptype}.log",
     params:
-        extra=config['picard'].get('extra', ''),
+        extra=config["picard"].get("extra", ""),
     wrapper:
         "bio/picard/collectmultiplemetrics"
 

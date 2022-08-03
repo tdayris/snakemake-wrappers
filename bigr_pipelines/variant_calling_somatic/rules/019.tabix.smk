@@ -1,11 +1,13 @@
 """
 This rule indexes the pbgzipped vcf file
 """
+
+
 rule tabix_index:
     input:
-        "{tool}/{subcommand}/{sample}.vcf.gz"
+        "{tool}/{subcommand}/{sample}.vcf.gz",
     output:
-        "{tool}/{subcommand}/{sample}.vcf.gz.tbi"
+        "{tool}/{subcommand}/{sample}.vcf.gz.tbi",
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
@@ -13,9 +15,9 @@ rule tabix_index:
         tmpdir="tmp",
     retries: 2
     params:
-        "-p vcf"
+        "-p vcf",
     log:
-        "logs/{tool}/{subcommand}/tabix/index/{sample}.log"
+        "logs/{tool}/{subcommand}/tabix/index/{sample}.log",
     wrapper:
         "bio/tabix"
 
@@ -23,21 +25,22 @@ rule tabix_index:
 """ 
 This rule compress a provided VCF file with pbgzip
 """
+
+
 rule pbgzip_compress:
     input:
-        "{tool}/{subcommand}/{sample}.vcf"
+        "{tool}/{subcommand}/{sample}.vcf",
     output:
-        "{tool}/{subcommand}/{sample}.vcf.gz"
-    threads:
-        1
+        "{tool}/{subcommand}/{sample}.vcf.gz",
+    threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
     retries: 2
     params:
-        ""
+        "",
     log:
-        "logs/{tool}/{subcommand}/pbgzip/{sample}.log"
+        "logs/{tool}/{subcommand}/pbgzip/{sample}.log",
     wrapper:
         "bio/bcftools/view"

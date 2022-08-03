@@ -43,7 +43,10 @@ ruleorder: gleaves_compatibility > tabix_index
 ########################
 
 default_config = read_yaml(workflow_source_dir / "config.hg38.yaml")
+
+
 configfile: get_config(default_config)
+
 
 wrapper_prefix = workflow_source_dir / ".." / ".."
 

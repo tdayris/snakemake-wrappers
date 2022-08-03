@@ -25,7 +25,6 @@ rule star_align_variants:
         "bio/star/align"
 
 
-
 rule samtools_view_star:
     input:
         "star/{sample}/{maptype}/{sample}.sam",
@@ -44,17 +43,16 @@ rule samtools_view_star:
     params:
         extra="-h",
     log:
-        "logs/sambamba/view/{sample}.{maptype}.raw_star.log"
+        "logs/sambamba/view/{sample}.{maptype}.raw_star.log",
     wrapper:
         "bio/samtools/view"
 
 
-
 rule sambamba_sort_star:
     input:
-        mapping="star/{sample}/{maptype}/{sample}.unsorted.bam"
+        mapping="star/{sample}/{maptype}/{sample}.unsorted.bam",
     output:
-        mapping=temp("star/{sample}/{maptype}/{sample}.bam")
+        mapping=temp("star/{sample}/{maptype}/{sample}.bam"),
     threads: min(config.get("max_threads", 20), 10)
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -89,9 +87,9 @@ rule gatk_split_n_cigar_reads:
         tmpdir="tmp",
     retries: 1
     log:
-        "logs/gatk/splitncigarreads/{sample}.log"
+        "logs/gatk/splitncigarreads/{sample}.log",
     params:
-        extra=config["gatk"].get("splitncigarreads_extra", "--create-output-bam-index")
+        extra=config["gatk"].get("splitncigarreads_extra", "--create-output-bam-index"),
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:

@@ -47,7 +47,7 @@ rule extractfields:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_20min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     retries: 1
     log:
         "logs/snpsift/extractAllFields/{sample}.log",
