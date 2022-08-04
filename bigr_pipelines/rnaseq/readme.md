@@ -135,6 +135,15 @@ Use iRODS command to get your fastq files, then clean them with Fastp. Assess or
 Command line argument order does not matter.
 
 ```{sh}
+# Go to your project directory
+cd /path/to/my/project/tmp
+
+# Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+
+# Put design file in ${PWD}
+
 # GRCh38 / HG38
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh QC --nt
 # GRCm38 / MM10
@@ -180,6 +189,15 @@ Use iRODS command to get your fastq files, then clean them with Fastp. Assess or
 Command line argument order does not matter.
 
 ```{sh}
+# Go to your project directory
+cd /path/to/my/project/tmp
+
+# Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+
+# Put design file in ${PWD}
+
 # GRCh38 / HG38
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh quant --nt
 # GRCm38 / MM10
@@ -240,6 +258,15 @@ data_output/
 ### Command line
 
 ```{sh}
+# Go to your project directory
+cd /path/to/my/project/tmp
+
+# Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+
+# Put design file in ${PWD}
+
 # GRCh38 / HG38
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh dge --nt
 # GRCm38 / MM10
@@ -493,3 +520,11 @@ DEseq2/
     ├── DGE_considering_factor_ConditionA_comparing_test_Treated_vs_reference_Untreated
     └── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Diseased_vs_reference_Untreated_Relapse
 ```
+
+## Fusions
+
+Under construction
+
+## Variant Calling
+
+Under construction
