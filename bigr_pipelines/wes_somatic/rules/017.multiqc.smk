@@ -70,7 +70,7 @@ rule multiqc_mapping:
         samtools_stats=expand(
             "samtools/stats/{sample}_{status}.{cleaning}.stats",
             sample=sample_list,
-            stats=status_list,
+            status=status_list,
             cleaning=cleaning_status,
         ),
     output:
