@@ -24,8 +24,8 @@ rule multiqc:
         ),
         samtools_stats=expand(
             "samtools/stats/{sample}_{status}.{cleaning}.stats",
-            sample=sample_list, 
-            stats=status_list, 
+            sample=sample_list,
+            stats=status_list,
             cleaning=cleaning_status,
         ),
         csvstats=expand("snpeff/csvstats/{sample}.csv", sample=sample_list),
@@ -69,10 +69,10 @@ rule multiqc:
         ),
         samtools_stats=expand(
             "samtools/stats/{sample}_{status}.{cleaning}.stats",
-            sample=sample_list, 
-            stats=status_list, 
+            sample=sample_list,
+            stats=status_list,
             cleaning=cleaning_status,
-        )
+        ),
     output:
         protected("data_output/MultiQC/MappingQC.html"),
     threads: 1
