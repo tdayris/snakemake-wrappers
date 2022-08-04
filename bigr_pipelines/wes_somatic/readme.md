@@ -1,8 +1,8 @@
 # Somatic WES
 
 1. [TLDR](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#tldr-run-this-pipeline)
-1. [design.tsv file](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#design-file)
-1. [config.yaml file](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#config-file)
+1. [`design.tsv` file](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#design-file)
+1. [`config.yaml` file](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#config-file)
 1. [Classical use](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#classical-use)
 1. [Quality controls](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#quality-controls)
 1. [Mapping only](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#mapping-only)
@@ -13,7 +13,7 @@
 1. [Fusions](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#fusions) Under construction
 
 
-## TLDR: run this pipeline
+# TLDR: run this pipeline
 
 ```{sh}
 # Go to your project directory
@@ -27,7 +27,7 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh
 ```
 
-## Design file
+# Design file
 
 The design file contains paths to your samples. It should look like:
 
@@ -52,7 +52,7 @@ No germline analysis available with this pipeline.
 
 No differential mutation analysis available with this pipeline.
 
-## Config file
+# Config file
 
 This file describes all optional parameters set in the pipeline.
 
@@ -64,7 +64,7 @@ The complete list of info fields contains more than two hundred of possible anno
 
 Any other parameter change may break the pipeline, do it at your own risks.
 
-## Classical use
+# Classical use
 
 ```{sh}
 # Go to your project directory
@@ -97,9 +97,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh 
 # Under construction
 ```
 
-## Quality controls 
+# Quality controls 
 
-### Pipeline
+## Pipeline
 
 1. iRODS copy 
 1. Fastp
@@ -108,7 +108,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh 
 
 Use iRODS command to get your fastq files, then clean them with Fastp. Assess organism quality with FastqScreen, then aggregate quality reports with MultiQC.
 
-### Command line
+## Command line
 
 ```{sh}
 # Go to your project directory
@@ -123,9 +123,9 @@ ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, o
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh QC --nt
 ```
 
-## Mapping only
+# Mapping only
 
-### Pipeline
+## Pipeline
 
 1. iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)
 1. Fastp (trimm fastq reads)
@@ -134,7 +134,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh 
 1. FastqScreen
 1. MultiQC
 
-### Command line
+## Command line
 
 ```{sh}
 # Go to your project directory
@@ -149,9 +149,9 @@ ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, o
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh mapping --nt
 ```
 
-## Variant Calling
+# Variant Calling
 
-### Pipeline
+## Pipeline
 
 1. iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)
 1. Fastp (trim fastq reads)
@@ -166,7 +166,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh 
 1. FastqScreen
 1. MultiQC
 
-### Command line
+## Command line
 
 ```{sh}
 # Go to your project directory
@@ -181,9 +181,9 @@ ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, o
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh variants --nt
 ```
 
-## CNV calling
+# CNV calling
 
-### Pipeline
+## Pipeline
 
 1. iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)
 1. Fastp (trimm fastq reads)
@@ -194,7 +194,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh 
 1. FastqScreen
 1. MultiQC
 
-### Command line
+## Command line
 
 ```{sh}
 # Go to your project directory
@@ -209,9 +209,9 @@ ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, o
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh cnv --nt
 ```
 
-## Tumor molecular burden
+# Tumor molecular burden
 
-### Pipeline
+## Pipeline
 
 1. iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)
 1. Fastp (trim fastq reads)
@@ -222,7 +222,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh 
 1. FastqScreen
 1. MultiQC
 
-### Command line
+## Command line
 
 ```{sh}
 # Go to your project directory
@@ -237,9 +237,9 @@ ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, o
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh tmb --nt
 ```
 
-## Miscosatellites instability
+# Micro satellites instability
 
-### Pipeline
+## Pipeline
 
 1. iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)
 1. Fastp (trim fastq reads)
@@ -250,7 +250,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh 
 1. FastqScreen
 1. MultiQC
 
-### Command line
+## Command line
 
 ```{sh}
 # Go to your project directory
@@ -265,6 +265,6 @@ ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, o
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh msi --nt
 ```
 
-## Fusions
+# Fusions
 
 Under construction
