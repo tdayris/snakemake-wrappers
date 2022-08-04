@@ -1,4 +1,4 @@
-rule multiqc:
+rule multiqc_variant:
     input:
         html=expand(
             "fastp/html/pe/{sample}_{status}.fastp.html",
@@ -43,7 +43,7 @@ rule multiqc:
         "bio/multiqc"
 
 
-rule multiqc:
+rule multiqc_mapping:
     input:
         html=expand(
             "fastp/html/pe/{sample}_{status}.fastp.html",
