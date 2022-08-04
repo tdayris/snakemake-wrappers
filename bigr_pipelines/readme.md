@@ -1,6 +1,3 @@
-[![Snakemake](https://img.shields.io/badge/snakemake-≥5.7.0-brightgreen.svg)](https://snakemake.readthedocs.io)
-[![GitHub actions status](https://github.com/snakemake/snakemake-wrappers/workflows/Tests/badge.svg?branch=master)](https://github.com/snakemake/snakemake-wrappers/actions?query=branch%3Amaster+workflow%3ATests)
-
 # RNA-Seq bulk
 
 [Documentation summary](https://github.com/tdayris/snakemake-wrappers/blob/Unofficial/bigr_pipelines/rnaseq/readme.md):
@@ -35,10 +32,3 @@
 1. [Tumor Molecular Burden](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#tumor-molecular-burden)
 1. [Micro satellites instability](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#miscosatellites-instability)
 1. [Fusions](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#fusions) Under construction
-
-# The Snakemake Wrapper Repository
-
-The Snakemake Wrapper Repository is a collection of reusable wrappers that allow to quickly use popular command line tools
-from [Snakemake](https://snakemake.readthedocs.io) rules and workflows.
-
-Visit https://snakemake-wrappers.readthedocs.io for more information.

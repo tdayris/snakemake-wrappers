@@ -5,11 +5,11 @@
 1. [config.yaml file](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#config-file)
 1. [Classical use](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#classical-use)
 1. [Quality controls](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#quality-controls)
-1. [Mapping only]()
+1. [Mapping only](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#mapping-only)
 1. [Variant calling](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#variant-calling)
 1. [CNV calling](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#cnv-calling)
 1. [Tumor Molecular Burden](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#tumor-molecular-burden)
-1. [Micro satellites instability]()
+1. [Micro satellites instability](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#miscosatellites-instability)
 1. [Fusions](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#fusions) Under construction
 
 
