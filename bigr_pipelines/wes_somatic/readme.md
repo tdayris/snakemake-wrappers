@@ -5,9 +5,11 @@
 1. [config.yaml file](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#config-file)
 1. [Classical use](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#classical-use)
 1. [Quality controls](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#quality-controls)
+1. [Mapping only]()
 1. [Variant calling](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#variant-calling)
 1. [CNV calling](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#cnv-calling)
 1. [Tumor Molecular Burden](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#tumor-molecular-burden)
+1. [Micro satellites instability]()
 1. [Fusions](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#fusions) Under construction
 
 
@@ -121,7 +123,7 @@ ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, o
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh QC --nt
 ```
 
-## Variant Calling
+## Mapping only
 
 ### Pipeline
 
@@ -129,11 +131,6 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh 
 1. Fastp (trimm fastq reads)
 1. bwa-mem2 (map against genome reference)
 1. sambamba/samtools (fix mates, clean poor mapping qualities, remove duplicated, remove unmapped)
-1. mutect2/GATK (call variants, assess multiple bias and go though HardFilters from GATK)
-1. SnpEff/SnpSift/BCFtools/VCFtools (Annotated with 14 separate databases, mostly cancer oriented)
-1. In-house scripts (Annotated with 4 databases built in Gustave Roussy or clinical data)
-1. Facets (call CNV)
-1. In-house scripts (Assess tumor molecular burden)
 1. FastqScreen
 1. MultiQC
 
@@ -148,7 +145,39 @@ ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
-# Run basic quality controls, keep intermediar files
+# Run basic quality controls, keep intermediar files, map files
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh mapping --nt
+```
+
+## Variant Calling
+
+### Pipeline
+
+1. iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)
+1. Fastp (trimm fastq reads)
+1. bwa-mem2 (map against genome reference)
+1. sambamba/samtools (fix mates, clean poor mapping qualities, remove duplicated, remove unmapped)
+1. mutect2/GATK (call variants, assess multiple bias and go though HardFilters from GATK)
+1. SnpEff/SnpSift/BCFtools/VCFtools (Annotated with 14 separate databases, mostly cancer oriented)
+1. In-house scripts (Annotated with 4 databases built in Gustave Roussy or clinical data)
+1. Facets (call CNV)
+1. In-house scripts (Assess tumor molecular burden)
+1. MSIsensor-pro (call MSI status)
+1. FastqScreen
+1. MultiQC
+
+### Command line
+
+```{sh}
+# Go to your project directory
+cd /path/to/my/project/tmp
+
+# Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
+
+# Run basic quality controls, keep intermediar files, call vairants, CNV, TMB, and MSI
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh variants --nt
 ```
 
@@ -176,7 +205,7 @@ ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
-# Run basic quality controls, keep intermediar files
+# Run basic quality controls, keep intermediar files, call CNV
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh cnv --nt
 ```
 
@@ -204,8 +233,36 @@ ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
-# Run basic quality controls, keep intermediar files
+# Run basic quality controls, keep intermediar files, estimates TMB
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh tmb --nt
+```
+
+## Miscosatellites instability
+
+### Pipeline
+
+1. iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)
+1. Fastp (trimm fastq reads)
+1. bwa-mem2 (map against genome reference)
+1. sambamba/samtools (fix mates, clean poor mapping qualities, remove duplicated, remove unmapped)
+1. mutect2/GATK (call variants, assess multiple bias and go though HardFilters from GATK)
+1. MSIsensor-pro (call MSI status)
+1. FastqScreen
+1. MultiQC
+
+### Command line
+
+```{sh}
+# Go to your project directory
+cd /path/to/my/project/tmp
+
+# Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
+
+# Run basic quality controls, keep intermediar files, estimate msi status
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh msi --nt
 ```
 
 ## Fusions
