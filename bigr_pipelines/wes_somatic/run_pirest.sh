@@ -12,9 +12,9 @@ set -e
 #
 #Pour le moment:
 #- GRCh38 # OK
-#- GRCh19 # En cours de test
+#- GRCh19 # Pas fait
 #- GRCm9  # Pas fait
-#- GRCm38 # OK
+#- GRCm38 # En cours de tests
 
 # Col1 = Sample_id
 # Col2 = datasetIdBED
@@ -39,8 +39,6 @@ fi
 
 if [ "${genome_version}" == "GRCh38" ]; then
   echo bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_somatic/run.sh hg38
-elif [ "${genome_version}" == "GRCh37" ]; then
-  echo bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_somatic/run.sh hg19
 elif [ "${genome_version}" == "GRCm38" ]; then
   echo bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_somatic/run.sh mm10
 else
