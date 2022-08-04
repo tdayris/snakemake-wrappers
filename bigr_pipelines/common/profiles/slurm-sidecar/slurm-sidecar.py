@@ -38,7 +38,7 @@ import uuid
 
 
 #: Enables debug messages for slurm sidecard.
-DEBUG = 0 # bool(int(os.environ.get("SNAKEMAKE_SLURM_DEBUG", "0")))
+DEBUG = False # bool(int(os.environ.get("SNAKEMAKE_SLURM_DEBUG", "0")))
 #: Command to call when calling squeue
 SQUEUE_CMD = "squeue" # os.environ.get("SNAKEMAKE_SLURM_SQUEUE_CMD", "squeue")
 #: Number of seconds to wait between ``squeue`` calls.
