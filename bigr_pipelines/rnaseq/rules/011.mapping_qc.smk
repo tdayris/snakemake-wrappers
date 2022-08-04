@@ -7,7 +7,7 @@ rule samtools_stats:
         ref_dict=config["reference"]["genome_dict"],
         bed=config["reference"]["capture_kit_bed"],
     output:
-        temp("samtools/stats/{sample}.{maptype}.stats")
+        temp("samtools/stats/{sample}.{maptype}.stats"),
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_35min_per_attempt,

@@ -7,7 +7,7 @@ rule samtools_stats_raw:
         ref_dict=config["reference"]["fasta_dict"],
         bed=config["reference"]["capture_kit_bed"],
     output:
-        temp("samtools/stats/{sample}_{status}.raw.stats")
+        temp("samtools/stats/{sample}_{status}.raw.stats"),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
@@ -30,7 +30,7 @@ rule samtools_stats_cleaned:
         ref_dict=config["reference"]["fasta_dict"],
         bed=config["reference"]["capture_kit_bed"],
     output:
-        temp("samtools/stats/{sample}_{status}.cleaned.stats")
+        temp("samtools/stats/{sample}_{status}.cleaned.stats"),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
