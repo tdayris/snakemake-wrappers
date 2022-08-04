@@ -15,7 +15,7 @@ rule fastq_screen:
         mem_mb=get_10gb_per_attempt,
         time_min=get_75min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     params:
         fastq_screen_config=config["fastq_screen"]["fastq_screen_config"],
         subset=config["fastq_screen"].get("subset", 100000),

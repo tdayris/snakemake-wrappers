@@ -15,7 +15,7 @@ rule sambamba_sort_coordinate:
         mem_mb=get_4gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     shadow:
         "shallow"
     params:
@@ -36,7 +36,7 @@ rule sambamba_sort_raw:
         mem_mb=get_2gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     shadow:
         "shallow"
     params:
@@ -105,7 +105,7 @@ rule sambamba_sort_raw_bwa:
         mem_mb=get_2gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     shadow:
         "shallow"
     params:
@@ -136,7 +136,7 @@ rule bwa_mem:
         mem_mb=get_75gb_and_2gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     shadow:
         "shallow"
     params:

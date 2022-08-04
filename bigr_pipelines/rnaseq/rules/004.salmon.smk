@@ -15,7 +15,7 @@ rule salmon_quant:
         time_min=get_45min_per_attempt,
         mem_mb=get_15gb_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     params:
         libType=config["salmon"].get("salmon_libtype", "A"),
         extra=config["salmon"].get(

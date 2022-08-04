@@ -12,7 +12,7 @@ rule bigr_copy:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_45min_per_attempt,
-    retries: 3
+    retries: 1
     params:
         input=lambda wildcards, output: fastq_links[output[0]],
     log:

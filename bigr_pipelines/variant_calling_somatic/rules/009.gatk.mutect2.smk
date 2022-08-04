@@ -72,7 +72,7 @@ rule gatk_filter_mutect_calls:
         mem_mb=get_8gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     params:
         extra=config["gatk"].get(
             "filter_mutect_calls",
@@ -196,7 +196,7 @@ rule mutect2_somatic:
         time_min=get_5h_per_attempt,
         mem_mb=get_8gb_per_attempt,
         tmpdir="tmp",
-    retries: 3
+    retries: 1
     params:
         extra=lambda wildcards, output: (
             f"{config['gatk'].get('mutect2', '')} "

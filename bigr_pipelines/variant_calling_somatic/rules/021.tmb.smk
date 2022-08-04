@@ -64,7 +64,7 @@ rule compute_tmb:
         mem_mb=get_2gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     log:
         "logs/tmb.log",
     params:

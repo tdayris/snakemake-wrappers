@@ -113,7 +113,7 @@ rule gatk_variant_filtration:
         mem_mb=get_8gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     log:
         "logs/gatk/variant_filtration/{sample}.log",
     params:

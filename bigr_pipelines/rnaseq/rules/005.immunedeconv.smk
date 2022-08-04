@@ -36,7 +36,7 @@ rule subset_gene_counts:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     log:
         "logs/immunedeconv/filter_gene_counts.log",
     params:
@@ -66,7 +66,7 @@ rule immunedeconv_xcell:
         mem_mb=get_4gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmp="tmp",
-    retries: 2
+    retries: 1
     message:
         "Using xCell to deconvolute expression into cell types"
     params:
@@ -92,7 +92,7 @@ rule immunedeconv_quantiseq:
         mem_mb=get_4gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmp="tmp",
-    retries: 2
+    retries: 1
     message:
         "Using QuantiSeq to deconvolute expression into cell types"
     params:
@@ -118,7 +118,7 @@ rule immunedeconv_epic:
         mem_mb=get_4gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmp="tmp",
-    retries: 2
+    retries: 1
     params:
         gene_col="Hugo_ID",
     message:
@@ -144,7 +144,7 @@ rule mcpcounter:
         mem_mb=get_4gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmp="tmp",
-    retries: 2
+    retries: 1
     message:
         "Using MCP-Counter to deconvolute expression into cell types"
     params:
@@ -173,7 +173,7 @@ rule cibersort_abs:
         mem_mb=get_4gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmp="tmp",
-    retries: 2
+    retries: 1
     params:
         gene_col="Hugo_ID",
     log:
@@ -199,7 +199,7 @@ rule cibersort:
         mem_mb=get_4gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmp="tmp",
-    retries: 2
+    retries: 1
     message:
         "Using cibersort to deconvolute expression into cell types"
     log:
@@ -222,7 +222,7 @@ rule get_cibersort:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmp="tmp",
-    retries: 2
+    retries: 1
     message:
         "Gathering Cibersort requirements"
     log:

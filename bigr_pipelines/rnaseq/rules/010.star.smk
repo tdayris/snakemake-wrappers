@@ -15,7 +15,7 @@ rule star_align_variants:
         mem_mb=get_75gb_and_5gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     log:
         "logs/star/{sample}.log",
     params:
@@ -35,7 +35,7 @@ rule sambamba_sort_star:
         mem_mb=get_2gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     shadow:
         "shallow"
     params:

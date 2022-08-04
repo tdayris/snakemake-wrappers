@@ -21,7 +21,7 @@ rule msisensor_pro_msi:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     log:
         "logs/msisensor_pro/msi/{sample}.log",
     params:

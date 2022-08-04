@@ -42,7 +42,7 @@ rule gatk_apply_baserecalibrator:
         mem_mb=get_4gb_per_attempt,
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     log:
         "logs/gatk/applybqsr/{sample}.log",
     params:
@@ -72,7 +72,7 @@ rule gatk_compute_baserecalibration_table:
         mem_mb=get_4gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     log:
         "logs/gatk3/compute_bqsr/{sample}.log",
     params:

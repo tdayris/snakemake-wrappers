@@ -53,7 +53,7 @@ rule samtools_cram:
         mem_mb=get_1gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     params:
         extra=config["samtools"].get("gram_extra", ""),
     log:

@@ -44,7 +44,7 @@ rule calculate_contamination:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     params:
         extra=config["gatk"].get("calculate_contamination", ""),
     log:
@@ -72,7 +72,7 @@ rule get_pileup_summaries:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     params:
         extra=config["gatk"].get("pileup_summaries", ""),
     log:

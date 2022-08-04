@@ -36,7 +36,7 @@ rule deseq2_readable:
         mem_mb=get_1gb_per_attempt,
         time_min=get_20min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     log:
         "logs/deseq2/readable/{comparison}.log",
     wrapper:
@@ -64,7 +64,7 @@ rule rbt_csv_report:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     group:
         "csv_report"
     log:
@@ -89,7 +89,7 @@ rule zip_csv_report:
         mem_mb=get_1gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     group:
         "csv_report"
     log:
@@ -156,7 +156,7 @@ rule multiqc_config:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
-    retries: 3
+    retries: 1
     log:
         "logs/multiqc/config.{factor}.{test}.{ref}.log",
     params:
@@ -222,7 +222,7 @@ rule plot_deseq_genes:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     params:
         condition_dict=lambda wildcards: condition_dict[wildcards.comparison],
         gene_list=config.get("genes_of_interest", ["ENSG00000141510"]),
@@ -255,7 +255,7 @@ rule seaborn_clustermap_sample:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     params:
         conditions=lambda wildcards: condition_dict[wildcards.comparison],
         factor=lambda wildcards: (
@@ -290,7 +290,7 @@ rule enhancedvolcano_volcanoplot:
         mem_mb=get_2gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     params:
         alpha_threshold=config["deseq2"]["thresholds"].get("alpha", 0.05),
         fc_threshold=config["deseq2"]["thresholds"].get("fc", 0.6),
@@ -320,7 +320,7 @@ rule deseq2_maplot:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     log:
         "logs/deseq2/maplot/maplot.{comparison}.log",
     wrapper:
@@ -349,7 +349,7 @@ rule pcaexplorer_pca:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     params:
         extra=lambda wildcards: (
             f"intgroup = c('{wildcards.factor}'), ntop = 100, pcX = {wildcards.a}, pcY = {wildcards.b}, ellipse = {'TRUE' if wildcards.elipse == 'with_elipse' else 'FALSE'}"
@@ -379,7 +379,7 @@ rule pca_explorer_distro_expr:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
-    retries: 2
+    retries: 1
     log:
         "logs/pcaexplorer/distro_expr/{comparison}.log",
     wrapper:
