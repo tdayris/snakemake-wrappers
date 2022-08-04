@@ -32,7 +32,7 @@ rule rseqc_tin:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp",
     retries: 1
     log:
@@ -108,7 +108,12 @@ rule rseqc_junction_annotation:
         refgene=config["reference"]["refgene_model"],
     output:
         txt=temp("rseqc/junction_annotation/{maptype}/{sample}.txt"),
-        pdf=temp("rseqc/junction_annotation/{maptype}/{sample}.pdf"),
+        pdf_splice=temp("rseqc/junction_annotation/{maptype}/{sample}.splice_junction.pdf"),
+        pdf_events=temp("rseqc/junction_annotation/{maptype}/{sample}.splice_events.pdf"),
+        xls=temp("rseqc/junction_annotation/{maptype}/{sample}.junction.xls"),
+        bed=temp("rseqc/junction_annotation/{maptype}/{sample}.junction.bed"),
+        rscript=temp("rseqc/junction_annotation/{maptype}/{sample}.junction_plot.r"),
+        interact=temp("rseqc/junction_annotation/{maptype}/{sample}.junction.Interact.bed"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -128,4 +133,4 @@ rule rseqc_junction_annotation:
         "--refgene {input.refgene} "
         "--out-prefix {params.prefix} "
         "{params.extra} "
-        "> {log} 2>&1 "
+        "> {output.txt} 2> {log} "
