@@ -1,79 +1,47 @@
-rule collect_multiple_metrics_raw:
+rule samtools_stats_raw:
     input:
         bam="bwa_mem2/sorted/{sample}_{status}.bam",
         bai="bwa_mem2/sorted/{sample}_{status}.bam.bai",
         ref=config["reference"]["fasta"],
         ref_idx=config["reference"]["fasta_index"],
         ref_dict=config["reference"]["fasta_dict"],
+        bed=config["reference"]["capture_kit_bed"],
     output:
-        temp(
-            multiext(
-                "picard/stats/{sample}_{status}.raw",
-                ".alignment_summary_metrics",
-                ".insert_size_metrics",
-                ".insert_size_histogram.pdf",
-                ".quality_distribution_metrics",
-                ".quality_distribution.pdf",
-                ".gc_bias.detail_metrics",
-                ".gc_bias.summary_metrics",
-                ".gc_bias.pdf",
-                ".bait_bias_detail_metrics",
-                ".bait_bias_summary_metrics",
-                ".error_summary_metrics",
-                ".pre_adapter_detail_metrics",
-                ".pre_adapter_summary_metrics",
-            )
-        ),
+        temp("samtools/stats/{sample}_{status}.raw.stats")
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
-        time_min=get_1h_per_attempt,
+        time_min=get_35min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/picard/multiple_metrics/{sample}.{status}.raw.log",
+        "logs/samtools/stats/{sample}.{status}.raw.log",
     params:
-        extra=config["picard"].get("collect_multiple_metrics", ""),
+        extra=config["samtools"].get("stats", ""),
     wrapper:
-        "bio/picard/collectmultiplemetrics"
+        "bio/samtools/stats"
 
 
-rule collect_multiple_metrics_cleaned:
+rule samtools_stats_cleaned:
     input:
         bam="sambamba/markdup/{sample}_{status}.bam",
         bai="sambamba/markdup/{sample}_{status}.bam.bai",
         ref=config["reference"]["fasta"],
         ref_idx=config["reference"]["fasta_index"],
         ref_dict=config["reference"]["fasta_dict"],
+        bed=config["reference"]["capture_kit_bed"],
     output:
-        temp(
-            multiext(
-                "picard/stats/{sample}_{status}.cleaned",
-                ".alignment_summary_metrics",
-                ".insert_size_metrics",
-                ".insert_size_histogram.pdf",
-                ".quality_distribution_metrics",
-                ".quality_distribution.pdf",
-                ".gc_bias.detail_metrics",
-                ".gc_bias.summary_metrics",
-                ".gc_bias.pdf",
-                ".bait_bias_detail_metrics",
-                ".bait_bias_summary_metrics",
-                ".error_summary_metrics",
-                ".pre_adapter_detail_metrics",
-                ".pre_adapter_summary_metrics",
-            )
-        ),
+        temp("samtools/stats/{sample}_{status}.cleaned.stats")
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
-        time_min=get_1h_per_attempt,
+        time_min=get_35min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/picard/multiple_metrics/{sample}.{status}.cleaned.log",
+        "logs/samtools/stats/{sample}.{status}.cleaned.log",
     params:
-        extra=config["picard"].get("collect_multiple_metrics", ""),
+        extra=config["samtools"].get("stats", ""),
     wrapper:
-        "bio/picard/collectmultiplemetrics"
+        "bio/samtools/stats"
 
 
 rule fastq_screen:

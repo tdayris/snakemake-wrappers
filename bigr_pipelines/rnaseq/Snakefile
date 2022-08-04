@@ -198,25 +198,7 @@ rule star_fusion_results:
             "star/{sample}/chimera/{sample}.Log.progress.out", sample=sample_list
         ),
         logf=expand("star/{sample}/chimera/{sample}.Log.final.out", sample=sample_list),
-        picard=[
-            multiext(
-                f"picard/stats/{sample}.chimera",
-                ".alignment_summary_metrics",
-                ".insert_size_metrics",
-                ".insert_size_histogram.pdf",
-                ".quality_distribution_metrics",
-                ".quality_distribution.pdf",
-                ".gc_bias.detail_metrics",
-                ".gc_bias.summary_metrics",
-                ".gc_bias.pdf",
-                ".bait_bias_detail_metrics",
-                ".bait_bias_summary_metrics",
-                ".error_summary_metrics",
-                ".pre_adapter_detail_metrics",
-                ".pre_adapter_summary_metrics",
-            )
-            for sample in sample_list
-        ],
+        samtools_stats=expand("samtools/stats/{sample}.chimera.stats", sample=sample_list),
         fastp=expand(
             "fastp/{ext}/{sample}.fastp.{ext}",
             sample=sample_list,

@@ -13,5 +13,14 @@ extra = snakemake.params.get("extra", "")
 region = snakemake.params.get("region", "")
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
+reference = snakemake.input.get("ref", "")
+if reference:
+    reference = f"-r {reference}"
 
-shell("samtools stats {extra} {snakemake.input} {region} > {snakemake.output} {log}")
+
+regions = snakemake.input.get("bed", "")
+if regions:
+    regions = f"-t {regions}"
+
+
+shell("samtools stats {extra} {reference} {regions} {snakemake.input.aln} {region} > {snakemake.output} {log}")

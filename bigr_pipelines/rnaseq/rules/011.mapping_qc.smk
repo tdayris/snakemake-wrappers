@@ -1,40 +1,24 @@
-rule collect_multiple_metrics:
+rule samtools_stats:
     input:
         bam="star/{sample}/{maptype}/{sample}.bam",
         bai="star/{sample}/{maptype}/{sample}.bam.bai",
         ref=config["reference"]["genome"],
         ref_idx=config["reference"]["genome_index"],
         ref_dict=config["reference"]["genome_dict"],
+        bed=config["reference"]["capture_kit_bed"],
     output:
-        temp(
-            multiext(
-                "picard/stats/{sample}.{maptype}",
-                ".alignment_summary_metrics",
-                ".insert_size_metrics",
-                ".insert_size_histogram.pdf",
-                ".quality_distribution_metrics",
-                ".quality_distribution.pdf",
-                ".gc_bias.detail_metrics",
-                ".gc_bias.summary_metrics",
-                ".gc_bias.pdf",
-                ".bait_bias_detail_metrics",
-                ".bait_bias_summary_metrics",
-                ".error_summary_metrics",
-                ".pre_adapter_detail_metrics",
-                ".pre_adapter_summary_metrics",
-            )
-        ),
+        temp("samtools/stats/{sample}.{maptype}.stats")
     resources:
-        mem_mb=get_4gb_per_attempt,
-        time_min=get_1h_per_attempt,
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_35min_per_attempt,
         tmpdir="tmp",
     retries: 1
     log:
-        "logs/picard/multiple_metrics/{sample}.{maptype}.log",
+        "logs/samtools/stats/{sample}.{maptype}.log",
     params:
-        extra=config["picard"].get("extra", ""),
+        extra=config["samtools"].get("stats", ""),
     wrapper:
-        "bio/picard/collectmultiplemetrics"
+        "bio/samtools/stats"
 
 
 rule samtools_index_bam:

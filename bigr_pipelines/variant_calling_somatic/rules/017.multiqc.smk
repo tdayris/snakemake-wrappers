@@ -22,27 +22,12 @@ rule multiqc:
             ext=["txt", "png"],
             status=status_list,
         ),
-        picard=[
-            multiext(
-                f"picard/stats/{sample}_{status}.{cleaning}",
-                ".alignment_summary_metrics",
-                ".insert_size_metrics",
-                ".insert_size_histogram.pdf",
-                ".quality_distribution_metrics",
-                ".quality_distribution.pdf",
-                ".gc_bias.detail_metrics",
-                ".gc_bias.summary_metrics",
-                ".gc_bias.pdf",
-                ".bait_bias_detail_metrics",
-                ".bait_bias_summary_metrics",
-                ".error_summary_metrics",
-                ".pre_adapter_detail_metrics",
-                ".pre_adapter_summary_metrics",
-            )
-            for cleaning in cleaning_status
-            for sample in sample_list
-            for status in status_list
-        ],
+        samtools_stats=expand(
+            "samtools/stats/{sample}_{status}.{cleaning}.stats",
+            sample=sample_list, 
+            stats=status_list, 
+            cleaning=cleaning_status,
+        )
         csvstats=expand("snpeff/csvstats/{sample}.csv", sample=sample_list),
     output:
         protected("data_output/MultiQC/Somatic_Variant_Calling.html"),
