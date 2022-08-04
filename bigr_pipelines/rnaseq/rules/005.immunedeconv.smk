@@ -7,7 +7,7 @@ This snakefile contains all rules related to immunedeconv
 rule immunedeconv_results:
     input:
         graphs=expand(
-            "{tool}/celltypes.{graph}.png",
+            "data_output/{tool}/celltypes.{graph}.png",
             tool=config["immunedeconv"].get(
                 "tool_list",
                 [
@@ -21,6 +21,12 @@ rule immunedeconv_results:
             ),
             graph=["histogram", "dotplot"],
         ),
+        tpm_table=expand(
+            "data_output/Quantification/TPM.{feature}.tsv",
+            feature=["transcripts", "genes"],
+        ),
+        raw_counts="data_output/Quantification/Raw.genes.tsv",
+        qc="data_output/MultiQC/ImmuneDeconv.html",
 
 
 # Subset salmon original TPM counts to fulfill immenedeconv requirements
@@ -56,19 +62,17 @@ rule immunedeconv_xcell:
     input:
         expr_mat="immunedeconv/TPM.tsv",
     output:
-        histogram="xcell/celltypes.hist.png",
-        dotplot="xcell/celltypes.dotplot.png",
+        histogram="data_output/xcell/celltypes.hist.png",
+        dotplot="data_output/xcell/celltypes.dotplot.png",
         tsv="xcell/celltypes.tsv",
         rds="xcell/celltypes.RDS",
-        plotdir=directory("xcell/celltypes.dotplots"),
+        plotdir=directory("data_output/xcell/celltypes.dotplots"),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmp="tmp",
     retries: 1
-    message:
-        "Using xCell to deconvolute expression into cell types"
     params:
         gene_col="Hugo_ID",
     log:
@@ -82,19 +86,17 @@ rule immunedeconv_quantiseq:
     input:
         expr_mat="immunedeconv/TPM.tsv",
     output:
-        histogram="quantiseq/celltypes.hist.png",
-        dotplot="quantiseq/celltypes.dotplot.png",
+        histogram="data_output/quantiseq/celltypes.hist.png",
+        dotplot="data_output/quantiseq/celltypes.dotplot.png",
         tsv="quantiseq/celltypes.tsv",
         rds="quantiseq/celltypes.RDS",
-        plotdir=directory("quantiseq/celltypes.dotplots"),
+        plotdir=directory("data_output/quantiseq/celltypes.dotplots"),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmp="tmp",
     retries: 1
-    message:
-        "Using QuantiSeq to deconvolute expression into cell types"
     params:
         gene_col="Hugo_ID",
     log:
@@ -108,11 +110,11 @@ rule immunedeconv_epic:
     input:
         expr_mat="immunedeconv/TPM.tsv",
     output:
-        histogram="epic/celltypes.hist.png",
-        dotplot="epic/celltypes.dotplot.png",
+        histogram="data_output/epic/celltypes.hist.png",
+        dotplot="data_output/epic/celltypes.dotplot.png",
         tsv="epic/celltypes.tsv",
         rds="epic/celltypes.RDS",
-        plotdir=directory("epic/celltypes.dotplots"),
+        plotdir=directory("data_output/epic/celltypes.dotplots"),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
@@ -121,8 +123,6 @@ rule immunedeconv_epic:
     retries: 1
     params:
         gene_col="Hugo_ID",
-    message:
-        "Using EPIC to deconvolute expression into cell types"
     log:
         "logs/immunedeconv/epic.log",
     wrapper:
@@ -134,19 +134,17 @@ rule mcpcounter:
     input:
         expr_mat="immunedeconv/TPM.tsv",
     output:
-        histogram="mcpcounter/celltypes.hist.png",
-        dotplot="mcpcounter/celltypes.dotplot.png",
-        tsv="mcpcounter/celltypes.tsv",
-        rds="mcpcounter/celltypes.RDS",
-        plotdir=directory("mcpcounter/celltypes.dotplots"),
+        histogram="data_output/mcp_counter/celltypes.hist.png",
+        dotplot="data_output/mcp_counter/celltypes.dotplot.png",
+        tsv="mcp_counter/celltypes.tsv",
+        rds="mcp_counter/celltypes.RDS",
+        plotdir=directory("data_output/mcp_counter/celltypes.dotplots"),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmp="tmp",
     retries: 1
-    message:
-        "Using MCP-Counter to deconvolute expression into cell types"
     params:
         gene_col="Hugo_ID",
     log:
@@ -161,13 +159,11 @@ rule cibersort_abs:
         cibersort_binary="CIBERSORT.R",
         cibersort_mat="LM22.txt",
     output:
-        histogram="cibersort_abs/celltypes.hist.png",
-        dotplot="cibersort_abs/celltypes.dotplot.png",
+        histogram="data_output/cibersort_abs/celltypes.hist.png",
+        dotplot="data_output/cibersort_abs/celltypes.dotplot.png",
         tsv="cibersort_abs/celltypes.tsv",
         rds="cibersort_abs/celltypes.RDS",
-        plotdir=directory("cibersort_abs/celltypes.dotplots"),
-    message:
-        "Using Cibersort-absolute to deconvolute expression into cell types"
+        plotdir=directory("data_output/cibersort_abs/celltypes.dotplots"),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
@@ -189,19 +185,17 @@ rule cibersort:
         cibersort_binary="CIBERSORT.R",
         cibersort_mat="LM22.txt",
     output:
-        histogram="cibersort/celltypes.hist.png",
-        dotplot="cibersort/celltypes.dotplot.png",
+        histogram="data_output/cibersort/celltypes.hist.png",
+        dotplot="data_output/cibersort/celltypes.dotplot.png",
         tsv="cibersort/celltypes.tsv",
         rds="cibersort/celltypes.RDS",
-        plotdir=directory("cibersort/celltypes.dotplots"),
+        plotdir=directory("data_output/cibersort/celltypes.dotplots"),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_15min_per_attempt,
         tmp="tmp",
     retries: 1
-    message:
-        "Using cibersort to deconvolute expression into cell types"
     log:
         "logs/immunedeconv/Cibersort.log",
     params:
@@ -223,8 +217,6 @@ rule get_cibersort:
         time_min=get_15min_per_attempt,
         tmp="tmp",
     retries: 1
-    message:
-        "Gathering Cibersort requirements"
     log:
         "logs/cibersort.bin.log",
     conda:
@@ -236,3 +228,53 @@ rule get_cibersort:
         "rsync {params.rsync} {input.cibersort_binary} {output.cibersort_binary} > {log} 2>&1 && "
         "chmod {params.chmod} {output.cibersort_binary} >> {log} 2>&1 && "
         "rsync {params.rsync} {input.cibersort_mat} {output.cibersort_mat} >> {log} 2>&1"
+
+
+rule multiqc_config_immunedeconv:
+    input:
+        expand("cibersort/celltypes.tsv", tool=tool_list),
+    output:
+        yaml=temp("immunedeconv/multiqc_config_mqc.yaml"),
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
+        tmpdir="tmp",
+    log:
+        "logs/multiqc_config_immunedeconv.log",
+    params:
+        prefix="",
+    conda:
+        str(workflow_source_dir / "envs" / "python.yaml")
+    script:
+        str(workflow_source_dir / "scripts" / "immunedeconv_to_multiqc.py")
+
+
+rule multiqc:
+    input:
+        salmon_quant=lambda wildcards: expand(
+            "salmon/pseudo_mapping/{sample}/quant.genes.sf",
+            sample=samples_per_prefixes[wildcards.comparison],
+        ),
+        fastp=lambda wildcards: expand(
+            "fastp/{ext}/{sample}.fastp.{ext}",
+            sample=samples_per_prefixes[wildcards.comparison],
+            ext=["html", "json"],
+        ),
+        fastq_screen=lambda wildcards: expand(
+            "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+            sample=samples_per_prefixes[wildcards.comparison],
+            stream=streams,
+            ext=["txt", "png"],
+        ),
+    output:
+        "data_output/MultiQC/ImmuneDeconv.html",
+    threads: 1
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
+    log:
+        "logs/multiqc/immunedeconv.log",
+    wrapper:
+        "bio/multiqc"

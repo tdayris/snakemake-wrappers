@@ -146,6 +146,8 @@ features = ["gene", "transcript"]
 maptypes = ["variants", "chimera"]
 # DEseq2 results content list
 content_list = ["SortedOnLogFC", "SortedOnPadj", "Complete"]
+# Immune deconv tool list
+tool_list = ["cibersort", "cibersort_abs", "mcp_counter", "epic", "quantiseq", "xcell"]
 
 logging.info("Constraining wildcards...")
 
@@ -162,3 +164,4 @@ wildcard_constraints:
     feature=r"|".join(features),
     maptype=r"|".join(maptypes),
     content=r"|".join(content_list),
+    tool=r"|".join(tool_list),
