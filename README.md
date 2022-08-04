@@ -1,6 +1,13 @@
 [![Snakemake](https://img.shields.io/badge/snakemake-≥5.7.0-brightgreen.svg)](https://snakemake.readthedocs.io)
 [![GitHub actions status](https://github.com/snakemake/snakemake-wrappers/workflows/Tests/badge.svg?branch=master)](https://github.com/snakemake/snakemake-wrappers/actions?query=branch%3Amaster+workflow%3ATests)
 
+# Pipelines available in Gustave Roussy only:
+
+1. [RNA-seq](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines#rna-seq-bulk) bulk
+1. [WES](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines#somatic-wes), for normal/tumor pairs
+
+See below for mors information
+
 # RNA-Seq bulk
 
 [Documentation summary](https://github.com/tdayris/snakemake-wrappers/blob/Unofficial/bigr_pipelines/rnaseq/readme.md):
