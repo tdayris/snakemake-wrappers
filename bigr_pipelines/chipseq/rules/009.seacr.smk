@@ -9,7 +9,7 @@ rule seacr_callpeak:
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/seacr/{sample}.stringent.log",
+        "logs/seacr/{sample}.{mode}.log",
     params:
         fdr=0.01,
         norm="norm",
