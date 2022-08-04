@@ -32,6 +32,7 @@ while [ "$#" -gt 0 ]; do
     salmon|Salmon|quant) SNAKE_ARGS+=("--until salmon_quant_results"); shift;;
     fusions|fusion) SNAKE_ARGS+=("--until star_fusion_results"); shift;;
     qc|QC) SNAKE_ARGS+=("--until quality_control_results"); shift;;
+    immu|deconv) SNAKE_ARGS+=("--until immunedeconv_results"); shift;;
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac
 done

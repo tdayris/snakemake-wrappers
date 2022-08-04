@@ -2,33 +2,6 @@
 This snakefile contains all rules related to immunedeconv
 """
 
-
-# Call this fantom rule to access all results from immunedeconv
-rule immunedeconv_results:
-    input:
-        graphs=expand(
-            "data_output/{tool}/celltypes.{graph}.png",
-            tool=config["immunedeconv"].get(
-                "tool_list",
-                [
-                    "xcell",
-                    "quantiseq",
-                    "epic",
-                    "mcpcounter",
-                    "cibersort",
-                    "cibersort_abs",
-                ],
-            ),
-            graph=["histogram", "dotplot"],
-        ),
-        tpm_table=expand(
-            "data_output/Quantification/TPM.{feature}.tsv",
-            feature=["transcripts", "genes"],
-        ),
-        raw_counts="data_output/Quantification/Raw.genes.tsv",
-        qc="data_output/MultiQC/ImmuneDeconv.html",
-
-
 # Subset salmon original TPM counts to fulfill immenedeconv requirements
 rule subset_gene_counts:
     input:
@@ -250,31 +223,4 @@ rule multiqc_config_immunedeconv:
         str(workflow_source_dir / "scripts" / "immunedeconv_to_multiqc.py")
 
 
-rule multiqc:
-    input:
-        salmon_quant=lambda wildcards: expand(
-            "salmon/pseudo_mapping/{sample}/quant.genes.sf",
-            sample=samples_per_prefixes[wildcards.comparison],
-        ),
-        fastp=lambda wildcards: expand(
-            "fastp/{ext}/{sample}.fastp.{ext}",
-            sample=samples_per_prefixes[wildcards.comparison],
-            ext=["html", "json"],
-        ),
-        fastq_screen=lambda wildcards: expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
-            sample=samples_per_prefixes[wildcards.comparison],
-            stream=streams,
-            ext=["txt", "png"],
-        ),
-    output:
-        "data_output/MultiQC/ImmuneDeconv.html",
-    threads: 1
-    resources:
-        mem_mb=get_2gb_per_attempt,
-        time_min=get_45min_per_attempt,
-        tmpdir="tmp",
-    log:
-        "logs/multiqc/immunedeconv.log",
-    wrapper:
-        "bio/multiqc"
+
