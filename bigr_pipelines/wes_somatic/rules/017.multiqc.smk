@@ -25,7 +25,7 @@ rule multiqc:
         samtools_stats=expand(
             "samtools/stats/{sample}_{status}.{cleaning}.stats",
             sample=sample_list,
-            stats=status_list,
+            status=status_list,
             cleaning=cleaning_status,
         ),
         csvstats=expand("snpeff/csvstats/{sample}.csv", sample=sample_list),
