@@ -42,9 +42,9 @@ Header **must** be the first line:
 
 1. `Sample_id` **must** be in the header (first line). Column order does not matter.
 1. `Upstream_file_normal` **must** be in the header (first line). Column order does not matter.
-1. `Downstream_file_normal` **must** be in the header (first line). No single-ended analyses here. Column order does not matter.
+1. `Downstream_file_normal` **must** be in the header (first line). No single-ended analyzes here. Column order does not matter.
 1. `Upstream_file_tumor` **must** be in the header (first line). Column order does not matter.
-1. `Downstream_file_tumor` **must** be in the header (first line). No single-ended analyses here. Column order does not matter.
+1. `Downstream_file_tumor` **must** be in the header (first line). No single-ended analyzes here. Column order does not matter.
 
 No trio analysis available with this pipeline.
 
@@ -60,7 +60,7 @@ Possible edition:
 
 1. You may wan to select info fields available in final result table.
 
-The complete list of info fields contains more than two hundread of possible annotation fields. Surch a large table does not suit the weak computers belonging to our fellow biologists.
+The complete list of info fields contains more than two hundred of possible annotation fields. Such a large table does not suit the weak computers belonging to our fellow biologists.
 
 Any other parameter change may break the pipeline, do it at your own risks.
 
@@ -75,7 +75,7 @@ ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv . || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
-# Run basic quality controls, keep intermediar files
+# Run basic quality controls, keep intermediary files
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh QC --nt
 
 # Choose wether to continue the analysis or not.
@@ -119,7 +119,7 @@ ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
-# Run basic quality controls, keep intermediar files
+# Run basic quality controls, keep intermediary files
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh QC --nt
 ```
 
@@ -145,7 +145,7 @@ ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
-# Run basic quality controls, keep intermediar files, map files
+# Run basic quality controls, keep intermediary files, map files
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh mapping --nt
 ```
 
@@ -154,7 +154,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh 
 ### Pipeline
 
 1. iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)
-1. Fastp (trimm fastq reads)
+1. Fastp (trim fastq reads)
 1. bwa-mem2 (map against genome reference)
 1. sambamba/samtools (fix mates, clean poor mapping qualities, remove duplicated, remove unmapped)
 1. mutect2/GATK (call variants, assess multiple bias and go though HardFilters from GATK)
@@ -177,7 +177,7 @@ ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
-# Run basic quality controls, keep intermediar files, call vairants, CNV, TMB, and MSI
+# Run basic quality controls, keep intermediary files, call variants, CNV, TMB, and MSI
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh variants --nt
 ```
 
@@ -205,7 +205,7 @@ ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
-# Run basic quality controls, keep intermediar files, call CNV
+# Run basic quality controls, keep intermediary files, call CNV
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh cnv --nt
 ```
 
@@ -214,7 +214,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh 
 ### Pipeline
 
 1. iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)
-1. Fastp (trimm fastq reads)
+1. Fastp (trim fastq reads)
 1. bwa-mem2 (map against genome reference)
 1. sambamba/samtools (fix mates, clean poor mapping qualities, remove duplicated, remove unmapped)
 1. mutect2/GATK (call variants, assess multiple bias and go though HardFilters from GATK)
@@ -233,7 +233,7 @@ ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
-# Run basic quality controls, keep intermediar files, estimates TMB
+# Run basic quality controls, keep intermediary files, estimates TMB
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh tmb --nt
 ```
 
@@ -242,7 +242,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh 
 ### Pipeline
 
 1. iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)
-1. Fastp (trimm fastq reads)
+1. Fastp (trim fastq reads)
 1. bwa-mem2 (map against genome reference)
 1. sambamba/samtools (fix mates, clean poor mapping qualities, remove duplicated, remove unmapped)
 1. mutect2/GATK (call variants, assess multiple bias and go though HardFilters from GATK)
@@ -261,7 +261,7 @@ ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
-# Run basic quality controls, keep intermediar files, estimate msi status
+# Run basic quality controls, keep intermediary files, estimate msi status
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh msi --nt
 ```
 

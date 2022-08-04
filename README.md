@@ -6,7 +6,7 @@
 1. [RNA-seq](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines#rna-seq-bulk) bulk
 1. [WES](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines#somatic-wes), for normal/tumor pairs
 
-See below for mors information
+See below for more information
 
 # RNA-Seq bulk
 
