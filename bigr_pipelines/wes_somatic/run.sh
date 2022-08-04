@@ -29,9 +29,10 @@ while [ "$#" -gt 0 ]; do
     --rulegraph) GRAPH="${2}"; shift 2;;
     hg38|HG38) CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"; CACHE_RULES+=("msisensor_pro_scan_hg38");  CACHE_RULES+=("bwa_index_hg38"); shift;;
     mm10|MM10) CONFIG_PATH="${PIPELINE_PATH}/config/config.mm10.yaml"; CACHE_RULES+=("msisensor_pro_scan_mm10"); CACHE_RULES+=("bwa_index_mm10"); shift;;
-    tmb|TMB) SNAKE_ARGS+=("--until compute_tmb");;
-    msi|MSI) SNAKE_ARGS+=("--until msi_results");;
-    cnv|CNV|facets) SNAKE_ARGS+=("--until cnv_facets");;
+    tmb|TMB) SNAKE_ARGS+=("--until tmb_only");;
+    msi|MSI) SNAKE_ARGS+=("--until msi_only");;
+    cnv|CNV|facets) SNAKE_ARGS+=("--until cnv_only");;
+    map|mapping) SNAKE_ARGS+=("--until mapping_only");;
     anmo|ANMO) ANMO="RUN"; shift;;
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac

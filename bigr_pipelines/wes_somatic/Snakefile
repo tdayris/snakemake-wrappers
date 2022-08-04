@@ -1,7 +1,7 @@
 include: "rules/000.common.smk"
 
 
-rule target:
+rule variants_only:
     input:
         multiqc="data_output/MultiQC/Somatic_Variant_Calling.html",
         vcfs=expand("data_output/VCF/{sample}.vcf.gz", sample=sample_list),
@@ -9,7 +9,31 @@ rule target:
         vcf_xlsx=expand("data_output/XLSX/{sample}.xlsx", sample=sample_list),
         vcf_tsv=expand("data_output/TSV/{sample}.tsv", sample=sample_list),
         tmb="data_output/TMB.tsv",
+        msi="data_output/MSI.tsv",
         cnv=expand("data_output/CNV/{sample}.tsv", sample=sample_list),
+
+
+rule cnv_only:
+    input:
+        cnv=expand("data_output/CNV/{sample}.tsv", sample=sample_list),
+        multiqc="data_output/MultiQC/MappingQC.html"
+
+
+rule tmb_only:
+    input:
+        tmb="data_output/TMB.tsv",
+        multiqc="data_output/MultiQC/Somatic_Variant_Calling.html"
+
+
+rule msi_only:
+    input:
+        msi="data_output/MSI.tsv",
+        multiqc="data_output/MultiQC/MappingQC.html"
+
+
+rule mapping_only:
+    input:
+        multiqc="data_output/MultiQC/MappingQC.html"
 
 
 #####################
