@@ -10,7 +10,7 @@ source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/environment.sh"
 
 # Define pipeline related variables
 declare -x SNAKEMAKE_PROFILE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/common/profiles"
-declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/variant_calling_somatic"
+declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/wes_somatic"
 export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 
 SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
