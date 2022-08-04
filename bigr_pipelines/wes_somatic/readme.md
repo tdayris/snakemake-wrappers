@@ -1,14 +1,14 @@
 # Somatic WES
 
-1. [TLDR]()
-1. [design.tsv file]()
-1. [config.yaml file]()
-1. [Classical use]()
-1. [Quality controls]()
-1. [Variant calling]()
-1. [CNV calling]()
-1. [Tumor Molecular Burden]()
-1. [Fusions]() Under construction
+1. [TLDR](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#tldr-run-this-pipeline)
+1. [design.tsv file](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#design-file)
+1. [config.yaml file](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#config-file)
+1. [Classical use](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#classical-use)
+1. [Quality controls](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#quality-controls)
+1. [Variant calling](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#variant-calling)
+1. [CNV calling](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#cnv-calling)
+1. [Tumor Molecular Burden](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#tumor-molecular-burden)
+1. [Fusions](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/wes_somatic#fusions) Under construction
 
 
 ## TLDR: run this pipeline

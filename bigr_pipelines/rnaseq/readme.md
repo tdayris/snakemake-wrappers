@@ -12,7 +12,9 @@ This pipeline aims to perform classical RNASeq-bulk analyses:
 1. [Aggregate factors](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#aggregate-factors)
 1. [Ignore factors](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#ignore-factors)
 1. [Perform only a subset of DGE](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#perform-only-a-subset-of-dge)
-1. [Fusion]() Under construction
+1. [Immune cell population deconvolution]() Under construction
+1. [Fusions](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#fusions) Under construction
+1. [Variant Calling](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#variant-calling) Under construction
 
 
 Each subsection can be selected one by one, or the whole pipeline may be executed.
