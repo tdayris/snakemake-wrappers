@@ -10,6 +10,7 @@ include: "rules/010.macs2.smk"
 include: "rules/011.deeptools.smk"
 include: "rules/012.mapping_qc.smk"
 include: "rules/013.multiqc.smk"
+include: "rules/009.seacr.smk"
 
 
 rule target:
@@ -23,3 +24,4 @@ rule target:
         ),
         expand("deeptools/bamcoverage/{sample}.bw", sample=sample_list),
         "multiqc/Chipseq.html",
+        expand("seacr/{sample}.{mode}.bed", sample=sample_list, mode=mode_list)

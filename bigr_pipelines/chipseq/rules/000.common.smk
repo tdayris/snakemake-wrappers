@@ -75,6 +75,7 @@ fastq_links = link_fq(
 sample_list = design.index.tolist()
 peak_types = ["broadPeak", "narrowPeak"]
 streams = ["1", "2"]
+mode_list = ["relaxed", "stringent"]
 
 
 wildcard_constraints:
