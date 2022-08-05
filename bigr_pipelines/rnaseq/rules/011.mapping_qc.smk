@@ -1,7 +1,7 @@
 rule samtools_stats:
     input:
-        bam="star/{sample}/{maptype}/{sample}.bam",
-        bai="star/{sample}/{maptype}/{sample}.bam.bai",
+        aln="star/{sample}/{maptype}/{sample}.bam",
+        aln_idx="star/{sample}/{maptype}/{sample}.bam.bai",
         ref=config["reference"]["genome"],
         ref_idx=config["reference"]["genome_index"],
         ref_dict=config["reference"]["genome_dict"],
