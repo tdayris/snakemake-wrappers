@@ -42,10 +42,10 @@ rule samtools_index_bam:
 
 rule samtools_cram:
     input:
-        "star/{sample}/{maptype}/{sample}.bam",
-        bam_index="star/{sample}/{maptype}/{sample}.bam.bai",
-        ref=config["reference"]["genome"],
-        ref_idx=config["reference"]["genome_index"],
+        aln="star/{sample}/{maptype}/{sample}.bam",
+        aln_idx="star/{sample}/{maptype}/{sample}.bam.bai",
+        fasta=config["reference"]["genome"],
+        fasta_idx=config["reference"]["genome_index"],
     output:
         protected("data_output/Mapping/{maptype}/{sample}.cram"),
     threads: min(config.get("max_threads", 2), 2)

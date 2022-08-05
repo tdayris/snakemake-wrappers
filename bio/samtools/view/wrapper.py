@@ -16,14 +16,14 @@ if aln is None:
 
 ref = ""
 if "fasta" in snakemake.input.keys():
-    ref = f"-T {snakemake.input['fasta']}"
+    ref = f"-T {snakemake.input['fasta']} "
 
 if "fasta_idx" in snakemake.input.keys():
-    ref += f" -t {snakemake.input['fasta_idx']}"
+    ref += f" -t {snakemake.input['fasta_idx']} "
 
 bed = ""
 if "bed" in snakemake.input.keys():
-    bed = f"-L {snakemake.input['bed']}"
+    bed = f"-L {snakemake.input['bed']} "
     
 position = snakemake.params.get("position", "")
 
