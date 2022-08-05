@@ -7,8 +7,8 @@ rule rseqc_read_distribution:
         temp("rseqc/read_distribution/{maptype}/{sample}.read_distribution.tsv"),
     threads: 1
     resources:
-        mem_mb=get_2gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp",
     retries: 1
     log:
@@ -32,7 +32,7 @@ rule rseqc_tin:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        time_min=get_2h_per_attempt,
+        time_min=get_5h_per_attempt,
         tmpdir="tmp",
     retries: 1
     log:
@@ -57,8 +57,8 @@ rule rseqc_bam_stat:
         temp("rseqc/bam_stat/{maptype}/{sample}.txt"),
     threads: 1
     resources:
-        mem_mb=get_2gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp",
     retries: 1
     log:
@@ -82,7 +82,7 @@ rule rseqc_gene_body_coverage:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        time_min=get_8h_per_attempt,
         tmpdir="tmp",
     retries: 1
     log:
@@ -117,7 +117,7 @@ rule rseqc_junction_annotation:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        time_min=get_1h_per_attempt,
         tmpdir="tmp",
     retries: 1
     log:
