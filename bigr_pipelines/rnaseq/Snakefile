@@ -275,11 +275,11 @@ rule star_fusion_results:
             sample=sample_list,
             ext=["txt", "pdf"],
         ),
-        junctype=expand(
-            "rseqc/junction_annotation/chimera/{sample}.{ext}",
-            sample=sample_list,
-            ext=["txt", "pdf"],
+        txt=expand(
+            "rseqc/junction_annotation/chimera/{sample}.txt",
+            sample=sample_list
         ),
+    threads: 1
     output:
         report(
             "data_output/multiqc/MultiQC.Star.Chimera.html",
