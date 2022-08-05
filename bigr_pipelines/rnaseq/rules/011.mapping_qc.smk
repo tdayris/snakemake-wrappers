@@ -45,7 +45,7 @@ rule samtools_cram:
         aln="star/{sample}/{maptype}/{sample}.bam",
         aln_idx="star/{sample}/{maptype}/{sample}.bam.bai",
         fasta=config["reference"]["genome"],
-        fasta_idx=config["reference"]["genome_index"],
+        fasta_index=config["reference"]["genome_index"],
     output:
         protected("data_output/Mapping/{maptype}/{sample}.cram"),
     threads: min(config.get("max_threads", 2), 2)
