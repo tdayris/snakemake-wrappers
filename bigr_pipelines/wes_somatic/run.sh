@@ -33,7 +33,7 @@ while [ "$#" -gt 0 ]; do
     msi|MSI) SNAKE_ARGS+=("--until msi_only");;
     cnv|CNV|facets) SNAKE_ARGS+=("--until cnv_only");;
     map|mapping) SNAKE_ARGS+=("--until mapping_only");;
-    anmo|ANMO) ANMO="RUN"; shift;;
+    fusions) SNAKE_ARGS+=("--until fusions_only");;
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac
 done

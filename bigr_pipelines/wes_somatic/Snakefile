@@ -36,12 +36,25 @@ rule mapping_only:
         multiqc="data_output/MultiQC/MappingQC.html",
 
 
+rule fusions_only:
+    input:
+        multiqc="data_output/MultiQC/FusionsQC.html"
+
+
 #####################
 ### Final archive ###
 #####################
 
 
 include: "rules/024.archive.smk"
+
+
+###############
+### Fusions ###
+###############
+
+include: "rules/025.star_chimera.smk"
+include: "rules/026.star_fusions.smk"
 
 
 ###############################

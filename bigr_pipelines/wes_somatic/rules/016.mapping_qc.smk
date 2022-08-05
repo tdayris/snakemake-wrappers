@@ -44,6 +44,30 @@ rule samtools_stats_cleaned:
         "bio/samtools/stats"
 
 
+rule samtools_stats_fusions:
+    input:
+        bam="star/chimera/{sample}_{status}.bam",
+        bai="star/chimera/{sample}_{status}.bam.bai",
+        ref=config["reference"]["fasta"],
+        ref_idx=config["reference"]["fasta_index"],
+        ref_dict=config["reference"]["fasta_dict"],
+        bed=config["reference"]["capture_kit_bed"],
+    output:
+        temp("samtools/stats/{sample}_{status}.chimera.stats"),
+    threads: 1
+    resources:
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_35min_per_attempt,
+        tmpdir="tmp",
+    log:
+        "logs/samtools/stats/{sample}.{status}.chimera.log",
+    params:
+        extra=config["samtools"].get("stats", ""),
+    wrapper:
+        "bio/samtools/stats"
+
+
+
 rule fastq_screen:
     input:
         "fastp/trimmed/{sample}_{status}.{stream}.fastq",
