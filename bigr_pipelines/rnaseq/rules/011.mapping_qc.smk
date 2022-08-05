@@ -9,8 +9,8 @@ rule samtools_stats:
     output:
         temp("samtools/stats/{sample}.{maptype}.stats"),
     resources:
-        mem_mb=get_2gb_per_attempt,
-        time_min=get_35min_per_attempt,
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_1h_per_attempt,
         tmpdir="tmp",
     retries: 1
     log:
@@ -28,8 +28,8 @@ rule samtools_index_bam:
         temp("star/{sample}/{maptype}/{sample}.bam.bai"),
     threads: min(config.get("max_threads", 20), 4)
     resources:
-        mem_mb=get_1gb_per_attempt,
-        time_min=get_15min_per_attempt,
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp",
     retries: 1
     params:
@@ -51,7 +51,7 @@ rule samtools_cram:
     threads: min(config.get("max_threads", 2), 2)
     resources:
         mem_mb=get_6gb_per_attempt,
-        time_min=get_2h_per_attempt,
+        time_min=get_4h_per_attempt,
         tmpdir="tmp",
     retries: 1
     params:
