@@ -117,6 +117,9 @@ output_prefixes = [
     f"DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}"
     for factor, test, ref in comparison_levels
 ]
+if config.get("write_comparisons", True):
+    with open("list_of_possible_comparisons.txt", "w") as outcomplist:
+        outcomplist.write(str(output_prefixes) + "\n")
 
 # A dict containing comparison names and factors/levels
 contrasts = dict(zip(output_prefixes, comparison_levels))
