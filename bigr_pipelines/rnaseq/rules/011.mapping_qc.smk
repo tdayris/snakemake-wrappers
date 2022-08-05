@@ -50,7 +50,7 @@ rule samtools_cram:
         protected("data_output/Mapping/{maptype}/{sample}.cram"),
     threads: min(config.get("max_threads", 2), 2)
     resources:
-        mem_mb=get_1gb_per_attempt,
+        mem_mb=get_6gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
     retries: 1
