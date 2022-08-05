@@ -267,4 +267,26 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh 
 
 # Fusions
 
-Under construction
+## Pipeline
+
+1. iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)
+1. Fastp (trimm fastq reads)
+1. STAR (mapping + fusions)
+1. FusionAnnotator
+1. FusionInspector
+1. MultiQC
+
+## Command line
+
+```{sh}
+# Go to your project directory
+cd /path/to/my/project/tmp
+
+# Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
+
+# Run basic quality controls, keep intermediary files, search, check and annotate fusions
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh fusions --nt
+```
