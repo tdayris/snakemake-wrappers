@@ -2,6 +2,7 @@
 This snakefile contains all rules related to immunedeconv
 """
 
+
 # Subset salmon original TPM counts to fulfill immenedeconv requirements
 rule subset_gene_counts:
     input:
@@ -221,6 +222,3 @@ rule multiqc_config_immunedeconv:
         str(workflow_source_dir / "envs" / "python.yaml")
     script:
         str(workflow_source_dir / "scripts" / "immunedeconv_to_multiqc.py")
-
-
-

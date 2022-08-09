@@ -114,7 +114,7 @@ rule multiqc_fusions:
         fusions=expand(
             "star-fusions/{sample}/",
             sample=sample_list,
-        )
+        ),
     output:
         protected("data_output/MultiQC/FusionsQC.html"),
     threads: 1

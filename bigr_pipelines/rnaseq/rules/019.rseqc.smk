@@ -108,12 +108,18 @@ rule rseqc_junction_annotation:
         refgene=config["reference"]["refgene_model"],
     output:
         txt=temp("rseqc/junction_annotation/{maptype}/{sample}.txt"),
-        pdf_splice=temp("rseqc/junction_annotation/{maptype}/{sample}.splice_junction.pdf"),
-        pdf_events=temp("rseqc/junction_annotation/{maptype}/{sample}.splice_events.pdf"),
+        pdf_splice=temp(
+            "rseqc/junction_annotation/{maptype}/{sample}.splice_junction.pdf"
+        ),
+        pdf_events=temp(
+            "rseqc/junction_annotation/{maptype}/{sample}.splice_events.pdf"
+        ),
         xls=temp("rseqc/junction_annotation/{maptype}/{sample}.junction.xls"),
         bed=temp("rseqc/junction_annotation/{maptype}/{sample}.junction.bed"),
         rscript=temp("rseqc/junction_annotation/{maptype}/{sample}.junction_plot.r"),
-        interact=temp("rseqc/junction_annotation/{maptype}/{sample}.junction.Interact.bed"),
+        interact=temp(
+            "rseqc/junction_annotation/{maptype}/{sample}.junction.Interact.bed"
+        ),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,

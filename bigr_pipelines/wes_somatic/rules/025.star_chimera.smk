@@ -25,7 +25,6 @@ rule star_align_chimera:
         "bio/star/align"
 
 
-
 rule sambamba_sort_star:
     input:
         mapping="star/{sample}/{sample}_{status}.unsorted.bam",

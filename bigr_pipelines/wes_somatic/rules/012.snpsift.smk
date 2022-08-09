@@ -225,7 +225,7 @@ rule snpsift_vartype:
         calls_tbi="splice_ai/annot/{sample}.vcf.gz.tbi",
     output:
         call=temp("snpsift/vartype/{sample}.vcf"),
-    threads: 2
+    threads: 1
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,

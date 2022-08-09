@@ -67,7 +67,6 @@ rule samtools_stats_fusions:
         "bio/samtools/stats"
 
 
-
 rule fastq_screen:
     input:
         "fastp/trimmed/{sample}_{status}.{stream}.fastq",
