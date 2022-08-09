@@ -1,0 +1,105 @@
+.. _`bio/bedtools/getfasta`:
+
+MASKFASTA
+=========
+
+bedtools maskfasta masks sequences in a FASTA file based on intervals defined in a feature file.
+
+**URL**: https://bedtools.readthedocs.io/en/latest/content/tools/maskfasta.html
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_bedtools_maskfasta:
+        input:
+            fasta="sequences.fa",
+            bed="coordinates.bed"
+        output:
+            "regenerated.fa"
+        params:
+            extra=""
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bedtools/maskfasta"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bedtools=2.29.0``
+
+Input/Output
+------------
+**Input:**
+
+* ``fasta``: Path to a genome sequence
+* ``bed``: Path to the mask file
+
+**Output:**
+
+* Path to the masked fasta file
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters for bedtools maskfasta
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+
+    """Snakemake wrapper for bedtools getfasta"""
+
+    from snakemake.shell import shell
+
+    ## Extract arguments
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    if str(snakemake.output[0]).endswith("bed"):
+        extra += " -bedOut"
+    elif str(snakemake.output[0]).endswith("tsv"):
+        extra += " -tab"
+
+
+    shell(
+        "(bedtools getfasta"
+        " {extra}"
+        " -fi {snakemake.input.fasta}"
+        " -bed {snakemake.input.bed}"
+        " -fo {snakemake.output})"
+        " {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

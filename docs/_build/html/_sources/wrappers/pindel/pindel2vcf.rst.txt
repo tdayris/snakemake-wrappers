@@ -1,0 +1,181 @@
+.. _`bio/pindel/pindel2vcf`:
+
+PINDEL2VCF
+==========
+
+Convert pindel output to vcf.
+
+**URL**: http://gmt.genome.wustl.edu/packages/pindel/
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule pindel2vcf:
+        input:
+            ref="genome.fasta",
+            pindel="pindel/all_{type}"
+        output:
+            "pindel/all_{type}.vcf"
+        params:
+            refname="hg38",  # mandatory, see pindel manual
+            refdate="20170110",  # mandatory, see pindel manual
+            extra=""  # extra params (except -r, -p, -R, -d, -v)
+        log:
+            "logs/pindel/pindel2vcf.{type}.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/pindel/pindel2vcf"
+
+    rule pindel2vcf_multi_input:
+        input:
+            ref="genome.fasta",
+            pindel=["pindel/all_D", "pindel/all_INV"]
+        output:
+            "pindel/all.vcf"
+        params:
+            refname="hg38",  # mandatory, see pindel manual
+            refdate="20170110",  # mandatory, see pindel manual
+            extra=""  # extra params (except -r, -p, -R, -d, -v)
+        log:
+            "logs/pindel/pindel2vcf.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/pindel/pindel2vcf"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``pindel==0.2.5b8``
+
+Input/Output
+------------
+**Input:**
+
+* ``ref``: Reference genome sequence (fasta)
+* ``pindel``: Pindel call(s)
+
+**Output:**
+
+* VCF formatted calls
+
+
+
+Params
+------
+
+* ``refname``: Reference genome
+
+* ``refdate``: Reference genome release date
+
+* ``extra``: Optional parameters
+
+
+
+
+Notes
+-----
+
+This tool/wrapper does not handle multithreading
+
+
+
+Authors
+-------
+
+* Johannes Köster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster, Patrik Smeds"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "koester@jimmy.harvard.edu"
+    __license__ = "MIT"
+
+    import os
+    import tempfile
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    expected_endings = [
+        "INT",
+        "D",
+        "SI",
+        "INV",
+        "INV_final" "TD",
+        "LI",
+        "BP",
+        "CloseEndMapped",
+        "RP",
+    ]
+
+
+    def split_file_name(file_parts, file_ending_index):
+        return (
+            "_".join(file_parts[:file_ending_index]),
+            "_".join(file_parts[file_ending_index]),
+        )
+
+
+    def process_input_path(input_file):
+        """
+        :params input_file: Input file from rule, ex /path/to/file/all_D or /path/to/file/all_INV_final
+        :return: ""/path/to/file", "all"
+
+        """
+        file_path, file_name = os.path.split(input_file)
+        file_parts = file_name.split("_")
+        # seperate ending and name, to name: all ending: D or name: all ending: INV_final
+        file_name, file_ending = split_file_name(
+            file_parts, -2 if file_name.endswith("_final") else -1
+        )
+        if not file_ending in expected_endings:
+            raise Exception("Unexpected variant type: " + file_ending)
+        return file_path, file_name
+
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        input_flag = "-p"
+        input_file = snakemake.input.get("pindel")
+        if isinstance(input_file, list) and len(input_file) > 1:
+            input_flag = "-P"
+            input_path, input_name = process_input_path(input_file[0])
+            input_file = os.path.join(input_path, input_name)
+            for variant_input in snakemake.input.pindel:
+                if not variant_input.startswith(input_file):
+                    raise Exception(
+                        "Unable to extract common path from multi file input, expect path is: "
+                        + input_file
+                    )
+                if not os.path.isfile(variant_input):
+                    raise Exception('Input "' + input_file + '" is not a file!')
+                os.symlink(
+                    os.path.abspath(variant_input),
+                    os.path.join(tmpdirname, os.path.basename(variant_input)),
+                )
+            input_file = os.path.join(tmpdirname, input_name)
+        shell(
+            "pindel2vcf {snakemake.params.extra} {input_flag} {input_file} -r {snakemake.input.ref} -R {snakemake.params.refname} -d {snakemake.params.refdate} -v {snakemake.output[0]} {log}"
+        )
+
+
+.. |nl| raw:: html
+
+   <br>

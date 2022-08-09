@@ -1,0 +1,90 @@
+.. _`bio/sambamba/merge`:
+
+SAMBAMBA MERGE
+==============
+
+merge multiple BAM files into one using `sambamba https://lomereiter.github.io/sambamba/docs/sambamba-merge.html`_
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule sambamba_merge:
+        input:
+            ["mapped/{sample}_1.sorted.bam", "mapped/{sample}_2.sorted.bam"]
+        output:
+            "mapped/{sample}.merged.bam"
+        params:
+            extra=""  # optional parameters
+        log:
+            "logs/sambamba-merge/{sample}.log"
+        threads: 1
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/sambamba/merge"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``sambamba==0.8.0``
+
+Input/Output
+------------
+**Input:**
+
+* sorted bam files
+
+**Output:**
+
+* merged bam file
+
+
+
+
+
+Authors
+-------
+
+* Jan Forster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2021, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+
+    import os
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "sambamba merge {snakemake.params.extra} --nthreads {snakemake.threads} "
+        "{snakemake.output[0]} {snakemake.input} "
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

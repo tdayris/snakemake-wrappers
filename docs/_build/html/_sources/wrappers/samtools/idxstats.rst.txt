@@ -1,0 +1,84 @@
+.. _`bio/samtools/idxstats`:
+
+SAMTOOLS IDXSTATS
+=================
+
+Use samtools to retrieve and print stats form indexed bam, sam or cram files. For more information see `SAMtools documentation <http://www.htslib.org/doc/samtools-idxstats.html>`_.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule samtools_idxstats:
+        input:
+            bam="mapped/{sample}.bam",
+            idx="mapped/{sample}.bam.bai"
+        output:
+            "mapped/{sample}.bam.idxstats"
+        log:
+            "logs/samtools/idxstats/{sample}.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/samtools/idxstats"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``samtools==1.10``
+
+Input/Output
+------------
+**Input:**
+
+* indexed sam, bam or cram file (.sam, .bam, .cram)
+* corresponding index files
+
+**Output:**
+
+* idxstat file (.idxstats)
+
+
+
+
+
+Authors
+-------
+
+* Antonie Vietor
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Antonie Vietor"
+    __copyright__ = "Copyright 2020, Antonie Vietor"
+    __email__ = "antonie.v@gmx.de"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell("samtools idxstats {snakemake.input.bam} > {snakemake.output[0]} {log}")
+
+
+.. |nl| raw:: html
+
+   <br>

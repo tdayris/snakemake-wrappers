@@ -1,0 +1,138 @@
+.. _`bio/SomaticSignatures/mutationContext`:
+
+MUTATIONAL_CONTEXT
+==================
+
+Compute mutational context
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_mutationContext:
+        input:
+            call = "calls.rds",
+            sequence = "sequence.rds"
+        output:
+            rds = "context.rds"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/SomaticSignatures/mutationContext"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconda:bioconductor-somaticsignatures=2.24.0``
+* ``conda-forge:r-nmf=0.21.0``
+
+Input/Output
+------------
+**Input:**
+
+* VCF as VRanged RDS object
+* Fasta file as RDS object
+
+**Output:**
+
+* RDS object containing variants with mutational context
+
+
+
+
+Notes
+-----
+
+See VariantAnnotation and Rsamtools wrappers for input requirements.
+
+
+
+Authors
+-------
+
+* authors
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # Read a Vranged-VCF and a parsed fasta file to build mutation context
+    library(package = "Rsamtools", quietly = TRUE);
+    library(package = "VariantAnnotation", quietly = TRUE);
+    library(package = "SomaticSignatures", quietly = TRUE);
+
+    # Load input datasets
+    fasta <- base::readRDS(
+      file = base::as.character(x = snakemake@input[["sequence"]])
+    );
+
+    calling <- base::readRDS(
+      file = base::as.character(x = snakemake@input[["call"]])
+    );
+
+    extra <- "vr = calling, ref = fasta";
+    if ("extra" %in% names(snakemake@params)) {
+      extra <- base::paste(
+        extra,
+        snakemake@params[["extra"]],
+        sep = ", "
+      );
+    }
+
+    command <- base::paste0(
+      "SomaticSignatures::mutationContext(",
+      extra,
+      ")"
+    );
+    print(command);
+
+
+    # Build context
+    context <- base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+    # Filtering empty genotypes
+    context <- context[context$GT != "./.", ];
+
+    # Saving results on user's demand
+    if ("rds" %in% base::names(snakemake@output)) {
+      base::saveRDS(
+        object = context,
+        file = base::as.character(x = snakemake@output[["rds"]])
+      );
+    }
+
+    if ("tsv" %in% base::names(snakemake@output)) {
+      utils::write.table(
+        x = base::as.data.frame(context),
+        file = base::as.character(x = snakemake@output[["tsv"]]),
+        quote = FALSE,
+        sep = "\t",
+        row.names = FALSE
+      );
+    }
+
+
+.. |nl| raw:: html
+
+   <br>

@@ -1,0 +1,106 @@
+.. _`bio/msisensor_pro/scan`:
+
+MSISENSOR PRO SCAN
+==================
+
+Scan genome in search of microsatellites
+
+**URL**: https://github.com/xjtu-omics/msisensor-pro/wiki/Key-Commands#scan-from-msisensor
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_msisensor_scan:
+        input:
+            "genome.fasta"
+        output:
+            "microsat.list"
+        threads:
+            1
+        params:
+            extra = ""
+        log:
+            "logs/msisensor_scan.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/msisensor_pro/scan"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``msisensor-pro==1.2.0``
+
+Input/Output
+------------
+**Input:**
+
+* Path to reference genome
+
+**Output:**
+
+* Path to homopolymer file
+
+
+
+
+Notes
+-----
+
+This tools directly comes from msisensor.
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+
+    """Snakemake wrapper for MSI Sensor pro scan"""
+
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2021, Dayris Thibault"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    # Extra parameters default value is an empty string
+    extra = snakemake.params.get("extra", "")
+
+    shell(
+        "msisensor-pro scan "  # Tool and its sub-command
+        "-d {snakemake.input} "  # Path to fasta file
+        "-o {snakemake.output} "  # Path to output file
+        "{extra} "  # Optional extra parameters
+        "{log}"  # Logging behavior
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

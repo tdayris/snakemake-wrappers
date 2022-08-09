@@ -1,0 +1,121 @@
+.. _`bio/biobambam2/bamsormadup`:
+
+BIOBAMBAM2 BAMSORMADUP
+======================
+
+Mark PCR and optical duplicates, followed with sorting, with BioBamBam2 tools
+
+
+**URL**: https://gitlab.com/german.tischler/biobambam2
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule mark_duplicates:
+        input:
+            "mapped/{sample}.bam"
+        output:
+            bam="dedup/{sample}.bam",
+            index="dedup/{sample}.bai",
+            metrics="dedup/{sample}.metrics.txt",
+        log:
+            "logs/{sample}.log"
+        params:
+            extra="SO=coordinate"
+        resources:
+            mem_mb=1024
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/biobambam2/bamsormadup"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``biobambam=2.0``
+
+Input/Output
+------------
+**Input:**
+
+* SAM/BAM/CRAM file, must be the first element in the input file list
+* reference (for CRAM output)
+
+**Output:**
+
+* ``bam``: SAM/BAM/CRAM file with marked duplicates
+* ``index``: BAM index file (optional)
+* ``metrics``: metrics file (optional)
+
+
+
+Params
+------
+
+* ``extra``: The `extra` param allows for additional program arguments (not `inputformat` or `outputformat`). More information on the `official documentation <https://gitlab.com/german.tischler/biobambam2#using-bamsormadup>`_
+
+
+
+
+
+Authors
+-------
+
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Filipe G. Vieira"
+    __copyright__ = "Copyright 2021, Filipe G. Vieira"
+    __license__ = "MIT"
+
+
+    import os
+    from snakemake.shell import shell
+
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True, append=True)
+    extra = snakemake.params.get("extra", "")
+
+
+    # File formats
+    in_name, in_format = os.path.splitext(snakemake.input[0])
+    in_format = in_format.lstrip(".")
+    out_name, out_format = os.path.splitext(snakemake.output[0])
+    out_format = out_format.lstrip(".")
+
+
+    index = snakemake.output.get("index", "")
+    if index:
+        index = f"indexfilename={index}"
+
+
+    metrics = snakemake.output.get("metrics", "")
+    if metrics:
+        metrics = f"M={metrics}"
+
+
+    shell(
+        "bamsormadup threads={snakemake.threads} inputformat={in_format} outputformat={out_format} {index} {metrics} {extra} < {snakemake.input[0]} > {snakemake.output[0]} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

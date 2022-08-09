@@ -1,0 +1,119 @@
+.. _`bio/snpeff/annotate`:
+
+SNPEFF
+======
+
+Annotate predicted effect of nucleotide changes with `SnpEff <https://pcingola.github.io/SnpEff/se_introduction/>`_
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule snpeff:
+        input:
+            calls="{sample}.vcf", # (vcf, bcf, or vcf.gz)
+            db="resources/snpeff/ebola_zaire" # path to reference db downloaded with the snpeff download wrapper
+        output:
+            calls="snpeff/{sample}.vcf",   # annotated calls (vcf, bcf, or vcf.gz)
+            stats="snpeff/{sample}.html",  # summary statistics (in HTML), optional
+            csvstats="snpeff/{sample}.csv" # summary statistics in CSV, optional
+        log:
+            "logs/snpeff/{sample}.log"
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=4096
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/snpeff/annotate"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``snpeff==4.3.1t``
+* ``bcftools==1.15.1``
+* ``snakemake-wrapper-utils==0.4.1``
+* ``htslib=1.15.1``
+
+
+
+
+
+Authors
+-------
+
+* Bradford Powell
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Bradford Powell"
+    __copyright__ = "Copyright 2018, Bradford Powell"
+    __email__ = "bpow@unc.edu"
+    __license__ = "BSD"
+
+
+    from snakemake.shell import shell
+    from os import path
+    import shutil
+    import tempfile
+    from pathlib import Path
+    from snakemake_wrapper_utils.java import get_java_opts
+
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
+
+    outcalls = snakemake.output.calls
+    if outcalls.endswith(".vcf.gz"):
+        outprefix = "| bcftools view -Oz"
+    elif outcalls.endswith(".bcf"):
+        outprefix = "| bcftools view -Ob"
+    else:
+        outprefix = ""
+
+    incalls = snakemake.input[0]
+    if incalls.endswith((".bcf", "vcf.gz")):
+        incalls = "< <(bcftools view {})".format(incalls)
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    data_dir = Path(snakemake.input.db).parent.resolve()
+
+    stats = snakemake.output.get("stats", "")
+    csvstats = snakemake.output.get("csvstats", "")
+    csvstats_opt = "" if not csvstats else "-csvStats {}".format(csvstats)
+    stats_opt = "-noStats" if not stats else "-stats {}".format(stats)
+
+    reference = path.basename(snakemake.input.db)
+
+    shell(
+        "snpEff {java_opts} -dataDir {data_dir} "
+        "{stats_opt} {csvstats_opt} {extra} "
+        "{reference} {incalls} "
+        "{outprefix} > {outcalls} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

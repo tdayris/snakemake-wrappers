@@ -1,0 +1,118 @@
+.. _`bio/cutadapt/se`:
+
+CUTADAPT-SE
+===========
+
+Trim single-end reads using cutadapt.
+
+
+**URL**: https://cutadapt.readthedocs.io/en/stable/
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule cutadapt:
+        input:
+            "reads/{sample}.fastq"
+        output:
+            fastq="trimmed/{sample}.fastq",
+            qc="trimmed/{sample}.qc.txt"
+        params:
+            adapters="-a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC",
+            extra="-q 20"
+        log:
+            "logs/cutadapt/{sample}.log"
+        threads: 4 # set desired number of threads here
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/cutadapt/se"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``cutadapt==3.4``
+
+Input/Output
+------------
+**Input:**
+
+* fastq file, this must be the first element of the input file list
+
+**Output:**
+
+* ``fastq``: trimmed fastq file
+* ``qc``: text file containing trimming statistics
+
+
+
+Params
+------
+
+* ``adapters``: Adapters to remove
+
+* ``extra``: Optional parameters
+
+
+
+
+
+Authors
+-------
+
+* Julian de Ruiter
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for trimming single-end reads using cutadapt."""
+
+    __author__ = "Julian de Ruiter"
+    __copyright__ = "Copyright 2017, Julian de Ruiter"
+    __email__ = "julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    n = len(snakemake.input)
+    assert n == 1, "Input must contain 1 (single-end) element."
+
+    extra = snakemake.params.get("extra", "")
+    adapters = snakemake.params.get("adapters", "")
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    assert (
+        extra != "" or adapters != ""
+    ), "No options provided to cutadapt. Please use 'params: adapters=' or 'params: extra='."
+
+    shell(
+        "cutadapt"
+        " {adapters}"
+        " {extra}"
+        " -j {snakemake.threads}"
+        " -o {snakemake.output.fastq}"
+        " {snakemake.input[0]}"
+        " > {snakemake.output.qc} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

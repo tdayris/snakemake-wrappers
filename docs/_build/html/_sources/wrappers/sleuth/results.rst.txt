@@ -1,0 +1,132 @@
+.. _`bio/sleuth/results`:
+
+SLEUTH_RESULTS
+==============
+
+Extract human readable results from a Sleuth object
+
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_sleuth_results:
+        input:
+            rds = "wald_test.rds"
+        output:
+            result_dir = directory("results")
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/sleuth/results"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconda:r-sleuth``
+
+Input/Output
+------------
+**Input:**
+
+* RDS formatted sleuth object containing wald tests
+
+**Output:**
+
+* TSV formatted result table
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/bin/R
+
+    # Snakemake wrapper for sleuth results
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    base::library(package = "sleuth", quietly = TRUE);
+
+    so <- base::readRDS(
+        file = snakemake@input[["rds"]]
+    );
+
+    extra <- "";
+    if ("extra" %in% names(snakemake@params)) {
+      extra <- base::as.character(
+        x = snakemake@params[["extra"]]
+      );
+    }
+
+
+    # For each beta, run sleuth_wt
+    for (beta in colnames(so$design_matrix)) {
+
+      # Update extra parameters
+      extra_beta <- base::paste0(
+        extra,
+        ", test = ",
+        beta
+      );
+
+      # Build command line
+      command <- base::paste(
+        "sleuth::sleuth_wt(",
+        "obj = so",
+        extra_beta,
+        ")",
+        sep = ", "
+      );
+
+      # Extract results
+      so_results <- base::eval(
+        base::parse(
+          text = command
+        )
+      );
+
+      output_path <- base::file.path(
+        snakemake@output[["result_dir"]],
+        base::paste0("Sleuth_Results_", beta, ".tsv")
+      );
+
+      # Save table
+      utils::write.table(
+        so_results,
+        file = output_path,
+        quote = FALSE,
+        row.names = FALSE,
+        sep = "\t"
+      );
+    }
+
+
+.. |nl| raw:: html
+
+   <br>

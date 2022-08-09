@@ -1,0 +1,151 @@
+.. _`bio/gatk/filtermutectcalls`:
+
+GATK FILTERMUTECTCALLS
+======================
+
+Run gatk FilterMutectCalls.
+
+
+**URL**: https://gatk.broadinstitute.org/hc/en-us/articles/360042476952-FilterMutectCalls
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule gatk_filtermutectcalls:
+        input:
+            vcf="calls/snvs.vcf",
+            ref="genome.fasta",
+            # Optional BAM
+            # bam="",
+            # Optional LearnReadOrientationModel result
+            # f1r2=""
+        output:
+            vcf="calls/snvs.mutect.filtered.vcf",
+        log:
+            "logs/gatk/filter/snvs.log",
+        params:
+            extra="--max-alt-allele-count 3",  # optional arguments, see GATK docs
+            java_opts="",  # optional
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024,
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/gatk/filtermutectcalls"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``gatk4==4.2.0.0``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* ``vcf``: Path to vcf file
+* ``ref``: Path to reference genome
+
+**Output:**
+
+* ``vcf``: filtered vcf file
+
+
+
+Params
+------
+
+* ``java_opts``: The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-XX:ParallelGCThreads=10" (not for `-XmX` or `-Djava.io.tmpdir`, since they are handled automatically).
+
+* ``extra``: The `extra` param allows for additional program arguments.
+
+
+
+
+
+Authors
+-------
+
+* Patrik Smeds
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Patrik Smeds"
+    __copyright__ = "Copyright 2021, Patrik Smeds"
+    __email__ = "patrik.smeds@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    bam = ""
+    if "bam" in snakemake.input.keys():
+        bam = " --input {}".format(snakemake.input["bam"])
+
+
+    contamination = ""
+    if "contamination" in snakemake.input.keys():
+        contamination = "--contamination-table {}".format(
+            snakemake.input["contamination"]
+        )
+
+
+    segmentation = ""
+    if "segmentation" in snakemake.input.keys():
+        segmentation = "--tumor-segmentation {}".format(
+            snakemake.input["segmentation"]
+        )
+
+
+    stats = ""
+    if "stats" in snakemake.output.keys():
+        stats = "--stats {}".format(snakemake.output["stats"])
+
+
+    f1r2 = ""
+    if "f1r2" in snakemake.input.keys():
+        f1r2 = "--orientation-bias-artifact-priors {}".format(
+            snakemake.input["f1r2"]
+        )
+
+    shell(
+        "gatk --java-options '{java_opts}' FilterMutectCalls "
+        "-R {snakemake.input.ref} -V {snakemake.input.vcf} "
+        "{extra} {contamination} {f1r2} {segmentation} {stats} {bam} "
+        "-O {snakemake.output.vcf} "
+        "{log}"
+    )
+
+    # Checking VCF format in search for truncated files
+    shell(" ( echo 'Removing {snakemake.output.vcf} if it is truncated.' ; ( gunzip -c {snakemake.output.vcf} | tail ) || rm --verbose {snakemake.output.vcf} ) {log} ")
+
+
+.. |nl| raw:: html
+
+   <br>

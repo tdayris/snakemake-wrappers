@@ -1,0 +1,120 @@
+.. _`bio/picard/collectinsertsizemetrics`:
+
+PICARD COLLECTINSERTSIZEMETRICS
+===============================
+
+Collect metrics on insert size of paired end reads with picard tools.
+
+
+**URL**: https://gatk.broadinstitute.org/hc/en-us/articles/360037225252-CollectInsertSizeMetrics-Picard-
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule insert_size:
+        input:
+            "mapped/{sample}.bam"
+        output:
+            txt="stats/{sample}.isize.txt",
+            pdf="stats/{sample}.isize.pdf"
+        log:
+            "logs/picard/insert_size/{sample}.log"
+        params:
+            # optional parameters (e.g. relax checks as below)
+            "VALIDATION_STRINGENCY=LENIENT "
+            "METRIC_ACCUMULATION_LEVEL=null "
+            "METRIC_ACCUMULATION_LEVEL=SAMPLE"
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/picard/collectinsertsizemetrics"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``picard==2.23.4``
+* ``r-base==3.6.2``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* bam file. This must be the only element of the input file list
+
+**Output:**
+
+* ``txt``: textual representation of metrics
+* ``pdf``: insert size histogram
+
+
+
+Params
+------
+
+* ``Optional arguments``: 
+
+
+
+
+Notes
+-----
+
+This tool/wrapper does not handle multithreading
+
+
+
+Authors
+-------
+
+* Johannes Köster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "johannes.koester@protonmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    log = snakemake.log_fmt_shell()
+
+    extra = snakemake.params
+    java_opts = get_java_opts(snakemake)
+
+
+    shell(
+        "picard CollectInsertSizeMetrics {java_opts} {extra} "
+        "INPUT={snakemake.input} OUTPUT={snakemake.output.txt} "
+        "HISTOGRAM_FILE={snakemake.output.pdf} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

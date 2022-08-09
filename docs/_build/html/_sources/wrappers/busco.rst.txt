@@ -1,0 +1,129 @@
+.. _`bio/busco`:
+
+BUSCO
+=====
+
+Assess assembly and annotation completeness with BUSCO
+
+
+**URL**: https://busco-archive.ezlab.org/
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule run_busco:
+        input:
+            "transcripts.fasta"
+        output:
+            directory("txome_busco")
+        log:
+            "logs/quality/transcriptome_busco.log"
+        threads: 8
+        params:
+            mode="transcriptome",
+            lineage="stramenopiles_odb10",
+            downloads_path="resources/busco_downloads",
+            # optional parameters
+            extra=""
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/busco"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``busco==5.1.2``
+
+Input/Output
+------------
+**Input:**
+
+* assembly fasta, this must be the only element of the input file list
+
+**Output:**
+
+* annotation quality files, must be the first files in the output file list
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters, see `BUSCO official documentation <https://gitlab.com/ezlab/busco/-/raw/3.0.2/BUSCO_v3_userguide.pdf>`_ for more information.
+
+* ``mode``: Either genome, proteins, or transcriptome
+
+* ``lineage``: location of the BUSCO lineage data to use
+
+* ``download_path``: Path to downloaded BUSCO data for offline use
+
+
+
+
+
+Authors
+-------
+
+* Tessa Pierce
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for BUSCO assessment"""
+
+    __author__ = "Tessa Pierce"
+    __copyright__ = "Copyright 2018, Tessa Pierce"
+    __email__ = "ntpierce@gmail.com"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    from os import path
+    import tempfile
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    extra = snakemake.params.get("extra", "")
+    mode = snakemake.params.get("mode")
+    assert mode is not None, "please input a run mode: genome, transcriptome or proteins"
+    lineage = snakemake.params.get("lineage")
+    assert lineage is not None, "please input the path to a lineage for busco assessment"
+
+    stripped_output = snakemake.output[0].rstrip("/")
+    out = path.basename(stripped_output)
+    out_dirname = path.dirname(stripped_output)
+    out_path = " --out_path {} ".format(out_dirname) if out_dirname else ""
+
+    download_path_dir = snakemake.params.get("download_path", "")
+    download_path = (
+        " --download_path {} ".format(download_path_dir) if download_path_dir else ""
+    )
+
+    # note: --force allows snakemake to handle rewriting files as necessary
+    # without needing to specify *all* busco outputs as snakemake outputs
+    shell(
+        "busco --in {snakemake.input} --out {out} --force "
+        "{out_path} "
+        "--cpu {snakemake.threads} --mode {mode} --lineage {lineage} "
+        "{download_path} "
+        "{extra} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

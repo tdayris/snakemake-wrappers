@@ -1,0 +1,124 @@
+.. _`bio/cutadapt/pe`:
+
+CUTADAPT-PE
+===========
+
+Trim paired-end reads using cutadapt.
+
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule cutadapt:
+        input:
+            ["reads/{sample}.1.fastq", "reads/{sample}.2.fastq"]
+        output:
+            fastq1="trimmed/{sample}.1.fastq",
+            fastq2="trimmed/{sample}.2.fastq",
+            qc="trimmed/{sample}.qc.txt"
+        params:
+            # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
+            adapters="-a AGAGCACACGTCTGAACTCCAGTCAC -g AGATCGGAAGAGCACACGT -A AGAGCACACGTCTGAACTCCAGTCAC -G AGATCGGAAGAGCACACGT",
+            # https://cutadapt.readthedocs.io/en/stable/guide.html#
+            extra="--minimum-length 1 -q 20"
+        log:
+            "logs/cutadapt/{sample}.log"
+        threads: 4 # set desired number of threads here
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/cutadapt/pe"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``cutadapt==3.4``
+
+Input/Output
+------------
+**Input:**
+
+* Two (paired-end) fastq files. They must be the only elements in the input file list.
+
+**Output:**
+
+* ``fastq1``: trimmed R1 fastq file
+* ``fastq2``: trimmed R2 fastq file
+* ``qc``: text file containing trimming statistics
+
+
+
+Params
+------
+
+* ``adapters``: Adapters to remove
+
+* ``extra``: Optional parameters
+
+
+
+
+
+Authors
+-------
+
+* Julian de Ruiter
+* David Laehnemann
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for trimming paired-end reads using cutadapt."""
+
+    __author__ = "Julian de Ruiter"
+    __copyright__ = "Copyright 2017, Julian de Ruiter"
+    __email__ = "julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+
+    n = len(snakemake.input)
+    assert n == 2, "Input must contain 2 (paired-end) elements."
+
+    extra = snakemake.params.get("extra", "")
+    adapters = snakemake.params.get("adapters", "")
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    assert (
+        extra != "" or adapters != ""
+    ), "No options provided to cutadapt. Please use 'params: adapters=' or 'params: extra='."
+
+    shell(
+        "cutadapt"
+        " {adapters}"
+        " {extra}"
+        " -o {snakemake.output.fastq1}"
+        " -p {snakemake.output.fastq2}"
+        " -j {snakemake.threads}"
+        " {snakemake.input}"
+        " > {snakemake.output.qc} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

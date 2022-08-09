@@ -1,0 +1,142 @@
+.. _`bio/pandas/merge_tsv`:
+
+PANDAS MERGE
+============
+
+Merge text tables with pandas
+
+**URL**: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.merge.html
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``pandas=1.4.2``
+
+Input/Output
+------------
+**Input:**
+
+* ``tsv``: A list of paths to TSV files
+
+**Output:**
+
+* Path to a TSV file
+
+
+
+Params
+------
+
+* ``read_extra``: Dictionary of optional parameters to `pandas.read_csv()`
+
+* ``merge_extra``: Dictionary of optional parameters to `pandas.merge()`
+
+* ``write_extra``: Dictionary of optional parameters to `pandas.to_csv()`
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # coding: utf-8
+
+    """Merge multiple TSV with pandas"""
+
+    import logging
+    import pandas
+
+    from typing import Any
+
+    try:
+        # Case user provided logging file
+        logging.basicConfig(
+            filename=snakemake.log[0],
+            filemode="w",
+            level=logging.DEBUG
+        )
+    except IndexError:
+        # Case user did not provide any logging file
+        logging.basicConfig(filemode="w", level=logging.DEBUG)
+
+    
+    def read_single_tsv(path: str, extra: dict[str, Any]) -> pandas.DataFrame:
+        """Return a pandas.DataFrame from a path to a TSV file"""
+        logging.debug("Loading %s", path)
+        return pandas.read_csv(
+            path,
+            **extra
+        )
+
+
+    def merge_tsv(paths: list[str], 
+                  extra_read: dict[str, Any], 
+                  extra_merge: dict[str, Any]
+                 ) -> pandas.DataFrame:
+        """Read multiple TSV files and merge them according to the extra params"""
+        result = None
+        for path in paths:
+            tmp = read_single_tsv(path, extra_read)
+            try:
+                result = pandas.merge(
+                    left=result,
+                    right=tmp,
+                    **extra_merge
+                )
+            except AttributeError:
+                # The first and only the first merging attempt will fail,
+                # because result is None. Else, there should not be any issue.
+                retult = tmp
+
+        logging.debug("Tables merged: %s", str(result.head()))
+        return result
+
+
+    if len(snakemake.input["tsv"]) <= 1:
+        raise ValueError("Cannot merge 1 or less file.")
+
+    df = merge_tsv(
+        paths=snakemake.input["tsv"],
+        extra_read=snakemake.params.get("extra_read", {}),
+        extra_merge=snakemake.params.get("extra_merge", {})
+    )
+
+    logging.debug("Saving results to disk")
+    df.to_csv(
+        snakemake.output[0],
+        sep="\t",
+        **snakemake.params.get("extra_write", {})
+    )
+
+.. |nl| raw:: html
+
+   <br>

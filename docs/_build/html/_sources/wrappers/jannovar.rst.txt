@@ -1,0 +1,117 @@
+.. _`bio/jannovar`:
+
+JANNOVAR
+========
+
+Annotate predicted effect of nucleotide changes with `Jannovar <https://doc-openbio.readthedocs.io/projects/jannovar/en/master/>`_
+
+**URL**: https://doc-openbio.readthedocs.io/projects/jannovar/en/master/
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule jannovar:
+        input:
+            vcf="{sample}.vcf",
+            pedigree="pedigree_ar.ped" # optional, contains familial relationships
+        output:
+            "jannovar/{sample}.vcf.gz"
+        log:
+            "logs/jannovar/{sample}.log"
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mg}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_gb = 1
+        params:
+            database="hg19_small.ser", # path to jannovar reference dataset
+            extra="--show-all"         # optional parameters
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/jannovar"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``jannovar-cli==0.31``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* ``vcf``: Path to input VCF file
+* ``pedigree``: Path to pedigree file (optional)
+
+**Output:**
+
+* Path to VCF output file, this must be he only output file
+
+
+
+Params
+------
+
+* ``extra``: Optional extra parameters
+
+* ``database``: Path to jannovar database
+
+
+
+
+
+Authors
+-------
+
+* Bradford Powell
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Bradford Powell"
+    __copyright__ = "Copyright 2018, Bradford Powell"
+    __email__ = "bpow@unc.edu"
+    __license__ = "BSD"
+
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    shell.executable("bash")
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
+
+    pedigree = snakemake.input.get("pedigree", "")
+    if pedigree:
+        pedigree = '--pedigree-file "%s"' % pedigree
+
+    shell(
+        "jannovar annotate-vcf --database {snakemake.params.database}"
+        " --input-vcf {snakemake.input.vcf} --output-vcf {snakemake.output}"
+        " {pedigree} {extra} {java_opts} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

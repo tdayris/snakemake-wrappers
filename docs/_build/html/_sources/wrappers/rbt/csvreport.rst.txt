@@ -1,0 +1,86 @@
+.. _`bio/rbt/csvreport`:
+
+RBT CSV-REPORT
+==============
+
+Creates an html report of qc data stored in a csv file. For more details, visit https://github.com/rust-bio/rust-bio-tools
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule csv_report:
+        input:
+            # a csv formatted file containing the data for the report
+            "report.csv",
+        output:
+            # path to the resulting report directory
+            directory("qc_data"),
+        params:
+            extra="--sort-column 'contig length'",
+        log:
+            "logs/rbt-csv-report",
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/rbt/csvreport"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``rust-bio-tools=0.22``
+
+Input/Output
+------------
+**Input:**
+
+* A csv file containing the qc report
+
+**Output:**
+
+* QC report folder including html document and .xlsx file
+
+
+
+
+
+Authors
+-------
+
+* Jan Forster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2021, Jan Forster"
+    __email__ = "jan.forster@uk-essen.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell("rbt csv-report {snakemake.input} {snakemake.output} {extra} {log}")
+
+
+.. |nl| raw:: html
+
+   <br>

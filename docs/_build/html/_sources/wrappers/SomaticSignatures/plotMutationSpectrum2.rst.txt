@@ -1,0 +1,248 @@
+.. _`bio/SomaticSignatures/plotMutationSpectrum2`:
+
+PLOTMUTATIONSPECTRUM
+====================
+
+Plot Mutational spectrum
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_SomaticSignatures_plotMutationSpectrum:
+        input:
+            context = "context.rds"
+        output:
+            png = "plot.png"
+        params:
+            extra = "group = 'sampleNames'"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/SomaticSignatures/plotMutationSpectrum"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconda:bioconductor-somaticsignatures=2.24.0``
+* ``conda-forge:r-nmf=0.21.0``
+
+Input/Output
+------------
+**Input:**
+
+* A RDS-formatted mutational context
+
+**Output:**
+
+* PNG image of the mutational spectrum
+
+
+
+
+Notes
+-----
+
+This version is a not the original SomaticSignatures'. It plots more context.
+
+See VariantAnnotation, Rsamtools, and SomaticSignatures wrappers
+for input requirements.
+
+
+
+Authors
+-------
+
+* authors
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # Plot mutational spectrum
+    #library(package = "SomaticSignatures", quietly=TRUE);
+    library(package = "S4Vectors", quietly = TRUE);
+    library(package = "reshape2", quietly = TRUE);
+    library(package = "ggplot2", quietly = TRUE);
+    library(package = "VariantAnnotation", quietly = TRUE);
+
+
+    # contexts <- sapply(
+    #   snakemake@input[["calls"]],
+    #   function(call) base::readRDS(file = base::as.character(x = call))
+    # );
+    # names(contexts) <- sapply(
+    #   snakemake@input[["calls"]],
+    #   function(call) tools::file_path_sans_ext(base::basename(call))
+    # );
+
+    theme_ss <- function() {
+
+      t = theme_bw() +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5),
+              axis.text.y = element_text(hjust = 0.5))
+
+      return(t)
+    }
+
+    theme_small_axis <- function(x = TRUE, y = TRUE, size = 6, family = "mono") {
+      ## decrease the x/y-axis label size
+      template = element_text(size = size, family = family)
+      t = theme_ss()
+      if(x)
+        t = t + theme(axis.text.x = template)
+      if(y)
+        t = t + theme(axis.text.y = template)
+
+      return(t)
+    }
+
+    plotSpectrum <- function(x, colorby = c("sample", "alteration")) {
+
+        colorby = match.arg(colorby)
+
+        ## reused part of 'meltSignatures'
+        w_df = melt(x, varnames = c("motif", "sample"))
+        w_df$alteration = sub("([ACGTN])([ACGTN]) .+", "\\1>\\2", w_df$motif)
+        w_df$context = sub("[ACGTN][ACGTN] (.+)", "\\1", w_df$motif)
+
+        p = ggplot(w_df)
+        p = p + geom_bar(aes_string(x = "context", y = "value", fill = colorby),
+            stat = "identity", position = "identity")
+        p = p + facet_grid(sample ~ alteration)
+        p = p + theme_ss() + theme_small_axis()
+        p = p + theme(legend.position = "none")
+        p = p + scale_fill_brewer(palette = "Set3")
+        p = p + xlab("Motif") + ylab("Contribution")
+
+        return(p)
+    }
+
+
+    plotMutationSpectrum <- function(vr, group, colorby = c("sample", "alteration"), normalize = TRUE) {
+
+        m = motifMatrix(vr, group, normalize = normalize)
+
+        p = plotSpectrum(m, colorby)
+
+        return(p)
+    }
+
+    plotSignatures <- function(s, normalize = FALSE, percent = FALSE) {
+
+        h = signatures(s)
+        if(normalize) {
+            h = t(t(h) / colSums(h))
+            if(percent) {
+                h = h * 100
+            }
+        }
+        w_df = meltSignatures(h)
+
+        p = ggplot(w_df)
+        p = p + geom_bar(aes_string(x = "context", y = "value", fill = "alteration"),
+            stat = "identity", position = "identity")
+        p = p + facet_grid(signature ~ alteration)
+        p = p + theme_ss() + theme_small_axis()
+        p = p + theme(legend.position = "none")
+        p = p + scale_fill_brewer(palette = "Set3")
+        p = p + xlab("Motif") + ylab("Contribution")
+
+        return(p)
+    }
+
+
+    constructMotifs3 <- function() {
+
+        alteration = expand.grid(ref = DNA_BASES, alt = DNA_BASES)
+        alteration = subset(alteration, ref != alt)
+        alteration = sort(paste0(alteration$ref, alteration$alt))
+        motifs = expand.grid(s = DNA_BASES, p = DNA_BASES, a = alteration)
+        motifs = sprintf("%s %s.%s", motifs$a, motifs$p, motifs$s)
+
+        return(motifs)
+    }
+
+
+    motifMatrix <- function(vr, group = "sampleNames", normalize = TRUE) {
+
+        voi <- if( group %in% names(mcols(vr)) ) {
+            mcols(vr)[ ,group]
+        } else {
+            df = as(unname(vr), "data.frame")
+            if( !(group %in% colnames(df)) ) {
+                stop(sprintf("Column '%s' not present in input object.", group))
+            }
+            df[ ,group]
+        }
+
+        ## form the matrix
+        motif = factor(paste(vr$alteration, vr$context),
+                       levels = constructMotifs3())
+        y = as(table(motif, voi), "matrix")
+        dimnames(y) = unname(dimnames(y))
+
+        if(normalize) {
+            y = t(t(y) / colSums(y))
+        }
+
+        return(y)
+    }
+    contexts <- base::readRDS(file = base::as.character(x = snakemake@input[['context']]))
+    # contexts$alteration <- paste0(ref(contexts), alt(contexts))
+    print(contexts)
+
+    extra <- "contexts";
+    if ("extra" %in% names(snakemake@params)) {
+      extra <- base::paste(
+        extra,
+        base::as.character(x = snakemake@params[["extra"]]),
+        sep = ", "
+      );
+    }
+
+    command <- paste0(
+      "plotMutationSpectrum(",
+      extra,
+      ")"
+    );
+    print(command);
+
+
+    png(
+      filename = snakemake@output[["png"]],
+      width = 2048,
+      height = 1536,
+      units = "px",
+      type = "cairo"
+    );
+
+    base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+    dev.off();
+
+
+.. |nl| raw:: html
+
+   <br>

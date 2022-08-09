@@ -1,0 +1,142 @@
+.. _`bio/picard/samtofastq`:
+
+PICARD SOMTOFASTQ
+=================
+
+Converts a SAM or BAM file to FASTQ.
+
+
+**URL**: https://gatk.broadinstitute.org/hc/en-us/articles/360036485372-SamToFastq-Picard-
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bam_to_fastq:
+        input:
+            "mapped/{sample}.bam"
+        output:
+            fastq1="reads/{sample}.R1.fastq",
+            fastq2="reads/{sample}.R2.fastq"
+        log:
+            "logs/picard/sam_to_fastq/{sample}.log"
+        params:
+            extra="" # optional: Extra arguments for picard.
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/picard/samtofastq"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``picard==2.22.1``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* sam/bam file. This must be the first element of the input file list
+
+**Output:**
+
+* ``fastq1``: Path to R1 fastq
+* ``fastq2``: Path to R2 fastq (Optional)
+* ``unpaired_fastq``: Path to unpaired fastq (Optional, required if ``fastq2`` is provided)
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+
+
+
+Notes
+-----
+
+This tool/wrapper does not handle multithreading
+
+
+
+Authors
+-------
+
+* Patrik Smeds
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for picard SortSam."""
+
+    __author__ = "Julian de Ruiter"
+    __copyright__ = "Copyright 2017, Julian de Ruiter"
+    __email__ = "julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+
+    fastq1 = snakemake.output.fastq1
+    fastq2 = snakemake.output.get("fastq2", None)
+    fastq_unpaired = snakemake.output.get("unpaired_fastq", None)
+
+    if not isinstance(fastq1, str):
+        raise ValueError("f1 needs to be provided")
+
+    output = " FASTQ=" + fastq1
+
+    if isinstance(fastq2, str):
+        output += " SECOND_END_FASTQ=" + fastq2
+
+    if isinstance(fastq_unpaired, str):
+        if not isinstance(fastq2, str):
+            raise ValueError("f2 is required if fastq_unpaired is set")
+
+        output += " UNPAIRED_FASTQ=" + fastq_unpaired
+
+    shell(
+        "picard"
+        " SamToFastq"
+        " {java_opts}"
+        " {extra}"
+        " INPUT={snakemake.input[0]}"
+        " {output}"
+        " {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

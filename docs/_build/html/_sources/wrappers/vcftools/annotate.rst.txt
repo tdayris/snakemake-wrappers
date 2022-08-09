@@ -1,0 +1,123 @@
+.. _`bio/vcftools/annotate`:
+
+VCFTOOLS ANNOTATE
+=================
+
+Annotate VCF files with VCFtools
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_vcftools:
+        input:
+            vcf = "/path/to/calls.vcf.gz",
+            annotation = "path/to/annotation.vcf",
+            description = "path/to/headers.txt"
+        output:
+            vcf = "path/to/output.vcf.gz"
+        threads: 4 # 3 threads if output is not gzipped
+        log:
+            "logs/vcftools/annotate.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/vcftools/annotate"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``vcftools==0.1.16``
+* ``perl-vcftools-vcf==0.1.16``
+* ``pbgzip==2016.08.04``
+* ``tabix==1.11``
+
+Input/Output
+------------
+**Input:**
+
+* ``vcf``: Path to vcf file that is to be annotated
+* ``annot``: Path to annotation file (gzipped)
+
+**Output:**
+
+* ``vcf``: Annotated VCF file
+
+
+
+
+Notes
+-----
+
+This wrapper requires at least two threads.
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+
+    """Annotate VCF file with VCFtools perl script"""
+
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    if "description" in snakemake.input.keys():
+        extra += " --description {}".format(snakemake.input["description"])
+
+    if "annotation" in snakemake.input.keys():
+        extra += " --annotations {}".format(snakemake.input["annotation"])
+
+    stream = "gunzip -c" if str(snakemake.input.vcf).endswith(".gz") else "cat"
+
+    sort = "vcf-sort | " if snakemake.params.get("sort", True) is True else ""
+
+    if str(snakemake.output.vcf).endswith(".gz"):
+        if snakemake.threads != 4:
+            raise ValueError("This wrapper requires exactly three threads to work")
+        shell(
+            "({stream} {snakemake.input.vcf} | "
+            "vcf-annotate {extra} | "
+            "{sort} "
+            "pbgzip -c) > {snakemake.output.vcf} {log}"
+        )
+    else:
+        if snakemake.threads != 3:
+            raise ValueError("This wrapper requires exactly two threads to work")
+        shell(
+            "({stream} {snakemake.input.vcf} | "
+            "{sort} "
+            "vcf-annotate {extra}) "
+            "> {snakemake.output.vcf} {log}"
+        )
+
+
+.. |nl| raw:: html
+
+   <br>

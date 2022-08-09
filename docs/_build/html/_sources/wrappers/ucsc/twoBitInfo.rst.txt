@@ -1,0 +1,88 @@
+.. _`bio/ucsc/twoBitInfo`:
+
+TWOBITINFO
+==========
+
+Generate \*.chorom.sizes file by \*.2bit file (see http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/FOOTER.txt)
+
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule twoBitInfo:
+        input:
+            "{sample}.2bit"
+        output:
+            "{sample}.chrom.sizes"
+        log:
+            "logs/{sample}.chrom.sizes.log"
+        params:
+            "" # optional params string
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/ucsc/twoBitInfo"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``ucsc-twobitinfo==377``
+
+Input/Output
+------------
+**Input:**
+
+* Path to genome \*.2bit file
+
+**Output:**
+
+* Path to output \*.chrom.sizes file
+
+
+
+
+
+Authors
+-------
+
+* Roman Cherniatchik
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for *.2bit to *.fa conversion using UCSC twoBitInfo tool."""
+    # http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/FOOTER.txt
+
+    __author__ = "Roman Chernyatchik"
+    __copyright__ = "Copyright (c) 2019 JetBrains"
+    __email__ = "roman.chernyatchik@jetbrains.com"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    shell("twoBitInfo {extra} {snakemake.input} {snakemake.output} {log}")
+
+
+.. |nl| raw:: html
+
+   <br>

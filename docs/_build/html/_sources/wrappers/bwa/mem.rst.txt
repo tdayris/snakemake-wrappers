@@ -1,0 +1,181 @@
+.. _`bio/bwa/mem`:
+
+BWA MEM
+=======
+
+Map reads using bwa mem, with optional sorting using samtools or picard.
+
+**URL**: http://bio-bwa.sourceforge.net/bwa.shtml
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bwa_mem:
+        input:
+            reads=["reads/{sample}.1.fastq", "reads/{sample}.2.fastq"],
+        output:
+            "mapped/{sample}.bam",
+        log:
+            "logs/bwa_mem/{sample}.log",
+        params:
+            index="genome",
+            extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
+            sorting="none",  # Can be 'none', 'samtools' or 'picard'.
+            sort_order="queryname",  # Can be 'queryname' or 'coordinate'.
+            sort_extra="",  # Extra args for samtools/picard.
+            tmp_dir="/tmp/",  # Path to temp dir. (optional)
+        threads: 8
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bwa/mem"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bwa==0.7.17``
+* ``samtools=1.12``
+* ``picard=2.25``
+
+Input/Output
+------------
+**Input:**
+
+* ``reads``: FASTQ file(s)
+
+**Output:**
+
+* SAM/BAM/CRAM file
+
+
+
+Params
+------
+
+* ``index``: Path to the bwa index
+
+* ``extra``: The `extra` param allows for additional arguments for bwa-mem.
+
+* ``sorting``: The `sorting` param allows to enable sorting, and can be either 'none', 'samtools' or 'picard'.
+
+* ``sort_extra``: The `sort_extra` allows for extra arguments for samtools/picard
+
+* ``tmp_dir``: The `tmp_dir` param allows to define path to the temp dir. One can use `tmpdir resources <https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html?highlight=tmpdir#standard-resources>`_ instead.
+
+
+
+
+Notes
+-----
+
+Warning, this wrapper uses a number of threads equal to one plus the number of threads written in the Snakefile: sort + bwa mem
+
+
+
+Authors
+-------
+
+* Johannes Köster
+* Julian de Ruiter
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster, Julian de Ruiter"
+    __copyright__ = "Copyright 2016, Johannes Köster and Julian de Ruiter"
+    __email__ = "koester@jimmy.harvard.edu, julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from os import path
+    import re
+    import tempfile
+    from snakemake.shell import shell
+
+
+    # Extract arguments.
+    extra = snakemake.params.get("extra", "")
+
+    sort = snakemake.params.get("sorting", "none")
+    sort_order = snakemake.params.get("sort_order", "coordinate")
+    sort_extra = snakemake.params.get("sort_extra", "")
+
+    if re.search(r"-T\b", sort_extra) or re.search(r"--TMP_DIR\b", sort_extra):
+        sys.exit(
+            "You have specified temp dir (`-T` or `--TMP_DIR`) in params.sort_extra; this is automatically set from params.tmp_dir."
+        )
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    tmp_dir = snakemake.params.get("tmp_dir")
+    if tmp_dir:
+        tempfile.tempdir = tmp_dir
+
+
+    # Check inputs/arguments.
+    if not isinstance(snakemake.input.reads, str) and len(snakemake.input.reads) not in {
+        1,
+        2,
+    }:
+        raise ValueError("input must have 1 (single-end) or " "2 (paired-end) elements")
+
+    if sort_order not in {"coordinate", "queryname"}:
+        raise ValueError("Unexpected value for sort_order ({})".format(sort_order))
+
+    # Determine which pipe command to use for converting to bam or sorting.
+    if sort == "none":
+
+        # Simply convert to bam using samtools view.
+        pipe_cmd = "samtools view -Sbh -o {snakemake.output[0]} -"
+
+    elif sort == "samtools":
+
+        # Add name flag if needed.
+        if sort_order == "queryname":
+            sort_extra += " -n"
+
+        # Sort alignments using samtools sort.
+        pipe_cmd = "samtools sort -T {tmp} {sort_extra} -o {snakemake.output[0]} -"
+
+    elif sort == "picard":
+
+        # Sort alignments using picard SortSam.
+        pipe_cmd = (
+            "picard SortSam {sort_extra} --INPUT /dev/stdin"
+            " --OUTPUT {snakemake.output[0]} --SORT_ORDER {sort_order} --TMP_DIR {tmp}"
+        )
+
+    else:
+        raise ValueError("Unexpected value for params.sort ({})".format(sort))
+
+    with tempfile.TemporaryDirectory() as tmp:
+        #shell("mkdir --patents --verbose $(basename {snakemake.output[0]})")
+        shell(
+            "(bwa mem"
+            " -t {snakemake.threads}"
+            " {extra}"
+            " {snakemake.params.index}"
+            " {snakemake.input.reads}"
+            " | " + pipe_cmd + ") {log}"
+        )
+
+
+.. |nl| raw:: html
+
+   <br>

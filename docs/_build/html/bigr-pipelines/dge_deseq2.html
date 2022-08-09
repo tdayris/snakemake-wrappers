@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DGE_DESEQ2 &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="FASTQC_MULTIQC" href="fastqc_multiqc.html" />
+    <link rel="prev" title="DESIGN_BUILDER" href="design_builder.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Snakemake Wrappers
+          </a>
+              <div class="version">
+                heads/Unofficial
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers and Pipelines</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../pipelines.html">BiGR Pipelines</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="CTC_Variant_Calling_Integragen_Legacy.html">CTC_VARIANT_CALLING_INTEGRAGEN_LEGACY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="WES_germline.html">WES_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="annot_sv.html">ANNO_SV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCL2FASTQ (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="celltype_deconvolution_rnaseq.html">CELLTYPE_DECONVOLUTION_RNASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chipseq.html">CHIPSEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">DGE_DESEQ2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snakefile">Snakefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_set_enrichment.html">GENE_SET_ENRICHMENT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low_pass_wgs_copy_number.html">LOW_PASS_WGS_COPY_NUMBER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nfcore_chipseq.html">NFCORE-CHIPSEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="retrotransposons.html">RETROTRANSPOSONS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rnaseq.html">RNASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sarek_enhanced.html">SAREK ENHANCED</a></li>
+<li class="toctree-l2"><a class="reference internal" href="seqoia.html">SEQOIA SINGLE-SAMPLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sigprofiler_signatures.html">SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline.html">VARIANT_CALLING_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline_wes.html">VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_somatic.html">VARIANT_CALLING_SOMATIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_callling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_occurence_cohort.html">VARIANT_OCCURENCE_COHORT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wes_somatic.html">VARIANT_CALLING_SOMATIC</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Snakemake Wrappers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../pipelines.html">BiGR Pipelines</a> &raquo;</li>
+      <li>DGE_DESEQ2</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/bigr-pipelines/dge_deseq2.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dge-deseq2">
+<span id="id1"></span><h1>DGE_DESEQ2<a class="headerlink" href="#dge-deseq2" title="Permalink to this headline"></a></h1>
+<p>Perform trimming and quantification on RNASeq</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
+<p>In order to run the pipeline, use the following commands</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Go to your working directory</span>
+
+<span class="nb">cd</span> /path/to/my/working/directory
+
+<span class="c1"># Build a design file (see below)</span>
+
+<span class="c1"># Copy/paste the following line for **HG19**</span>
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/dge_deseq2/run.sh hg19
+
+<span class="c1"># Copy/paste the following line for **HG38**</span>
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/dge_deseq2/run.sh hg38
+</pre></div>
+</div>
+</section>
+<section id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline"></a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>Fastq files</p></li>
+<li><p>Fasta-formatted Genome sequence</p></li>
+<li><p>Fasta-formatted transcriptome sequence</p></li>
+<li><p>GTF formatted genome annotation</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>Salmon quantification</p></li>
+<li><p>Quality controls</p></li>
+<li><p>Trimmed fastq files</p></li>
+</ul>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<p>Prerequisites:</p>
+<ul class="simple">
+<li><p>A TSV formatted design file, <em>named ‘design.tsv’</em> with the following columns:</p></li>
+</ul>
+<table class="colwidths-given docutils align-default" id="id2">
+<caption><span class="caption-text">Desgin file format</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sample_id</p></th>
+<th class="head"><p>Upstream_fastq</p></th>
+<th class="head"><p>Downstream_fastq</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Name of the Sample1</p></td>
+<td><p>Path to upstream fastq file</p></td>
+<td><p>Path to downstream fastq file</p></td>
+</tr>
+<tr class="row-odd"><td><p>Name of the Sample2</p></td>
+<td><p>Path to upstream fastq file</p></td>
+<td><p>Path to downstream fastq file</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+</tbody>
+</table>
+<p>How doas it work ?</p>
+<ol class="arabic simple">
+<li><p>Salmon quantification</p></li>
+</ol>
+<p>You name it! It’s the salmon_quant pipeline itself. I won’t copy-paste all
+it explanations around here, click on salmon_quant on the left panel and see
+you here right after.</p>
+<ol class="arabic simple" start="2">
+<li><p>Aggregation</p></li>
+</ol>
+<p>Based on the GTF annotation, the correspondancy between trnascripts
+identifiers and gene names is written in a text table. This will later be
+used for annotations and results descriptions.</p>
+<p>TXimport is used to aggregate trnascript counts into gene ones. It also takes
+bootstraps into account and build a DESeqDataset object with statistical
+formula and experimental design included.</p>
+<ol class="arabic simple" start="3">
+<li><p>DESeq2</p></li>
+</ol>
+<p>DESeq2 is run over all factor combinations (1 condition vs 1 other), for every
+single possible comparisons. We use ENSG annotations in this step to avoid
+duplicates in gene names. This would raise errors and lead to errors in the
+result interpretations.</p>
+<p>If you have more than 2 factors, this step can return A LOT of results. And
+by A LOT, I speak about combinations and interpolations. Example: with 2
+factors (WT and KO) and 2 status (Treated and Untreated), then 6 comparisons
+are computed. If you add a single batch effect, then up to 28 comparisons can
+be computed. Most of the time, only one or two of them are usefull.</p>
+<p>Look at the results names or filter them!</p>
+<p>You may modify your config-file to auto-filter results. Note the head of your
+config-file. It starts with <cite>design: path: design.tsv</cite>. On the same level as
+<cite>path</cite> add a new key named <cite>include_only</cite> to include results with a given
+list of words in it. Example: with 2 factors (WT and KO) and 2 status
+(Treated and Untreated). It want only WT_Untreated to be the reference. Then,
+I add <cite>include_only: [‘WT_Untreated’]</cite> in the config file.</p>
+<p>You may wan to “combine” two columns in your design file. Use
+<cite>aggregate_col: [[“factor1”, “factor2”]]</cite> to combine them. Example: with 2
+factors (WT and KO) and 2 status (Treated and Untreated). I would write:
+<cite>aggregate_col: [[“factor”, “status”]]</cite> on the same level as <cite>path</cite>.</p>
+<ol class="arabic simple" start="4">
+<li><p>Post processing: TSV</p></li>
+</ol>
+<p>DESeq2 results are not usefull for a fellow biologists. They are annotated by
+in-house scripts. Gene names are added, pvalues are filtered, counts are
+merged and results are sorted around the two most asked ranks.</p>
+<p>Differential expression satus is also written in full letters, as well as the
+expression change.</p>
+<ol class="arabic simple" start="5">
+<li><p>Post processing: PNG</p></li>
+</ol>
+<p>DESeq2 objects are not usefull for fellow biologists. Most of them do not use
+R/Python on a daily basis and it is completely normal. Clustering, MAPlots,
+Volcanoplots and many others are build and aggregated in a nice HTML page.</p>
+<p>You may need special graphs over genes of interest. This may be to highlight
+a differential expression or to understand why surch expression variation was
+not statistically significant. Then use the key: <cite>genes_of_interest</cite> with a
+list of genes on the same level as <cite>design</cite>.</p>
+<ol class="arabic simple" start="6">
+<li><p>Post processing: Quality controls</p></li>
+</ol>
+<p>Additional quality controls are built for this pipeline. Most of them
+are embedded in a HTML file with MultiQC. It also includes salmon_quant
+quality controls!</p>
+<p>Note that a MultiQC HTML report ships only the samples used in the comparison.
+If a Sample should not belong to a given HTML report, then the design was
+wrong to begin with…</p>
+</section>
+<section id="snakefile">
+<h2>Snakefile<a class="headerlink" href="#snakefile" title="Permalink to this headline"></a></h2>
+<p>The pipeline contains the following steps:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">min_version</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">yaml</span> <span class="kn">import</span> <span class="n">dump</span>
+<span class="n">min_version</span><span class="p">(</span><span class="s2">&quot;6.0&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">worflow_source_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">get_sources</span><span class="p">())))</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">common</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;../common/python&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">common</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">dataframes</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">file_manager</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">files_linker</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">graphics</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">write_yaml</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">messages</span> <span class="kn">import</span> <span class="n">message</span>
+
+
+<span class="c1">#################</span>
+<span class="c1">### Preambule ###</span>
+<span class="c1">#################</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;snakemake.dge_deseq2.log&quot;</span><span class="p">,</span>
+    <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+<span class="p">)</span>
+
+<span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;config.hg38.yaml&quot;</span><span class="p">)</span>
+<span class="n">configfile</span><span class="p">:</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">design</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;design.tsv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="c1">#design.set_index(&quot;Sample_id&quot;, inplace=True)</span>
+<span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+        <span class="sd">&quot;&quot;&quot;A design file is required for this pipeline. It is a TSV with</span>
+<span class="sd">        the following columns:</span>
+
+<span class="sd">        1. Sample_id (case matters): Name of your sample, unique and composed</span>
+<span class="sd">           with a least 1 letter (no sample should have numerical names only,</span>
+<span class="sd">           it would make R fail while parsing sample names with DESeq2)</span>
+<span class="sd">        2. Upstream_file (case matters): Path to the file, it can be</span>
+<span class="sd">           an absolute path, a relative path, or a iRODS url.</span>
+<span class="sd">        3. Downstream_file (case matters): Path to the file, it can be</span>
+<span class="sd">           an absolute path, a relative path, or a iRODS url.</span>
+<span class="sd">        4. XXXX: A name of your choice, unique and understandable. It will be</span>
+<span class="sd">           used as comparison name within DESeq2 and graphs. It contains levels</span>
+<span class="sd">           for each single sample. Do not use only integers or floats for your</span>
+<span class="sd">           level name: R and DESeq2 behaves stangely with them.</span>
+<span class="sd">        5. YYYY: A name of your choice, unique and understandable. It will be</span>
+<span class="sd">           used as comparison name within DESeq2 and graphs. It contains levels</span>
+<span class="sd">           for each single sample. Do not use only integers or floats for your</span>
+<span class="sd">           level name: R and DESeq2 behaves stangely with them.</span>
+<span class="sd">        Etc, etc. You can have any other condition name. Name them as you want,</span>
+<span class="sd">        these names must be unique and understandable. It will be used as</span>
+<span class="sd">        comparison name within DESeq2 and graphs. It contains levels for each</span>
+<span class="sd">        single sample. Do not use only integers or floats for your level name:</span>
+<span class="sd">        R and DESeq2 behaves stangely with them.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">fastq_links</span> <span class="o">=</span> <span class="n">link_fq</span><span class="p">(</span>
+        <span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">,</span>
+        <span class="n">design</span><span class="o">.</span><span class="n">Upstream_file</span><span class="p">,</span>
+        <span class="n">design</span><span class="o">.</span><span class="n">Downstream_file</span>
+    <span class="p">)</span>
+
+    <span class="n">ruleorder</span><span class="p">:</span> <span class="n">multiqc</span> <span class="o">&gt;</span> <span class="n">multiqc_se</span>
+    <span class="n">ruleorder</span><span class="p">:</span> <span class="n">salmon_quant</span> <span class="o">&gt;</span> <span class="n">salmon_quant_se</span>
+
+<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+    <span class="n">fastq_links</span> <span class="o">=</span> <span class="n">link_fq</span><span class="p">(</span>
+        <span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">,</span>
+        <span class="n">design</span><span class="o">.</span><span class="n">Upstream_file</span>
+    <span class="p">)</span>
+
+    <span class="n">ruleorder</span><span class="p">:</span> <span class="n">multiqc_se</span> <span class="o">&gt;</span> <span class="n">multiqc</span>
+    <span class="n">ruleorder</span><span class="p">:</span> <span class="n">salmon_quant_se</span> <span class="o">&gt;</span> <span class="n">salmon_quant</span>
+
+<span class="c1"># A list that holds all comparisons expected for this snakemake pipeline</span>
+<span class="n">comparison_levels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">yield_comps</span><span class="p">(</span>
+    <span class="n">complete_design</span><span class="o">=</span><span class="n">design</span><span class="p">,</span>
+    <span class="n">aggregate</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;design&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;aggregate_col&quot;</span><span class="p">),</span>
+    <span class="n">remove</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;design&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;remove_col&quot;</span><span class="p">),</span>
+    <span class="n">contains</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;design&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;include_only&quot;</span><span class="p">)</span>
+<span class="p">))</span>
+
+<span class="c1"># Stored as a list for futrther re-use</span>
+<span class="n">output_prefixes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="sa">f</span><span class="s2">&quot;DGE_considering_factor_</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">_comparing_</span><span class="si">{</span><span class="n">test</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">for</span> <span class="n">factor</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">comparison_levels</span>
+<span class="p">]</span>
+<span class="c1"># print(output_prefixes)</span>
+
+<span class="c1"># An iterator that holds all samples involved in the comparisons</span>
+<span class="c1"># listed above</span>
+<span class="n">samples_iterator</span> <span class="o">=</span> <span class="n">yield_samples</span><span class="p">(</span>
+    <span class="n">complete_design</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+    <span class="n">aggregate</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;design&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;aggregate_col&quot;</span><span class="p">),</span>
+    <span class="n">remove</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;design&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;remove_col&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+
+<span class="n">expected_pcas</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="sa">f</span><span class="s2">&quot;figures/DGE_considering_factor_</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">_comparing_</span><span class="si">{</span><span class="n">test</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2">/pca/pca_</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">axes</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">elipse</span><span class="si">}</span><span class="s2">.png&quot;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span> <span class="ow">in</span> <span class="n">comparison_levels</span>
+    <span class="k">for</span> <span class="n">axes</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ax_1_ax_2&quot;</span><span class="p">,</span> <span class="s2">&quot;ax_2_ax_3&quot;</span><span class="p">]</span> <span class="c1"># , &quot;ax_3_ax_4&quot;]</span>
+    <span class="k">for</span> <span class="n">elipse</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;with_elipse&quot;</span><span class="p">,</span> <span class="s2">&quot;without_elipse&quot;</span><span class="p">]</span>
+<span class="p">]</span>
+
+<span class="n">condition_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="sa">f</span><span class="s2">&quot;DGE_considering_factor_</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">_comparing_</span><span class="si">{</span><span class="n">test</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">relation_condition_sample</span><span class="p">(</span><span class="n">design</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">factor</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">factor</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">comparison_levels</span>
+<span class="p">}</span>
+
+<span class="n">samples_per_prefixes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">output_prefixes</span><span class="p">,</span> <span class="n">condition_dict</span><span class="p">))</span>
+<span class="n">samples_per_prefixes</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">prefix</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">condition_dict</span><span class="p">[</span><span class="n">prefix</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="n">output_prefixes</span>
+<span class="p">}</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">samples_per_prefixes</span><span class="p">)</span>
+<span class="c1"># print(samples_per_prefixes)</span>
+<span class="c1"># print(condition_dict)</span>
+
+
+<span class="c1">############################</span>
+<span class="c1">### Wilcards constraints ###</span>
+<span class="c1">############################</span>
+
+<span class="n">wildcard_constraints</span><span class="p">:</span>
+    <span class="n">comparison</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_prefixes</span><span class="p">),</span>
+    <span class="n">factor</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comparison_levels</span><span class="p">])),</span>
+    <span class="n">test</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comparison_levels</span><span class="p">])),</span>
+    <span class="n">ref</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">comparison_levels</span><span class="p">])),</span>
+    <span class="n">axes</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;ax_1_ax_2&quot;</span><span class="p">,</span> <span class="s2">&quot;ax_2_ax_3&quot;</span><span class="p">,</span> <span class="s2">&quot;ax_3_ax_4&quot;</span><span class="p">]),</span>
+    <span class="n">elipse</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;with_elipse&quot;</span><span class="p">,</span> <span class="s2">&quot;without_elipse&quot;</span><span class="p">])</span>
+
+
+<span class="c1">###################</span>
+<span class="c1">### Target rule ###</span>
+<span class="c1">###################</span>
+
+<span class="n">rule</span> <span class="n">target</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">multiqc</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.</span><span class="si">{comparison}</span><span class="s2">.html&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span>
+        <span class="p">),</span>
+        <span class="n">gseaapp</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/deseq2_</span><span class="si">{subset}</span><span class="s2">_</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span><span class="p">,</span>
+            <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;complete_results&quot;</span><span class="p">,</span> <span class="s2">&quot;sorted_on_fold_change&quot;</span><span class="p">,</span> <span class="s2">&quot;sorted_on_pval&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">csv_report</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/html_table_deseq2_</span><span class="si">{subset}</span><span class="s2">.tar.bz2&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span><span class="p">,</span>
+            <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;complete_results&quot;</span><span class="p">,</span> <span class="s2">&quot;sorted_on_fold_change&quot;</span><span class="p">,</span> <span class="s2">&quot;sorted_on_pval&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">deseq2_wald</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;deseq2/</span><span class="si">{comparison}</span><span class="s2">/wald.</span><span class="si">{comparison}</span><span class="s2">.RDS&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span>
+        <span class="p">),</span>
+        <span class="n">pcas</span><span class="o">=</span><span class="n">expected_pcas</span><span class="p">,</span>
+        <span class="n">general_pcas</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;figures/pca/general.pca_</span><span class="si">{axes}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+            <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PC1_PC2&quot;</span><span class="p">,</span> <span class="s2">&quot;PC2_PC1&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">counts_with_deseq2</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/deseq2_</span><span class="si">{content}</span><span class="s2">_with_counts_</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;complete_results&quot;</span><span class="p">,</span> <span class="s2">&quot;sorted_on_pval&quot;</span><span class="p">,</span> <span class="s2">&quot;sorted_on_fold_change&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">gene_plots</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;results/</span><span class="si">{comparison}</span><span class="s2">/gene_plots/</span><span class="si">{gene}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span><span class="p">,</span>
+            <span class="n">gene</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;genes_of_interest&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;ENSG00000141510&quot;</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="c1">#consensus=expand(</span>
+        <span class="c1">#    &quot;consensusclusterplus/{comparison}&quot;,</span>
+        <span class="c1">#    comparison=output_prefixes</span>
+        <span class="c1">#)</span>
+
+
+<span class="c1">##############################</span>
+<span class="c1">### DESeq2 post processing ###</span>
+<span class="c1">##############################</span>
+
+
+<span class="n">deseq2_post_process_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;condition_dict&quot;</span><span class="p">:</span> <span class="n">condition_dict</span><span class="p">,</span>
+    <span class="s2">&quot;samples_per_prefixes&quot;</span><span class="p">:</span> <span class="n">samples_per_prefixes</span><span class="p">,</span>
+    <span class="s2">&quot;design&quot;</span><span class="p">:</span> <span class="n">design</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+    <span class="s2">&quot;thresholds&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;thresholds&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;genes_of_interest&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">&quot;genes_of_interest&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;ENSG00000141510&quot;</span><span class="p">]</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;chromosomes&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">&quot;chromosomes&quot;</span><span class="p">,</span>
+        <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">24</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">24</span><span class="p">)))</span>
+    <span class="p">)</span>
+<span class="p">}</span>
+
+
+<span class="n">module</span> <span class="n">deseq2_post_process</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/deseq2_post_process/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">deseq2_post_process_config</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">deseq2_post_process</span> <span class="k">as</span> <span class="o">*</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">pandas_merge_salmon_tr</span> <span class="kn">from</span> <span class="nn">deseq2_post_process</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">quant</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="p">),</span>
+        <span class="n">tx2gene</span> <span class="o">=</span> <span class="s2">&quot;tximport/transcripts2genes.tsv&quot;</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">multiqc</span> <span class="kn">from</span> <span class="nn">deseq2_post_process</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">txt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.txt&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">png</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.png&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">salmon</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">json</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/multiqc_config.yaml&quot;</span><span class="p">,</span>
+        <span class="n">fqscreen</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">],</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">additional_plots</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="c1">#temp(&quot;pairwise_scatterplot_mqc.png&quot;),</span>
+            <span class="c1">#temp(&quot;clustermap_sample_mqc.png&quot;),</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/clustermap_sample_mqc.png&quot;</span><span class="p">,</span>
+            <span class="c1">#&quot;multiqc/{comparison}/clustermap_genes_mqc.png&quot;,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/pca_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/volcanoplot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_expr_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/ma_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_mu_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/independent_filter_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/inde_theta_filter_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/pvalue_qc_mqc.png&quot;</span><span class="p">,</span>
+            <span class="c1">#temp(&quot;multiqc/{comparison}/clustermap_sample_mqc.png&quot;),</span>
+            <span class="c1">#temp(&quot;pca_axes_correlation_mqc.png&quot;)</span>
+        <span class="p">]</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">multiqc</span> <span class="kn">from</span> <span class="nn">deseq2_post_process</span> <span class="k">as</span> <span class="n">multiqc_se</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">txt</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/fastq_screen/</span><span class="si">{sample}</span><span class="s2">.fastq_screen.txt&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">png</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.fastq_screen.png&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">salmon</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">json</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/multiqc_config.yaml&quot;</span><span class="p">,</span>
+        <span class="n">fqscreen</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/fastq_screen/</span><span class="si">{sample}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">],</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">additional_plots</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="c1">#temp(&quot;pairwise_scatterplot_mqc.png&quot;),</span>
+            <span class="c1">#temp(&quot;clustermap_sample_mqc.png&quot;),</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/clustermap_sample_mqc.png&quot;</span><span class="p">,</span>
+            <span class="c1">#&quot;multiqc/{comparison}/clustermap_genes_mqc.png&quot;,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/pca_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/volcanoplot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_expr_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/ma_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_mu_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/independent_filtering_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/theta_knee_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/pvalue_qc.png&quot;</span><span class="p">,</span>
+            <span class="c1">#temp(&quot;multiqc/{comparison}/clustermap_sample_mqc.png&quot;),</span>
+            <span class="c1">#temp(&quot;pca_axes_correlation_mqc.png&quot;)</span>
+        <span class="p">]</span>
+
+
+<span class="c1">###########################</span>
+<span class="c1">### tximprot and DESeq2 ###</span>
+<span class="c1">###########################</span>
+
+<span class="n">deseq2_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;gtf&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;gtf&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;design&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;design&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;output_prefixes&quot;</span><span class="p">:</span> <span class="n">output_prefixes</span><span class="p">,</span>
+    <span class="s2">&quot;comparison_levels&quot;</span><span class="p">:</span> <span class="n">comparison_levels</span><span class="p">,</span>
+    <span class="s2">&quot;samples_per_prefixes&quot;</span><span class="p">:</span> <span class="n">samples_per_prefixes</span>
+<span class="p">}</span>
+
+
+<span class="n">module</span> <span class="n">tximport_deseq2</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/tximport_deseq2/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">deseq2_config</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">tximport_deseq2</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">tximport</span> <span class="kn">from</span> <span class="nn">tximport_deseq2</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">quant</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">tx_to_gene</span><span class="o">=</span><span class="s2">&quot;tximport/tx2gene.tsv&quot;</span>
+
+
+<span class="c1">#############################</span>
+<span class="c1">### Salmon quantification ###</span>
+<span class="c1">#############################</span>
+
+<span class="n">rule</span> <span class="n">salmon_quant</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">design</span><span class="o">=</span><span class="n">ancient</span><span class="p">(</span><span class="s2">&quot;design.tsv&quot;</span><span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">ancient</span><span class="p">(</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">results</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;salmon_quant/results_to_upload&quot;</span><span class="p">),</span>
+        <span class="n">quant_genes</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">quant</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">tx2gene</span><span class="o">=</span><span class="s2">&quot;salmon_quant/salmon/tx2gene.tsv&quot;</span><span class="p">,</span>
+        <span class="n">html</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">json</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">fastq_screen</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">quant_qc</span><span class="o">=</span><span class="s2">&quot;salmon_quant/multiqc/MultiQC.html&quot;</span><span class="p">,</span>
+        <span class="n">quant_gene_table</span><span class="o">=</span><span class="s2">&quot;salmon_quant/salmon/TPM.genes.tsv&quot;</span><span class="p">,</span>
+        <span class="n">quant_tr_table</span><span class="o">=</span><span class="s2">&quot;salmon_quant/salmon/TPM.transcripts.tsv&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Quantifying mRNAs over gentrome&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">handover</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/salmon_quant_pipeline.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;--symbolic --force --relative --verbose&quot;</span><span class="p">,</span>
+        <span class="n">mkdir</span><span class="o">=</span><span class="s2">&quot;--parents --verbose&quot;</span><span class="p">,</span>
+        <span class="n">quant_dir</span><span class="o">=</span><span class="s2">&quot;salmon_quant&quot;</span><span class="p">,</span>
+        <span class="n">pipeline_path</span><span class="o">=</span><span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh&quot;</span><span class="p">,</span>
+        <span class="n">pipeline_params</span><span class="o">=</span><span class="s2">&quot;--nt&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;(mkdir </span><span class="si">{params.mkdir}</span><span class="s2"> </span><span class="si">{params.quant_dir}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;ln </span><span class="si">{params.ln}</span><span class="s2"> </span><span class="si">{input.design}</span><span class="s2"> </span><span class="si">{params.quant_dir}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;ln </span><span class="si">{params.ln}</span><span class="s2"> </span><span class="si">{input.config}</span><span class="s2"> </span><span class="si">{params.quant_dir}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;cd </span><span class="si">{params.quant_dir}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;bash </span><span class="si">{params.pipeline_path}</span><span class="s2"> </span><span class="si">{params.pipeline_params}</span><span class="s2">) # &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1&quot;</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">salmon_quant</span> <span class="k">as</span> <span class="n">salmon_quant_se</span> <span class="k">with</span><span class="p">:</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">results</span><span class="o">=</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;salmon_quant/results_to_upload&quot;</span><span class="p">),</span>
+        <span class="n">quant_genes</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">quant</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;salmon_quant/salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">tx2gene</span><span class="o">=</span><span class="s2">&quot;salmon/tx2gene.tsv&quot;</span><span class="p">,</span>
+        <span class="n">html</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">json</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">.fastp.json&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">fastq_screen</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">quant_qc</span><span class="o">=</span><span class="s2">&quot;salmon_quant/multiqc/MultiQC.html&quot;</span><span class="p">,</span>
+        <span class="n">quant_gene_table</span><span class="o">=</span><span class="s2">&quot;salmon_quant/salmon/TPM.genes.tsv&quot;</span><span class="p">,</span>
+        <span class="n">quant_tr_table</span><span class="o">=</span><span class="s2">&quot;salmon_quant/salmon/TPM.transcripts.tsv&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Thibault Dayris</p></li>
+<li><p>M boyba Diop</p></li>
+<li><p>Marc Deloger</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="design_builder.html" class="btn btn-neutral float-left" title="DESIGN_BUILDER" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fastqc_multiqc.html" class="btn btn-neutral float-right" title="FASTQC_MULTIQC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016, The Snakemake team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

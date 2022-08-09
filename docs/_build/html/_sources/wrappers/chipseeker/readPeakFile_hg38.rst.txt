@@ -1,0 +1,161 @@
+.. _`bio/chipseeker/readPeakFile_hg38`:
+
+READ PEAK FILE HG38
+===================
+
+Load Peak files in R with ChipSeeker for hg38
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_read_peak_file_hg38:
+        input:
+            bed="peaks.bed.gz"
+        output:
+            grange="peaks.GRanges.RDS",
+            tagmatrix="peaks.TagMatrix.RDS"
+        log:
+            "logs/readpeaks.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/chipseeker/readPeakFile_hg38"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconda::bioconductor-txdb.hsapiens.ucsc.hg38.knowngene==3.13.0``
+* ``bioconda::bioconductor-chipseeker==1.28.3``
+* ``bioconda::bioconductor-org.hs.eg.db==3.13.0``
+
+Input/Output
+------------
+**Input:**
+
+* ``bed``: A single peak file from macs2
+
+**Output:**
+
+* ``granges``: A RDS formatted GRanges object containing peaks
+* ``tagmatrix``: A RDS formatted TagMatrix object containing peaks
+* ``annotated``: A RDS formatted AnnotatePeaks object containing annotated peaks
+
+
+
+Params
+------
+
+* ``extra_readpeaks``: Optional parameters for ReadPeakFile function
+
+* ``extra_promoters``: Optional parameters for getPromoters function
+
+* ``extra_tagmatrix``: Optional parameters for getTagMatrix function
+
+* ``extra_annotate``: Optional parameters for AnnotatePeaks function
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script loads peaks into R with ChipSeeker
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2021, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # Load libraries
+    base::library(package = "ChIPseeker", quietly = TRUE);
+    base::library(package = "TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE);
+
+
+    # Cast as character since '/' causes issues in R
+    bed_file <- base::as.character(x=snakemake@input[["bed"]]);
+    extra_readpeaks <- "bed_file, as = 'GRanges'";
+    if ("extra_readpeaks" %in% base::names(snakemake@params)) {
+      extra_readpeaks <- base::paste(
+        extra_readpeaks,
+        base::as.character(x=snakemake@params[["extra_readpeaks"]]),
+        sep=","
+      );
+    }
+
+    extra_promoters <- "TxDb=TxDb.Hsapiens.UCSC.hg38.knownGene";
+    if ("extra_promoters" %in% base::names(snakemake@params)) {
+      extra_promoters <- base::paste(
+        extra_promoters,
+        base::as.character(x=snakemake@params[["extra_promoters"]]),
+        sep=","
+      );
+    }
+
+    extra_tagmatrix <- "peak=granges, windows=promoters";
+    if ("extra_tagmatrix" %in% base::names(snakemake@params)) {
+      extra_tagmatrix <- base::paste(
+        extra_tagmatrix,
+        base::as.character(x=snakemake@params[["extra_tagmatrix"]]),
+        sep=","
+      );
+    }
+
+
+    # Build GRanges, getPromoters and TagMatrix command lines
+    granges_command <- base::paste0("ChIPseeker::ReadPeakFile(", extra, ");");
+    base::messages(granges_command);
+    get_promoters_command <- base::paste0("ChIPseeker::getPromoters(", extra, ")");
+    base::messages(get_promoters_command);
+    tagmatrix_command <- base::paste0("ChIPseeker::getTagMatrix(", extra, ");");
+    base::messages(tagmatrix_command);
+
+    # Build GRanges and TagMatrix objects
+    granges <- base::eval(base::parse(text = granges_command));
+    promoters <- base::eval(base::parse(text = get_promoters_command));
+    tagmatrix <- base::eval(base::parse(text = tagmatrix_command));
+
+
+    # Keeping results
+    if ("grange" %in% base::names(snakemake@output)) {
+      base::saveRDS(
+        object=granges,
+        file=base::as.character(x=snakemake@output[["grange"]])
+      );
+    }
+
+    if ("tagmatrix" %in% base::names(snakemake@output)) {
+      base::saveRDS(
+        object=tagmatrix,
+        file=base::as.character(x=snakemake@output[["tagmatrix"]])
+      );
+    }
+
+
+.. |nl| raw:: html
+
+   <br>

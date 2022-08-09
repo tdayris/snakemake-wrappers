@@ -1,0 +1,97 @@
+.. _`bio/salmon/index`:
+
+SALMON_INDEX
+============
+
+Index a transcriptome assembly with salmon 
+
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule salmon_index:
+        input:
+            sequences = "gentrome.fasta",
+            decoys = "decoys.txt"
+        output:
+            index = directory("salmon/transcriptome_index")
+        log:
+            "logs/salmon/transcriptome_index.log"
+        threads: 2
+        params:
+            # optional parameters
+            extra="-k 11"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/salmon/index"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``salmon==1.4.0``
+
+Input/Output
+------------
+**Input:**
+
+* assembly fasta
+
+**Output:**
+
+* indexed assembly
+
+
+
+
+
+Authors
+-------
+
+* Tessa Pierce
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for Salmon Index."""
+
+    __author__ = "Tessa Pierce"
+    __copyright__ = "Copyright 2018, Tessa Pierce"
+    __email__ = "ntpierce@gmail.com"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    if "decoys" in snakemake.input.keys():
+        extra += " --decoys {} ".format(snakemake.input["decoys"])
+
+    shell(
+        "salmon index --transcripts {snakemake.input.sequences} "
+        "--index {snakemake.output.index} "
+        "--threads {snakemake.threads} {extra} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

@@ -1,0 +1,124 @@
+.. _`bio/subread/featurecounts`:
+
+SUBREAD FEATURECOUNTS
+=====================
+
+FeatureCounts assign mapped reads or fragments (paired-end data) to genomic features such as genes, exons and promoters. For more information please see `featureCounts tutorial <http://bioinf.wehi.edu.au/featureCounts/>`_, `documentation of subread <https://bioconductor.org/packages/release/bioc/vignettes/Rsubread/inst/doc/SubreadUsersGuide.pdf>`_ and commandline help.
+
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule feature_counts:
+        input:
+            sam="{sample}.bam", # list of sam or bam files
+            annotation="annotation.gtf",
+            # optional input
+            # chr_names="",           # implicitly sets the -A flag
+            # fasta="genome.fasta"      # implicitly sets the -G flag
+        output:
+            multiext("results/{sample}",
+                     ".featureCounts",
+                     ".featureCounts.summary",
+                     ".featureCounts.jcounts")
+        threads:
+            2
+        params:
+            tmp_dir="",   # implicitly sets the --tmpDir flag
+            r_path="",    # implicitly sets the --Rpath flag
+            extra="-O --fracOverlap 0.2"
+        log:
+            "logs/{sample}.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/subread/featurecounts"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``subread=2.0``
+
+Input/Output
+------------
+**Input:**
+
+* a list of .sam or .bam files
+* GTF, GFF or SAF annotation file
+* optional a tab separating file that determines the sorting order and contains the chromosome names in the first column
+* optional a fasta index file
+
+**Output:**
+
+* .featureCounts file including read counts (tab separated)
+* .featureCounts.summary file including summary statistics (tab separated)
+* .featureCounts.jcounts file including count number of reads supporting each exon-exon junction (tab separated)
+
+
+
+
+
+Authors
+-------
+
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Antonie Vietor"
+    __copyright__ = "Copyright 2020, Antonie Vietor"
+    __email__ = "antonie.v@gmx.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    # optional input files and directories
+    fasta = snakemake.input.get("fasta", "")
+    chr_names = snakemake.input.get("chr_names", "")
+    tmp_dir = snakemake.params.get("tmp_dir", "")
+    r_path = snakemake.params.get("r_path", "")
+
+    if fasta:
+        extra += " -G {}".format(fasta)
+    if chr_names:
+        extra += " -A {}".format(chr_names)
+    if tmp_dir:
+        extra += " --tmpDir {}".format(tmp_dir)
+    if r_path:
+        extra += " --Rpath {}".format(r_path)
+
+    shell(
+        "(featureCounts"
+        " {extra}"
+        " -T {snakemake.threads}"
+        " -J"
+        " -a {snakemake.input.annotation}"
+        " -o {snakemake.output[0]}"
+        " {snakemake.input.sam})"
+        " {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

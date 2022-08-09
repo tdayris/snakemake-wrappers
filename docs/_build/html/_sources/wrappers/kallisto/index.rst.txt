@@ -1,0 +1,108 @@
+.. _`bio/kallisto/index`:
+
+KALLISTO INDEX
+==============
+
+Index a transcriptome using kallisto.
+
+**URL**: https://bioinformatics.readthedocs.io/en/latest/kallisto/
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule kallisto_index:
+        input:
+            fasta = "{transcriptome}.fasta"
+        output:
+            index = "{transcriptome}.idx"
+        params:
+            extra = "--kmer-size=5"
+        log:
+            "logs/kallisto_index_{transcriptome}.log"
+        threads: 1
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/kallisto/index"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``kallisto==0.45.0``
+
+Input/Output
+------------
+**Input:**
+
+* ``fasta``: Path to transcriptome fasta file
+
+**Output:**
+
+* ``index``: Path to index directory
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+
+
+
+
+Authors
+-------
+
+* Joël Simoneau
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for Kallisto index"""
+
+    __author__ = "Joël Simoneau"
+    __copyright__ = "Copyright 2019, Joël Simoneau"
+    __email__ = "simoneaujoel@gmail.com"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    # Creating log
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    # Placeholder for optional parameters
+    extra = snakemake.params.get("extra", "")
+
+    # Allowing for multiple FASTA files
+    fasta = snakemake.input.get("fasta")
+    assert fasta is not None, "input-> a FASTA-file is required"
+    fasta = " ".join(fasta) if isinstance(fasta, list) else fasta
+
+    shell(
+        "kallisto index "  # Tool
+        "{extra} "  # Optional parameters
+        "--index={snakemake.output.index} "  # Output file
+        "{fasta} "  # Input FASTA files
+        "{log}"  # Logging
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

@@ -1,0 +1,101 @@
+.. _`bio/bcftools/annotate`:
+
+BCFTOOLS_ANNOTATE
+=================
+
+Annotate VCF files with VCF/BED using bcftools
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_bcftools_annotate:
+        input:
+            calls = "file.vcf",
+            annotation = "annot.tsv"
+        output:
+            "annot.vcf"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bcftools/annotate"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bcftools==1.12``
+* ``snakemake-wrapper-utils==0.2``
+
+Input/Output
+------------
+**Input:**
+
+* ``call``: The VCF to annotate
+* ``annotation``: The BED/VCF/TSV to annotate with
+
+**Output:**
+
+* The annotated VCF file
+
+
+
+
+Notes
+-----
+
+Use `--columns` in extra to set field names
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+
+    """Snakemake wrapper for bcftools annotate"""
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.bcftools import get_bcftools_opts
+
+    bcftools_opts = get_bcftools_opts(snakemake)
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    if "info" in snakemake.input.keys():
+        extra += f" --header-lines {snakemake.input.info}"
+
+    shell(
+        "bcftools annotate {bcftools_opts} "
+        "{extra} "
+        "--annotations {snakemake.input.annotation} "
+        "{snakemake.input.calls} "
+        " --output {snakemake.output[0]}"
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

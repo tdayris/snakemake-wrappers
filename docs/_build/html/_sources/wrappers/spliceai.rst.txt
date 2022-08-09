@@ -1,0 +1,115 @@
+.. _`bio/spliceai`:
+
+SPLICE AI
+=========
+
+Annotate VCF with Splice AI
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_snpsift_annotate:
+        input:
+            call="in.vcf",
+            database="annotation.vcf"
+        output:
+            call="annotated/out.vcf"
+        log:
+            "annotate.log"
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/snpsift/annotate"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconda::spliceai==1.3.1``
+* ``conda-forge::tensorflow==2.6.0``
+* ``conda-forge::tensorflow-gpu==2.6.0``
+* ``conda-forge::cudatoolkit==11.5.0``
+
+Input/Output
+------------
+**Input:**
+
+* ``vcf``: Path to vcf that is to be annotated
+* ``fasta``: Path to reference genome sequence (fasta formatted)
+
+**Output:**
+
+* ``vcf``: Path to annotated VCF
+
+
+
+Params
+------
+
+* ``annotate``: Genome version (following Gencode scheme)
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    # -*- coding: utf-8 -*-
+
+    """Splice AI wrapper"""
+
+    from snakemake.shell import shell
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    if "gres" in snakemake.resources.keys():
+        shell("export LD_LIBRARY_PATH=/usr/local/cuda-11.1/targets/x86_64-linux/lib:${{LD_LIBRARY_PATH}}")
+        shell("export PATH=/usr/local/cuda/bin:${{PATH}}")
+    shell("export OMP_NUM_THREADS={snakemake.threads}")
+
+    if snakemake.params.piped is True:
+        shell(
+            "spliceai -R {snakemake.input.fasta} "
+            "-A {snakemake.params.annotation} "
+            "-O {snakemake.output.vcf} "
+            "< {snakemake.input.vcf} {log}"
+        )
+    else:
+        shell(
+            "spliceai -I {snakemake.input.vcf} "
+            "-R {snakemake.input.fasta} "
+            "-A {snakemake.params.annotation} "
+            "-O {snakemake.output.vcf} {log}"
+        )
+
+
+.. |nl| raw:: html
+
+   <br>

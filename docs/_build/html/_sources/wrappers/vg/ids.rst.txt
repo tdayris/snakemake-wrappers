@@ -1,0 +1,75 @@
+.. _`bio/vg/ids`:
+
+VG IDS
+======
+
+Manipulate id space of input graphs. NOTE Use `bio/vg/merge` for making a joint id space for graphs.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule ids:
+        input:
+            vgs="c.vg"
+        output:
+            mod="graph/c_mod.vg"
+        log:
+            "logs/vg/ids/c.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/vg/ids"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``vg==1.27.0``
+
+
+
+
+
+Authors
+-------
+
+* Ali Ghaffaari
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Ali Ghaffaari"
+    __copyright__ = "Copyright 2017, Ali Ghaffaari"
+    __email__ = "ghaffari@mpi-inf.mpg.de"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False)
+
+    shell(
+        "(vg ids {snakemake.params} {snakemake.input.vgs}"
+        " > {snakemake.output.mod}) {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

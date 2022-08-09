@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GMT ENRICHMENT &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="GO ENRICHMENT" href="enrichGO.html" />
+    <link rel="prev" title="DOSE ENRICHMENT" href="enrichDO.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Snakemake Wrappers
+          </a>
+              <div class="version">
+                heads/Unofficial
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers and Pipelines</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../wrappers.html">Wrappers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../BiGR.html">BIGR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Rsamtools.html">RSAMTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../SomaticSignatures.html">SOMATICSIGNATURES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../VariantAnnotation.html">VARIANTANNOTATION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../adapterremoval.html">ADAPTERREMOVAL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../arriba.html">ARRIBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../art.html">ART</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../assembly-stats.html">ASSEMBLY-STATS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../awk.html">AWK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bamtools.html">BAMTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bbtools.html">BBTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bcftools.html">BCFTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bcl2fastq.html">BCF2FASTQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bedtools.html">BEDTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../benchmark.html">BENCHMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../biobambam2.html">BIOBAMBAM2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bioinfokit.html">BIOINFOKIT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../biomaRt.html">BIOMART</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../biseq.html">BISEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bismark.html">BISMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../blast.html">BLAST</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bowtie2.html">BOWTIE2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../busco.html">BUSCO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bwa.html">BWA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bwa-mem2.html">BWA-MEM2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cairosvg.html">CAIROSVG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../check_md5.html">CHECK MD5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../chipseeker.html">CHIPSEEKER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../clustalo.html">CLUSTALO</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="DESeq2_to_geneList.html">DESEQ2 TO GENELIST</a></li>
+<li class="toctree-l3"><a class="reference internal" href="barplot.html">BARPLOT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bitr_GRCh38.html">TSV TO GENE LIST</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cnetplot.html">CNETPLOT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comparecluster.html">COMPARE CLUSTER</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dotplot.html">DOTPLOT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enrichDGN.html">DGN ENRICHMENT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enrichDO.html">DOSE ENRICHMENT</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">GMT ENRICHMENT</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="enrichGO.html">GO ENRICHMENT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enrichNCG.html">NCG ENRICHMENT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="groupGO.html">GROUP GO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gseDGN.html">GSEA DNG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gseDO.html">GSEA DOSE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gseGMT.html">GMT GENE SET ENRICHMENT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gseGO.html">GSEA GO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gseNCG.html">GSEA NCG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gseaplot.html">GSEA PLOT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="heatplot.html">HEATMAP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hg38_genelist.html">HG38_GENELIST</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hg38_tsv_to_genelist.html">TSV TO GENELIST (HG38)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="msigdb_gsea.html">GSEA MSIGDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pathview.html">PATHVIEW</a></li>
+<li class="toctree-l3"><a class="reference internal" href="treeplot.html">TREEPLOT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upsetplot.html">UPSET PLOT</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../compress.html">COMPRESS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../concatenate_fastq.html">CONCATENATE FASTQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../consensusclusterplus.html">CONSENSUSCLUSTERPLUS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpat.html">CPAT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dada2.html">DADA2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../delly.html">DELLY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../diamond.html">DIAMOND</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eacon.html">EACON</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../epic.html">EPIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../facets.html">FACETS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fastp.html">FASTP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fastqc.html">FASTQC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fgbio.html">FGBIO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fgsea.html">FGSEA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../filtlong.html">FILTLONG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../freebayes.html">FREEBAYES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gatk.html">GATK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gatk3.html">GATK3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdc-api.html">GDC-API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdc-client.html">GDC-CLIENT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gencode.html">GENCODE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../genomepy.html">GENOMEPY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gridss.html">GRIDSS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gsva.html">GSVA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gtf.html">GTF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hap.py.html">HAP.PY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hisat2.html">HISAT2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hmmer.html">HMMER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../homer.html">HOMER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../iRODS.html">IRODS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../igv-reports.html">IGV-REPORTS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../immunedeconv.html">IMMUNEDECONV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../infernal.html">INFERNAL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../isoformSwitchAnalyseR.html">ISOFORMSWITCHANALYSER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jannovar.html">JANNOVAR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../kallisto.html">KALLISTO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../last.html">LAST</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../liftoff.html">LIFTOFF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lofreq.html">LOFREQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../macs2.html">MACS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../maftools.html">MAFTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mapdamage2.html">MAPDAMAGE2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mashmap.html">MASHMAP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../microphaser.html">MICROPHASER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mosdepth.html">MOSDEPTH</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../msisensor_pro.html">MSISENSOR_PRO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nanosim-h.html">NANOSIM-H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nextflow.html">NEXTFLOW</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ngs-disambiguate.html">NGS-DISAMBIGUATE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../open-cravat.html">OPEN-CRAVAT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pandas.html">PANDAS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pandora.html">PANDORA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pbmm2.html">PBMM2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pcaExplorer.html">PCAEXPLORER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pear.html">PEAR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pfam.html">PFAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pheatmap.html">PHEATMAP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../picard.html">PICARD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pindel.html">PINDEL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../plass.html">PLASS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../preseq.html">PRESEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../primerclip.html">PRIMERCLIP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prosolo.html">PROSOLO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ptrimmer.html">PTRIMMER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pyfastaq.html">PYFASTAQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../qualimap.html">QUALIMAP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rasusa.html">RASUSA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../razers3.html">RAZERS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rbt.html">RBT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rebaler.html">REBALER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html">REFERENCE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../refgenie.html">REFGENIE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rest.html">REST</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rsem.html">RSEM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rubic.html">RUBIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../salmon.html">SALMON</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sambamba.html">SAMBAMBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../samtools.html">SAMTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sansa.html">SANSA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../seaborn.html">SEABORN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sed.html">SED</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../seqtk.html">SEQTK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../shovill.html">SHOVILL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sickle.html">SICKLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sigprofiler.html">SIGPROFILER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../simplifyenrichment.html">SIMPLIFYENRICHMENT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sleuth.html">SLEUTH</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../snp-mutator.html">SNP-MUTATOR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../snpsift.html">SNPSIFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sort.html">SORT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sourmash.html">SOURMASH</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../spades.html">SPADES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../spliceai.html">SPLICE AI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sra-tools.html">SRA-TOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../star.html">STAR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../strelka.html">STRELKA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../strling.html">STRLING</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../subread.html">SUBREAD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tabix.html">TABIX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tmb.html">TMB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transdecoder.html">TRANSDECODER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tximeta.html">TXIMETA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../umis.html">UMIS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../unicycler.html">UNICYCLER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vardict.html">VARDICT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../variant_distribution.html">VARIANT_DISTRIBUTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../variantoccurence.html">VARIANTOCCURENCE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../varscan.html">VARSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vembrane.html">VEMBRANE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vep.html">VEP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vg.html">VG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wgsim.html">WGSIM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wisecondorx.html">WISECONDORX</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta-wrappers.html">Meta-Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pipelines.html">BiGR Pipelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Snakemake Wrappers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../wrappers.html">Wrappers</a> &raquo;</li>
+          <li><a href="../clusterProfiler.html">CLUSTERPROFILER</a> &raquo;</li>
+      <li>GMT ENRICHMENT</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/wrappers/clusterProfiler/enrichGMT.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="gmt-enrichment">
+<span id="bio-clusterprofiler-enrichgmt"></span><h1>GMT ENRICHMENT<a class="headerlink" href="#gmt-enrichment" title="Permalink to this headline"></a></h1>
+<p>Perform over representation analysis on a given GMT file</p>
+<p><strong>URL</strong>:</p>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h2>
+<p>This wrapper can be used in the following way:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">enricher</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">rds</span> <span class="o">=</span> <span class="s2">&quot;gene_lists/</span><span class="si">{comparison}</span><span class="s2">.RDS&quot;</span>
+        <span class="n">gmt</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;gmt&quot;</span><span class="p">][</span><span class="n">wildcards</span><span class="o">.</span><span class="n">database</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">rds</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;enrich/</span><span class="si">{database}</span><span class="s2">/</span><span class="si">{comparison}</span><span class="s2">/enrich.</span><span class="si">{database}</span><span class="s2">.</span><span class="si">{comparison}</span><span class="s2">.RDS&quot;</span><span class="p">),</span>
+        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;results/enrich.</span><span class="si">{database}</span><span class="s2">.</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enrich_extra&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;enricher&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enricher&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/enricher/</span><span class="si">{database}</span><span class="s2">/</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/clusterProfiler/enrichGMT&quot;</span>
+</pre></div>
+</div>
+<p>Note that input, output and log file paths can be chosen freely.</p>
+<p>When running with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
+</pre></div>
+</div>
+<p>the software dependencies will be automatically deployed into an isolated environment before execution.</p>
+</section>
+<section id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">_libgcc_mutex=0.1=conda_forge</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_openmp_mutex=4.5=1_gnu</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_r-mutex=1.0.1=anacondar_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">binutils_impl_linux-64=2.36.1=h193b22a_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">binutils_linux-64=2.36=hf3e587d_9</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-annotationdbi=1.56.1=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-biobase=2.54.0=r41h5c21468_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-biocgenerics=0.40.0=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-biocparallel=1.28.3=r41h619a076_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-biostrings=2.62.0=r41h5c21468_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-clusterprofiler=4.2.0=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-do.db=2.9=r41hdfd78af_12</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-dose=3.20.0=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-enrichplot=1.14.1=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-fgsea=1.20.0=r41h619a076_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-genomeinfodb=1.30.0=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-genomeinfodbdata=1.2.7=r41hdfd78af_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-ggtree=3.2.0=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-go.db=3.14.0=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-gosemsim=2.20.0=r41h619a076_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-iranges=2.28.0=r41h5c21468_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-keggrest=1.34.0=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-org.hs.eg.db=3.14.0=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-org.mm.eg.db=3.14.0=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-qvalue=2.26.0=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-s4vectors=0.32.3=r41h5c21468_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-treeio=1.18.0=r41hdfd78af_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-xvector=0.34.0=r41h5c21468_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bioconductor-zlibbioc=1.40.0=r41h5c21468_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bwidget=1.9.14=ha770c72_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bzip2=1.0.8=h7f98852_4</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c-ares=1.18.1=h7f98852_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ca-certificates=2021.10.8=ha878542_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cairo=1.16.0=ha61ee94_1011</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">curl=7.82.0=h2283fc2_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">expat=2.4.8=h27087fc_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">font-ttf-dejavu-sans-mono=2.37=hab24e00_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">font-ttf-inconsolata=3.000=h77eed37_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">font-ttf-source-code-pro=2.038=h77eed37_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">font-ttf-ubuntu=0.83=hab24e00_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fontconfig=2.14.0=h8e229c2_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fonts-conda-ecosystem=1=0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fonts-conda-forge=1=0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">freetype=2.10.4=h0708190_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fribidi=1.0.10=h36c2ea0_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gcc_impl_linux-64=10.3.0=hf2f2afa_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gcc_linux-64=10.3.0=hc39de41_9</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gettext=0.19.8.1=h73d1719_1008</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gfortran_impl_linux-64=10.3.0=h73f4979_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gfortran_linux-64=10.3.0=hb09a455_9</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gmp=6.2.1=h58526e2_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">graphite2=1.3.13=h58526e2_1001</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gsl=2.7=he838d99_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gxx_impl_linux-64=10.3.0=hf2f2afa_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gxx_linux-64=10.3.0=h2593f52_9</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">harfbuzz=4.2.0=hf9f4e7c_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">icu=70.1=h27087fc_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">jbig=2.1=h7f98852_2003</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">jpeg=9e=h7f98852_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kernel-headers_linux-64=2.6.32=he073ed8_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">keyutils=1.6.1=h166bdaf_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">krb5=1.19.3=h08a2579_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ld_impl_linux-64=2.36.1=hea4e1c9_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lerc=3.0=h9c3ff4c_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libblas=3.9.0=14_linux64_openblas</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libcblas=3.9.0=14_linux64_openblas</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libcurl=7.82.0=h2283fc2_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libdeflate=1.10=h7f98852_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libedit=3.1.20191231=he28a2e2_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libev=4.33=h516909a_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libffi=3.4.2=h7f98852_5</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libgcc-devel_linux-64=10.3.0=he6cfe16_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libgcc-ng=11.2.0=h1d223b6_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libgfortran-ng=11.2.0=h69a702a_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libgfortran5=11.2.0=h5c6108e_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libglib=2.70.2=h174f98d_4</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libgomp=11.2.0=h1d223b6_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libiconv=1.16=h516909a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">liblapack=3.9.0=14_linux64_openblas</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libnghttp2=1.47.0=he49606f_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libopenblas=0.3.20=pthreads_h78a6416_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libpng=1.6.37=h21135ba_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libsanitizer=10.3.0=h26c7422_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libssh2=1.10.0=ha35d2d1_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libstdcxx-devel_linux-64=10.3.0=he6cfe16_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libstdcxx-ng=11.2.0=he4da1e4_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libtiff=4.3.0=h542a066_3</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libuuid=2.32.1=h7f98852_1000</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libwebp-base=1.2.2=h7f98852_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libxcb=1.13=h7f98852_1004</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libxml2=2.9.12=h22db469_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libzlib=1.2.11=h166bdaf_1014</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lz4-c=1.9.3=h9c3ff4c_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">make=4.3=hd18ef5c_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ncurses=6.3=h27087fc_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">openssl=3.0.2=h166bdaf_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pango=1.50.6=hbd2fdc8_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pcre=8.45=h9c3ff4c_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pcre2=10.37=h032f7d1_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pixman=0.40.0=h36c2ea0_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pthread-stubs=0.4=h36c2ea0_1001</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-ape=5.6_2=r41h43535f1_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-aplot=0.1.3=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-askpass=1.1=r41hcfec24a_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-backports=1.4.1=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-base=4.1.3=h06d3f91_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-bh=1.78.0_0=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-biocmanager=1.30.16=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-bit=4.0.4=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-bit64=4.0.5=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-bitops=1.0_7=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-blob=1.2.2=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-brio=1.1.3=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-cachem=1.0.6=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-cairo=1.5_15=r41h06615bd_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-callr=3.7.0=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-cli=3.2.0=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-colorspace=2.0_3=r41h06615bd_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-crayon=1.5.1=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-curl=4.3.2=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-data.table=1.14.2=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-dbi=1.1.2=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-desc=1.4.1=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-diffobj=0.3.5=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-digest=0.6.29=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-downloader=0.4=r41hc72bb7e_1003</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-dplyr=1.0.8=r41h7525677_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-ellipsis=0.3.2=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-evaluate=0.15=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-fansi=1.0.3=r41h06615bd_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-farver=2.1.0=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-fastmap=1.1.0=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-fastmatch=1.1_3=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-formatr=1.12=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-futile.logger=1.4.3=r41hc72bb7e_1003</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-futile.options=1.0.1=r41hc72bb7e_1002</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-generics=0.1.2=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-ggforce=0.3.3=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-ggfun=0.0.6=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-ggplot2=3.3.5=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-ggplotify=0.1.0=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-ggraph=2.0.5=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-ggrepel=0.9.1=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-ggupset=0.3.0=r41hc72bb7e_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-glue=1.6.2=r41h06615bd_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-graphlayouts=0.8.0=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-gridextra=2.3=r41hc72bb7e_1003</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-gridgraphics=0.5_1=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-gtable=0.3.0=r41hc72bb7e_3</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-httr=1.4.2=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-igraph=1.3.0=r41hf10d5bd_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-isoband=0.2.5=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-jsonlite=1.8.0=r41h06615bd_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-labeling=0.4.2=r41hc72bb7e_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-lambda.r=1.2.4=r41hc72bb7e_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-lattice=0.20_45=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-lazyeval=0.2.2=r41hcfec24a_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-lifecycle=1.0.1=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-magrittr=2.0.3=r41h06615bd_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-mass=7.3_56=r41h06615bd_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-matrix=1.4_1=r41h0154571_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-memoise=2.0.1=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-mgcv=1.8_40=r41h0154571_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-mime=0.12=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-munsell=0.5.0=r41hc72bb7e_1004</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-nlme=3.1_157=r41h8da6f51_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-openssl=2.0.0=r41h1f3e0c5_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-patchwork=1.1.1=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-pillar=1.7.0=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-pkgconfig=2.0.3=r41hc72bb7e_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-pkgload=1.2.4=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-plogr=0.2.0=r41hc72bb7e_1003</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-plyr=1.8.7=r41h7525677_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-png=0.1_7=r41hcfec24a_1004</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-polyclip=1.10_0=r41h03ef668_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-praise=1.0.0=r41hc72bb7e_1005</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-processx=3.5.3=r41h06615bd_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-ps=1.6.0=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-purrr=0.3.4=r41hcfec24a_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-r6=2.5.1=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-rcolorbrewer=1.1_3=r41h785f33e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-rcpp=1.0.8.3=r41h7525677_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-rcpparmadillo=0.11.0.0.0=r41h43535f1_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-rcppeigen=0.3.3.9.1=r41h306847c_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-rcurl=1.98_1.6=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-rematch2=2.1.2=r41hc72bb7e_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-reshape2=1.4.4=r41h03ef668_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-rlang=1.0.2=r41h7525677_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-rprojroot=2.0.3=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-rsqlite=2.2.8=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-rstudioapi=0.13=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-rvcheck=0.1.8=r41hc72bb7e_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-scales=1.1.1=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-scatterpie=0.1.6=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-shadowtext=0.1.1=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-snow=0.4_4=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-stringi=1.7.6=r41h30a9eb7_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-stringr=1.4.0=r41hc72bb7e_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-sys=3.4=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-testthat=3.1.3=r41h7525677_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-tibble=3.1.6=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-tidygraph=1.2.0=r41h7525677_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-tidyr=1.2.0=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-tidyselect=1.1.2=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-tidytree=0.3.9=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-tweenr=1.0.2=r41h03ef668_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-upsetr=1.4.0=r41hc72bb7e_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-utf8=1.2.2=r41hcfec24a_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-vctrs=0.4.0=r41h7525677_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-viridis=0.6.2=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-viridislite=0.4.0=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-waldo=0.4.0=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-withr=2.5.0=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r-yulab.utils=0.0.4=r41hc72bb7e_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">readline=8.1=h46c0cb4_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sed=4.8=he412f7d_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sysroot_linux-64=2.12=he073ed8_15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tk=8.6.12=h27826a3_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tktable=2.10=hb7b940f_3</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xorg-kbproto=1.0.7=h7f98852_1002</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xorg-libice=1.0.10=h7f98852_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xorg-libsm=1.2.3=hd9c2040_1000</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xorg-libx11=1.7.2=h7f98852_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xorg-libxau=1.0.9=h7f98852_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xorg-libxdmcp=1.1.3=h7f98852_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xorg-libxext=1.3.4=h7f98852_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xorg-libxrender=0.9.10=h7f98852_1003</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xorg-libxt=1.2.1=h7f98852_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xorg-renderproto=0.11.1=h7f98852_1002</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xorg-xextproto=7.3.0=h7f98852_1002</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xorg-xproto=7.0.31=h7f98852_1007</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xz=5.2.5=h516909a_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zlib=1.2.11=h166bdaf_1014</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zstd=1.5.2=ha95c52a_0</span></code></p></li>
+</ul>
+</section>
+<section id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline"></a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>A geneList object as RDS</p></li>
+<li><p>A GMT file</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>A RDS object containing the ORA</p></li>
+<li><p>A TSV file containing the ORA</p></li>
+</ul>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<p>The geneList object if described in the
+hg38_genelist wrapper</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><p>extra: Extra parameters for enricher, besides <cite>gene</cite> and <cite>TERM2GENE</cite></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Thibault Dayris</p></li>
+</ul>
+</section>
+<section id="code">
+<h2>Code<a class="headerlink" href="#code" title="Permalink to this headline"></a></h2>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="c1">#!/usr/bin/R</span>
+
+<span class="c1"># This script takes a geneList object and performs</span>
+<span class="c1"># an enrichment analysis based on GO database</span>
+
+<span class="c1"># __author__ = &quot;Thibault Dayris&quot;</span>
+<span class="c1"># __copyright__ = &quot;Copyright 2020, Thibault Dayris&quot;</span>
+<span class="c1"># __email__ = &quot;thibault.dayris@gustaveroussy.fr&quot;</span>
+<span class="c1"># __license__ = &quot;MIT&quot;</span>
+
+<span class="c1"># Sink the stderr and stdout to the snakemake log file</span>
+<span class="c1"># https://stackoverflow.com/a/48173272</span>
+<span class="n">log.file</span><span class="o">&lt;-</span><span class="nf">file</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">log</span><span class="p">[[</span><span class="m">1</span><span class="p">]],</span><span class="n">open</span><span class="o">=</span><span class="s">&quot;wt&quot;</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">log.file</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">log.file</span><span class="p">,</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;message&quot;</span><span class="p">);</span>
+
+<span class="c1"># Perform gene enrichment</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;DOSE&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;clusterProfiler&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">library</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&quot;org.Mm.eg.db&quot;</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">);</span>
+
+<span class="c1"># Loading input datasets</span>
+<span class="n">geneList</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">readRDS</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;rds&quot;</span><span class="p">]]);</span>
+
+<span class="c1"># Annotation</span>
+<span class="n">term2gene</span> <span class="o">&lt;-</span> <span class="kc">NULL</span><span class="p">;</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;gmt&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">gmt_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;gmt&quot;</span><span class="p">]]);</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="n">gmt_path</span><span class="p">);</span>
+  <span class="n">term2gene</span> <span class="o">&lt;-</span> <span class="n">clusterProfiler</span><span class="o">::</span><span class="nf">read.gmt</span><span class="p">(</span><span class="n">gmt_path</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;term_gene&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">tsv_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;term_gene&quot;</span><span class="p">]]);</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="n">tsv_path</span><span class="p">);</span>
+  <span class="n">term2gene</span> <span class="o">&lt;-</span> <span class="n">utils</span><span class="o">::</span><span class="nf">read.table</span><span class="p">(</span>
+    <span class="n">tsv_path</span><span class="p">,</span>
+    <span class="n">sep</span><span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">,</span>
+    <span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1"># Annotation names</span>
+<span class="n">term2name</span> <span class="o">&lt;-</span> <span class="kc">NULL</span><span class="p">;</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;term_name&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">tsv_path</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;term_name&quot;</span><span class="p">]]);</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="n">tsv_path</span><span class="p">);</span>
+  <span class="n">term2name</span> <span class="o">&lt;-</span> <span class="n">utils</span><span class="o">::</span><span class="nf">read.table</span><span class="p">(</span>
+    <span class="n">tsv_path</span><span class="p">,</span>
+    <span class="n">sep</span><span class="o">=</span><span class="s">&quot;\t&quot;</span><span class="p">,</span>
+    <span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1"># Gene annotations</span>
+<span class="n">org</span> <span class="o">&lt;-</span> <span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">;</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;org&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">paramorg</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;org&quot;</span><span class="p">]]);</span>
+  <span class="nf">if </span><span class="p">(</span><span class="n">paramorg</span> <span class="o">==</span> <span class="s">&quot;Mm&quot;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">org</span> <span class="o">&lt;-</span> <span class="s">&quot;org.Mm.eg.db&quot;</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Libraries and datasets loaded&quot;</span><span class="p">);</span>
+
+<span class="c1"># Building command line</span>
+<span class="n">genes</span> <span class="o">&lt;-</span> <span class="nf">names</span><span class="p">(</span><span class="n">geneList</span><span class="p">);</span>
+<span class="n">universe</span> <span class="o">&lt;-</span> <span class="kc">NULL</span><span class="p">;</span>
+<span class="n">extra</span> <span class="o">&lt;-</span> <span class="s">&quot;gene=genes, TERM2GENE=term2gene, TERM2NAME=term2name&quot;</span><span class="p">;</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;universe&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">universe</span> <span class="o">&lt;-</span> <span class="nf">readRDS</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;universe&quot;</span><span class="p">]]);</span>
+  <span class="n">universe</span> <span class="o">&lt;-</span> <span class="nf">lapply</span><span class="p">(</span><span class="n">universe</span><span class="p">,</span> <span class="n">as.character</span><span class="p">);</span>
+  <span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span>
+    <span class="n">extra</span><span class="p">,</span>
+    <span class="s">&quot;universe=universe&quot;</span><span class="p">,</span>
+    <span class="n">sep</span><span class="o">=</span><span class="s">&quot;, &quot;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;extra&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span>
+    <span class="n">extra</span><span class="p">,</span>
+    <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;extra&quot;</span><span class="p">]]),</span>
+    <span class="n">sep</span><span class="o">=</span><span class="s">&quot;, &quot;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">command</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span>
+  <span class="s">&quot;clusterProfiler::enricher(&quot;</span><span class="p">,</span>
+  <span class="n">extra</span><span class="p">,</span>
+  <span class="s">&quot;)&quot;</span>
+<span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+
+<span class="c1"># Performing DisGeNET enrichment</span>
+<span class="n">enriched_terms</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">eval</span><span class="p">(</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">parse</span><span class="p">(</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">command</span>
+  <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1"># Saving results</span>
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;rds&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">saveRDS</span><span class="p">(</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">enriched_terms</span><span class="p">,</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;rds&quot;</span><span class="p">]])</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;tsv&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">utils</span><span class="o">::</span><span class="nf">write.table</span><span class="p">(</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">enriched_terms</span><span class="p">,</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;tsv&quot;</span><span class="p">]])</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nf">if </span><span class="p">(</span><span class="s">&quot;org&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">readable_terms</span> <span class="o">&lt;-</span> <span class="n">DOSE</span><span class="o">::</span><span class="nf">setReadable</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">enriched_terms</span><span class="p">,</span>
+    <span class="n">OrgDb</span><span class="o">=</span><span class="n">org</span><span class="p">,</span>
+    <span class="n">keyType</span><span class="o">=</span><span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;keytype&quot;</span><span class="p">]])</span>
+  <span class="p">);</span>
+
+  <span class="nf">if </span><span class="p">(</span><span class="s">&quot;readable_rds&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">base</span><span class="o">::</span><span class="nf">saveRDS</span><span class="p">(</span>
+      <span class="n">obj</span> <span class="o">=</span> <span class="n">readable_terms</span><span class="p">,</span>
+      <span class="n">file</span> <span class="o">=</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;readable_rds&quot;</span><span class="p">]])</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="nf">if </span><span class="p">(</span><span class="s">&quot;readable_tsv&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">utils</span><span class="o">::</span><span class="nf">write.table</span><span class="p">(</span>
+      <span class="n">x</span> <span class="o">=</span> <span class="n">readable_terms</span><span class="p">,</span>
+      <span class="n">file</span> <span class="o">=</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">output</span><span class="p">[[</span><span class="s">&quot;readable_tsv&quot;</span><span class="p">]])</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># Proper syntax to close the connection for the log file</span>
+<span class="c1"># but could be optional for Snakemake wrapper</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;message&quot;</span><span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">();</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="enrichDO.html" class="btn btn-neutral float-left" title="DOSE ENRICHMENT" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="enrichGO.html" class="btn btn-neutral float-right" title="GO ENRICHMENT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016, The Snakemake team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

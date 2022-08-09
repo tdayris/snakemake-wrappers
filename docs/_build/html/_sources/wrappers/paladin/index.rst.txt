@@ -1,0 +1,110 @@
+.. _`bio/paladin/index`:
+
+PALADIN INDEX
+=============
+
+Index a protein fasta file for mapping with paladin. PALADIN is a protein sequence alignment tool designed for the accurate functional characterization of metagenomes.
+
+**URL**: http://genomebio.org/paladin/
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule paladin_index:
+        input:
+            "prot.fasta",
+        output:
+            "index/prot.fasta.bwt"
+        log:
+            "logs/paladin/prot_index.log"
+        params:
+          reference_type=3
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/paladin/index"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``paladin=1.4.4``
+* ``samtools=1.5``
+
+Input/Output
+------------
+**Input:**
+
+* protein fasta file (this must be the first input)
+* gff file (this may be the second and last input, do not use key-word ``gff``, the annotation entry vouls be duplicated)
+
+**Output:**
+
+* file indexed for paladin mapping
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+
+
+
+
+Authors
+-------
+
+* N. Tessa Pierce
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for Paladin Index."""
+
+    __author__ = "N. Tessa Pierce"
+    __copyright__ = "Copyright 2019, N. Tessa Pierce"
+    __email__ = "ntpierce@gmail.com"
+    __license__ = "MIT"
+
+
+    # this wrapper temporarily copies your assembly into the output dir
+    # so that all the paladin output files end up in the desired spot
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    input_assembly = snakemake.input
+    annotation = snakemake.input.get("gff", "")
+    paladin_index = str(snakemake.output)
+    reference_type = snakemake.params.get("reference_type", "3")
+    assert int(reference_type) in [1, 2, 3, 4]
+    ref_type_cmd = "-r" + str(reference_type)
+
+    output_base = paladin_index.rsplit(".bwt")[0]
+
+    shell("cp {input_assembly} {output_base}")
+    shell("paladin index {ref_type_cmd} {output_base} {annotation} {extra} {log}")
+    shell("rm -f {output_base}")
+
+
+.. |nl| raw:: html
+
+   <br>

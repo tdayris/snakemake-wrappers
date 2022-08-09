@@ -1,0 +1,101 @@
+.. _`bio/samtools/mpileup`:
+
+SAMTOOLS MPILEUP
+================
+
+Generate pileup using samtools. For more information see `SAMtools documentation <http://www.htslib.org/doc/samtools-mpileup.html>`_.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule mpilup:
+        input:
+            # single or list of bam files
+            bam="mapped/{sample}.bam",
+            reference_genome="genome.fasta"
+        output:
+            "mpileup/{sample}.mpileup.gz"
+        log:
+            "logs/samtools/mpileup/{sample}.log"
+        params:
+            extra="-d 10000",  # optional
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/samtools/mpileup"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``samtools==1.10``
+* ``pigz==2.3.4``
+
+
+
+
+
+Authors
+-------
+
+* Patrik Smeds
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for running mpileup."""
+
+    __author__ = "Julian de Ruiter"
+    __copyright__ = "Copyright 2017, Julian de Ruiter"
+    __email__ = "julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    bam_input = snakemake.input.bam
+    reference_genome = snakemake.input.reference_genome
+
+    extra = snakemake.params.get("extra", "")
+
+    if "bed" in snakemake.input.keys():
+        extra += " --positions {} ".format(snakemake.input["bed"])
+
+    if not snakemake.output[0].endswith(".gz"):
+        raise Exception(
+            'output file will be compressed and therefore filename should end with ".gz"'
+        )
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell(
+        "samtools mpileup "
+        "{extra} "
+        "--fasta-ref {reference_genome} "
+        "{bam_input}  "
+        " | pigz > {snakemake.output} "
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

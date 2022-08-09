@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VARIANT_CALLING_SOMATIC &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)" href="variant_callling_germline.html" />
+    <link rel="prev" title="VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)" href="variant_calling_germline_wes.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Snakemake Wrappers
+          </a>
+              <div class="version">
+                heads/Unofficial
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers and Pipelines</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../pipelines.html">BiGR Pipelines</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="CTC_Variant_Calling_Integragen_Legacy.html">CTC_VARIANT_CALLING_INTEGRAGEN_LEGACY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="WES_germline.html">WES_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="annot_sv.html">ANNO_SV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCL2FASTQ (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="celltype_deconvolution_rnaseq.html">CELLTYPE_DECONVOLUTION_RNASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chipseq.html">CHIPSEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dge_deseq2.html">DGE_DESEQ2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_set_enrichment.html">GENE_SET_ENRICHMENT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low_pass_wgs_copy_number.html">LOW_PASS_WGS_COPY_NUMBER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nfcore_chipseq.html">NFCORE-CHIPSEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="retrotransposons.html">RETROTRANSPOSONS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rnaseq.html">RNASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sarek_enhanced.html">SAREK ENHANCED</a></li>
+<li class="toctree-l2"><a class="reference internal" href="seqoia.html">SEQOIA SINGLE-SAMPLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sigprofiler_signatures.html">SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline.html">VARIANT_CALLING_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline_wes.html">VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">VARIANT_CALLING_SOMATIC</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#used-meta-wrappers">Used meta-wrappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#used-wrappers">Used wrappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snakefile">Snakefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="variant_callling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_occurence_cohort.html">VARIANT_OCCURENCE_COHORT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wes_somatic.html">VARIANT_CALLING_SOMATIC</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Snakemake Wrappers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../pipelines.html">BiGR Pipelines</a> &raquo;</li>
+      <li>VARIANT_CALLING_SOMATIC</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/bigr-pipelines/variant_calling_somatic.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="variant-calling-somatic">
+<span id="id1"></span><h1>VARIANT_CALLING_SOMATIC<a class="headerlink" href="#variant-calling-somatic" title="Permalink to this headline"></a></h1>
+<p>Perform Variant calling on Somatic</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
+<p>In order to run the pipeline, use the following commands</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Go to your working directory</span>
+
+<span class="nb">cd</span> /path/to/my/working/directory
+
+<span class="c1"># Build a design file (see below)</span>
+
+<span class="c1"># Copy/paste the following line for **HG19**</span>
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_somatic/run.sh hg19
+
+<span class="c1"># Copy/paste the following line for **HG38**</span>
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_somatic/run.sh hg38
+
+<span class="c1"># Copy/paste the following line for **MM10**</span>
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_somatic/run.sh mm10
+</pre></div>
+</div>
+</section>
+<section id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline"></a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>Pairs of Tumor Fastq-formatted sequence files</p></li>
+<li><p>Pairs of corresponding Non-Tumor Fastq-formatted sequence files</p></li>
+<li><p>Cosmic database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)</p></li>
+<li><p>dbSNP database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)</p></li>
+<li><p>MSigDB database formatted as GMT (already provided for IGR Flamingo users)</p></li>
+<li><p>GWASCatalog database formatted as TSV (already provided for IGR Flamingo users)</p></li>
+<li><p>Kaviar database formatted as gzipped vcf and its tbi index (already provided for IGR Flamingo users)</p></li>
+<li><p>SnpEff database downloaded with SnpEff itself (already provided for IGR Flamingo users)</p></li>
+<li><p>CaptureKit genomic intervals formatted as BED (already provided for IGR Flamingo users)</p></li>
+<li><p>Known variants from dbSNP, with only AF within the INFO field for GATK (already provided for IGR Flamingo users)</p></li>
+<li><p>dbNSFP database formatted as TSV (already provided for IGR Flamingo users)</p></li>
+<li><p>FastQ Screen databases (already provided for IGR Flamingo users)</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>Annotated VCF files</p></li>
+<li><p>MultiQC report</p></li>
+</ul>
+</section>
+<section id="used-meta-wrappers">
+<h2>Used meta-wrappers<a class="headerlink" href="#used-meta-wrappers" title="Permalink to this headline"></a></h2>
+<p>The following individual meta-wrappers are used in this pipeline:</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">meta/bio/bwa_fixmate</span></p></li>
+<li><p><span class="xref std std-ref">meta/bio/gatk_bqsr</span></p></li>
+<li><p><span class="xref std std-ref">meta/bio/varscan2_calling</span></p></li>
+<li><p><span class="xref std std-ref">bigr_pipelines/snpeff_snpsift</span></p></li>
+</ul>
+<p>Please refer to each meta-wrapper in above list for additional configuration parameters and information about the executed code.</p>
+</section>
+<section id="used-wrappers">
+<h2>Used wrappers<a class="headerlink" href="#used-wrappers" title="Permalink to this headline"></a></h2>
+<p>The following individual wrappers are used in this pipeline:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../wrappers/BiGR/copy.html#bio-bigr-copy"><span class="std std-ref">IGR_COPY</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/fastp.html#bio-fastp"><span class="std std-ref">FASTP</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/compress/pbgzip.html#bio-compress-pbgzip"><span class="std std-ref">COMPRESS_PBGZIP</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/tabix.html#bio-tabix"><span class="std std-ref">TABIX</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/multiqc.html#bio-multiqc"><span class="std std-ref">MULTIQC</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/picard/collectalignmentsummarymetrics.html#bio-picard-collectalignmentsummarymetrics"><span class="std std-ref">PICARD COLLECTALIGNMENTSUMMARYMETRICS</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/fastq_screen.html#bio-fastq-screen"><span class="std std-ref">FASTQ_SCREEN</span></a></p></li>
+</ul>
+<p>Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.</p>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<p>Prerequisites for piREST:</p>
+<ul class="simple">
+<li><p>A TSV formatted design file, <em>named ‘design.tsv’</em> with the following columns:</p></li>
+</ul>
+</section>
+<section id="snakefile">
+<h2>Snakefile<a class="headerlink" href="#snakefile" title="Permalink to this headline"></a></h2>
+<p>The pipeline contains the following steps:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">worflow_source_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">get_sources</span><span class="p">())))</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">common</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;../common/python&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">common</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">file_manager</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">files_linker</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">write_yaml</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">messages</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">min_version</span>
+<span class="n">min_version</span><span class="p">(</span><span class="s2">&quot;6.0&quot;</span><span class="p">)</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;snakemake.variant_calling_somatic.log&quot;</span><span class="p">,</span>
+    <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+<span class="p">)</span>
+
+<span class="n">container</span><span class="p">:</span> <span class="s2">&quot;docker://continuumio/miniconda3:4.4.10&quot;</span>
+<span class="n">localrules</span><span class="p">:</span> <span class="n">bigr_copy</span>
+
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">sambamba_index_bam</span> <span class="o">&gt;</span> <span class="n">sambamba_index</span>
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">gatk_filter_mutect_calls</span> <span class="o">&gt;</span> <span class="n">tabix_index</span>
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">mutect2_somatic</span> <span class="o">&gt;</span> <span class="n">tabix_index</span>
+
+<span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;config.hg38.yaml&quot;</span><span class="p">)</span>
+<span class="n">configfile</span><span class="p">:</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
+<span class="n">design</span> <span class="o">=</span> <span class="n">get_design</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">search_fastq_somatic</span><span class="p">)</span>
+<span class="c1">#design = design.head(2).tail(1)</span>
+<span class="n">design</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1">#print(design)</span>
+
+<span class="n">design</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+<span class="c1">#design.drop(index=&quot;s070&quot;, inplace=True)</span>
+
+<span class="n">wildcard_constraints</span><span class="p">:</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]),</span>
+    <span class="n">stream</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;1|2|R1|R2&quot;</span><span class="p">,</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;normal|tumor&quot;</span><span class="p">,</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;snp|indel&quot;</span>
+
+
+<span class="n">fastq_links</span> <span class="o">=</span> <span class="n">link_fq_somatic</span><span class="p">(</span>
+    <span class="n">sample_names</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">,</span>
+    <span class="n">n1_paths</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">Upstream_file_normal</span><span class="p">,</span>
+    <span class="n">t1_paths</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">Upstream_file_tumor</span><span class="p">,</span>
+    <span class="n">n2_paths</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">Downstream_file_normal</span><span class="p">,</span>
+    <span class="n">t2_paths</span><span class="o">=</span><span class="n">design</span><span class="o">.</span><span class="n">Downstream_file_tumor</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">fix_annotation_for_gatk</span> <span class="o">&gt;</span> <span class="n">pbgzip_compress</span>
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">gatk_variant_filtration</span> <span class="o">&gt;</span> <span class="n">pbgzip_compress</span>
+
+<span class="n">rule</span> <span class="nb">all</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="c1">#maf=&quot;maf/complete.maf&quot;,</span>
+        <span class="c1">#mafs=expand(</span>
+        <span class="c1">#    &quot;maf/maftools/{sample}.maf&quot;,</span>
+        <span class="c1">#    sample=design[&quot;Sample_id&quot;].tolist()</span>
+        <span class="c1">#),</span>
+        <span class="c1">#calls=expand(</span>
+        <span class="c1">#   &quot;maf/occurence_annotated/{sample}.vcf.gz{index}&quot;,</span>
+        <span class="c1">#   sample=design[&quot;Sample_id&quot;].tolist(),</span>
+        <span class="c1">#   index=[&quot;&quot;, &quot;.tbi&quot;]</span>
+        <span class="c1"># ),</span>
+        <span class="c1">#mutect2=expand(</span>
+        <span class="c1">#    &quot;bcftools/mutect2/{sample}.vcf.gz&quot;,</span>
+        <span class="c1">#    sample=design[&quot;Sample_id&quot;].tolist()</span>
+        <span class="c1">#),</span>
+        <span class="c1">#mutect2_tbi=expand(</span>
+        <span class="c1">#    &quot;bcftools/mutect2/{sample}.vcf.gz.tbi&quot;,</span>
+        <span class="c1">#    sample=design[&quot;Sample_id&quot;].tolist()</span>
+        <span class="c1">#),</span>
+        <span class="c1">#annotated_vcf=expand(</span>
+        <span class="c1">#    &quot;snpeff_snpsift/results_to_upload&quot;,</span>
+        <span class="c1">#),</span>
+        <span class="n">facets</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;facets/</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;vcf.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;cnv.png&quot;</span><span class="p">,</span> <span class="s2">&quot;cov.pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;spider.pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;csv.gz&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">calls_index</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf.gz.tbi&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">table</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/snpsift/extractFields/</span><span class="si">{sample}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">=</span><span class="s2">&quot;snpeff_snpsift/multiqc/SnpEff_annotation.html&quot;</span><span class="p">,</span>
+        <span class="n">html_data</span><span class="o">=</span><span class="s2">&quot;snpeff_snpsift/multiqc/SnpEff_annotation_data&quot;</span><span class="p">,</span>
+        <span class="n">snpeff</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/snpeff/csvstats/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;genes.txt&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="c1">#varscan2=expand(</span>
+        <span class="c1">#    &quot;bcftools/varscan2/{sample}.vcf.gz&quot;,</span>
+        <span class="c1">#    sample=design[&quot;Sample_id&quot;].tolist()</span>
+        <span class="c1">#),</span>
+        <span class="c1">#varscan2_tbi=expand(</span>
+        <span class="c1">#    &quot;bcftools/varscan2/{sample}.vcf.gz.tbi&quot;,</span>
+        <span class="c1">#    sample=design[&quot;Sample_id&quot;].tolist()</span>
+        <span class="c1">#),</span>
+        <span class="n">msisensor</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;msisensor/</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.msi&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="p">),</span>
+        <span class="n">qc</span><span class="o">=</span><span class="s2">&quot;multiqc/variant_calling_somatic.html&quot;</span><span class="p">,</span>
+        <span class="c1">#calling_result=&quot;final.vcf.list&quot;</span>
+        <span class="n">results</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;pandas/filter/</span><span class="si">{how}</span><span class="s2">/dp</span><span class="si">{dp}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.dp</span><span class="si">{dp}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+            <span class="n">how</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;census_only&quot;</span><span class="p">,</span> <span class="s2">&quot;oncokb_only&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ANMO&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">],</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">dp</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;10&quot;</span><span class="p">,</span> <span class="s2">&quot;40&quot;</span><span class="p">,</span> <span class="s2">&quot;60&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">results_xl</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;pandas/filter/</span><span class="si">{how}</span><span class="s2">/dp</span><span class="si">{dp}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.dp</span><span class="si">{dp}</span><span class="s2">.xlsx&quot;</span><span class="p">,</span>
+            <span class="n">how</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;census_only&quot;</span><span class="p">,</span> <span class="s2">&quot;oncokb_only&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ANMO&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">],</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">dp</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;10&quot;</span><span class="p">,</span> <span class="s2">&quot;40&quot;</span><span class="p">,</span> <span class="s2">&quot;60&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;results_to_upload&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Finishing the WES Somatic Variant Calling&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">768</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/resultdir.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">mk</span><span class="o">=</span><span class="s2">&quot;--parents --verbose&quot;</span><span class="p">,</span>
+        <span class="n">rs</span><span class="o">=</span><span class="s2">&quot;--checksum --verbose --human-readable&quot;</span><span class="p">,</span>
+        <span class="n">dirlist</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;results_to_upload/</span><span class="si">{</span><span class="n">content</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;msi&quot;</span><span class="p">,</span> <span class="s2">&quot;tmb&quot;</span><span class="p">,</span> <span class="s2">&quot;vcf&quot;</span><span class="p">,</span> <span class="s2">&quot;tsv&quot;</span><span class="p">,</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">,</span> <span class="s2">&quot;cnv&quot;</span><span class="p">,</span> <span class="s2">&quot;qc&quot;</span><span class="p">]])</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mk}</span><span class="s2"> </span><span class="si">{params.dirlist}</span><span class="s2"> &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;rsync </span><span class="si">{params.rs}</span><span class="s2"> </span><span class="si">{input.msisensor}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2">/msi/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;rsync </span><span class="si">{params.rs}</span><span class="s2"> </span><span class="si">{input.results}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2">/tsv/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;rsync </span><span class="si">{params.rs}</span><span class="s2"> </span><span class="si">{input.results}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2">/xlsx/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;rsync </span><span class="si">{params.rs}</span><span class="s2"> </span><span class="si">{input.facets}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2">/cnv/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;rsync </span><span class="si">{params.rs}</span><span class="s2"> </span><span class="si">{input.calls}</span><span class="s2"> </span><span class="si">{input.calls_index}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2">/vcf/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;rsync </span><span class="si">{params.rs}</span><span class="s2"> </span><span class="si">{input.html}</span><span class="s2"> </span><span class="si">{input.qc}</span><span class="s2"> </span><span class="si">{output}</span><span class="s2">/qc/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &quot;</span>
+
+
+<span class="c1">#########################</span>
+<span class="c1">### ANMO-like filters ###</span>
+<span class="c1">#########################</span>
+
+
+<span class="n">rule</span> <span class="n">pandas_filter_tsv</span><span class="p">:</span>
+   <span class="nb">input</span><span class="p">:</span>
+      <span class="n">table</span><span class="o">=</span><span class="s2">&quot;snpeff_snpsift/snpsift/extractFields/</span><span class="si">{sample}</span><span class="s2">.tsv&quot;</span>
+   <span class="n">output</span><span class="p">:</span>
+      <span class="n">table</span><span class="o">=</span><span class="s2">&quot;pandas/filter/</span><span class="si">{how}</span><span class="s2">/dp</span><span class="si">{dp}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.dp</span><span class="si">{dp}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+      <span class="n">xlsx</span><span class="o">=</span><span class="s2">&quot;pandas/filter/</span><span class="si">{how}</span><span class="s2">/dp</span><span class="si">{dp}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.dp</span><span class="si">{dp}</span><span class="s2">.xlsx&quot;</span>
+   <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+   <span class="n">resources</span><span class="p">:</span>
+      <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+      <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+      <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+   <span class="n">log</span><span class="p">:</span>
+      <span class="s2">&quot;logs/pandas_filter/</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{how}</span><span class="s2">.</span><span class="si">{dp}</span><span class="s2">.log&quot;</span>
+   <span class="n">params</span><span class="p">:</span>
+      <span class="n">new_cols</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">[</span>
+         <span class="p">[</span><span class="s2">&quot;Mutect2_Allele_Frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_AF&quot;</span><span class="p">]</span>
+      <span class="p">],</span>
+      <span class="n">prefixes</span> <span class="o">=</span> <span class="p">[</span>
+         <span class="p">[</span><span class="s2">&quot;Chromosome&quot;</span><span class="p">,</span> <span class="s2">&quot;chr&quot;</span><span class="p">]</span>
+      <span class="p">],</span>
+      <span class="n">keep_column</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;Chromosome&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Start_Position&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Variant_ID&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;SYMBOL&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Reference_Allele&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Tumor_Seq_Allele1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Mutect2_Read_depth&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Tumor_Seq_Allele2&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;HGVSc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;HGVSp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;VarOcc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BIOTYPE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;IMPACT&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Variant_Classification&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Mutect2_Read_depth&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Mutect2_Allele_Frequency&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Variant_Type&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Tumor_Sample_Barcode&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dbSNP_Pubmed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dbSNP_Clinical_Diagnostic_Assay&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dbNSFP_ExAC_AlleleFrequency&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Kaviar_Allele_Frequency&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;MSigDb_Pathways&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dbNSFP_Polyphen2_HDIV_pred&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dbNSFP_SIFT_pred&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dbNSFP_FATHMM_pred&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dbNSFP_ClinPred_score&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dbNSFP_MutationTaster_pred&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;dbNSFP_MutationAssessor_pred&#39;</span><span class="p">,</span>
+            <span class="s2">&quot;dbNSFP_MetaLR_pred&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dbNSFP_LIST_S2_pred&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dbNSFP_LRT_pred&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dbNSFP_BayesDel_noAF_pred&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dbNSFP_Aloft_pred&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Transcript_ID&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Gene&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Filter&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Center&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Hugo_Symbol&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;End_Position&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CancerGeneCensus_Gene_Symbol&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CancerGeneCensus_Name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CancerGeneCensus_Entrez_GeneId&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CancerGeneCensus_Tier&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CancerGeneCensus_Somatic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CancerGeneCensus_Germline&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CancerGeneCensus_Tumour_TypesSomatic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OncoKB_Hugo_Symbol&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OncoKB_Entrez_Gene_ID&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OncoKB_GRCh37_Isoform&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OncoKB_GRCh37_RefSeq&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OncoKB_GRCh38_RefSeq&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OncoKB_OncoKB_Annotated&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OncoKB_Is_Oncogene&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OncoKB_Is_Tumor_Suppressor_Gene&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OncoKB_MSK_IMPACT&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OncoKB_MSK_HEME&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_normal_Reference_Allele&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_normal_Seq_Allele1&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_normal_Seq_Allele2&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_normal_DP&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_normal_AD_allele2&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_normal_AF&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_Reference_Allele&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_Seq_Allele1&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_Seq_Allele2&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_DP&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_AD_allele1&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_AD_allele2&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_AF&quot;</span><span class="p">,</span>
+      <span class="p">],</span>
+      <span class="n">convert_cols_type</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;Mutect2_Allele_Frequency&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Mutect2_Read_depth&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_AF&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_normal_AF&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+            <span class="c1">#f&quot;{wildcards.sample}_normal_AD_allele2&quot;: &quot;float&quot;,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_DP&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span>
+            <span class="c1">#f&quot;{wildcards.sample}_tumor_AD_allele2&quot;: &quot;float&quot;,</span>
+      <span class="p">},</span>
+      <span class="n">filters</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">[</span>
+            <span class="c1"># [&quot;Variant_Classification&quot;, &quot;!=&quot;, &quot;downstream_gene_variant&quot;],</span>
+            <span class="c1"># [&quot;Variant_Classification&quot;, &quot;!=&quot;, &quot;intergenic_region&quot;],</span>
+            <span class="c1"># [&quot;Variant_Classification&quot;, &quot;!=&quot;, &quot;synonymous_variant&quot;],</span>
+            <span class="c1"># [&quot;Variant_Classification&quot;, &quot;!=&quot;, &quot;non_coding_transcript_exon_variant&quot;],</span>
+            <span class="c1"># [&quot;Variant_Classification&quot;, &quot;!=&quot;, &quot;upstream_gene_variant&quot;],</span>
+            <span class="c1"># [&quot;Variant_Classification&quot;, &quot;!=&quot;, &quot;splice_region_variant&amp;synonymous_variant&quot;],</span>
+            <span class="c1"># [&quot;Variant_Classification&quot;, &quot;!=&quot;, &quot;non_coding_transcript_variant&quot;],</span>
+            <span class="c1"># [&quot;Variant_Classification&quot;, &quot;!=&quot;, &quot;intron_variant&quot;],</span>
+            <span class="p">[</span><span class="s2">&quot;Variant_Classification&quot;</span><span class="p">,</span> <span class="s2">&quot;!=&quot;</span><span class="p">,</span> <span class="s2">&quot;Synonymous_Variant&quot;</span><span class="p">],</span>
+            <span class="c1">#[&quot;Mutect2_Read_depth&quot;, &quot;&gt;=&quot;, int(wildcards.filter)],</span>
+            <span class="c1">#[&#39;Mutect2_Allele_Frequency&#39;, &quot;&gt;=&quot;, 0.1],</span>
+            <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_AF&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+            <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_normal_AF&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;=&quot;</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+            <span class="c1">#[f&quot;{wildcards.sample}_normal_AD_allele2&quot;, &quot;&lt;=&quot;, float(wildcards.dp)],</span>
+            <span class="c1">#[f&quot;{wildcards.sample}_tumor_AD_allele2&quot;, &quot;&gt;=&quot;, float(wildcards.dp)],</span>
+            <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wildcards</span><span class="o">.</span><span class="n">sample</span><span class="si">}</span><span class="s2">_tumor_DP&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">wildcards</span><span class="o">.</span><span class="n">dp</span><span class="p">)],</span>
+            <span class="c1">#[&quot;dbNSFP_ExAC_AlleleFrequency&quot;, &quot;&lt;=&quot;, 0.05],</span>
+            <span class="p">[</span><span class="s2">&quot;VarOcc&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;=&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+      <span class="p">]</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ANMO&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="p">[],</span>
+      <span class="n">not_contains</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">[</span><span class="s2">&quot;Filter&quot;</span><span class="p">,</span> <span class="s2">&quot;germline&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;Filter&quot;</span><span class="p">,</span> <span class="s2">&quot;multiallelic&quot;</span><span class="p">],</span>
+            <span class="c1">#&quot;Filter&quot;: &quot;fragment&quot;,</span>
+            <span class="c1">#&quot;Filter&quot;: &quot;contamination&quot;,</span>
+            <span class="c1">#&quot;Filter&quot;: &quot;weak_evidence&quot;,</span>
+            <span class="c1">#&quot;Filter&quot;: &quot;slippage&quot;,</span>
+            <span class="c1">#&quot;Filter&quot;: &quot;strand_bias&quot;,</span>
+            <span class="c1">#&quot;Filter&quot;: &quot;map_qual&quot;,</span>
+            <span class="p">[</span><span class="s2">&quot;Filter&quot;</span><span class="p">,</span> <span class="s2">&quot;haplotype&quot;</span><span class="p">],</span>
+            <span class="c1">#&quot;Filter&quot;: &quot;base_qual&quot;,</span>
+            <span class="c1">#[&quot;Filter&quot;, &quot;DPBelow5&quot;],</span>
+            <span class="p">[</span><span class="s2">&quot;Filter&quot;</span><span class="p">,</span> <span class="s2">&quot;AboveFisherStrandBias&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;Filter&quot;</span><span class="p">,</span> <span class="s2">&quot;AboveStrandOddsRatio&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;Filter&quot;</span><span class="p">,</span> <span class="s2">&quot;BelowMQRankSum&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;Filter&quot;</span><span class="p">,</span> <span class="s2">&quot;BelowReadPosRankSum&quot;</span><span class="p">],</span>
+            <span class="c1">#[&quot;Filter&quot;, &quot;VarOccAbove105&quot;],</span>
+            <span class="c1">#[&quot;Filter&quot;, f&quot;DepthBelow{wildcards.filter}X&quot;],</span>
+            <span class="c1">#[&quot;Filter&quot;, &quot;AFBelow40pct&quot;]</span>
+      <span class="p">],</span>
+      <span class="n">contains</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">[</span><span class="s2">&quot;Filter&quot;</span><span class="p">,</span> <span class="p">(</span>
+               <span class="s2">&quot;ExistsInCancerGeneCensus&quot;</span> <span class="k">if</span> <span class="n">wildcards</span><span class="o">.</span><span class="n">how</span> <span class="o">==</span> <span class="s2">&quot;census_only&quot;</span> <span class="k">else</span> <span class="p">(</span>
+                  <span class="s2">&quot;ExistsInOncoKB&quot;</span> <span class="k">if</span> <span class="n">wildcards</span><span class="o">.</span><span class="n">how</span> <span class="o">==</span> <span class="s2">&quot;oncokb_only&quot;</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))]</span>
+      <span class="p">],</span>
+      <span class="n">drop_duplicated_lines</span><span class="o">=</span><span class="kc">True</span>
+   <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/pandas/filter_table&quot;</span>
+
+
+<span class="c1">##################</span>
+<span class="c1">### VCF to MAF ###</span>
+<span class="c1">##################</span>
+
+<span class="n">vcf_post_process_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;ncbi_build&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ncbi_build&quot;</span><span class="p">,</span> <span class="s2">&quot;GRCh38&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;center&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;GustaveRoussy&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;annotation_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;ANN=&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sample_list&quot;</span><span class="p">:</span> <span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
+    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;known&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;chr&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">module</span> <span class="n">vcf_post_process</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/vcf_post_process/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">vcf_post_process_config</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">vcf_post_process</span>
+
+
+<span class="c1">#################</span>
+<span class="c1">### Gather QC ###</span>
+<span class="c1">#################</span>
+
+<span class="n">rule</span> <span class="n">multiqc</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">html</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">status</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;normal&quot;</span><span class="p">,</span> <span class="s2">&quot;tumor&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">json</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.fastp.json&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">status</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;normal&quot;</span><span class="p">,</span> <span class="s2">&quot;tumor&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">sambamba_metrics</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">status</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;normal&quot;</span><span class="p">,</span> <span class="s2">&quot;tumor&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">fastq_screen</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">],</span>
+            <span class="n">status</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;normal&quot;</span><span class="p">,</span> <span class="s2">&quot;tumor&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">picard_summary</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;picard/alignment_summary/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.summary.txt&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">status</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;normal&quot;</span><span class="p">,</span> <span class="s2">&quot;tumor&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">snpeff</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/csvstats/</span><span class="si">{sample}</span><span class="s2">.genes.txt&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">report</span><span class="p">(</span>
+            <span class="s2">&quot;multiqc/variant_calling_somatic.html&quot;</span><span class="p">,</span>
+            <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;../common/reports/multiqc.rst&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;Quality Controls&quot;</span>
+        <span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Aggregating quality reports from SnpEff&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1536</span><span class="p">,</span> <span class="mi">10240</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/multiqc.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/multiqc&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">alignment_summary</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;sambamba/sort/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;sambamba/sort/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">),</span>
+        <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">],</span>
+        <span class="n">ref_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+        <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;picard/alignment_summary/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.summary.txt&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Collecting alignment metrics on GATK recalibrated </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; (considering </span><span class="si">{wildcards.status}</span><span class="s2">)&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1020</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/picard/alignment_summary/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s2">&quot;VALIDATION_STRINGENCY=LENIENT &quot;</span>
+        <span class="s2">&quot;METRIC_ACCUMULATION_LEVEL=null &quot;</span>
+        <span class="s2">&quot;METRIC_ACCUMULATION_LEVEL=SAMPLE&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/picard/collectalignmentsummarymetrics&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">fastq_screen</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;reads/</span><span class="si">{status}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fq.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">txt</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.fastq_screen.txt&quot;</span><span class="p">),</span>
+        <span class="n">png</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.fastq_screen.png&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Assessing quality of </span><span class="si">{wildcards.sample}</span><span class="s2">, </span><span class="si">{wildcards.stream}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot; (considering </span><span class="si">{wildcards.status}</span><span class="s2">)&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">20480</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">75</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">fastq_screen_config</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fastq_screen&quot;</span><span class="p">],</span>
+        <span class="n">subset</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
+        <span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;bowtie2&#39;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/fastqc/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/fastq_screen&quot;</span>
+
+
+<span class="c1">######################</span>
+<span class="c1">### MSI sensor pro ###</span>
+<span class="c1">######################</span>
+
+<span class="n">msi_sensor_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;fasta&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;bed&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;capture_kit_bed&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;msi_scan_extra&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;msisensor_pro&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scan&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;msi_pro_extra&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;msisensor_pro&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;msi&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">module</span> <span class="n">missensor_pro_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/msi_sensor_pro/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">msi_sensor_config</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">missensor_pro_meta</span>
+
+<span class="c1">##################</span>
+<span class="c1">### CNV Facets ###</span>
+<span class="c1">##################</span>
+
+
+<span class="n">rule</span> <span class="n">add_chr_to_pileup</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.mpileup.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;samtools/mpileup/</span><span class="si">{sample}</span><span class="s2">.chr.mpileup.gz&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Adding &#39;chr&#39; to sequences on </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">3</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">512</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">75</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/cnv_facets/add_chr/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">gzip</span> <span class="o">=</span> <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+        <span class="n">awk</span> <span class="o">=</span> <span class="s1">&#39;BEGIN {FS=&quot;</span><span class="se">\\</span><span class="s1">t&quot;; print &quot;Chromosome</span><span class="se">\\</span><span class="s1">tPosition</span><span class="se">\\</span><span class="s1">tRef</span><span class="se">\\</span><span class="s1">tAlt</span><span class="se">\\</span><span class="s1">tFile1R</span><span class="se">\\</span><span class="s1">tFile1A</span><span class="se">\\</span><span class="s1">tFile1E</span><span class="se">\\</span><span class="s1">tFile1D</span><span class="se">\\</span><span class="s1">tFile2R</span><span class="se">\\</span><span class="s1">tFile2A</span><span class="se">\\</span><span class="s1">tFile2E</span><span class="se">\\</span><span class="s1">tFile2D&quot;} {if ($1 !~ /^chr*/) {print &quot;chr&quot;$0} else {print $0}}&#39;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;gunzip </span><span class="si">{params.gzip}</span><span class="s2"> </span><span class="si">{input}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot;awk &#39;</span><span class="si">{params.awk}</span><span class="s2">&#39; | &quot;</span>
+        <span class="s2">&quot;gzip </span><span class="si">{params.gzip}</span><span class="s2"> &gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">cnv_facets</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="c1">#pileup=&quot;samtools/mpileup/{sample}.chr.mpileup.gz&quot;,</span>
+        <span class="n">tumor_bam</span><span class="o">=</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_tumor.bam&quot;</span><span class="p">,</span>
+        <span class="n">normal_bam</span><span class="o">=</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_normal.bam&quot;</span><span class="p">,</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">],</span>
+        <span class="n">vcf_index</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">]),</span>
+        <span class="n">bed</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;capture_kit_bed&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;facets/</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">profile</span><span class="o">=</span><span class="s2">&quot;facets/</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.cnv.png&quot;</span><span class="p">,</span>
+        <span class="n">coverage</span><span class="o">=</span><span class="s2">&quot;facets/</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.cov.pdf&quot;</span><span class="p">,</span>
+        <span class="n">spider</span><span class="o">=</span><span class="s2">&quot;facets/</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.spider.pdf&quot;</span><span class="p">,</span>
+        <span class="n">pileup</span><span class="o">=</span><span class="s2">&quot;facets/</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.csv.gz&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Searching for CNV in </span><span class="si">{wildcards.sample}</span><span class="s2"> with Facets&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">10</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">20</span><span class="p">)</span> <span class="o">+</span> <span class="mi">102400</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;facets_extra&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--snp-count-orphans --gbuild hg38 --nbhd-snp 250&quot;</span>
+        <span class="p">),</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;facets/</span><span class="si">{sample}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/facets/cnv/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/facets/cnv&quot;</span>
+
+
+<span class="c1">#################################</span>
+<span class="c1">### FINAL VCF FILE INDEXATION ###</span>
+<span class="c1">#################################</span>
+
+<span class="n">module</span> <span class="n">compress_index_vcf_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/compress_index_vcf/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">compress_index_vcf_meta</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">tabix_index</span> <span class="kn">from</span> <span class="nn">compress_index_vcf_meta</span> <span class="k">as</span> <span class="n">snp_indel_tabix_index</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{content}</span><span class="s2">.vcf.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{content}</span><span class="s2">.vcf.gz.tbi&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Indexing </span><span class="si">{wildcards.sample}</span><span class="s2"> (from somatic varscan &quot;</span>
+        <span class="s2">&quot;</span><span class="si">{wildcards.content}</span><span class="s2">) with tabix.&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/tabix/index/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{content}</span><span class="s2">.log&quot;</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">pbgzip_compress</span> <span class="kn">from</span> <span class="nn">compress_index_vcf_meta</span> <span class="k">as</span> <span class="n">si_pbgzip</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{content}</span><span class="s2">.vcf&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{content}</span><span class="s2">.vcf.gz&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Compressnig </span><span class="si">{wildcards.sample}</span><span class="s2"> (from somatic varscan &quot;</span>
+        <span class="s2">&quot;</span><span class="si">{wildcards.content}</span><span class="s2">) with pbgzip.&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/pgbzip/varcsanc2/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{content}</span><span class="s2">.log&quot;</span>
+
+
+<span class="c1">######################</span>
+<span class="c1">### VCF annotation ###</span>
+<span class="c1">######################</span>
+
+<span class="n">rule</span> <span class="n">annotate_vcf</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">design</span><span class="o">=</span><span class="s2">&quot;design.tsv&quot;</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">,</span>
+        <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;mutect2/corrected/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">calls_index</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;mutect2/corrected/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">),</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">calls</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/results_to_upload/VCF/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">calls_index</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/results_to_upload/VCF/</span><span class="si">{sample}</span><span class="s2">.vcf.gz.tbi&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">table</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/results_to_upload/TSV/</span><span class="si">{sample}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">html</span><span class="o">=</span><span class="s2">&quot;snpeff_snpsift/results_to_upload/QC/SnpEff_annotation.html&quot;</span><span class="p">,</span>
+        <span class="n">raw_html</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpeff_snpsift/multiqc/SnpEff_annotation.html&quot;</span><span class="p">),</span>
+        <span class="n">raw_html_data</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;snpeff_snpsift/multiqc/SnpEff_annotation_data&quot;</span><span class="p">)),</span>
+        <span class="n">bigr_format_to_info</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/bigr/format_to_info/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">bigr_occurence_per_chr</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/bigr/occurence/</span><span class="si">{chrom}</span><span class="s2">.txt&quot;</span><span class="p">,</span>
+            <span class="n">chrom</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">bigr_occurence_annot</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/bigr/occurence_annotated/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">bigr_occurences</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpeff_snpsift/bigr/occurences/all_chrom.txt&quot;</span><span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpeff_snpsift/config.yaml&quot;</span><span class="p">),</span>
+        <span class="n">column_description</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpeff_snpsift/columns_description.txt&quot;</span><span class="p">),</span>
+        <span class="n">design</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpeff_snpsift/design.tsv&quot;</span><span class="p">),</span>
+        <span class="n">logs</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;logs&quot;</span><span class="p">)),</span>
+        <span class="n">db_descriptions</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/</span><span class="si">{db}</span><span class="s2">/description.txt&quot;</span><span class="p">,</span>
+            <span class="n">db</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;revel&quot;</span><span class="p">,</span> <span class="s2">&quot;mane&quot;</span><span class="p">,</span> <span class="s2">&quot;mistic&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">snpsift_intermediar</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/snpsift/</span><span class="si">{db}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+            <span class="n">db</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;clinvar&quot;</span><span class="p">,</span> <span class="s2">&quot;dbnsfp&quot;</span><span class="p">,</span> <span class="s2">&quot;dbsnp&quot;</span><span class="p">,</span> <span class="s2">&quot;gmt&quot;</span><span class="p">,</span> <span class="s2">&quot;kaviar&quot;</span><span class="p">,</span> <span class="s2">&quot;vartype&quot;</span><span class="p">],</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">splice_ai</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/splice_ai/annot/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">directory</span><span class="p">(</span><span class="s2">&quot;snpeff_snpsift/tmp&quot;</span><span class="p">)),</span>
+        <span class="n">vcftools</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/vcftools/</span><span class="si">{db}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="n">db</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;revel&quot;</span><span class="p">,</span> <span class="s2">&quot;mane&quot;</span><span class="p">,</span> <span class="s2">&quot;mistic&quot;</span><span class="p">],</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">snpeff_raw_call</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/snpeff/calls/</span><span class="si">{sample}</span><span class="s2">.vcf</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;.gz.tbi&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">snpeff_raw_html</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/snpeff/html/</span><span class="si">{sample}</span><span class="s2">.html&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+        <span class="p">)),</span>
+        <span class="n">snpeff_raw_csvstats</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/snpeff/csvstats/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;genes.txt&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">snpsift_raw_fields</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/snpsift/extractFields/</span><span class="si">{sample}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="n">snpsift_raw_vcf</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift/snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;vcf&quot;</span><span class="p">,</span> <span class="s2">&quot;vcf.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;vcf.gz.tbi&quot;</span><span class="p">]</span>
+        <span class="p">))</span>
+        <span class="c1">#results=directory(&quot;snpeff_snpsift/results_to_upload&quot;)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Annotating VCF&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">handover</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/snpeff_snpsift_pipeline.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">mkdir</span><span class="o">=</span><span class="s2">&quot;--parents --verbose&quot;</span><span class="p">,</span>
+        <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;--symbolic --force --relative --verbose&quot;</span><span class="p">,</span>
+        <span class="n">variant_dir</span><span class="o">=</span><span class="s2">&quot;mutect2/corrected/&quot;</span><span class="p">,</span>
+        <span class="n">outdir</span><span class="o">=</span><span class="s2">&quot;snpeff_snpsift&quot;</span><span class="p">,</span>
+        <span class="n">pipeline_path</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff_snpsift_run_path&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh&quot;</span>
+        <span class="p">),</span>
+        <span class="n">smk</span><span class="o">=</span><span class="s2">&quot;--nt&quot;</span><span class="p">,</span>
+        <span class="n">organism</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;organism&quot;</span><span class="p">,</span> <span class="s2">&quot;hg38&quot;</span><span class="p">)</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mkdir}</span><span class="s2"> </span><span class="si">{params.outdir}</span><span class="s2">/data_input &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;ln </span><span class="si">{params.ln}</span><span class="s2"> </span><span class="si">{input.config}</span><span class="s2"> </span><span class="si">{params.outdir}</span><span class="s2"> &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;ln </span><span class="si">{params.ln}</span><span class="s2"> </span><span class="si">{params.variant_dir}</span><span class="s2">/ </span><span class="si">{params.outdir}</span><span class="s2">/data_input/calls &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;cd </span><span class="si">{params.outdir}</span><span class="s2"> &amp;&amp; &quot;</span>
+        <span class="s2">&quot;bash </span><span class="si">{params.pipeline_path}</span><span class="s2"> </span><span class="si">{params.organism}</span><span class="s2"> </span><span class="si">{params.smk}</span><span class="s2"> | tee -a ${{OLDPWD}}/</span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1&quot;</span>
+
+
+<span class="c1">#####################################</span>
+<span class="c1">### Merge variant calling results ###</span>
+<span class="c1">#####################################</span>
+
+<span class="c1"># module metacaller_somatic_meta:</span>
+<span class="c1">#     snakefile: &quot;../../meta/bio/meta_caller_somatic/test/Snakefile&quot;</span>
+<span class="c1">#     config: {&quot;genome&quot;: config[&quot;ref&quot;][&quot;fasta&quot;], &quot;bed&quot;: config[&quot;ref&quot;][&quot;capture_kit_bed&quot;]}</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># use rule * from metacaller_somatic_meta as *</span>
+
+
+<span class="c1">############################################################################</span>
+<span class="c1">### Correcting Mutect2 :                                                 ###</span>
+<span class="c1">### AS_FilterStatus: Number=1 and not Number=A which violates VCF format ###</span>
+<span class="c1">############################################################################</span>
+
+<span class="n">rule</span> <span class="n">correct_mutect2_vcf</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;bcftools/mutect2/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;mutect2/corrected/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Fixing AS_FilterStrand format error&quot;</span>
+        <span class="s2">&quot; on </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/mutect2/correct_fields/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">fix_as_filterstatus</span><span class="o">=</span><span class="s2">&quot;&#39;s/ID=AS_FilterStatus,Number=A/ID=AS_FilterStatus,Number=1/g&#39;&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;(gunzip -c </span><span class="si">{input}</span><span class="s2"> | &quot;</span>
+        <span class="s2">&quot;sed </span><span class="si">{params.fix_as_filterstatus}</span><span class="s2">) &quot;</span>
+        <span class="s2">&quot;&gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
+<span class="c1">###############################</span>
+<span class="c1">### Variant calling Mutect2 ###</span>
+<span class="c1">###############################</span>
+
+<span class="n">gatk_mutect2_somatic_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;known&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;af_only&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;bed&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;capture_kit_bed&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;dbsnp&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;sample_list&quot;</span><span class="p">:</span> <span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
+    <span class="s2">&quot;chrom&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
+
+<span class="n">module</span> <span class="n">gatk_mutect2_somatic_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/mutect2_somatic/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">gatk_mutect2_somatic_config</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">gatk_mutect2_somatic_meta</span>
+
+
+<span class="c1">################################</span>
+<span class="c1">### Variant Calling Varscan2 ###</span>
+<span class="c1">################################</span>
+
+<span class="n">varscan2_somatic_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;bed&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;capture_kit_bed&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">module</span> <span class="n">varscan2_somatic_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/varscan2_somatic/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">varscan2_somatic_config</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">varscan2_somatic_meta</span>
+
+
+<span class="c1">##############################</span>
+<span class="c1">### GATK BAM RECALIBRATION ###</span>
+<span class="c1">##############################</span>
+
+<span class="n">gatk_bqsr_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;threads&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;dbsnp&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;dbsnp&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;base_recal_extra&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;apply_base_recal_extra&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">&quot;gatk&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;apply_base_recal_extra&quot;</span><span class="p">:</span> <span class="s2">&quot;--create-output-bam-index&quot;</span><span class="p">}</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;apply_base_recal_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;--create-output-bam-index&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">module</span> <span class="n">gatk_bqsr_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/gatk_bqsr/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">gatk_bqsr_config</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">gatk_apply_baserecalibrator</span> <span class="kn">from</span> <span class="nn">gatk_bqsr_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">),</span>
+        <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">],</span>
+        <span class="n">ref_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+        <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+        <span class="n">recal_table</span><span class="o">=</span><span class="s2">&quot;gatk/recal_data_table/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.grp&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;gatk/recal_bam/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bai</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;gatk/recal_bam/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Applying BQSR on </span><span class="si">{wildcards.status}</span><span class="s2"> </span><span class="si">{wildcards.sample}</span><span class="s2"> with GATK&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;gatk&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;apply_base_recal_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;--create-output-bam-index&quot;</span><span class="p">}</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;apply_base_recal_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;--create-output-bam-index&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/gatk/applybqsr/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">gatk_compute_baserecalibration_table</span> <span class="kn">from</span> <span class="nn">gatk_bqsr_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bam_index</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">),</span>
+        <span class="n">ref</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">],</span>
+        <span class="n">ref_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+        <span class="n">ref_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;fasta&#39;</span><span class="p">]),</span>
+        <span class="n">known</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;dbsnp&#39;</span><span class="p">],</span>
+        <span class="n">known_idx</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">][</span><span class="s1">&#39;dbsnp&#39;</span><span class="p">])</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">recal_table</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;gatk/recal_data_table/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.grp&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Compute BQSR table from </span><span class="si">{wildcards.status}</span><span class="s2"> </span><span class="si">{wildcards.sample}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;with GATK&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/gatk3/compute_bqsr/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
+
+
+<span class="c1">#####################</span>
+<span class="c1">### Deduplicating ###</span>
+<span class="c1">#####################</span>
+
+<span class="n">rule</span> <span class="n">sambamba_markduplicates</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="s2">&quot;samtools/filter/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">,</span>
+        <span class="n">bai</span><span class="o">=</span><span class="n">get_bai</span><span class="p">(</span><span class="s2">&quot;samtools/filter/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">bam</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;sambamba/markdup/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Removing duplicates on </span><span class="si">{wildcards.sample}</span><span class="s2"> (</span><span class="si">{wildcards.status}</span><span class="s2">)&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">10</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">10240</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/sambamba/markduplicates/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;sambamba&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;markdup&quot;</span><span class="p">:</span> <span class="s2">&quot;--remove-duplicates&quot;</span><span class="p">}</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;markdup&quot;</span><span class="p">,</span> <span class="s2">&quot;--remove-duplicates&quot;</span><span class="p">)</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/sambamba/markdup&quot;</span>
+
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Filter a bam over the capturekit bed file</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">rule</span> <span class="n">samtools_filter_bed</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;sambamba/sort/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span>
+        <span class="n">fasta</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">],</span>
+        <span class="n">fasta_idx</span><span class="o">=</span><span class="n">get_fai</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
+        <span class="n">fasta_dict</span><span class="o">=</span><span class="n">get_dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;genome&quot;</span><span class="p">]),</span>
+        <span class="n">bed</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;bed&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;samtools/filter/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">10</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;--bam --with-header&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/samtools/filter/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/samtools/view&quot;</span>
+
+
+<span class="c1">###################</span>
+<span class="c1">### BWA MAPPING ###</span>
+<span class="c1">###################</span>
+
+<span class="n">module</span> <span class="n">bwa_fixmate_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/bwa_fixmate/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;threads&quot;</span><span class="p">],</span> <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">]}</span>
+
+
+<span class="k">def</span> <span class="nf">get_best_bwa_index</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return cached data if available&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">multiext</span><span class="p">(</span>
+            <span class="s2">&quot;bwa_mem2/index/genome.hg38&quot;</span><span class="p">,</span> <span class="s2">&quot;.0123&quot;</span><span class="p">,</span> <span class="s2">&quot;.amb&quot;</span><span class="p">,</span> <span class="s2">&quot;.ann&quot;</span><span class="p">,</span> <span class="s2">&quot;.pac&quot;</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">multiext</span><span class="p">(</span>
+            <span class="s2">&quot;bwa_mem2/index/genome.hg19&quot;</span><span class="p">,</span> <span class="s2">&quot;.0123&quot;</span><span class="p">,</span> <span class="s2">&quot;.amb&quot;</span><span class="p">,</span> <span class="s2">&quot;.ann&quot;</span><span class="p">,</span> <span class="s2">&quot;.pac&quot;</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.dna.fasta&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">multiext</span><span class="p">(</span>
+            <span class="s2">&quot;bwa_mem2/index/genome.mm10&quot;</span><span class="p">,</span> <span class="s2">&quot;.0123&quot;</span><span class="p">,</span> <span class="s2">&quot;.amb&quot;</span><span class="p">,</span> <span class="s2">&quot;.ann&quot;</span><span class="p">,</span> <span class="s2">&quot;.pac&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">multiext</span><span class="p">(</span>
+        <span class="s2">&quot;bwa_mem2/index/genome&quot;</span><span class="p">,</span> <span class="s2">&quot;.0123&quot;</span><span class="p">,</span> <span class="s2">&quot;.amb&quot;</span><span class="p">,</span> <span class="s2">&quot;.ann&quot;</span><span class="p">,</span> <span class="s2">&quot;.pac&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">sambamba_index</span> <span class="kn">from</span> <span class="nn">bwa_fixmate_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;sambamba/sort/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;sambamba/sort/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam.bai&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Indexing mapped reads of </span><span class="si">{wildcards.status}</span><span class="s2"> </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/sambamba/sort/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">sambamba_sort_coordinate</span> <span class="kn">from</span> <span class="nn">bwa_fixmate_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">mapping</span><span class="o">=</span><span class="s2">&quot;samtools/fixmate/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">mapping</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;sambamba/sort/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Sorting </span><span class="si">{wildcards.status}</span><span class="s2"> </span><span class="si">{wildcards.sample}</span><span class="s2"> reads by position&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/sambamba/sort/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">samtools_fixmate</span> <span class="kn">from</span> <span class="nn">bwa_fixmate_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;bwa_mem2/mem/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;samtools/fixmate/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Fixing mate annotation on </span><span class="si">{wildcards.status}</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;</span><span class="si">{wildcards.sample}</span><span class="s2"> with Samtools&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/samtools/fixmate/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">bwa_mem</span> <span class="kn">from</span> <span class="nn">bwa_fixmate_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">reads</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/trimmed/pe/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq&quot;</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
+            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">),</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">get_best_bwa_index</span><span class="p">()</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bwa_mem2/mem/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Mapping </span><span class="si">{wildcards.status}</span><span class="s2"> </span><span class="si">{wildcards.sample}</span><span class="s2"> with BWA&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">index</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;-R &#39;@RG</span><span class="se">\t</span><span class="s2">ID:</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="se">\t</span><span class="s2">SM:</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="se">\t</span><span class="s2">PU:</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="se">\t</span><span class="s2">PL:ILLUMINA</span><span class="se">\t</span><span class="s2">CN:IGR</span><span class="se">\t</span><span class="s2">DS:WES</span><span class="se">\t</span><span class="s2">PG:BWA-MEM2&#39; -M -A 2 -E 1&quot;</span><span class="p">,</span>
+        <span class="n">sort</span><span class="o">=</span><span class="s2">&quot;samtools&quot;</span><span class="p">,</span>         <span class="c1"># We chose Samtools to sort by queryname</span>
+        <span class="n">sort_order</span><span class="o">=</span><span class="s2">&quot;queryname&quot;</span><span class="p">,</span>  <span class="c1"># Queryname sort is needed for a fixmate</span>
+        <span class="n">sort_extra</span><span class="o">=</span><span class="s2">&quot;-m 1536M&quot;</span>     <span class="c1"># We extand the sort buffer memory</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bwa_mem2/mem/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
+
+<span class="c1"># rule bwa_samblaster_sambamba:</span>
+<span class="c1">#     input:</span>
+<span class="c1">#         reads=expand(</span>
+<span class="c1">#             &quot;fastp/trimmed/pe/{sample}_{status}.{stream}.fastq&quot;,</span>
+<span class="c1">#             stream=[&quot;1&quot;, &quot;2&quot;],</span>
+<span class="c1">#             allow_missing=True</span>
+<span class="c1">#         ),</span>
+<span class="c1">#         index=get_best_bwa_index()</span>
+<span class="c1">#     output:</span>
+<span class="c1">#         bam=temp(&quot;bwa_mem2/mem/{sample}_{status}.bam&quot;)</span>
+<span class="c1">#     message:</span>
+<span class="c1">#         &quot;Mapping {wildcards.status} {wildcards.sample} with BWA, removing &quot;</span>
+<span class="c1">#         &quot;duplicates with Samblaster, sorting and filtering with Sambamba.&quot;</span>
+<span class="c1">#     threads:</span>
+<span class="c1">#         min(config.get(&quot;threads&quot;, 20), 20)</span>
+<span class="c1">#     threads: 1</span>
+<span class="c1">#     resources:</span>
+<span class="c1">#         mem_mb=lambda wildcards, attempt: attempt * 6144 + 61440,</span>
+<span class="c1">#         time_min=lambda wildcards, attempt: attempt * 120,</span>
+<span class="c1">#         tmpdir=&quot;tmp&quot;</span>
+<span class="c1">#     shadow: &quot;shallow&quot;</span>
+<span class="c1">#     params:</span>
+<span class="c1">#         index=get_best_bwa_index()[0].split(&#39;.&#39;)[0],</span>
+<span class="c1">#         extra=lambda wildcards: f&quot;-R &#39;@RG\tID:{wildcards.sample}_{wildcards.status}\tSM:{wildcards.sample}_{wildcards.status}\tPU:{wildcards.sample}_{wildcards.status}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2&#39; -M -A 2 -E 1&quot;,</span>
+<span class="c1">#         sort_extra=config.get(&quot;sambamba&quot;, {&quot;sort_extra&quot;: &quot;&quot;}).get(&quot;sort_extra&quot;, &quot;&quot;),</span>
+<span class="c1">#         samblaster_extra=config.get(&quot;samblaster&quot;, {&quot;extra&quot;: &quot;&quot;}).get(&quot;extra&quot;, &quot;&quot;),</span>
+<span class="c1">#         sambamba_view_extra=config.get(&quot;sambamba&quot;, {&quot;view_extra&quot;: &quot;-h&quot;}).get(&quot;view_extra&quot;, &quot;-h&quot;)</span>
+<span class="c1">#     log:</span>
+<span class="c1">#         &quot;logs/bwa_samblaster_sambamba/{sample}_{status}.log&quot;</span>
+<span class="c1">#</span>
+
+
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">bwa_index</span> <span class="kn">from</span> <span class="nn">bwa_fixmate_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">bwa_index_hg38</span> <span class="kn">from</span> <span class="nn">bwa_fixmate_meta</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">bwa_index_hg19</span> <span class="kn">from</span> <span class="nn">bwa_fixmate_meta</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">bwa_index_mm10</span> <span class="kn">from</span> <span class="nn">bwa_fixmate_meta</span>
+
+
+<span class="c1">############################</span>
+<span class="c1">### FASTP FASTQ CLEANING ###</span>
+<span class="c1">############################</span>
+
+<span class="n">rule</span> <span class="n">fastp_clean</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">sample</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;reads/</span><span class="si">{status}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fq.gz&quot;</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
+            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">),</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">trimmed</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;fastp/trimmed/pe/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq&quot;</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
+            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)),</span>
+        <span class="n">html</span><span class="o">=</span><span class="s2">&quot;fastp/html/pe/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.fastp.html&quot;</span><span class="p">,</span>
+        <span class="n">json</span><span class="o">=</span><span class="s2">&quot;fastp/json/pe/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.fastp.json&quot;</span>
+    <span class="n">message</span><span class="p">:</span> <span class="s2">&quot;Cleaning </span><span class="si">{wildcards.status}</span><span class="s2"> </span><span class="si">{wildcards.sample}</span><span class="s2"> with Fastp&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">10</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">15360</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">adapters</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fastp_adapters&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fastp_extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/fastp/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/fastp&quot;</span>
+
+
+<span class="c1">#################################################</span>
+<span class="c1">### Gather files from iRODS or mounting point ###</span>
+<span class="c1">#################################################</span>
+
+<span class="n">rule</span> <span class="n">bigr_copy</span><span class="p">:</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;reads/</span><span class="si">{status}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fq.gz&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Gathering </span><span class="si">{wildcards.status}</span><span class="s2"> </span><span class="si">{wildcards.sample}</span><span class="s2"> fastq files &quot;</span>
+        <span class="s2">&quot;(</span><span class="si">{wildcards.stream}</span><span class="s2">)&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">2048</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcard</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="nb">input</span><span class="o">=</span><span class="k">lambda</span> <span class="n">w</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="n">fastq_links</span><span class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">status</span><span class="p">][</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bigr_copy/</span><span class="si">{status}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/BiGR/copy&quot;</span>
+
+
+<span class="c1">###########################</span>
+<span class="c1">### Datasets indexation ###</span>
+<span class="c1">###########################</span>
+
+<span class="n">index_datasets_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;genome&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">module</span> <span class="n">index_datasets</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/index_datasets/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">index_datasets_config</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">samtools_faidx</span> <span class="kn">from</span> <span class="nn">index_datasets</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">picard_create_sequence_dictionnary</span> <span class="kn">from</span> <span class="nn">index_datasets</span>
+
+<span class="n">rule</span> <span class="n">sambamba_index_bam</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.bam.bai&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Indexing </span><span class="si">{wildcards.sample}</span><span class="s2"> (</span><span class="si">{wildcards.status}</span><span class="s2">) &quot;</span>
+        <span class="s2">&quot;from </span><span class="si">{wildcards.tool}</span><span class="s2">:</span><span class="si">{wildcards.subcommand}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">8</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;sambamba/index/</span><span class="si">{tool}</span><span class="s2">_</span><span class="si">{subcommand}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">_</span><span class="si">{status}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/sambamba/index&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Thibault Dayris</p></li>
+<li><p>M boyba Diop</p></li>
+<li><p>Marc Deloger</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="variant_calling_germline_wes.html" class="btn btn-neutral float-left" title="VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="variant_callling_germline.html" class="btn btn-neutral float-right" title="VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016, The Snakemake team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

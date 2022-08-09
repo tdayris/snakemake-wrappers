@@ -1,0 +1,240 @@
+.. _`bio/BiGR/fix_vcf`:
+
+FIX VCF
+=======
+
+Fixes format issues like empty fields for GATK compliance
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_fix_vcf:
+        input:
+            vcf="in.vcf"
+        output:
+            vcf="out.vcf"
+        log:
+            "logs/fix_vcf.log"
+        params:
+            rename_sample={"fake_KJ660346": 'Sample1'}
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/BiGR/fix_vcf"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``python==3.9.6``
+
+Input/Output
+------------
+**Input:**
+
+* ``vcf``: Path to a VCF file
+
+**Output:**
+
+* ``vcf``: Path to the corrected VCF file
+
+
+
+Params
+------
+
+* ``delete_empty_fields``: Remove trailing ";" and double ";;" in the info field (default True)
+
+* ``remove_non_conventional_chromosomes``: Remove chromosomes not present in the provided list (default are human chromosomes, including MT, X and Y).
+
+* ``rename_sample``: Rename a sample in the VCf header
+
+
+
+
+Notes
+-----
+
+Warning: If duplicate keys exists, they will all be renamed (ex INFO and FORMAT fields duplicated).
+
+This wrapper takes non-gzipped VCF files
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3.8
+    # -*- coding: utf-8 -*-
+
+    """
+    split ANN field in the INFO column in a VCF file
+    """
+
+    import datetime
+    import gzip
+    import logging
+    import re
+
+    logging.basicConfig(
+        filename=snakemake.log[0],
+        filemode="w",
+        level=logging.INFO
+    )
+
+
+    def open_function(file: str):
+        """Return the correct opening function"""
+        if file.endswith(".gz"):
+            return gzip.open(file, "rb")
+        return open(file, "r")
+
+
+    def create_header(section: str,
+                      key: str,
+                      tp: str,
+                      nb: str,
+                      desc: str) -> str:
+        return f'##{section}=<ID={key},Number={nb},Type={tp},Description="{desc}">'
+
+
+    def add_info(key: str, value: str, info: str) -> str:
+        if info != ".":
+            info += ";"
+        else:
+            info = ""
+
+        if key in info:
+            logging.warning(f"Adding existing key: {key} to {info}")
+
+        return f"{info}{key}={value}"
+
+
+    def add_format_header(key: str, format: str) -> str:
+        return ":".join(map(str, [format, key]))
+
+    def add_sample(value: str, format: str) -> str:
+        return ":".join(map(str, [format, value]))
+
+    def add_format(format_header: str,
+                   key: str,
+                   value: str,
+                   *formats: list[str]) -> str:
+        result = [add_format_header(key, format_header)]
+        for format in formats:
+            result.append(add_sample(value, format))
+        return "\t".join(result)
+
+
+    def sort_headers(lines) -> str:
+        infos = []
+        formats = []
+        filters = []
+        contigs = []
+        fileformats = []
+        others = []
+
+        for line in lines:
+            if line.startswith("##INFO"):
+                infos.append(line)
+            elif line.startswith("##FORMAT"):
+                formats.append(line)
+            elif line.startswith("##FILTER"):
+                filters.append(line)
+            elif line.startswith("##contig"):
+                contigs.append(line)
+            elif line.startswith("##fileformat"):
+                fileformats.append(line)
+            else:
+                others.append(line)
+
+        return "".join(fileformats + filters + formats + infos + others + contigs)
+
+    default_chr = list(map(str, range(23))) + ["MT", "X", "Y"]
+    if "default_chr" in snakemake.params.keys():
+        default_chr = snakemake.params["default_chr"]
+
+    sample_rename_dict = snakemake.params.get("rename_sample", {})
+
+    version = 1.0
+    name = "fix_vcf"
+    url = f"github.com/tdayris/snakemake-wrappers/tree/Unofficial/bio/BiGR/{name}/wrapper.py"
+    headers = f"""##BiGRCommandLine=<ID={name},CommandLine="{url}",Version={version},Date={datetime.date.today()}>\n"""
+
+    header_list = []
+
+
+    logging.debug("Opening VCFs")
+    if str(snakemake.output["vcf"]).endswith("vcf.gz"):
+        out_vcf = snakemake.output["vcf"][:-3]
+    else:
+        out_vcf = snakemake.output["vcf"]
+
+    with (open_function(snakemake.input["vcf"]) as vcfin,
+          open(out_vcf, "w", encoding="utf-8") as vcfout):
+        for line in vcfin:
+            if isinstance(line, bytes):
+                line = line.decode("utf-8")
+
+            if line.startswith("##"):
+                # Header/formats/filters...
+                #vcfout.write(line)
+                header_list.append(line)
+                continue
+
+            elif line.startswith("#"):
+                # Column names
+                vcfout.write(sort_headers(header_list))
+                vcfout.write(headers)
+                print(line)
+                chomp = line[:-1].split("\t")
+                print(chomp)
+                for idx, col in enumerate(chomp):
+                    chomp[idx] = sample_rename_dict.get(col, col)
+                line = "\t".join(chomp) + "\n"
+                vcfout.write(line)
+                continue
+
+            chrom, pos, idx, ref, alt, qual, fil, info, format, *samples = line[:-1].split("\t")
+
+            if (snakemake.params.get("remove_non_conventional_chromosomes", True) is True) and (chrom not in default_chr):
+                continue
+
+            info = info.replace(";;", ";").strip(";")
+            line = "\t".join([chrom, pos, idx, ref, alt, qual, fil, info, format, *samples]) + "\n"
+            vcfout.write(line)
+
+
+    if str(snakemake.output["vcf"]).endswith("vcf.gz"):
+        logging.info(f"Compressing {out_vcf}")
+        shell("pbgzip -c {out_vcf} > {snakemake.output['vcf']} 2> {log}")
+        logging.info(f"Indexing {snakemake.output['call']}")
+        shell("tabix -p vcf {snakemake.output['vcf']} >> {log} 2>&1")
+        logging.info(f"Removing temporary file {out_vcf}")
+        shell("rm --verbose {out_vcf} >> {log} 2>&1")
+
+
+.. |nl| raw:: html
+
+   <br>

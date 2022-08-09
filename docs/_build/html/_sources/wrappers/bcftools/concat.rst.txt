@@ -1,0 +1,110 @@
+.. _`bio/bcftools/concat`:
+
+BCFTOOLS CONCAT
+===============
+
+Concatenate vcf/bcf files with bcftools. For more information see `BCFtools documentation <https://www.htslib.org/doc/bcftools.html#concat>`_.
+
+**URL**: https://www.htslib.org/doc/bcftools.html#concat
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bcftools_concat:
+        input:
+            calls=["a.bcf", "b.bcf"],
+        output:
+            "all.bcf",
+        log:
+            "logs/all.log",
+        params:
+            uncompressed_bcf=False,
+            extra="",  # optional parameters for bcftools concat (except -o)
+        threads: 4
+        resources:
+            mem_mb=10,
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bcftools/concat"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bcftools=1.12``
+* ``snakemake-wrapper-utils==0.2.0``
+
+Input/Output
+------------
+**Input:**
+
+* ``calls``: list of vcf files
+
+**Output:**
+
+* Concatenated VCF/BCF file, must be the first file in output
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters (not `--threads, `-O/--output-type`, `-m/--max-mem`, or `-T/--temp-dir`)
+
+* ``uncompressed_bcf``: The `uncompressed_bcf` param allows to specify that a BCF output should be uncompressed (ignored otherwise).
+
+* ``bcftools_use_mem``: The `bcftools_use_mem` param controls whether to pass the resources.mem_mb to bcftools
+
+
+
+
+
+Authors
+-------
+
+* Johannes Köster
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "koester@jimmy.harvard.edu"
+    __license__ = "MIT"
+
+
+    from os import path
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.bcftools import get_bcftools_opts
+
+
+    bcftools_opts = get_bcftools_opts(snakemake, parse_memory=False)
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+
+    shell(
+        "bcftools concat {snakemake.params.extra} {bcftools_opts} -o {snakemake.output[0]} "
+        "{snakemake.input.calls} "
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

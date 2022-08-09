@@ -1,0 +1,204 @@
+.. _`bio/seaborn/gene-count`:
+
+SEABORN GENE BOX PLOTS
+======================
+
+Build a gene box-plot
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_gene_box_count:
+        input:
+            counts = "table.tsv"
+        output:
+            dir = directory("gene_plots")
+        message:
+            "Testing boxp lot of normalized counts"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 512, 10240)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 5, 200)
+            )
+        params:
+            targets = ["ENST00000002596.5", "ENST00000001146.6"],
+            condition = {"Sample_01": "A",
+                         "Sample_02": "A",
+                         "Sample_03": "A",
+                         "Sample_07": "B",
+                         "Sample_08": "B",
+                         "Sample_09": "B",}
+        log:
+            "logs/test_box_count.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/seaborn/gene-count"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``conda-forge:python=3.8.2``
+* ``conda-forge:pandas=1.0.1``
+* ``conda-forge:numpy=1.18.1``
+* ``conda-forge:seaborn=0.10.0``
+* ``conda-forge:matplotlib=3.1.3``
+* ``conda-forge:pillow=7.0.0``
+* ``conda-forge:pyqt=5.12.3``
+
+Input/Output
+------------
+**Input:**
+
+* A TSV-formatted normalized counts table of all samples
+
+**Output:**
+
+* A PNG-formatted image of the clustered heatmap
+
+
+
+
+Notes
+-----
+
+Parameters:
+
+* condition: a dictionnary containing each sample name and their corresponding condition
+* target: a list of genes/transcripts/targets to plot
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3.8
+    # conding: utf-8
+
+    """
+    Plot a box plot of each gene counts
+    """
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    import logging
+    import matplotlib
+    import matplotlib.pyplot
+    import numpy
+    import pandas
+    import seaborn
+
+    from os.path import join
+    from snakemake.utils import makedirs
+
+    logging.basicConfig(
+        filename=snakemake.log[0],
+        filemode="w",
+        level=logging.DEBUG
+    )
+
+    # Build output directory if necessary
+    if (outdir := snakemake.output["dir"]) != "":
+        makedirs(outdir)
+        logging.debug(f"Directory: '{outdir}' created.")
+
+    # Load normalized counts
+    data = pandas.read_csv(
+        snakemake.input["counts"],
+        sep="\t",
+        header=0,
+        index_col=0
+    )
+
+    # Remove possible text annotations and validate
+    data = data[list(data.select_dtypes(include=[numpy.number]).columns.values)]
+
+    # Stack values in order to plot counts
+    data = pandas.DataFrame(data.stack())
+    data.reset_index(inplace=True)
+    data.columns = ["Target_id", "Sample", "Normalized_Counts"]
+
+    data["Condition"] = [
+        snakemake.params["condition"][sample]
+        for sample in data.Sample
+    ]
+
+    logging.debug("Head of post processed dataset:")
+    logging.debug(data.head())
+
+
+    for target in snakemake.params["targets"]:
+        logging.info(f"Working on '{target}'")
+
+        # Define output path
+        output_path = join(outdir, f"{target}.png")
+
+        # Subset to searched targets
+        tmp = data[data["Target_id"] == target]
+        logging.debug("Head of plotted data:")
+        logging.debug(tmp.head())
+
+        if len(tmp) == 0:
+            msg = f"No target named '{target}' in dataset"
+            logging.error(msg)
+            raise ValueError(msg)
+
+        # Build plot
+        seaborn.set(
+            style="ticks",
+            palette="pastel"
+        )
+
+        seaborn.boxplot(
+            x = "Target_id",
+            y = "Normalized_Counts",
+            hue = "Condition",
+            data = tmp
+        )
+
+        seaborn.despine(
+            offset = 10,
+            trim = True
+        )
+
+        # Save figure
+        matplotlib.pyplot.savefig(
+            output_path,
+            bbox_inches="tight"
+        )
+        matplotlib.pyplot.clf()
+    logging.info("Process over.")
+
+
+.. |nl| raw:: html
+
+   <br>

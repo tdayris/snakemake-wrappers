@@ -1,0 +1,111 @@
+.. _`bio/picard/renamesampleinvcf`:
+
+PICARD RENAMESAMPLEINVCF
+========================
+
+Rename a sample in either a VCF or BCF file.
+
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_picard_renamesampleinvcf:
+        input:
+            vcf = "snvs.chr1.vcf"
+        output:
+            vcf = "renamed.snvs.chr1.vcf"
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb = 1024
+        params:
+            new_sample_name = "NewName"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/picard/renamesampleinvcf"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``picard==2.22.1``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* vcf file
+
+**Output:**
+
+* vcf file with renamed sample
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for picard RenameSampleInVcf."""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Dayris Thibault"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
+
+    if "index" in snakemake.output.keys():
+        extra += " --CREATE_INDEX true"
+
+    if "fasta" in snakemake.input.keys():
+        extra += "--REFERENCE_SEQUENCE {}".format(snakemake.input["fasta"])
+
+
+    shell(
+        "picard"
+        " RenameSampleInVcf"
+        " {java_opts}"
+        " {extra}"
+        " INPUT={snakemake.input.vcf}"
+        " OUTPUT={snakemake.output.vcf}"
+        " NEW_SAMPLE_NAME={snakemake.params.new_sample_name}"
+        " {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

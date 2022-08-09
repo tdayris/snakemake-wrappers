@@ -1,0 +1,91 @@
+.. _`bio/vcftools/filter`:
+
+VCFTOOLS FILTER
+===============
+
+Filter vcf files using vcftools
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule filter_vcf:
+        input:
+            "{sample}.vcf"
+        output:
+            "{sample}.filtered.vcf"
+        params:
+            extra="--chr 1 --recode-INFO-all"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/vcftools/filter"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``vcftools==0.1.16``
+
+
+
+
+
+Authors
+-------
+
+* Patrik Smeds
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Patrik Smeds"
+    __copyright__ = "Copyright 2018, Patrik Smeds"
+    __email__ = "patrik.smeds@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    input_flag = "--vcf"
+    if snakemake.input[0].endswith(".gz"):
+        input_flag = "--gzvcf"
+
+    output = " > " + snakemake.output[0]
+    if output.endswith(".gz"):
+        output = " | gzip" + output
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+
+    shell(
+        "vcftools "
+        "{input_flag} "
+        "{snakemake.input} "
+        "{extra} "
+        "--recode "
+        "--stdout "
+        "{output} "
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

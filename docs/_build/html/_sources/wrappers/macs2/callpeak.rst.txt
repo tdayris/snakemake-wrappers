@@ -1,0 +1,228 @@
+.. _`bio/macs2/callpeak`:
+
+MACS2 CALLPEAK
+==============
+
+``MACS2 callpeak`` model-based analysis tool for ChIP-sequencing that calls peaks from alignment results.
+
+
+**URL**: https://github.com/macs3-project/MACS/blob/master/README.md
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule callpeak:
+        input:
+            treatment="samples/a.bam",   # required: treatment sample(s)
+            control="samples/b.bam"      # optional: control sample(s)
+        output:
+            # all output-files must share the same basename and only differ by it's extension
+            # Usable extensions (and which tools they implicitly call) are listed here:
+            #         https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/macs2/callpeak.html.
+            multiext("callpeak/basename",
+                     "_peaks.xls",   ### required
+                     ### optional output files
+                     "_peaks.narrowPeak",
+                     "_summits.bed"
+                     )
+        log:
+            "logs/macs2/callpeak.log"
+        params:
+            "-f BAM -g hs --nomodel"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/macs2/callpeak"
+
+    rule callpeak_options:
+        input:
+            treatment="samples/a.bam",   # required: treatment sample(s)
+            control="samples/b.bam"      # optional: control sample(s)
+        output:
+            # all output-files must share the same basename and only differ by it's extension
+            # Usable extensions (and which tools they implicitly call) are listed here:
+            #         https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/macs2/callpeak.html.
+            multiext("callpeak_options/basename",
+                     "_peaks.xls",   ### required
+                     ### optional output files
+                     # these output extensions internally set the --bdg or -B option:
+                     "_treat_pileup.bdg",
+                     "_control_lambda.bdg",
+                     # these output extensions internally set the --broad option:
+                     "_peaks.broadPeak",
+                     "_peaks.gappedPeak"
+                     )
+        log:
+            "logs/macs2/callpeak.log"
+        params:
+            "-f BAM -g hs --broad-cutoff 0.1 --nomodel"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/macs2/callpeak"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``macs2>=2.2``
+
+Input/Output
+------------
+**Input:**
+
+* ``control``: Path to input peaks (Optional)
+* ``treatment``: SAM, BAM, BED, ELAND, ELANDMULTI, ELANDEXPORT, BOWTIE, BAMPE or BEDPE files
+
+**Output:**
+
+* tabular file in excel format (.xls) AND
+* different optional metrics in bedGraph or BED formats
+
+
+
+Params
+------
+
+* ``Optional parameters. This must b the only element in the param section of the snakemake rule``: 
+
+
+
+
+Notes
+-----
+
+For usage information about ``MACS2 callpeak``, please see the `documentation <https://github.com/macs3-project/MACS/blob/master/README.md>`_ and the command line help.
+For more information about ``MACS2``, also see the `source code <https://github.com/macs3-project/MACS>`_ and `published article <https://genomebiology.biomedcentral.com/articles/10.1186/gb-2008-9-9-r137>`_.
+Depending on the selected extension(s), the option(s) will be set automatically (please see table below).
+Please note that there are extensions, that are incompatible with each other, because they require the --broad option either to be enabled or disabled.
+
+
+  +--------------------------------+----------------------------------------+----------+--------------------+
+  | Extension for the output files | Description                            | Format   | Option             |
+  |                                |                                        |          |                    |
+  |                                |                                        |          |                    |
+  +================================+========================================+==========+====================+
+  | NAME_peaks.xls                 | a table with information about called  | excel    |                    |
+  |                                |                                        |          |                    |
+  |                                | peaks                                  |          |                    |
+  +--------------------------------+----------------------------------------+----------+--------------------+
+  | NAME_control_lambda.bdg        | local biases estimated for each genomic| bedGraph | -\-bdg or -B       |
+  |                                |                                        |          |                    |
+  |                                | location from the control sample       |          |                    |
+  +--------------------------------+----------------------------------------+----------+--------------------+
+  | NAME_treat_pileup.bdg          | pileup signals from treatment sample   | bedGraph | -\-bdg or -B       |
+  +--------------------------------+----------------------------------------+----------+--------------------+
+  | NAME_peaks.broadPeak           | similar to _peaks.narrowPeak file,     | BED 6+3  | -\-broad           |
+  |                                |                                        |          |                    |
+  |                                | except for missing the annotating peak |          |                    |
+  |                                |                                        |          |                    |
+  |                                | summits                                |          |                    |
+  +--------------------------------+----------------------------------------+----------+--------------------+
+  | NAME_peaks.gappedPeak          | contains the broad region and narrow   | BED 12+3 | -\-broad           |
+  |                                |                                        |          |                    |
+  |                                | peaks                                  |          |                    |
+  +--------------------------------+----------------------------------------+----------+--------------------+
+  | NAME_peaks.narrowPeak          | contains the peak locations, peak      | BED 6+4  | if not set -\-broad|
+  |                                |                                        |          |                    |
+  |                                | summit, p-value and q-value            |          |                    |
+  +--------------------------------+----------------------------------------+----------+--------------------+
+  | NAME_summits.bed               | peak summits locations for every peak  | BED      | if not set -\-broad|
+  +--------------------------------+----------------------------------------+----------+--------------------+
+
+
+
+Authors
+-------
+
+* Antonie Vietor
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Antonie Vietor"
+    __copyright__ = "Copyright 2020, Antonie Vietor"
+    __email__ = "antonie.v@gmx.de"
+    __license__ = "MIT"
+
+    import os
+    import sys
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    in_contr = snakemake.input.get("control")
+    params = "{}".format(snakemake.params)
+    opt_input = ""
+    out_dir = ""
+
+    ext = "_peaks.xls"
+    out_file = [o for o in snakemake.output if o.endswith(ext)][0]
+    out_name = os.path.basename(out_file[: -len(ext)])
+    out_dir = os.path.dirname(out_file)
+
+    if in_contr:
+        opt_input = "-c {contr}".format(contr=in_contr)
+
+    if out_dir:
+        out_dir = "--outdir {dir}".format(dir=out_dir)
+
+    if any(out.endswith(("_peaks.narrowPeak", "_summits.bed")) for out in snakemake.output):
+        if any(
+            out.endswith(("_peaks.broadPeak", "_peaks.gappedPeak"))
+            for out in snakemake.output
+        ):
+            sys.exit(
+                "Output files with _peaks.narrowPeak and/or _summits.bed extensions cannot be created together with _peaks.broadPeak and/or _peaks.gappedPeak extended output files.\n"
+                "For usable extensions please see https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/macs2/callpeak.html.\n"
+            )
+        else:
+            if " --broad" in params:
+                sys.exit(
+                    "If --broad option in params is given, the _peaks.narrowPeak and _summits.bed files will not be created. \n"
+                    "Remove --broad option from params if these files are needed.\n"
+                )
+
+    if any(
+        out.endswith(("_peaks.broadPeak", "_peaks.gappedPeak")) for out in snakemake.output
+    ):
+        if "--broad " not in params and not params.endswith("--broad"):
+            params += " --broad "
+
+    if any(
+        out.endswith(("_treat_pileup.bdg", "_control_lambda.bdg"))
+        for out in snakemake.output
+    ):
+        if all(p not in params for p in ["--bdg", "-B"]):
+            params += " --bdg "
+    else:
+        if any(p in params for p in ["--bdg", "-B"]):
+            sys.exit(
+                "If --bdg or -B option in params is given, the _control_lambda.bdg and _treat_pileup.bdg extended files must be specified in output. \n"
+            )
+
+    shell(
+        "(macs2 callpeak "
+        "-t {snakemake.input.treatment} "
+        "{opt_input} "
+        "{out_dir} "
+        "-n {out_name} "
+        "{params}) {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

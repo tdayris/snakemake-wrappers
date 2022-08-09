@@ -1,0 +1,130 @@
+.. _`bio/gatk/printreadsspark`:
+
+GATK PRINTREADSSPARK
+====================
+
+Write reads from SAM format file (SAM/BAM/CRAM) that pass specified criteria to a new file. This is the version that can be run on Spark.
+
+
+**URL**: https://gatk.broadinstitute.org/hc/en-us/articles/360057441531-PrintReadsSpark
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule gatk_printreadsspark:
+        input:
+            bam="mapped/{sample}.bam",
+            ref="genome.fasta",
+            dict="genome.dict",
+        output:
+            bam="{sample}.bam"
+        log:
+            "logs/{sample}.log"
+        params:
+            extra="",  # optional
+            java_opts="", # optional
+            #spark_runner="",  # optional, local by default
+            #spark_0.50.4-1991-g7872381db="",  # optional
+            #spark_extra="", # optional
+        resources:
+            mem_mb=1024
+        threads: 8
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/gatk/printreadsspark"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``gatk4=4.2``
+* ``openjdk=8``
+* ``snakemake-wrapper-utils=0.2``
+
+Input/Output
+------------
+**Input:**
+
+* ``bam``: Path to bam file
+* ``ref``: Path to reference file (fasta)
+
+**Output:**
+
+* ``bam``: filtered bam file
+
+
+
+Params
+------
+
+* ``java_opts``: The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-XX:ParallelGCThreads=10" (not for `-XmX` or `-Djava.io.tmpdir`, since they are handled automatically).
+
+* ``extra``: The `extra` param allows for additional program arguments for `printreadsspark`.
+
+* ``spark_runner``: The `spark_runner` param = "LOCAL"|"SPARK"|"GCS" allows to set the spark_runner. Set the parameter to "LOCAL" or don't set it at all to run on local machine.
+
+* ``spark_master``: The `spark_master` param allows to set the URL of the Spark Master to submit the job. Set to "local[number_of_cores]" for local execution. Don't set it at all for local execution with number of cores determined by snakemake.
+
+* ``spark_extra``: The `spark_extra` param allows for additional spark arguments.
+
+
+
+
+
+Authors
+-------
+
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Filipe G. Vieira"
+    __copyright__ = "Copyright 2021, Filipe G. Vieira"
+    __license__ = "MIT"
+
+    import tempfile
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+    spark_runner = snakemake.params.get("spark_runner", "LOCAL")
+    spark_master = snakemake.params.get(
+        "spark_master", "local[{}]".format(snakemake.threads)
+    )
+    spark_extra = snakemake.params.get("spark_extra", "")
+    java_opts = get_java_opts(snakemake)
+
+    tmpdir = tempfile.gettempdir()
+
+    shell(
+        "gatk --java-options '{java_opts}' PrintReadsSpark {extra} "
+        "--reference {snakemake.input.ref} --input {snakemake.input.bam} "
+        "--tmp-dir {tmpdir} "
+        "--output {snakemake.output.bam} "
+        "-- --spark-runner {spark_runner} --spark-master {spark_master} {spark_extra} "
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

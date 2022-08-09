@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RENAME_SNPSIFT_MAF_COLS &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="SPLIT_DESIGN" href="split_design.html" />
+    <link rel="prev" title="CANCER_GENE_CENSUS_ANNOTATE" href="pharmkdb_annotate.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Snakemake Wrappers
+          </a>
+              <div class="version">
+                heads/Unofficial
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers and Pipelines</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../wrappers.html">Wrappers</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../BiGR.html">BIGR</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cancer_gene_census_annotate.html">CANCER_GENE_CENSUS_ANNOTATE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="copy.html">IGR_COPY</a></li>
+<li class="toctree-l3"><a class="reference internal" href="drop_duplicates_md5.html">DROP_MD5_DUPLICATES</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fix_vcf.html">FIX VCF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gleaves_compatibility.html">GLEAVES_COMPATIBILITY</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mane_to_vcftools_annotate.html">MANE_TO_VCFTOOLS_ANNOTATE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="msisensor_table.html">MSISENSOR_TABLE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multiqc_rnaseq_report.html">MULTIQC_RNASEQ_REPORT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="oncokb_annotate.html">ONCOKB_ANNOTATE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pharmkdb_annotate.html">CANCER_GENE_CENSUS_ANNOTATE</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">RENAME_SNPSIFT_MAF_COLS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#software-dependencies">Software dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#params">Params</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#authors">Authors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#code">Code</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="split_design.html">SPLIT_DESIGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="split_vcf_features.html">SPLIT VCF FEATURES</a></li>
+<li class="toctree-l3"><a class="reference internal" href="split_vcf_multiallelic.html">SPLIT VCF MULTIALLELIC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="translate_vcf_seqoia.html">TRANSLATE_VCF_SEQOIA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vcf_format_to_info.html">VCF_FORMAT_TO_INFO</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Rsamtools.html">RSAMTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../SomaticSignatures.html">SOMATICSIGNATURES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../VariantAnnotation.html">VARIANTANNOTATION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../adapterremoval.html">ADAPTERREMOVAL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../arriba.html">ARRIBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../art.html">ART</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../assembly-stats.html">ASSEMBLY-STATS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../awk.html">AWK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bamtools.html">BAMTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bbtools.html">BBTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bcftools.html">BCFTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bcl2fastq.html">BCF2FASTQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bedtools.html">BEDTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../benchmark.html">BENCHMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../biobambam2.html">BIOBAMBAM2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bioinfokit.html">BIOINFOKIT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../biomaRt.html">BIOMART</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../biseq.html">BISEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bismark.html">BISMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../blast.html">BLAST</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bowtie2.html">BOWTIE2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../busco.html">BUSCO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bwa.html">BWA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bwa-mem2.html">BWA-MEM2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cairosvg.html">CAIROSVG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../check_md5.html">CHECK MD5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../chipseeker.html">CHIPSEEKER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../clustalo.html">CLUSTALO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../clusterProfiler.html">CLUSTERPROFILER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compress.html">COMPRESS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../concatenate_fastq.html">CONCATENATE FASTQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../consensusclusterplus.html">CONSENSUSCLUSTERPLUS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cp.html">CP (BASH)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpat.html">CPAT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cutadapt.html">CUTADAPT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dada2.html">DADA2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deeptools.html">DEEPTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deepvariant.html">DEEPVARIANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../delly.html">DELLY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../diamond.html">DIAMOND</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eacon.html">EACON</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../epic.html">EPIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../facets.html">FACETS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fastp.html">FASTP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fastq_screen.html">FASTQ_SCREEN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fastqc.html">FASTQC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fgbio.html">FGBIO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fgsea.html">FGSEA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../filtlong.html">FILTLONG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../freebayes.html">FREEBAYES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gatk.html">GATK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gatk3.html">GATK3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdc-api.html">GDC-API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdc-client.html">GDC-CLIENT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gencode.html">GENCODE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../genomepy.html">GENOMEPY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gridss.html">GRIDSS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gsva.html">GSVA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gtf.html">GTF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hap.py.html">HAP.PY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hisat2.html">HISAT2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hmmer.html">HMMER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../homer.html">HOMER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../iRODS.html">IRODS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../igv-reports.html">IGV-REPORTS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../immunedeconv.html">IMMUNEDECONV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../infernal.html">INFERNAL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../isoformSwitchAnalyseR.html">ISOFORMSWITCHANALYSER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jannovar.html">JANNOVAR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../kallisto.html">KALLISTO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../last.html">LAST</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../liftoff.html">LIFTOFF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lofreq.html">LOFREQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../macs2.html">MACS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../maftools.html">MAFTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mapdamage2.html">MAPDAMAGE2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mashmap.html">MASHMAP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../microphaser.html">MICROPHASER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../minimap2.html">MINIMAP2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mixcr.html">MIXCR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mlst.html">MLST</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mosdepth.html">MOSDEPTH</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../msisensor_pro.html">MSISENSOR_PRO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nanosim-h.html">NANOSIM-H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nextflow.html">NEXTFLOW</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ngs-disambiguate.html">NGS-DISAMBIGUATE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../open-cravat.html">OPEN-CRAVAT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../optitype.html">OPTITYPE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../paladin.html">PALADIN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pandas.html">PANDAS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pandora.html">PANDORA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pbmm2.html">PBMM2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pcaExplorer.html">PCAEXPLORER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pear.html">PEAR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pfam.html">PFAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pheatmap.html">PHEATMAP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../picard.html">PICARD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pindel.html">PINDEL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../plass.html">PLASS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../preseq.html">PRESEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../primerclip.html">PRIMERCLIP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prosolo.html">PROSOLO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ptrimmer.html">PTRIMMER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pyfastaq.html">PYFASTAQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../qualimap.html">QUALIMAP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rasusa.html">RASUSA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../razers3.html">RAZERS3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rbt.html">RBT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rebaler.html">REBALER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html">REFERENCE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../refgenie.html">REFGENIE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rest.html">REST</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rsem.html">RSEM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rubic.html">RUBIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../salmon.html">SALMON</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sambamba.html">SAMBAMBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../samtools.html">SAMTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sansa.html">SANSA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../seaborn.html">SEABORN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sed.html">SED</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../seqtk.html">SEQTK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../shovill.html">SHOVILL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sickle.html">SICKLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sigprofiler.html">SIGPROFILER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../simplifyenrichment.html">SIMPLIFYENRICHMENT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sleuth.html">SLEUTH</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../snp-mutator.html">SNP-MUTATOR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../snpeff.html">SNPEFF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../snpsift.html">SNPSIFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sort.html">SORT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sourmash.html">SOURMASH</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../spades.html">SPADES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../spliceai.html">SPLICE AI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sra-tools.html">SRA-TOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../star.html">STAR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../strelka.html">STRELKA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../strling.html">STRLING</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../subread.html">SUBREAD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tabix.html">TABIX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tmb.html">TMB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transdecoder.html">TRANSDECODER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../trim_galore.html">TRIM_GALORE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../trimmomatic.html">TRIMMOMATIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../trinity.html">TRINITY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tximeta.html">TXIMETA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tximport.html">TXIMPORT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ucsc.html">UCSC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../umis.html">UMIS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../unicycler.html">UNICYCLER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vardict.html">VARDICT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../variant_distribution.html">VARIANT_DISTRIBUTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../variantoccurence.html">VARIANTOCCURENCE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../varscan.html">VARSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vembrane.html">VEMBRANE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vep.html">VEP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vg.html">VG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wgsim.html">WGSIM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wisecondorx.html">WISECONDORX</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta-wrappers.html">Meta-Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pipelines.html">BiGR Pipelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Snakemake Wrappers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../wrappers.html">Wrappers</a> &raquo;</li>
+          <li><a href="../BiGR.html">BIGR</a> &raquo;</li>
+      <li>RENAME_SNPSIFT_MAF_COLS</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/wrappers/BiGR/rename_snpsift_maf_cols.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rename-snpsift-maf-cols">
+<span id="bio-bigr-rename-snpsift-maf-cols"></span><h1>RENAME_SNPSIFT_MAF_COLS<a class="headerlink" href="#rename-snpsift-maf-cols" title="Permalink to this headline"></a></h1>
+<p>Columns from snpsift are usually named in a non-human readable manner.</p>
+<p><strong>URL</strong>:</p>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h2>
+<p>This wrapper can be used in the following way:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">test_rename_snpsift_maf_cols</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;mouse.tsv&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;mouse.renamed.tsv&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/renamed.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;0.50.4-1991-g7872381db/bio/BiGR/rename_snpsift_maf_cols&quot;</span>
+</pre></div>
+</div>
+<p>Note that input, output and log file paths can be chosen freely.</p>
+<p>When running with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
+</pre></div>
+</div>
+<p>the software dependencies will be automatically deployed into an isolated environment before execution.</p>
+</section>
+<section id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">python==3.9.6</span></code></p></li>
+</ul>
+</section>
+<section id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline"></a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tsv</span></code>: TSV formatted calls</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tsv</span></code>: TSV formatted calls, with renamed columns</p></li>
+</ul>
+</section>
+<section id="params">
+<h2>Params<a class="headerlink" href="#params" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">add_cols</span></code>: Boolean. Add (default) optional columns, or don’t.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ncbi_build</span></code>: The NCBI build version of the genome. Required if and only if add_cols is True.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">center</span></code>: Sequencing center. Required if and only if add_cols is True.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">caller</span></code>: Used variant caller. One of <cite>Mutect2</cite>. Required if and only if add_cols is True.</p></li>
+</ul>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<p>Further columns descriptions may be added.</p>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Thibault Dayris</p></li>
+</ul>
+</section>
+<section id="code">
+<h2>Code<a class="headerlink" href="#code" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3.8</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Rename splitted vcf columns</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">filename</span><span class="o">=</span><span class="n">snakemake</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+<span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_variant_type</span><span class="p">(</span><span class="n">ref</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">alt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return variant type given the reference and the alternative alleles</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">ref</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span> <span class="c1"># Nothing in REF, added in ALT</span>
+        <span class="k">return</span> <span class="s2">&quot;INS&quot;</span>
+    <span class="k">if</span> <span class="n">alt</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;DEL&quot;</span> <span class="c1"># Something in REF, nothing in ALT</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">alt</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;SNP&quot;</span> <span class="c1"># REF and ALT only have one nucleotide</span>
+        <span class="k">return</span> <span class="s2">&quot;ONP&quot;</span> <span class="c1"># REF had less nucleotides than ALT</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">alt</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;DNP&quot;</span> <span class="c1"># REF and ALT have two nucleotides</span>
+        <span class="k">return</span> <span class="s2">&quot;ONP&quot;</span> <span class="c1"># REF has two nucleotides, ALT have unknown</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">alt</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;TNP&quot;</span> <span class="c1"># REF and ALT have three nucleotides</span>
+        <span class="k">return</span> <span class="s2">&quot;ONP&quot;</span> <span class="c1"># REF has three nucleotides, ALT have unknown</span>
+    <span class="k">return</span> <span class="s2">&quot;ONP&quot;</span> <span class="c1"># More than 3 nucleotides in ref, unknown in ALT</span>
+
+
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;CHROM&quot;</span><span class="p">:</span> <span class="s2">&quot;Chromosome&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;POS&quot;</span><span class="p">:</span> <span class="s2">&quot;Start_Position&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ID&quot;</span><span class="p">:</span> <span class="s2">&quot;Variant_ID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;REF&quot;</span><span class="p">:</span> <span class="s2">&quot;REF&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ALT&quot;</span><span class="p">:</span> <span class="s2">&quot;ALT&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FILTER&quot;</span><span class="p">:</span> <span class="s2">&quot;Filter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_AD&quot;</span><span class="p">:</span> <span class="s2">&quot;Format_Allelic_depths&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_AF&quot;</span><span class="p">:</span> <span class="s2">&quot;Format_Allele_Frequency&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_DP&quot;</span><span class="p">:</span> <span class="s2">&quot;Format_Read_Depth&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_F1R2&quot;</span><span class="p">:</span> <span class="s2">&quot;F1R2_orientation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_F2R1&quot;</span><span class="p">:</span> <span class="s2">&quot;F2R1_orientation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_GQ&quot;</span><span class="p">:</span> <span class="s2">&quot;Genotype_quality&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_GT&quot;</span><span class="p">:</span> <span class="s2">&quot;Genotype&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_PGT&quot;</span><span class="p">:</span> <span class="s2">&quot;Physical_phasing_haplotype&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_PID&quot;</span><span class="p">:</span> <span class="s2">&quot;Physical_phasing_ID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_PL&quot;</span><span class="p">:</span> <span class="s2">&quot;Normalized_Phred_scaled_likelihoods&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_PS&quot;</span><span class="p">:</span> <span class="s2">&quot;Phasing_set&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_SB&quot;</span><span class="p">:</span> <span class="s2">&quot;Strand_bias_Fisher_component&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;AC&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_afr&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_African_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_afr_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_African_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_afr_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_African_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_ami&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Amish_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_ami_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Amish_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_ami_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Amish_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_amr&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Latino_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_amr_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Latino_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_amr_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Latino_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_asj&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Ashkenazi_Jewish_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_asj_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Ashkenazi_Jewish_ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_asj_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Ashkenazi_Jewish_ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_eas&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_East_Asian_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_eas_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_East_Asian_ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_eas_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_East_Asian_ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_fin&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Finnish_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_fin_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Finnish_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_fin_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Finnish_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_nfe&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Non_Finnish_Europeans&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_nfe_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Non_Finnish_Europeans_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_nfe_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_Non_Finnish_Europeans_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_oth&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_oth&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_oth_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_oth_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_oth_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_oth_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_raw&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_raw&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_sas&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_South_Asian_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_sas_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_South_Asian_ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AC_sas_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleCount_South_Asian_ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_ESP&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_ESP&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_EXAC&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_EXAC&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_TGP&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_TGP&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_afr&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_African_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_afr_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_African_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_afr_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_African_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_ami&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Amish_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_ami_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Amish_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_ami_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Amish_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_amr&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Latino_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_amr_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Latino_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_amr_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Latino_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_asj&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Ashkenazi_Jewish_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_asj_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Ashkenazi_Jewish_ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_asj_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Ashkenazi_Jewish_ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_eas&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_East_Asian_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_eas_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_East_Asian_ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_eas_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_East_Asian_ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_fin&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Finnish_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_fin_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Finnish_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_fin_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Finnish_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_nfe&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Non_Finnish_Europeans&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_nfe_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Non_Finnish_Europeans_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_nfe_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_Non_Finnish_Europeans_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_oth&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_oth&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_oth_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_oth_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_oth_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_oth_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_raw&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_raw&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_sas&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_South_Asian_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_sas_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_South_Asian_ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AF_sas_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleFrequency_South_Asian_ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_afr&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_African_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_afr_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_African_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_afr_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_African_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_ami&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Amish_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_ami_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Amish_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_ami_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Amish_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_amr&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Latino_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_amr_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Latino_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_amr_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Latino_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_asj&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Ashkenazi_Jewish_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_asj_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Ashkenazi_Jewish_ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_asj_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Ashkenazi_Jewish_ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_eas&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_East_Asian_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_eas_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_East_Asian_ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_eas_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_East_Asian_ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_fin&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Finnish_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_fin_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Finnish_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_fin_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Finnish_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_nfe&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Non_Finnish_Europeans&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_nfe_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Non_Finnish_Europeans_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_nfe_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_Non_Finnish_Europeans_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_oth&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_oth&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_oth_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_oth_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_oth_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_oth_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_raw&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_raw&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_sas&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_South_Asian_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_sas_female&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_South_Asian_ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AN_sas_male&#39;</span><span class="p">:</span> <span class="s1">&#39;AlleleNumber_South_Asian_ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;AS_FilterStatus&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_AS_FilterStatus&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AS_SB_TABLE&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Allele_specific_Strand_bias&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AS_UNIQ_ALT_READ_COUNT&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Unique_alt_variant_count&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CONTQ&quot;</span><span class="p">:</span> <span class="s2">&quot;Phred_scaled_qualities_non_contamination&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DP&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Read_depth&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ECNT&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Events_in_haplotype&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;GERMQ&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Phred_scaled_quality_non_germline&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MBQ&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Median_base_quality&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MFRL&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Median_fragment_length&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MMQ&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Median_mapping_quality&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MPOS&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Median_distance_to_end_read&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NALOD&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Negative_log_10_odds_of_artifact&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NCount&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Pileup_N_base_depth&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NLOD&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Normal_log_10_likelihood_ploïdy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OCM&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Non_matching_original_alignment&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PON&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Panel_of_Normal&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;POPAF&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_negative_log_10_population_allele_frequencies&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ROQ&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Phred_scaled_qualities_not_orientation_bias&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RPA&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Number_tandem_repetition&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RU&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Repeat_unit&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SEQQ&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Phred_scaled_quality_not_sequencing_error&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;STR&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Is_short_tandem_repeat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;STRANDQ&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Phred_scaled_quality_not_strand_bias&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;STRQ&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Phred_scaled_quality_not_tandem_polymerase_error&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TLOD&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Log_10_likelihood_variant_exists&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FORMAT_sample_tumor_AF&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutect2_Allele_Frequency&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].ALLELE&quot;</span><span class="p">:</span> <span class="s2">&quot;Allele&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].EFFECT&quot;</span><span class="p">:</span> <span class="s2">&quot;Variant_Classification&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].IMPACT&quot;</span><span class="p">:</span> <span class="s2">&quot;IMPACT&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].GENE&quot;</span><span class="p">:</span> <span class="s2">&quot;Hugo_Symbol&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].GENEID&quot;</span><span class="p">:</span> <span class="s2">&quot;Gene&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].FEATURE&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].FEATUREID&quot;</span><span class="p">:</span> <span class="s2">&quot;Transcript_ID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].BIOTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;BIOTYPE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].RANK&quot;</span><span class="p">:</span> <span class="s2">&quot;Exon_Intron_rank&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].HGVS_C&quot;</span><span class="p">:</span> <span class="s2">&quot;HGVSc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].HGVS_P&quot;</span><span class="p">:</span> <span class="s2">&quot;HGVSp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].CDNA_POS&quot;</span><span class="p">:</span> <span class="s2">&quot;cDNA_position&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].CDNA_LEN&quot;</span><span class="p">:</span> <span class="s2">&quot;cDNA_Length&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].CDS_POS&quot;</span><span class="p">:</span> <span class="s2">&quot;CDS_position&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].CDS_LEN&quot;</span><span class="p">:</span> <span class="s2">&quot;CDS_length&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].AA_POS&quot;</span><span class="p">:</span> <span class="s2">&quot;Protein_position&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].AA_LEN&quot;</span><span class="p">:</span> <span class="s2">&quot;Protein_length&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].DISTANCE&quot;</span><span class="p">:</span> <span class="s2">&quot;DISTANCE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANN[*].ERRORS&quot;</span><span class="p">:</span> <span class="s2">&quot;Errors&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EFF[*].EFFECT&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Effect&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EFF[*].IMPACT&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Impact&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EFF[*].FUNCLASS&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_FunctionalClass&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EFF[*].CODON&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Codon&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EFF[*].AA&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_AminoAcid&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EFF[*].AA_LEN&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_AminoAcid_Length&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EFF[*].GENE&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Gene_Name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EFF[*].BIOTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Biotype&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EFF[*].CODING&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_CodingSequence&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EFF[*].TRID&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_TranscriptID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EFF[*].RANK&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Rank&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LOF[*].GENE&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_LOF_GeneName&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LOF[*].GENEID&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_LOF_GeneID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LOF[*].NUMTR&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_LOF_TranscriptNb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LOF[*].PERC&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_LOF_PctTrancrtipcsAffected&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LOF&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_LOF_SnpEff&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NMD[*].GENE&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_NMD_GeneName&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NMD[*].GENEID&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_NMD_GeneID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NMD[*].NUMTR&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_NMD_TranscriptNb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NMD[*].PERC&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_NMD_PctTrancrtipcsAffected&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NMD&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_NMD_SnpEff&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NMD&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Nonsense_mediated_decay&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;VARTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Variant_types&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SNP&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Is_SNP&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MNP&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Is_MNP&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;INS&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Is_INS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DEL&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Is_DEL&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MIXED&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Is_MIXED_Polymorphisms&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;HOM&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Is_Homozygous&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;HET&quot;</span><span class="p">:</span> <span class="s2">&quot;SnpEff_Is_Heterozygous&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MSigDb&quot;</span><span class="p">:</span> <span class="s2">&quot;MSigDb_Pathways&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Kaviar_AC&quot;</span><span class="p">:</span> <span class="s2">&quot;Kaviar_Allele_Count&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Kaviar_AF&quot;</span><span class="p">:</span> <span class="s2">&quot;Kaviar_Allele_Frequency&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Kaviar_AN&quot;</span><span class="p">:</span> <span class="s2">&quot;Kaviar_Allele_Number&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Kaviar_DS&quot;</span><span class="p">:</span> <span class="s2">&quot;Kaviar_Database_Source&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Kaviar_END&quot;</span><span class="p">:</span> <span class="s2">&quot;Kaviar_End_Position&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ExistsInKaviar&quot;</span><span class="p">:</span> <span class="s2">&quot;Variant_ExistsInKaviar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_CDA&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Clinical_Diagnostic_Assay&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_OTH&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Orthologous_Variants_in_NCBI&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_S3D&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Has_known_3D_structure&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_WTD&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Is_Withdrawn_by_submitter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_dbSNPBuildID&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_BuildID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_SLO&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_SubmitterLinkOut&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_NSF&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Has_Non_Synonymous_Frameshift&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_R3&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_3p_variant&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_R5&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_5p_variant&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_NSN&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Has_Nonsense_Changes_Stop&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_NSM&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Has_Nonsense_Changes_Peptide&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_G5A&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Less_5pct_population&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_COMMON&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Is_common_variant&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_RS&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_RS_id&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_RV&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Variant_is_reversed&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_TPA&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Third_party_annotation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_CFL&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Has_assembly_conflict&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_GNO&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Has_Available_genotype&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_VLD&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Is_Validated&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_ASP&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Is_Assembly_Specific&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_ASS&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Acceptor_splice_variant&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_REF&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Variant_identical_to_reference&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_U3&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_3p_UTR_variant&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_U5&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_5p_UTR_variant&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_TOPMED&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_AF_in_TopMed_db&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_WGT&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Weight&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_MTP&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Microattribution_TPA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_LSD&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Locus_specific_database&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_NOC&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Contig_not_in_variant_list&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_DSS&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Donor_splice_varianP&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_SYN&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Synonymous_variant&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_KGPhase3&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_1000genome_p3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_CAF&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Alleles_in_1000g&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_VC&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Variant_class&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_MUT&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Is_cited&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_KGPhase1&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_1000genome_p1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_NOV&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Non_Overlapping_Alleles&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_VP&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Variant_property&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_SAO&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Variant_Origin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_GENEINFO&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Gene_info&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_INT&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Is_Intronic&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_G5&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_MAF_Over_5pct&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_OM&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Has_OMIM_OMIA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_PMC&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Pubmed&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_SSR&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Suspect_reason_code&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_RSPOS&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Position_dbSNP&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_HD&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_High_density_genotyping_kit_dbGaP&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dbSNP_PM&quot;</span><span class="p">:</span> <span class="s2">&quot;dbSNP_Variant_Precious&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ExistsInDBsnp&quot;</span><span class="p">:</span> <span class="s2">&quot;Variant_ExistsInDBsnp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cosmic_CDS&quot;</span><span class="p">:</span> <span class="s2">&quot;Cosmic_CDS_Annotation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cosmic_AA&quot;</span><span class="p">:</span> <span class="s2">&quot;Cosmic_AA_Annotation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cosmic_GENE&quot;</span><span class="p">:</span> <span class="s2">&quot;Cosmic_Gene_Name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cosmic_CNT&quot;</span><span class="p">:</span> <span class="s2">&quot;Cosmic_Sample_Number&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cosmic_SNP&quot;</span><span class="p">:</span> <span class="s2">&quot;Cosmic_Is_SNP&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cosmic_STRAND&quot;</span><span class="p">:</span> <span class="s2">&quot;Cosmic_Gene_Strand&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ExistsInCosmic&quot;</span><span class="p">:</span> <span class="s2">&quot;Variant_ExistsInCosmic&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_SAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_South_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_DEOGEN2_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_DEOGEN2_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_clinvar_var_source&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_clinvar_var_source&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_SAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_South_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_GERP___RS&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_GERP___RS&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_SAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_South_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_HGVSp_ANNOVAR&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_HGVSp_ANNOVAR&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_aaalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_AlternativeAminoAcid&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_H1_hESC_fitCons_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_H1_hESC_fitCons_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AMR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Latino_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AMR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Latino_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_1000Gp3_EAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_1000Gp3_East_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MetaSVM_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MetaSVM_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_SAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_South_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_M_CAP_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_M_CAP_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutationAssessor_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutationAssessor_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Aloft_Confidence&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Aloft_Confidence&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_NFE_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_Non_Finnish_Europeans_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_NFE_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Non_Finnish_Europeans_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_NFE_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_Non_Finnish_Europeans_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_1000Gp3_EAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_1000Gp3_East_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Aloft_prob_Tolerant&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Aloft_prob_Tolerant&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_LRT_converted_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_LRT_converted_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AMI_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Amish_Ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_APPRIS&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_APPRIS&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_FIN_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_Finnish_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_PrimateAI_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_PrimateAI_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_fathmm_MKL_coding_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_fathmm_MKL_coding_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_NFE_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Non_Finnish_Europeans_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_fathmm_MKL_coding_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_fathmm_MKL_coding_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_FIN_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_Finnish_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_ASJ_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Ashkenazi_Jewish_ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ESP6500_EA_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ESP6500_EA_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_SAS_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_South_Asian_ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_ASJ_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Ashkenazi_Jewish_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_NFE_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Non_Finnish_Europeans_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_FATHMM_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_FATHMM_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_FIN_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Finnish_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_ASJ_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Ashkenazi_Jewish_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_FIN_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Finnish_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_FIN_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_Finnish_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_FIN_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_Finnish_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_EAS_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_East_Asian_ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_phastCons17way_primate&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_phastCons17way_primate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_FIN_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_Finnish_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_LRT_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_LRT_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Ancestral_allele&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Ancestral_allele&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ESP6500_EA_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ESP6500_EA_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_FIN_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Finnish_Ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutPred_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutPred_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_FIN_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_Finnish_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_FIN_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Finnish_Ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_GENCODE_basic&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_GENCODE_basic&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_PrimateAI_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_PrimateAI_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_bStatistic_converted_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_bStatistic_converted_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_HUVEC_confidence_value&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_HUVEC_confidence_value&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_H1_hESC_confidence_value&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_H1_hESC_confidence_value&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_SAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_South_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_GTEx_V8_tissue&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_GTEx_V8_tissue&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Eigen_PC_phred_coding&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Eigen_PC_phred_coding&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Ensembl_geneid&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Ensembl_geneid&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_SAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_South_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_NFE_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Non_Finnish_Europeans_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_HGVSc_VEP&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_HGVSc_VEP&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_SAS_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_South_Asian_ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_HGVSp_snpEff&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_HGVSp_snpEff&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_PROVEAN_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_PROVEAN_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AMR_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Latino_Ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_phastCons100way_vertebrate&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_phastCons100way_vertebrate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MetaSVM_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MetaSVM_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AFR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AFR_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AFR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AFR_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AMI_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Amish_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Denisova&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Denisova&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_refcodon&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_refcodon&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_clinvar_id&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_clinvar_id&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AFR_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AFR_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ESP6500_AA_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ESP6500_AA_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_M_CAP_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_M_CAP_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AMI_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Amish_Ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_CADD_phred_hg19&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_CADD_phred_hg19&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ESP6500_AA_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ESP6500_AA_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_fathmm_XF_coding_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_fathmm_XF_coding_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_flag&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_flag&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_hg19_pos_1_based_&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_hg19_pos_1_based_&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_NFE_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_Non_Finnish_Europeans_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_BayesDel_addAF_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_BayesDel_addAF_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_LIST_S2_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_LIST_S2_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AMI_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Amish_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_PROVEAN_converted_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_PROVEAN_converted_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_DEOGEN2_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_DEOGEN2_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_bStatistic&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_bStatistic&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ref&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Reference&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_DANN_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_DANN_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_EAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_East_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_AMR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Latino_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_EAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_East_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_AMR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Latino_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Aloft_prob_Recessive&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Aloft_prob_Recessive&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Interpro_domain&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Interpro_domain&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_SiPhy_29way_logOdds_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_SiPhy_29way_logOdds_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ClinPred_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ClinPred_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Reliability_index&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Reliability_index&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_AMR_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Latino_Ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_FIN_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Finnish_Ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_NFE_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Non_Finnish_Europeans_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_phyloP30way_mammalian&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_phyloP30way_mammalian&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_ASJ_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Ashkenazi_Jewish_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_ASJ_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Ashkenazi_Jewish_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MetaLR_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MetaLR_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_ASJ_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Ashkenazi_Jewish_ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_chr&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_chr&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_phastCons17way_primate_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_phastCons17way_primate_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_1000Gp3_AFR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_1000Gp3_AFR_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_BayesDel_noAF_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_BayesDel_noAF_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_HGVSp_VEP&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_HGVSp_VEP&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_AMR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_Latino_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_1000Gp3_AFR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_1000Gp3_AFR_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AMR_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Latino_Ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_AMR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_Latino_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_NFE_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_Non_Finnish_Europeans_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Eigen_PC_raw_coding_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Eigen_PC_raw_coding_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_FIN_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Finnish_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_clinvar_review&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_clinvar_review&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_DEOGEN2_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_DEOGEN2_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_genename&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_genename&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_REVEL_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_REVEL_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_FIN_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Finnish_Ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutPred_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutPred_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_EAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_East_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_PrimateAI_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_PrimateAI_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_UK10K_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_UK10K_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_BayesDel_addAF_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_BayesDel_addAF_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_CADD_raw_hg19&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_CADD_raw_hg19&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_HUVEC_fitCons_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_HUVEC_fitCons_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MVP_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MVP_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_UK10K_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_UK10K_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_hg19_chr&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_hg19_chr&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AFR_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_AFR_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_POPMAX_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_PopulationMax_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_AFR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_AFR_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_1000Gp3_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_1000Gp3_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_1000Gp3_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_1000Gp3_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_AFR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_AFR_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Uniprot_acc&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Uniprot_acc&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_ASJ_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Ashkenazi_Jewish_ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_flag&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_flag&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_LINSIGHT_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_LINSIGHT_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_GM12878_fitCons_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_GM12878_fitCons_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Eigen_PC_raw_coding&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Eigen_PC_raw_coding&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_GM12878_confidence_value&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_GM12878_confidence_value&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_NFE_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Non_Finnish_Europeans_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_M_CAP_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_M_CAP_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutationTaster_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutationTaster_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_EAS_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_East_Asian_ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_LIST_S2_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_LIST_S2_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Polyphen2_HVAR_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Polyphen2_HVAR_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_SIFT_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_SIFT_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_FIN_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Finnish_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_phastCons30way_mammalian&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_phastCons30way_mammalian&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_NFE_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Non_Finnish_Europeans_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_POPMAX_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_PopulationMax_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_POPMAX_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_PopulationMax_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Ensembl_transcriptid&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Ensembl_transcriptid&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_NFE_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Non_Finnish_Europeans_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_phastCons100way_vertebrate_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_phastCons100way_vertebrate_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_clinvar_MedGen_id&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_clinvar_MedGen_id&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_POPMAX_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_PopulationMax_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_NFE_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Non_Finnish_Europeans_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_AMR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_Latino_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_AMR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_Latino_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutPred_protID&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutPred_protID&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AMR_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Latino_Ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_FATHMM_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_FATHMM_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_SIFT4G_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_SIFT4G_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_integrated_fitCons_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_integrated_fitCons_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutPred_Top5features&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutPred_Top5features&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_fathmm_XF_coding_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_fathmm_XF_coding_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_HUVEC_fitCons_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_HUVEC_fitCons_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_Adj_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_Adj_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_SIFT4G_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_SIFT4G_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_VindijiaNeandertal&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_VindijiaNeandertal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AMR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Latino_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_EAS_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_East_Asian_ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_SAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_South_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_POPMAX_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_PopulationMax_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_Adj_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_Adj_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_SIFT_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_SIFT_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_phyloP100way_vertebrate_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_phyloP100way_vertebrate_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_SAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_South_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_codon_degeneracy&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_codon_degeneracy&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_POPMAX_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_PopulationMax_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AMR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Latino_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_SAS_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_South_Asian_ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_rs_dbSNP151&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_rs_dbSNP151&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_EAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_East_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MetaSVM_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MetaSVM_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_SAS_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_South_Asian_ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_DANN_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_DANN_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_POPMAX_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_PopulationMax_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Aloft_prob_Dominant&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Aloft_prob_Dominant&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_BayesDel_noAF_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_BayesDel_noAF_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_phyloP30way_mammalian_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_phyloP30way_mammalian_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_1000Gp3_SAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_1000Gp3_South_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_EAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_East_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_cds_strand&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_cds_strand&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_POPMAX_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_PopulationMax_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_1000Gp3_SAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_1000Gp3_South_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_EAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_East_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutationTaster_model&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutationTaster_model&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_EAS_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_East_Asian_ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_codonpos&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_codonpos&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_Adj_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_Adj_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ClinPred_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ClinPred_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MPC_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MPC_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_VEP_canonical&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_VEP_canonical&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_Adj_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_Adj_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_Adj_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_Adj_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_AFR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_AFR_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_BayesDel_addAF_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_BayesDel_addAF_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ClinPred_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ClinPred_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_AFR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_AFR_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_SIFT4G_converted_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_SIFT4G_converted_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_GenoCanyon_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_GenoCanyon_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_SIFT_converted_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_SIFT_converted_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_EAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_East_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_Adj_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_Adj_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_EAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_East_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Aloft_Fraction_transcripts_affected&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Aloft_Fraction_transcripts_affected&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_VEST4_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_VEST4_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Polyphen2_HDIV_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Polyphen2_HDIV_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutationTaster_converted_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutationTaster_converted_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Eigen_raw_coding_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Eigen_raw_coding_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_phyloP100way_vertebrate&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_phyloP100way_vertebrate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_LRT_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_LRT_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_1000Gp3_EUR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_1000Gp3_EUR_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_CADD_phred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_CADD_phred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_ASJ_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Ashkenazi_Jewish_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_1000Gp3_EUR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_1000Gp3_EUR_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_ASJ_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Ashkenazi_Jewish_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_FIN_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Finnish_Ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Eigen_phred_coding&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Eigen_phred_coding&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Uniprot_entry&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Uniprot_entry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_clinvar_trait&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_clinvar_trait&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_fathmm_XF_coding_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_fathmm_XF_coding_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Eigen_raw_coding&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Eigen_raw_coding&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_clinvar_Orphanet_id&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_clinvar_Orphanet_id&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_ASJ_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Ashkenazi_Jewish_ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_NFE_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_Non_Finnish_Europeans_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_PROVEAN_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_PROVEAN_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ALSPAC_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ALSPAC_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_BayesDel_noAF_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_BayesDel_noAF_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_VEST4_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_VEST4_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_NFE_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_Non_Finnish_Europeans_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_SiPhy_29way_logOdds&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_SiPhy_29way_logOdds&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_SAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_South_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_EAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_East_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_GERP___NR&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_GERP___NR&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_EAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_East_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Polyphen2_HVAR_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Polyphen2_HVAR_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_SAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_South_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_FATHMM_converted_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_FATHMM_converted_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_HGVSc_ANNOVAR&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_HGVSc_ANNOVAR&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_phastCons30way_mammalian_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_phastCons30way_mammalian_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_1000Gp3_AMR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_1000Gp3_Latino_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ALSPAC_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ALSPAC_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_AMR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_Latino_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_NFE_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_Non_Finnish_Europeans_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_clinvar_OMIM_id&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_clinvar_OMIM_id&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_EAS_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_East_Asian_ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_1000Gp3_AMR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_1000Gp3_Latino_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_NFE_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Non_Finnish_Europeans_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_AMR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonTCGA_Latino_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_phyloP17way_primate_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_phyloP17way_primate_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_CADD_raw_rankscore_hg19&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_CADD_raw_rankscore_hg19&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_integrated_confidence_value&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_integrated_confidence_value&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_NFE_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Non_Finnish_Europeans_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_FIN_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Finnish_Ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_integrated_fitCons_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_integrated_fitCons_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_AFR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_AFR_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutPred_AAchange&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutPred_AAchange&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_CADD_raw&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_CADD_raw&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_FIN_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Finnish_Ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_AFR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_AFR_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Polyphen2_HVAR_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Polyphen2_HVAR_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_fathmm_MKL_coding_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_fathmm_MKL_coding_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_GERP___RS_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_GERP___RS_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_alt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Alternative&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Aloft_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Aloft_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Polyphen2_HDIV_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Polyphen2_HDIV_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_TSL&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_TSL&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_pos_1_based_&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_pos_1_based_&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_FIN_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Finnish_Ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_AltaiNeandertal&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_AltaiNeandertal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_aapos&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_AminoAcidPosition&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_AFR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_AFR_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_clinvar_clnsig&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_clinvar_clnsig&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MetaLR_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MetaLR_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_ASJ_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Ashkenazi_Jewish_ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutationTaster_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutationTaster_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_AFR_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_AFR_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MetaLR_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MetaLR_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_AMR_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Latino_Ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MPC_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MPC_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_REVEL_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_REVEL_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_CADD_raw_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_CADD_raw_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_LIST_S2_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_LIST_S2_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_GTEx_V8_gene&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_GTEx_V8_gene&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AFR_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_AFR_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_AFR_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_AFR_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Geuvadis_eQTL_target_gene&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Geuvadis_eQTL_target_gene&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_fathmm_MKL_coding_group&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_fathmm_MKL_coding_group&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_ASJ_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_Ashkenazi_Jewish_ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutationAssessor_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutationAssessor_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_TWINSUK_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_TWINSUK_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_TWINSUK_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_TWINSUK_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AFR_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_AFR_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_HGVSc_snpEff&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_HGVSc_snpEff&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MVP_rankscore&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MVP_rankscore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_GM12878_fitCons_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_GM12878_fitCons_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_AFR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_AFR_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Ensembl_proteinid&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Ensembl_proteinid&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_clinvar_hgvs&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_clinvar_hgvs&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AFR_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AFR_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_genomes_AFR_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_genomes_AFR_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutationTaster_AAE&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutationTaster_AAE&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_LINSIGHT&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_LINSIGHT&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_SAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_South_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_EAS_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_East_Asian_ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_GenoCanyon_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_GenoCanyon_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_POPMAX_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_PopulationMax_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_SAS_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_South_Asian_ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_ExAC_nonpsych_SAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_ExAC_nonpsych_South_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_SiPhy_29way_pi&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_SiPhy_29way_pi&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_EAS_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_East_Asian_ancestry_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_H1_hESC_fitCons_score&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_H1_hESC_fitCons_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_EAS_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_East_Asian_ancestry_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_Polyphen2_HDIV_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_Polyphen2_HDIV_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_POPMAX_AC&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_PopulationMax_AlleleCount&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_phyloP17way_primate&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_phyloP17way_primate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_AMR_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_Latino_Ancestry_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_LRT_Omega&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_LRT_Omega&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_aaref&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_AminoAcidReference&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_MutationAssessor_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_MutationAssessor_pred&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_POPMAX_AF&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_PopulationMax_AlleleFrequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_POPMAX_nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_PopulationMax_HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_SAS_AN&#39;</span><span class="p">:</span> <span class="s1">&#39;dbNSFP_gnomAD_exomes_controls_South_Asian_ancestry_AlleleNumber&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_DBVARID&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_dbvar_AccessionNumber&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_ALLELEID&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_Allele_ID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_CLNSIG&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_ClinicalSignificance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_CLNVCSO&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_SequenceOnthology&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_CLNREVSTAT&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_ReviewStatus&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_RS&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_dbSNP_ID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_CLNDNINCL&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_Disease_ID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_ORIGIN&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_Origin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_MC&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_MolecularConsequences&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_CLNDN&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_Disease_Name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_CLNVC&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_VariantType&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_CLNVI&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_ClinicalSource&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_AF_EXAC&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_ExAC_AlleleFrequency&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_AF_ESP&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_ESP_AlleleFrequency&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_CLNSIGINCL&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_Haplotype_Significance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_CLNDISDB&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_DiseaseDatabase&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_GENEINFO&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_Gene_Info&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_CLNDISDBINCL&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_Disease_Gene&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_AF_TGP&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_TGP_AlleleFrequency&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_CLNSIGCONF&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_SingleVariant_Significance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_CLNHGVS&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_HGVS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clinvar_SSR&quot;</span><span class="p">:</span> <span class="s2">&quot;ClinVar_SuspectReasonCode&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ExistsInClinVar&quot;</span><span class="p">:</span> <span class="s2">&quot;Variant_ExistsInClinVar&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;faf95_adj&#39;</span><span class="p">:</span> <span class="s1">&#39;FilteredAlleleFrequency95pct_adj&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;faf95_afr&#39;</span><span class="p">:</span> <span class="s1">&#39;FilteredAlleleFrequency95pct_African_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;faf95_amr&#39;</span><span class="p">:</span> <span class="s1">&#39;FilteredAlleleFrequency95pct_Latino_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;faf95_eas&#39;</span><span class="p">:</span> <span class="s1">&#39;FilteredAlleleFrequency95pct_East_Asian_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;faf95_nfe&#39;</span><span class="p">:</span> <span class="s1">&#39;FilteredAlleleFrequency95pct_Non_Finnish_Europeans&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;faf95_sas&#39;</span><span class="p">:</span> <span class="s1">&#39;FilteredAlleleFrequency95pct_South_Asian_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;faf99_adj&#39;</span><span class="p">:</span> <span class="s1">&#39;FilteredAlleleFrequency99pct_adj&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;faf99_afr&#39;</span><span class="p">:</span> <span class="s1">&#39;FilteredAlleleFrequency99pct_African_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;faf99_amr&#39;</span><span class="p">:</span> <span class="s1">&#39;FilteredAlleleFrequency99pct_Latino_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;faf99_eas&#39;</span><span class="p">:</span> <span class="s1">&#39;FilteredAlleleFrequency99pct_East_Asian_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;faf99_nfe&#39;</span><span class="p">:</span> <span class="s1">&#39;FilteredAlleleFrequency99pct_Non_Finnish_Europeans&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;faf99_sas&#39;</span><span class="p">:</span> <span class="s1">&#39;FilteredAlleleFrequency99pct_South_Asian_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;lcr&#39;</span><span class="p">:</span> <span class="s1">&#39;lcr&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;n_alt_alleles&#39;</span><span class="p">:</span> <span class="s1">&#39;n_Alternative_alleles&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_afr&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_African_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_afr_female&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_African_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_afr_male&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_African_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_ami&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Amish_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_ami_female&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Amish_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_ami_male&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Amish_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_amr&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Latino_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_amr_female&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Latino_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_amr_male&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Latino_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_asj&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Ashkenazi_Jewish_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_asj_female&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Ashkenazi_Jewish_ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_asj_male&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Ashkenazi_Jewish_ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_eas&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_East_Asian_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_eas_female&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_East_Asian_ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_eas_male&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_East_Asian_ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_female&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_fin&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Finnish_Ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_fin_female&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Finnish_Ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_fin_male&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Finnish_Ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_male&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_nfe&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Non_Finnish_Europeans&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_nfe_female&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Non_Finnish_Europeans_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_nfe_male&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_Non_Finnish_Europeans_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_oth&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_oth&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_oth_female&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_oth_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_oth_male&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_oth_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_raw&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_raw&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_sas&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_South_Asian_ancestry&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_sas_female&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_South_Asian_ancestry_female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nhomalt_sas_male&#39;</span><span class="p">:</span> <span class="s1">&#39;HomozygousIndividuals_South_Asian_ancestry_male&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;non_par&#39;</span><span class="p">:</span> <span class="s1">&#39;non_Paralog&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;variant_type&#39;</span><span class="p">:</span> <span class="s1">&#39;variant_type&#39;</span>
+<span class="p">}</span>
+
+<span class="c1"># Gather parameters</span>
+<span class="n">add_cols</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;add_cols&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">ncbi_build</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ncbi_build&quot;</span><span class="p">,</span> <span class="s2">&quot;GRCh38&quot;</span><span class="p">)</span>
+<span class="n">center</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;GustaveRoussy&quot;</span><span class="p">)</span>
+<span class="c1">#caller = snakemake.params.get(&quot;caller&quot;, &quot;mutect2&quot;)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Parameters retrieved&quot;</span><span class="p">)</span>
+
+<span class="c1"># Load user&#39;s data</span>
+<span class="n">variants</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="n">snakemake</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;tsv&quot;</span><span class="p">],</span>
+    <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">index_col</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Variants loaded in memory&quot;</span><span class="p">)</span>
+
+<span class="c1"># Replace header names</span>
+<span class="n">new_header</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># translation_table = (</span>
+<span class="c1">#     headers_mutect2</span>
+<span class="c1">#     if caller.lower() == &quot;mutect2&quot;</span>
+<span class="c1">#     else None</span>
+<span class="c1"># )</span>
+<span class="n">translation_table</span> <span class="o">=</span> <span class="n">headers</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">colname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()):</span>
+    <span class="n">new_colname</span> <span class="o">=</span> <span class="n">translation_table</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">colname</span><span class="p">,</span> <span class="n">colname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">colname</span> <span class="o">==</span> <span class="s2">&quot;REF&quot;</span><span class="p">:</span>
+        <span class="n">new_header</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Reference_Allele&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">new_header</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_colname</span> <span class="k">if</span> <span class="n">new_colname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">colname</span><span class="p">)</span>
+<span class="n">variants</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">new_header</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;New header defined&quot;</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+<span class="c1"># Add new columns on demand</span>
+<span class="k">if</span> <span class="n">add_cols</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;Center&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding Sequencing Center information&quot;</span><span class="p">)</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Center&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Hugo_Symbol&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;NCBI_Build&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding NCBI build information&quot;</span><span class="p">)</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;NCBI_Build&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Hugo_Symbol&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;End_Position&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding End position&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;Reference_Allele&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+            <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Reference_Allele&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variant</span><span class="p">[</span><span class="s2">&quot;REF&quot;</span><span class="p">]</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;End_Position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">start</span> <span class="o">-</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">ref</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Start_Position&quot;</span><span class="p">],</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Reference_Allele&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;Variant_Type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding variant type&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">variants</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Variant_Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">get_variant_type</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span>
+            <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Reference_Allele&quot;</span><span class="p">],</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;ALT&quot;</span><span class="p">])</span>
+        <span class="p">]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;SYMBOL&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding gene symbols&quot;</span><span class="p">)</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;SYMBOL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Hugo_Symbol&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;HGNC_ID&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding hugo symbols&quot;</span><span class="p">)</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;HGNC_ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Hugo_Symbol&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;ExAC_AF_AFR&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;Allele_Frequency_African_Ancestry&quot;</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding ExAC_AF_AFR symbols&quot;</span><span class="p">)</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;ExAC_AF_AFR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Allele_Frequency_African_Ancestry&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;ExAC_AF_AMR&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;Allele_Frequency_Latino_Ancestry&quot;</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding ExAC_AF_AMR symbols&quot;</span><span class="p">)</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;ExAC_AF_AMR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Allele_Frequency_Latino_Ancestry&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;ExAC_AF_EAS&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;Allele_Frequency_East_Asian_ancestry&quot;</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding ExAC_AF_EAS symbols&quot;</span><span class="p">)</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;ExAC_AF_EAS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Allele_Frequency_East_Asian_ancestry&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;ExAC_AF_FIN&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;Allele_Frequency_Finnish_ancestry&quot;</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding ExAC_AF_FIN symbols&quot;</span><span class="p">)</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;ExAC_AF_FIN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Allele_Frequency_Finnish_ancestry&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;ExAC_AF_NFE&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;Allele_Frequency_Non_Finnish_Europeans&quot;</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding ExAC_AF_NFE symbols&quot;</span><span class="p">)</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;ExAC_AF_NFE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Allele_Frequency_Non_Finnish_Europeans&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;ExAC_AF_OTH&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;Allele_Frequency_Other_Ancestry&quot;</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding ExAC_AF_OTH symbols&quot;</span><span class="p">)</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;ExAC_AF_OTH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Allele_Frequency_Other_Ancestry&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;ExAC_AF_SAS&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;Allele_Frequency_South_Asian_ancestry&quot;</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding ExAC_AF_SAS symbols&quot;</span><span class="p">)</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;ExAC_AF_SAS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Allele_Frequency_South_Asian_ancestry&quot;</span><span class="p">]</span>
+
+    <span class="c1"># if &quot;vcf_region&quot; not in variants.columns:</span>
+    <span class="c1">#     logging.debug(&quot;Adding VCF regions&quot;)</span>
+    <span class="c1">#     logging.debug(variants[[&quot;Chromosome&quot;, &quot;Start_Position&quot;, &quot;Variant_ID&quot;, &quot;Reference_Allele&quot;, &quot;Tumor_Seq_Allele2&quot;]].shape)</span>
+    <span class="c1">#     variants[&quot;vcf_region&quot;] = [</span>
+    <span class="c1">#         &quot;:&quot;.join(map(str, [chr, pos, id, ref, alt]))</span>
+    <span class="c1">#         for chr, pos, id, ref, alt in zip(</span>
+    <span class="c1">#             variants[&quot;Chromosome&quot;],</span>
+    <span class="c1">#             variants[&quot;Start_Position&quot;],</span>
+    <span class="c1">#             variants[&quot;Variant_ID&quot;],</span>
+    <span class="c1">#             variants[&quot;Reference_Allele&quot;],</span>
+    <span class="c1">#             variants[&quot;Tumor_Seq_Allele1&quot;]</span>
+    <span class="c1">#         )</span>
+    <span class="c1">#     ]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;Variant_Origin&quot;</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Translating Variant_Origin&quot;</span><span class="p">)</span>
+        <span class="n">translation</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;0&quot;</span><span class="p">:</span> <span class="s2">&quot;unspecified&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;0.0&quot;</span><span class="p">:</span> <span class="s2">&quot;unspecified&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nan&quot;</span><span class="p">:</span> <span class="s2">&quot;unspecified&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="s2">&quot;germline&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1.0&quot;</span><span class="p">:</span> <span class="s2">&quot;germline&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;2&quot;</span><span class="p">:</span> <span class="s2">&quot;somatic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;2.0&quot;</span><span class="p">:</span> <span class="s2">&quot;somatic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;3&quot;</span><span class="p">:</span> <span class="s2">&quot;both_germline_somatic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;3.0&quot;</span><span class="p">:</span> <span class="s2">&quot;both_germline_somatic&quot;</span>
+        <span class="p">}</span>
+
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Variant_Origin_Readable&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">translation</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Variant_Origin&quot;</span><span class="p">]</span>
+        <span class="p">]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;Suspect_reason_code&quot;</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">translation</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;0&quot;</span><span class="p">:</span> <span class="s2">&quot;unspecified&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="s2">&quot;Paralog&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;2&quot;</span><span class="p">:</span> <span class="s2">&quot;byEST&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;4&quot;</span><span class="p">:</span> <span class="s2">&quot;oldAlign&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;8&quot;</span><span class="p">:</span> <span class="s2">&quot;Para_EST&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;16&quot;</span><span class="p">:</span> <span class="s2">&quot;1kg_failed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1024&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;0.0&quot;</span><span class="p">:</span> <span class="s2">&quot;unspecified&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1.0&quot;</span><span class="p">:</span> <span class="s2">&quot;Paralog&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;2.0&quot;</span><span class="p">:</span> <span class="s2">&quot;byEST&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;4.0&quot;</span><span class="p">:</span> <span class="s2">&quot;oldAlign&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;8.0&quot;</span><span class="p">:</span> <span class="s2">&quot;Para_EST&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;16.0&quot;</span><span class="p">:</span> <span class="s2">&quot;1kg_failed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1024.0&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nan&quot;</span><span class="p">:</span> <span class="s2">&quot;unspecified&quot;</span>
+        <span class="p">}</span>
+
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Suspect_reason_code_Readable&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">translation</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Suspect_reason_code&quot;</span><span class="p">]</span>
+        <span class="p">]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;Tumor_Sample_Barcode&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="s2">&quot;Tumor_Sample_Barcode&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Tumor_Sample_Barcode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;Tumor_Sample_Barcode&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Start_Position&quot;</span><span class="p">]</span>
+        <span class="p">]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;Matched_Norm_Sample_Barcode&quot;</span> <span class="ow">in</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="s2">&quot;Matched_Norm_Sample_Barcode&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+        <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Matched_Norm_Sample_Barcode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;Matched_Norm_Sample_Barcode&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">variants</span><span class="p">[</span><span class="s2">&quot;Start_Position&quot;</span><span class="p">]</span>
+        <span class="p">]</span>
+
+<span class="n">variants</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;tsv&quot;</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pharmkdb_annotate.html" class="btn btn-neutral float-left" title="CANCER_GENE_CENSUS_ANNOTATE" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="split_design.html" class="btn btn-neutral float-right" title="SPLIT_DESIGN" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016, The Snakemake team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

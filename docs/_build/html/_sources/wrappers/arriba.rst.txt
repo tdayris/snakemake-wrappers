@@ -1,0 +1,159 @@
+.. _`bio/arriba`:
+
+ARRIBA
+======
+
+Detect gene fusions from chimeric STAR output
+
+**URL**: https://github.com/suhrig/arriba
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule arriba:
+        input:
+            # STAR bam containing chimeric alignments
+            bam="{sample}.bam",
+            # path to reference genome
+            genome="genome.fasta",
+            # path to annotation gtf
+            annotation="annotation.gtf",
+        output:
+            # approved gene fusions
+            fusions="fusions/{sample}.tsv",
+            # discarded gene fusions
+            discarded="fusions/{sample}.discarded.tsv" # optional
+        log:
+            "logs/arriba/{sample}.log"
+        params:
+            # arriba blacklist file
+            blacklist="blacklist.tsv", # strongly recommended, see https://arriba.readthedocs.io/en/latest/input-files/#blacklist
+            # file containing known fusions
+            known_fusions="", # optional
+            # file containing information from structural variant analysis
+            sv_file="", # optional
+            # optional parameters
+            extra="-T -P -i 1,2"
+        threads: 1
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/arriba"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``arriba==1.1.0``
+
+Input/Output
+------------
+**Input:**
+
+* ``bam``: Path to bam formatted alignment file from STAR
+* ``genome``: Path to fasta formatted genome sequence
+* ``annotation``: Path to GTF formatted genome annotation
+
+**Output:**
+
+* ``fusions``: Path to output fusion file
+
+
+
+Params
+------
+
+* ``known_fusions``: Path to known fusions file, see `official documentation on known fusions <https://arriba.readthedocs.io/en/latest/input-files/#known-fusions>`_ for more information.
+
+* ``blacklist``: Path to blacklist file, see `official documentation on blacklist <https://arriba.readthedocs.io/en/latest/input-files/#blacklist>`_ for more information.
+
+* ``sv_file``: Path to structural variations calls from WGS, see `official documentation on SV <https://arriba.readthedocs.io/en/latest/input-files/#structural-variant-calls-from-wgs>`_ for more information.
+
+* ``extra``: Other `optional parameters <https://arriba.readthedocs.io/en/latest/command-line-options/>`_
+
+
+
+
+Notes
+-----
+
+This tool/wrapper does not handle multi threading.
+
+
+
+Authors
+-------
+
+* Jan Forster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2019, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+
+    import os
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    discarded_fusions = snakemake.output.get("discarded", "")
+    if discarded_fusions:
+        discarded_cmd = "-O " + discarded_fusions
+    else:
+        discarded_cmd = ""
+
+    blacklist = snakemake.params.get("blacklist")
+    if blacklist:
+        blacklist_cmd = "-b " + blacklist
+    else:
+        blacklist_cmd = ""
+
+    known_fusions = snakemake.params.get("known_fusions")
+    if known_fusions:
+        known_cmd = "-k" + known_fusions
+    else:
+        known_cmd = ""
+
+    sv_file = snakemake.params.get("sv_file")
+    if sv_file:
+        sv_cmd = "-d" + sv_file
+    else:
+        sv_cmd = ""
+
+    shell(
+        "arriba "
+        "-x {snakemake.input.bam} "
+        "-a {snakemake.input.genome} "
+        "-g {snakemake.input.annotation} "
+        "{blacklist_cmd} "
+        "{known_cmd} "
+        "{sv_cmd} "
+        "-o {snakemake.output.fusions} "
+        "{discarded_cmd} "
+        "{extra} "
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

@@ -1,0 +1,172 @@
+.. _`bio/reference/ensembl-variation`:
+
+ENSEMBL-VARIATION
+=================
+
+Download known genomic variants from ENSEMBL FTP servers, and store them in a single .vcf.gz file.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule get_variation:
+        # Optional: add fai as input to get VCF with annotated contig lengths (as required by GATK)
+        # and properly sorted VCFs.
+        # input:
+        #     fai="refs/genome.fasta.fai"
+        output:
+            vcf="refs/variation.vcf.gz",
+        params:
+            species="saccharomyces_cerevisiae",
+            release="98",  # releases <98 are unsupported
+            build="R64-1-1",
+            type="all",  # one of "all", "somatic", "structural_variation"
+            # chromosome="21", # optionally constrain to chromosome, only supported for homo_sapiens
+        log:
+            "logs/get_variation.log",
+        cache: True  # save space and time with between workflow caching (see docs)
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/reference/ensembl-variation"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bcftools=1.11``
+* ``curl``
+
+
+
+
+
+Authors
+-------
+
+* Johannes Köster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2019, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    import tempfile
+    import subprocess
+    import sys
+    import os
+    from snakemake.shell import shell
+    from snakemake.exceptions import WorkflowError
+
+    species = snakemake.params.species.lower()
+    release = int(snakemake.params.release)
+    build = snakemake.params.build
+    type = snakemake.params.type
+    chromosome = snakemake.params.get("chromosome", "")
+
+    if release < 98:
+        print("Ensembl releases <98 are unsupported.", file=open(snakemake.log[0], "w"))
+        exit(1)
+
+    branch = ""
+    if release >= 81 and build == "GRCh37":
+        # use the special grch37 branch for new releases
+        branch = "grch37/"
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    if chromosome and type != "all":
+        raise ValueError(
+            "Parameter chromosome given but chromosome-wise download"
+            "is only implemented for type='all'."
+        )
+
+    if type == "all":
+        if species == "homo_sapiens" and release >= 93:
+            chroms = (
+                list(range(1, 23)) + ["X", "Y", "MT"] if not chromosome else [chromosome]
+            )
+            suffixes = ["-chr{}".format(chrom) for chrom in chroms]
+        else:
+            if chromosome:
+                raise ValueError(
+                    "Parameter chromosome given but chromosome-wise download"
+                    "is only implemented for homo_sapiens in releases >=93."
+                )
+            suffixes = [""]
+    elif type == "somatic":
+        suffixes = ["_somatic"]
+    elif type == "structural_variations":
+        suffixes = ["_structural_variations"]
+    else:
+        raise ValueError(
+            "Unsupported type {} (only all, somatic, structural_variations are allowed)".format(
+                type
+            )
+        )
+
+    species_filename = species if release >= 91 else species.capitalize()
+
+    urls = [
+        "ftp://ftp.ensembl.org/pub/{branch}release-{release}/variation/vcf/{species}/{species_filename}{suffix}.{ext}".format(
+            release=release,
+            species=species,
+            suffix=suffix,
+            species_filename=species_filename,
+            branch=branch,
+            ext=ext,
+        )
+        for suffix in suffixes
+        for ext in ["vcf.gz", "vcf.gz.csi"]
+    ]
+    names = [os.path.basename(url) for url in urls if url.endswith(".gz")]
+
+    try:
+        gather = "curl {urls}".format(urls=" ".join(map("-O {}".format, urls)))
+        workdir = os.getcwd()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            if snakemake.input.get("fai"):
+                shell(
+                    "(cd {tmpdir}; {gather} && "
+                    "bcftools concat -Oz --naive {names} > concat.vcf.gz && "
+                    "bcftools reheader --fai {workdir}/{snakemake.input.fai} concat.vcf.gz "
+                    "> {workdir}/{snakemake.output}) {log}"
+                )
+            else:
+                shell(
+                    "(cd {tmpdir}; {gather} && "
+                    "bcftools concat -Oz --naive {names} "
+                    "> {workdir}/{snakemake.output}) {log}"
+                )
+    except subprocess.CalledProcessError as e:
+        if snakemake.log:
+            sys.stderr = open(snakemake.log[0], "a")
+        print(
+            "Unable to download variation data from Ensembl. "
+            "Did you check that this combination of species, build, and release is actually provided? ",
+            file=sys.stderr,
+        )
+        exit(1)
+
+
+.. |nl| raw:: html
+
+   <br>

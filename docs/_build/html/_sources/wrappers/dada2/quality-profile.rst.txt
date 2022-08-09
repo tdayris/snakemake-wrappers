@@ -1,0 +1,111 @@
+.. _`bio/dada2/quality-profile`:
+
+DADA2_QUALITY_PROFILES
+======================
+
+`DADA2 <https://benjjneb.github.io/dada2/index.html>`_
+Plotting the quality profile of reads using dada2 ``plotQualityProfile`` function. The function is introduced in the dedicated tutorial `section <https://benjjneb.github.io/dada2/tutorial.html#inspect-read-quality-profiles>`_.
+
+
+**URL**: https://benjjneb.github.io/dada2/index.html
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule dada2_quality_profile_se:
+        input:
+            # FASTQ file without primers sequences
+            "trimmed/{sample}.{orientation}.fastq"
+        output:
+            "reports/dada2/quality-profile/{sample}.{orientation}-quality-profile.png"
+        log:
+            "logs/dada2/quality-profile/{sample}.{orientation}-quality-profile-se.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/dada2/quality-profile"
+
+    rule dada2_quality_profile_pe:
+        input:
+            # FASTQ file without primers sequences
+            expand("trimmed/{{sample}}.{orientation}.fastq",orientation=[1,2])
+        output:
+            "reports/dada2/quality-profile/{sample}-quality-profile.png"
+        log:
+            "logs/dada2/quality-profile/{sample}-quality-profile-pe.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/dada2/quality-profile"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconductor-dada2==1.16``
+
+Input/Output
+------------
+**Input:**
+
+* a FASTQ file (potentially compressed) without primers sequences. This must be the only elements in the input file list.
+
+**Output:**
+
+* A PNG file of the quality plot. It must be the first element in the output file.
+
+
+
+
+
+Authors
+-------
+
+* Charlie Pauvert
+
+
+Code
+----
+
+.. code-block:: R
+
+    # __author__ = "Charlie Pauvert"
+    # __copyright__ = "Copyright 2020, Charlie Pauvert"
+    # __email__ = "cpauvert@protonmail.com"
+    # __license__ = "MIT"
+
+    # Snakemake wrapper for plotting the quality profile of reads using dada2 plotQualityProfile function.
+
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt")
+    sink(log.file)
+    sink(log.file,type="message")
+
+    library(dada2)
+
+    # Plot the quality profile for a given FASTQ file or a list of files
+    pquality<-plotQualityProfile(unlist(snakemake@input))
+
+    # Write the plots to files
+    library(ggplot2)
+    ggsave(snakemake@output[[1]], pquality, width = 4, height = 3, dpi = 300)
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    sink(type="message")
+    sink()
+
+
+.. |nl| raw:: html
+
+   <br>

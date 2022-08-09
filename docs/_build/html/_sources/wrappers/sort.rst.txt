@@ -1,0 +1,107 @@
+.. _`bio/sort`:
+
+SORT
+====
+
+Bash sort files
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_sort:
+        input:
+            "file.txt"
+        output:
+            "sorted.txt"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/sort"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bash``
+
+Input/Output
+------------
+**Input:**
+
+* Path to the file that is to be sorted
+
+**Output:**
+
+* Path to the sorted file
+
+
+
+Params
+------
+
+* ``keys``: List of keys parameters
+
+
+
+
+Notes
+-----
+
+tmpdir and threading are automatically passed as arguments
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+
+    from snakemake.shell import shell
+
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+    tmpdir = snakemake.resources.get("tmpdir", "/tmp")
+
+    extra = snakemake.params.get("extra", "")
+
+    keys = snakemake.params.get("columns", [])
+    if isinstance(keys, str) or isinstance(keys, int):
+        keys = f"-k{keys}"
+    elif isinstance(keys, list):
+        keys = " ".join([f"-k{k}" for k in keys])
+    else:
+        keys = ""
+
+    shell(
+        "sort --parallel={snakemake.threads} "
+        "--temporary-directory={tmpdir} "
+        "{keys} {extra} {snakemake.input[0]} "
+        "> {snakemake.output[0]} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

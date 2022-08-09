@@ -1,0 +1,113 @@
+.. _`bio/star/index`:
+
+STAR INDEX
+==========
+
+Index fasta sequences with STAR
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule star_index:
+        input:
+            fasta = "{genome}.fasta"
+        output:
+            directory("{genome}")
+        message:
+            "Testing STAR index"
+        threads:
+            1
+        params:
+            extra = ""
+        log:
+            "logs/star_index_{genome}.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/star/index"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``star==2.7.8a``
+
+Input/Output
+------------
+**Input:**
+
+* A (multi)fasta formatted file
+
+**Output:**
+
+* A directory containing the indexed sequence for downstream STAR mapping
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+* Tomás Di Domenico
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for STAR index"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2019, Dayris Thibault"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    from snakemake.utils import makedirs
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+    sjdb_overhang = snakemake.params.get("sjdbOverhang", "100")
+
+    gtf = snakemake.input.get("gtf")
+    if gtf is not None:
+        gtf = "--sjdbGTFfile " + gtf
+        sjdb_overhang = "--sjdbOverhang " + sjdb_overhang
+    else:
+        gtf = sjdb_overhang = ""
+
+    makedirs(snakemake.output)
+
+    shell(
+        "STAR "  # Tool
+        "--runMode genomeGenerate "  # Indexation mode
+        "{extra} "  # Optional parameters
+        "--runThreadN {snakemake.threads} "  # Number of threads
+        "--genomeDir {snakemake.output} "  # Path to output
+        "--genomeFastaFiles {snakemake.input.fasta} "  # Path to fasta files
+        "{sjdb_overhang} "  # Read-len - 1
+        "{gtf} "  # Highly recommended GTF
+        "{log}"  # Logging
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

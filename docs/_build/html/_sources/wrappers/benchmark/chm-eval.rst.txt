@@ -1,0 +1,114 @@
+.. _`bio/benchmark/chm-eval`:
+
+CHM-EVAL
+========
+
+Evaluate given VCF file with chm-eval for benchmarking variant calling.
+
+**URL**: https://github.com/lh3/CHM-eval
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+
+
+    rule chm_eval:
+        input:
+            kit="resources/chm-eval-kit",
+            vcf="{sample}.vcf"
+        output:
+            summary="chm-eval/{sample}.summary", # summary statistics
+            bed="chm-eval/{sample}.err.bed.gz" # bed file with errors
+        params:
+            extra="",
+            build="38"
+        log:
+            "logs/chm-eval/{sample}.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/benchmark/chm-eval"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``perl=5.26``
+
+Input/Output
+------------
+**Input:**
+
+* ``kit``: Path to downloaded chm-eval-kit
+* ``vcf``: Path to VCF formatted calls
+
+**Output:**
+
+* Summary file
+* bed files containing errors
+
+
+
+Params
+------
+
+* ``build``: Genome build
+
+* ``extra``: Other optional arguments
+
+
+
+
+Notes
+-----
+
+Output file order and mapping do not matter within the Snakefile
+
+
+
+Authors
+-------
+
+* Johannes Köster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2020, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    kit = snakemake.input.kit
+    vcf = snakemake.input.vcf
+    build = snakemake.params.build
+    extra = snakemake.params.get("extra", "")
+
+    if not snakemake.output[0].endswith(".summary"):
+        raise ValueError("Output file must end with .summary")
+    out = snakemake.output[0][:-8]
+
+    shell("({kit}/run-eval -g {build} -o {out} {extra} {vcf} | sh) {log}")
+
+
+.. |nl| raw:: html
+
+   <br>

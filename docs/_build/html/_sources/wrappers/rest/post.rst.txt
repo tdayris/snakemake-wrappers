@@ -1,0 +1,88 @@
+.. _`bio/rest/post`:
+
+REST POST
+=========
+
+Send rest requests and get result in a json file
+
+**URL**: https://bedtools.readthedocs.io/en/latest/content/tools/maskfasta.html
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``requests=2.27.1``
+
+Input/Output
+------------
+**Input:**
+
+* ``fasta``: Path to a genome sequence
+* ``bed``: Path to the mask file
+
+**Output:**
+
+* Path to the masked fasta file
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters for bedtools maskfasta
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # coding: utf-8
+
+    """Snakemake wrapper to post rest requests"""
+
+    import json
+    import requests
+
+
+    files = {str(k), str(v) for k, v in snakemake.input.items()}
+    extra = snakemake.params.get("extra", {})
+    address = snakemake.params["address"]
+
+    request = requests.post(address, files=files, **extra)
+    request_result = request.json()
+
+    with open(snakemake.output["json"], "w") as request_json:
+        json.dump(request_result, request_json)
+
+.. |nl| raw:: html
+
+   <br>

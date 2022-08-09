@@ -1,0 +1,87 @@
+.. _`bio/mixcr/exportAlignments`:
+
+MIXCR EXPORT ALIGNMENT
+======================
+
+export alignment results from a binary file (.vdjca) to a human-readable text file with `mixcr <https://mixcr.readthedocs.io/en/master/export.html#export>`_
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_mixcr_export_alignments:
+        input:
+            "alignment.vdjca"
+        output:
+            "export.txt"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/mixcr/exportAlignments"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``mixcr==3.0.3``
+
+Input/Output
+------------
+**Input:**
+
+* Alignments in vdjca format
+
+**Output:**
+
+* TSV-formetted text file
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3
+    # -*- coding: utf-8 -*-
+
+    """This is the Snakemake Wrapper for mixcr export aligments"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    shell(
+        "mixcr exportAlignments {extra} {snakemake.input} {snakemake.output} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

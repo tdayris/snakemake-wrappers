@@ -1,0 +1,117 @@
+.. _`bio/bedtools/complement`:
+
+BEDTOOLS COMPLEMENT
+===================
+
+`Bedtools complement <https://bedtools.readthedocs.io/en/latest/content/tools/complement.html>`_ maps all regions of the genome which are not covered by the input.
+
+
+**URL**: https://bedtools.readthedocs.io/en/latest/content/tools/complement.html
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bedtools_complement_bed:
+        input:
+            in_file="a.bed",
+            genome="dummy.genome"
+        output:
+            "results/bed-complement/a.complement.bed"
+        params:
+            ## Add optional parameters
+            extra="-L"
+        log:
+            "logs/a.complement.bed.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bedtools/complement"
+
+    rule bedtools_complement_vcf:
+        input:
+            in_file="a.vcf",
+            genome="dummy.genome"
+        output:
+            "results/vcf-complement/a.complement.vcf"
+        params:
+            ## Add optional parameters
+            extra="-L"
+        log:
+            "logs/a.complement.vcf.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bedtools/complement"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bedtools=2.29``
+
+Input/Output
+------------
+**Input:**
+
+* ``in_file``: BED/GFF/VCF files
+* ``genome``: genome file (`genome file format <https://bedtools.readthedocs.io/en/latest/content/general-usage.html#genome-file-format>`_)
+
+**Output:**
+
+* complemented BED/GFF/VCF file, must be the first element in the output list
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+
+
+
+
+Authors
+-------
+
+* Antonie Vietor
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Antonie Vietor"
+    __copyright__ = "Copyright 2020, Antonie Vietor"
+    __email__ = "antonie.v@gmx.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "(bedtools complement"
+        " {extra}"
+        " -i {snakemake.input.in_file}"
+        " -g {snakemake.input.genome}"
+        " > {snakemake.output[0]})"
+        " {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

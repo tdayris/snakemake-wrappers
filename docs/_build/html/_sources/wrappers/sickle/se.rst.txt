@@ -1,0 +1,80 @@
+.. _`bio/sickle/se`:
+
+SICKLE SE
+=========
+
+Trim single-end reads with sickle.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule sickle_pe:
+      input:
+        "input_R1.fq"
+      output:
+        "output_R1.fq"
+      params:
+        qual_type="sanger",
+        # optional extra parameters
+        extra=""
+      log:
+        "logs/sickle/job.log"
+      wrapper:
+        "0.50.4-1991-g7872381db/bio/sickle/pe"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``sickle-trim==1.33``
+
+
+
+
+
+Authors
+-------
+
+* Wibowo Arindrarto
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Wibowo Arindrarto"
+    __copyright__ = "Copyright 2016, Wibowo Arindrarto"
+    __email__ = "bow@bow.web.id"
+    __license__ = "BSD"
+
+    from snakemake.shell import shell
+
+    # Placeholder for optional parameters
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell()
+
+    shell(
+        "(sickle se -f {snakemake.input[0]} -o {snakemake.output[0]} "
+        "-t {snakemake.params.qual_type} {extra}) {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

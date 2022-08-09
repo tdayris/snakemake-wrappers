@@ -1,0 +1,82 @@
+.. _`bio/paladin/prepare`:
+
+PALADIN PREPARE
+===============
+
+Download and prepare uniprot refs for paladin mapping. PALADIN is a protein sequence alignment tool designed for the accurate functional characterization of metagenomes.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule paladin_prepare:
+        output:
+            "uniprot_sprot.fasta.gz",
+            "uniprot_sprot.fasta.gz.pro"
+        log:
+            "logs/paladin/prepare_sprot.log"
+        params:
+            reference_type=1, # 1=swiss-prot, 2=uniref90
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/paladin/prepare"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``paladin=1.4.4``
+* ``samtools=1.5``
+
+
+
+
+
+Authors
+-------
+
+* N. Tessa Pierce
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for Paladin Prepare"""
+
+    __author__ = "N. Tessa Pierce"
+    __copyright__ = "Copyright 2019, N. Tessa Pierce"
+    __email__ = "ntpierce@gmail.com"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    reference_type = snakemake.params.get(
+        "reference_type", "1"
+    )  # download swissprot as default
+    assert int(reference_type) in [1, 2]
+    ref_type_cmd = "-r" + str(reference_type)
+
+    shell("paladin prepare {ref_type_cmd} {extra} {log}")
+
+
+.. |nl| raw:: html
+
+   <br>

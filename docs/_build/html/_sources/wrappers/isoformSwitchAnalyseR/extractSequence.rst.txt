@@ -1,0 +1,128 @@
+.. _`bio/isoformSwitchAnalyseR/extractSequence`:
+
+EXTRACTSEQUENCE
+===============
+
+Extracting Nucleotide and Amino Acid Sequences
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_analyze_orf:
+        input:
+            switch_list = "orf_analyzed_switch_list.RDS"
+        output:
+            fasta = "sequence_extracted_nt.fasta",
+            aa_sequence = "sequence_extracted_AA.fasta"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/isoformSwitchAnalyzeR/extractSequence"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconda:bioconductor-isoformswitchanalyzer=1.8.0``
+
+Input/Output
+------------
+**Input:**
+
+* Switch list with isoforms tested
+
+**Output:**
+
+* Switch list with extracted sequences
+
+
+
+
+Notes
+-----
+
+Parameters:
+
+* extra (str): Extra parameters basides 'switchAnalyzeRlist'
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # This script takes a IsoformSwitchAnalyseR object
+    # and extract sequences from targets
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # The main package
+    base::library(package = "IsoformSwitchAnalyzeR", quietly = TRUE);
+
+    # Gathering input dataset and parameters
+    switch_list <- base::readRDS(
+      file = base::as.character(x = snakemake@input[["switch_list"]])
+    );
+
+    prefix <- "isoformSwitchAnalyzeR_isoform";
+    if ("prefix" %in% base::names(snakemake@params)) {
+      prefix <- base::as.character(snakemake@params[["prefix"]]);
+    } else if ("fasta" %in% base::names(snakemake@output)) {
+      prefix <- base::gsub("_nt.fasta", "", snakemake@output[["fasta"]])
+    } else if ("aa_sequence" %in% base::names(snakemake@output)) {
+      prefix <- base::gsub("_AA.fasta", "", snakemake@output[["aa_sequence"]])
+    }
+
+    extra <- "switchAnalyzeRlist = switch_list, outputPrefix = prefix";
+    if ("extra" %in% base::names(snakemake@params)) {
+      extra <- base::paste(
+          extra,
+          snakemake@params[["extra"]],
+          sep = ", "
+      );
+    }
+
+    command <- base::paste0(
+      "IsoformSwitchAnalyzeR::extractSequence(",
+      extra,
+      ")"
+    );
+    base::message("Libraries and input data loaded");
+    base::message(command);
+
+    # Running command
+    extracted <- base::eval(
+      base::parse(
+        text = command
+      )
+    );
+
+
+.. |nl| raw:: html
+
+   <br>

@@ -1,0 +1,192 @@
+.. _`bio/dada2/filter-trim`:
+
+DADA2_FILTER_TRIM
+=================
+
+`DADA2 <https://benjjneb.github.io/dada2/index.html>`_
+Quality filtering of single or paired-end reads using dada2 ``filterAndTrim`` function. Optional parameters are documented in the `manual <https://www.bioconductor.org/packages/release/bioc/manuals/dada2/man/dada2.pdf#filterAndTrim>`_ and the function is introduced in the dedicated tutorial `section <https://benjjneb.github.io/dada2/tutorial.html#filter-and-trim>`_.
+
+
+**URL**: https://benjjneb.github.io/dada2/index.html
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule dada2_filter_trim_se:
+        input:
+            # Single-end files without primers sequences
+            fwd="trimmed/{sample}.1.fastq.gz"
+        output:
+            filt="filtered-se/{sample}.1.fastq.gz",
+            stats="reports/dada2/filter-trim-se/{sample}.tsv"
+        # Even though this is an R wrapper, use named arguments in Python syntax
+        # here, to specify extra parameters. Python booleans (`arg1=True`, `arg2=False`)
+        # and lists (`list_arg=[]`) are automatically converted to R.
+        # For a named list as an extra named argument, use a python dict
+        #   (`named_list={name1=arg1}`).
+        params:
+            # Set the maximum expected errors tolerated in filtered reads
+            maxEE=1,
+            # Set the number of kept bases to 7 for the toy example
+            truncLen=7,
+            # Set minLen to 1 for the toy example but default is 20
+            minLen=1
+        log:
+            "logs/dada2/filter-trim-se/{sample}.log"
+        threads: 1 # set desired number of threads here
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/dada2/filter-trim"
+
+    rule dada2_filter_trim_pe:
+        input:
+            # Paired-end files without primers sequences
+            fwd="trimmed/{sample}.1.fastq",
+            rev="trimmed/{sample}.2.fastq"
+        output:
+            filt="filtered-pe/{sample}.1.fastq.gz",
+            filt_rev="filtered-pe/{sample}.2.fastq.gz",
+            stats="reports/dada2/filter-trim-pe/{sample}.tsv"
+        # Even though this is an R wrapper, use named arguments in Python syntax
+        # here, to specify extra parameters. Python booleans (`arg1=True`, `arg2=False`)
+        # and lists (`list_arg=[]`) are automatically converted to R.
+        # For a named list as an extra named argument, use a python dict
+        #   (`named_list={name1=arg1}`).
+        params:
+            # Set the maximum expected errors tolerated in filtered reads
+            maxEE=1,
+            # Set the number of kept bases in forward and reverse reads
+            # respectively to 7 for the toy example
+            truncLen=[7,6],
+            # Set minLen to 1 for the toy example but default is 20
+            minLen=1
+        log:
+            "logs/dada2/filter-trim-pe/{sample}.log"
+        threads: 1 # set desired number of threads here
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/dada2/filter-trim"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconductor-dada2==1.16``
+
+Input/Output
+------------
+**Input:**
+
+* ``fwd``: a forward FASTQ file (potentially compressed) without primer sequences
+* ``rev``: an (optional) reverse FASTQ file (potentially compressed) without primer sequences
+
+**Output:**
+
+* ``filt``: a compressed filtered forward FASTQ file
+* ``filt_rev``: an (optional) compressed filtered reverse FASTQ file
+* ``stats``: a .tsv file with the number of processed and filtered reads per sample
+
+
+
+Params
+------
+
+* ``optional arguments for ``filterAndTrim()``, please provide them as python ``key=value`` pairs``: 
+
+
+
+
+
+Authors
+-------
+
+* Charlie Pauvert
+
+
+Code
+----
+
+.. code-block:: R
+
+    # __author__ = "Charlie Pauvert"
+    # __copyright__ = "Copyright 2020, Charlie Pauvert"
+    # __email__ = "cpauvert@protonmail.com"
+    # __license__ = "MIT"
+
+    # Snakemake wrapper for filtering single or paired-end reads using dada2 filterAndTrim function.
+
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt")
+    sink(log.file)
+    sink(log.file,type="message")
+
+    library(dada2)
+
+    # Prepare arguments (no matter the order)
+    args<-list(
+            fwd = snakemake@input[["fwd"]],
+            filt = snakemake@output[["filt"]],
+            multithread=snakemake@threads
+    )
+    # Test if paired end input is passed
+    if(!is.null(snakemake@input[["rev"]]) & !is.null(snakemake@output[["filt_rev"]])){
+            args<-c(args,
+                rev = snakemake@input[["rev"]],
+                filt.rev = snakemake@output[["filt_rev"]]
+                )
+    }
+    # Check if extra params are passed
+    if(length(snakemake@params) > 0 ){
+        # Keeping only the named elements of the list for do.call()
+        extra<-snakemake@params[ names(snakemake@params) != "" ]
+        # Check if 'compress=' option is passed
+        if(!is.null(extra[["compress"]])){
+            stop("Remove the `compress=` option from `params`.\n",
+                "The `compress` option is implicitly set here from the file extension.")
+        } else {
+            # Check if output files are given as compressed files
+            # ex: in se version, all(TRUE, NULL) gives TRUE
+            compressed <- c(
+                endsWith(args[["filt"]], '.gz'),
+                if(is.null(args[["filt.rev"]])) NULL else {endsWith(args[["filt.rev"]], 'gz')}
+            )
+            if ( all(compressed) ) {
+                extra[["compress"]] <- TRUE
+            } else if ( any(compressed) ) {
+                stop("Either all or no fastq output should be compressed. Please check `output.filt` and `output.filt_rev` for consistency.")
+            } else {
+                extra[["compress"]] <- FALSE
+            }
+        }
+        # Add them to the list of arguments
+        args<-c(args, extra)
+    } else {
+        message("No optional parameters. Using default parameters from dada2::filterAndTrim()")
+    }
+
+    # Call the function with arguments
+    filt.stats<-do.call(filterAndTrim, args)
+
+    # Write processed reads report
+    write.table(filt.stats, snakemake@output[["stats"]], sep="\t", quote=F)
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    sink(type="message")
+    sink()
+
+
+.. |nl| raw:: html
+
+   <br>

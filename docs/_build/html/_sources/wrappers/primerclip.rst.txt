@@ -1,0 +1,136 @@
+.. _`bio/primerclip`:
+
+PRIMERCLIP
+==========
+
+Primer trimming on sam file
+
+
+**URL**: https://github.com/swiftbiosciences/primerclip
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule primerclip:
+        input:
+            0.50.4-1991-g7872381db_file="0.50.4-1991-g7872381db_file",
+            alignment_file="mapped/{sample}.bam"
+        output:
+            alignment_file="mapped/{sample}.trimmed.bam"
+        log:
+            "logs/primerclip/{sample}.log"
+        params:
+            extra=""
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/primerclip"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``samtools==1.9``
+* ``primerclip==0.3.8``
+
+Input/Output
+------------
+**Input:**
+
+* ``alignment_file``: sam file
+* ``master_file``: master primer file
+
+**Output:**
+
+* ``alignment_file``: sam file
+
+
+
+
+Notes
+-----
+
+This wrapper uses 4 threads:
+
+* samtools view
+* primerclip
+* head
+* samtools view
+
+Despite being present in the Snakefile, this wrapper does not hantle extra parameters
+
+
+
+Authors
+-------
+
+* Patrik Smeds
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Patrik Smeds"
+    __copyright__ = "Copyright 2019, Patrik Smeds"
+    __email__ = "patrik.smeds@gmail.com"
+    __license__ = "MIT"
+
+
+    from os import path
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    master_file = snakemake.input.master_file
+    in_alignment_file = snakemake.input.alignment_file
+    out_alignment_file = snakemake.output.alignment_file
+
+    # Check inputs/arguments.
+    if not isinstance(master_file, str):
+        raise ValueError("master_file, path to the master file")
+
+    if not isinstance(in_alignment_file, str):
+        raise ValueError("in_alignment_file, path to the input alignment file")
+
+    if not isinstance(out_alignment_file, str):
+        raise ValueError("out_alignment_file, path to the output file")
+
+    samtools_input_command = "samtools view -h " + in_alignment_file
+
+    samtools_output_command = " | head -n -3 | samtools view -Sh"
+
+    if out_alignment_file.endswith(".cram"):
+        samtools_output_command += "C -o " + out_alignment_file
+    elif out_alignment_file.endswith(".sam"):
+        samtools_output_command += " -o " + out_alignment_file
+    else:
+        samtools_output_command += "b -o " + out_alignment_file
+
+    shell(
+        "{samtools_input_command} |"
+        " primerclip"
+        " {master_file}"
+        " /dev/stdin"
+        " /dev/stdout"
+        " {samtools_output_command}"
+        " {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

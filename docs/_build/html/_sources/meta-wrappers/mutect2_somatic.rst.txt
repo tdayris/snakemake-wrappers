@@ -1,0 +1,446 @@
+.. _`mutect2_somatic`:
+
+MUTECT2_SOMATIC
+===============
+
+Call variants on BAM files with Mutect2, considering a pair of bam file.
+
+
+Example
+-------
+
+This meta-wrapper can be used by integrating the following into your workflow:
+
+.. code-block:: python
+
+    from typing import Union
+    import sys
+    from pathlib import Path
+
+    worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
+    common = str(worflow_source_dir / "../../../../bigr_pipelines/common/python")
+    sys.path.append(common)
+
+    from file_manager import *
+
+    default_config_mutect2_somatic = {
+        # Your genome sequence
+        "genome": "reference/genome.fasta",
+        # Path to a VCF containing AF fields
+        "known": "reference/dbsnp.vcf.gz",
+        # Path to a BED containing the kit's catpured regions
+        "bed": "reference/regions.bed",
+        # Path to dbSNP vcf, its tbi should be aside.
+        "dbsnp": "reference/dbsnp.vcf.gz",
+        # List of samples
+        "sample_list": ["S1", "S2"],
+        # Extra parameters
+        "gatk_crate_stomatic_pon_extra": "",
+        "gatk_get_pileup_summaries_extra": "",
+        "gatk_calculate_tumor_contamination_extra": "",
+        "gatk_filter_mutect_calls_extra": ""
+    }
+
+    try:
+        if config == dict():
+            config = default_config_mutect2_somatic
+    except NameError:
+        config = default_config_mutect2_somatic
+
+    def mutect2_input(config: dict[str, Union[list[str], str]]) -> dict[str, str]:
+        """
+        PoN should be used if and only if more than 40 normal samples are
+        provided.
+        """
+        input_dict = dict(
+            fasta=config["genome"],
+            fasta_index=get_fai(config["genome"]),
+            fasta_dict=get_dict(config["genome"]),
+            map="sambamba/markdup/{sample}_normal.bam",
+            map_index=get_bai("sambamba/markdup/{sample}_normal.bam"),
+            tumor="sambamba/markdup/{sample}_tumor.bam",
+            tumor_index=get_bai("sambamba/markdup/{sample}_tumor.bam"),
+            germline=config["known"],
+            germline_tbi=get_tbi(config["known"]),
+            intervals=config["bed"]
+        )
+        # if len(config["sample_list"]) >= 40:
+        #     input_dict["pon"] = "gatk/pon/PoN.g.vcf.gz"
+        #     input_dict["pon_index"] = get_tbi("gatk/pon/PoN.g.vcf.gz")
+
+        return input_dict
+
+    ##################################
+    ### Correct multiallelic sites ###
+    ##################################
+
+    rule split_multiallelic_mutect2:
+        input:
+            call="mutect2/filter/{sample}.vcf.gz",
+            idx=get_tbi("mutect2/filter/{sample}.vcf.gz"),
+            fasta=config["genome"]
+        output:
+            "bcftools/mutect2/{sample}.vcf.gz"
+        message:
+            "Splitting Mutect2 multiallelic sites {wildcards.sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir="tmp"
+        params:
+            extra = config.get(
+                "gatk_bcftools_split_multiallelic",
+                "-m -both --check-ref w"
+            )
+        log:
+            "logs/bcftools/norm/mutect2/{sample}.log"
+        wrapper:
+            "bio/bcftools/norm"
+
+
+    ###########################
+    ### Filter Mutect calls ###
+    ###########################
+
+    rule gatk_filter_mutect_calls:
+        input:
+            vcf="mutect2/call/{sample}.vcf.gz",
+            vcf_tbi=get_tbi("mutect2/call/{sample}.vcf.gz"),
+            ref=config["genome"],
+            ref_index=get_fai(config["genome"]),
+            ref_dict=get_dict(config["genome"]),
+            bam="sambamba/markdup/{sample}_tumor.bam",
+            bam_index=get_bai("sambamba/markdup/{sample}_tumor.bam"),
+            #f1r2="mutect2/f1r2/{sample}.tar.gz",
+            f1r2="gatk/orientation_model/{sample}/{sample}.artifacts-prior.tar.gz",
+            contamination="summary/{sample}_calculate_contamination.table"
+        output:
+            vcf=temp("mutect2/filter/{sample}.vcf.gz"),
+            vcf_index=temp("mutect2/filter/{sample}.vcf.gz.tbi")
+        message:
+            "Filtering GATK calls on {wildcards.sample}"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir="tmp"
+        params:
+            extra=config.get(
+                "gatk_filter_mutect_calls_extra",
+                "--create-output-variant-index --min-median-mapping-quality 35"
+            )
+        log:
+            "logs/mutect2/filter/{sample}.log"
+        wrapper:
+            "bio/gatk/filtermutectcalls"
+
+
+    ###########################################
+    ### Estimate cross-sample contamination ###
+    ###########################################
+
+
+    """
+    Estimate possible contaminations
+    """
+    rule calculate_tumor_contamination:
+        input:
+            summary="gatk/getpileupsummaries/{sample}_tumor_getpileupsummaries.table",
+            normal="gatk/getpileupsummaries/{sample}_normal_getpileupsummaries.table",
+        output:
+            table=temp("summary/{sample}_calculate_contamination.table"),
+            segmentation=temp("summary/{sample}_segments.table")
+        group:
+            "Contamination_Estimate"
+        message:
+            "Summarizing read support for known variant sites to further "
+            "estimate contamination on {wildcards.sample} (on tumor only)"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir="tmp"
+        params:
+            extra=config.get("gatk_calculate_tumor_contamination_extra", "")
+        log:
+            "logs/gatk/CalculateContamination/{sample}.log"
+        wrapper:
+            "bio/gatk/calculatecontamination"
+
+
+    """
+    Summarize the read support over known variants
+    """
+    rule get_pileup_summaries:
+        input:
+            bam="sambamba/markdup/{sample}_{status}.bam",
+            bam_index=get_bai("sambamba/markdup/{sample}_{status}.bam"),
+            intervals=config["bed"],
+            variants=config["known"],
+            variants_index=get_tbi(config["known"])
+        output:
+            table=temp(
+                "gatk/getpileupsummaries/{sample}_{status}_getpileupsummaries.table"
+            )
+        group:
+            "Contamination_Estimate"
+        message:
+            "Summarizing read support for known variant sites to further "
+            "estimate contamination on {wildcards.sample} ({wildcards.status})"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
+            time_min=lambda wildcards, attempt: attempt * 35,
+            tmpdir="tmp"
+        params:
+            extra=config.get("gatk_get_pileup_summaries_extra", "")
+        log:
+            "logs/gatk/GetPileupSummaries/{sample}.{status}.log"
+        wrapper:
+            "bio/gatk/getpileupsummaries"
+
+
+
+    """
+    Build orientation bias model to filter false positive calls
+    """
+    rule gatk_learn_read_orientation_model:
+        input:
+            f1r2="mutect2/f1r2/{sample}.tar.gz"
+        output:
+            temp("gatk/orientation_model/{sample}/{sample}.artifacts-prior.tar.gz")
+        message:
+            "Learning orientation bias in {wildcards.sample}"
+        threads: 1
+        resources:
+            time_min=lambda wildcards, attempt: attempt * 60,
+            mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
+            tmpdir="tmp"
+        params:
+            extra=""
+        log:
+            "gatk/orientation_model/{sample}.log"
+        wrapper:
+            "bio/gatk/learnreadorientationmodel"
+
+
+
+    ######################
+    ### Actual Calling ###
+    ######################
+    """
+    This rule calls somatic variants with GATK Mutect2
+    """
+    rule mutect2_somatic:
+        input:
+            **mutect2_input(config)
+        output:
+            vcf=temp("mutect2/call/{sample}.vcf.gz"),
+            vcf_index=temp("mutect2/call/{sample}.vcf.gz.tbi"),
+            f1r2=temp("mutect2/f1r2/{sample}.tar.gz"),
+            #bam=temp("mutect2/bam/{sample}.bam")
+        message:
+            "Calling variants on {wildcards.sample} with GATK Mutect2"
+        threads: 20
+        resources:
+            time_min=lambda wildcards, attempt: attempt * 60 * 15,
+            mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
+            tmpdir="tmp"
+        params:
+            extra=lambda wildcards, output: (
+                "--create-output-variant-index "
+                "--max-reads-per-alignment-start 0 "
+                "--annotation AlleleFraction "
+                "--annotation AS_QualByDepth "
+                "--annotation BaseQuality "
+                "--annotation Coverage "
+                "--annotation MappingQuality "
+                "--annotation PossibleDeNovo "
+                "--annotation QualByDepth "
+                "--annotation ReferenceBases "
+                "--annotation StrandOddsRatio "
+                "--disable-read-filter MateOnSameContigOrNoMappedMateReadFilter "
+                "--tumor-sample {}_tumor "
+                "--normal-sample {}_normal ".format(
+                    wildcards.sample,
+                    wildcards.sample
+                )
+            )
+        log:
+            "logs/gatk/mutect2/call/{sample}.log"
+        wrapper:
+            "bio/gatk/mutect"
+
+
+    ################################
+    ### Building Panel of Normal ###
+    ################################
+
+    rule gatk_crate_stomatic_pon:
+        input:
+            ref=config["genome"],
+            ref_index=get_fai(config["genome"]),
+            ref_dict=get_dict(config["genome"]),
+            bams=expand(
+                "sambamba/markdup/{sample}_normal.bam",
+                sample=config["sample_list"]
+            ),
+            bams_index=expand(
+                get_bai("sambamba/markdup/{sample}_normal.bam"),
+                sample=config["sample_list"]
+            ),
+            gvcfs=expand(
+                "mutect2/pon_call/{sample}.vcf.gz",
+                sample=config["sample_list"]
+            ),
+            gvcfs_tbi=expand(
+                get_tbi("mutect2/pon_call/{sample}.vcf.gz"),
+                sample=config["sample_list"]
+            ),
+            intervals=config["bed"]
+        output:
+            gvcf=temp("gatk/pon/PoN.g.vcf.gz"),
+            gatk_tmp=temp(directory("gatk/temp/PoN/"))
+        message:
+            "Building PoN over Mutect2 normal germline callings"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * (1024 * 5),
+            time_min=lambda wildcards, attempt: attempt * 45,
+            tmpdir="tmp"
+        log:
+            "logs/gatk/pon/pon.gvcf.log"
+        params:
+            extra=config.get("gatk_crate_stomatic_pon_extra", "")
+        wrapper:
+            "bio/gatk/createsomaticpanelofnormals"
+
+
+    rule gatk_genomics_db_import:
+        input:
+            ref=config["genome"],
+            ref_index=get_fai(config["genome"]),
+            ref_dict=get_dict(config["genome"]),
+            bams=expand(
+                "sambamba/markdup/{sample}_normal.bam",
+                sample=config["sample_list"]
+            ),
+            bams_index=expand(
+                get_bai("sambamba/markdup/{sample}_normal.bam"),
+                sample=config["sample_list"]
+            ),
+            gvcfs=expand(
+                "mutect2/pon_call/{sample}.vcf.gz",
+                sample=config["sample_list"]
+            ),
+            gvcfs_tbi=expand(
+                get_tbi("mutect2/pon_call/{sample}.vcf.gz"),
+                sample=config["sample_list"]
+            ),
+            intervals=config["bed"]
+        output:
+            genomicsdb=temp("gatk/genomicsdb/pon_db")
+        message: "Building PoN database"
+        threads: 1
+        resources:
+            mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
+            time_min=lambda wildcards, attempt: attempt * 35
+        params:
+            extra="",
+            db_action="create",
+            intervals=lambda wildcards, intput: input.intervals
+        log:
+            "logs/gatk/genomicsdbimport/pon.log"
+        wrapper:
+            "bio/gatk/genomicsdbimport"
+
+
+    rule gatk_mutect2_germline_normal:
+        input:
+            fasta=config["genome"],
+            fasta_index=get_fai(config["genome"]),
+            fasta_dict=get_dict(config["genome"]),
+            map="sambamba/markdup/{sample}_normal.bam",
+            map_index=get_bai("sambamba/markdup{sample}_normal.bam"),
+            germline=config["known"],
+            germline_tbi=get_tbi(config["known"]),
+            intervals=config["bed"]
+        output:
+            vcf=temp("mutect2/pon_call/{sample}.vcf.gz")
+        message:
+            "Calling germline variants on {wildcards.sample} with GATK Mutect2,"
+            "on normal sample only: it will be used for PoN"
+        threads: 4
+        resources:
+            time_min=lambda wildcards, attempt: attempt * 300,
+            mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
+            tmpdir="tmp"
+        params:
+            extra=(
+                "--max-reads-per-alignment-start 0 "
+                "--normal Mutect2_{sample}_normal "
+                "--disable-read-filter MateOnSameContigOrNoMappedMateReadFilter "
+            )
+        log:
+            "logs/gatk/mutect2/pon_call/{sample}.log"
+        wrapper:
+            "bio/gatk/mutect"
+
+Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
+For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+
+Used wrappers
+---------------------
+
+The following individual wrappers are used in this meta-wrapper:
+
+
+* :ref:`bio/gatk/filtermutectcalls`
+
+* :ref:`bio/gatk/learnreadorientationmodel`
+
+* :ref:`bio/gatk/calculatecontamination`
+
+* :ref:`bio/gatk/getpileupsummaries`
+
+* :ref:`bio/gatk/mutect`
+
+* :ref:`bio/bcftools/norm`
+
+* :ref:`bio/gatk/createsomaticpanelofnormals`
+
+* :ref:`bio/gatk/genomicsdbimport`
+
+
+Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.
+
+
+
+
+
+
+Notes
+-----
+
+Bam are expected to be mate-fixed (see bwa_fixmate meta-wrapper).
+
+
+
+
+Authors
+-------
+
+
+* Thibault Dayris
+

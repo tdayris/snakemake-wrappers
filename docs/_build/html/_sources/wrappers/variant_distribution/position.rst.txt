@@ -1,0 +1,154 @@
+.. _`bio/variant_distribution/position`:
+
+VARIANT POSITION
+================
+
+Compute relative position to a gene start
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_variant_distribution_position:
+        input:
+            vcf = "fake_KJ660346.vcf"
+        output:
+            tsv = "fake_KJ660346.tsv"
+        message:
+            "Tsting variant_distribution_position"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 10240)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 20, 200)
+            )
+        log:
+            "logs/test_variant_distribution_position.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/variant_distribution/position"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``conda-forge:python=3.8.2``
+
+Input/Output
+------------
+**Input:**
+
+* A VCF file containing the variant to position
+
+**Output:**
+
+* A TSV-formatted text file
+
+
+
+
+Notes
+-----
+
+Parameters:
+
+* header (bool): Weather to print column names or not
+
+The output file contains the following columns:
+
++--------------+-------------------------+
+| Columns name | Content                 |
++==============+=========================+
+| Chromosome   | Chromosome Name         |
++--------------+-------------------------+
+| GeneID       | Gene Identifier         |
++--------------+-------------------------+
+| Position     | Variant position        |
++--------------+-------------------------+
+| Ref          | Reference nucleotide    |
++--------------+-------------------------+
+| Alt          | Alternative nucleotide  |
++--------------+-------------------------+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3.8
+    # conding: utf-8
+
+    """
+    This script computes relative position of the variant in its parent gene.
+    """
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    import logging
+    import re
+
+    vcf_path = snakemake.input["vcf"]
+    tsv_path = snakemake.output["tsv"]
+    gene_re = re.compile(snakemake.params.get("gene_re", "ENSG[0-9]+"))
+
+    logging.basicConfig(
+        filename=snakemake.log[0],
+        filemode="w",
+        level=logging.DEBUG
+    )
+
+    with open(vcf_path, "r") as vcf, open(tsv_path, "w") as tsv:
+        # Write header on user's request
+        if snakemake.params.get("header", False) is True:
+            cols = ["Chromosome", "GeneID", "Position", "Ref", "Alt\n"]
+            tsv.write('\t'.join(cols))
+
+        for line in vcf:
+            if line.startswith("#"):
+                # Then this is a comment
+                continue
+
+            chomp = line[:-1].split("\t")
+            genes_id = gene_re.findall(chomp[7])
+
+            if len(genes_id) == 0:
+                logging.warning(f"WARNING: no gene id found in {line}")
+                continue
+
+            for gene in genes_id:
+                tsv.write(
+                    "\t".join([chomp[0], gene, chomp[1], chomp[3], chomp[4]])
+                )
+                tsv.write("\n")
+
+
+.. |nl| raw:: html
+
+   <br>

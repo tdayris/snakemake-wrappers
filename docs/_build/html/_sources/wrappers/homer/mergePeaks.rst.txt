@@ -1,0 +1,106 @@
+.. _`bio/homer/mergePeaks`:
+
+HOMER MERGEPEAKS
+================
+
+Merge ChIP-Seq peaks from multiple peak files. For more information, please see the `documentation <http://homer.ucsd.edu/homer/ngs/mergePeaks.html>`_. Please be aware that this wrapper does not yet support use of the ``-prefix`` parameter.
+
+
+**URL**: http://homer.ucsd.edu/homer/ngs/mergePeaks.html
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule homer_mergePeaks:
+        input:
+            # input peak files
+            "peaks/{sample1}.peaks",
+            "peaks/{sample2}.peaks"
+        output:
+            "merged/{sample1}_{sample2}.peaks"
+        params:
+            extra="-d given"  # optional params, see homer manual
+        log:
+            "logs/mergePeaks/{sample1}_{sample2}.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/homer/mergePeaks"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``homer==4.11``
+
+Input/Output
+------------
+**Input:**
+
+* Paths to peak files. This must be the only elements of the input file list.
+
+**Output:**
+
+* Path to merged peaks. This must be the only element in the output file list.
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+
+
+
+
+Authors
+-------
+
+* Jan Forster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2020, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    import os.path as path
+    import sys
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+
+    class PrefixNotSupportedError(Exception):
+        pass
+
+
+    if "-prefix" in extra:
+        raise PrefixNotSupportedError(
+            "The use of the -prefix parameter is not yet supported in this wrapper"
+        )
+
+    shell("(mergePeaks" " {snakemake.input}" " {extra}" " > {snakemake.output})" " {log}")
+
+
+.. |nl| raw:: html
+
+   <br>

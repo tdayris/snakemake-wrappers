@@ -1,0 +1,98 @@
+.. _`bio/benchmark/chm-eval-kit`:
+
+CHM-EVAL-KIT
+============
+
+Download CHM-eval kit for benchmarking variant calling.
+
+**URL**: https://github.com/lh3/CHM-eval
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule chm_eval_kit:
+        output:
+            directory("resources/chm-eval-kit")
+        params:
+            # Tag and version must match, see https://github.com/lh3/CHM-eval/releases.
+            tag="v0.5",
+            version="20180222"
+        log:
+            "logs/chm-eval-kit.log"
+        cache: True
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/benchmark/chm-eval-kit"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``curl``
+
+
+
+Params
+------
+
+* ``version``: The kit version number
+
+* ``tag``: The kit tag number
+
+
+
+
+Notes
+-----
+
+At least two threads are required (curl + tar)
+
+
+
+Authors
+-------
+
+* Johannes Köster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2020, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    import os
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+    url = (
+        "https://github.com/lh3/CHM-eval/releases/"
+        "download/{tag}/CHM-evalkit-{version}.tar"
+    ).format(version=snakemake.params.version, tag=snakemake.params.tag)
+
+    os.makedirs(snakemake.output[0])
+    shell(
+        "(curl -L {url} | tar --strip-components 1 -C {snakemake.output[0]} -xf - &&"
+        "(cd {snakemake.output[0]}; chmod +x htsbox run-eval k8)) {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

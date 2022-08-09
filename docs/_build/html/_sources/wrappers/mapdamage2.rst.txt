@@ -1,0 +1,124 @@
+.. _`bio/mapdamage2`:
+
+MAPDAMAGE2
+==========
+
+tracking and quantifying damage patterns in ancient DNA sequences.
+
+**URL**: https://ginolhac.github.io/mapDamage/
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule mapdamage2:
+        input:
+            ref="genome.fasta",
+            bam="mapped/{sample}.bam",
+        output:
+            log="results/{sample}/Runtime_log.txt",  # output folder is infered from this file, so it needs to be the same folder for all output files
+            GtoA3p="results/{sample}/3pGtoA_freq.txt",
+            CtoT5p="results/{sample}/5pCtoT_freq.txt",
+            dnacomp="results/{sample}/dnacomp.txt",
+            frag_misincorp="results/{sample}/Fragmisincorporation_plot.pdf",
+            len="results/{sample}/Length_plot.pdf",
+            lg_dist="results/{sample}/lgdistribution.txt",
+            misincorp="results/{sample}/misincorporation.txt",
+    #        rescaled_bam="results/{sample}.rescaled.bam", # uncomment if you want the rescaled BAM file
+        params:
+            extra="--no-stats"  # optional parameters for mapdamage2 (except -i, -r, -d, --rescale)
+        log:
+            "logs/{sample}/mapdamage2.log"
+        threads: 1  # MapDamage2 is not threaded
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/mapdamage2"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``mapdamage2=2.2``
+
+Input/Output
+------------
+**Input:**
+
+* ``ref``: Path to fasta genome sequence
+* ``bam``: Path to mapped dna sequences
+
+**Output:**
+
+* ``rescaled_bam``: Path to rescaled bam (Optional)
+* ``log``: Path to output directory
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+
+
+
+
+Authors
+-------
+
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Filipe G. Vieira"
+    __copyright__ = "Copyright 2020, Filipe G. Vieira"
+    __license__ = "MIT"
+
+    import os.path
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    in_bam = snakemake.input.get("bam", "")
+    if in_bam:
+        in_bam = "--input " + in_bam
+
+    output_folder = os.path.dirname(snakemake.output.get("log", ""))
+    if not output_folder:
+        raise ValueError("mapDamage2 rule needs output 'log'.")
+
+    rescaled_bam = snakemake.output.get("rescaled_bam", "")
+    if rescaled_bam:
+        rescaled_bam = "--rescale-out " + rescaled_bam
+
+
+    shell(
+        "mapDamage "
+        "{in_bam} "
+        "--reference {snakemake.input.ref} "
+        "--folder {output_folder} "
+        "{rescaled_bam} "
+        "{extra} "
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

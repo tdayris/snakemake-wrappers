@@ -1,0 +1,177 @@
+.. _`bio/gridss/assemble`:
+
+GRIDSS ASSEMBLE
+===============
+
+GRIDSS is a module software suite containing tools useful for the detection of genomic rearrangements. It includes a genome-wide break-end assembler, as well as a structural variation caller for Illumina sequencing data. ``assemble`` performs GRIDSS breakend assembly.
+
+
+**URL**: https://github.com/PapenfussLab/gridss
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    WORKING_DIR = "working_dir"
+    samples = ["A", "B"]
+
+    preprocess_endings = (
+        ".cigar_metrics",
+        ".coverage.blacklist.bed",
+        ".idsv_metrics",
+        ".insert_size_histogram.pdf",
+        ".insert_size_metrics",
+        ".mapq_metrics",
+        ".sv.bam",
+        ".sv.bam.bai",
+        ".sv_metrics",
+        ".tag_metrics",
+        )
+
+    assembly_endings = (
+        ".cigar_metrics",
+        ".coverage.blacklist.bed",
+        ".downsampled_0.bed",
+        ".excluded_0.bed",
+        ".idsv_metrics",
+        ".mapq_metrics",
+        ".quality_distribution.pdf",
+        ".quality_distribution_metrics",
+        ".subsetCalled_0.bed",
+        ".sv.bam",
+        ".sv.bam.bai",
+        ".tag_metrics",
+        )
+
+    reference_index_endings = (".amb",".ann", ".bwt", ".pac", ".sa", ".gridsscache", ".img")
+
+    rule gridss_assemble:
+        input:
+            bams=expand("mapped/{sample}.bam", sample=samples),
+            bais=expand("mapped/{sample}.bam.bai", sample=samples),
+            reference="reference/genome.fasta",
+            dictionary="reference/genome.dict",
+            indices=multiext("reference/genome.fasta", *reference_index_endings),
+            preprocess=expand("{working_dir}/{sample}.bam.gridss.working/{sample}.bam{ending}", working_dir=[WORKING_DIR], sample=samples, ending=preprocess_endings)
+        output:
+            assembly="assembly/group.bam",
+            assembly_others=expand("{working_dir}/group.bam.gridss.working/group.bam{ending}", working_dir=[WORKING_DIR], ending=assembly_endings)
+        params:
+            extra="--jvmheap 1g",
+            workingdir=WORKING_DIR
+        log:
+            "log/gridss/assemble/group.log"
+        threads:
+            100
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/gridss/assemble"
+
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``gridss==2.9.4``
+
+Input/Output
+------------
+**Input:**
+
+* ``bams``: path to mapped bam files
+* ``reference``: Path to indexed reference genome all "``.amb``", "``.ann``", "``.bwt``", "``.pac``", "``.sa``", "``.dict``" files are expected
+
+**Output:**
+
+* ``assembly``: Path to output assembly
+
+
+
+Params
+------
+
+* ``workingdir``: Path to working directory
+
+* ``extra``: Optional parameters
+
+
+
+
+
+Authors
+-------
+
+* Christopher Schröder
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for gridss assemble"""
+
+    __author__ = "Christopher Schröder"
+    __copyright__ = "Copyright 2020, Christopher Schröder"
+    __email__ = "christopher.schroede@tu-dortmund.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    from os import path
+
+    # Creating log
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    # Placeholder for optional parameters
+    extra = snakemake.params.get("extra", "")
+
+    # Check inputs/arguments.
+    reference = snakemake.input.get("reference")
+
+    if not snakemake.params.workingdir:
+        raise ValueError("Please set params.workingdir to provide a working directory.")
+
+    if not snakemake.input.reference:
+        raise ValueError("Please set input.reference to provide reference genome.")
+
+    for ending in (".amb", ".ann", ".bwt", ".pac", ".sa"):
+        if not path.exists("{}{}".format(reference, ending)):
+            raise ValueError(
+                "{reference}{ending} missing. Please make sure the reference was properly indexed by bwa.".format(
+                    reference=reference, ending=ending
+                )
+            )
+
+    dictionary = path.splitext(reference)[0] + ".dict"
+    if not path.exists(dictionary):
+        raise ValueError(
+            "{dictionary}.dict missing. Please make sure the reference dictionary was properly created. This can be accomplished for example by CreateSequenceDictionary.jar from Picard".format(
+                dictionary=dictionary
+            )
+        )
+
+    shell(
+        "(gridss -s assemble "  # Tool
+        "--reference {reference} "  # Reference
+        "--threads {snakemake.threads} "  # Threads
+        "--workingdir {snakemake.params.workingdir} "  # Working directory
+        "--assembly {snakemake.output.assembly} "  # Assembly output
+        "{snakemake.input.bams} "
+        "{extra}) {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

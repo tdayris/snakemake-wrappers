@@ -1,0 +1,136 @@
+.. _`bio/hisat2/align`:
+
+HISAT2 ALIGN
+============
+
+Map reads with hisat2.
+
+
+**URL**: https://daehwankimlab.github.io/hisat2/
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule hisat2_align:
+        input:
+          reads=["reads/{sample}_R1.fastq", "reads/{sample}_R2.fastq"]
+        output:
+          "mapped/{sample}.bam"
+        log:
+            "logs/hisat2_align_{sample}.log"
+        params:
+          extra="",
+          idx="index/",
+        threads: 2
+        wrapper:
+          "0.50.4-1991-g7872381db/bio/hisat2/align"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``hisat2==2.1.0``
+* ``samtools==1.9``
+
+Input/Output
+------------
+**Input:**
+
+* ``reads``: either 1 or 2 FASTQ files with reads
+
+**Output:**
+
+* bam file with mapped reads. This must be the first output element in the output file list.
+
+
+
+Params
+------
+
+* ``idx``: prefix of index file path (required)
+
+* ``extra``: additional parameters
+
+
+
+
+Notes
+-----
+
+* The `-S` flag must not be used since output is already directly piped to
+  `samtools` for compression.
+* The `--threads/-p` flag must not be used since threads is set separately
+  via the snakemake `threads` directive.
+* The wrapper does not yet handle SRA input accessions.
+* No reference index files checking is done since the actual number of files
+  may differ depending on the reference sequence size. This is also why
+  the index is supplied in the `params` directive instead of the `input`
+  directive.
+
+Warning, this pipeline uses more threads than the number set in the snakemake rule. For X threads written, X+1 are used: X for hisat2, 1 for samtools view.
+
+
+
+Authors
+-------
+
+* Wibowo Arindrarto
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Wibowo Arindrarto"
+    __copyright__ = "Copyright 2016, Wibowo Arindrarto"
+    __email__ = "bow@bow.web.id"
+    __license__ = "BSD"
+
+
+    from snakemake.shell import shell
+
+    # Placeholder for optional parameters
+    extra = snakemake.params.get("extra", "")
+    # Run log
+    log = snakemake.log_fmt_shell()
+
+    # Input file wrangling
+    reads = snakemake.input.get("reads")
+    if isinstance(reads, str):
+        input_flags = "-U {0}".format(reads)
+    elif len(reads) == 1:
+        input_flags = "-U {0}".format(reads[0])
+    elif len(reads) == 2:
+        input_flags = "-1 {0} -2 {1}".format(*reads)
+    else:
+        raise RuntimeError(
+            "Reads parameter must contain at least 1 and at most 2" " input files."
+        )
+
+    # Executed shell command
+    shell(
+        "(hisat2 {extra} "
+        "--threads {snakemake.threads} "
+        " -x {snakemake.params.idx} {input_flags} "
+        " | samtools view -Sbh -o {snakemake.output[0]} -) "
+        " {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

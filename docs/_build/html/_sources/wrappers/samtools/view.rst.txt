@@ -1,0 +1,124 @@
+.. _`bio/samtools/view`:
+
+SAMTOOLS VIEW
+=============
+
+Convert or filter SAM/BAM. For more information see `SAMtools documentation <http://www.htslib.org/doc/samtools-view.html>`_.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule samtools_view:
+        input:
+            "{sample}.sam"
+        output:
+            "{sample}.bam"
+        log:
+            "{sample}.log"
+        params:
+            extra="" # optional params string
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/samtools/view"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``samtools==1.12``
+* ``snakemake-wrapper-utils==0.2.0``
+
+Input/Output
+------------
+**Input:**
+
+* SAM/BAM/CRAM file
+
+**Output:**
+
+* SAM/BAM/CRAM file
+
+
+
+
+Notes
+-----
+
+* The `extra` param allows for additional program arguments (not `-@/--threads` or `-O/--output-fmt`).
+* For more information see, http://www.htslib.org/doc/samtools-view.html
+
+
+
+Authors
+-------
+
+* Johannes Köster
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "koester@jimmy.harvard.edu"
+    __license__ = "MIT"
+
+
+    import os
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.samtools import get_samtools_opts
+
+
+    samtools_opts = get_samtools_opts(snakemake)
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
+    aln = snakemake.input.get("aln", None)
+    if aln is None:
+        aln = snakemake.input[0]
+
+    ref = snakemake.input.get('fasta')
+    if ref:
+        ref_dir = os.path.dirname(ref)
+        ref = f"-T {ref} "
+
+        if "fasta_idx" in snakemake.input.keys():
+            ref += f" -t {snakemake.input['fasta_idx']} "
+
+        cache = snakemake.input.get("cache", "")
+        if cache:
+           os.environ["REF_PATH"] = f"{cache}/%2s/%2s/%s:{ref_dir}:http://www.ebi.ac.uk/ena/cram/md5/%s"
+           os.environ["REF_CACHE"] = f"{cache}/%2s/%2s/%s"
+
+    bed = ""
+    if "bed" in snakemake.input.keys():
+        bed = f"-L {snakemake.input['bed']} "
+    
+    position = snakemake.params.get("position", "")
+
+    shell(
+        "samtools view {snakemake.params.extra} {ref} {bed} {samtools_opts} "
+        "-o {snakemake.output[0]} {aln} "
+        "{position} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

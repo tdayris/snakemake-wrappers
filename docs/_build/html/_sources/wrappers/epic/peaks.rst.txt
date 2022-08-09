@@ -1,0 +1,136 @@
+.. _`bio/epic/peaks`:
+
+EPIC
+====
+
+Find broad enriched domains in ChIP-Seq data with epic
+
+
+**URL**: https://github.com/biocore-ntnu/epic
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule epic:
+        input:
+          treatment = "bed/test.bed",
+          background = "bed/control.bed"
+        output:
+          enriched_regions = "epic/enriched_regions.csv", # required
+          bed = "epic/enriched_regions.bed", # optional
+          matrix = "epic/matrix.gz" # optional
+        log:
+            "logs/epic/epic.log"
+        params:
+          genome = "hg19", # optional, default hg19
+          extra="-g 3 -w 200" # "--bigwig epic/bigwigs"
+        threads: 1 # optional, defaults to 1
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/epic/peaks"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``epic=0.2.7``
+* ``pandas=0.22.0``
+
+Input/Output
+------------
+**Input:**
+
+* ``treatment``: chip .bed(.gz/.bz) files
+* ``background``: input .bed(.gz/.bz) files
+
+**Output:**
+
+* ``enriched_regions``: main output file with enriched peaks
+* ``bed``: (optional) contains much of the same info as enriched_regions but in a bed format, suitable for viewing in the UCSC genome browser or downstream use with bedtools
+* ``matrix``: (optional) a gzipped matrix of read counts
+
+
+
+Params
+------
+
+* ``extra``: additional parameters
+
+* ``log``: (optional) file to write the log output to
+
+
+
+
+Notes
+-----
+
+* All/any of the different bigwig options must be given as extra parameters
+
+
+
+Authors
+-------
+
+* Endre Bakken Stovner
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Endre Bakken Stovner"
+    __copyright__ = "Copyright 2017, Endre Bakken Stovner"
+    __email__ = "endrebak85@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    # Placeholder for optional parameters
+    extra = snakemake.params.get("extra", "")
+    threads = snakemake.threads or 1
+
+    treatment = snakemake.input.get("treatment")
+    background = snakemake.input.get("background")
+
+    # Executed shell command
+    enriched_regions = snakemake.output.get("enriched_regions")
+
+    bed = snakemake.output.get("bed")
+    matrix = snakemake.output.get("matrix")
+
+    if len(snakemake.log) > 0:
+        log = snakemake.log[0]
+
+    genome = snakemake.params.get("genome")
+
+    cmd = "epic -cpu {threads} -t {treatment} -c {background} -o {enriched_regions} -gn {genome}"
+
+    if bed:
+        cmd += " -b {bed}"
+    if matrix:
+        cmd += " -sm {matrix}"
+    if log:
+        cmd += " -l {log}"
+
+    cmd += " {extra}"
+
+    shell(cmd)
+
+
+.. |nl| raw:: html
+
+   <br>

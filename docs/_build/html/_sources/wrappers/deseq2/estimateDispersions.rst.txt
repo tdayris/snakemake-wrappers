@@ -1,0 +1,141 @@
+.. _`bio/deseq2/estimateDispersions`:
+
+ESTIMATE DISPERSIONS
+====================
+
+Estimate the dispersions for a DESeqDataSet
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_estimateDispersions:
+        input:
+            dds = "esf.RDS"
+        output:
+            disp = "disp.RDS"
+        message:
+            "Testing estimateDispersions"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 2048)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 10, 20)
+            )
+        log:
+            "logs/test_estimateDispersions.log"
+        params:
+            extra = "fitType='local'"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/deseq2/estimateDispersions"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconda::bioconductor-deseq2==1.32.0``
+
+Input/Output
+------------
+**Input:**
+
+* A deseq2 dataset as RDS
+
+**Output:**
+
+* A RDS file of the DDS object with dispertion estimates
+
+
+
+
+Notes
+-----
+
+Besides the RDS object, you can add any arguments in extra, they
+shall be interpreted within the "..." argument in R.
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/bin/R
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # Perform sample dispertion estimates
+
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt");
+    base::sink(log.file);
+    base::sink(log.file,type="message");
+
+    # Differential Gene expression
+    base::library(package = "DESeq2", quietly = TRUE);
+
+    # Cast input path as character
+    dds_path <- base::as.character(x = snakemake@input[["dds"]]);
+    dds <- base::readRDS(dds_path);
+
+    # Cast locfunc as function name
+    extra <- "";
+    if ("extra" %in% names(snakemake@params)) {
+      extra <- base::paste0(
+        ", ",
+        base::as.character(x = snakemake@params[["extra"]])
+      );
+    }
+    # Create object
+    dds <- base::eval(
+      base::parse(
+        text = base::paste0(
+          "DESeq2::estimateDispersions(dds", extra, ");"
+        )
+      )
+    );
+
+    # Save as RDS
+    output_path <- base::as.character(x = snakemake@output[["disp"]]);
+    base::saveRDS(
+      obj = dds,
+      file = output_path
+    );
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    base::sink(type="message");
+    base::sink();
+
+
+.. |nl| raw:: html
+
+   <br>

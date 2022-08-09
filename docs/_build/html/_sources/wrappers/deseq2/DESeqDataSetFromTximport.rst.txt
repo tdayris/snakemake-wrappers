@@ -1,0 +1,209 @@
+.. _`bio/deseq2/DESeqDataSetFromTximport`:
+
+DESEQ DATASET FROM TXIMPORT
+===========================
+
+Import counts from Tximport into DESeq2
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_DESeqDataSetFromTximport:
+        input:
+            tximport = "txi.RDS",
+            coldata = "coldata.tsv"
+        output:
+            dds = "deseq2/dds.RDS"
+        message:
+            "Testing DESeqDataSetFromTximport"
+        log:
+            "logs/deseq2/DESeqDataSetFromTximport.logs"
+        params:
+            design = "~Cond",
+            levels = ["A", "B"],
+            factor = "Cond"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/deseq2/DESeqDataSetFromTximport/"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconda::bioconductor-deseq2==1.32.0``
+* ``conda-forge::r-readr==1.4.0``
+* ``conda-forge::r-jsonlite==1.7.2``
+* ``bioconda::bioconductor-tximport==1.20.0``
+
+Input/Output
+------------
+**Input:**
+
+* A tximport RDS file
+* A TSV design file as described in DESeq2 documentation
+
+**Output:**
+
+* A RDS file of the DDS object.
+
+
+
+
+Notes
+-----
+
+Depending on your formula, your design file can contain any number of
+optional columns
+
+Parameters:
+
+* design: the R formulae used to performs differential expression
+* levels: a list of condition to study. The first one is the reference level
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # This script takes a tximport object and builds a deseq2 dataset
+    # for each formula given to snakemake.
+
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt");
+    base::sink(log.file);
+    base::sink(log.file,type="message");
+
+    # Perform actual count importation in R
+    base::library(package = "tximport", quietly = TRUE);
+    # Read faster!
+    base::library(package = "readr", quietly = TRUE);
+    # Importing inferential replicates
+    base::library(package = "jsonlite", quietly = TRUE);
+    # Differential Gene expression
+    base::library(package = "DESeq2", quietly = TRUE);
+
+    base::write("Libraries loaded.", stderr());
+
+    # Load txi object
+    txi_rds_path <- base::as.character(x = snakemake@input[["tximport"]]);
+    txi <- base::readRDS(
+      file = txi_rds_path
+    );
+
+    # Load experimental design
+    coldata_path <- base::as.character(x = snakemake@input[["coldata"]]);
+    coldata <- utils::read.table(
+      file = coldata_path,
+      sep = "\t",
+      header = TRUE
+    );
+    rownames(coldata) <- coldata$Sample_id;
+
+    count_filter <- 0;
+    if ("count_filter" %in% names(snakemake@params)) {
+      count_filter <- base::as.numeric(
+        x = snakemake@params[["count_filter"]]
+      );
+    }
+
+    # Cast formula as formula instead of string
+    formula <- stats::as.formula(
+      object = snakemake@params[["design"]]
+    );
+
+    base::message("Input dataset and options recovered.");
+
+    # Create dds object
+    dds <- DESeq2::DESeqDataSetFromTximport(
+      txi = txi,
+      colData = coldata,
+      design = formula
+    );
+    base::write("DESeqDataSet built.", stderr());
+
+    levels <- ("levels" %in% base::names(snakemake@params));
+    factor <- ("factor" %in% base::names(snakemake@params));
+    if (levels & factor) {
+      # Levels should come with reference as first item
+      levels <- sapply(
+        snakemake@params[["levels"]],
+        function(level) base::as.character(x = level)
+      );
+      factor <- base::as.character(x = snakemake@params[["factor"]]);
+
+      dds[[factor]] <- base::factor(dds[[factor]], levels = levels);
+      if ("ref_level" %in% base::names(snakemake@params)) {
+          base::message("Ref level: ", snakemake@params[["ref_level"]]);
+          dds[[factor]] <- stats::relevel(
+            dds[[factor]],
+            ref = snakemake@params[["ref_level"]]
+        );
+      } else {
+        base::message("Ref level: ", levels[[1]]);
+        dds[[factor]] <- stats::relevel(dds[[factor]], ref = levels[[1]]);
+      }
+      dds[[factor]] <- droplevels(dds[[factor]]);
+      base::write("Factors have been releveled", stderr());
+    }
+    print(dds[[factor]]);
+    print(colData(dds));
+
+    keep <- rowSums(counts(dds)) > count_filter;
+    dds <- dds[keep, ];
+
+    if ("remove_zeros" %in% base::names(snakemake@params)) {
+      keep <- rowSums(counts(dds)==0) < length(colnames(dds)) - 1;
+      dds <- dds[keep, ];
+      base::write("Zeros have been removed", stderr());
+    }
+    print(head(dds));
+    base::message("Low counts in DESeqDataSet were filtered.");
+
+    # Save as RDS
+    output_path <- base::as.character(x = snakemake@output[["dds"]]);
+    base::saveRDS(
+      obj = dds,
+      file = output_path
+    );
+
+    base::write("Process over.", stderr());
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    base::sink(type="message");
+    base::sink();
+
+
+.. |nl| raw:: html
+
+   <br>

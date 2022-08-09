@@ -1,0 +1,224 @@
+.. _`bio/pcaExplorer/plotCorrs`:
+
+PCAEXPLORER PCA CORRELATION
+===========================
+
+Plot PCA axes correlations
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_pcaexplorer_pcacorrs:
+        input:
+            dst = "vst.RDS",
+            dds = "dds.RDS"
+        output:
+            png = "plot.png"
+        message:
+            "Testing pcaExplorer PCA Correlations"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 1024, 10240)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 20, 200)
+            )
+        log:
+            "logs/test_pcaexplorer_pcacorrs.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/pcaExplorer/plotCorrs"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconda::bioconductor-deseq2==1.32.0``
+* ``bioconda::bioconductor-pcaexplorer==2.18.0``
+* ``bioconda::bioconductor-delayedarray==0.18.0``
+* ``conda-forge::r-readr==1.4.0``
+* ``conda-forge::r-jsonlite==1.7.2``
+* ``bioconda::bioconductor-summarizedexperiment==1.22.0``
+* ``bioconda::bioconductor-iranges==2.26.0``
+* ``conda-forge::cairo==1.16.0``
+* ``conda-forge::r-cairo==1.5_12.2``
+
+Input/Output
+------------
+**Input:**
+
+* A normalized dds (vst/rlog) of all samples and targets
+* A DESeq2 dataset
+
+**Output:**
+
+* A png image of the correlation of the requested axe with factors
+
+
+
+
+Notes
+-----
+
+Parameters:
+
+* extra (str) Command line arguments (interpreted by R)
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/usr/bin/R
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # This script takes a deseq2 transform object and performs
+    # a plots over factor correlation with pca axes
+
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt");
+    base::sink(log.file);
+    base::sink(log.file,type="message");
+
+    base::library(package = "DESeq2");        # Differential analysis
+    base::library(package = "pcaExplorer");   # Handles PCAs
+    base::library(package = "Cairo");         # Graphic library
+
+    cleanColData <- function(dds, factor) {
+      NApos <- base::is.na(dds[[factor]]);
+      dds2 <- dds[, !NApos];
+      for (coldata in base::names(colData(dds2))) {
+        dds2[[coldata]] <- dds[[coldata]][!NApos]
+        if (length(levels(dds2[[coldata]])) == 1) {dds2[[coldata]] <- NULL}
+      }
+      return(dds2)
+    }
+
+    # Overload output defaults in order to avoid
+    # X11 foreward errors on cluster nodes
+    options(bitmapType="cairo");
+
+    # Load specified input files
+    dst_path <- base::as.character(
+      x = snakemake@input[["dst"]]
+    );
+    dst <- base::readRDS(file = dst_path);
+    pca <- stats::prcomp(t(SummarizedExperiment::assay(dst)))
+
+    dds_path <- base::as.character(
+      x = snakemake@input[["dds"]]
+    );
+    dds <- base::readRDS(file = dds_path);
+
+    base::message("Printing coldata:");
+    base::print(dds);
+    base::print(colData(dds));
+
+    base::message("Factor of interest:");
+    print(snakemake@params)
+    base::print(snakemake@params[["factor"]]);
+
+    base::message("Printing pca:");
+    base::print(head(pca));
+
+    corrs_pca <- tryCatch({
+        pcaExplorer::correlatePCs(pca, colData(dds))
+      },
+      error = function(e) {
+        dds <- cleanColData(
+          dds = dds,
+          factor = base::as.character(x = snakemake@params[["factor"]])
+        );
+        pcaExplorer::correlatePCs(pca, colData(dds))
+      }
+    );
+
+    # Load extra parameters
+    extra <- "corrs_pca"
+    if ("extra" %in% names(snakemake@params)) {
+      extra <- base::paste(
+          extra,
+          snakemake@params[["extra"]],
+          sep = ", "
+      );
+    }
+
+    command <- base::paste0(
+      "pcaExplorer::plotPCcorrs(",
+      extra,
+      ");"
+    );
+
+    base::message(command);
+
+    # Build plot
+    w <- 1024;
+    if ("w" %in% base::names(snakemake@params)) {
+      w <- base::as.numeric(snakemake@params[["w"]]);
+    }
+    h <- 768;
+    if ("h" %in% base::names(snakemake@params)) {
+      h <- base::as.numeric(snakemake@params[["h"]]);
+    }
+
+    png(
+      filename = snakemake@output[["png"]],
+      width = w,
+      height = h,
+      units = "px",
+      type = "cairo"
+    );
+
+    tryCatch({
+        base::eval(base::parse(text = command))
+      },
+      error = function(e) {
+        dds <- cleanColData(
+          dds = dds,
+          factor = base::as.character(x = snakemake@params[["factor"]])
+        );
+        base::eval(base::parse(text = command))
+      }
+    );
+
+    dev.off();
+
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    base::sink(type="message");
+    base::sink();
+
+
+.. |nl| raw:: html
+
+   <br>

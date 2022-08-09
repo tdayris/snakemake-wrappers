@@ -1,0 +1,164 @@
+.. _`bio/bcftools/view`:
+
+BCFTOOLS VIEW
+=============
+
+View vcf/bcf file in a different format.
+
+**URL**: https://samtools.github.io/bcftools/bcftools.html#view
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bcf_view_sample_file:
+        input:
+            "{prefix}.bcf",  # input bcf/vcf needs to be first input
+            index="{prefix}.bcf.csi",  # other inputs are optional
+            samples="samples.txt",
+        output:
+            "{prefix}.view_sample.vcf",
+        log:
+            "log/{prefix}.view_sample.vcf.log",
+        params:
+            # optional extra parameters
+            extra=lambda w, input: f"-S {input.samples}",
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bcftools/view"
+
+
+    rule bcf_view_o_vcf:
+        input:
+            "{prefix}.bcf",
+        output:
+            "{prefix}.view.vcf",
+        log:
+            "log/{prefix}.view.vcf.log",
+        params:
+            extra="",
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bcftools/view"
+
+
+    rule bcf_view_o_vcf_gz:
+        input:
+            "{prefix}.bcf",
+        output:
+            "{prefix}.view.vcf.gz",
+        log:
+            "log/{prefix}.view.vcf.gz.log",
+        params:
+            extra="",
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bcftools/view"
+
+
+    rule bcf_view_o_bcf:
+        input:
+            "{prefix}.bcf",
+        output:
+            "{prefix}.view.bcf",
+        log:
+            "log/{prefix}.view.bcf.log",
+        params:
+            extra="",
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bcftools/view"
+
+
+    rule bcf_view_o_uncompressed_bcf:
+        input:
+            "{prefix}.bcf",
+        output:
+            "{prefix}.view.uncompressed.bcf",
+        log:
+            "log/{prefix}.view.uncompressed.bcf.log",
+        params:
+            uncompressed_bcf=True,
+            extra="",
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bcftools/view"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bcftools==1.12``
+* ``snakemake-wrapper-utils==0.2``
+
+Input/Output
+------------
+**Input:**
+
+* VCF/BCF file, must be the first in the input file list
+
+**Output:**
+
+* Filtered VCF/BCF file, must be the only element in the output file list
+
+
+
+Params
+------
+
+* ``extra``: The `extra` param allows for additional program arguments (not `--threads, `-O/--output-type`, `-m/--max-mem`, or `-T/--temp-dir`).
+
+* ``uncompressed_bcf``: he `uncompressed_bcf` param allows to specify that a BCF output should be uncompressed (ignored otherwise).
+
+* ``bcftools_use_mem``: The `bcftools_use_mem` param controls whether to pass the resources.mem_mb to bcftools
+
+
+
+
+
+Authors
+-------
+
+* Johannes Köster
+* Nikos Tsardakas Renhuldt
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2016, Johannes Köster"
+    __email__ = "koester@jimmy.harvard.edu"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.bcftools import get_bcftools_opts
+
+    bcftools_opts = get_bcftools_opts(snakemake)
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    extra = snakemake.params[0]
+
+    shell(
+        "bcftools view {bcftools_opts} "
+        "{extra} "
+        "{snakemake.input[0]} "
+        "-o {snakemake.output} "
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

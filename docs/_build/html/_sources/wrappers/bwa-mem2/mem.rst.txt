@@ -1,0 +1,137 @@
+.. _`bio/bwa-mem2/mem`:
+
+BWA-MEM2
+========
+
+Bwa-mem2 is the next version of the bwa-mem algorithm in bwa. It produces alignment identical to bwa and is ~1.3-3.1x faster depending on the use-case, dataset and the running machine. Optional sorting using samtools or picard.
+
+**URL**: https://github.com/bwa-mem2/bwa-mem2
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bwa_mem2_mem:
+        input:
+            reads=["reads/{sample}.1.fastq", "reads/{sample}.2.fastq"]
+        output:
+            "mapped/{sample}.bam"
+        log:
+            "logs/bwa_mem2/{sample}.log"
+        params:
+            index="genome.fasta",
+            extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
+            sort="none",             # Can be 'none', 'samtools' or 'picard'.
+            sort_order="coordinate", # Can be 'coordinate' (default) or 'queryname'.
+            sort_extra=""            # Extra args for samtools/picard.
+        threads: 8
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bwa-mem2/mem"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bwa-mem2==2.2.1``
+* ``samtools==1.12``
+* ``picard==2.23``
+
+Input/Output
+------------
+**Input:**
+
+* ``reads``: List of paths to fastq files. R1 is mandatory, and an optional R2 is required for paired end
+
+**Output:**
+
+* SAM/BAM file
+
+
+
+Params
+------
+
+* ``index``: Path to indexed genome
+
+* ``extra``: Optional parameters for bwa mem
+
+* ``sort``: Either "none", "samtools", or "picard".
+
+* ``sort_order``: Either "coordinate" or "queryname"
+
+* ``sort_extra``: Extra parameters for samtools or picard
+
+
+
+
+Notes
+-----
+
+This wrapper uses an inner pipe. For X threads reserved in the snakemake rule, this wrapper uses X+1 threads when the `sort` parameter is not none.
+
+
+
+Authors
+-------
+
+* Christopher Schröder
+* Johannes Köster
+* Julian de Ruiter
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Christopher Schröder, Johannes Köster, Julian de Ruiter"
+    __copyright__ = (
+        "Copyright 2020, Christopher Schröder, Johannes Köster and Julian de Ruiter"
+    )
+    __email__ = "christopher.schroeder@tu-dortmund.de koester@jimmy.harvard.edu, julianderuiter@gmail.com"
+    __license__ = "MIT"
+
+
+    from os import path
+
+    from snakemake.shell import shell
+
+
+    # Extract arguments.
+    extra = snakemake.params.get("extra", "")
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    # Check inputs/arguments.
+    if not isinstance(snakemake.input.reads, str) and len(snakemake.input.reads) not in {
+        1,
+        2,
+    }:
+        raise ValueError("input must have 1 (single-end) or 2 (paired-end) elements")
+
+
+
+    shell(
+        "bwa-mem2 mem"
+        " -t {snakemake.threads}"
+        " {extra}"
+        " {snakemake.params.index}"
+        " {snakemake.input.reads}"
+        " > {snakemake.output[0]} {log}"
+    )
+
+.. |nl| raw:: html
+
+   <br>

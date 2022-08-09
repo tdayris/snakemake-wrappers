@@ -1,0 +1,142 @@
+.. _`bio/gatk/colectsequencingartifacts`:
+
+GATK COLLECTSEQUENCINGARTIFACTMETRICS
+=====================================
+
+Run gatk CollectSequencingArtifactMetrics to estimate sequencing bias
+
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_collect_sequencing_bias:
+        input:
+            # Optional bed intervals
+            # intervals="",
+            # Optional dbSNP
+            # dbsnp="",
+            bam="mapped/{sample}.bam",
+            ref="reference/genome.fasta"
+        output:
+            "artifacts.pre_adapter_detail_metrics"
+        log:
+            "logs/gatk/collectsequencingartifactmetrics/{sample}.log"
+        params:
+            prefix="artifacts" # See notes below
+            extra="",  # optional
+            java_opts="", # optional
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/gatk/collectsequencingartifactmetrics"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``gatk4==4.2.0.0``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* Bam formatted mapped reads
+* Optional dbSNP (vcf.gz) with its tabix index aside
+* Optional interval (bed) file
+
+**Output:**
+
+* Bias metrics files under expected format (default = txt)
+
+
+
+
+Notes
+-----
+
+* The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
+* The `extra` param alllows for additional program arguments.
+* For more inforamtion see, https://software.broadinstitute.org/gatk/documentation/article?id=11050
+* WARNING: provide output prefix as a parameter named "prefix", or let "*.pre_adapter_detail_metrics" be your first result
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python
+
+    """
+    Snakemake wrapper for GATK CollectSequencingArtifactMetrics
+    """
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2021, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    import os
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
+
+    dbsnp = ""
+    if "dbsnp" in snakemake.input.keys():
+        dbsnp = "--DB_SNP {}".format(snakemake.input["dbsnp"])
+
+    intervals = ""
+    if "intervals" in snakemake.input.keys():
+        intervals = "--INTERVALS {}".format(snakemake.input["intervals"])
+
+    prefix = snakemake.params.get("prefix", "")
+    if prefix == "":
+        prefix = snakemake.output[0][:-len(".pre_adapter_detail_metrics")]
+
+
+    shell(
+        "gatk --java-options '{java_opts}' "  # Base GATK Call with java arguments
+        "CollectSequencingArtifactMetrics {extra} "  # Optional arguments
+        "{dbsnp} "  # Optional dbsnp file
+        "{intervals} "  # Optional bed file
+        "--INPUT {snakemake.input.bam} "  # Path to input bam file
+        "--REFERENCE_SEQUENCE {snakemake.input.ref} "  # Path to reference genome
+        "--OUTPUT {prefix} {log}"  # Path to output file
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

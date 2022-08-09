@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SNPEFF_SNPSIFT &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="VARIANT_CALLING_AMPLISEQ" href="variant_calling_ampliseq.html" />
+    <link rel="prev" title="SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT)" href="sigprofiler_signatures.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Snakemake Wrappers
+          </a>
+              <div class="version">
+                heads/Unofficial
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers and Pipelines</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../pipelines.html">BiGR Pipelines</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="CTC_Variant_Calling_Integragen_Legacy.html">CTC_VARIANT_CALLING_INTEGRAGEN_LEGACY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="WES_germline.html">WES_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="annot_sv.html">ANNO_SV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCL2FASTQ (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="celltype_deconvolution_rnaseq.html">CELLTYPE_DECONVOLUTION_RNASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chipseq.html">CHIPSEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dge_deseq2.html">DGE_DESEQ2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_set_enrichment.html">GENE_SET_ENRICHMENT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low_pass_wgs_copy_number.html">LOW_PASS_WGS_COPY_NUMBER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nfcore_chipseq.html">NFCORE-CHIPSEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="retrotransposons.html">RETROTRANSPOSONS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rnaseq.html">RNASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sarek_enhanced.html">SAREK ENHANCED</a></li>
+<li class="toctree-l2"><a class="reference internal" href="seqoia.html">SEQOIA SINGLE-SAMPLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sigprofiler_signatures.html">SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SNPEFF_SNPSIFT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#used-meta-wrappers">Used meta-wrappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#used-wrappers">Used wrappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snakefile">Snakefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline.html">VARIANT_CALLING_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline_wes.html">VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_somatic.html">VARIANT_CALLING_SOMATIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_callling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_occurence_cohort.html">VARIANT_OCCURENCE_COHORT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wes_somatic.html">VARIANT_CALLING_SOMATIC</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Snakemake Wrappers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../pipelines.html">BiGR Pipelines</a> &raquo;</li>
+      <li>SNPEFF_SNPSIFT</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/bigr-pipelines/snpeff_snpsift.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="snpeff-snpsift">
+<span id="id1"></span><h1>SNPEFF_SNPSIFT<a class="headerlink" href="#snpeff-snpsift" title="Permalink to this headline"></a></h1>
+<p>Annotate VCF files with SnpEff and SNpSift</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
+<p>In order to run the pipeline, use the following commands</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Go to your directory containing VCF files</span>
+
+<span class="nb">cd</span> /path/to/VCF/dir
+
+<span class="c1"># Copy/paste the following line for **HG38**</span>
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh hg38
+
+<span class="c1"># Copy/paste the following line for **HG19**</span>
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/snpeff_snpsift/run.sh hg19
+</pre></div>
+</div>
+</section>
+<section id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline"></a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>VCF files (searched in current working directory)</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">snpsift</span></code>: Annotated VCF file</p></li>
+</ul>
+</section>
+<section id="used-meta-wrappers">
+<h2>Used meta-wrappers<a class="headerlink" href="#used-meta-wrappers" title="Permalink to this headline"></a></h2>
+<p>The following individual meta-wrappers are used in this pipeline:</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">meta/bio/snpeff_annotate</span></p></li>
+<li><p><span class="xref std std-ref">meta/bio/snpsift</span></p></li>
+</ul>
+<p>Please refer to each meta-wrapper in above list for additional configuration parameters and information about the executed code.</p>
+</section>
+<section id="used-wrappers">
+<h2>Used wrappers<a class="headerlink" href="#used-wrappers" title="Permalink to this headline"></a></h2>
+<p>The following individual wrappers are used in this pipeline:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../wrappers/tabix.html#bio-tabix"><span class="std std-ref">TABIX</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/compress/pbgzip.html#bio-compress-pbgzip"><span class="std std-ref">COMPRESS_PBGZIP</span></a></p></li>
+<li><p><a class="reference internal" href="../wrappers/multiqc.html#bio-multiqc"><span class="std std-ref">MULTIQC</span></a></p></li>
+</ul>
+<p>Please refer to each wrapper in above list for additional configuration parameters and information about the executed code.</p>
+</section>
+<section id="snakefile">
+<h2>Snakefile<a class="headerlink" href="#snakefile" title="Permalink to this headline"></a></h2>
+<p>The pipeline contains the following steps:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;snakemake.snpeff_snpsift.log&quot;</span><span class="p">,</span>
+    <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+<span class="p">)</span>
+
+<span class="n">worflow_source_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">get_sources</span><span class="p">())))</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">common</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;../common/python&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">common</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">file_manager</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">files_linker</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">write_yaml</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">messages</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">min_version</span>
+<span class="n">min_version</span><span class="p">(</span><span class="s2">&quot;6.0&quot;</span><span class="p">)</span>
+
+<span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;config.hg38.yaml&quot;</span><span class="p">)</span>
+<span class="n">configfile</span><span class="p">:</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
+<span class="n">design</span> <span class="o">=</span> <span class="n">get_design</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">search_vcf_files</span><span class="p">)</span>
+<span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+
+<span class="n">container</span><span class="p">:</span> <span class="s2">&quot;docker://continuumio/miniconda3:4.4.10&quot;</span>
+<span class="n">localrules</span><span class="p">:</span> <span class="n">bigr_copy</span>
+
+<span class="n">ruleorder</span><span class="p">:</span> <span class="n">bigr_copy</span> <span class="o">&gt;</span> <span class="n">pbgzip_compress</span>
+
+<span class="n">samples_list</span> <span class="o">=</span> <span class="n">design</span><span class="p">[</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">]</span>
+
+<span class="n">wildcard_constraints</span><span class="p">:</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">samples_list</span><span class="p">)</span>
+
+<span class="n">vcf_links</span> <span class="o">=</span> <span class="n">link_vcf</span><span class="p">(</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">,</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">Upstream_file</span>
+<span class="p">)</span>
+
+<span class="n">last_vcf</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;bigr/cancer_gene_census/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;ncbi_build&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;mm10&quot;</span>
+    <span class="k">else</span> <span class="s2">&quot;snpsift/dbsnp/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+<span class="p">)</span>
+
+
+
+<span class="c1">##################</span>
+<span class="c1">### Flag rules ###</span>
+<span class="c1">##################</span>
+
+<span class="n">onsuccess</span><span class="p">:</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;touch DONE &amp;&amp; rm --force --verbose ON_GOING ERROR&quot;</span><span class="p">)</span>
+
+<span class="n">onerror</span><span class="p">:</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;touch ERROR &amp;&amp; rm --force --verbose ON_GOING DONE&quot;</span><span class="p">)</span>
+
+<span class="n">onstart</span><span class="p">:</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;touch ON_GOING &amp;&amp; rm --force --verbose ERROR DONE&quot;</span><span class="p">)</span>
+
+
+<span class="n">rule</span> <span class="n">target_snpeff_snpsift</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_list</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;.tbi&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">qc</span><span class="o">=</span><span class="s2">&quot;multiqc/SnpEff_annotation.html&quot;</span><span class="p">,</span>
+        <span class="n">tsv</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift/extractFields/</span><span class="si">{sample}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_list</span>
+        <span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;columns_description.txt&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">directory</span><span class="p">(</span><span class="s2">&quot;results_to_upload&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Finishing the annotation pipeline&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">ln</span> <span class="o">=</span> <span class="s2">&quot;--symbolic --force --relative --verbose&quot;</span><span class="p">,</span>
+        <span class="n">mkdir</span> <span class="o">=</span> <span class="s2">&quot;--parents --verbose&quot;</span><span class="p">,</span>
+        <span class="n">rs</span> <span class="o">=</span> <span class="s2">&quot;--checksum --verbose --recursive --human-readable&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/rsync/results.log&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;mkdir </span><span class="si">{params.mkdir}</span><span class="s2"> results_to_upload/ &gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;rsync </span><span class="si">{params.rs}</span><span class="s2"> snpsift/fixed results_to_upload/VCF &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;rsync </span><span class="si">{params.rs}</span><span class="s2"> snpsift/extractFields results_to_upload/TSV &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;rsync </span><span class="si">{params.rs}</span><span class="s2"> multiqc results_to_upload/QC &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &amp;&amp; &quot;</span>
+        <span class="s2">&quot;rsync </span><span class="si">{params.rs}</span><span class="s2"> columns_description.txt results_to_upload/ &gt;&gt; </span><span class="si">{log}</span><span class="s2"> 2&gt;&amp;1 &quot;</span>
+
+<span class="c1">#################################</span>
+<span class="c1">### FINAL VCF FILE INDEXATION ###</span>
+<span class="c1">#################################</span>
+
+<span class="n">module</span> <span class="n">compress_index_vcf_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/compress_index_vcf/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">config</span>
+
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">compress_index_vcf_meta</span>
+
+
+<span class="c1"># use rule pbgzip_compress from compress_index_vcf_meta with:</span>
+<span class="c1">#     output:</span>
+<span class="c1">#         protected(&quot;{tool}/{subcommand}/{sample}.vcf.gz&quot;)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># use rule tabix_index from compress_index_vcf_meta with:</span>
+<span class="c1">#     output:</span>
+<span class="c1">#         protected(&quot;{tool}/{subcommand}/{sample}.vcf.gz.tbi&quot;)</span>
+<span class="c1">#     threads: 1</span>
+
+
+<span class="c1">#####################</span>
+<span class="c1">### Export to TSV ###</span>
+<span class="c1">#####################</span>
+
+<span class="n">rule</span> <span class="n">extractfields</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">call_index</span><span class="o">=</span><span class="n">get_tbi</span><span class="p">(</span><span class="s2">&quot;snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">tsv</span><span class="o">=</span><span class="s2">&quot;snpsift/extractFields/</span><span class="si">{sample}</span><span class="s2">.tsv&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Making </span><span class="si">{wildcards.sample}</span><span class="s2"> annotated VCF readable&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">4096</span><span class="p">,</span> <span class="mi">15360</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">20</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/snpsift/extractAllFields/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;-s &#39;;&#39; -e &#39;.&#39;&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/snpsift/extractAllFields&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">fix_vcf</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="n">last_vcf</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Removing empty fields, trailing &#39;;&#39; and non-canonical chromosomes &quot;</span>
+        <span class="s2">&quot;for </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bigr_scripts/fix_vcf/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">default_chr</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;chr&quot;</span><span class="p">],</span>
+        <span class="n">remove_non_conventional_chromosomes</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/BiGR/fix_vcf&quot;</span>
+
+
+<span class="c1">############################</span>
+<span class="c1">### Column signification ###</span>
+<span class="c1">############################</span>
+
+
+<span class="n">rule</span> <span class="n">column_signification</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expand</span><span class="p">(</span><span class="s2">&quot;snpsift/fixed/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">samples_list</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;columns_description.txt&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Extract column description from VCF headers&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">8</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/columns_description.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;(cat </span><span class="si">{input}</span><span class="s2"> | grep -P &#39;##INFO&#39; | sort | uniq | &quot;</span>
+        <span class="s2">&quot;grep -oP </span><span class="se">\&quot;</span><span class="s2">(ID=[^,]+|Description=.+$)</span><span class="se">\&quot;</span><span class="s2"> | cut -f2- -d&#39;=&#39; | &quot;</span>
+        <span class="s2">&quot;paste - - | sed &#39;s/</span><span class="se">\\\&quot;</span><span class="s2">&gt;/</span><span class="se">\\\&quot;</span><span class="s2">/g&#39;) &gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
+<span class="c1">###############</span>
+<span class="c1">### MultiQC ###</span>
+<span class="c1">###############</span>
+
+<span class="n">rule</span> <span class="n">multiqc</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff/report/</span><span class="si">{sample}</span><span class="s2">.html&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_list</span>
+        <span class="p">),</span>
+        <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpeff/csvstats/</span><span class="si">{sample}</span><span class="s2">.csv&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_list</span>
+        <span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">report</span><span class="p">(</span>
+            <span class="s2">&quot;multiqc/SnpEff_annotation.html&quot;</span><span class="p">,</span>
+            <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;../common/reports/multiqc.rst&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;Quality Controls&quot;</span>
+        <span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Aggregating quality reports from SnpEff&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1536</span><span class="p">,</span> <span class="mi">10240</span><span class="p">),</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/multiqc.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/multiqc&quot;</span>
+
+
+<span class="c1">###################################</span>
+<span class="c1">### OncoKB and CancerGeneCensus ###</span>
+<span class="c1">### Custom annotations          ###</span>
+<span class="c1">###################################</span>
+
+
+<span class="n">rule</span> <span class="n">cancer_gene_census_annotate</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;bigr/oncokb/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+        <span class="n">cgc</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;cancer_census&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bigr/cancer_gene_census/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Adding CancerGeneCensus annotation in </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">25</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bigr/cancer_gene_census_annotate/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/BiGR/cancer_gene_census_annotate&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">oncokb_annotate</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="c1">#vcf=&quot;snpsift/clinvar/{sample}.vcf&quot;,</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="s2">&quot;bigr/format_to_info/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+        <span class="n">oncokb</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;oncokb&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bigr/oncokb/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Adding OncoKB annotation in </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">35</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bigr/oncokb/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/BiGR/oncokb_annotate&quot;</span>
+
+
+<span class="c1">####################</span>
+<span class="c1">## Format to info ##</span>
+<span class="c1">####################</span>
+
+<span class="n">rule</span> <span class="n">format_to_info</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;vcftools/mane/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">call</span><span class="o">=</span><span class="s2">&quot;bigr/format_to_info/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with clear Format descriptions&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bigr/format_to_info/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/BiGR/vcf_format_to_info&quot;</span>
+
+
+<span class="c1">#####################</span>
+<span class="c1">## MANE annotation ##</span>
+<span class="c1">#####################</span>
+
+
+<span class="n">rule</span> <span class="n">additional_headers_mane</span><span class="p">:</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;mane/description.txt&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Building annotation headers for MANE&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/mane/description.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_NCBI_GeneID,Number=1,Type=String,Description=&quot;NCBI_GeneID field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_Ensembl_Gene,Number=1,Type=String,Description=&quot;Ensembl_Gene field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_HGNC_ID,Number=1,Type=String,Description=&quot;HGNC_ID field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_symbol,Number=1,Type=String,Description=&quot;symbol field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_name,Number=1,Type=String,Description=&quot;name field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_RefSeq_nuc,Number=1,Type=String,Description=&quot;RefSeq_nuc field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_RefSeq_prot,Number=1,Type=String,Description=&quot;RefSeq_prot field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_Ensembl_nuc,Number=1,Type=String,Description=&quot;Ensembl_nuc field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_Ensembl_prot,Number=1,Type=String,Description=&quot;Ensembl_prot field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_MANE_status,Number=1,Type=String,Description=&quot;MANE_status field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_GRCh38_chr,Number=1,Type=String,Description=&quot;GRCh38_chr field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_chr_start,Number=1,Type=String,Description=&quot;chr_start field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_chr_end,Number=1,Type=String,Description=&quot;chr_end field from MANE&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MANE_chr_strand,Number=1,Type=String,Description=&quot;chr_strand field from MANE&quot;&#39;</span><span class="p">,</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s1">&#39;for PARAM in </span><span class="si">{params}</span><span class="s1">; do echo &quot;${{PARAM}}&quot;; done &gt; </span><span class="si">{output}</span><span class="s1"> 2&gt; </span><span class="si">{log}</span><span class="s1">&#39;</span>
+
+
+<span class="n">rule</span> <span class="n">vcftools_annotate_mane</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;vcftools/revel/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">annotation</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;mane&quot;</span><span class="p">],</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;mane/description.txt&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;vcftools/mane/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with MANE database, using VCFTools&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/vcftools/annotate/</span><span class="si">{sample}</span><span class="s2">.mane.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;--columns INFO/MANE_NCBI_GeneID,INFO/MANE_Ensembl_Gene,&quot;</span>
+            <span class="s2">&quot;INFO/MANE_HGNC_ID,INFO/MANE_symbol,INFO/MANE_name,&quot;</span>
+            <span class="s2">&quot;INFO/MANE_RefSeq_nuc,INFO/MANE_RefSeq_prot,INFO/MANE_Ensembl_nuc,&quot;</span>
+            <span class="s2">&quot;INFO/MANE_Ensembl_prot,INFO/MANE_MANE_status,CHROM,FROM,TO,&quot;</span>
+            <span class="s2">&quot;INFO/MANE_chr_strand&quot;</span>
+        <span class="p">)</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/vcftools/annotate&quot;</span>
+
+
+<span class="c1">######################</span>
+<span class="c1">## Revel annotation ##</span>
+<span class="c1">######################</span>
+
+
+<span class="n">rule</span> <span class="n">additional_headers_revel</span><span class="p">:</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;revel/description.txt&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Building annotation headers for REVEL&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/mane/description.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s1">&#39;key=INFO,ID=REVEL_aaref,Number=1,Type=String,Description=&quot;Reference Amino Acid from REVEL&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=REVEL_aaalt,Number=1,Type=String,Description=&quot;Alternative Amino Acid from REVEL&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=REVEL,Number=1,Type=String,Description=&quot;REVEL score&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=REVEL_Ensembl_transcriptid,Number=1,Type=String,Description=&quot;Ensemble transcript id from REVEL&quot;&#39;</span><span class="p">,</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s1">&#39;for PARAM in </span><span class="si">{params}</span><span class="s1">; do echo &quot;${{PARAM}}&quot;; done &gt; </span><span class="si">{output}</span><span class="s1"> 2&gt; </span><span class="si">{log}</span><span class="s1">&#39;</span>
+
+
+<span class="n">rule</span> <span class="n">vcftools_annotate_revel</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;vcftools/mistic/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">annotation</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;revel&quot;</span><span class="p">],</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;revel/description.txt&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;vcftools/revel/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with REVEL database, using VCFTools&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/vcftools/annotate/</span><span class="si">{sample}</span><span class="s2">.revel.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;--columns CHROM,POS,-,REF,ALT,INFO/REVEL_aaref,INFO/REVEL_aaalt,INFO/REVEL,INFO/REVEL_Ensembl_transcriptid&quot;</span>
+            <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;ncbi_build&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;GRCh38&quot;</span> <span class="k">else</span>
+            <span class="s2">&quot;--columns CHROM,-,POS,REF,ALT,INFO/AAREF,INFO/AAALT,INFO/REVEL,INFO/REVEL_Ensembl_transcriptid&quot;</span>
+        <span class="p">)</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/vcftools/annotate&quot;</span>
+
+
+<span class="c1">#######################</span>
+<span class="c1">## Mistic annotation ##</span>
+<span class="c1">#######################</span>
+
+
+<span class="n">rule</span> <span class="n">additional_headers_mistic</span><span class="p">:</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;mistic/description.txt&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Building annotation headers for REVEL&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/mane/description.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="s1">&#39;key=INFO,ID=MISTIC_score,Number=1,Type=String,Description=&quot;MISTIC high sensitivity prediction for exome analysis&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;key=INFO,ID=MISTIC_pred,Number=1,Type=String,Description=&quot;MISTIC prediction for global performance&quot;&#39;</span><span class="p">,</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s1">&#39;for PARAM in </span><span class="si">{params}</span><span class="s1">; do echo &quot;${{PARAM}}&quot;; done &gt; </span><span class="si">{output}</span><span class="s1"> 2&gt; </span><span class="si">{log}</span><span class="s1">&#39;</span>
+
+
+<span class="n">rule</span> <span class="n">vcftools_annotate_mistic</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;splice_ai/annot/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">annotation</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;mistic&quot;</span><span class="p">],</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;mistic/description.txt&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;vcftools/mistic/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Annotating </span><span class="si">{wildcards.sample}</span><span class="s2"> with MISTIC database, using VCFTools&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/vcftools/annotate/</span><span class="si">{sample}</span><span class="s2">.mistic.log&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;--columns CHROM,POS,REF,ALT,INFO/MISTIC_score,INFO/MISTIC_pred&quot;</span>
+        <span class="p">)</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/vcftools/annotate&quot;</span>
+
+<span class="c1">########################################</span>
+<span class="c1">## Compute occurence of each variant  ##</span>
+<span class="c1">## within the complete cohort         ##</span>
+<span class="c1">########################################</span>
+
+
+<span class="n">rule</span> <span class="n">variant_occurence_annotate</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">calls</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;snpsift/gnomad/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">],</span>
+        <span class="n">occurence</span> <span class="o">=</span> <span class="s2">&quot;bigr/occurences/all_chroms.txt&quot;</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">calls</span> <span class="o">=</span> <span class="p">[</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bigr/occurence_annotated/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">)]</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/variant_occurence/uncompress/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/variantoccurence/annotate&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">concatenate_per_chr_information</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;bigr/occurence/</span><span class="si">{chr}</span><span class="s2">.txt&quot;</span><span class="p">,</span>
+            <span class="nb">chr</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bigr/occurences/all_chroms.txt&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/variant_occurence/all.log&quot;</span>
+    <span class="n">shell</span><span class="p">:</span>
+        <span class="s2">&quot;for i in </span><span class="si">{input}</span><span class="s2">; do sed &#39;1d&#39; ${{i}}; done &gt; </span><span class="si">{output}</span><span class="s2"> 2&gt; </span><span class="si">{log}</span><span class="s2">&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">variant_occurence_per_chr</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">calls</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;snpsift/vartype/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_list</span>
+        <span class="p">)</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">txt</span><span class="o">=</span><span class="n">temp</span><span class="p">(</span><span class="s2">&quot;bigr/occurence/</span><span class="si">{chr}</span><span class="s2">.txt&quot;</span><span class="p">)</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">7</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/variant_occurence/</span><span class="si">{chr}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/variantoccurence/chromosomes&quot;</span>
+
+
+
+<span class="c1">##########################</span>
+<span class="c1">## Splice AI annotation ##</span>
+<span class="c1">##########################</span>
+
+
+<span class="n">rule</span> <span class="n">splice_ai</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="s2">&quot;bigr/occurence_annotated/</span><span class="si">{sample}</span><span class="s2">.vcf&quot;</span><span class="p">,</span>
+        <span class="n">fasta</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;fasta&quot;</span><span class="p">]</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="n">vcf</span> <span class="o">=</span> <span class="n">temp</span><span class="p">(</span><span class="s2">&quot;splice_ai/annot/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">)</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Adding Splice Variant annotation to </span><span class="si">{wildcards.sample}</span><span class="s2">&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">10</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">2048</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span>
+        <span class="c1"># gres=&quot;gpu:t4:1&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">annotation</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ncbi_build&quot;</span><span class="p">,</span> <span class="s2">&quot;grch38&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+        <span class="n">piped</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/splice_ai/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/spliceai&quot;</span>
+
+
+<span class="c1">#################################</span>
+<span class="c1">### snpeff-snpsift annotation ###</span>
+<span class="c1">#################################</span>
+
+<span class="n">snpeff_snpsift_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;ref&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">],</span>
+    <span class="o">**</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;snpeff_snpsift&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">module</span> <span class="n">snpeff_meta</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/snpeff_annotate/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">snpeff_snpsift_config</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="n">snpeff</span> <span class="kn">from</span> <span class="nn">snpeff_meta</span> <span class="k">with</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">calls</span><span class="o">=</span><span class="s2">&quot;data_input/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span><span class="p">,</span>
+        <span class="n">calls_index</span><span class="o">=</span><span class="s2">&quot;data_input/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz.tbi&quot;</span><span class="p">,</span>
+        <span class="n">db</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;snpeff&quot;</span><span class="p">]</span>
+
+
+<span class="c1">##########################</span>
+<span class="c1">### snpsift annotation ###</span>
+<span class="c1">##########################</span>
+
+
+<span class="n">module</span> <span class="n">snpsift</span><span class="p">:</span>
+    <span class="n">snakefile</span><span class="p">:</span> <span class="s2">&quot;../../meta/bio/snpsift/test/Snakefile&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">snpeff_snpsift_config</span>
+
+<span class="n">use</span> <span class="n">rule</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">snpsift</span>
+
+
+<span class="c1">#################################################</span>
+<span class="c1">### Gather files from iRODS or mounting point ###</span>
+<span class="c1">#################################################</span>
+
+<span class="n">rule</span> <span class="n">bigr_copy</span><span class="p">:</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;data_input/calls/</span><span class="si">{sample}</span><span class="s2">.vcf.gz&quot;</span>
+    <span class="n">message</span><span class="p">:</span>
+        <span class="s2">&quot;Getting </span><span class="si">{wildcards.sample}</span><span class="s2"> VCF file&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+      <span class="n">mem_mb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">2048</span><span class="p">),</span>
+      <span class="n">time_min</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">*</span> <span class="mi">45</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="nb">input</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="n">vcf_links</span><span class="p">[</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/bigr_copy/</span><span class="si">{sample}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/BiGR/copy&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Thibault Dayris</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="sigprofiler_signatures.html" class="btn btn-neutral float-left" title="SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="variant_calling_ampliseq.html" class="btn btn-neutral float-right" title="VARIANT_CALLING_AMPLISEQ" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016, The Snakemake team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

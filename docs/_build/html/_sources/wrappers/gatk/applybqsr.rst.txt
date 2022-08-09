@@ -1,0 +1,114 @@
+.. _`bio/gatk/applybqsr`:
+
+GATK APPLYBQSR
+==============
+
+Run gatk ApplyBQSR.
+
+
+**URL**: https://gatk.broadinstitute.org/hc/en-us/articles/360046222011-ApplyBQSR
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule gatk_applybqsr:
+        input:
+            bam="mapped/{sample}.bam",
+            ref="genome.fasta",
+            dict="genome.dict",
+            recal_table="recal/{sample}.grp"
+        output:
+            bam="recal/{sample}.bam"
+        log:
+            "logs/gatk/gatk_applybqsr/{sample}.log"
+        params:
+            extra="",  # optional
+            java_opts="", # optional
+        resources:
+            mem_mb=1024
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/gatk/applybqsr"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``gatk4==4.2.0.0``
+* ``openjdk=8``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* ``bam``: Path to bam file
+* ``ref``: Path to fasta-formatted reference genome
+* ``recal_table``: Path to recalibration table for the bam
+
+**Output:**
+
+* ``bam``: recalibrated bam file
+
+
+
+Params
+------
+
+* ``extra``: The `extra` param allows for additional program arguments for ApplyBSQR.
+
+* ``java_opts``: The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-XX:ParallelGCThreads=10" (not for `-XmX` or `-Djava.io.tmpdir`, since they are handled automatically).
+
+
+
+
+
+Authors
+-------
+
+* Christopher Schröder
+* Johannes Köster
+* Jake VanCampen
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Christopher Schröder"
+    __copyright__ = "Copyright 2020, Christopher Schröder"
+    __email__ = "christopher.schroeder@tu-dortmund.de"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
+    shell(
+        "gatk --java-options '{java_opts}' ApplyBQSR {extra} "
+        "-R {snakemake.input.ref} -I {snakemake.input.bam} "
+        "--bqsr-recal-file {snakemake.input.recal_table} "
+        "-O {snakemake.output.bam} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

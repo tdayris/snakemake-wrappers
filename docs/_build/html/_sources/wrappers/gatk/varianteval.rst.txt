@@ -1,0 +1,159 @@
+.. _`bio/gatk/varianteval`:
+
+GATK VARIANTEVAL
+================
+
+Run gatk VariantEval.
+
+
+**URL**: https://gatk.broadinstitute.org/hc/en-us/articles/360056967892-VariantEval-BETA-
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule gatk_varianteval:
+        input:
+            vcf="calls/snvs.vcf",
+            ref="genome.fasta",
+            dict="genome.dict",
+            # comp="calls/comp.vcf", # optional comparison VCF
+        output:
+            vcf="snvs.varianteval.grp"
+        log:
+            "logs/gatk/varianteval/snvs.log"
+        params:
+            extra="",  # optional arguments, see GATK docs
+            java_opts="", # optional
+        resources:
+            mem_mb=1024
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/gatk/varianteval"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``gatk4==4.2.0.0``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* ``vcf``: Path to input vcf files
+* ``bam``: Path to BAM/CRAM files (optional)
+* ``ref``: Path to reference genome (optional)
+* ``dict``: Path to reference dictionary (optional)
+* ``known``: Path to vcf.gz of known variants (optional)
+* ``ped``: Path to PED (pedigree) file (optional)
+* ``comp``: Path to comparison file (optional)
+
+**Output:**
+
+* Evaluation tables detailing the results of the eval modules on VCF file. This must be the first element of the output file list.
+
+
+
+Params
+------
+
+* ``extra``: The `extra` param allows for additional program arguments.
+
+* ``java_opts``: The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-XX:ParallelGCThreads=10" (not for `-XmX` or `-Djava.io.tmpdir`, since they are handled automatically).
+
+
+
+
+
+Authors
+-------
+
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Filipe G. Vieira"
+    __copyright__ = "Copyright 2021, Filipe G. Vieira"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
+
+
+    vcf = snakemake.input.vcf
+    if isinstance(vcf, str):
+        vcf = "--eval  {}".format(vcf)
+    else:
+        vcf = list(map("--eval {}".format, vcf))
+
+    bam = snakemake.input.get("bam", "")
+    if bam:
+        if isinstance(bam, str):
+            bam = "--input  {}".format(bam)
+        else:
+            bam = list(map("--input {}".format, bam))
+
+    ref = snakemake.input.get("ref", "")
+    if ref:
+        ref = "--reference " + ref
+
+    ref_dict = snakemake.input.get("dict", "")
+    if ref_dict:
+        ref_dict = "--sequence-dictionary " + ref_dict
+
+    known = snakemake.input.get("known", "")
+    if known:
+        known = "--dbsnp " + known
+
+    comp = snakemake.input.get("comp", "")
+    if comp:
+        if isinstance(comp, str):
+            comp = "--comparison  {}".format(comp)
+        else:
+            comp = list(map("--comparison {}".format, comp))
+
+    ped = snakemake.input.get("ped", "")
+    if ped:
+        ped = "--pedigree " + ped
+
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+
+    shell(
+        "gatk --java-options '{java_opts}' VariantEval "
+        "{vcf} "
+        "{bam} "
+        "{ref} "
+        "{ref_dict} "
+        "{known} "
+        "{ped} "
+        "{comp} "
+        "{extra} --output {snakemake.output[0]} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

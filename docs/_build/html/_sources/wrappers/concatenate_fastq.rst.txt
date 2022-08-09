@@ -1,0 +1,115 @@
+.. _`bio/concatenate_fastq`:
+
+CONCATENATE FASTQ
+=================
+
+Contactenate fastq files
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_concatenate_fastq:
+        input:
+            "1.fq.gz",
+            "2.fq.gz"
+        output:
+            "concat.fq.gz"
+        threads: 2
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/concatenate_fastq"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``conda-forge:bash=5.0.011``
+* ``bioconda:pbgzip=2016.08.04``
+
+Input/Output
+------------
+**Input:**
+
+* Multiple fastq files
+
+**Output:**
+
+* A single merged fastq file
+
+
+
+
+Notes
+-----
+
+This is a dummy port of gzip
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3.7
+    # -*- coding: utf-8 -*-
+
+    """Snakemake wrapper fastq concatenation"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2019, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    input_list = list(snakemake.input)
+    if len(input_list) > 1 and snakemake.threads != 2:
+        raise ValueError(
+            "Exactly two threads are required for this wrapper, "
+            "and {} was/were given.".format(str(snakemake.threads))
+        )
+
+    if len(snakemake.input) > 1:
+        log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+        shell(
+            " zcat "  # Concatenate gzipped files
+            " {input_list} "  # List of input files
+            " | "
+            " gzip -c "  # Gzip output file
+            " > {snakemake.output} "  # Path to output file
+            " {log} "  # Logging
+        )
+    else:
+        log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+        shell(
+            " cp -v "  # Copy if not merge needed
+            " {input_list} "  # Path to input file
+            " {snakemake.output} "  # Path to output file
+            " {log} "  # Logging
+        )
+
+
+.. |nl| raw:: html
+
+   <br>

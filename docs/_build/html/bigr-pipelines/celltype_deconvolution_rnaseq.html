@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CELLTYPE_DECONVOLUTION_RNASEQ &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CHIPSEQ" href="chipseq.html" />
+    <link rel="prev" title="BCL2FASTQ (UNDER DEVELOPMENT)" href="bcl2fastq.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Snakemake Wrappers
+          </a>
+              <div class="version">
+                heads/Unofficial
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers and Pipelines</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../pipelines.html">BiGR Pipelines</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="CTC_Variant_Calling_Integragen_Legacy.html">CTC_VARIANT_CALLING_INTEGRAGEN_LEGACY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="WES_germline.html">WES_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="annot_sv.html">ANNO_SV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCL2FASTQ (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">CELLTYPE_DECONVOLUTION_RNASEQ</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snakefile">Snakefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="chipseq.html">CHIPSEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dge_deseq2.html">DGE_DESEQ2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_set_enrichment.html">GENE_SET_ENRICHMENT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low_pass_wgs_copy_number.html">LOW_PASS_WGS_COPY_NUMBER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nfcore_chipseq.html">NFCORE-CHIPSEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="retrotransposons.html">RETROTRANSPOSONS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rnaseq.html">RNASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sarek_enhanced.html">SAREK ENHANCED</a></li>
+<li class="toctree-l2"><a class="reference internal" href="seqoia.html">SEQOIA SINGLE-SAMPLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sigprofiler_signatures.html">SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline.html">VARIANT_CALLING_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline_wes.html">VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_somatic.html">VARIANT_CALLING_SOMATIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_callling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_occurence_cohort.html">VARIANT_OCCURENCE_COHORT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wes_somatic.html">VARIANT_CALLING_SOMATIC</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Snakemake Wrappers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../pipelines.html">BiGR Pipelines</a> &raquo;</li>
+      <li>CELLTYPE_DECONVOLUTION_RNASEQ</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/bigr-pipelines/celltype_deconvolution_rnaseq.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="celltype-deconvolution-rnaseq">
+<span id="id1"></span><h1>CELLTYPE_DECONVOLUTION_RNASEQ<a class="headerlink" href="#celltype-deconvolution-rnaseq" title="Permalink to this headline"></a></h1>
+<p>Perform trimming and quantification on RNASeq, then cell type opulation deconvolution</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
+<p>In order to run the pipeline, use the following commands</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Go to your working directory</span>
+
+<span class="nb">cd</span> /path/to/my/working/directory
+
+<span class="c1"># Build a design file (see below)</span>
+
+<span class="c1"># Copy/paste the following line for **HG19**</span>
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/celltype_deconvolution_rnaseq/run.sh hg19
+
+<span class="c1"># Copy/paste the following line for **HG38**</span>
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/celltype_deconvolution_rnaseq/run.sh hg38
+</pre></div>
+</div>
+</section>
+<section id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline"></a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>Fastq files</p></li>
+<li><p>Fasta-formatted Genome sequence</p></li>
+<li><p>Fasta-formatted transcriptome sequence</p></li>
+<li><p>GTF formatted genome annotation</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>Both PNG and TSV formatted deconvolution results</p></li>
+<li><p>Salmon quantification</p></li>
+<li><p>Quality controls</p></li>
+<li><p>Trimmed fastq files</p></li>
+</ul>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<p>Prerequisites:</p>
+<ul class="simple">
+<li><p>A TSV formatted design file, <em>named ‘design.tsv’</em> with the following columns:</p></li>
+</ul>
+<table class="colwidths-given docutils align-default" id="id2">
+<caption><span class="caption-text">Desgin file format</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sample_id</p></th>
+<th class="head"><p>Upstream_fastq</p></th>
+<th class="head"><p>Downstream_fastq</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Name of the Sample1</p></td>
+<td><p>Path to upstream fastq file</p></td>
+<td><p>Path to downstream fastq file</p></td>
+</tr>
+<tr class="row-odd"><td><p>Name of the Sample2</p></td>
+<td><p>Path to upstream fastq file</p></td>
+<td><p>Path to downstream fastq file</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="snakefile">
+<h2>Snakefile<a class="headerlink" href="#snakefile" title="Permalink to this headline"></a></h2>
+<p>The pipeline contains the following steps:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">snakemake.utils</span> <span class="kn">import</span> <span class="n">min_version</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">yaml</span> <span class="kn">import</span> <span class="n">dump</span>
+<span class="n">min_version</span><span class="p">(</span><span class="s2">&quot;7.0&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">worflow_source_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">snakemake</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">srcdir</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
+<span class="n">common</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;..&quot;</span> <span class="o">/</span> <span class="s2">&quot;common&quot;</span> <span class="o">/</span> <span class="s2">&quot;python&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">common</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">file_manager</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">files_linker</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">write_yaml</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">messages</span> <span class="kn">import</span> <span class="n">message</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;snakemake.celltype_deconvolution_rnaseq.log&quot;</span><span class="p">,</span>
+    <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+<span class="p">)</span>
+
+<span class="n">default_config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">worflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;config.hg38.yaml&quot;</span><span class="p">)</span>
+<span class="n">configfile</span><span class="p">:</span> <span class="n">get_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
+<span class="n">design</span> <span class="o">=</span> <span class="n">get_design</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">search_fastq_pairs</span><span class="p">)</span>
+<span class="c1">#print(design)</span>
+
+<span class="k">if</span> <span class="s2">&quot;Sample_id&quot;</span> <span class="ow">in</span> <span class="n">design</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Sample_id&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">fastq_links</span> <span class="o">=</span> <span class="n">link_fq</span><span class="p">(</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">Upstream_file</span><span class="p">,</span>
+    <span class="n">design</span><span class="o">.</span><span class="n">Downstream_file</span>
+<span class="p">)</span>
+
+<span class="n">localrules</span><span class="p">:</span> <span class="n">get_cibersort</span>
+
+
+
+<span class="c1">##################</span>
+<span class="c1">### Flag rules ###</span>
+<span class="c1">##################</span>
+
+<span class="n">onsuccess</span><span class="p">:</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;touch DONE &amp;&amp; rm --force --verbose ON_GOING ERROR&quot;</span><span class="p">)</span>
+
+<span class="n">onerror</span><span class="p">:</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;touch ERROR &amp;&amp; rm --force --verbose ON_GOING DONE&quot;</span><span class="p">)</span>
+
+<span class="n">onstart</span><span class="p">:</span>
+    <span class="n">shell</span><span class="p">(</span><span class="s2">&quot;touch ON_GOING &amp;&amp; rm --force --verbose ERROR DONE&quot;</span><span class="p">)</span>
+
+
+<span class="n">rule</span> <span class="n">target_celltype_deconvolution_rnaseq</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">graphs</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/celltypes.</span><span class="si">{plot}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+            <span class="n">tool</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cibersort_abs&quot;</span><span class="p">,</span> <span class="s2">&quot;cibersort&quot;</span><span class="p">,</span> <span class="s2">&quot;quantiseq&quot;</span><span class="p">,</span> <span class="s2">&quot;xcell&quot;</span><span class="p">,</span> <span class="s2">&quot;epic&quot;</span><span class="p">],</span>
+            <span class="n">plot</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hist&quot;</span><span class="p">,</span> <span class="s2">&quot;dotplot&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/celltypes.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">tool</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cibersort_abs&quot;</span><span class="p">,</span> <span class="s2">&quot;cibersort&quot;</span><span class="p">,</span> <span class="s2">&quot;quantiseq&quot;</span><span class="p">,</span> <span class="s2">&quot;xcell&quot;</span><span class="p">,</span> <span class="s2">&quot;epic&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;tsv&quot;</span><span class="p">,</span> <span class="s2">&quot;RDS&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">plotdirs</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">{tool}</span><span class="s2">/celltypes.dotplots&quot;</span><span class="p">,</span>
+            <span class="n">tool</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cibersort_abs&quot;</span><span class="p">,</span> <span class="s2">&quot;cibersort&quot;</span><span class="p">,</span> <span class="s2">&quot;quantiseq&quot;</span><span class="p">,</span> <span class="s2">&quot;xcell&quot;</span><span class="p">,</span> <span class="s2">&quot;epic&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+<span class="c1">################################</span>
+<span class="c1">### Deconvolution: CIBERSORT ###</span>
+<span class="c1">################################</span>
+
+
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/007.cibersort.smk&quot;</span>
+
+
+<span class="c1">#############################</span>
+<span class="c1">### Deconvolution: OTHERS ###</span>
+<span class="c1">#############################</span>
+
+
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/006.mcpcounter.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/005.epic.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/004.quantiseq.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/003.xcell.smk&quot;</span>
+
+
+<span class="c1">######################</span>
+<span class="c1">### Quantification ###</span>
+<span class="c1">######################</span>
+
+
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/002.salmon_post_process.smk&quot;</span>
+
+
+<span class="c1"># #############################</span>
+<span class="c1"># ### Salmon quantification ###</span>
+<span class="c1"># #############################</span>
+
+
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/001.salmon_quant_pipeline.smk&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Thibault Dayris</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="bcl2fastq.html" class="btn btn-neutral float-left" title="BCL2FASTQ (UNDER DEVELOPMENT)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="chipseq.html" class="btn btn-neutral float-right" title="CHIPSEQ" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016, The Snakemake team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

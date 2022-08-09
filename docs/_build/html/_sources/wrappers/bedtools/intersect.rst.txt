@@ -1,0 +1,102 @@
+.. _`bio/bedtools/intersect`:
+
+BEDTOOLS INTERSECT
+==================
+
+Intersect BED/BAM/VCF files with bedtools.
+
+**URL**: https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bedtools_merge:
+        input:
+            left="A.bed",
+            right="B.bed"
+        output:
+            "A_B.intersected.bed"
+        params:
+            ## Add optional parameters
+            extra="-wa -wb" ## In this example, we want to write original entries in A and B for each overlap.
+        log:
+            "logs/intersect/A_B.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bedtools/intersect"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bedtools=2.29.0``
+
+Input/Output
+------------
+**Input:**
+
+* ``left``: BAM/BED/GFF/VCF file
+* ``right``: One or more BAM/BED/GFF/VCF file(s)
+
+**Output:**
+
+* Path to output intersection. Must be the only element in the output file list
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters, see `bedtools intersect official documentation <https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html#usage-and-option-summary>`_ for more information.
+
+
+
+
+
+Authors
+-------
+
+* Jan Forster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2019, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    ## Extract arguments
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "(bedtools intersect"
+        " {extra}"
+        " -a {snakemake.input.left}"
+        " -b {snakemake.input.right}"
+        " > {snakemake.output})"
+        " {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

@@ -1,0 +1,185 @@
+.. _`bio/freebayes`:
+
+FREEBAYES
+=========
+
+Call small genomic variants with freebayes.
+
+**URL**: https://github.com/freebayes/freebayes
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule freebayes:
+        input:
+            ref="genome.fasta",
+            # you can have a list of samples here
+            samples="mapped/{sample}.bam",
+            # the matching BAI indexes have to present for freebayes
+            indexes="mapped/{sample}.bam.bai"
+            # optional BED file specifying chromosomal regions on which freebayes
+            # should run, e.g. all regions that show coverage
+            #regions="/path/to/region-file.bed"
+        output:
+            "calls/{sample}.vcf"  # either .vcf or .bcf
+        log:
+            "logs/freebayes/{sample}.log"
+        params:
+            extra="",         # optional parameters
+            chunksize=100000, # reference genome chunk size for parallelization (default: 100000)
+            normalize=False,  # flag to use bcftools norm to normalize indels
+        threads: 2
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/freebayes"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``freebayes=1.3.1``
+* ``bcftools=1.11``
+* ``parallel=20190522``
+* ``bedtools>=2.29``
+* ``sed=4.7``
+
+Input/Output
+------------
+**Input:**
+
+* ``samples``: SAM/BAM/CRAM file(s)
+* ``ref``: reference genome
+* ``regions``: Optional BED regions
+
+**Output:**
+
+* VCF/VCF.gz/BCF file, this must be the first file in the output file list
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+* ``chunkzise``: The `chunkzise` param allows setting reference genome chunk size for parallelization (default 100000)
+
+* ``uncompressed_bcf``: The `uncompressed_bcf` param allows for uncompressed BCF output.
+
+* ``normalize``: The `normalize` param allows to use `bcftools norm` to normalize indels.
+
+
+
+
+Notes
+-----
+
+If a region bed is provided in input, this wrapper uses more threads than the number of threads declared in the snakefile.
+
+For X threads expected:
+
+* X is used in freebayes
+* 1 in bedtools intersect
+* 2 in piped sed commands
+
+
+
+Authors
+-------
+
+* Johannes Köster
+* Felix Mölder
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster, Felix Mölder, Christopher Schröder"
+    __copyright__ = "Copyright 2017, Johannes Köster"
+    __email__ = "johannes.koester@protonmail.com, felix.moelder@uni-due.de"
+    __license__ = "MIT"
+
+
+    from os import path
+    from snakemake.shell import shell
+
+    shell.executable("bash")
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    params = snakemake.params.get("extra", "")
+    norm = snakemake.params.get("normalize", False)
+    assert norm in [True, False]
+
+
+    # Infer output format
+    uncompressed_bcf = snakemake.params.get("uncompressed_bcf", False)
+    out_name, out_ext = path.splitext(snakemake.output[0])
+    if out_ext == ".vcf":
+        out_format = "v"
+    elif out_ext == ".bcf":
+        if uncompressed_bcf:
+            out_format = "u"
+        else:
+            out_format = "b"
+    elif out_ext == ".gz":
+        out_name, out_ext = path.splitext(out_name)
+        if out_ext == ".vcf":
+            out_format = "z"
+        else:
+            raise ValueError("output file with invalid extension (.vcf, .vcf.gz, .bcf).")
+    else:
+        raise ValueError("output file with invalid extension (.vcf, .vcf.gz, .bcf).")
+
+
+    pipe = ""
+    if norm:
+        pipe = f"| bcftools norm --output-type {out_format} -"
+    else:
+        pipe = f"| bcftools view --output-type {out_format} -"
+
+
+    if snakemake.threads == 1:
+        freebayes = "freebayes"
+    else:
+        chunksize = snakemake.params.get("chunksize", 100000)
+        regions = (
+            "<(fasta_generate_regions.py {snakemake.input.ref}.fai {chunksize})".format(
+                snakemake=snakemake, chunksize=chunksize
+            )
+        )
+        if snakemake.input.get("regions", ""):
+            regions = (
+                "<(bedtools intersect -a "
+                r"<(sed 's/:\([0-9]*\)-\([0-9]*\)$/\t\1\t\2/' "
+                "{regions}) -b {snakemake.input.regions} | "
+                r"sed 's/\t\([0-9]*\)\t\([0-9]*\)$/:\1-\2/')"
+            ).format(regions=regions, snakemake=snakemake)
+        freebayes = ("freebayes-parallel {regions} {snakemake.threads}").format(
+            snakemake=snakemake, regions=regions
+        )
+
+    shell(
+        "({freebayes} {params} -f {snakemake.input.ref}"
+        " {snakemake.input.samples} {pipe} > {snakemake.output[0]}) {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

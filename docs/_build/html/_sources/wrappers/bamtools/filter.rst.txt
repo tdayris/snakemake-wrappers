@@ -1,0 +1,153 @@
+.. _`bio/bamtools/filter`:
+
+BAMTOOLS FILTER
+===============
+
+Filters BAM files. For more information about bamtools see `bamtools documentation <http://stab.st-andrews.ac.uk/wiki/index.php/Bamtools>`_
+
+**URL**: https://github.com/pezmaster31/bamtools
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bamtools_filter:
+        input:
+            "{sample}.bam"
+        output:
+            "filtered/{sample}.bam"
+        params:
+            # optional parameters
+            tags = [ "NM:<4", "MQ:>=10" ],    # list of key:value pair strings
+            min_size = "-2000",
+            max_size = "2000",
+            min_length = "10",
+            max_length = "20",
+            # to add more optional parameters (see bamtools filter --help):
+            additional_params = "-mapQuality \">=0\" -isMapped \"true\""
+        log:
+            "logs/bamtools/filtered/{sample}.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bamtools/filter"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bamtools==2.5.1``
+
+Input/Output
+------------
+**Input:**
+
+* bam files (.bam), must be in first position
+
+**Output:**
+
+* bam file (.bam), must be in first position
+
+
+
+Params
+------
+
+* ``tags``: filtering tags
+
+* ``min_size``: minimum insert size
+
+* ``max_size``: maximum insert size
+
+* ``min_length``: minimum read length
+
+* ``max_length``: maximum read length
+
+* ``additional_params``: Other filtering and optional parameters
+
+
+
+
+Notes
+-----
+
+A complete usage documentation is available here: https://raw.githubusercontent.com/wiki/pezmaster31/bamtools/Tutorial_Toolkit_BamTools-1.0.pdf
+
+This tool/wrapper does not handle multi threading
+
+
+
+Authors
+-------
+
+* Antonie Vietor
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Antonie Vietor"
+    __copyright__ = "Copyright 2020, Antonie Vietor"
+    __email__ = "antonie.v@gmx.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    # extract arguments
+    params = ""
+    extra_limits = ""
+    tags = snakemake.params.get("tags")
+    min_size = snakemake.params.get("min_size")
+    max_size = snakemake.params.get("max_size")
+    min_length = snakemake.params.get("min_length")
+    max_length = snakemake.params.get("max_length")
+    additional_params = snakemake.params.get("additional_params")
+
+    if tags and tags is not None:
+        params = params + " " + " ".join(map('-tag "{}"'.format, tags))
+
+    if min_size and min_size is not None:
+        params = params + ' -insertSize ">=' + min_size + '"'
+        if max_size and max_size is not None:
+            extra_limits = extra_limits + ' -insertSize "<=' + max_size + '"'
+    else:
+        if max_size and max_size is not None:
+            params = params + ' -insertSize "<=' + max_size + '"'
+
+    if min_length and min_length is not None:
+        params = params + ' -length ">=' + min_length + '"'
+        if max_length and max_length is not None:
+            extra_limits = extra_limits + ' -length "<=' + max_length + '"'
+    else:
+        if max_length and max_length is not None:
+            params = params + ' -length "<=' + max_length + '"'
+
+    if additional_params and additional_params is not None:
+        params = params + " " + additional_params
+
+    if extra_limits:
+        params = params + " | bamtools filter" + extra_limits
+
+    shell(
+        "(bamtools filter"
+        " -in {snakemake.input[0]}" + params + " -out {snakemake.output[0]}) {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

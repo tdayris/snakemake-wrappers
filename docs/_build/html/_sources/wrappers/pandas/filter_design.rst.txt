@@ -1,0 +1,148 @@
+.. _`bio/pandas/filter_design`:
+
+FILTER DESIGN
+=============
+
+Filter a design file
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_filter_design:
+        input:
+            design = "design.tsv"
+        output:
+            tsv = "filtered/design.tsv"
+        message:
+            "Testing design filter"
+        threads:
+            1
+        resources:
+            mem_mb = (
+                lambda wildcards, attempt: min(attempt * 512, 1024)
+            ),
+            time_min = (
+                lambda wildcards, attempt: min(attempt * 10, 20)
+            )
+        params:
+            keep_column = ["Cond"],
+            keep_sample = ["SRR493366_1.fastq", "SRR493369_1.fastq"]
+        log:
+            "logs/filter_design.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/pandas/filter_design"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``conda-forge:python=3.8.2``
+* ``conda-forge:pandas=1.0.1``
+* ``conda-forge:numpy=1.18.1``
+
+Input/Output
+------------
+**Input:**
+
+* A TSV formatted text file containing a design
+
+**Output:**
+
+* A TSV formatted text file containing a subset of the provided design
+
+
+
+
+Notes
+-----
+
+There should be a column named "Sample_id". This will be the index of the
+dataframe.
+
+Parameters:
+
+* keep_sample: A lit of samples to keep. Others will be filtered out
+* filter_sample: A list of samples to filter out. Others will be kept
+* keep_column: A list fo columns to keep. Others will be filtered out
+* filter_column: A list of columns to filter out. Others will be kept
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3.8
+    # conding: utf-8
+
+    """
+    Filter a design file
+    """
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    import logging
+    import pandas
+    import numpy
+
+    logging.basicConfig(
+        filename=snakemake.log[0],
+        filemode="w",
+        level=logging.DEBUG
+    )
+
+    data = (pandas.read_csv(snakemake.input["design"], sep="\t", header=0)
+                  .set_index("Sample_id"))
+
+    if (samples := snakemake.params.get("keep_sample", None)) is not None:
+        logging.debug(f"The following genes are kept: {samples}")
+        data = data[data.index.isin(samples)]
+
+    if (not_samples := snakemake.params.get("filter_sample", None)) is not None:
+        logging.debug(f"The following genes are droped out: {not_samples}")
+        data = data[not data.index.isin(not_samples)]
+
+    if (cols := snakemake.params.get("keep_column", None)) is not None:
+        logging.debug(f"The following columns are kept: {cols}")
+        data = data[cols]
+
+    if (not_cols := snakemake.params.get("filter_column")) is not None:
+        logging.debug(f"The following columns are droped out: {not_cols}")
+        data = data[list(set(data.columns.tolist()) - set(not_cols))]
+
+    logging.debug(f"Head of the final DataFrame:\n{data.head()}")
+
+    data.to_csv(
+        snakemake.output["tsv"],
+        sep="\t"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

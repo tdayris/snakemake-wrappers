@@ -1,0 +1,124 @@
+.. _`bio/gridss/setupreference`:
+
+GRIDSS SETUPREFERENCE
+=====================
+
+GRIDSS is a module software suite containing tools useful for the detection of genomic rearrangements. It includes a genome-wide break-end assembler, as well as a structural variation caller for Illumina sequencing data. ``setupreference`` is a once-off setup generating additional files in the same directory as the reference.
+
+
+**URL**: https://github.com/PapenfussLab/gridss
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule gridss_setupreference:
+        input:
+            reference="reference/genome.fasta",
+            dictionary="reference/genome.dict",
+            indices=multiext("reference/genome.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa")
+        output:
+            multiext("reference/genome.fasta", ".gridsscache", ".img")
+        params:
+            extra="--jvmheap 1g"
+        log:
+            "log/gridss/setupreference.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/gridss/setupreference"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``gridss==2.9.4``
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters
+
+
+
+
+Notes
+-----
+
+WARNING multiple instances of GRIDSS attempting to perform setupreference at the same time will result in file corruption.
+
+Make sure these files are generated before running parallel GRIDSS jobs.
+
+
+
+Authors
+-------
+
+* Christopher Schröder
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for gridss setupreference"""
+
+    __author__ = "Christopher Schröder"
+    __copyright__ = "Copyright 2020, Christopher Schröder"
+    __email__ = "christopher.schroede@tu-dortmund.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    from os import path
+
+    # Creating log
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    # Placeholder for optional parameters
+    extra = snakemake.params.get("extra", "")
+
+    # Check inputs/arguments.
+    reference = snakemake.input.get("reference", None)
+
+    if not snakemake.input.reference:
+        raise ValueError("A reference genome has to be provided!")
+
+    for ending in (".amb", ".ann", ".bwt", ".pac", ".sa"):
+        if not path.exists("{}{}".format(reference, ending)):
+            raise ValueError(
+                "{reference}{ending} missing. Please make sure the reference was properly indexed by bwa.".format(
+                    reference=reference, ending=ending
+                )
+            )
+
+    dictionary = path.splitext(reference)[0] + ".dict"
+    if not path.exists(dictionary):
+        raise ValueError(
+            "{dictionary}.dict missing. Please make sure the reference dictionary was properly created. This can be accomplished for example by CreateSequenceDictionary.jar from Picard".format(
+                dictionary=dictionary
+            )
+        )
+
+    shell(
+        "(gridss -s setupreference "  # Tool
+        "--reference {reference} "  # Reference
+        "{extra}) {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

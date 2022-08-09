@@ -1,0 +1,79 @@
+.. _`bio/vg/index/gcsa`:
+
+VG INDEX GCSA
+=============
+
+Build GCSA index for variation graphs.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule gcsa:
+        input:
+            vgs=["x.vg", "c.vg"]
+        output:
+            gcsa="index/wg.gcsa"
+        params:
+            "-Z 3000 -X 3"
+        log:
+            "logs/vg/index/gcsa/wg.log"
+        threads:
+            4
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/vg/index/gcsa"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``vg==1.27.0``
+
+
+
+
+
+Authors
+-------
+
+* Ali Ghaffaari
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Ali Ghaffaari"
+    __copyright__ = "Copyright 2017, Ali Ghaffaari"
+    __email__ = "ghaffari@mpi-inf.mpg.de"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell()
+
+    shell(
+        "(vg index -g {snakemake.output.gcsa} --threads {snakemake.threads}"
+        " {snakemake.params} {snakemake.input.vgs}) {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

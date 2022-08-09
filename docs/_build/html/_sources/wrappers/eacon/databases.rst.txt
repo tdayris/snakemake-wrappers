@@ -1,0 +1,94 @@
+.. _`bio/eacon/databases`:
+
+EACON_DOWNLOAD_DATABASES
+========================
+
+Download optional annotation databases for Oncoscan/CytoScan
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_eacon_databases:
+        output:
+            databases = directory("EaCoN_databases"),
+            grd = "grd.pl"
+        log:
+            "EaCoN_databases.log"
+        cache: True
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/eacon/databases"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``python==3.8.5``
+* ``libcurl==7.71.1``
+* ``webdavclient2==0.1.1``
+* ``pip==20.2.3``
+* ``{'pip':['webdavclient']}``
+
+Input/Output
+------------
+**Input:**
+
+* None
+
+**Output:**
+
+* EaCoN databases
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/bin/python3.8
+
+    # This wrapper downloads and install optional EaCoN packages
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
+
+    if "databases" in snakemake.output.keys():
+        shell("wget -O {snakemake.output.databases}.tar.bz2 https://nextcloud.gustaveroussy.fr/s/jZkw6cCsAKMGXsz/download {log}")
+        shell("tar -xvjf {snakemake.output.databases}.tar.bz2 {log}")
+
+    if "grd" in snakemake.output.keys():
+        shell("wget -O {snakemake.output.grd} https://raw.githubusercontent.com/tdayris/cel-cnv-eacon/master/scripts/grd {log}")
+        shell("chmod u+x {snakemake.output.grd} {log}")
+
+
+.. |nl| raw:: html
+
+   <br>

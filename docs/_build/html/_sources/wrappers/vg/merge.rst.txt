@@ -1,0 +1,77 @@
+.. _`bio/vg/merge`:
+
+VG MERGE
+========
+
+Generate a joint id space across each graph and merge them all.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule merge:
+        input:
+            vgs=["c.vg", "x.vg"]
+        output:
+            merged="graph/wg.vg"
+        log:
+            "logs/vg/merge/wg.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/vg/merge"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``vg==1.27.0``
+
+
+
+
+
+Authors
+-------
+
+* Ali Ghaffaari
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Ali Ghaffaari"
+    __copyright__ = "Copyright 2017, Ali Ghaffaari"
+    __email__ = "ghaffari@mpi-inf.mpg.de"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False)
+
+    shell(
+        "(vg ids --join {snakemake.input.vgs} &&"
+        " for VGFILE in {snakemake.input.vgs};"
+        " do cat $VGFILE >> {snakemake.output.merged};"
+        " done) {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

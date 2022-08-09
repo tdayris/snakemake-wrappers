@@ -1,0 +1,145 @@
+.. _`bio/seaborn/displot`:
+
+DISPLOT
+=======
+
+Perform a distribution plot with Seaborn
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_seaborn_displot:
+        input:
+            tsv = "table.tsv"
+        output:
+            png = "displot.png"
+        log:
+            "displot.log"
+        params:
+            extra = {
+                "x": "score",
+                "hue": "Sample_id",
+                "multiple": "dodge"
+            }
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/seaborn/displot"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``conda-forge:python=3.9.0``
+* ``conda-forge:pandas=1.1.3``
+* ``conda-forge:numpy=1.19.2``
+* ``conda-forge:seaborn=0.11.0``
+* ``conda-forge:matplotlib=3.3.2``
+* ``conda-forge:pillow=8.0.0``
+* ``conda-forge:pyqt=5.12.3``
+
+Input/Output
+------------
+**Input:**
+
+* a TSV formatted table
+
+**Output:**
+
+* A PNG formatted distribution
+
+
+
+
+Notes
+-----
+
+Use extra parameters to fill distplot arguments
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3.8
+    # conding: utf-8
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    """
+    Plot the distribution
+    """
+
+    import logging
+    import matplotlib
+    import matplotlib.pyplot
+    import numpy
+    import pandas
+    import seaborn
+
+    from os.path import basename, dirname
+    from snakemake.utils import makedirs
+
+    logging.basicConfig(
+        filename=snakemake.log[0],
+        filemode="w",
+        level=logging.DEBUG
+    )
+
+    # Build output directory if necessary
+    if (outdir := basename(dirname(snakemake.output["png"]))) != "":
+        makedirs(outdir)
+        logging.debug(f"Directory: '{outdir}' created.")
+
+    # Load datasets
+    data = pandas.read_csv(
+        snakemake.input["tsv"],
+        sep="\t",
+        header=0
+    )
+    logging.debug("Dataframe:")
+    logging.debug(data.head())
+
+
+    # Build plot
+    seaborn.displot(
+        data=data,
+        **snakemake.params.get("extra", {})
+    )
+    logging.debug("Plot created")
+
+    # Save figure
+    matplotlib.pyplot.savefig(
+        snakemake.output["png"],
+        bbox_inches="tight"
+    )
+    logging.debug("Process over.")
+
+
+.. |nl| raw:: html
+
+   <br>

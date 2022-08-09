@@ -1,0 +1,170 @@
+.. _`bio/eacon/annotate`:
+
+EACON_ANNOTATE
+==============
+
+Annotate your segments with EaCoN
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule eacon_annotate:
+        input:
+            rds = "{sample}/ASCAT/L2R/{sample}.SEG.ASCAT.RDS",
+            grd = "grd.pl",
+            ldb = "databases"
+        output:
+            multiext(
+                "{sample}/ASCAT/L2R/{sample}",
+                ".BAF.png",
+                ".Cut.acbs",
+                ".Instab.txt",
+                ".INT.png",
+                ".L2R.G.png",
+                ".L2R.K.png",
+                ".TargetGenes.txt",
+                ".TruncatedGenes.txt"
+            ),
+            expand(
+                "{sample}/ASCAT/L2R/chromosomes/{chromosome}",
+                chromosome = [
+                    f"chr{i}.png" for i in list(map(str, range(1, 23))) + ["X", "Y"]
+                ],
+                allow_missing=True
+            ),
+            "{sample}/ASCAT/L2R/{sample}.REPORT.html",
+            directory("{sample}/ASCAT/L2R/{sample}_solo.hg19")
+        log:
+            "logs/EaCoN/{sample}/annotate.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/eacon/annotate"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``conda-forge::r-base==4.1.0``
+* ``conda-forge::r-devtools==2.4.2``
+* ``conda-forge::r-dbi==1.1.1``
+* ``conda-forge::r-rsqlite==2.2.5``
+* ``conda-forge::r-rmarkdown==2.8``
+* ``bioconda::r-eacon==0.3.6``
+* ``bioconda::bioconductor-bsgenome==1.60.0``
+* ``bioconda::bioconductor-bsgenome.hsapiens.ucsc.hg19==1.4.3``
+* ``bioconda::bioconductor-bsgenome.hsapiens.ucsc.hg38==1.4.3``
+* ``bioconda::bioconductor-bsgenome.hsapiens.1000genomes.hs37d5==0.99.1``
+* ``bioconda::bioconductor-affxparser==1.64.0``
+* ``bioconda::bioconductor-biostrings==2.60.0``
+* ``bioconda::bioconductor-aroma.light==3.22.0``
+* ``bioconda::bioconductor-copynumber==1.32.0``
+* ``bioconda::bioconductor-genomicranges==1.44.0``
+* ``bioconda::bioconductor-rhdf5==2.36.0``
+* ``bioconda::bioconductor-limma==3.48.0``
+* ``bioconda::r-sequenza==3.0.0``
+* ``bioconda::r-facets==0.6.1``
+* ``bioconda::ascat==2.5.2``
+* ``conda-forge::r-foreach==1.5.1``
+* ``conda-forge::r-dplyr==1.0.6``
+
+Input/Output
+------------
+**Input:**
+
+* A RDS file
+* A GRD script
+* A set of databases
+
+**Output:**
+
+* Multiple PNG and text files.
+* HTML report
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/bin/R
+
+    # This is the snakemake wrapper for EaCoN annotate
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # Sink the stderr and stdout to the snakemake log file
+    # https://stackoverflow.com/a/48173272
+    log.file<-file(snakemake@log[[1]],open="wt");
+    base::sink(log.file);
+    base::sink(log.file,type="message");
+
+    library(package = "EaCoN", quietly = TRUE);
+    library(package = "devtools", quietly = TRUE);
+
+    # Load user data
+    rds_path <- base::as.character(
+      x = snakemake@input[["rds"]]
+    )
+
+    grd_path <- base::normalizePath(
+      path = base::as.character(x=snakemake@input[["grd"]])
+    );
+
+    ldb <- base::normalizePath(
+      path = base::as.character(x=snakemake@input[["ldb"]])
+    );
+
+    base::Sys.setenv(
+      PATH = paste(
+        base::Sys.getenv("PATH"),
+        base::dirname(grd_path),
+        sep=":"
+      )
+    );
+
+    print(base::Sys.getenv("PATH"));
+
+
+    EaCoN::Annotate.ff(
+      RDS.file = rds_path,
+      author.name = "BiGR",
+      ldb = ldb,
+      solo = TRUE
+    );
+
+
+    # Proper syntax to close the connection for the log file
+    # but could be optional for Snakemake wrapper
+    base::sink(type="message");
+    base::sink();
+
+
+.. |nl| raw:: html
+
+   <br>

@@ -1,0 +1,143 @@
+.. _`bio/tximeta/makeLinkedTxome`:
+
+MAKE LINKED TXOME
+=================
+
+Build a meta data file for your genome index
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_tximeta_makelinkedtxome:
+        input:
+            fasta="genome.fasta",
+            gtf="annotations.gtf",
+            index="transcriptome_index"
+        output:
+            json="metadata.json",
+            bioc_dir=directory("BiocFileCacheDir")
+        params:
+            source="de-novo",
+            organism="fake",
+            release="0.1",
+            genome="fake_contigs"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/tximeta/makeLinkedTxome"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioconductor-tximeta==1.8.0``
+
+Input/Output
+------------
+**Input:**
+
+* A GTF formatted genome annotation
+* A Fasta formatted transcriptome sequences
+
+**Output:**
+
+* A metadata BiocFile
+* A json-formatted metadata file
+
+
+
+
+Notes
+-----
+
+If GTF and/or FASTA are provided as HTTP/FTP addresses, the files will be downloaded.
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: R
+
+    #!/bin/R
+
+    # __author__ = "Thibault Dayris"
+    # __copyright__ = "Copyright 2020, Thibault Dayris"
+    # __email__ = "thibault.dayris@gustaveroussy.fr"
+    # __license__ = "MIT"
+
+    # Loading library
+    base::library(package = "tximeta", quietly = TRUE);
+    base::message("Libraries loaded");
+
+    # Defining output directory
+    bioc_dir <- base::as.character(x = snakemake@output[["bioc_dir"]]);
+    base::dir.create(bioc_dir, showWarnings = TRUE);
+    tximeta::setTximetaBFC(dir = bioc_dir, quiet = FALSE);
+    write("Cache destination set");
+
+    # Loading user defined information about the genome
+    index <- base::as.character(x = snakemake@input[["index"]]);
+    source <- base::as.character(x = snakemake@params[["source"]]);
+    organism <- base::as.character(x = snakemake@params[["organism"]]);
+    release <- base::as.character(x = snakemake@params[["release"]]);
+    genome <- base::as.character(x = snakemake@params[["genome"]]);
+
+    gtf <- NULL;
+    if ("gtf" %in% base::names(snakemake@input)) {
+      gtf <- base::as.character(x = snakemake@input[["gtf"]]);
+    } else if ("gtf" %in% base::names(snakemake@params)) {
+      gtf <- base::as.character(x = snakemake@params[["gtf"]]);
+    }
+
+    fasta <- NULL;
+    if ("fasta" %in% base::names(snakemake@input)) {
+      fasta <- base::as.character(x = snakemake@input[["fasta"]]);
+    } else if ("fasta" %in% base::names(snakemake@params)) {
+      fasta <- base::as.character(x = snakemake@params[["fasta"]]);
+    }
+
+    write <- FALSE;
+    json_path <- NULL;
+    if ("json" %in% base::names(snakemake@output)) {
+      json_path <- base::as.character(x = snakemake@output[["json"]]);
+      write <- TRUE;
+    }
+    base::message("Parametres set");
+
+    tximeta::makeLinkedTxome(
+      indexDir = index,
+      source = source,
+      organism = organism,
+      release = release,
+      genome = genome,
+      fasta = fasta,
+      gtf = gtf,
+      write = write,
+      json = json_path
+    );
+    base::message("Process over");
+
+
+.. |nl| raw:: html
+
+   <br>

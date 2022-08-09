@@ -1,0 +1,87 @@
+.. _`bio/snpeff/download`:
+
+SNPEFF DOWNLOAD
+===============
+
+Download `snpeff <https://pcingola.github.io/SnpEff/se_introduction/>`_ DB for a given species.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule snpeff_download:
+        output:
+            # wildcard {reference} may be anything listed in `snpeff databases`
+            directory("resources/snpeff/{reference}")
+        log:
+            "logs/snpeff/download/{reference}.log"
+        params:
+            reference="{reference}"
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/snpeff/download"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``snpeff==4.3.1t``
+* ``bcftools==1.15.1``
+* ``snakemake-wrapper-utils==0.4.1``
+* ``htslib=1.15.1``
+
+
+
+
+
+Authors
+-------
+
+* Johannes Köster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2020, Johannes Köster"
+    __email__ = "johannes.koester@uni-due.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+    from pathlib import Path
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    java_opts = get_java_opts(snakemake)
+
+    reference = snakemake.params.reference
+    outdir = Path(snakemake.output[0]).parent.resolve()
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell("snpEff download {java_opts} -dataDir {outdir} {reference} {log}")
+
+
+.. |nl| raw:: html
+
+   <br>

@@ -1,0 +1,120 @@
+.. _`bio/picard/bedtointervallist`:
+
+PICARD BEDTOINTERVALLIST
+========================
+
+`picard BedToIntervalList <https://broadinstitute.github.io/picard/command-line-overview.html#BedToIntervalList>`_ converts a BED file to Picard Interval List format.
+
+
+**URL**: https://broadinstitute.github.io/picard/command-line-overview.html#BedToIntervalList
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bed_to_interval_list:
+        input:
+            bed="resources/a.bed",
+            dict="resources/genome.dict"
+        output:
+            "a.interval_list"
+        log:
+            "logs/picard/bedtointervallist/a.log"
+        params:
+            # optional parameters
+            "SORT=true " # sort output interval list before writing
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/picard/bedtointervallist"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``picard==2.22.1``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* ``bed``: region file
+* ``dict``: genome dictionary file (from samtools dict or `picard CreateSequenceDictionary <https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/picard/createsequencedictionary.html>`_ )
+
+**Output:**
+
+* interval_list Picard format. This must be th only element in the output file list.
+
+
+
+Params
+------
+
+* ``Optional arguments``: 
+
+
+
+
+Notes
+-----
+
+This tool/wrapper does not handle multithreading
+
+
+
+Authors
+-------
+
+* Fabian Kilpert
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Fabian Kilpert"
+    __copyright__ = "Copyright 2020, Fabian Kilpert"
+    __email__ = "fkilpert@gmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+
+    extra = snakemake.params
+    java_opts = get_java_opts(snakemake)
+
+    shell(
+        "picard BedToIntervalList "
+        "{java_opts} {extra} "
+        "INPUT={snakemake.input.bed} "
+        "SEQUENCE_DICTIONARY={snakemake.input.dict} "
+        "OUTPUT={snakemake.output} "
+        "{log} "
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

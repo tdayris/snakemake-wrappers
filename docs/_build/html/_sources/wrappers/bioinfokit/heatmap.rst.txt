@@ -1,0 +1,138 @@
+.. _`bio/bioinfokit/heatmap`:
+
+BIOINFOKIT HEATMAP
+==================
+
+Build a HeatMap from a TSV file with Bioinfokit
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_bioinfokit_heatmap:
+        input:
+            "hm_cot.csv"
+        output:
+            "figures/heatmap.png"
+        params:
+            read_csv = {"index_col": 0},
+            hmap = {"rowclus": True}
+        log:
+            "bioinfokit.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bioinfokit/heatmap"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bioinfokit=1.0.8``
+* ``numpy=1.20.1``
+* ``pandas=1.2.3``
+* ``matplotlib=3.3.4``
+* ``seaborn=0.11.1``
+* ``matplotlib-venn=0.11.6``
+* ``adjusttext=0.7.3.1``
+* ``imagemagick==7.0.11_4``
+* ``fastcluster==1.1.26``
+
+Input/Output
+------------
+**Input:**
+
+* A table containing gene IDs, log fold change, and normalized counts
+
+**Output:**
+
+* A PNG-formatted ma plot
+
+
+
+
+Notes
+-----
+
+Use parameters in Snakefile to pass options to python functions with dictionnaries
+
+* read_csv Dict[str, Any]: Arguments to pandas.read_csv(). Do not set: `filepath_or_bufferstr`, or `sep`.
+* volcano Dict[str, Any]: Arguments to bioinfokit.visuz.gene_exp.volcano(). Do not set: `df`, `figtype`, `figname`, or `show`.
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for bioinfokit HeatMap"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020"
+    __email__ = "Thibault Dayris"
+    __license__ = "MIT"
+
+    from bioinfokit import visuz
+    import csv
+    import logging
+    import os
+    import pandas
+
+
+    logging.basicConfig(
+        filename=snakemake.log[0],
+        filemode="w",
+        level=logging.DEBUG
+    )
+    logging.getLogger('matplotlib.font_manager').disabled = True
+
+
+    # Recover both figure format and name from output file name
+    figname, figtype = os.path.splitext(snakemake.output[0])
+    figtype = figtype.strip(".").lower()
+
+    # Detect delimiter with python
+    with open(snakemake.input[0], "r") as table:
+        dialect = csv.Sniffer().sniff(table.readline())
+        logging.debug(f"Detected dialect: {dialect.delimiter}")
+
+    # Loading dataset
+    df = pandas.read_csv(
+        snakemake.input[0],
+        sep=dialect.delimiter,
+        **snakemake.params.get("read_csv", {})
+    )
+    logging.debug(df.head())
+
+    # Building and saving volcanoplot
+    visuz.gene_exp.hmap(
+        df=df,
+        show=False,
+        figtype=figtype,
+        figname=figname,
+        **snakemake.params.get("hmap", {})
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

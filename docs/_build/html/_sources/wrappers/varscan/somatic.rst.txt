@@ -1,0 +1,140 @@
+.. _`bio/varscan/somatic`:
+
+VARSCAN SOMATIC
+===============
+
+`Varscan Somatic <http://varscan.sourceforge.net/somatic-calling.html>`_ calls variants and identifies their somatic status (Germline/LOH/Somatic) using pileup files from a matched tumor-normal pair.
+
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule varscan_somatic:
+        input:
+            # A pair of pileup files can be used *instead* of the mpileup
+            # normal_pileup = ""
+            # tumor_pileup = ""
+            mpileup = "mpileup/{sample}.mpileup.gz"
+        output:
+            snp = "vcf/{sample}.snp.vcf",
+            indel = "vcf/{sample}.indel.vcf"
+        message:
+            "Calling somatic variants {wildcards.sample}"
+        threads:
+            1
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
+        params:
+            extra = ""
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/varscan/somatic"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``varscan==2.4.3``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* A pair of pileup files (Normal/Tumor)
+
+**Output:**
+
+* A VCF file
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for varscan somatic"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2019, Dayris Thibault"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    import os.path as op
+
+    from snakemake.shell import shell
+    from snakemake.utils import makedirs
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    # Defining logging and gathering extra parameters
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
+
+    # Building output dirs
+    makedirs(op.dirname(snakemake.output.snp))
+    makedirs(op.dirname(snakemake.output.indel))
+
+    # Output prefix
+    prefix = op.splitext(snakemake.output.snp)[0]
+
+    # Searching for input files
+    pileup_pair = ["normal_pileup", "tumor_pileup"]
+
+    in_pileup = ""
+    mpileup = ""
+    if "mpileup" in snakemake.input.keys():
+        # Case there is a mpileup with both normal and tumor
+        in_pileup = snakemake.input.mpileup
+        mpileup = "--mpileup 1"
+    elif all(pileup in snakemake.input.keys() for pileup in pileup_pair):
+        # Case there are two separate pileup files
+        in_pileup = " {snakemake.input.normal_pileup}" " {snakemakeinput.tumor_pileup} "
+    else:
+        raise KeyError("Could not find either a mpileup, or a pair of pileup files")
+
+    if str(snakemake.output["snp"]).endswith(("vcf", "vcf.gz")):
+        extra += " --output-vcf 1 "
+
+    shell(
+        "varscan somatic"  # Tool and its subcommand
+        " {in_pileup}"  # Path to input file(s)
+        " {prefix}"  # Path to output
+        " {java_opts} {extra}"  # Extra parameters
+        " {mpileup}"
+        " --output-snp {snakemake.output.snp}"  # Path to snp output file
+        " --output-indel {snakemake.output.indel}"  # Path to indel output file
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

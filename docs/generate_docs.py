@@ -25,6 +25,7 @@ BLACKLIST = {
     ".git",
     ".gitignore",
     "README.md",
+    "readme.md",
     ".cache",
     "__init__.py",
     "test.py",
@@ -34,6 +35,7 @@ BLACKLIST = {
 PIPELINE_BLACKLIST = {
     "common",
     "README.md",
+    "readme.md",
     "bash_aliases.sh",
     "Makefile"
 }

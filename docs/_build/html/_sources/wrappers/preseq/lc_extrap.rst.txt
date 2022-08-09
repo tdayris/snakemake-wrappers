@@ -1,0 +1,113 @@
+.. _`bio/preseq/lc_extrap`:
+
+PRESEQ LC_EXTRAP
+================
+
+``preseq`` estimates the library complexity of existing sequencing data to then estimate the yield of future experiments based on their design. For usage information, please see ``preseq``'s command line help (this seems more up to date than the available `documentation from 2014 <http://smithlabresearch.org/wp-content/uploads/manual.pdf>`_ ).
+
+
+**URL**: https://github.com/smithlabcode/preseq
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule preseq_lc_extrap_bam:
+        input:
+            "samples/{sample}.sorted.bam"
+        output:
+            "test_bam/{sample}.lc_extrap"
+        params:
+            "-v"   #optional parameters
+        log:
+            "logs/test_bam/{sample}.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/preseq/lc_extrap"
+
+    rule preseq_lc_extrap_bed:
+        input:
+            "samples/{sample}.sorted.bed"
+        output:
+            "test_bed/{sample}.lc_extrap"
+        params:
+            "-v"   #optional parameters
+        log:
+            "logs/test_bed/{sample}.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/preseq/lc_extrap"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``preseq==2.0.3``
+
+Input/Output
+------------
+**Input:**
+
+* bed/bam files containing duplicates and sorted by chromosome, start position, strand position and finally strand OR
+* bam files containing duplicates and sorted by using bamtools or samtools sort.
+* Only the first element of the input list is used in this wrapper
+
+**Output:**
+
+* lc_extrap (.lc_extrap) This must be the first element of the output list
+
+
+
+Params
+------
+
+* ``Optional parameters``: 
+
+
+
+
+
+Authors
+-------
+
+* Antonie Vietor
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Antonie Vietor"
+    __copyright__ = "Copyright 2020, Antonie Vietor"
+    __email__ = "antonie.v@gmx.de"
+    __license__ = "MIT"
+
+    import os
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    params = ""
+    if (os.path.splitext(snakemake.input[0])[-1]) == ".bam":
+        if "-bam" not in (snakemake.input[0]):
+            params = "-bam "
+
+    shell(
+        "(preseq lc_extrap {params} {snakemake.params} {snakemake.input[0]} -output {snakemake.output[0]}) {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

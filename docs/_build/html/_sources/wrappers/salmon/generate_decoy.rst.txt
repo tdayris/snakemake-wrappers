@@ -1,0 +1,126 @@
+.. _`bio/salmon/generate_decoy`:
+
+GENERATE DECOY
+==============
+
+Generate decoy genome/transcriptome for further use with Salmon.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_salmon_decoy:
+        input:
+            transcriptome = "transcriptome.fasta",
+            genome = "genome.fasta"
+        output:
+            decoys = "decoys.txt",
+            gentrome = "gentrome.fasta"
+        threads: 2
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/salmon/generate_decoy"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``conda-forge:bash==5.0.018``
+
+Input/Output
+------------
+**Input:**
+
+* Transcriptome (fasta formatted, may be gzipped)
+* Genome sequence (fasta formatted, may be gzipped)
+
+**Output:**
+
+* (gzipped) gentrome (fasta formatted)
+* decoy sequence names (txt formatted)
+
+
+
+
+Notes
+-----
+
+See `this tutorial <https://combine-lab.github.io/alevin-tutorial/2019/selective-alignment/>`_ for more information.
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3
+    # -*- coding: utf-8 -*-
+
+    """This is the Snakemake Wrapper for bcl2fastq"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True, append=True)
+    min_threads = 2
+
+    genome_input = snakemake.input["genome"]
+    if genome_input.endswith(".gz"):
+        genome_input = "<(gunzip -c {})".format(genome_input)
+        min_threads += 1
+    
+    decoy = (
+        f"{snakemake.params.get('prefix')}.decoy" 
+        if "prefix" in snakemake.params.keys() else snakemake.output[0]
+    )
+
+    gentrome = (
+        f"{snakemake.params.get('prefix')}.fasta" 
+        if "prefix" in snakemake.params.keys() else snakemake.output[1]
+    )
+
+
+    if snakemake.threads != min_threads:
+        raise ValueError(
+            "This wrapper requires exactly {} threads".format(min_threads)
+        )
+
+    shell(
+        "grep '^>' {genome_input} | cut -d ' ' -f 1 "
+        "> {decoy} {log}"
+    )
+
+    shell(
+        "sed -i.bak -e 's/>//g' {decoy} {log} & "
+        "cat {snakemake.input.transcriptome} {snakemake.input.genome} "
+        "> {gentrome} {log} & wait"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

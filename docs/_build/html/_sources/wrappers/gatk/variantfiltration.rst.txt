@@ -1,0 +1,117 @@
+.. _`bio/gatk/variantfiltration`:
+
+GATK VARIANTFILTRATION
+======================
+
+Run gatk VariantFiltration.
+
+
+**URL**: https://gatk.broadinstitute.org/hc/en-us/articles/360041850471-VariantFiltration
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule gatk_filter:
+        input:
+            vcf="calls/snvs.vcf",
+            ref="genome.fasta",
+        output:
+            vcf="calls/snvs.filtered.vcf"
+        log:
+            "logs/gatk/filter/snvs.log"
+        params:
+            filters={"myfilter": "AB < 0.2 || MQ0 > 50"},
+            extra="",  # optional arguments, see GATK docs
+            java_opts="", # optional
+        # optional specification of memory usage of the JVM that snakemake will respect with global
+        # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+        # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+        # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        resources:
+            mem_mb=1024
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/gatk/variantfiltration"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``gatk4==4.2.0.0``
+* ``snakemake-wrapper-utils==0.1.3``
+
+Input/Output
+------------
+**Input:**
+
+* ``vcf``: Path to vcf file
+* ``ref``: Path to reference genome
+
+**Output:**
+
+* ``vcf``: Path to the filtered vcf file
+
+
+
+Params
+------
+
+* ``extra``: The `extra` param allows for additional program arguments.
+
+* ``java_opts``: The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
+
+
+
+
+
+Authors
+-------
+
+* Johannes Köster
+* Jake VanCampen
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Johannes Köster"
+    __copyright__ = "Copyright 2018, Johannes Köster"
+    __email__ = "johannes.koester@protonmail.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.java import get_java_opts
+
+    extra = snakemake.params.get("extra", "")
+    java_opts = get_java_opts(snakemake)
+
+    filters = [
+        "--filter-name {} --filter-expression '{}'".format(name, expr.replace("'", "\\'"))
+        for name, expr in snakemake.params.filters.items()
+    ]
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    shell(
+        "gatk --java-options '{java_opts}' VariantFiltration -R {snakemake.input.ref} -V {snakemake.input.vcf} "
+        "{extra} {filters} -O {snakemake.output.vcf} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

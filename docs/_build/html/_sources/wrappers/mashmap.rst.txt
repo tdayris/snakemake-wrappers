@@ -1,0 +1,91 @@
+.. _`bio/mashmap`:
+
+MASHMAP
+=======
+
+MashMap implements a fast and approximate algorithm for computing local alignment boundaries between long DNA sequences.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``mashmap==2.0``
+* ``gsl==2.7``
+
+Input/Output
+------------
+**Input:**
+
+* ``query``: Path to query fasta/fastq files
+* ``fasta``: Path to reference sequence file
+
+**Output:**
+
+* Path to alignment file
+
+
+
+Params
+------
+
+* ``extra``: Optional parameters for MashMap
+
+
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+
+    """Snakemake wrapper for MashMap"""
+
+    from snakemake.shell import shell
+
+    ## Extract arguments
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell(
+        "mashmap --ref {snakemake.input.fasta} "
+        "--query {snakemake.input.query} "
+        "--threads {snakemake.threads} "
+        "--output {snakemake.output} "
+        "{extra} "
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

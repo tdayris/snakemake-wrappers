@@ -1,0 +1,100 @@
+.. _`bio/bamtools/stats`:
+
+BAMTOOLS STATS
+==============
+
+Use bamtools to collect statistics from a BAM file. For more information about bamtools see `bamtools documentation <http://stab.st-andrews.ac.uk/wiki/index.php/Bamtools>`_ and `bamtools source code <https://github.com/pezmaster31/bamtools>`_.
+
+**URL**: https://github.com/pezmaster31/bamtools
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bamtools_stats:
+        input:
+            "{sample}.bam"
+        output:
+            "{sample}.bamstats"
+        params:
+            "-insert" # optional summarize insert size data
+        log:
+            "logs/bamtools/stats/{sample}.log"
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bamtools/stats"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bamtools==2.5.1``
+
+Input/Output
+------------
+**Input:**
+
+* bam files (.bam), must be in first position
+
+**Output:**
+
+* bamstats file (.bamstats), must be in first position
+
+
+
+Params
+------
+
+* ``Optional parameters as first and only value.``: 
+
+
+
+
+Notes
+-----
+
+A complete usage documentation is available here: https://raw.githubusercontent.com/wiki/pezmaster31/bamtools/Tutorial_Toolkit_BamTools-1.0.pdf
+
+This tool/wrapper does not handle multi threading
+
+
+
+Authors
+-------
+
+* Antonie Vietor
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Antonie Vietor"
+    __copyright__ = "Copyright 2020, Antonie Vietor"
+    __email__ = "antonie.v@gmx.de"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell(
+        "(bamtools stats {snakemake.params} -in {snakemake.input[0]} > {snakemake.output[0]}) {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

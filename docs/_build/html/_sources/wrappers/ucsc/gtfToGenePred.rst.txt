@@ -1,0 +1,90 @@
+.. _`bio/ucsc/gtfToGenePred`:
+
+GTFTOGENEPRED
+=============
+
+Convert a GTF file to genePred format (see https://genome.ucsc.edu/FAQ/FAQformat.html#format9)
+
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule gtfToGenePred:
+        input:
+            # annotations containing gene, transcript, exon, etc. data in GTF format
+            "annotation.gtf"
+        output:
+            "annotation.genePred"
+        log:
+            "logs/gtfToGenePred.log"
+        params:
+            extra="-genePredExt" # optional parameters to pass to gtfToGenePred
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/ucsc/gtfToGenePred"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``ucsc-gtftogenepred==377``
+
+Input/Output
+------------
+**Input:**
+
+* GTF file
+
+**Output:**
+
+* genePred table
+
+
+
+
+
+Authors
+-------
+
+* Brett Copeland
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Brett Copeland"
+    __copyright__ = "Copyright 2021, Brett Copeland"
+    __email__ = "brcopeland@ucsd.edu"
+    __license__ = "MIT"
+
+
+    import os
+
+
+    from snakemake.shell import shell
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    shell("gtfToGenePred {extra} {snakemake.input} {snakemake.output} {log}")
+
+
+.. |nl| raw:: html
+
+   <br>

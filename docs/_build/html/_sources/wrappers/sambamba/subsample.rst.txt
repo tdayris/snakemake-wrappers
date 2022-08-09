@@ -1,0 +1,120 @@
+.. _`bio/sambamba/subsample`:
+
+SAMBAMBA VIEW
+=============
+
+Filter and/or view BAM files. See details `here https://lomereiter.github.io/sambamba/docs/sambamba-view.html`_
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``sambamba==0.8.0``
+
+Input/Output
+------------
+**Input:**
+
+* bam/sam file
+
+**Output:**
+
+* (filtered) bam/sam file
+
+
+
+
+Notes
+-----
+
+This wrapper contains additional features for subsampling
+
+
+Authors
+-------
+
+* Jan Forster
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+
+    """Snakemake wrapper for subsampling"""
+
+    from functools import singledispatch
+    from random import uniform
+    from typing import Dict, List
+
+    from gzip import open as gzopen
+
+    @singledispatch
+    def fraction(expected: float, total: float) -> float:
+        """From an expected number of reads, return input file fraction"""
+        return expected / total
+
+    @fraction.register(list)
+    def fraction(expected: List[float], total: float) -> float:
+        """From a mean and std, return input file fraction"""
+        vmin = expected[0] - expected[1]
+        vmax = expected[0] + expected[1]
+        return random.uniform(vmin, vmax) / total
+
+
+    @fraction.register(dict)
+    def fraction(expected: Dict[str, float], total: float) -> float:
+        """From a mean and std, return input file fraction"""
+        vmin = expected["mean"] - expected["std"]
+        vmax = expected["mean"] + expected["std"]
+        return random.uniform(vmin, vmax) / total
+
+
+    def nb_reads(fq_path: str) -> float:
+        with gzopen(fq_path) as fq_stream:
+            return sum(1 for _ in fq_stream) / 4
+
+
+    total = nb_reads(snakemake.input["fastq"])
+    subsample = fraction(
+        snakemake.params.get("read_nb", {"mean": 6.25576e+07, "std": 1.05253e+07})
+        total
+    )
+
+    try:
+        seed = snakemake.wildcards["seed"]
+    except KeyError:
+        seed = snakemake.params.get("seed", random.randint(0, 999))
+
+    shell(
+        "sambamba view --nthreads {snakemake.threads} --subsample {subsample} "
+        "--subsample-seed {seed} "
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

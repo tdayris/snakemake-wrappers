@@ -1,0 +1,85 @@
+.. _`bio/samtools/depth`:
+
+SAMTOOLS DEPTH
+==============
+
+Compute the read depth at each position or region using samtools. For more information see `SAMtools documentation <http://www.htslib.org/doc/samtools-depth.html>`_.
+
+**URL**: 
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule samtools_depth:
+        input:
+            bams=["mapped/A.bam", "mapped/B.bam"],
+            bed="regionToCalcDepth.bed", # optional
+        output:
+            "depth.txt"
+        params:
+            # optional bed file passed to -b
+            extra="" # optional additional parameters as string
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/samtools/depth"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``samtools==1.10``
+
+
+
+
+
+Authors
+-------
+
+* Dayne Filer
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for running samtools depth."""
+
+    __author__ = "Dayne L Filer"
+    __copyright__ = "Copyright 2020, Dayne L Filer"
+    __email__ = "dayne.filer@gmail.com"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    params = snakemake.params.get("extra", "")
+
+    # check for optional bed file
+    bed = snakemake.input.get("bed", "")
+    if bed:
+        bed = "-b " + bed
+
+    shell(
+        "samtools depth {params} {bed} "
+        "-o {snakemake.output[0]} {snakemake.input.bams} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

@@ -1,0 +1,149 @@
+.. _`bio/bcftools/reheader`:
+
+BCFTOOLS REHEADER
+=================
+
+Change header or sample names of vcf/bcf file.
+
+**URL**: https://samtools.github.io/bcftools/bcftools.html#mpileup
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule bcftools_reheader:
+        input:
+            vcf="a.bcf",
+            ## new header, can be omitted if "samples" is set
+            header="header.txt",
+            ## file containing new sample names, can be omitted if "header" is set
+            samples="samples.tsv"
+        output:
+            "a.reheader.bcf"
+        params:
+            extra="",  # optional parameters for bcftools reheader
+            view_extra="-O b"  # add output format for internal bcftools view call
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/bcftools/reheader"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``bcftools==1.12``
+
+Input/Output
+------------
+**Input:**
+
+* ``vcf``: Path to vcf file
+* ``header``: Path to the new header (optional)
+* ``samples``: Path to the sample file (optional)
+
+**Output:**
+
+* reheaded vcf, must be the only output file
+
+
+
+Params
+------
+
+* ``extra``: bcftools reheader optional parameters
+
+* ``view_extra``: bcftools view optional parameters
+
+
+
+
+Notes
+-----
+
+This wrapper requires at least two threads: one for bcftools reheader, one for bcftools view.
+
+
+
+Authors
+-------
+
+* Jan Forster
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Jan Forster"
+    __copyright__ = "Copyright 2020, Jan Forster"
+    __email__ = "j.forster@dkfz.de"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    if snakemake.threads != 2:
+        raise ValueError("BCFTools reheader wrapper requires exactly 2 threads")
+
+    ## Extract arguments
+    header = snakemake.input.get("header", None)
+    if header is not None:
+        header_cmd = "--header " + header
+    else:
+        header_cmd = ""
+
+    samples = snakemake.input.get("samples", None)
+    if samples is not None:
+        samples_cmd = f"--samples {samples}"
+    else:
+        samples_cmd = ""
+
+    fai = snakemake.input.get("fai", None)
+    if fai is not None:
+        fai_cmd = f"--fai {fai}"
+    else:
+        fai_cmd = ""
+
+    extra = snakemake.params.get("extra", "")
+    view_extra = snakemake.params.get("view_extra", "")
+
+    if str(snakemake.output).endswith(".gz"):
+        view_extra += " --output-type z "
+    elif str(snakemake.output).endswith(".bcf"):
+        view_extra += " --output-type b "
+    elif str(snakemake.output).endswith(".vcf"):
+        view_extra += " --output-type v "
+    if "regions" in snakemake.input.keys():
+        view_extra += " --regions-file {}".format(snakemake.input["regions"])
+
+
+    shell(
+        "bcftools reheader "
+        "{extra} "
+        "{header_cmd} "
+        "{samples_cmd} "
+        "{fai_cmd} "
+        "{snakemake.input.vcf} "
+        "| bcftools view "
+        "{view_extra} "
+        "> {snakemake.output} "
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

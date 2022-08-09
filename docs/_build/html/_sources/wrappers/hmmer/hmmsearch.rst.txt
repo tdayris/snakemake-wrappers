@@ -1,0 +1,157 @@
+.. _`bio/hmmer/hmmsearch`:
+
+HMMSEARCH
+=========
+
+search profile(s) against a sequence database
+
+**URL**: http://hmmer.org/
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule hmmsearch_profile:
+        input:
+            fasta="test-protein.fa",
+            profile="test-profile.hmm.h3f",
+        output:
+            # only one of these is required
+            tblout="test-prot-tbl.txt", # save parseable table of per-sequence hits to file <f>
+            domtblout="test-prot-domtbl.txt", # save parseable table of per-domain hits to file <f>
+            alignment_hits="test-prot-alignment-hits.txt", # Save a multiple alignment of all significant hits (those satisfying inclusion thresholds) to the file <f>
+            outfile="test-prot-out.txt", # Direct the main human-readable output to a file <f> instead of the default stdout.
+        log:
+            "logs/hmmsearch.log"
+        params:
+            evalue_threshold=0.00001,
+            # if bitscore threshold provided, hmmsearch will use that instead
+            #score_threshold=50,
+            extra="",
+        threads: 4
+        wrapper:
+            "0.50.4-1991-g7872381db/bio/hmmer/hmmsearch"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``hmmer=3.2.1``
+
+Input/Output
+------------
+**Input:**
+
+* ``profile``: hmm profile(s)
+* ``fasta``: sequence database
+
+**Output:**
+
+* ``tblout``: save parseable table of per-sequence hits to file
+* ``domtblout``: save parseable table of per-sequence hits to file
+* ``pfamtblout``: save table of hits and domains to file, in Pfam format
+* ``outfile``: Direct the main human-readable output to a file
+
+
+
+Params
+------
+
+* ``evalue_threshold``: default is 0.00001
+
+* ``score_threshold``: if bitscore threshold provided, hmmsearch will use that instead
+
+
+
+
+Notes
+-----
+
+"`Challenges in Homology Search: HMMER3 and Convergent Evolution of Coiled-Coil Regions. J. Mistry, R. D. Finn, S. R. Eddy, A. Bateman, M. Punta. Nucleic Acids Research, 41:e121, 2013   <https://doi.org/10.1093/nar/gkt263>`_"
+
+
+
+Authors
+-------
+
+* N Tessa Pierce
+
+
+Code
+----
+
+.. code-block:: python
+
+    """Snakemake wrapper for hmmsearch"""
+
+    __author__ = "N. Tessa Pierce"
+    __copyright__ = "Copyright 2019, N. Tessa Pierce"
+    __email__ = "ntpierce@gmail.com"
+    __license__ = "MIT"
+
+    from os import path
+    from snakemake.shell import shell
+
+    profile = snakemake.input.get("profile")
+
+    profile = profile.rsplit(".h3", 1)[0]
+    assert profile.endswith(".hmm"), 'your profile file should end with ".hmm" '
+
+    # Direct the main human-readable output to a file <f> instead of the default stdout.
+    out_cmd = ""
+    outfile = snakemake.output.get("outfile", "")
+    if outfile:
+        out_cmd += " -o {} ".format(outfile)
+
+    # save parseable table of per-sequence hits to file <f>
+    tblout = snakemake.output.get("tblout", "")
+    if tblout:
+        out_cmd += " --tblout {} ".format(tblout)
+
+    # save parseable table of per-domain hits to file <f>
+    domtblout = snakemake.output.get("domtblout", "")
+    if domtblout:
+        out_cmd += " --domtblout {} ".format(domtblout)
+
+    # Save a multiple alignment of all significant hits (those satisfying inclusion thresholds) to the file <f>
+    alignment_hits = snakemake.output.get("alignment_hits", "")
+    if alignment_hits:
+        out_cmd += " -A {} ".format(alignment_hits)
+
+    ## default params: enable evalue threshold. If bitscore thresh is provided, use that instead (both not allowed)
+    # report models >= this score threshold in output
+    evalue_threshold = snakemake.params.get("evalue_threshold", 0.00001)
+    score_threshold = snakemake.params.get("score_threshold", "")
+
+    if score_threshold:
+        thresh_cmd = " -T {} ".format(float(score_threshold))
+    else:
+        thresh_cmd = " -E {} ".format(float(evalue_threshold))
+
+    # all other params should be entered in "extra" param
+    extra = snakemake.params.get("extra", "")
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+    shell(
+        " hmmsearch --cpu {snakemake.threads} "
+        " {out_cmd} {thresh_cmd} {extra} {profile} "
+        " {snakemake.input.fasta} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>
