@@ -18,9 +18,6 @@ incall = snakemake.input["call"]
 if snakemake.input["call"].endswith("bcf"):
     min_threads += 1
     incall = "< <(bcftools view {})".format(incall)
-elif snakemake.input["call"].endswith("gz"):
-    min_threads += 1
-    incall = "< <(gunzip -c {})".format(incall)
 
 # Compression shall be done according to user-defined output
 outcall = snakemake.output["call"]
@@ -46,5 +43,5 @@ shell(
     " {snakemake.input.database}"  # Path to annotation vcf file
     " {incall} "  # Path to input vcf file
     " {outcall} "  # Path to output vcf file
-    " {log}"  # Logging behaviour
+    " {log}"  # Logging behavior
 )
