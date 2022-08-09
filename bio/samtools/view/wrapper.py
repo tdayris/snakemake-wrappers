@@ -26,7 +26,7 @@ if ref:
 
     cache = snakemake.input.get("cache", "")
     if cache:
-       os.environ["REF_PATH"] = f"{cache}/%2s/%2s/%s:{ref_dir}"
+       os.environ["REF_PATH"] = f"{cache}/%2s/%2s/%s:{ref_dir}:http://www.ebi.ac.uk/ena/cram/md5/%s"
        os.environ["REF_CACHE"] = f"{cache}/%2s/%2s/%s"
 
 bed = ""
