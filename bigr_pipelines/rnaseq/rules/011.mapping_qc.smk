@@ -55,7 +55,7 @@ rule samtools_cram:
         tmpdir="tmp",
     retries: 1
     params:
-        extra=config["samtools"].get("gram_extra", ""),
+        extra=config["samtools"].get("cram_extra", ""),
     log:
         "logs/samtools/cram/{sample}.{maptype}.log",
     wrapper:

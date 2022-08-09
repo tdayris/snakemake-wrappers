@@ -4,6 +4,8 @@ __email__ = "koester@jimmy.harvard.edu"
 __license__ = "MIT"
 
 
+import os
+
 from snakemake.shell import shell
 from snakemake_wrapper_utils.samtools import get_samtools_opts
 
@@ -14,12 +16,18 @@ aln = snakemake.input.get("aln", None)
 if aln is None:
     aln = snakemake.input[0]
 
-ref = ""
-if "fasta" in snakemake.input.keys():
-    ref = f"-T {snakemake.input['fasta']} "
+ref = snakemake.input.get('fasta')
+if ref:
+    ref_dir = os.path.dirname(ref)
+    ref = f"-T {ref} "
 
-if "fasta_idx" in snakemake.input.keys():
-    ref += f" -t {snakemake.input['fasta_idx']} "
+    if "fasta_idx" in snakemake.input.keys():
+        ref += f" -t {snakemake.input['fasta_idx']} "
+
+    cache = snakemake.input.get("cache", "")
+    if cache:
+       os.environ["REF_PATH"] = f"{cache}/%2s/%2s/%s:{ref_dir}"
+       os.environ["REF_CACHE"] = f"{cache}/%2s/%2s/%s"
 
 bed = ""
 if "bed" in snakemake.input.keys():
