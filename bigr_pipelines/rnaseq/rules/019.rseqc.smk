@@ -91,7 +91,7 @@ rule rseqc_gene_body_coverage:
         str(workflow_source_dir / "envs" / "rseqc.yaml")
     params:
         extra=config["rseqc"].get("gene_body", "--format pdf"),
-        prefix=lambda wildcards: f"rseqc/gene_body_coverage/{wildcards.maptype}/{wildcards.sample}.geneBodyCoverage",
+        prefix=lambda wildcards: f"rseqc/gene_body_coverage/{wildcards.maptype}/{wildcards.sample}",
     shell:
         "geneBody_coverage.py "
         "--input {input.bam} "
