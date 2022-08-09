@@ -18,9 +18,7 @@ incall = snakemake.input["call"]
 if incall.endswith("bcf"):
     min_threads += 1
     incall = "< <(bcftools view {})".format(incall)
-elif incall.endswith("gz"):
-    min_threads += 1
-    incall = "< <(gunzip -c {})".format(incall)
+
 
 # Compression shall be done according to user-defined output
 outcall = snakemake.output["call"]
