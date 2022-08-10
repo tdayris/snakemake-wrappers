@@ -59,7 +59,7 @@ rule bwa_mem:
     envmodules:
         "bwa/0.7.15",
     log:
-        "logs/bwa/mem/{sample}.{status}.log",
+        "logs/bwa/mem/{sample}.log",
     params:
         " -R '@rg\tID:GRCh38\tSM:{sample}\tPL:Illumina'",
     shell:

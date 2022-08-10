@@ -20,6 +20,6 @@ rule cutadapt:
     params:
         "-a ACTGACAGCAGGAATCCCACT -g AGTGGGATTCCTGCTGTCAGT -n 2 -e 0.2",
     log:
-        "logs/cutadapt/{sample}.{status}.log",
+        "logs/cutadapt/{sample}.log",
     shell:
         "cutadapt {params} -o {output} {input} > {log} 2>&1"

@@ -71,3 +71,8 @@ bam_links = link_bam(
     files=design.Upstream_file,
     prefix="data_input"
 )
+
+samples_list = design["Sample_id"].tolist()
+
+wildcard_constraints:
+    sample=r"|".join(samples_list)
