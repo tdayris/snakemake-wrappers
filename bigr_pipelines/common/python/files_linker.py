@@ -8,6 +8,7 @@ This file contains function to perform files mapping between original name
 """
 
 import pandas
+import functools
 
 from typing import Dict, List, Optional
 
@@ -88,16 +89,6 @@ def link_fq_somatic(
     return link_dict
 
 
-def link_vcf(sample_names: List[str], files: List[str]) -> Dict[str, str]:
-    """
-    Build a dictionary linking a vcf path to its expected path
-    """
-    return {
-        f"data_input/calls/{sample}.vcf.gz": file
-        for file, sample in zip(files, sample_names)
-    }
-
-
 def link_bed(design: pandas.DataFrame, bed: Optional[str] = None):
     """
     Build a dictionary linking a sample name to a capture kit bed.
@@ -122,3 +113,20 @@ def link_bed(design: pandas.DataFrame, bed: Optional[str] = None):
             sample: bed for sample in design["Sample_id"]
         }
     return bed_to_sample_link
+
+
+def link_mapping(sample_names: List[str], files: List[str], ext: str) -> Dict[str, str]:
+    """
+    Build a dictionary linking a file path to its expected path
+    """
+    return {
+        f"data_input/{sample}.{ext}": file
+        for file, sample in zip(files, sample_names)
+    }
+
+
+link_bam = functools.partial(link_mapping, ext="bam")
+link_sam = functools.partial(link_mapping, ext="sam")
+link_cram = functools.partial(link_mapping, ext="cram")
+link_bai = functools.partial(link_mapping, ext="bam.bai")
+link_vcf = functools.partial(link_mapping, ext="vcf.gz")
