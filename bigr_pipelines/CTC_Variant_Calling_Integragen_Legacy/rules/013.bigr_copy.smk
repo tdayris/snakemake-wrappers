@@ -7,7 +7,7 @@ This Snakefile deals with IO from and to iRODS
 # iRODS paths are accepted
 rule bigr_copy:
     output:
-        temp("data_input/{sample}.bam"),
+        temp("data_input/{sample}.{status}.bam"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,

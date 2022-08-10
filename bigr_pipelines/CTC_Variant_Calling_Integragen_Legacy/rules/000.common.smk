@@ -20,6 +20,7 @@ from yaml import dump
 min_version("7.5")
 
 import sys
+import pandas
 
 # My own libraries
 workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
@@ -66,6 +67,59 @@ logging.info("Design file loaded")
 # Links fastq paths provided by users and fastq paths used in this pipeline
 # this is done in order to handle iRODS paths.
 logging.info("Building globals...")
+
+def parse_design(design: pandas.DataFrame, 
+                 prefix: str = "data_input",
+                 suffix: str = "bam") -> dict[str, str]:
+
+    link_bams = {}
+    sample_list = []
+    link_sample_baseline = {}
+
+    row = next(design.iterrows()[1], None)
+
+    while row is not None:
+        if row["Status"].lower() == "baseline":
+            result[f"{prefix}/{sample}.baseline.{suffix}"] = bam
+
+        elif row["Status"].lower() == "wbc":
+            manip = row["Manip"]
+            kit = row["kit_version"]
+            sample_id = f"{sample}_V{kit}_M{manip}"
+
+            result[f"{prefix}/{sample_id}.wbc.{suffix}"] = bam
+
+
+        elif row["Status"].lower() == "ctc":
+            manip = row["Manip"]
+            kit = row["kit_version"]
+            replicate = row["Replicate"]
+            raw_sample_id = f"{sample}_V{kit}_M{manip}"
+            sample_id = f"{raw_sample_id}_{replicate}"
+
+            sample_list.append(sample_id)
+            result[f"{prefix}/{sample_id}.ctc.{suffix}"] = bam
+            link_sample_baseline[sample_id] = {
+                "ctc": f"{prefix}/{sample_id}.ctc.{suffix}",
+                "wbc": f"{prefix}/{raw_sample_id}.wbc.{suffix}",
+                "baseline": f"{prefix}/{sample}.baseline.{suffix}",
+            }
+
+
+def get_baseline(wildcards):
+    return link_sample_baseline[wildcards.sample]["baseline"]
+
+
+def get_wbc(wildcards):
+    return link_sample_baseline[wildcards.sample]["wbc"]
+
+
+def get_ctc(wildcards):
+    return link_sample_baseline[wildcards.sample]["ctc"]
+
+
+
+
 bam_links = link_bam(
     sample_names=design.Sample_id,
     files=design.Upstream_file,
