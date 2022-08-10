@@ -11,9 +11,9 @@ rule gatk_select_variants:
         temp("gatk/select_variants/baseline/{sample}.tmp.vcf"),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 10,
-        time_min=lambda wildcards, attempt: attempt * 75,
-        java_mem_gb=lambda wildcards, attempt: attempt * 9,
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        java_mem_gb=get_10gb_per_attempt,
         tmpdir="tmp",
     group:
         "retrieve_baseline"

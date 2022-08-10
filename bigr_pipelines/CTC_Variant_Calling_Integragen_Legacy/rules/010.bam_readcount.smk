@@ -11,8 +11,8 @@ rule bam_readcount:
         temp("bam_readcount/{sample}.{status}.tsv"),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 6,
-        time_min=lambda wildcards, attempt: attempt * 35,
+        mem_mb=get_8gb_per_attempt,
+        time_min=get_35min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/bam_readcount/{sample}.{status}.log",

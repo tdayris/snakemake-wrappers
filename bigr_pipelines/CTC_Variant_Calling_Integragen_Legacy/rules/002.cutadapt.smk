@@ -5,13 +5,13 @@ cutadapt (v1.14) : cutadapt -a ACTGACAGCAGGAATCCCACT -g AGTGGGATTCCTGCTGTCAGT -n
 
 rule cutadapt:
     input:
-        "fastq/{sample}.{status}.fastq",
+        "fastq/{sample}.fastq",
     output:
-        temp("cutadapt/{sample}.{status}.fastq"),
+        temp("cutadapt/{sample}.fastq"),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
-        time_min=lambda wildcards, attempt: attempt * 20,
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_35min_per_attempt,
         tmpdir="tmp",
     group:
         "clean_input"
@@ -22,4 +22,4 @@ rule cutadapt:
     log:
         "logs/cutadapt/{sample}.{status}.log",
     shell:
-        "cutadapt {params} -o {outpuy} {input} > {log} 2>&1"
+        "cutadapt {params} -o {output} {input} > {log} 2>&1"

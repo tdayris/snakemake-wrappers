@@ -5,21 +5,21 @@ gatk 3.7 haplotypecaller (on each normal sample) : java -Xmx8g -jar GenomeAnalys
 
 rule gatk_haplotype_caller:
     input:
-        bam="sambamba/markdup/{sample}.{status}.bam",
+        bam="sambamba/markdup/{sample}.bam",
         fasta=config["ref"]["fasta"],
     output:
-        vcf=temp("gatk/haplotypecaller/{sample}.{status}.g.vcf.gz"),
+        vcf=temp("gatk/haplotypecaller/{sample}.g.vcf.gz"),
         bam="gatk/haplotypecaller/{sample}.baseline.bam",
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 10,
-        java_mem_gb=lambda wildcards, attempt: attempt * 9,
-        time_min=lambda wildcards, attempt: attempt * 75,
+        mem_mb=get_20gb_per_attempt,
+        java_mem_gb=get_20gb_per_attempt,
+        time_min=get_8h_per_attempt,
         tmpdir="tmp",
     group:
         "baseline_wbc_calling"
     log:
-        "logs/haplotypecaller/{sample}.{status}.log",
+        "logs/haplotypecaller/{sample}.log",
     params:
         "-ERC GVCF",
     conda:
@@ -50,9 +50,9 @@ rule gatk_genotype_gvcf:
         temp("gatk/genotype_gvcf/baseline_wbc/{sample}.g.vcf.gz"),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 10,
-        java_mem_gb=lambda wildcards, attempt: attempt * 9,
-        time_min=lambda wildcards, attempt: attempt * 75,
+        mem_mb=get_10gb_per_attempt,
+        java_mem_gb=get_10gb_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp",
     group:
         "baseline_wbc_calling"
@@ -87,9 +87,9 @@ rule gatk_select_variants:
         temp("gatk/select_variants/baseline_wbc/{sample}.g.vcf"),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 10,
-        java_mem_gb=lambda wildcards, attempt: attempt * 9,
-        time_min=lambda wildcards, attempt: attempt * 75,
+        mem_mb=get_10gb_per_attempt,
+        java_mem_gb=get_10gb_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp",
     group:
         "baseline_wbc_variant_filters"
@@ -123,9 +123,9 @@ rule gatk_variant_filtration:
         temp("gatk/variant_filtration/baseline_wbc/{sample}.g.vcf"),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 10,
-        java_mem_gb=lambda wildcards, attempt: attempt * 9,
-        time_min=lambda wildcards, attempt: attempt * 75,
+        mem_mb=get_10gb_per_attempt,
+        java_mem_gb=get_10gb_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp",
     group:
         "baseline_wbc_variant_filters"

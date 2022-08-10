@@ -11,8 +11,8 @@ rule brc2vep:
         filtered=temp("bcr2vep/filtered/{sample}.csv"),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 10,
-        time_min=lambda wildcards, attempt: attempt * 45,
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/bcr2vep/{sample}.log",

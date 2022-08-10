@@ -13,9 +13,9 @@ rule mutect2:
         "gatk/mutect2/{sample}.vcf.gz",
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 10,
-        time_min=lambda wildcards, attempt: attempt * 75,
-        java_mem_gb=lambda wildcards, attempt: attempt * 9,
+        mem_mb=get_10gb_per_attempt,
+        java_mem_gb=get_10gb_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp",
     log:
         "logs/gatk/mutect2/{sample}.log",

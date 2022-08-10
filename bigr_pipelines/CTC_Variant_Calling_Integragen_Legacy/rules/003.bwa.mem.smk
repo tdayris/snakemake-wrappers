@@ -17,8 +17,8 @@ rule bwa_index:
         ),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: 1024 * 10 * attempt,
-        time_min=lambda wildcards, attempt: 120 * attempt,
+        mem_mb=get_75gb_and_2gb_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp",
     envmodules:
         "bwa/0.7.15",
@@ -37,7 +37,7 @@ bwa 0.7.15-r1140 : bwa mem -R '@rg\tID:GRCh38\tSM:{sample}\tPL:Illumina' -t {thr
 
 rule bwa_mem:
     input:
-        fq="cutadapt/{sample}.{status}.fastq",
+        fq="cutadapt/{sample}.fastq",
         index=config.get(
             "bwa_index",
             multiext(
@@ -50,14 +50,12 @@ rule bwa_mem:
             ),
         ),
     output:
-        temp("bwa/mem/{sample}.{status}.sam"),
+        temp("bwa/mem/{sample}.sam"),
     threads: 20
     resources:
-        mem_mb=lambda wildcards, attempt: 1024 * 68 * attempt,
-        time_min=lambda wildcards, attempt: 120 * attempt,
+        mem_mb=get_75gb_and_2gb_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp",
-    group:
-        "map_n_sort"
     envmodules:
         "bwa/0.7.15",
     log:

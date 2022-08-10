@@ -10,8 +10,8 @@ rule grep:
         temp("grep/baseline_wbc/{sample}.vcf"),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 512,
-        time_min=lambda wildcards, attempt: attempt * 35,
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_35min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/grep/{sample}.log",

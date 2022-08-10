@@ -12,8 +12,8 @@ rule ensembl_vep:
         vcf=temp("vep/annotate/{sample}.vcf"),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attmpt * 1024 * 8,
-        time_min=lambda wildcards, attempt: attmpt * 55,
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/vep/{sample}.log",
@@ -44,8 +44,8 @@ rule ensemblvep_hc:
         vcf=temp("vep/hc/{sample}.vcf"),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 10,
-        time_min=lambda wildcards, attempt: attempt * 45,
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/vep_hc.log",
@@ -65,8 +65,8 @@ rule ensemblvep_bcr:
         vcf=temp("vep/mutect/{sample}.vcf"),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 10,
-        time_min=lambda wildcards, attempt: attempt * 45,
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/vep_hc.log",
@@ -86,8 +86,8 @@ rule ensemblvep_bcr:
         vcf=temp("vep/bcr/{sample}.vcf"),
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 10,
-        time_min=lambda wildcards, attempt: attempt * 45,
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/vep_hc.log",
