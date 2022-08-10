@@ -1,6 +1,6 @@
 rule snpsift_gwascat:
     input:
-        call="snpsift/dbvar/{sample}.vcf",
+        call="snpsift/exac/{sample}.vcf",
         gwascat=config["reference"]["gwascat"],
     output:
         call=temp("snpsift/gwascat/{sample}.vcf"),
