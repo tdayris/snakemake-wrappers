@@ -68,6 +68,6 @@ logging.info("Design file loaded")
 logging.info("Building globals...")
 bam_links = link_bam(
     sample_names=design.Sample_id,
-    r1_paths=design.Upstream_file,
-    prefix="data_input",
+    files=design.Upstream_file,
+    prefix="data_input"
 )
