@@ -1,6 +1,6 @@
 rule samtools_stats_raw:
     input:
-        bam="bwa_mem2/sorted/{sample}_{status}.bam",
+        aln="bwa_mem2/sorted/{sample}_{status}.bam",
         bai="bwa_mem2/sorted/{sample}_{status}.bam.bai",
         ref=config["reference"]["fasta"],
         ref_idx=config["reference"]["fasta_index"],
