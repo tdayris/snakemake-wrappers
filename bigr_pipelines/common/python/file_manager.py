@@ -12,20 +12,18 @@ This file contains usefull functions for file managment:
 
 import logging
 import pandas
-import os
-import shutil
 
 from pathlib import Path
 
 from os.path import commonprefix, basename
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from write_yaml import *
 
 FilePathType = Union[str, Path]
 
 
-def remove_suffixes(word: str, suffixes: list[str]) -> str:
+def remove_suffixes(word: str, suffixes: List[str]) -> str:
     """
     From a given word (usually a path) remove the provided suffixe
     (usually an extension)
@@ -95,7 +93,7 @@ def get_tbi(vcf_path: str) -> str:
     return get_vcf_tbi_from_vcf_path(vcf_path)
 
 
-def search_files(dirpath: FilePathType, ext: Optional[str] = None) -> list[str]:
+def search_files(dirpath: FilePathType, ext: Optional[str] = None) -> List[str]:
     """
     Within a given directory, search all files. If an extension is provided,
     return only the ones with matching suffixe. If a path leads to a directory,
@@ -117,7 +115,7 @@ def search_files(dirpath: FilePathType, ext: Optional[str] = None) -> list[str]:
             yield str(filepath.absolute())
 
 
-def search_vcf_files(dirpath: FilePathType) -> dict[str, str]:
+def search_vcf_files(dirpath: FilePathType) -> Dict[str, str]:
     """
     Within a given directory, search all vcf files. If a path leads to a
     directory, the subfunction is called recursively.
@@ -129,7 +127,7 @@ def search_vcf_files(dirpath: FilePathType) -> dict[str, str]:
     }
 
 
-def search_vcf(dirpath: FilePathType) -> dict[str, str]:
+def search_vcf(dirpath: FilePathType) -> Dict[str, str]:
     """
     Within a given directory, search all vcf files. If a path leads to a
     directory, the subfunction is called recursively.
@@ -137,7 +135,7 @@ def search_vcf(dirpath: FilePathType) -> dict[str, str]:
     return search_vcf_files(dirpath)
 
 
-def search_fastq_files(dirpath: FilePathType) -> dict[str, str]:
+def search_fastq_files(dirpath: FilePathType) -> Dict[str, str]:
     """
     Within a given directory, search all fastq files. If a path leads to a
     directory, the subfunction is called recursively.
@@ -149,7 +147,7 @@ def search_fastq_files(dirpath: FilePathType) -> dict[str, str]:
     }
 
 
-def search_fastq_files_dict(dirpath: FilePathType) -> dict[str, dict[str, str]]:
+def search_fastq_files_dict(dirpath: FilePathType) -> Dict[str, Dict[str, str]]:
     """
     Within a given directory, search all fastq files. If a path leads to a
     directory, the subfunction is called recursively.
@@ -161,7 +159,7 @@ def search_fastq_files_dict(dirpath: FilePathType) -> dict[str, dict[str, str]]:
     }
 
 
-def search_fastq_somatic(dirpath: FilePathType) -> dict[str, str]:
+def search_fastq_somatic(dirpath: FilePathType) -> Dict[str, str]:
     """
     Within a given directory, search all vcf files. If a path leads to a
     directory, the subfunction is called recursively.
@@ -179,7 +177,7 @@ def search_fastq_somatic(dirpath: FilePathType) -> dict[str, str]:
     }
 
 
-def search_fastq_trio(dirpath: FilePathType) -> dict[str, str]:
+def search_fastq_trio(dirpath: FilePathType) -> Dict[str, str]:
     """
     Within a given directory, search all vcf files. If a path leads to a
     directory, the subfunction is called recursively.
@@ -200,7 +198,7 @@ def search_fastq_trio(dirpath: FilePathType) -> dict[str, str]:
     }
 
 
-def search_fastq_pairs(dirpath: FilePathType) -> dict[str, dict[str, str]]:
+def search_fastq_pairs(dirpath: FilePathType) -> Dict[str, Dict[str, str]]:
     """
     Within a given directory, search all vcf files. If a path leads to a
     directory, the subfunction is called recursively.
@@ -215,7 +213,7 @@ def search_fastq_pairs(dirpath: FilePathType) -> dict[str, dict[str, str]]:
     }
 
 
-def search_mapping(dirpath: FilePathType) -> dict[str, str]:
+def search_mapping(dirpath: FilePathType) -> Dict[str, str]:
     """
     Within a given directory, search all bam files. If a path leads to a
     directory, the subfunction is called recursively.
@@ -227,7 +225,7 @@ def search_mapping(dirpath: FilePathType) -> dict[str, str]:
     }
 
 
-def search_bam(dirpath: FilePathType) -> dict[str, str]:
+def search_bam(dirpath: FilePathType) -> Dict[str, str]:
     """
     Within a given directory, search all bam files. If a path leads to a
     directory, the subfunction is called recursively.
@@ -235,7 +233,7 @@ def search_bam(dirpath: FilePathType) -> dict[str, str]:
     return search_mapping(dirpath)
 
 
-def search_fasta(dirpath: FilePathType) -> list[str]:
+def search_fasta(dirpath: FilePathType) -> List[str]:
     """
     Within a given directory, search all fasta files. If a path leads to a
     directory, the subfunction is called recursively.
@@ -243,7 +241,7 @@ def search_fasta(dirpath: FilePathType) -> list[str]:
     return search_files(dirpath, ext=("fa", "fasta", "fa.gz", "fasta.gz"))
 
 
-def search_fa(dirpath: FilePathType) -> list[str]:
+def search_fa(dirpath: FilePathType) -> List[str]:
     """
     Within a given directory, search all fasta files. If a path leads to a
     directory, the subfunction is called recursively.
@@ -260,7 +258,7 @@ def read_design(design_path: FilePathType) -> pandas.DataFrame:
 
 def build_design(
         dirpath: FilePathType,
-        search_func: Callable[FilePathType, dict[str, dict[str, str]]]) \
+        search_func: Callable[FilePathType, Dict[str, Dict[str, str]]]) \
         -> pandas.DataFrame:
     """
     Search for files with the provided function within the given directory,
@@ -276,7 +274,7 @@ def build_design(
 
 def get_design(
         dirpath: FilePathType,
-        search_func: Callable[FilePathType, dict[str, dict[str, str]]]) \
+        search_func: Callable[FilePathType, Dict[str, Dict[str, str]]]) \
         -> pandas.DataFrame:
     """
     From a given path, search for a file named 'design.tsv'. If this file is
@@ -294,7 +292,7 @@ def get_design(
     return design
 
 
-def get_config(default_config: dict[str, Any]) -> str:
+def get_config(default_config: Dict[str, Any]) -> str:
     """
     From a given path, seach for a function named "config.yaml". If this file
     is missing, this function saves a copy of the default configuration.
@@ -313,10 +311,10 @@ def get_config(default_config: dict[str, Any]) -> str:
 
 
 def design_config(
-        default_config: dict[str, Any],
+        default_config: Dict[str, Any],
         dirpath: FilePathType,
-        search_func: Callable[FilePathType, dict[str, dict[str, str]]]) \
-        -> list[Union[pandas.DataFrame, str]]:
+        search_func: Callable[FilePathType, Dict[str, Dict[str, str]]]) \
+        -> List[Union[pandas.DataFrame, str]]:
     """
     Shortcut to build/load both design and config at once.
     """

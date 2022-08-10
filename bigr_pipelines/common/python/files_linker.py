@@ -8,23 +8,24 @@ This file contains function to perform files mapping between original name
 """
 
 import pandas
+import functools
 
-from typing import Optional
+from typing import Dict, List, Optional
 
 def link_fq(
-        sample_names: list[str],
-        r1_paths: list[str],
-        r2_paths: Optional[list[str]] = None,
+        sample_names: List[str],
+        r1_paths: List[str],
+        r2_paths: Optional[List[str]] = None,
         prefix: str = "reads"
-    ) -> dict[str, str]:
+    ) -> Dict[str, str]:
     """
     Case r2 are provided:
-    Build a dictionnary containing the following pairs:
+    Build a dictionary containing the following pairs:
     original_r1_name: reads/{sample}.1.fq.gz
     original_r2_name: reads/{sample}.2.fq.gz
 
     Otherwise:
-    Build a dictionnary containing the following fastq:
+    Build a dictionary containing the following fastq:
     original_name: reads/{sample}.fq.gz
     """
     if r2_paths is None:
@@ -41,16 +42,16 @@ def link_fq(
 
 
 def link_fq_somatic(
-        sample_names: list[str],
-        n1_paths: list[str],
-        t1_paths: list[str],
-        n2_paths: Optional[list[str]] = None,
-        t2_paths: Optional[list[str]] = None,
+        sample_names: List[str],
+        n1_paths: List[str],
+        t1_paths: List[str],
+        n2_paths: Optional[List[str]] = None,
+        t2_paths: Optional[List[str]] = None,
         prefix: str = "reads"
-    ) -> dict[str, dict[str, str]]:
+    ) -> Dict[str, Dict[str, str]]:
     """
     Case r2 are provided:
-    Build a dictionnary containing the following pairs:
+    Build a dictionary containing the following pairs:
     normal:
         original_r1_name: {prefix}/normal/{sample}.1.fq.gz
         original_r2_name: {prefix}/normal/{sample}.2.fq.gz
@@ -59,7 +60,7 @@ def link_fq_somatic(
         original_r2_name: {prefix}/tumor/{sample}.2.fq.gz
 
     Otherwise:
-    Build a dictionnary containing the following fastq:
+    Build a dictionary containing the following fastq:
     tumor:
         original_name: {prefix}/tumor/{sample}.fq.gz
     normal:
@@ -88,26 +89,16 @@ def link_fq_somatic(
     return link_dict
 
 
-def link_vcf(sample_names: list[str], files: list[str]) -> dict[str, str]:
-    """
-    Build a dictionnary linking a vcf path to its axpected path
-    """
-    return {
-        f"data_input/calls/{sample}.vcf.gz": file
-        for file, sample in zip(files, sample_names)
-    }
-
-
 def link_bed(design: pandas.DataFrame, bed: Optional[str] = None):
     """
-    Build a dictionnary linking a sample name to a capturekit bed.
+    Build a dictionary linking a sample name to a capture kit bed.
 
-    Since more than one capturekig may be used in a sequencing run,
+    Since more than one capture kit may be used in a sequencing run,
     this must be either implemented, or multiple instances of this
     pipelines are being run simultaneously: once per capture kit used.
 
     This is useless in a single-project single-captured analysis. So, yes,
-    useless for data analysts, but usefull for piREST and automated pipelines
+    useless for data analysts, but useful for piREST and automated pipelines
     """
     bed_to_sample_link = {}
     dataset_to_bed_path = {}
@@ -122,3 +113,20 @@ def link_bed(design: pandas.DataFrame, bed: Optional[str] = None):
             sample: bed for sample in design["Sample_id"]
         }
     return bed_to_sample_link
+
+
+def link_mapping(sample_names: List[str], files: List[str], ext: str) -> Dict[str, str]:
+    """
+    Build a dictionary linking a file path to its expected path
+    """
+    return {
+        f"data_input/{sample}.{ext}": file
+        for file, sample in zip(files, sample_names)
+    }
+
+
+link_bam = functools.partial(link_mapping, ext="bam")
+link_sam = functools.partial(link_mapping, ext="sam")
+link_cram = functools.partial(link_mapping, ext="cram")
+link_bai = functools.partial(link_mapping, ext="bam.bai")
+link_vcf = functools.partial(link_mapping, ext="vcf.gz")

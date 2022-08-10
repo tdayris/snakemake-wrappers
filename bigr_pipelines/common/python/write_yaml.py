@@ -4,18 +4,18 @@
 
 """
 This script contains functions to read and write yaml files from various object
-types in python. Depending on the needs in the upcomming pipelines.
+types in python. Depending on the needs in the upcoming pipelines.
 """
 
 import yaml
 
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, Dict, Union
 
 
-def write_yaml(output_yaml: Union[str, Path], data: dict[str, Any]) -> None:
+def write_yaml(output_yaml: Union[str, Path], data: Dict[str, Any]) -> None:
     """
-    Save given dictionnary as Yaml-formatted text file
+    Save given dictionary as Yaml-formatted text file
     """
     if isinstance(output_yaml, str):
         write_yaml_from_str(output_yaml, data)
@@ -23,25 +23,25 @@ def write_yaml(output_yaml: Union[str, Path], data: dict[str, Any]) -> None:
         write_yaml_from_path(output_yaml, data)
 
 
-def write_yaml_from_str(output_yaml: str, data: dict[str, Any]) -> None:
+def write_yaml_from_str(output_yaml: str, data: Dict[str, Any]) -> None:
     """
-    Save given dictionnary as Yaml-formatted text file,
+    Save given dictionary as Yaml-formatted text file,
     the output_yaml is a string.
     """
     with open(output_yaml, "w") as outyaml:
         yaml.dump(data, outyaml, default_flow_style=False)
 
 
-def write_yaml_from_path(output_yaml: Path, data: dict[str, Any]) -> None:
+def write_yaml_from_path(output_yaml: Path, data: Dict[str, Any]) -> None:
     """
-    Save given dictionnary as Yaml-formatted text file,
+    Save given dictionary as Yaml-formatted text file,
     the output_yaml is a Path
     """
     with output_yaml.open("w") as outyaml:
         yaml.dump(data, outyaml, default_flow_style=False)
 
 
-def read_yaml(yaml_path: Union[str, Path]) -> dict[str, Any]:
+def read_yaml(yaml_path: Union[str, Path]) -> Dict[str, Any]:
     res = {}
     if isinstance(yaml_path, str):
         yaml_path = Path(yaml_path)

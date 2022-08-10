@@ -1,20 +1,22 @@
 """
 ensembl VEP 87.0 refseq (on each normal VCF/TSV) : singularity run -B /mnt/beegfs:/mnt/beegfs /mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif vep -i {patient}_CTC_all.cutadapt.sorted.rmmarkdup.hc.snps.filtered.PASS.{sample1_normal}.vcf -o {patient}_CTC_all.cutadapt.sorted.rmmarkdup.hc.snps.filtered.PASS.{sample1_normal}.annotated.vcf --species homo_sapiens --assembly GRCh38 --cache --dir_cache /mnt/beegfs/database/bioinfo/vep/87/ --everything --offline --fasta /mnt/beegfs/database/bioinfo/vep/87/homo_sapiens/87_GRCh38/Homo_sapiens.GRCh38.dna.primary_assembly.fa --vcf --refseq
 """
+
+
 rule ensembl_vep:
     input:
-        vcf = "gatk/mutect2/{sample}.vcf",
-        cache = config["ref"]["vep"],
-        fasta = config["ref"]["fasta"]
+        vcf="gatk/mutect2/{sample}.vcf",
+        cache=config["ref"]["vep"],
+        fasta=config["ref"]["fasta"],
     output:
-        vcf = temp("vep/annotate/{sample}.vcf")
+        vcf=temp("vep/annotate/{sample}.vcf"),
     threads: 1
     resources:
-        mem_mb = lambda wildcards, attempt: attmpt * 1024 * 8,
-        time_min = lambda wildcards, attempt: attmpt * 55,
-        tmpdir = "tmp"
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
     log:
-        "logs/vep/{sample}.log"
+        "logs/vep/{sample}.log",
     params:
         "--species homo_sapiens "
         "--assembly GRCh38 "
@@ -22,7 +24,7 @@ rule ensembl_vep:
         "--everything "
         "--offline "
         "--vcf "
-        "--refseq "
+        "--refseq ",
     container:
         "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
     shell:
@@ -36,19 +38,19 @@ rule ensembl_vep:
 
 rule ensemblvep_hc:
     input:
-        cancer_genes = config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
-        vcfs = ["vep/annotate/{sample}.vcf"]
+        cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
+        vcfs=["vep/annotate/{sample}.vcf"],
     output:
-        vcf = temp("vep/hc/{sample}.vcf")
+        vcf=temp("vep/hc/{sample}.vcf"),
     threads: 1
     resources:
-        mem_mb = lambda wildcards, attempt: attempt * 1024 * 10,
-        time_min = lambda wildcards, attempt: attempt * 45,
-        tmpdir = "tmp"
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
     log:
-        "logs/vep_hc.log"
+        "logs/vep_hc.log",
     params:
-        organism = config.get("vep_db", "hg38"),
+        organism=config.get("vep_db", "hg38"),
     container:
         "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
     script:
@@ -57,19 +59,19 @@ rule ensemblvep_hc:
 
 rule ensemblvep_bcr:
     input:
-        cancer_genes = config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
-        vcfs = ["vep/hc/{sample}.vcf"]
+        cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
+        vcfs=["vep/hc/{sample}.vcf"],
     output:
-        vcf = temp("vep/mutect/{sample}.vcf")
+        vcf=temp("vep/mutect/{sample}.vcf"),
     threads: 1
     resources:
-        mem_mb = lambda wildcards, attempt: attempt * 1024 * 10,
-        time_min = lambda wildcards, attempt: attempt * 45,
-        tmpdir = "tmp"
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
     log:
-        "logs/vep_hc.log"
+        "logs/vep_hc.log",
     params:
-        organism = config.get("vep_db", "hg38"),
+        organism=config.get("vep_db", "hg38"),
     container:
         "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
     script:
@@ -78,19 +80,19 @@ rule ensemblvep_bcr:
 
 rule ensemblvep_bcr:
     input:
-        cancer_genes = config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
-        vcfs = ["vep/mutect/{sample}.vcf"]
+        cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
+        vcfs=["vep/mutect/{sample}.vcf"],
     output:
-        vcf = temp("vep/bcr/{sample}.vcf")
+        vcf=temp("vep/bcr/{sample}.vcf"),
     threads: 1
     resources:
-        mem_mb = lambda wildcards, attempt: attempt * 1024 * 10,
-        time_min = lambda wildcards, attempt: attempt * 45,
-        tmpdir = "tmp"
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
     log:
-        "logs/vep_hc.log"
+        "logs/vep_hc.log",
     params:
-        organism = config.get("vep_db", "hg38"),
+        organism=config.get("vep_db", "hg38"),
     container:
         "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
     script:

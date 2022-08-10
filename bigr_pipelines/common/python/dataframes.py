@@ -3,18 +3,18 @@
 
 
 """
-This file contains usefull functions for pandas dataframe managment
+This file contains useful functions for pandas data frame management
 """
 
 import itertools
 import pandas
 import logging
 
-from typing import Optional, Union
+from typing import Dict, List, Optional, Union
 
 def filter_df(df: pandas.DataFrame,
               colname: str,
-              levels: list[str]) -> pandas.DataFrame:
+              levels: List[str]) -> pandas.DataFrame:
     """
     Filter a dataframe given a column name and a list of levels to keep
     """
@@ -22,10 +22,10 @@ def filter_df(df: pandas.DataFrame,
 
 
 def yield_comps(complete_design: pandas.DataFrame,
-                aggregate: Optional[list[str]] = None,
-                remove: Optional[list[str]] = None,
-                contains: Optional[list[str]] = None) \
-                -> list[Union[pandas.DataFrame, list[str]]]:
+                aggregate: Optional[List[str]] = None,
+                remove: Optional[List[str]] = None,
+                contains: Optional[List[str]] = None) \
+                -> List[Union[pandas.DataFrame, List[str]]]:
     """
     Split a large design into simple ones and provide comparison information
     """
@@ -47,7 +47,7 @@ def yield_comps(complete_design: pandas.DataFrame,
         )
 
         if len(levels) <= 1:
-            # We need at least two levels to perfom a differential analysis
+            # We need at least two levels to perform a differential analysis
             continue
 
 
@@ -57,7 +57,7 @@ def yield_comps(complete_design: pandas.DataFrame,
             # levels and guess reference name.
             level, ref = sorted([l1, l2])
             for level, ref in [[l1, l2], [l2, l1]]:
-               # Building humand readable design name
+               # Building human readable design name
                # Edit:
                # All previous attempt to guess reference name failed. This is now
                # me, not guessing anymore and doing all possible comparisons
@@ -71,9 +71,9 @@ def yield_comps(complete_design: pandas.DataFrame,
 
 
 def yield_samples(complete_design: pandas.DataFrame,
-                  aggregate: Optional[list[str]] = None,
-                  remove: Optional[list[str]] = None) \
-                  -> list[Union[pandas.DataFrame, list[str]]]:
+                  aggregate: Optional[List[str]] = None,
+                  remove: Optional[List[str]] = None) \
+                  -> List[Union[pandas.DataFrame, List[str]]]:
     """
     Split a large design into simple ones and provide comparison information
     """
@@ -116,9 +116,9 @@ def yield_samples(complete_design: pandas.DataFrame,
 def relation_condition_sample(complete_design: pandas.DataFrame,
                               factor: str,
                               test: Optional[str] = None,
-                              ref: Optional[str] = None) -> dict[str, str]:
+                              ref: Optional[str] = None) -> Dict[str, str]:
     """
-    From a design dataframe and a factor name, return the list of samples
+    From a design data frame and a factor name, return the list of samples
     involved.
     """
     if (test is None) and (ref is None):

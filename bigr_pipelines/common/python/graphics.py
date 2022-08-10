@@ -9,16 +9,16 @@ This file contains functions relative to graphs and image formats
 import math
 import pandas
 
-from typing import Optional
+from typing import List, Optional
 
-def optimal_size(multiplier: int = 1) -> list[int]:
+def optimal_size(multiplier: int = 1) -> List[int]:
     """
     Return optimal width/height of a graph
     """
     return [1024 * multiplier, 768 * multiplier]
 
 
-def image_size_from_sample_number(sample_nb: Optional[int] = None) -> list[int]:
+def image_size_from_sample_number(sample_nb: Optional[int] = None) -> List[int]:
     """
     Return usual image size given a sample number
     """
@@ -28,7 +28,7 @@ def image_size_from_sample_number(sample_nb: Optional[int] = None) -> list[int]:
 def image_size_from_design(design: pandas.DataFrame,
                            factor: str,
                            test: str,
-                           ref: str) -> list[int]:
+                           ref: str) -> List[int]:
     """
     Return usual image size given a design and a comparison level
     """
