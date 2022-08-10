@@ -3,7 +3,7 @@ gatk 3.7 selectvariants (to separate each "normal" on independent VCFs) : java -
 """
 
 
-rule gatk_select_variants:
+rule gatk_select_variants_wbc:
     input:
         vcf="grep/baseline_wbc/{sample}.vcf",
         fasta=config["ref"]["fasta"],

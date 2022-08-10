@@ -79,7 +79,7 @@ rule gatk_genotype_gvcf:
 """
 
 
-rule gatk_select_variants:
+rule gatk_select_variants_baseline:
     input:
         gvcf="gatk/genotype_gvcf/baseline_wbc/{sample}.g.vcf.gz",
         fasta=config["ref"]["fasta"],
