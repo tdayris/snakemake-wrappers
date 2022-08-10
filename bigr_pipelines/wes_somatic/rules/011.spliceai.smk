@@ -8,7 +8,7 @@ rule splice_ai:
     threads: config.get("max_threads", 20)
     resources:
         mem_mb=get_8gb_per_attempt,
-        time_min=get_3h_per_attempt,
+        time_min=get_6h_per_attempt,
         tmpdir="tmp",
     retries: 1
     params:
