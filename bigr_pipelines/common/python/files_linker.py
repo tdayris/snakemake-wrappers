@@ -115,12 +115,12 @@ def link_bed(design: pandas.DataFrame, bed: Optional[str] = None):
     return bed_to_sample_link
 
 
-def link_mapping(sample_names: List[str], files: List[str], ext: str) -> Dict[str, str]:
+def link_mapping(sample_names: List[str], files: List[str], ext: str, prefix: str = "data_input/calls") -> Dict[str, str]:
     """
     Build a dictionary linking a file path to its expected path
     """
     return {
-        f"data_input/{sample}.{ext}": file
+        f"{prefix}/{sample}.{ext}": file
         for file, sample in zip(files, sample_names)
     }
 
