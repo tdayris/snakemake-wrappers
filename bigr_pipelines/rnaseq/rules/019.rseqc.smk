@@ -78,7 +78,9 @@ rule rseqc_gene_body_coverage:
         refgene=config["reference"]["refgene_model"],
     output:
         txt=temp("rseqc/gene_body_coverage/{maptype}/{sample}.geneBodyCoverage.txt"),
-        pdf=temp("rseqc/gene_body_coverage/{maptype}/{sample}.geneBodyCoverage.curves.pdf"),
+        pdf=temp(
+            "rseqc/gene_body_coverage/{maptype}/{sample}.geneBodyCoverage.curves.pdf"
+        ),
         r=temp("rseqc/gene_body_coverage/{maptype}/{sample}.geneBodyCoverage.r"),
     threads: 1
     resources:
