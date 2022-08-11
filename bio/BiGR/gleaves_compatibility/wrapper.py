@@ -9,7 +9,6 @@ import datetime
 import gzip
 import logging
 
-from scipy.stats import hypergeom as hg
 from typing import Any
 
 logging.basicConfig(
