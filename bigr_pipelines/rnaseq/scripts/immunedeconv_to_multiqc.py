@@ -95,7 +95,7 @@ def get_description(tool_name: str,
             "dataset composed of TCGA's {tumor}. "
         )
     
-    text += get_description(tool_name)
+    text += get_permissions(tool_name)
     return text
     
 
