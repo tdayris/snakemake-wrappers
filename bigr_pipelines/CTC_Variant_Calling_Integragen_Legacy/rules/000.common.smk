@@ -118,6 +118,15 @@ def get_ctc(wildcards):
     return link_sample_baseline[wildcards.sample]["ctc"]
 
 
+def get_trio(wildcards):
+    return {
+        "tumor": link_sample_baseline[wildcards.sample]["ctc"],
+        "wbc": link_sample_baseline[wildcards.sample]["wbc"],
+        "normal": link_sample_baseline[wildcards.sample]["baseline"],
+        "fasta": config["ref"]["fasta"],
+    }
+
+
 bam_links = link_bam(
     sample_names=design.Sample_id, files=design.Upstream_file, prefix="data_input"
 )

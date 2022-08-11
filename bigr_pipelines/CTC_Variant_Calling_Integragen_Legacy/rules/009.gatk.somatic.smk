@@ -5,10 +5,7 @@ mutect 2.0 : java -Xmx8g -jar GenomeAnalysisTK.jar -T MuTect2 -I:tumor {sample_t
 
 rule mutect2:
     input:
-        tumor="sambamba/markdup/{sample}.tumor.bam",
-        normal="sambamba/markdup/{sample}.baseline.bam",
-        wbc="sambamba/markdup/{sample}.wbc.bam",
-        fasta=config["ref"]["fasta"],
+        unpack(get_trio)
     output:
         "gatk/mutect2/{sample}.vcf.gz",
     threads: 1

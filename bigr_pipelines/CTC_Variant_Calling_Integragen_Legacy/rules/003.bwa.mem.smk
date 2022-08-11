@@ -37,7 +37,7 @@ bwa 0.7.15-r1140 : bwa mem -R '@rg\tID:GRCh38\tSM:{sample}\tPL:Illumina' -t {thr
 
 rule bwa_mem:
     input:
-        fq="cutadapt/{sample}.fastq",
+        fq="cutadapt/{sample}.{status}.fastq",
         index=config.get(
             "bwa_index",
             multiext(
@@ -50,7 +50,7 @@ rule bwa_mem:
             ),
         ),
     output:
-        temp("bwa/mem/{sample}.sam"),
+        temp("bwa/mem/{sample}.{status}.sam"),
     threads: 20
     resources:
         mem_mb=get_75gb_and_2gb_per_attempt,
@@ -59,7 +59,7 @@ rule bwa_mem:
     envmodules:
         "bwa/0.7.15",
     log:
-        "logs/bwa/mem/{sample}.log",
+        "logs/bwa/mem/{sample}.{status}.log",
     params:
         " -R '@rg\tID:GRCh38\tSM:{sample}\tPL:Illumina'",
     shell:

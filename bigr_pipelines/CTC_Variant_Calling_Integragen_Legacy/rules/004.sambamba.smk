@@ -5,9 +5,9 @@ sambamba view 0.6.5 : sambamba view -S -h -f bam -t {threads} -o {sample}.cutada
 
 rule sambamba_view:
     input:
-        "bwa/mem/{sample}.sam",
+        "bwa/mem/{sample}.{status}.sam",
     output:
-        temp("sambamba/bam/{sample}.bam"),
+        temp("sambamba/bam/{sample}.{status}.bam"),
     threads: 10
     resources:
         mem_mb=get_8gb_per_attempt,
@@ -18,7 +18,7 @@ rule sambamba_view:
     params:
         "-S -h -f bam",
     log:
-        "sambamba/view/{sample}.log",
+        "sambamba/view/{sample}.{status}.log",
     shell:
         "sambamba view {params} -t {threads} -o {output} {input} > {log} 2>&1"
 
@@ -30,9 +30,9 @@ sambamba sort 0.6.5 : sambamba sort -t {threads} -o {sample}.cutadapt.sorted.bam
 
 rule sambamba_sort:
     input:
-        "sambamba/bam/{sample}.bam",
+        "sambamba/bam/{sample}.{status}.bam",
     output:
-        temp("sambamba/sort/{sample}.bam"),
+        temp("sambamba/sort/{sample}.{status}.bam"),
     threads: 4
     resources:
         time_min=get_45min_per_attempt,
@@ -43,7 +43,7 @@ rule sambamba_sort:
     params:
         "",
     log:
-        "logs/sambamba/sort/{sample}.log",
+        "logs/sambamba/sort/{sample}.{status}.log",
     shell:
         "sambamba sort {params} -t {threads} -o {output} {input} > {log} 2>&1"
 
@@ -55,9 +55,9 @@ sambamba markdup 0.6.5 (optional) : sambamba markdup -r -t {threads} {sample}.cu
 
 rule sambamba_markdup:
     input:
-        "sambamba/sort/{sample}.bam",
+        "sambamba/sort/{sample}.{status}.bam",
     output:
-        "sambamba/markdup/{sample}.bam",
+        "sambamba/markdup/{sample}.{status}.bam",
     threads: 10
     resources:
         time_min=lambda wildcards, attempt: attempt * 45,
@@ -68,6 +68,6 @@ rule sambamba_markdup:
     params:
         "-r",
     log:
-        "logs/sambamba/markdup/{sample}.log",
+        "logs/sambamba/markdup/{sample}.{status}.log",
     shell:
         "sambamba markdup {params} -t {threads} {input} {output} > {log} 2>&1"

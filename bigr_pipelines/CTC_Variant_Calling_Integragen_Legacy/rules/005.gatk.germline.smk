@@ -5,11 +5,11 @@ gatk 3.7 haplotypecaller (on each normal sample) : java -Xmx8g -jar GenomeAnalys
 
 rule gatk_haplotype_caller:
     input:
-        bam="sambamba/markdup/{sample}.bam",
+        bam="sambamba/markdup/{sample}.{status}.bam",
         fasta=config["ref"]["fasta"],
     output:
-        vcf=temp("gatk/haplotypecaller/{sample}.g.vcf.gz"),
-        bam="gatk/haplotypecaller/{sample}.baseline.bam",
+        vcf=temp("gatk/haplotypecaller/{sample}.{status}.g.vcf.gz"),
+        bam="gatk/haplotypecaller/{sample}.{status}.bam",
     threads: 1
     resources:
         mem_mb=get_20gb_per_attempt,
@@ -19,7 +19,7 @@ rule gatk_haplotype_caller:
     group:
         "baseline_wbc_calling"
     log:
-        "logs/haplotypecaller/{sample}.log",
+        "logs/haplotypecaller/{sample}.{status}.log",
     params:
         "-ERC GVCF",
     conda:

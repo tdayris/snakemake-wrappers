@@ -5,9 +5,9 @@ cutadapt (v1.14) : cutadapt -a ACTGACAGCAGGAATCCCACT -g AGTGGGATTCCTGCTGTCAGT -n
 
 rule cutadapt:
     input:
-        "fastq/{sample}.fastq",
+        "fastq/{sample}.{status}.fastq",
     output:
-        temp("cutadapt/{sample}.fastq"),
+        temp("cutadapt/{sample}.{status}.fastq"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -20,6 +20,6 @@ rule cutadapt:
     params:
         "-a ACTGACAGCAGGAATCCCACT -g AGTGGGATTCCTGCTGTCAGT -n 2 -e 0.2",
     log:
-        "logs/cutadapt/{sample}.log",
+        "logs/cutadapt/{sample}.{status}.log",
     shell:
         "cutadapt {params} -o {output} {input} > {log} 2>&1"

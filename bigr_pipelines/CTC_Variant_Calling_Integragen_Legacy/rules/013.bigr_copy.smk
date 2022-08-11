@@ -16,6 +16,6 @@ rule bigr_copy:
     params:
         input=lambda wildcards, output: bam_links[output[0]],
     log:
-        "logs/bigr_copy/{sample}.log",
+        "logs/bigr_copy/{sample}.{status}.log",
     wrapper:
         "bio/BiGR/copy"
