@@ -131,6 +131,11 @@ def get_trio(wildcards):
 
 
 link_bams, sample_list, link_sample_baseline = parse_design(design.copy())
+
+sample_baseline_table = pandas.DataFrame(link_sample_baseline)
+sample_baseline_table.set_index(['baseline', "wbc"], inplace=True)
+logging.info(f"First 20 lines of fastq correspondancies: \n{sample_baseline_table.head(20)}")
+
 replicate_list = list(set(design["Replicate"]))
 version_list = list(set(design["Version"]))
 manip_list = list(set(design["Manip"]))
