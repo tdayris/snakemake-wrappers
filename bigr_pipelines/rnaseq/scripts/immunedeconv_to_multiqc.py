@@ -128,7 +128,7 @@ def build_config(tool_name: str,
             "title": f"Call-type deconvolution with {tool_name}",
             "ylab": get_ylab(tool_name=tool_name),
         },
-        "data": {data}
+        "data": data
     }
     logging.debug(config)
     return config
