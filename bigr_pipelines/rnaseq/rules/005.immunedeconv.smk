@@ -6,7 +6,7 @@ This snakefile contains all rules related to immunedeconv
 # Subset salmon original TPM counts to fulfill immenedeconv requirements
 rule subset_gene_counts:
     input:
-        table="salmon/TPM.genes.tsv",
+        table="data_output/Quantification/TPM.genes.tsv",
     output:
         table=temp("immunedeconv/TPM.tsv"),
     message:
