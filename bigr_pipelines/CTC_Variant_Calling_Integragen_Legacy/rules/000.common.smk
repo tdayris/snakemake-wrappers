@@ -81,14 +81,14 @@ def parse_design(
 
     while row is not None:
         if row["Status"].lower() == "baseline":
-            result[f"{prefix}/{sample}.baseline.{suffix}"] = bam
+            result[f"{prefix}/{sample}.baseline.{suffix}"] = row["bam"]
 
         elif row["Status"].lower() == "wbc":
             manip = row["Manip"]
             kit = row["Version"]
             sample_id = f"{sample}_V{kit}_M{manip}"
 
-            result[f"{prefix}/{sample_id}.wbc.{suffix}"] = bam
+            result[f"{prefix}/{sample_id}.wbc.{suffix}"] = row["bam"]
 
         elif row["Status"].lower() == "ctc":
             manip = row["Manip"]
@@ -98,7 +98,7 @@ def parse_design(
             sample_id = f"{raw_sample_id}_{replicate}"
 
             sample_list.append(sample_id)
-            result[f"{prefix}/{sample_id}.ctc.{suffix}"] = bam
+            result[f"{prefix}/{sample_id}.ctc.{suffix}"] = row["bam"]
             link_sample_baseline[sample_id] = {
                 "ctc": f"{prefix}/{sample_id}.ctc.{suffix}",
                 "wbc": f"{prefix}/{raw_sample_id}.wbc.{suffix}",
