@@ -5,7 +5,7 @@ mutect 2.0 : java -Xmx8g -jar GenomeAnalysisTK.jar -T MuTect2 -I:tumor {sample_t
 
 rule mutect2:
     input:
-        unpack(get_trio)
+        unpack(get_trio),
     output:
         "gatk/mutect2/{sample}.vcf.gz",
     threads: 1
