@@ -77,7 +77,7 @@ def parse_design(
     sample_list = []
     link_sample_baseline = {}
 
-    row = next(design.iterrows()[1], None)
+    row = next(design.iterrows(), None)[1]
 
     while row is not None:
         if row["Status"].lower() == "baseline":
