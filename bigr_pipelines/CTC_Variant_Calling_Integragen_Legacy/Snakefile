@@ -12,15 +12,8 @@ include: "rules/010.bam_readcount.smk"
 include: "rules/011.bcr2vep.smk"
 
 
-import pandas
-
-
-configfile: "config.yaml"
-
-
-design = pandas.read_csv(config["design"], sep="\t", header=0)
-
-
 rule target:
     input:
-        expand("gatk/mutect2/{sample}.vcf.gz", sample=design["Sample_id"]),
+        raw=expand("gatk/mutect2/{sample}.vcf.gz", sample=sample_list),
+        annotated=expand("vep/bcr/{sample}.vcf", sample=sample_list),
+

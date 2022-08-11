@@ -85,14 +85,14 @@ def parse_design(
 
         elif row["Status"].lower() == "wbc":
             manip = row["Manip"]
-            kit = row["kit_version"]
+            kit = row["Version"]
             sample_id = f"{sample}_V{kit}_M{manip}"
 
             result[f"{prefix}/{sample_id}.wbc.{suffix}"] = bam
 
         elif row["Status"].lower() == "ctc":
             manip = row["Manip"]
-            kit = row["kit_version"]
+            kit = row["Version"]
             replicate = row["Replicate"]
             raw_sample_id = f"{sample}_V{kit}_M{manip}"
             sample_id = f"{raw_sample_id}_{replicate}"
@@ -104,6 +104,8 @@ def parse_design(
                 "wbc": f"{prefix}/{raw_sample_id}.wbc.{suffix}",
                 "baseline": f"{prefix}/{sample}.baseline.{suffix}",
             }
+
+    return link_bams, sample_list, link_sample_baseline
 
 
 def get_baseline(wildcards):
@@ -127,12 +129,13 @@ def get_trio(wildcards):
     }
 
 
-bam_links = link_bam(
-    sample_names=design.Sample_id, files=design.Upstream_file, prefix="data_input"
-)
-
-samples_list = design["Sample_id"].tolist()
+link_bams, sample_list, link_sample_baseline = parse_design(design.copy())
+replicate_list = list(set(design["Replicate"]))
+version_list = list(set(design["Version"]))
+manip_list = list(set(design["Manip"]))
+status_list = list(set(design["Status"]))
 
 
 wildcard_constraints:
     sample=r"|".join(samples_list),
+    status=r"|".join(status_list),
