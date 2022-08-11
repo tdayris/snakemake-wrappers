@@ -36,10 +36,10 @@ rule immunedeconv_xcell:
     input:
         expr_mat="immunedeconv/TPM.tsv",
     output:
-        histogram="data_output/xcell/celltypes.hist.png",
-        dotplot="data_output/xcell/celltypes.dotplot.png",
-        tsv="xcell/celltypes.tsv",
-        rds="xcell/celltypes.RDS",
+        histogram=protected("data_output/xcell/celltypes.hist.png"),
+        dotplot=protected("data_output/xcell/celltypes.dotplot.png"),
+        tsv=temp("xcell/celltypes.tsv"),
+        rds=temp("xcell/celltypes.RDS"),
         plotdir=directory("data_output/xcell/celltypes.dotplots"),
     threads: 1
     resources:
@@ -60,10 +60,10 @@ rule immunedeconv_quantiseq:
     input:
         expr_mat="immunedeconv/TPM.tsv",
     output:
-        histogram="data_output/quantiseq/celltypes.hist.png",
-        dotplot="data_output/quantiseq/celltypes.dotplot.png",
-        tsv="quantiseq/celltypes.tsv",
-        rds="quantiseq/celltypes.RDS",
+        histogram=protected("data_output/quantiseq/celltypes.hist.png"),
+        dotplot=protected("data_output/quantiseq/celltypes.dotplot.png"),
+        tsv=temp("quantiseq/celltypes.tsv"),
+        rds=temp("quantiseq/celltypes.RDS"),
         plotdir=directory("data_output/quantiseq/celltypes.dotplots"),
     threads: 1
     resources:
@@ -84,10 +84,10 @@ rule immunedeconv_epic:
     input:
         expr_mat="immunedeconv/TPM.tsv",
     output:
-        histogram="data_output/epic/celltypes.hist.png",
-        dotplot="data_output/epic/celltypes.dotplot.png",
-        tsv="epic/celltypes.tsv",
-        rds="epic/celltypes.RDS",
+        histogram=protected("data_output/epic/celltypes.hist.png"),
+        dotplot=protected("data_output/epic/celltypes.dotplot.png"),
+        tsv=temp("epic/celltypes.tsv"),
+        rds=temp("epic/celltypes.RDS"),
         plotdir=directory("data_output/epic/celltypes.dotplots"),
     threads: 1
     resources:
@@ -108,10 +108,10 @@ rule mcpcounter:
     input:
         expr_mat="immunedeconv/TPM.tsv",
     output:
-        histogram="data_output/mcp_counter/celltypes.hist.png",
-        dotplot="data_output/mcp_counter/celltypes.dotplot.png",
-        tsv="mcp_counter/celltypes.tsv",
-        rds="mcp_counter/celltypes.RDS",
+        histogram=protected("data_output/mcp_counter/celltypes.hist.png"),
+        dotplot=protected("data_output/mcp_counter/celltypes.dotplot.png"),
+        tsv=temp("mcp_counter/celltypes.tsv"),
+        rds=temp("mcp_counter/celltypes.RDS"),
         plotdir=directory("data_output/mcp_counter/celltypes.dotplots"),
     threads: 1
     resources:
@@ -133,10 +133,10 @@ rule cibersort_abs:
         cibersort_binary="CIBERSORT.R",
         cibersort_mat="LM22.txt",
     output:
-        histogram="data_output/cibersort_abs/celltypes.hist.png",
-        dotplot="data_output/cibersort_abs/celltypes.dotplot.png",
-        tsv="cibersort_abs/celltypes.tsv",
-        rds="cibersort_abs/celltypes.RDS",
+        histogram=protected("data_output/cibersort_abs/celltypes.hist.png"),
+        dotplot=protected("data_output/cibersort_abs/celltypes.dotplot.png"),
+        tsv=temp("cibersort_abs/celltypes.tsv"),
+        rds=temp("cibersort_abs/celltypes.RDS"),
         plotdir=directory("data_output/cibersort_abs/celltypes.dotplots"),
     threads: 1
     resources:
@@ -159,10 +159,10 @@ rule cibersort:
         cibersort_binary="CIBERSORT.R",
         cibersort_mat="LM22.txt",
     output:
-        histogram="data_output/cibersort/celltypes.hist.png",
-        dotplot="data_output/cibersort/celltypes.dotplot.png",
-        tsv="cibersort/celltypes.tsv",
-        rds="cibersort/celltypes.RDS",
+        histogram=protected("data_output/cibersort/celltypes.hist.png"),
+        dotplot=protected("data_output/cibersort/celltypes.dotplot.png"),
+        tsv=temp("cibersort/celltypes.tsv"),
+        rds=temp("cibersort/celltypes.RDS"),
         plotdir=directory("data_output/cibersort/celltypes.dotplots"),
     threads: 1
     resources:

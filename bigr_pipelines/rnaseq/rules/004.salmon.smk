@@ -7,9 +7,13 @@ rule salmon_quant:
         index=ancient(config["salmon"]["index"]),
         gtf=ancient(config["reference"]["gtf"]),
     output:
-        quant="salmon/pseudo_mapping/{sample}/quant.sf",
-        quant_genes="salmon/pseudo_mapping/{sample}/quant.genes.sf",
-        lib="salmon/pseudo_mapping/{sample}/lib_format_counts.json",
+        quant=temp("salmon/pseudo_mapping/{sample}/quant.sf"),
+        quant_genes=temp("salmon/pseudo_mapping/{sample}/quant.genes.sf"),
+        lib=temp("salmon/pseudo_mapping/{sample}/lib_format_counts.json"),
+        aux_info=temp(directory("salmon/pseudo_mapping/{sample}/aux_info")),
+        cmd_info=temp("salmon/pseudo_mapping/{sample}/cmd_info.json"),
+        libparams=temp(directory("salmon/pseudo_mapping/{sample}/libParams")),
+        logs=temp(directory("salmon/pseudo_mapping/{sample}/logs")),
     threads: config.get("max_threads", 20)
     resources:
         time_min=get_45min_per_attempt,

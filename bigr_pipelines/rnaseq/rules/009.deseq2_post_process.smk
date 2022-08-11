@@ -56,7 +56,7 @@ rule rbt_csv_report:
     input:
         "data_output/DEseq2/{comparison}/{content}_{comparison}.tsv",
     output:
-        directory("rbt/csvreport/{comparison}/{content}_html_table/"),
+        temp(directory("rbt/csvreport/{comparison}/{content}_html_table/")),
     message:
         "Making DESeq2 results readable and searchable"
     threads: 1
@@ -83,7 +83,7 @@ rule zip_csv_report:
     input:
         "rbt/csvreport/{comparison}/{content}_html_table/",
     output:
-        "data_output/DEseq2/{comparison}/{content}_html_table.tar.bz2",
+        protected("data_output/DEseq2/{comparison}/{content}_html_table.tar.bz2"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
@@ -200,8 +200,8 @@ rule plot_deseq_genes:
         metadata="deseq2/{comparison}/metadata.{comparison}.tsv",
         filter_theta="deseq2/{comparison}/filter.theta.{comparison}.tsv",
     output:
-        log_counts="figures/{comparison}/log_counts/log_dst.{comparison}.png",
-        log_mu="figures/{comparison}/log_counts/log_mu.{comparison}.png",
+        log_counts=temp("figures/{comparison}/log_counts/log_dst.{comparison}.png"),
+        log_mu=temp("figures/{comparison}/log_counts/log_mu.{comparison}.png"),
         gene_plots=report(
             expand(
                 "data_output/DEseq2/{comparison}/gene_plots/{gene}.png",
@@ -214,9 +214,9 @@ rule plot_deseq_genes:
             ),
             subcategory="{comparison}",
         ),
-        independent_filtering="figures/{comparison}/deseq2/independent_filter.{comparison}.png",
-        pval="figures/{comparison}/deseq2/pval.{comparison}.png",
-        filter_theta="figures/{comparison}/deseq2/theta.{comparison}.png",
+        independent_filtering=temp("figures/{comparison}/deseq2/independent_filter.{comparison}.png"),
+        pval=temp("figures/{comparison}/deseq2/pval.{comparison}.png"),
+        filter_theta=temp("figures/{comparison}/deseq2/theta.{comparison}.png"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
@@ -247,7 +247,7 @@ rule seaborn_clustermap_sample:
     input:
         counts="deseq2/{comparison}/dst.{comparison}.tsv",
     output:
-        png="figures/{comparison}/clustermap/ClusteredHeatmap.samples.{comparison}.png",
+        png=temp("figures/{comparison}/clustermap/ClusteredHeatmap.samples.{comparison}.png"),
     message:
         "Plotting sample-clustered heatmap for {wildcards.comparison}"
     threads: 1
@@ -282,7 +282,7 @@ rule enhancedvolcano_volcanoplot:
     input:
         deseq2_tsv="deseq2/{comparison}/wald.{comparison}.tsv",
     output:
-        png="figures/{comparison}/volcano/Volcano.{comparison}.png",
+        png=temp("figures/{comparison}/volcano/Volcano.{comparison}.png"),
     message:
         "Plotting Volcanoplot for {wildcards.comparison}"
     threads: 1
@@ -312,7 +312,7 @@ rule deseq2_maplot:
     input:
         res="deseq2/{comparison}/wald.{comparison}.tsv",
     output:
-        png="figures/{comparison}/maplot/maplot.{comparison}.png",
+        png=temp("figures/{comparison}/maplot/maplot.{comparison}.png"),
     message:
         "Building MA-plot for {wildcards.comparison}"
     threads: 1
@@ -340,7 +340,7 @@ rule pcaexplorer_pca:
     input:
         dst="deseq2/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/wald.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.RDS",
     output:
-        png="figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca/pca_{factor}_ax_{a}_ax_{b}_{elipse}.png",
+        png=temp("figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca/pca_{factor}_ax_{a}_ax_{b}_{elipse}.png"),
     message:
         "Plotting PCA for ({wildcards.factor}:"
         "{wildcards.a}/{wildcards.b}:{wildcards.elipse})"
@@ -371,7 +371,7 @@ rule pca_explorer_distro_expr:
     input:
         dst="deseq2/{comparison}/wald.{comparison}.RDS",
     output:
-        png="figures/{comparison}/distro_expr/distro_expr.{comparison}.png",
+        png=temp("figures/{comparison}/distro_expr/distro_expr.{comparison}.png"),
     message:
         "Plotting expression distributions for {wildcards.comparison}"
     threads: 1

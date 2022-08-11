@@ -17,8 +17,8 @@ rule fastp_clean:
                 allow_missing=True,
             )
         ),
-        html="fastp/html/{sample}.fastp.html",
-        json="fastp/json/{sample}.fastp.json",
+        html=temp("fastp/html/{sample}.fastp.html"),
+        json=temp("fastp/json/{sample}.fastp.json"),
     threads: min(config.get("max_threads", 5), 5)
     resources:
         mem_mb=get_4gb_per_attempt,

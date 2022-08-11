@@ -10,6 +10,30 @@ rule tximport:
             "salmon/pseudo_mapping/{sample}/quant.sf",
             sample=samples_per_prefixes[wildcards.comparison],
         ),
+        quant_genes=lambda wildcards: expand(
+            "salmon/pseudo_mapping/{sample}/quant.genes.sf",
+            sample=samples_per_prefixes[wildcards.comparison],
+        ),
+        lib=lambda wilcards: expand(
+            "salmon/pseudo_mapping/{sample}/lib_format_counts.json",
+            sample=samples_per_prefixes[wildcards.comparison],
+        ),
+        aux_info=lambda wildcards: expand(
+            "salmon/pseudo_mapping/{sample}/aux_info"),
+            sample=samples_per_prefixes[wildcards.comparison],
+        ),
+        cmd_info=lambda wildcards: expand(
+            "salmon/pseudo_mapping/{sample}/cmd_info.json",
+            sample=samples_per_prefixes[wildcards.comparison],
+        ),
+        libparams=lambda wildcards: expand(
+            "salmon/pseudo_mapping/{sample}/libParams",
+            sample=samples_per_prefixes[wildcards.comparison],
+        ),
+        logs=lambda wildcards: expand(
+            "salmon/pseudo_mapping/{sample}/logs",
+            sample=samples_per_prefixes[wildcards.comparison],
+        ),
         tx_to_gene="salmon/tx2gene_small.tsv",
     output:
         txi=temp("tximport/txi.{comparison}.RDS"),

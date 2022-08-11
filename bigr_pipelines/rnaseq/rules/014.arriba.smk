@@ -7,8 +7,8 @@ rule arriba:
         annotation=config["reference"]["gtf"],
         blacklist=config["arriba"]["blacklist"],
     output:
-        fusions="results/arriba/{sample}.fusions.tsv",
-        discarded="results/arriva/{sample}.fusions.discarded.tsv",
+        fusions=protected("data_output/arriba/{sample}.fusions.tsv"),
+        discarded=temp("results/arriva/{sample}.fusions.discarded.tsv"),
     threads: 1
     resources:
         mem_mb=get_20gb_per_attempt,
