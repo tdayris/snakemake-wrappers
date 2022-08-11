@@ -19,7 +19,7 @@ rule tximport:
             sample=samples_per_prefixes[wildcards.comparison],
         ),
         aux_info=lambda wildcards: expand(
-            "salmon/pseudo_mapping/{sample}/aux_info"),
+            "salmon/pseudo_mapping/{sample}/aux_info",
             sample=samples_per_prefixes[wildcards.comparison],
         ),
         cmd_info=lambda wildcards: expand(
