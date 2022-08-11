@@ -80,6 +80,7 @@ def parse_design(
     row = next(design.iterrows(), None)[1]
 
     while row is not None:
+        sample = row["Sample_id"]
         if row["Status"].lower() == "baseline":
             result[f"{prefix}/{sample}.baseline.{suffix}"] = row["bam"]
 
