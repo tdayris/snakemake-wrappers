@@ -145,6 +145,8 @@ def get_trio(wildcards):
 link_bams, sample_list, link_sample_baseline = parse_design(design.copy())
 
 sample_baseline_table = pandas.DataFrame(link_sample_baseline)
+logging.debug(sample_baseline_table.head())
+logging.debug(sample_baseline_table.columns)
 sample_baseline_table.set_index(["baseline", "wbc"], inplace=True)
 logging.info(
     f"First 20 lines of fastq correspondancies: \n{sample_baseline_table.head(20)}"
