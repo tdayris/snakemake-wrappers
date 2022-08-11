@@ -142,8 +142,8 @@ rule additional_headers_mistic:
 
 rule vcftools_annotate_mistic:
     input:
-        vcf="snpsift/gwascat/{sample}.vcf.gz",
-        vcf_tbi="snpsift/gwascat/{sample}.vcf.gz.tbi",
+        vcf="snpsift/exac/{sample}.vcf.gz",
+        vcf_tbi="snpsift/exac/{sample}.vcf.gz.tbi",
         annotation=config["reference"]["mistic"],
         description="mistic/description.txt",
     output:
