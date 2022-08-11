@@ -23,7 +23,7 @@ rule samtools_stats_raw:
 
 rule samtools_stats_cleaned:
     input:
-        bam="sambamba/markdup/{sample}_{status}.bam",
+        aln="sambamba/markdup/{sample}_{status}.bam",
         bai="sambamba/markdup/{sample}_{status}.bam.bai",
         ref=config["reference"]["fasta"],
         ref_idx=config["reference"]["fasta_index"],
@@ -46,7 +46,7 @@ rule samtools_stats_cleaned:
 
 rule samtools_stats_fusions:
     input:
-        bam="star/chimera/{sample}_{status}.bam",
+        aln="star/chimera/{sample}_{status}.bam",
         bai="star/chimera/{sample}_{status}.bam.bai",
         ref=config["reference"]["fasta"],
         ref_idx=config["reference"]["fasta_index"],
