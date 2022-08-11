@@ -80,7 +80,7 @@ def parse_design(
 
     row = next(design.iterrows(), None)[1]
 
-    while row is not None:
+    while row:
         sample = row["Sample_id"]
         if row["Status"].lower() == "baseline":
             link_bams[f"{prefix}/{sample}.baseline.{suffix}"] = row["bam"]
@@ -89,7 +89,7 @@ def parse_design(
         elif row["Status"].lower() == "wbc":
             manip = row["Manip"]
             kit = row["Version"]
-            sample_id = f"{sample}_V{kit}_M{manip}"
+            sample_id = f"{sample}_{kit}_M{manip}"
 
             link_bams[f"{prefix}/{sample_id}.wbc.{suffix}"] = row["bam"]
             logging.debug(f"New WBC added for {sample_id} precisely, all replicates concerned.")
@@ -110,6 +110,8 @@ def parse_design(
                 "baseline": f"{prefix}/{sample}.baseline.{suffix}",
             }
             logging.debug(f"New CTC added {raw_sample_id}, replicate number {replicate}.")
+        
+        row = next(design.iterrows(), None)[1]
 
     return link_bams, sample_list, link_sample_baseline
 
