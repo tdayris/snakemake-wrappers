@@ -65,19 +65,19 @@ def get_permissions(tool_name: str) -> str:
 
     if tool_name.lower() in between_samples:
         text = (
-            "{tool_name} method allows between-sample comparisons only, "
+            f"{tool_name} method allows between-sample comparisons only, "
             "not between-cell-types."
         )
 
     if tool_name.lower() in between_cell_types:
         text = (
-            "{tool_name} method allows between-cell-type comparisons, "
+            f"{tool_name} method allows between-cell-type comparisons, "
             "not between-sample."
         )
 
     if tool_name.lower() in both:
         text = (
-            "{tool_name} method allows both between-sample "
+            f"{tool_name} method allows both between-sample "
             "and between-cell-type comparisons."
         )
 
@@ -101,7 +101,7 @@ def get_description(tool_name: str,
     if tumor:
         text += (
             "It was performed against a known "
-            "dataset composed of TCGA's {tumor}. "
+            f"dataset composed of TCGA's {tumor}. "
         )
     
     text += get_permissions(tool_name)
@@ -117,6 +117,8 @@ def build_config(tool_name: str,
     return a custom config section
     """
     logging.info("Building config")
+    data = read_immunedeconv(path=deconv_path).to_dict()
+    logging.debug(data)
     config = {
         "id": tool_name,
         "description": get_description(tool_name=tool_name, tumor=tumor),
@@ -126,9 +128,7 @@ def build_config(tool_name: str,
             "title": f"Call-type deconvolution with {tool_name}",
             "ylab": get_ylab(tool_name=tool_name),
         },
-        "data": {
-            read_immunedeconv(path=deconv_path).to_dict()
-        }
+        "data": {data}
     }
     logging.debug(config)
     return config
@@ -191,9 +191,11 @@ multiqc_config = {
 }
 
 for deconv_result in snakemake.input:
+    logging.debug(deconv_result)
 
     if deconv_result.startswith(prefix):
         names = deconv_result[len(prefix):-len(suffix)]
+
     tool_name, tumor = names.split("/")
     logging.info(f"Tool name: {tool_name}")
     logging.info(f"Tumor abbrv: {tumor}")
