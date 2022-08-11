@@ -73,6 +73,7 @@ def parse_design(
     design: pandas.DataFrame, prefix: str = "data_input", suffix: str = "bam"
 ) -> dict[str, str]:
 
+    logging.info("Parsing design...")
     link_bams = {}
     sample_list = []
     link_sample_baseline = {}
@@ -83,6 +84,7 @@ def parse_design(
         sample = row["Sample_id"]
         if row["Status"].lower() == "baseline":
             link_bams[f"{prefix}/{sample}.baseline.{suffix}"] = row["bam"]
+            logging.debug(f"New baseline added for {sample} in general")
 
         elif row["Status"].lower() == "wbc":
             manip = row["Manip"]
@@ -90,6 +92,7 @@ def parse_design(
             sample_id = f"{sample}_V{kit}_M{manip}"
 
             link_bams[f"{prefix}/{sample_id}.wbc.{suffix}"] = row["bam"]
+            logging.debug(f"New WBC added for {sample_id} precisely, all replicates concerned.")
 
         elif row["Status"].lower() == "ctc":
             manip = row["Manip"]
@@ -98,6 +101,7 @@ def parse_design(
             raw_sample_id = f"{sample}_V{kit}_M{manip}"
             sample_id = f"{raw_sample_id}_{replicate}"
 
+
             sample_list.append(sample_id)
             link_bams[f"{prefix}/{sample_id}.ctc.{suffix}"] = row["bam"]
             link_sample_baseline[sample_id] = {
@@ -105,6 +109,7 @@ def parse_design(
                 "wbc": f"{prefix}/{raw_sample_id}.wbc.{suffix}",
                 "baseline": f"{prefix}/{sample}.baseline.{suffix}",
             }
+            logging.debug(f"New CTC added {raw_sample_id}, replicate number {replicate}.")
 
     return link_bams, sample_list, link_sample_baseline
 
