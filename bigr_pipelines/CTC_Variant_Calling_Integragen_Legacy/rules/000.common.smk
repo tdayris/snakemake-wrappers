@@ -78,10 +78,11 @@ def parse_design(
     sample_list = []
     link_sample_baseline = {}
 
-    row_iter = next(design.iterrows(), None)[1]
-    row = row_iter
+    rowiter = iter(design.iterrows())
+    row = next(row_iter, None)
 
     while row is not None:
+        row = row[1]
         sample = row["Sample_id"]
         if row["Status"].lower() == "baseline":
             link_bams[f"{prefix}/{sample}.baseline.{suffix}"] = row["bam"]
@@ -112,7 +113,7 @@ def parse_design(
             }
             logging.debug(f"New CTC added {raw_sample_id}, replicate number {replicate}.")
         
-        row = next(row_iter, None)[1]
+        row = next(row_iter, None)
 
     return link_bams, sample_list, link_sample_baseline
 
