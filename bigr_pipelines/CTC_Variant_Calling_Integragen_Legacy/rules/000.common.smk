@@ -78,7 +78,7 @@ def parse_design(
     sample_list = []
     link_sample_baseline = {}
 
-    rowiter = iter(design.iterrows())
+    row_iter = iter(design.iterrows())
     row = next(row_iter, None)
 
     while row is not None:
