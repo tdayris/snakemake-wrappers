@@ -68,9 +68,10 @@ logging.info("Design file loaded")
 # this is done in order to handle iRODS paths.
 logging.info("Building globals...")
 
-def parse_design(design: pandas.DataFrame, 
-                 prefix: str = "data_input",
-                 suffix: str = "bam") -> dict[str, str]:
+
+def parse_design(
+    design: pandas.DataFrame, prefix: str = "data_input", suffix: str = "bam"
+) -> dict[str, str]:
 
     link_bams = {}
     sample_list = []
@@ -88,7 +89,6 @@ def parse_design(design: pandas.DataFrame,
             sample_id = f"{sample}_V{kit}_M{manip}"
 
             result[f"{prefix}/{sample_id}.wbc.{suffix}"] = bam
-
 
         elif row["Status"].lower() == "ctc":
             manip = row["Manip"]
@@ -118,15 +118,12 @@ def get_ctc(wildcards):
     return link_sample_baseline[wildcards.sample]["ctc"]
 
 
-
-
 bam_links = link_bam(
-    sample_names=design.Sample_id,
-    files=design.Upstream_file,
-    prefix="data_input"
+    sample_names=design.Sample_id, files=design.Upstream_file, prefix="data_input"
 )
 
 samples_list = design["Sample_id"].tolist()
 
+
 wildcard_constraints:
-    sample=r"|".join(samples_list)
+    sample=r"|".join(samples_list),
