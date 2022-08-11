@@ -94,7 +94,9 @@ def parse_design(
             sample_id = f"{sample}_{kit}_M{manip}"
 
             link_bams[f"{prefix}/{sample_id}.wbc.{suffix}"] = row["bam"]
-            logging.debug(f"New WBC added for {sample_id} precisely, all replicates concerned.")
+            logging.debug(
+                f"New WBC added for {sample_id} precisely, all replicates concerned."
+            )
 
         elif row["Status"].lower() == "ctc":
             manip = row["Manip"]
@@ -103,7 +105,6 @@ def parse_design(
             raw_sample_id = f"{sample}_V{kit}_M{manip}"
             sample_id = f"{raw_sample_id}_{replicate}"
 
-
             sample_list.append(sample_id)
             link_bams[f"{prefix}/{sample_id}.ctc.{suffix}"] = row["bam"]
             link_sample_baseline[sample_id] = {
@@ -111,8 +112,10 @@ def parse_design(
                 "wbc": f"{prefix}/{raw_sample_id}.wbc.{suffix}",
                 "baseline": f"{prefix}/{sample}.baseline.{suffix}",
             }
-            logging.debug(f"New CTC added {raw_sample_id}, replicate number {replicate}.")
-        
+            logging.debug(
+                f"New CTC added {raw_sample_id}, replicate number {replicate}."
+            )
+
         row = next(row_iter, None)
 
     return link_bams, sample_list, link_sample_baseline
@@ -142,8 +145,10 @@ def get_trio(wildcards):
 link_bams, sample_list, link_sample_baseline = parse_design(design.copy())
 
 sample_baseline_table = pandas.DataFrame(link_sample_baseline)
-sample_baseline_table.set_index(['baseline', "wbc"], inplace=True)
-logging.info(f"First 20 lines of fastq correspondancies: \n{sample_baseline_table.head(20)}")
+sample_baseline_table.set_index(["baseline", "wbc"], inplace=True)
+logging.info(
+    f"First 20 lines of fastq correspondancies: \n{sample_baseline_table.head(20)}"
+)
 
 replicate_list = list(set(design["Replicate"]))
 version_list = list(set(design["Version"]))

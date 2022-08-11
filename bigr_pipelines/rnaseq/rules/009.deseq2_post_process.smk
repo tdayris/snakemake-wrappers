@@ -214,7 +214,9 @@ rule plot_deseq_genes:
             ),
             subcategory="{comparison}",
         ),
-        independent_filtering=temp("figures/{comparison}/deseq2/independent_filter.{comparison}.png"),
+        independent_filtering=temp(
+            "figures/{comparison}/deseq2/independent_filter.{comparison}.png"
+        ),
         pval=temp("figures/{comparison}/deseq2/pval.{comparison}.png"),
         filter_theta=temp("figures/{comparison}/deseq2/theta.{comparison}.png"),
     threads: 1
@@ -247,7 +249,9 @@ rule seaborn_clustermap_sample:
     input:
         counts="deseq2/{comparison}/dst.{comparison}.tsv",
     output:
-        png=temp("figures/{comparison}/clustermap/ClusteredHeatmap.samples.{comparison}.png"),
+        png=temp(
+            "figures/{comparison}/clustermap/ClusteredHeatmap.samples.{comparison}.png"
+        ),
     message:
         "Plotting sample-clustered heatmap for {wildcards.comparison}"
     threads: 1
@@ -340,7 +344,9 @@ rule pcaexplorer_pca:
     input:
         dst="deseq2/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/wald.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.RDS",
     output:
-        png=temp("figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca/pca_{factor}_ax_{a}_ax_{b}_{elipse}.png"),
+        png=temp(
+            "figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca/pca_{factor}_ax_{a}_ax_{b}_{elipse}.png"
+        ),
     message:
         "Plotting PCA for ({wildcards.factor}:"
         "{wildcards.a}/{wildcards.b}:{wildcards.elipse})"
