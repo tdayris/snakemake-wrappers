@@ -7,7 +7,7 @@ and returns a configuration file for MultiQC
 """
 
 
-from json import tool
+import logging
 import pandas
 import yaml
 
@@ -16,6 +16,7 @@ from typing import Any, Dict, Optional
 
 def read_immunedeconv(path: str) -> pandas.DataFrame:
     """Load immunedeconv in memory"""
+    logging.info(f"Loading dataframe at: {path}")
     # Load data frame
     tmp = pandas.read_csv(
         path,
@@ -26,13 +27,17 @@ def read_immunedeconv(path: str) -> pandas.DataFrame:
 
     # Drop lines full of zeros
     tmp = tmp.loc[~(tmp==0).all(axis=1)]
+    logging.debug(tmp.head())
     return tmp
 
 
 def load_config(path: str) -> Dict[str, Any]:
     """Load an existing MultiQC configuration file"""
+    logging.info(f"Loading config at: {path}")
     with open(path, "r") as yaml_stream:
-        return yaml.safe_load(stream=yaml_stream)
+        yaml_data = yaml.safe_load(stream=yaml_stream)
+        logging.debug(yaml_data)
+        return yaml_data
 
 
 
@@ -41,6 +46,8 @@ def get_permissions(tool_name: str) -> str:
     From the name of a tool handled by ImmuneDeconv, 
     return comparison permissions
     """
+    logging.info(f"Building permission text for {tool_name}:")
+    text = ""
     between_samples = [
         "mcp_counter", 
         "xcell", 
@@ -57,24 +64,25 @@ def get_permissions(tool_name: str) -> str:
     both = ["epic", "quantiseq", "cibersort_abs", "seqimmucc"]
 
     if tool_name.lower() in between_samples:
-        return (
+        text = (
             "{tool_name} method allows between-sample comparisons only, "
             "not between-cell-types."
         )
 
     if tool_name.lower() in between_cell_types:
-        return (
+        text = (
             "{tool_name} method allows between-cell-type comparisons, "
             "not between-sample."
         )
 
     if tool_name.lower() in both:
-        return (
+        text = (
             "{tool_name} method allows both between-sample "
             "and between-cell-type comparisons."
         )
 
-    return ""
+    logging.debug(text)
+    return text
 
 
 def get_ylab(tool_name: str) -> str:
@@ -88,6 +96,7 @@ def get_description(tool_name: str,
     Return a description for a given tool, 
     on an optional given tumor type
     """
+    logging.info(f"Description for {tool_name} ({tumor}):")
     text = f"This deconvolution has been made by {tool_name}. "
     if tumor:
         text += (
@@ -96,6 +105,7 @@ def get_description(tool_name: str,
         )
     
     text += get_permissions(tool_name)
+    logging.debug(text)
     return text
     
 
@@ -106,7 +116,8 @@ def build_config(tool_name: str,
     From a tool, path to its results and tumor name, 
     return a custom config section
     """
-    return {
+    logging.info("Building config")
+    config = {
         "id": tool_name,
         "description": get_description(tool_name=tool_name, tumor=tumor),
         "plot_type": "bargraph",
@@ -119,9 +130,17 @@ def build_config(tool_name: str,
             read_immunedeconv(path=deconv_path).to_dict()
         }
     }
+    logging.debug(config)
+    return config
 
 
 # Main program
+logging.basicConfig(
+    filename=snakemake.log[0],
+    filemode="w",
+    level=logging.DEBUG
+)
+
 tumor_abbreviation = {
     "kich": "Kidney Chromophobe",
     "blca": "Bladder Urothelial Carcinoma",
@@ -176,14 +195,19 @@ for deconv_result in snakemake.input:
     if deconv_result.startswith(prefix):
         names = deconv_result[len(prefix):-len(suffix)]
     tool_name, tumor = names.split("/")
+    logging.info(f"Tool name: {tool_name}")
+    logging.info(f"Tumor abbrv: {tumor}")
 
     tumor = tumor_abbreviation.get(tumor)
+    logging.info(f"Tumor name: {tumor}")
 
     multiqc_config["custom_data"][f"{tool_name.lower()}_results"] = build_config(
         tool_name=tool_name, 
         deconv_path=deconv_result, 
         tumor=tumor
     )
+    logging.info("Config built:")
+    logging.debug(multiqc_config)
 
 with open(snakemake.output["yaml"], "w") as yaml_outstream:
     yaml.safe_dump(
@@ -191,3 +215,5 @@ with open(snakemake.output["yaml"], "w") as yaml_outstream:
         stream=yaml_outstream, 
         default_flow_style=False
     )
+
+logging.info("Process over")
