@@ -132,15 +132,18 @@ rule gatk_variant_filtration:
     log:
         "logs/gatk/variant_filtration/baseline_wbc/{sample}.log",
     params:
-        "--filterExpression 'QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0' "
-        "--filterName 'custom_snp_filter'",
+        extra=(
+            "--filterExpression 'QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0' "
+            "--filterName 'custom_snp_filter'"
+        ),
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar"
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
-        "-jar GenomeAnalysisTK.jar "
+        "-jar {params.jar} "
         "-T VariantFiltration "
-        "{params} "
+        "{params.extra} "
         "-R {input.fasta} "
         "-V {input.gvcf} "
         "-o {output} "
