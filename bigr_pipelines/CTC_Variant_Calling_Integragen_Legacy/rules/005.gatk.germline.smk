@@ -23,7 +23,7 @@ rule gatk_haplotype_caller:
     params:
         "-ERC GVCF",
     conda:
-        "envs/conda/gatk3.yaml"
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
         "-jar GenomeAnalysisTK.jar "
@@ -61,7 +61,7 @@ rule gatk_genotype_gvcf:
     params:
         "",
     conda:
-        "envs/conda/gatk3.yaml"
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
         "-jar GenomeAnalysisTK.jar "
@@ -98,7 +98,7 @@ rule gatk_select_variants_baseline:
     params:
         "-selectType SNP",
     conda:
-        "envs/conda/gatk3.yaml"
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
         "-jar GenomeAnalysisTK.jar "
@@ -135,7 +135,7 @@ rule gatk_variant_filtration:
         "--filterExpression 'QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0' "
         "--filterName 'custom_snp_filter'",
     conda:
-        "envs/conda/gatk3.yaml"
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
         "-jar GenomeAnalysisTK.jar "

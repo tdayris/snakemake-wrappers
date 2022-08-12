@@ -22,7 +22,7 @@ rule gatk_select_variants_wbc:
     params:
         "-sn {sample}.baseline",
     conda:
-        "envs/conda/gatk3.yaml"
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
         "-jar GenomeAnalysisTK.jar "

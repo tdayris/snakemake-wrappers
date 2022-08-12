@@ -21,6 +21,6 @@ rule brc2vep:
         alt_ad=config["params"].get("min_alt_ad", 10),
         alt_vaf=config["params"].get("min_alt_vaf", 0.03),
     conda:
-        "envs/r.yaml"
+        str(workflow_source_dir / "envs" / "r.yaml")
     script:
         "scripts/bcr2vep.R"

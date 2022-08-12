@@ -22,7 +22,7 @@ rule mutect2:
         "--maxReadsInRegionPerSample 100000 "
         "--output_mode EMIT_VARIANTS_ONLY ",
     conda:
-        "envs/conda/gatk3.yaml"
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
         "-jar GenomeAnalysisTK.jar "

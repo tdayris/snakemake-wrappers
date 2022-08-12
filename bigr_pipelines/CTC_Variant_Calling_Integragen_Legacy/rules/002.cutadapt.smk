@@ -16,7 +16,7 @@ rule cutadapt:
     group:
         "clean_input"
     conda:
-        "envs/cutadapt.yaml"
+        str(workflow_source_dir / "envs" / "cutadapt.yaml")
     params:
         "-a ACTGACAGCAGGAATCCCACT -g AGTGGGATTCCTGCTGTCAGT -n 2 -e 0.2",
     log:

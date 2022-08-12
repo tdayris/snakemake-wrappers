@@ -17,6 +17,8 @@ rule grep_out_homozygote:
         "retrieve_baseline"
     log:
         "logs/grep/{sample}.log",
+    conda:
+        str(workflow_source_dir / "envs" / "bash.yaml")
     params:
         ' -v "./.:0,0:0:0,0,0"',
     shell:
