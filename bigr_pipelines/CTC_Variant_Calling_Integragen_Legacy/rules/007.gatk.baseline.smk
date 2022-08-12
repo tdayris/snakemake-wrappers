@@ -21,8 +21,7 @@ rule gatk_select_variants_wbc:
         "logs/gatk/select_variants/baseline_wbc/{sample}.pass.log",
     params:
         "-sn {sample}.baseline",
-    conda:
-        str(workflow_source_dir / "envs" / "gatk.yaml")
+    container: "/mnt/beegfs/userdata/t_dayris/gatk3.7.sif"
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
         "-jar GenomeAnalysisTK.jar "

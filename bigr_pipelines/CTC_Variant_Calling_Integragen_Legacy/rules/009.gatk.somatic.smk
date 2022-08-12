@@ -21,8 +21,7 @@ rule mutect2:
         "--max_alt_allele_in_normal_fraction 0.04 "
         "--maxReadsInRegionPerSample 100000 "
         "--output_mode EMIT_VARIANTS_ONLY ",
-    conda:
-        str(workflow_source_dir / "envs" / "gatk.yaml")
+    container: "/mnt/beegfs/userdata/t_dayris/gatk3.7.sif"
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
         "-jar GenomeAnalysisTK.jar "
