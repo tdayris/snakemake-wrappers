@@ -8,7 +8,7 @@ rule bwa_index:
         config["ref"]["fasta"],
     output:
         multiext(
-            "../tmp/bwa/index/GRCh38.99.homo_sapiens",
+            "bwa/index/GRCh38.99.homo_sapiens",
             ".amb",
             ".ann",
             ".bwt",
