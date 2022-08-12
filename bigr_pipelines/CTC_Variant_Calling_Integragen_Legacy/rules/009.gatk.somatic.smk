@@ -64,7 +64,7 @@ rule unzip_mutect2:
         time_min=get_35min_per_attempt,
         tmpdir="tmp",
     conda:
-        "envs/conda/gatk3.yaml"
+        str(workflow_source_dir / "envs" / "bash.yaml")
     log:
         "logs/gatk/mutect2/unzip/{sample}.log",
     params:
