@@ -26,8 +26,9 @@ rule gatk_haplotype_caller:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "java -Xmx{resources.java_mem_gb}GB "
-        "-jar {params.jar} "
+        # "java -Xmx{resources.java_mem_gb}GB "
+        # "-jar {params.jar} "
+        "gatk "
         "-T HaplotypeCaller "
         "{params.extra} "
         "-R {input.fasta} "
@@ -65,8 +66,9 @@ rule gatk_genotype_gvcf:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "java -Xmx{resources.java_mem_gb}GB "
-        "-jar {params.jar} "
+        # "java -Xmx{resources.java_mem_gb}GB "
+        # "-jar {params.jar} "
+        "gatk "
         "-T GenotypeGVCFs "
         "{params.extra} "
         "-R {input.fasta} "
@@ -103,8 +105,9 @@ rule gatk_select_variants_baseline:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "java -Xmx{resources.java_mem_gb}GB "
-        "-jar {params.jar} "
+        # "java -Xmx{resources.java_mem_gb}GB "
+        # "-jar {params.jar} "
+        "gatk "
         "-T SelectVariants "
         "{params.extra} "
         "-R {input.fasta} "
@@ -143,8 +146,9 @@ rule gatk_variant_filtration:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "java -Xmx{resources.java_mem_gb}GB "
-        "-jar {params.jar} "
+        # "java -Xmx{resources.java_mem_gb}GB "
+        # "-jar {params.jar} "
+        "gatk "
         "-T VariantFiltration "
         "{params.extra} "
         "-R {input.fasta} "

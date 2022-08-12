@@ -25,8 +25,9 @@ rule gatk_select_variants_wbc:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "java -Xmx{resources.java_mem_gb}GB "
-        "-jar {params.jar} "
+        # "java -Xmx{resources.java_mem_gb}GB "
+        # "-jar {params.jar} "
+        "gatk "
         "-T SelectVariants "
         "{params.extra} "
         "-R {input.fasta} "
