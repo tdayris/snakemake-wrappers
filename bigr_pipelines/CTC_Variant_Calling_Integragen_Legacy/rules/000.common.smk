@@ -76,6 +76,8 @@ def parse_design(
     logging.info("Parsing design...")
     link_bams = {}
     sample_list = []
+    baseline_sample_list = []
+    wbc_sample_list = []
     link_sample_baseline = {}
 
     row_iter = iter(design.iterrows())
@@ -87,11 +89,13 @@ def parse_design(
         if row["Status"].lower() == "baseline":
             link_bams[f"{prefix}/{sample}.baseline.{suffix}"] = row["bam"]
             logging.debug(f"New baseline added for {sample} in general")
+            baseline_samples.append(sample)
 
         elif row["Status"].lower() == "wbc":
             manip = row["Manip"]
             kit = row["Version"]
             sample_id = f"{sample}_{kit}_M{manip}"
+            wbc_sample_list.append(sample_id)
 
             link_bams[f"{prefix}/{sample_id}.wbc.{suffix}"] = row["bam"]
             logging.debug(
@@ -118,7 +122,7 @@ def parse_design(
 
         row = next(row_iter, None)
 
-    return link_bams, sample_list, link_sample_baseline
+    return link_bams, sample_list, link_sample_baseline, baseline_sample_list, wbc_sample_list
 
 
 def get_baseline(wildcards):
@@ -142,7 +146,7 @@ def get_trio(wildcards):
     }
 
 
-link_bams, samples_list, link_sample_baseline = parse_design(design.copy())
+link_bams, samples_list, link_sample_baseline, baseline_sample_list, wbc_sample_list = parse_design(design.copy())
 
 sample_baseline_table = pandas.DataFrame.from_dict(link_sample_baseline, orient="index")
 sample_baseline_table.set_index(["baseline", "wbc"], inplace=True)
@@ -159,5 +163,5 @@ status_list = list(set(design["Status"]))
 
 
 wildcard_constraints:
-    sample=r"|".join(samples_list),
+    sample=r"|".join(samples_list + baseline_sample_list + wbc_sample_list),
     status=r"|".join(status_list),

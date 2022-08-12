@@ -60,8 +60,8 @@ rule sambamba_markdup:
         "sambamba/markdup/{sample}.{status}.bam",
     threads: 10
     resources:
-        time_min=lambda wildcards, attempt: attempt * 45,
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 4,
+        time_min=get_45min_per_attempt,
+        mem_mb=get_8gb_per_attempt,
         tmpdir="tmp",
     conda:
         "envs/sambamba.yaml"
