@@ -128,11 +128,14 @@ def parse_info(chrom: str, pos: int, ref: str, alt: str, info: str) -> Dict[str,
 
 def get_sb_table(sb_table: str) -> Dict[str, int]:
     """Parse INFO field and return strand bias table"""
-    sb_table = sb_table.split("=")[-1]
-    alt, ref = sb_table.split("|")
-    ARCp, ARCm = map(int, alt.split(","))
-    RRCp, RRCm = map(int, ref.split(","))
-    return {"ARCp": ARCp, "ARCm": ARCm, "RRCp": RRCp, "RRCm": RRCm}
+    try:
+        sb_table = sb_table.split("=")[-1]
+        alt, ref = sb_table.split("|")
+        ARCp, ARCm = map(int, alt.split(","))
+        RRCp, RRCm = map(int, ref.split(","))
+        return {"ARCp": ARCp, "ARCm": ARCm, "RRCp": RRCp, "RRCm": RRCm}
+    except Exception:
+        return {"ARCp": None, "ARCm": None, "RRCp": None, "RRCm": None}
 
 
 def get_SOR(sor_field: str) -> Dict[str, float]:
