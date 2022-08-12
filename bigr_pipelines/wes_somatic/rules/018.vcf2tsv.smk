@@ -82,7 +82,7 @@ rule fix_vcf:
 
 rule gleaves_compatibility:
     input:
-        "snpsift/fixed/{sample}.vcf",
+        vcf="snpsift/fixed/{sample}.vcf",
     output:
         vcf=temp("gleaves/corrected/{sample}.vcf.gz"),
         vcf_tbi=temp("gleaves/corrected/{sample}.vcf.gz.tbi"),
