@@ -120,7 +120,11 @@ def parse_design(
                 f"New CTC added {raw_sample_id}, replicate number {replicate}."
             )
 
+        else:
+            raise ValueError(row)
+
         row = next(row_iter, None)
+
 
     return link_bams, sample_list, link_sample_baseline, baseline_sample_list, wbc_sample_list
 
