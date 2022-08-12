@@ -22,7 +22,8 @@ rule gatk_haplotype_caller:
         "logs/haplotypecaller/{sample}.{status}.log",
     params:
         "-ERC GVCF",
-    container: "/mnt/beegfs/userdata/t_dayris/gatk3.7.sif"
+    conda:
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
         "-jar GenomeAnalysisTK.jar "
@@ -59,7 +60,8 @@ rule gatk_genotype_gvcf:
         "logs/gatk/genotype_gvcf/baseline_wbc/{sample}.log",
     params:
         "",
-    container: "/mnt/beegfs/userdata/t_dayris/gatk3.7.sif"
+    conda:
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
         "-jar GenomeAnalysisTK.jar "
@@ -95,7 +97,8 @@ rule gatk_select_variants_baseline:
         "logs/gatk/select_variants/baseline_wbc/{sample}.log",
     params:
         "-selectType SNP",
-    container: "/mnt/beegfs/userdata/t_dayris/gatk3.7.sif"
+    conda:
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
         "-jar GenomeAnalysisTK.jar "
@@ -131,7 +134,8 @@ rule gatk_variant_filtration:
     params:
         "--filterExpression 'QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0' "
         "--filterName 'custom_snp_filter'",
-    container: "/mnt/beegfs/userdata/t_dayris/gatk3.7.sif"
+    conda:
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
         "-jar GenomeAnalysisTK.jar "
