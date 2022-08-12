@@ -37,37 +37,37 @@ rule mutect2:
 
 rule tabix_mutect2:
     input:
-        "gatk/mutect2/{sample}.vcf.gz"
+        "gatk/mutect2/{sample}.vcf.gz",
     output:
-        "gatk/mutect2/{sample}.vcf.gz.tbi"
+        "gatk/mutect2/{sample}.vcf.gz.tbi",
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     log:
-        "logs/tabix/{sample}.mutect2.log"
+        "logs/tabix/{sample}.mutect2.log",
     params:
-        "-p vcf"
+        "-p vcf",
     wrapper:
         "bio/tabix"
 
 
 rule unzip_mutect2:
     input:
-        "gatk/mutect2/{sample}.vcf.gz"
+        "gatk/mutect2/{sample}.vcf.gz",
     output:
-        temp("gatk/mutect2/{sample}.vcf")
+        temp("gatk/mutect2/{sample}.vcf"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     conda:
         "envs/conda/gatk3.yaml"
     log:
-        "logs/gatk/mutect2/unzip/{sample}.log"
+        "logs/gatk/mutect2/unzip/{sample}.log",
     params:
-        "--decompress --force --verbose --stdout"
+        "--decompress --force --verbose --stdout",
     shell:
         "gzip {params} {input} > {output} 2> {log}"
