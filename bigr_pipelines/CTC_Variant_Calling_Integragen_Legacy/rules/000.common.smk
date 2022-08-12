@@ -72,6 +72,7 @@ logging.info("Building globals...")
 def parse_design(
     design: pandas.DataFrame, prefix: str = "data_input", suffix: str = "bam"
 ) -> dict[str, str]:
+    "We assume Baseline and WBC correspondig to a sample always come first."
 
     logging.info("Parsing design...")
     link_bams = {}
@@ -79,6 +80,8 @@ def parse_design(
     baseline_sample_list = []
     wbc_sample_list = []
     link_sample_baseline = {}
+    last_baseline = None
+    last_wbc = None
 
     row_iter = iter(design.iterrows())
     row = next(row_iter, None)
@@ -90,12 +93,14 @@ def parse_design(
             link_bams[f"{prefix}/{sample}.baseline.{suffix}"] = row["bam"]
             logging.debug(f"New baseline added for {sample} in general")
             baseline_sample_list.append(sample)
+            last_baseline = f"{sample}.baseline"
 
         elif row["Status"].lower() == "wbc":
             manip = row["Manip"]
             kit = row["Version"]
             sample_id = f"{sample}_{kit}_M{manip}"
             wbc_sample_list.append(sample_id)
+            last_wbc = f"{sample_id}.wbc"
 
             link_bams[f"{prefix}/{sample_id}.wbc.{suffix}"] = row["bam"]
             logging.debug(
@@ -113,8 +118,8 @@ def parse_design(
             link_bams[f"{prefix}/{sample_id}.ctc.{suffix}"] = row["bam"]
             link_sample_baseline[sample_id] = {
                 "ctc": f"sambamba/markdup/{sample_id}.ctc.{suffix}",
-                "wbc": f"sambamba/markdup/{raw_sample_id}.wbc.{suffix}",
-                "baseline": f"sambamba/markdup/{sample}.baseline.{suffix}",
+                "wbc": f"sambamba/markdup/{last_wbc}.{suffix}",
+                "baseline": f"sambamba/markdup/{last_baseline}.{suffix}",
             }
             logging.debug(
                 f"New CTC added {raw_sample_id}, replicate number {replicate}."
@@ -157,8 +162,6 @@ sample_baseline_table.set_index(["baseline", "wbc"], inplace=True)
 logging.info(
     f"First 20 lines of fastq correspondancies: \n{sample_baseline_table.head(20)}"
 )
-
-logging.debug(link_bams)
 
 replicate_list = list(set(design["Replicate"]))
 version_list = list(set(design["Version"]))
