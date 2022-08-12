@@ -21,14 +21,15 @@ rule gatk_haplotype_caller:
     log:
         "logs/haplotypecaller/{sample}.{status}.log",
     params:
-        "-ERC GVCF",
+        extra="-ERC GVCF",
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar"
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
-        "-jar GenomeAnalysisTK.jar "
+        "-jar {params.jar} "
         "-T HaplotypeCaller "
-        "{params} "
+        "{params.extra} "
         "-R {input.fasta} "
         "-I {input.bam} "
         "-O {output.vcf} "
@@ -59,14 +60,15 @@ rule gatk_genotype_gvcf:
     log:
         "logs/gatk/genotype_gvcf/baseline_wbc/{sample}.log",
     params:
-        "",
+        extra="",
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar"
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
-        "-jar GenomeAnalysisTK.jar "
+        "-jar {params.jar} "
         "-T GenotypeGVCFs "
-        "{params} "
+        "{params.extra} "
         "-R {input.fasta} "
         "-V {input.baseline} "
         "-V {input.wbc} "
@@ -96,14 +98,15 @@ rule gatk_select_variants_baseline:
     log:
         "logs/gatk/select_variants/baseline_wbc/{sample}.log",
     params:
-        "-selectType SNP",
+        extra="-selectType SNP",
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar"
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
-        "-jar GenomeAnalysisTK.jar "
+        "-jar {params.jar} "
         "-T SelectVariants "
-        "{params} "
+        "{params.extra} "
         "-R {input.fasta} "
         "-V {input.gvcf} "
         "-o {output} "

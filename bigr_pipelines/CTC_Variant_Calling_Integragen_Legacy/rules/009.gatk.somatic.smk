@@ -17,16 +17,19 @@ rule mutect2:
     log:
         "logs/gatk/mutect2/{sample}.log",
     params:
-        "--max_alt_alleles_in_normal_count 2 "
-        "--max_alt_allele_in_normal_fraction 0.04 "
-        "--maxReadsInRegionPerSample 100000 "
-        "--output_mode EMIT_VARIANTS_ONLY ",
+        extra=(
+            "--max_alt_alleles_in_normal_count 2 "
+            "--max_alt_allele_in_normal_fraction 0.04 "
+            "--maxReadsInRegionPerSample 100000 "
+            "--output_mode EMIT_VARIANTS_ONLY "
+        ),
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar"
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "java -Xmx{resources.java_mem_gb}GB "
-        "-jar GenomeAnalysisTK.jar "
-        "{params} "
+        "-jar {params.jar} "
+        "{params.extra} "
         "-T MuTect2 "
         "-I:tumor {input.tumor} "
         "-I:normal {input.normal} "
