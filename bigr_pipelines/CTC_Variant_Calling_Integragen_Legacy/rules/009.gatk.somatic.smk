@@ -7,7 +7,7 @@ rule mutect2:
     input:
         unpack(get_trio),
     output:
-        "gatk/mutect2/{sample}.vcf.gz",
+        "gatk/mutect2/{sample}.vcf",
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
