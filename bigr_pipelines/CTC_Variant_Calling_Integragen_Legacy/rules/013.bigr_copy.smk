@@ -14,7 +14,7 @@ rule bigr_copy:
         time_min=get_45min_per_attempt,
     retries: 1
     params:
-        input=lambda wildcards, output: bam_links[output[0]],
+        input=lambda wildcards, output: link_bams[output[0]],
     log:
         "logs/bigr_copy/{sample}.{status}.log",
     wrapper:
