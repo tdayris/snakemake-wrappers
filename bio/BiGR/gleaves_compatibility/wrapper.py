@@ -10,6 +10,7 @@ import gzip
 import logging
 
 from typing import Any, Dict, Optional
+from snakemake.shell import shell
 
 logging.basicConfig(
     #filename=snakemake.log[0],
