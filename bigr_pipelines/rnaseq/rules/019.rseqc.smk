@@ -32,7 +32,7 @@ rule rseqc_tin:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        time_min=get_5h_per_attempt,
+        time_min=get_10h_per_attempt,
         tmpdir="tmp",
     retries: 1
     log:
@@ -85,7 +85,7 @@ rule rseqc_gene_body_coverage:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        time_min=get_8h_per_attempt,
+        time_min=get_16h_per_attempt,
         tmpdir="tmp",
     retries: 1
     log:
