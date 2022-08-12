@@ -36,6 +36,7 @@ ruleorder: mutect2_somatic > tabix_index
 ruleorder: gatk_variant_filtration > pbgzip_compress
 ruleorder: gatk_variant_filtration > tabix_index
 ruleorder: gleaves_compatibility > tabix_index
+ruleorder: gleaves_compatibility > pbgzip_compress
 
 
 ########################
