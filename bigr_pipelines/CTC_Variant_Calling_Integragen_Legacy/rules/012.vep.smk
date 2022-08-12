@@ -48,7 +48,7 @@ rule ensemblvep_hc:
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/vep_hc.log",
+        "logs/vep/hc/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
     container:
@@ -57,7 +57,7 @@ rule ensemblvep_hc:
         "scripts/ensmblVEP_hc.R"
 
 
-rule ensemblvep_bcr:
+rule ensemblvep_mutect:
     input:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
         vcfs=["vep/hc/{sample}.vcf"],
@@ -69,7 +69,7 @@ rule ensemblvep_bcr:
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/vep_hc.log",
+        "logs/vep/mutect/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
     container:
@@ -90,7 +90,7 @@ rule ensemblvep_bcr:
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/vep_hc.log",
+        "logs/vep/bcr/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
     container:
