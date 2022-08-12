@@ -234,7 +234,7 @@ with (open_function(snakemake.input["vcf"]) as in_vcf,
         if line.startswith("#"):
             pass
         else:
-            line = annotate(line, tsv)
+            line = annotate(line)
 
         out_vcf.write(line)
 
