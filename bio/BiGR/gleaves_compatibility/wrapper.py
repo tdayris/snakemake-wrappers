@@ -9,7 +9,7 @@ import datetime
 import gzip
 import logging
 
-from typing import Any
+from typing import Any, Dict, Optional
 
 logging.basicConfig(
     #filename=snakemake.log[0],
@@ -26,7 +26,7 @@ def open_function(file: str):
 
 
 
-def get_headers(description: dict[str, Any]) -> str:
+def get_headers(description: Dict[str, Any]) -> str:
     """
     From a list of column name, and an optional list of description,
     build VCF headers.
@@ -68,7 +68,7 @@ headers_description = {
 }
 
 
-def parse_info(chrom: str, pos: int, ref: str, alt: str, info: str) -> dict[str, Any]:
+def parse_info(chrom: str, pos: int, ref: str, alt: str, info: str) -> Dict[str, Any]:
     """
     Parse info fields and gather annotations
     """
@@ -126,7 +126,7 @@ def parse_info(chrom: str, pos: int, ref: str, alt: str, info: str) -> dict[str,
         
 
 
-def get_sb_table(sb_table: str) -> dict[str, int]:
+def get_sb_table(sb_table: str) -> Dict[str, int]:
     """Parse INFO field and return strand bias table"""
     alt, ref = sb_table.split("|")
     ARCp, ARCm = map(int, alt.split(","))
@@ -134,21 +134,21 @@ def get_sb_table(sb_table: str) -> dict[str, int]:
     return {"ARCp": ARCp, "ARCm": ARCm, "RRCp": RRCp, "RRCm": RRCm}
 
 
-def get_SOR(sor_field: str) -> dict[str, float]:
+def get_SOR(sor_field: str) -> Dict[str, float]:
     """
     Parse INFO field and return Strand Odds Ratio
     """
     return {"SBM": sor_field.split("=")[-1]}
 
 
-def get_fisher_test(fisher_field: str) -> dict[str, float]:
+def get_fisher_test(fisher_field: str) -> Dict[str, float]:
     """
     Parse INFO field and return Fisher Exact test
     """
     return {"SBP": fisher_field.split("=")[-1]}
 
 
-def get_var(vaf_field: str) -> dict[str, str]:
+def get_var(vaf_field: str) -> Dict[str, str]:
     """
     Parse VAF field to return genotype quality
     """
