@@ -150,6 +150,8 @@ logging.info(
     f"First 20 lines of fastq correspondancies: \n{sample_baseline_table.head(20)}"
 )
 
+logging.debug(link_bams)
+
 replicate_list = list(set(design["Replicate"]))
 version_list = list(set(design["Version"]))
 manip_list = list(set(design["Manip"]))
