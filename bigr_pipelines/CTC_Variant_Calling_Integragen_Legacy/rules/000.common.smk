@@ -40,7 +40,7 @@ from messages import message
 #####################
 
 # Save output stream in a file
-logging.basicConfig(filename="snakemake.rnaseq.log", filemode="w", level=logging.DEBUG)
+logging.basicConfig(filename="snakemake.CTC_Integragen_Legacy.log", filemode="w", level=logging.DEBUG)
 logging.info("Additional utils loaded")
 
 
