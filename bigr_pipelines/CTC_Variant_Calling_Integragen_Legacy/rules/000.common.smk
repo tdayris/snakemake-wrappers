@@ -102,7 +102,7 @@ def parse_design(
             manip = row["Manip"]
             kit = row["Version"]
             replicate = row["Replicate"]
-            raw_sample_id = f"{sample}_V{kit}_M{manip}"
+            raw_sample_id = f"{sample}_{kit}_M{manip}"
             sample_id = f"{raw_sample_id}_{replicate}"
 
             sample_list.append(sample_id)
