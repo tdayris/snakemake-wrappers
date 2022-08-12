@@ -21,3 +21,39 @@ rule grep_out_homozygote:
         ' -v "./.:0,0:0:0,0,0"',
     shell:
         "grep {params} {input} > {output} 2> {log}"
+
+
+rule zip_baseline_variants:
+    input:
+        "gatk/select_variants/baseline/{sample}.vcf"
+    output:
+        protected("data_output/Baseline/{sample}.vcf.gz")
+    threads: 2
+    resources:
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/bcftools/view/{sample}.baseline.log"
+    params:
+        extra=""
+    wrapper:
+        "bio/bcftools/view"
+
+
+rule tabix_baseline_variants:
+    input:
+        "gatk/select_variants/baseline/{sample}.vcf.gz"
+    output:
+        protected("data_output/Baseline/{sample}.vcf.gz.tbi")
+    threads: 1
+    resources:
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/tabix/{sample}.baseline.log"
+    params:
+        "-p vcf"
+    wrapper:
+        "bio/tabix"

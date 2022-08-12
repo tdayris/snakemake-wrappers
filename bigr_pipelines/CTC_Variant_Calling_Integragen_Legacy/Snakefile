@@ -17,4 +17,6 @@ include: "rules/013.bigr_copy.smk"
 rule target:
     input:
         raw=expand("gatk/mutect2/{sample}.vcf.gz", sample=samples_list),
-        annotated=expand("vep/bcr/{sample}.vcf", sample=samples_list),
+        raw_indexes=expand("gatk/mutect2/{sample}.vcf.gz.tbi", sample=samples_list),
+        annotated=expand("data_output/Annotated/{sample}.vcf.gz", sample=samples_list),
+        annotated_indexes=expand("data_output/Annotated/{sample}.vcf.gz.tbi", sample=samples_list),

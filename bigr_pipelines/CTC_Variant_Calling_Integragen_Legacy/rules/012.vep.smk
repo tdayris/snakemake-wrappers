@@ -97,3 +97,39 @@ rule ensemblvep_bcr:
         "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
     script:
         "scripts/ensmblVEP_bcr.R"
+
+
+rule compress_annotated_vcf:
+    input:
+        "vep/bcr/{sample}.vcf"
+    output:
+        protected("data_output/Annotated/{sample}.vcf.gz")
+    threads: 2
+    resources:
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/bcftools/view/{sample}.annotated.log"
+    params:
+        extra=""
+    wrapper:
+        "bio/bcftools/view"
+
+
+rule tabix_annotated_vcf:
+    input:
+        "data_output/Annotated/{sample}.vcf.gz"
+    output:
+        protected("data_output/Annotated/{sample}.vcf.gz.tbi")
+    threads: 1
+    resources:
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/tabis/{sample}.annotated.log"
+    params:
+        "-p vcf"
+    wrapper:
+        "bio/tabix"
