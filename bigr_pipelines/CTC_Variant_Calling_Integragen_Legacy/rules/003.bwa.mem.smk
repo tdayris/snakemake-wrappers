@@ -61,7 +61,7 @@ rule bwa_mem:
     log:
         "logs/bwa/mem/{sample}.{status}.log",
     params:
-        extra=" -R '@rg\tID:GRCh38\tSM:{sample}\tPL:Illumina'",
+        extra=" -R '@RG\tID:GRCh38\tSM:{sample}\tPL:Illumina'",
         index="bwa/index/GRCh38.99.homo_sapiens"
     shell:
         "bwa mem {params.extra} -t {threads} {params.index} {input.fq} > {output} 2> {log}"
