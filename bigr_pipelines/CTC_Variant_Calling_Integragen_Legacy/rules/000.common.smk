@@ -142,7 +142,7 @@ def get_trio(wildcards):
     }
 
 
-link_bams, sample_list, link_sample_baseline = parse_design(design.copy())
+link_bams, samples_list, link_sample_baseline = parse_design(design.copy())
 
 sample_baseline_table = pandas.DataFrame.from_dict(link_sample_baseline, orient="index")
 sample_baseline_table.set_index(["baseline", "wbc"], inplace=True)
