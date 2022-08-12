@@ -39,7 +39,7 @@ rule sambamba_sort:
         mem_mb=get_8gb_per_attempt,
         tmpdir="tmp",
     conda:
-        str(workflow_source_dir / "envs" / "ambamba.yaml")
+        str(workflow_source_dir / "envs" / "sambamba.yaml")
     params:
         "",
     log:
