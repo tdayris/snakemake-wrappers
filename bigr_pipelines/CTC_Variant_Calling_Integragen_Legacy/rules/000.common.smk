@@ -108,9 +108,9 @@ def parse_design(
             sample_list.append(sample_id)
             link_bams[f"{prefix}/{sample_id}.ctc.{suffix}"] = row["bam"]
             link_sample_baseline[sample_id] = {
-                "ctc": f"{prefix}/{sample_id}.ctc.{suffix}",
-                "wbc": f"{prefix}/{raw_sample_id}.wbc.{suffix}",
-                "baseline": f"{prefix}/{sample}.baseline.{suffix}",
+                "ctc": f"sambamba/markdup/{sample_id}.ctc.{suffix}",
+                "wbc": f"sambamba/markdup/{raw_sample_id}.wbc.{suffix}",
+                "baseline": f"sambamba/markdup/{sample}.baseline.{suffix}",
             }
             logging.debug(
                 f"New CTC added {raw_sample_id}, replicate number {replicate}."
