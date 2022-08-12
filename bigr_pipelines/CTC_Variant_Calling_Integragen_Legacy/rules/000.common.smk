@@ -89,7 +89,7 @@ def parse_design(
         if row["Status"].lower() == "baseline":
             link_bams[f"{prefix}/{sample}.baseline.{suffix}"] = row["bam"]
             logging.debug(f"New baseline added for {sample} in general")
-            baseline_samples.append(sample)
+            baseline_sample_list.append(sample)
 
         elif row["Status"].lower() == "wbc":
             manip = row["Manip"]
