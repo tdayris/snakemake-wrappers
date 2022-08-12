@@ -12,7 +12,7 @@ rule mutect2:
     resources:
         mem_mb=get_10gb_per_attempt,
         java_mem_gb=get_10gb_per_attempt,
-        time_min=get_2h_per_attempt,
+        time_min=get_6h_per_attempt,
         tmpdir="tmp",
     log:
         "logs/gatk/mutect2/{sample}.log",
