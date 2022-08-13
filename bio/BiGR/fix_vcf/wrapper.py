@@ -114,9 +114,9 @@ with (open_function(snakemake.input["vcf"]) as vcfin,
             # Header/formats/filters...
             #vcfout.write(line)
             if line[:-1] == '##FILTER=<ID=IsGermline,Number=.,Type=String,Description="Variant exists in Normal">':
-                header_list.append('##FILTER=<ID=IsGermline,Description="Variant exists in Normal">')
+                header_list.append('##FILTER=<ID=IsGermline,Description="Variant exists in Normal">\n')
             elif line[:-1] == '##FILTER=<ID=IsSomatic,Number=.,Type=String,Description="Variant does not exists in Normal, but exists in Tumor">':
-                header_list.append('##FILTER=<ID=IsSomatic,Description="Variant does not exists in Normal, but exists in Tumor">')
+                header_list.append('##FILTER=<ID=IsSomatic,Description="Variant does not exists in Normal, but exists in Tumor">\n')
             else:
                 header_list.append(line)
             continue
