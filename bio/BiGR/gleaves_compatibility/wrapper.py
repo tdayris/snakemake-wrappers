@@ -207,7 +207,7 @@ def annotate(line: str) -> str:
         info=line[7]
     )
     new_annotations = [
-        "{key}={val}" for key, val in new_annotations.items()
+        f"{key}={val}" for key, val in new_annotations.items()
         if val is not None
     ]
     new_annotations = ";".join(new_annotations)
