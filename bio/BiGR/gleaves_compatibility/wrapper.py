@@ -256,7 +256,7 @@ if str(snakemake.output["vcf"]).endswith("vcf.gz"):
     shell("pbgzip -c {out_vcf_path} > {compressed_vcf} {log}")
 
 
-    logging.info(f"Indexing {snakemake.output['call']}")
+    logging.info(f"Indexing {snakemake.output['vcf']}")
     log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)  
     shell("tabix -p vcf {compressed_vcf} {log}")
 
