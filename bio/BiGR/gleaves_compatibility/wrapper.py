@@ -242,7 +242,7 @@ with (open_function(snakemake.input["vcf"]) as in_vcf,
 
         if line.startswith("##"):
             pass
-        if line.startswith("#"):
+        elif line.startswith("#"):
             out_vcf.write(get_headers(headers_description))
         else:
             line = annotate(line)
