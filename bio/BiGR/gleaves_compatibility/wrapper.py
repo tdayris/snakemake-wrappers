@@ -250,8 +250,9 @@ with (open_function(snakemake.input["vcf"]) as in_vcf,
 
 if str(snakemake.output["vcf"]).endswith("vcf.gz"):
     logging.info(f"Compressing {out_vcf}")
-    shell("pbgzip -c {out_vcf} > {snakemake.output['vcf']} 2> {log}")
+    compressed_vcf = snakemake.output['vcf']
+    shell("pbgzip -c {out_vcf} > {compressed_vcf} 2> {log}")
     logging.info(f"Indexing {snakemake.output['call']}")
-    shell("tabix -p vcf {snakemake.output['vcf']} >> {log} 2>&1")
+    shell("tabix -p vcf {compressed_vcf} >> {log} 2>&1")
     logging.info(f"Removing temporary file {out_vcf}")
     shell("rm --verbose {out_vcf} >> {log} 2>&1")
