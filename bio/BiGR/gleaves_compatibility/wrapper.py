@@ -261,4 +261,4 @@ if str(snakemake.output["vcf"]).endswith("vcf.gz"):
     shell("tabix -p vcf {compressed_vcf} {log}")
 
     logging.info(f"Removing temporary file {out_vcf}")
-    shell("rm --verbose --force {out_vcf} {log}")
+    shell("rm --verbose --force {out_vcf_path} {log}")
