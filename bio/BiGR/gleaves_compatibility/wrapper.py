@@ -228,14 +228,14 @@ def annotate(line: str) -> str:
 # Annotating input VCF
 logging.debug("Opening VCF")
 if str(snakemake.output["vcf"]).endswith("vcf.gz"):
-    out_vcf = snakemake.output["vcf"][:-3]
+    out_vcf_path = snakemake.output["vcf"][:-3]
 else:
-    out_vcf = snakemake.output["vcf"]
+    out_vcf_path = snakemake.output["vcf"]
 
 
 
 with (open_function(snakemake.input["vcf"]) as in_vcf,
-      open(out_vcf, 'w', encoding="utf-8") as out_vcf):
+      open(out_vcf_path, 'w', encoding="utf-8") as out_vcf):
     for line in in_vcf:
         if isinstance(line, bytes):
             line = line.decode("utf-8")
@@ -253,7 +253,7 @@ if str(snakemake.output["vcf"]).endswith("vcf.gz"):
 
     log = snakemake.log_fmt_shell(stdout=False, stderr=True)
     compressed_vcf = snakemake.output['vcf']
-    shell("pbgzip -c {out_vcf} > {compressed_vcf} {log}")
+    shell("pbgzip -c {out_vcf_path} > {compressed_vcf} {log}")
 
 
     logging.info(f"Indexing {snakemake.output['call']}")
