@@ -240,8 +240,10 @@ with (open_function(snakemake.input["vcf"]) as in_vcf,
         if isinstance(line, bytes):
             line = line.decode("utf-8")
 
-        if line.startswith("#"):
+        if line.startswith("##"):
             pass
+        if line.startswith("#"):
+            out_vcf.write(get_headers(headers_description))
         else:
             line = annotate(line)
 
