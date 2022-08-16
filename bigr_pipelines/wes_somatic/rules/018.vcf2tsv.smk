@@ -1,6 +1,6 @@
 rule filter_tsv:
     input:
-        "snpsift/extractFields/{sample}.tsv",
+        table="snpsift/extractFields/{sample}.tsv",
     output:
         table=protected("data_output/TSV/{sample}.tsv"),
         xlsx=protected("data_output/XLSX/{sample}.xlsx"),
