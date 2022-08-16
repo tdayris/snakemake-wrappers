@@ -11,7 +11,7 @@ rule filter_tsv:
         tmpdir="tmp",
     params:
         drop_duplicated_lines=True,
-        contains=[["Filter", "PASS"]],
+        contains=[["FILTER", "PASS"]],
         prefixes=[["Chromosome", "chr"]],
         new_cols=lambda wildcards: [
             ["Mutect2_Allele_Frequency", "=", f"{wildcards.sample}_tumor_AF"],
