@@ -9,7 +9,6 @@ rule filter_tsv:
         mem_mb=get_8gb_per_attempt,
         time_min=get_20min_per_attempt,
         tmpdir="tmp",
-    retries: 1
     params:
         drop_duplicated_lines=True,
         contains=[["Filter", "PASS"]],
@@ -33,6 +32,8 @@ rule filter_tsv:
             f"{wildcards.sample}_tumor_AD_allele2",
             f"{wildcards.sample}_tumor_AF",
         ],
+    log:
+        "logs/pandas/filter_tsv/{sample}.log"
     wrapper:
         "bio/pandas/filter_table"
 
