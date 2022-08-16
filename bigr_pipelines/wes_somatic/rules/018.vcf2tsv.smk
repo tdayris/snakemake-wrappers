@@ -19,7 +19,8 @@ rule filter_tsv:
             ["Variant_ID", "=", "ID"],
             ["SYMBOL", "=", "ANN[*].GENE"],
             ["Reference_Allele", "=", "REF"],
-            ["Tumor_Seq_Allele1", "=", "ALT"]
+            ["Tumor_Seq_Allele1", "=", "ALT"],
+            ["Filter", "=", "FILTER"],
 
         ],
         keep_column=lambda wildcards: config["table_cols"]
