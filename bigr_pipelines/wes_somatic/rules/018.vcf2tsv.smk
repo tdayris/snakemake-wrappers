@@ -14,7 +14,8 @@ rule filter_tsv:
         contains=[["Filter", "PASS"]],
         prefixes=[["Chromosome", "chr"]],
         new_cols=lambda wildcards: [
-            ["Mutect2_Allele_Frequency", "=", f"{wildcards.sample}_tumor_AF"]
+            ["Mutect2_Allele_Frequency", "=", f"{wildcards.sample}_tumor_AF"],
+            ["Chromosome", "=", "CHROM"]
         ],
         keep_column=lambda wildcards: config["table_cols"]
         + [
