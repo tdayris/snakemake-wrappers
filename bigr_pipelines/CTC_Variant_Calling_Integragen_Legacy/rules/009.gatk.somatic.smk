@@ -12,24 +12,64 @@ rule mutect2:
     resources:
         mem_mb=get_10gb_per_attempt,
         java_mem_gb=get_10gb_per_attempt,
-        time_min=get_2h_per_attempt,
+        time_min=get_6h_per_attempt,
         tmpdir="tmp",
     log:
         "logs/gatk/mutect2/{sample}.log",
     params:
-        "--max_alt_alleles_in_normal_count 2 "
-        "--max_alt_allele_in_normal_fraction 0.04 "
-        "--maxReadsInRegionPerSample 100000 "
-        "--output_mode EMIT_VARIANTS_ONLY ",
+        extra=(
+            "--max_alt_alleles_in_normal_count 2 "
+            "--max_alt_allele_in_normal_fraction 0.04 "
+            "--maxReadsInRegionPerSample 100000 "
+            "--output_mode EMIT_VARIANTS_ONLY "
+        )
     conda:
-        "envs/conda/gatk3.yaml"
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "java -Xmx{resources.java_mem_gb}GB "
-        "-jar GenomeAnalysisTK.jar "
-        "{params} "
+        #"gatk -Xmx{resources.java_mem_gb}MB "
+        "gatk "
+        "{params.extra} "
         "-T MuTect2 "
         "-I:tumor {input.tumor} "
         "-I:normal {input.normal} "
         "-o {output} "
         "-R {input.fasta} "
         "> {log} 2>&1 "
+
+
+rule tabix_mutect2:
+    input:
+        "gatk/mutect2/{sample}.vcf.gz",
+    output:
+        "gatk/mutect2/{sample}.vcf.gz.tbi",
+    threads: 1
+    resources:
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
+    log:
+        "logs/tabix/{sample}.mutect2.log",
+    params:
+        "-p vcf",
+    wrapper:
+        "bio/tabix"
+
+
+rule unzip_mutect2:
+    input:
+        "gatk/mutect2/{sample}.vcf.gz",
+    output:
+        temp("gatk/mutect2/{sample}.vcf"),
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_35min_per_attempt,
+        tmpdir="tmp",
+    conda:
+        str(workflow_source_dir / "envs" / "bash.yaml")
+    log:
+        "logs/gatk/mutect2/unzip/{sample}.log",
+    params:
+        "--decompress --force --verbose --stdout",
+    shell:
+        "gzip {params} {input} > {output} 2> {log}"

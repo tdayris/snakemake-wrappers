@@ -8,7 +8,7 @@ rule bwa_index:
         config["ref"]["fasta"],
     output:
         multiext(
-            "../tmp/bwa/index/GRCh38.99.homo_sapiens",
+            "bwa/index/GRCh38.99.homo_sapiens",
             ".amb",
             ".ann",
             ".bwt",
@@ -61,6 +61,7 @@ rule bwa_mem:
     log:
         "logs/bwa/mem/{sample}.{status}.log",
     params:
-        " -R '@rg\tID:GRCh38\tSM:{sample}\tPL:Illumina'",
+        extra=" -R '@RG\tID:GRCh38\tSM:{sample}\tPL:Illumina'",
+        index="bwa/index/GRCh38.99.homo_sapiens"
     shell:
-        "bwa mem {params} -t {threads} /bwa/index/GRCh38.99.homo_sapiens {input.fq} > {output} 2>&1"
+        "bwa mem {params.extra} -t {threads} {params.index} {input.fq} > {output} 2> {log}"

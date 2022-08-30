@@ -48,7 +48,7 @@ rule ensemblvep_hc:
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/vep_hc.log",
+        "logs/vep/hc/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
     container:
@@ -57,7 +57,7 @@ rule ensemblvep_hc:
         "scripts/ensmblVEP_hc.R"
 
 
-rule ensemblvep_bcr:
+rule ensemblvep_mutect:
     input:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
         vcfs=["vep/hc/{sample}.vcf"],
@@ -69,7 +69,7 @@ rule ensemblvep_bcr:
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/vep_hc.log",
+        "logs/vep/mutect/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
     container:
@@ -90,10 +90,46 @@ rule ensemblvep_bcr:
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/vep_hc.log",
+        "logs/vep/bcr/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
     container:
         "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
     script:
         "scripts/ensmblVEP_bcr.R"
+
+
+rule compress_annotated_vcf:
+    input:
+        "vep/bcr/{sample}.vcf",
+    output:
+        protected("data_output/Annotated/{sample}.vcf.gz"),
+    threads: 2
+    resources:
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
+    log:
+        "logs/bcftools/view/{sample}.annotated.log",
+    params:
+        extra="",
+    wrapper:
+        "bio/bcftools/view"
+
+
+rule tabix_annotated_vcf:
+    input:
+        "data_output/Annotated/{sample}.vcf.gz",
+    output:
+        protected("data_output/Annotated/{sample}.vcf.gz.tbi"),
+    threads: 1
+    resources:
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
+    log:
+        "logs/tabis/{sample}.annotated.log",
+    params:
+        "-p vcf",
+    wrapper:
+        "bio/tabix"

@@ -18,6 +18,6 @@ rule picard_sam_to_fastq:
     log:
         "logs/picard/samtofq/{sample}.{status}.log",
     conda:
-        "envs/picard.yaml"
+        str(workflow_source_dir / "envs" / "picard.yaml")
     shell:
         "picard SamToFastq --INPUT {input} --FASTQ {output} > {log} 2>&1"

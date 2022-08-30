@@ -16,7 +16,7 @@ rule salmon_quant:
         logs=temp(directory("salmon/pseudo_mapping/{sample}/logs")),
     threads: config.get("max_threads", 20)
     resources:
-        time_min=get_45min_per_attempt,
+        time_min=get_90min_per_attempt,
         mem_mb=get_15gb_per_attempt,
         tmpdir="tmp",
     retries: 1

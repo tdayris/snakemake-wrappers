@@ -17,7 +17,7 @@ rule bam_readcount:
     log:
         "logs/bam_readcount/{sample}.{status}.log",
     conda:
-        "envs/bam_readcount.yaml"
+        str(workflow_source_dir / "envs" / "readcount.yaml")
     params:
         " -b 20 -q 20 -w 1",
     shell:

@@ -21,14 +21,16 @@ rule gatk_haplotype_caller:
     log:
         "logs/haplotypecaller/{sample}.{status}.log",
     params:
-        "-ERC GVCF",
+        extra="-ERC GVCF",
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar"
     conda:
-        "envs/conda/gatk3.yaml"
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "java -Xmx{resources.java_mem_gb}GB "
-        "-jar GenomeAnalysisTK.jar "
+        # "java -Xmx{resources.java_mem_gb}GB "
+        # "-jar {params.jar} "
+        "gatk "
         "-T HaplotypeCaller "
-        "{params} "
+        "{params.extra} "
         "-R {input.fasta} "
         "-I {input.bam} "
         "-O {output.vcf} "
@@ -59,14 +61,16 @@ rule gatk_genotype_gvcf:
     log:
         "logs/gatk/genotype_gvcf/baseline_wbc/{sample}.log",
     params:
-        "",
+        extra="",
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar"
     conda:
-        "envs/conda/gatk3.yaml"
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "java -Xmx{resources.java_mem_gb}GB "
-        "-jar GenomeAnalysisTK.jar "
+        # "java -Xmx{resources.java_mem_gb}GB "
+        # "-jar {params.jar} "
+        "gatk "
         "-T GenotypeGVCFs "
-        "{params} "
+        "{params.extra} "
         "-R {input.fasta} "
         "-V {input.baseline} "
         "-V {input.wbc} "
@@ -96,14 +100,16 @@ rule gatk_select_variants_baseline:
     log:
         "logs/gatk/select_variants/baseline_wbc/{sample}.log",
     params:
-        "-selectType SNP",
+        extra="-selectType SNP",
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar"
     conda:
-        "envs/conda/gatk3.yaml"
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "java -Xmx{resources.java_mem_gb}GB "
-        "-jar GenomeAnalysisTK.jar "
+        # "java -Xmx{resources.java_mem_gb}GB "
+        # "-jar {params.jar} "
+        "gatk "
         "-T SelectVariants "
-        "{params} "
+        "{params.extra} "
         "-R {input.fasta} "
         "-V {input.gvcf} "
         "-o {output} "
@@ -132,15 +138,19 @@ rule gatk_variant_filtration:
     log:
         "logs/gatk/variant_filtration/baseline_wbc/{sample}.log",
     params:
-        "--filterExpression 'QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0' "
-        "--filterName 'custom_snp_filter'",
+        extra=(
+            "--filterExpression 'QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0' "
+            "--filterName 'custom_snp_filter'"
+        ),
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar"
     conda:
-        "envs/conda/gatk3.yaml"
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "java -Xmx{resources.java_mem_gb}GB "
-        "-jar GenomeAnalysisTK.jar "
+        # "java -Xmx{resources.java_mem_gb}GB "
+        # "-jar {params.jar} "
+        "gatk "
         "-T VariantFiltration "
-        "{params} "
+        "{params.extra} "
         "-R {input.fasta} "
         "-V {input.gvcf} "
         "-o {output} "

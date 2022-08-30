@@ -1,6 +1,6 @@
 rule filter_tsv:
     input:
-        "snpsift/extractFields/{sample}.tsv",
+        table="snpsift/extractFields/{sample}.tsv",
     output:
         table=protected("data_output/TSV/{sample}.tsv"),
         xlsx=protected("data_output/XLSX/{sample}.xlsx"),
@@ -9,13 +9,19 @@ rule filter_tsv:
         mem_mb=get_8gb_per_attempt,
         time_min=get_20min_per_attempt,
         tmpdir="tmp",
-    retries: 1
     params:
         drop_duplicated_lines=True,
-        contains=[["Filter", "PASS"]],
+        contains=[["FILTER", "PASS"]],
         prefixes=[["Chromosome", "chr"]],
         new_cols=lambda wildcards: [
-            ["Mutect2_Allele_Frequency", "=", f"{wildcards.sample}_tumor_AF"]
+            ["Mutect2_Allele_Frequency", "=", f"{wildcards.sample}_tumor_AF"],
+            ["Chromosome", "=", "CHROM"],
+            ["Variant_ID", "=", "ID"],
+            ["SYMBOL", "=", "ANN[*].GENE"],
+            ["Reference_Allele", "=", "REF"],
+            ["Tumor_Seq_Allele1", "=", "ALT"],
+            ["Filter", "=", "FILTER"],
+
         ],
         keep_column=lambda wildcards: config["table_cols"]
         + [
@@ -33,6 +39,8 @@ rule filter_tsv:
             f"{wildcards.sample}_tumor_AD_allele2",
             f"{wildcards.sample}_tumor_AF",
         ],
+    log:
+        "logs/pandas/filter_tsv/{sample}.log"
     wrapper:
         "bio/pandas/filter_table"
 
@@ -82,7 +90,7 @@ rule fix_vcf:
 
 rule gleaves_compatibility:
     input:
-        "snpsift/fixed/{sample}.vcf",
+        vcf="snpsift/fixed/{sample}.vcf",
     output:
         vcf=temp("gleaves/corrected/{sample}.vcf.gz"),
         vcf_tbi=temp("gleaves/corrected/{sample}.vcf.gz.tbi"),

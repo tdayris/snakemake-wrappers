@@ -9,7 +9,8 @@ import datetime
 import gzip
 import logging
 
-from typing import Any
+from typing import Any, Dict, Optional
+from snakemake.shell import shell
 
 logging.basicConfig(
     #filename=snakemake.log[0],
@@ -26,7 +27,7 @@ def open_function(file: str):
 
 
 
-def get_headers(description: dict[str, Any]) -> str:
+def get_headers(description: Dict[str, Any]) -> str:
     """
     From a list of column name, and an optional list of description,
     build VCF headers.
@@ -68,7 +69,7 @@ headers_description = {
 }
 
 
-def parse_info(chrom: str, pos: int, ref: str, alt: str, info: str) -> dict[str, Any]:
+def parse_info(chrom: str, pos: int, ref: str, alt: str, info: str) -> Dict[str, Any]:
     """
     Parse info fields and gather annotations
     """
@@ -95,60 +96,68 @@ def parse_info(chrom: str, pos: int, ref: str, alt: str, info: str) -> dict[str,
     try:
         new_annotations["RRC"] = new_annotations["RRCp"] + new_annotations["RRCm"]
     except TypeError:
-        pass
+        new_annotations["RRC"] = None
 
 
     try:
         new_annotations["ARC"] = new_annotations["ARCp"] + new_annotations["ARCm"]
     except TypeError:
-        pass
+        new_annotations["ARC"] = None
 
     try:
         new_annotations["BRC"] = new_annotations["TRC"] - (new_annotations["RRC"] + new_annotations["ARC"])
     except TypeError:
-        pass
+        new_annotations["BRC"] = None
 
     try:
         new_annotations["BRR"] = new_annotations["BRC"] / new_annotations["TRC"]
     except TypeError:
-        pass
+        new_annotations["BRR"] = None
 
     try:
         new_annotations["BRE"] = 1 - new_annotations["BRR"]
     except TypeError:
-        pass
+        new_annotations["BRE"] = None
 
 
     new_annotations["BKG"] = get_bkg(new_annotations["BRE"])
     new_annotations["OLD_MULTIALLELIC"] = f"{chrom}:{pos}:{ref}:{alt}"
     new_annotations["OLD_VARIANT"] = f"{chrom}:{pos}:{ref}:{alt}"
     return new_annotations
-        
 
 
-def get_sb_table(sb_table: str) -> dict[str, int]:
+def get_sb_table(sb_table: str) -> Dict[str, Optional[int]]:
     """Parse INFO field and return strand bias table"""
-    alt, ref = sb_table.split("|")
-    ARCp, ARCm = map(int, alt.split(","))
-    RRCp, RRCm = map(int, ref.split(","))
-    return {"ARCp": ARCp, "ARCm": ARCm, "RRCp": RRCp, "RRCm": RRCm}
+    result = {"ARCp": None, "ARCm": None, "RRCp": None, "RRCm": None}
+    try:
+        sb_table_val = sb_table.split("=")[-1]
+        alt, ref = sb_table_val.split("|")
+        ARCp, ARCm = map(int, alt.split(","))
+        RRCp, RRCm = map(int, ref.split(","))
+        result = {"ARCp": ARCp, "ARCm": ARCm, "RRCp": RRCp, "RRCm": RRCm}
+    except Exception as e:
+        logging.error(sb_table)
+        logging.error(sb_table_val)
+        logging.error(e)
+    finally:
+        return result
 
 
-def get_SOR(sor_field: str) -> dict[str, float]:
+def get_SOR(sor_field: str) -> Dict[str, float]:
     """
     Parse INFO field and return Strand Odds Ratio
     """
     return {"SBM": sor_field.split("=")[-1]}
 
 
-def get_fisher_test(fisher_field: str) -> dict[str, float]:
+def get_fisher_test(fisher_field: str) -> Dict[str, float]:
     """
     Parse INFO field and return Fisher Exact test
     """
     return {"SBP": fisher_field.split("=")[-1]}
 
 
-def get_var(vaf_field: str) -> dict[str, str]:
+def get_var(vaf_field: str) -> Dict[str, str]:
     """
     Parse VAF field to return genotype quality
     """
@@ -198,7 +207,7 @@ def annotate(line: str) -> str:
         info=line[7]
     )
     new_annotations = [
-        "{key}={val}" for key, val in new_annotations.items()
+        f"{key}={val}" for key, val in new_annotations.items()
         if val is not None
     ]
     new_annotations = ";".join(new_annotations)
@@ -219,30 +228,39 @@ def annotate(line: str) -> str:
 # Annotating input VCF
 logging.debug("Opening VCF")
 if str(snakemake.output["vcf"]).endswith("vcf.gz"):
-    out_vcf = snakemake.output["vcf"][:-3]
+    out_vcf_path = snakemake.output["vcf"][:-3]
 else:
-    out_vcf = snakemake.output["vcf"]
+    out_vcf_path = snakemake.output["vcf"]
 
 
 
 with (open_function(snakemake.input["vcf"]) as in_vcf,
-      open(out_vcf, 'w', encoding="utf-8") as out_vcf):
+      open(out_vcf_path, 'w', encoding="utf-8") as out_vcf):
     for line in in_vcf:
         if isinstance(line, bytes):
             line = line.decode("utf-8")
 
-        if line.startswith("#"):
+        if line.startswith("##"):
             pass
+        elif line.startswith("#"):
+            out_vcf.write(get_headers(headers_description))
         else:
-            line = annotate(line, tsv)
+            line = annotate(line)
 
         out_vcf.write(line)
 
 
 if str(snakemake.output["vcf"]).endswith("vcf.gz"):
     logging.info(f"Compressing {out_vcf}")
-    shell("pbgzip -c {out_vcf} > {snakemake.output['vcf']} 2> {log}")
-    logging.info(f"Indexing {snakemake.output['call']}")
-    shell("tabix -p vcf {snakemake.output['vcf']} >> {log} 2>&1")
+
+    log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+    compressed_vcf = snakemake.output['vcf']
+    shell("pbgzip -c {out_vcf_path} > {compressed_vcf} {log}")
+
+
+    logging.info(f"Indexing {snakemake.output['vcf']}")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)  
+    shell("tabix -p vcf {compressed_vcf} {log}")
+
     logging.info(f"Removing temporary file {out_vcf}")
-    shell("rm --verbose {out_vcf} >> {log} 2>&1")
+    shell("rm --verbose --force {out_vcf_path} {log}")

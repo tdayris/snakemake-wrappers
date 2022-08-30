@@ -40,7 +40,7 @@ from messages import message
 #####################
 
 # Save output stream in a file
-logging.basicConfig(filename="snakemake.rnaseq.log", filemode="w", level=logging.DEBUG)
+logging.basicConfig(filename="snakemake.CTC_Integragen_Legacy.log", filemode="w", level=logging.DEBUG)
 logging.info("Additional utils loaded")
 
 
@@ -72,11 +72,16 @@ logging.info("Building globals...")
 def parse_design(
     design: pandas.DataFrame, prefix: str = "data_input", suffix: str = "bam"
 ) -> dict[str, str]:
+    "We assume Baseline and WBC correspondig to a sample always come first."
 
     logging.info("Parsing design...")
     link_bams = {}
     sample_list = []
+    baseline_sample_list = []
+    wbc_sample_list = []
     link_sample_baseline = {}
+    last_baseline = None
+    last_wbc = None
 
     row_iter = iter(design.iterrows())
     row = next(row_iter, None)
@@ -87,11 +92,15 @@ def parse_design(
         if row["Status"].lower() == "baseline":
             link_bams[f"{prefix}/{sample}.baseline.{suffix}"] = row["bam"]
             logging.debug(f"New baseline added for {sample} in general")
+            baseline_sample_list.append(sample)
+            last_baseline = f"{sample}.baseline"
 
         elif row["Status"].lower() == "wbc":
             manip = row["Manip"]
             kit = row["Version"]
             sample_id = f"{sample}_{kit}_M{manip}"
+            wbc_sample_list.append(sample_id)
+            last_wbc = f"{sample_id}.wbc"
 
             link_bams[f"{prefix}/{sample_id}.wbc.{suffix}"] = row["bam"]
             logging.debug(
@@ -102,23 +111,27 @@ def parse_design(
             manip = row["Manip"]
             kit = row["Version"]
             replicate = row["Replicate"]
-            raw_sample_id = f"{sample}_V{kit}_M{manip}"
+            raw_sample_id = f"{sample}_{kit}_M{manip}"
             sample_id = f"{raw_sample_id}_{replicate}"
 
             sample_list.append(sample_id)
             link_bams[f"{prefix}/{sample_id}.ctc.{suffix}"] = row["bam"]
             link_sample_baseline[sample_id] = {
-                "ctc": f"{prefix}/{sample_id}.ctc.{suffix}",
-                "wbc": f"{prefix}/{raw_sample_id}.wbc.{suffix}",
-                "baseline": f"{prefix}/{sample}.baseline.{suffix}",
+                "ctc": f"sambamba/markdup/{sample_id}.ctc.{suffix}",
+                "wbc": f"sambamba/markdup/{last_wbc}.{suffix}",
+                "baseline": f"sambamba/markdup/{last_baseline}.{suffix}",
             }
             logging.debug(
                 f"New CTC added {raw_sample_id}, replicate number {replicate}."
             )
 
+        else:
+            raise ValueError(row)
+
         row = next(row_iter, None)
 
-    return link_bams, sample_list, link_sample_baseline
+
+    return link_bams, sample_list, link_sample_baseline, baseline_sample_list, wbc_sample_list
 
 
 def get_baseline(wildcards):
@@ -142,11 +155,9 @@ def get_trio(wildcards):
     }
 
 
-link_bams, sample_list, link_sample_baseline = parse_design(design.copy())
+link_bams, samples_list, link_sample_baseline, baseline_sample_list, wbc_sample_list = parse_design(design.copy())
 
-sample_baseline_table = pandas.DataFrame(link_sample_baseline)
-logging.debug(sample_baseline_table.head())
-logging.debug(sample_baseline_table.columns)
+sample_baseline_table = pandas.DataFrame.from_dict(link_sample_baseline, orient="index")
 sample_baseline_table.set_index(["baseline", "wbc"], inplace=True)
 logging.info(
     f"First 20 lines of fastq correspondancies: \n{sample_baseline_table.head(20)}"
@@ -159,5 +170,5 @@ status_list = list(set(design["Status"]))
 
 
 wildcard_constraints:
-    sample=r"|".join(samples_list),
+    sample=r"|".join(samples_list + baseline_sample_list + wbc_sample_list),
     status=r"|".join(status_list),
