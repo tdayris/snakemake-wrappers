@@ -13,9 +13,10 @@ declare -x SNAKEMAKE_PROFILE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/common/prof
 declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/CTC_Variant_Calling_Integragen_Legacy"
 export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 
+CWD=$(readlink -e ${PWD})
 SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
 CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"
-SNAKE_ARGS=()
+SNAKE_ARGS=("--singularity-args \'-B ${CWD}:/WORKDIR/${CWD}" "-B /mnt/beegfs/database/bioinfo/:/WORKDIR/mnt/beegfs/database/bioinfo/\'")
 PROFILE="slurm"
 SUMMARY=""
 GRAPH=""
