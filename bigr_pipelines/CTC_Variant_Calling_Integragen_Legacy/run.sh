@@ -16,7 +16,11 @@ export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 CWD=$(readlink -e ${PWD})
 SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
 CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"
-SNAKE_ARGS=("--use-envmodules" "--singularity-args '-B ${CWD}:/WORKDIR/${CWD} -B /mnt/beegfs/database/bioinfo/:/WORKDIR/mnt/beegfs/database/bioinfo/'")
+SNAKE_ARGS=(
+  "--use-envmodules" 
+  "--use-singularity" 
+  "--singularity-args '-B ${CWD}:/WORKDIR/${CWD} -B /mnt/beegfs/database/bioinfo/:/WORKDIR/mnt/beegfs/database/bioinfo/'"
+)
 PROFILE="slurm"
 SUMMARY=""
 GRAPH=""
