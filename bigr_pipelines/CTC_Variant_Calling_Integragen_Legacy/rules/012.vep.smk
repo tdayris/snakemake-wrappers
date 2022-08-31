@@ -72,7 +72,7 @@ rule ensemblvep_hc:
     container:
         "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
     script:
-        workflow_source_dir / "scripts" / "ensmblVEP_hc.R"
+        str(workflow_source_dir / "scripts" / "ensmblVEP_hc.R")
 
 
 rule ensemblvep_mutect:
@@ -93,7 +93,7 @@ rule ensemblvep_mutect:
     container:
         "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
     script:
-        workflow_source_dir / "scripts" / "ensmblVEP_mutect.R"
+        str(workflow_source_dir / "scripts" / "ensmblVEP_mutect.R")
 
 
 rule ensemblvep_bcr:
@@ -114,7 +114,7 @@ rule ensemblvep_bcr:
     container:
         "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
     script:
-        workflow_source_dir / "scripts" / "ensmblVEP_bcr.R"
+        str(workflow_source_dir / "scripts" / "ensmblVEP_bcr.R")
 
 
 rule compress_annotated_vcf:
