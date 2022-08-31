@@ -8,7 +8,7 @@ from typing import Optional
 def is_default(params: Optional[str] = None) -> bool:
     if params is None:
         return True
-    elif params.lower() == "none":
+    elif params.lower() in ["none", "null", "None", "NULL"]:
         return True
     
     return False
