@@ -69,8 +69,8 @@ rule ensemblvep_hc:
         "logs/vep/hc/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
-    container:
-        "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
+    conda:
+        str(workflow_source_dir / "envs" / "r.yaml")
     script:
         str(workflow_source_dir / "scripts" / "ensemblVEP_hc.R")
 
@@ -90,8 +90,8 @@ rule ensemblvep_mutect:
         "logs/vep/mutect/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
-    container:
-        "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
+    conda:
+        str(workflow_source_dir / "envs" / "r.yaml")
     script:
         str(workflow_source_dir / "scripts" / "ensemblVEP_mutect.R")
 
@@ -111,8 +111,8 @@ rule ensemblvep_bcr:
         "logs/vep/bcr/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
-    container:
-        "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
+    conda:
+        str(workflow_source_dir / "envs" / "r.yaml")
     script:
         str(workflow_source_dir / "scripts" / "ensemblVEP_bcr.R")
 
