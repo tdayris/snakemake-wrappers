@@ -4,9 +4,12 @@ snpeff_meta_config = {
     **config["snpeff_snpsift"]
 }
 
-module snpsift:
-    snakefile: "../../meta/bio/snpsift/test/Snakefile"
-    config: snpeff_meta_config
+module snpeff_meta:
+    snakefile: "../../meta/bio/snpeff_annotate/test/Snakefile"
+    config: snpeff_snpsift_config
 
-
-use rule * from snpsift
+use rule snpeff from snpeff_meta with:
+    input:
+        calls="data_input/calls/{sample}.vcf.gz",
+        calls_index="data_input/calls/{sample}.vcf.gz.tbi",
+        db=config["ref"]["snpeff"]
