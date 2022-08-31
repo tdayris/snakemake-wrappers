@@ -19,7 +19,7 @@ CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"
 SNAKE_ARGS=(
   "--use-envmodules" 
   "--use-singularity" 
-  "--singularity-args '-B ${CWD}:${CWD} -B /mnt/beegfs/database/bioinfo/:mnt/beegfs/database/bioinfo/ -B ${CWD}/tmp/:/tmp/'"
+  "--singularity-args '-B ${CWD}:${CWD} -B /mnt/beegfs/database/bioinfo/:/mnt/beegfs/database/bioinfo/ -B ${CWD}/tmp/:/tmp/'"
 )
 PROFILE="slurm"
 SUMMARY=""
