@@ -42,6 +42,7 @@ rule ensembl_vep:
         "--everything "
         "--offline "
         "--vcf "
+        "--format vcf "
         "--refseq ",
     container:
         "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
