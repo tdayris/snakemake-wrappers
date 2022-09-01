@@ -1,5 +1,7 @@
-require(ensemblVEP)
-require(dplyr)
+library(ensemblVEP)
+library(dplyr)
+library(VariantAnnotation)
+
 hotspot_list <- read.table(
     file = base::as.character(x = snakemake@input[["cancer_genes"]]),
     header = TRUE,
