@@ -73,8 +73,6 @@ rule ensemblvep_hc:
         organism=config.get("vep_db", "hg38"),
     conda:
         str(workflow_source_dir / "envs" / "r.yaml")
-    container:
-        "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
     script:
         str(workflow_source_dir / "scripts" / "ensemblVEP_hc.R")
 
