@@ -14,7 +14,7 @@ rule tximport:
             "salmon/pseudo_mapping/{sample}/quant.genes.sf",
             sample=samples_per_prefixes[wildcards.comparison],
         ),
-        lib=lambda wilcards: expand(
+        lib=lambda wildcards: expand(
             "salmon/pseudo_mapping/{sample}/lib_format_counts.json",
             sample=samples_per_prefixes[wildcards.comparison],
         ),
