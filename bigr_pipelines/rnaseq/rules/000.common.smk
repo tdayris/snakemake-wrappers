@@ -151,6 +151,8 @@ maptypes = ["variants", "chimera"]
 content_list = ["SortedOnLogFC", "SortedOnPadj", "Complete"]
 # Immune deconv tool list
 tool_list = ["cibersort", "cibersort_abs", "mcp_counter", "epic", "quantiseq", "xcell"]
+# List of possible segment export in mixcr
+segment_export_list = ["vUsage", "jUsage", "isotypeUsage", "vjUsage"]
 
 logging.info("Constraining wildcards...")
 
@@ -168,3 +170,4 @@ wildcard_constraints:
     maptype=r"|".join(maptypes),
     content=r"|".join(content_list),
     tool=r"|".join(tool_list),
+    segment=r"|".join(segment_export_list),
