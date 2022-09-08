@@ -21,6 +21,6 @@ rule bismark_mapping:
     log:
         "logs/bismark/mapping/{sample}.log",
     params:
-        extra=lambda wildcards: f"{config['bismark']['mapping_extra']} --rg_tag '@RG\\tID:{wildcards.sample}\\tSM:{wildcards.sample}\\tPU:{wildcards.sample}\\tPL:ILLUMINA\\tCN:IGR\\tDS:BSAmpliSeq\\tPG:BOWTIE2'",
+        extra=lambda wildcards: f"--rg_tag \'@RG\\tID:{wildcards.sample}\\tSM:{wildcards.sample}\\tPU:{wildcards.sample}\\tPL:ILLUMINA\\tCN:IGR\\tDS:BSAmpliSeq\\tPG:BOWTIE2\' {config['bismark']['mapping_extra']}",
     wrapper:
         "bio/bismark/bismark"
