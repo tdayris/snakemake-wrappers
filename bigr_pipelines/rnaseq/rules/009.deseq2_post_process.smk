@@ -202,18 +202,7 @@ rule plot_deseq_genes:
     output:
         log_counts=temp("figures/{comparison}/log_counts/log_dst.{comparison}.png"),
         log_mu=temp("figures/{comparison}/log_counts/log_mu.{comparison}.png"),
-        gene_plots=report(
-            expand(
-                "data_output/DEseq2/{comparison}/gene_plots/{gene}.png",
-            gene=config.get("genes_of_interest", ["ENSG00000141510"]),
-            allow_missing=True,
-        ),
-        category="Gene Expression plots",
-        caption=str(
-        workflow_source_dir / "reports" / " 009.gene_expression_plot.rst"
-            ),
-            subcategory="{comparison}",
-        ),
+        gene_plots=directory("data_output/DEseq2/{comparison}/gene_plots/"),
         independent_filtering=temp(
             "figures/{comparison}/deseq2/independent_filter.{comparison}.png"
         ),

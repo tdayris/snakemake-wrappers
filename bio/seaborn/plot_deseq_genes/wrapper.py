@@ -156,16 +156,18 @@ def plot_single_gene(dst: pandas.DataFrame,
         gene_count = dstbox[dstbox.index == gene]
         gene_mu = mubox[mubox.index == gene]
         gene_dge = deseq[deseq.index == gene]
-        png_out = png_prefix + f"{gene}.png"
         status = gene_dge["Status"][0]
 
         padj = round(gene_dge["padj"][0], 4)
 
         try:
-            name = gene_dge["Gene_Name"][0]
-            name = f"{name} ({gene})"
+            gene_name = gene_dge["Gene_Name"][0]
+            name = f"{gene_name} ({gene})"
+            png_out = png_prefix + f"{gene_name}.{gene}.png"
         except KeyError:
             name = gene
+            gene_name = gene
+            png_out = png_prefix + f"{gene}.png"
 
         fig = matplotlib.pyplot.figure(figsize=(20,10))
 
