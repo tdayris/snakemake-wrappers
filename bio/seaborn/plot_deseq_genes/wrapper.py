@@ -9,13 +9,14 @@ import logging
 import matplotlib
 import matplotlib.pyplot
 import numpy
+import os
 import pandas
 import seaborn
 
 from typing import Any, Dict, List, Optional
 
 logging.basicConfig(
-    #filename=snakemake.log[0],
+    filename=snakemake.log[0],
     filemode="w",
     level=logging.DEBUG
 )
@@ -414,6 +415,7 @@ if "log_mu" in snakemake.output.keys():
     )
 
 if "gene_plots" in snakemake.output.keys():
+    os.makedirs(str(snakemake.output["gene_plots"]), exist_ok=True)
     try:
         gene_list = snakemake.wildcards["gene"]
     except AttributeError:
