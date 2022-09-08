@@ -5,7 +5,7 @@ rule multiqc:
         nuc=expand("bismark/align/{sample}.nucleotide_stats.txt", sample=sample_list),
         m_bias=expand("bismark/meth/{sample}.M-bias.txt", sample=sample_list),
         fastp=expand(
-            "fastp/json/{sample}.fastp.{ext}", sample=sample_list, ext=["html", "json"]
+            "fastp/{ext}/{sample}.fastp.{ext}", sample=sample_list, ext=["html", "json"]
         ),
     output:
         "data_output/MultiQC/Bismark.html",
