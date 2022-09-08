@@ -164,7 +164,7 @@ def plot_single_gene(dst: pandas.DataFrame,
     mubox["Condition"] = [condition_dict[s] for s in mubox['Sample ID']]
 
     for gene in genes:
-        logging.info(f"Plotting information on {gene}")
+        logging.info("Plotting gene information on %s", gene)
         gene_count = dstbox[dstbox.index == gene]
         gene_mu = mubox[mubox.index == gene]
         gene_dge = deseq[deseq.index == gene]
@@ -180,6 +180,7 @@ def plot_single_gene(dst: pandas.DataFrame,
             name = gene
             gene_name = gene
             png_out = png_prefix + f"{gene}.png"
+        logging.info(f"Plotting gene information on {name} to {png_out}")
 
         fig = matplotlib.pyplot.figure(figsize=(20,10))
 
@@ -228,6 +229,18 @@ def plot_single_gene(dst: pandas.DataFrame,
             matplotlib.pyplot.sca(ax)
             matplotlib.pyplot.xticks(rotation=90)
 
+
+        if not os.path.exists(snakemake.output["gene_plots"]):
+            logging.info(
+                "Building output directory: %s", 
+                snakemake.output["gene_plots"]
+            )
+            os.makedirs(str(snakemake.output["gene_plots"]))
+        else:
+            logging.info(
+                "Output directory '%s' already exists ", 
+                snakemake.output["gene_plots"]
+            )
 
         logging.info("Gene plot saved to %s", png_out)
         matplotlib.pyplot.savefig(
@@ -441,8 +454,16 @@ if "log_mu" in snakemake.output.keys():
 if "gene_plots" in snakemake.output.keys():
     logging.info("Performing gene plots ...")
     if not os.path.exists(snakemake.output["gene_plots"]):
-        logging.info("Building output directory: %s", snakemake.output["gene_plots"])
+        logging.info(
+            "Building output directory: %s", 
+            snakemake.output["gene_plots"]
+        )
         os.makedirs(str(snakemake.output["gene_plots"]))
+    else:
+        logging.info(
+            "Output directory '%s' already exists ", 
+            snakemake.output["gene_plots"]
+        )
 
     try:
         gene_list = snakemake.wildcards["gene"]
