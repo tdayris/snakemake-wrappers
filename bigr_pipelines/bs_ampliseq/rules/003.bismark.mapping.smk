@@ -22,5 +22,6 @@ rule bismark_mapping:
         "logs/bismark/mapping/{sample}.log",
     params:
         extra=lambda wildcards: f"{config['bismark']['mapping_extra']} --rg_id {wildcards.sample} --rg_sample {wildcards.sample}",
+        basename=lambda wildcards: str(wildcards.sample),
     wrapper:
         "bio/bismark/bismark"

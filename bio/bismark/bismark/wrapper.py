@@ -72,7 +72,9 @@ log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 cmdline_args.append("{log}")
 
 # run
-shell(" ".join(cmdline_args))
+with TemporaryDirectory() as tempdir:
+    cmdline_args.append(f"--temp_dir {tempdir}" )
+    shell(" ".join(cmdline_args))
 
 # Move outputs into proper position.
 expected_2_actual_paths = [
