@@ -16,7 +16,7 @@ export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
 CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"
 WRAPPERS_PATH=$(readlink -e "${PIPELINE_PATH}/../../")
-SNAKE_ARGS=("--wrapper-prefix" "${WRAPPERS_PATH}")
+SNAKE_ARGS=("--wrapper-prefix" "${WRAPPERS_PATH}/")
 PROFILE="slurm"
 SUMMARY=""
 GRAPH=""
