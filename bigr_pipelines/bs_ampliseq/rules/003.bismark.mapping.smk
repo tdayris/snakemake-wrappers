@@ -17,10 +17,10 @@ rule bismark_mapping:
     resources:
         mem_mb=get_75gb_and_2gb_per_attempt,
         time_min=get_3h_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     log:
-        "logs/bismark/mapping/{sample}.log"
+        "logs/bismark/mapping/{sample}.log",
     params:
-        extra=lambda wildcards: f"{config['bismark']['mapping_extra']} --rg_tag '@RG\\tID:{wildcards.sample}\\tSM:{wildcards.sample}\\tPU:{wildcards.sample}\\tPL:ILLUMINA\\tCN:IGR\\tDS:BSAmpliSeq\\tPG:BOWTIE2'"
+        extra=lambda wildcards: f"{config['bismark']['mapping_extra']} --rg_tag '@RG\\tID:{wildcards.sample}\\tSM:{wildcards.sample}\\tPU:{wildcards.sample}\\tPL:ILLUMINA\\tCN:IGR\\tDS:BSAmpliSeq\\tPG:BOWTIE2'",
     wrapper:
         "bio/bismark/bismark"
