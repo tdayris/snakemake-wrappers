@@ -229,19 +229,6 @@ def plot_single_gene(dst: pandas.DataFrame,
             matplotlib.pyplot.sca(ax)
             matplotlib.pyplot.xticks(rotation=90)
 
-
-        if not os.path.exists(snakemake.output["gene_plots"]):
-            logging.info(
-                "Building output directory: %s", 
-                snakemake.output["gene_plots"]
-            )
-            os.makedirs(str(snakemake.output["gene_plots"]))
-        else:
-            logging.info(
-                "Output directory '%s' already exists ", 
-                snakemake.output["gene_plots"]
-            )
-
         logging.info("Gene plot saved to %s", png_out)
         matplotlib.pyplot.savefig(
             png_out,
