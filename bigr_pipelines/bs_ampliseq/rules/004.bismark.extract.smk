@@ -5,7 +5,7 @@ rule bismark_methylation_extractor:
         mbias_r1="data_output/Bismark/{sample}.M-bias_R1.png",
         mbias_r2="data_output/Bismark/{sample}.M-bias_R2.png",
         mbias_report=temp("bismark/meth/{sample}.M-bias.txt"),
-        splitting_report=temp("bismark/meth/{sample}_PE_splitting_report.txt"),
+        splitting_report=temp("bismark/meth/{sample}_splitting_report.txt"),
         methylome_CpG_cov=protected("data_output/Bismark/{sample}.cpg.cov.gz"),
         methylome_CpG_mlevel_bedGraph=protected(
             "data_output/Bismark/{sample}.cpg.bedGraph.gz"
