@@ -1,11 +1,11 @@
 rule bismark_reports:
     input:
-        alignment_report=temp("bismark/bams/{sample}_report.txt"),
-        nucleotide_report=temp("bismark/bams/{sample}.nucleotide_stats.txt"),
-        mbias_report=temp("bismark/meth/{sample}.M-bias.txt"),
-        splitting_report=temp("bismark/meth/{sample}_splitting_report.txt"),
+        alignment_report="bismark/bams/{sample}_report.txt",
+        nucleotide_report="bismark/bams/{sample}.nucleotide_stats.txt",
+        mbias_report="bismark/meth/{sample}.M-bias.txt",
+        splitting_report="bismark/meth/{sample}_splitting_report.txt",
     output:
-        html="data_output/Bismark/{sample}.html",
+        html=protected("data_output/Bismark/{sample}.html"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
