@@ -19,7 +19,15 @@ if "report" in snakemake.output.keys():
     extra += " --report {} ".format(snakemake.output["report"])
 
 
+if "json" in snakemake.output.keys():
+    extra += "----json-report {}".format(snakemake.output["json"])
+
+
+if snakemake.output.clones.endswith((".clna", ".clns")):
+    extra += " --write-alignments"
+
+
 shell(
-    "mixcr assemble {extra} --threads {snakemake.threads} "
+    "mixcr assemble --verbose --force-overwrite {extra} --threads {snakemake.threads} "
     "{snakemake.input} {snakemake.output.clones} {log}"
 )

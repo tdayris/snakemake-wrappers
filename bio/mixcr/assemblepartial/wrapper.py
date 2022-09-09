@@ -23,6 +23,6 @@ if "json" in snakemake.output.keys():
     extra += "----json-report {}".format(snakemake.output["json"])
 
 shell(
-    "mixcr align --verbose --force-overwrite --species {species} {extra} --threads {snakemake.threads} "
+    "mixcr assemblePartial --force-overwrite {extra} --threads {snakemake.threads} "
     "{snakemake.input} {snakemake.output.vdjca} {log}"
 )
