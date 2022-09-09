@@ -1,6 +1,6 @@
 rule bismark_methylation_extractor:
     input:
-        "bismark/align/{sample}.PE.bam",
+        "bismark/align/{sample}.bam",
     output:
         mbias_r1="data_output/Bismark/{sample}.M-bias_R1.png",
         mbias_r2="data_output/Bismark/{sample}.M-bias_R2.png",
