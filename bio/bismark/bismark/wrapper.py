@@ -69,11 +69,11 @@ cmdline_args.append(f"--parallel {snakemake.threads}")
 
 # log
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-cmdline_args.append("{log}")
 
 # run
 with TemporaryDirectory() as tempdir:
     cmdline_args.append(f"--temp_dir {tempdir}" )
+    cmdline_args.append("{log}")
     shell(" ".join(cmdline_args))
 
 # Move outputs into proper position.
@@ -104,4 +104,4 @@ expected_2_actual_paths = [
 log_append = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
 for (exp_path, actual_path) in expected_2_actual_paths:
     if exp_path and (exp_path != actual_path):
-        shell("mv {actual_path:q} {exp_path:q} {log_append}")
+        shell("mv --verbose {actual_path:q} {exp_path:q} {log_append}")
