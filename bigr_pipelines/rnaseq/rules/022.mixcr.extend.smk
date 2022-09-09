@@ -35,7 +35,7 @@ rule mixcr_assemble:
     log:
         "logs/mixcr/extend/{sample}.log"
     wrapper:
-        "bio/mixcr/extend"
+        "bio/mixcr/assemble"
 
 
 rule mixcr_assemble_contigs:
