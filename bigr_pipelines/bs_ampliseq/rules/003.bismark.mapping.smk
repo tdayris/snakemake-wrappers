@@ -6,14 +6,10 @@ rule bismark_mapping:
         bismark_indexes_dir=config["ref"]["bismark_index"],
         genomic_freq=config["ref"]["bismark_frequencies"],
     output:
-        bam=temp("bismark/align/{sample}.PE.bam"),
+        bam=temp("bismark/align/{sample}.bam"),
         report=temp("bismark/align/{sample}_PE_report.txt"),
         nucleotide_stats=temp("bismark/align/{sample}.nucleotide_stats.txt"),
-        bam_unmapped_1=temp("bismark/align/{sample}_unmapped_reads_1.fq.gz"),
-        bam_unmapped_2=temp("bismark/align/{sample}_unmapped_reads_2.fq.gz"),
-        ambiguous_1=temp("bismark/align/{sample}_ambiguous_reads_1.fq.gz"),
-        ambiguous_2=temp("bismark/align/{sample}_ambiguous_reads_2.fq.gz"),
-    threads: config.get("max_threads", 20)
+    threads: 4
     resources:
         mem_mb=get_75gb_and_2gb_per_attempt,
         time_min=get_3h_per_attempt,
