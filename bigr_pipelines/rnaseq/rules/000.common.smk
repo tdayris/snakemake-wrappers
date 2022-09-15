@@ -80,8 +80,8 @@ logging.info("Building DESeq2 globals...")
 comparison_levels = list(
     yield_comps(
         complete_design=design,
-        aggregate=config["deseq2"]["design"].get("aggregate_col"),
-        remove=config["deseq2"]["design"].get("remove_col"),
+        aggregate=config["deseq2"]["design"].get("columns_to_aggregate"),
+        remove=config["deseq2"]["design"].get("columns_to_ignore"),
         contains=config["deseq2"]["design"].get("include_only"),
     )
 )
