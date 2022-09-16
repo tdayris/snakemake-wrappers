@@ -52,13 +52,18 @@ rule expand_rank_list:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        time_min=get_35min_per_attempt,
+        time_min=get_10min_per_attempt,
         tmpdir="tmp"
     params:
         gene_id_type=config.get(
             "gene_id_type", "ENSEMBL"
+        ),
+        orgdb=(
+            "org.Hs.eg.db" 
+            if config["clusterprofiler"].get("organism", "Hs") == "Hs" 
+            else "org.Mm.eg.db"
         )
     log:
-        "logs/clusterprofiler/expand.log"
+        "logs/expand.log"
     wrapper:
         "bio/clusterProfiler/hg38_genelist"
