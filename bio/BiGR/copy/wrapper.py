@@ -18,7 +18,7 @@ from tempfile import TemporaryDirectory
 log = snakemake.log_fmt_shell(stdout=False, stderr=True, append=True)
 extra_cp = snakemake.params.get("extra", "-v")
 extra_iget = snakemake.params.get("extra_irods", "-vK")
-
+extra_ln = snakemake.params.get("extra_ln", "-sfrv")
 
 # No node can access a cold storage
 # these files must be copied. However,
@@ -37,11 +37,13 @@ def cat_files(dest: str, *src: str, log: str = log) -> None:
 def bash_copy(src: str,
               dest: str,
               extra: str = extra_cp,
+              extra_ln: str = extra_ln,
               log: str = log,
               cold: str = cold_storage) -> None:
-    if src.startswith(cold) and ("--symbolic-link" not in extra):
-        extra += " --symbolic-link"
-    shell(f"cp {extra} {src} {dest} {log}")
+    if src.startswith(cold):
+        shell(f"ln {extra_ln} {src} {dest} {log}")
+    else:
+        shell(f"cp {extra} {src} {dest} {log}")
 
 
 def iRODS_copy(src: str,
