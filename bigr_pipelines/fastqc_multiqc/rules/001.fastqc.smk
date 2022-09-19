@@ -16,4 +16,4 @@ rule fastqc:
     log:
         "logs/fastqc/{sample}.{stream}.log"
     wrapper:
-        str(worflow_source_dir /  "bio" / "fastqc")
+        "bio/fastqc"

@@ -18,4 +18,4 @@ rule fastq_screen:
     log:
         "logs/fastq_screen/{sample}.{stream}.log"
     wrapper:
-        str(worflow_source_dir /  "bio" / "fastq_screen")
+        "bio/fastq_screen"
