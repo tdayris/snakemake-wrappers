@@ -36,7 +36,7 @@ rule multiqc:
     log:
         "logs/multiqc.log"
     wrapper:
-        "bio/multiqc"
+        str(worflow_source_dir /  "bio"/ "multiqc")
 
 
 

@@ -13,4 +13,4 @@ rule bigr_copy:
     log:
         "logs/bigr_copy/{sample}.log"
     wrapper:
-        "bio/BiGR/copy"
+        str(worflow_source_dir / "bio" / "BiGR" / "copy")
