@@ -10,7 +10,7 @@ source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/environment.sh"
 
 PROFILE="slurm";
 SUMMARY=""
-SNAKE_ARGS=()
+SNAKE_ARGS=("--wrapper-prefix" "${WRAPPERS_PATH}/")
 GRAPH=""
 
 while [ "$#" -gt 0 ]; do
