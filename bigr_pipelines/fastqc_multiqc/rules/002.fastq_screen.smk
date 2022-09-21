@@ -8,7 +8,7 @@ rule fastq_screen:
         "Assessing quality of {wildcards.sample}, stream {wildcards.stream}"
     threads: config.get("threads", 20)
     resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 4096, 8192),
+        mem_mb=lambda wildcard, attempt: min(attempt * 8192, 1024 * 15),
         time_min=lambda wildcard, attempt: attempt * 50,
         tmpdir="tmp"
     params:
