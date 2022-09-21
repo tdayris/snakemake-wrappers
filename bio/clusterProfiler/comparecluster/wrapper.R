@@ -10,17 +10,17 @@
 
 # Sink the stderr and stdout to the snakemake log file
 # https://stackoverflow.com/a/48173272
-log.file<-file(snakemake@log[[1]],open="wt");
-base::sink(log.file);
-base::sink(log.file,type="message");
+log.file <- file(snakemake@log[[1]], open = "wt")
+base::sink(log.file)
+base::sink(log.file, type = "message")
 
 
 readGeneList <- function(path) {
     genelist <- utils::read.table(
-        file=base::as.character(x=path), 
-        header=TRUE, 
-        sep="\t"
-    );
+        file = base::as.character(x = path),
+        header = TRUE,
+        sep = "\t"
+    )
     return(genelist)
 }
 
@@ -36,15 +36,17 @@ readGeneLists <- function(paths, conditions) {
 
 conditions <- sapply(
     snakemake@params[["condition"]]),
-    function(c) base::as.character(x=c)
+    function(c) base::as.character(x = c)
 );
+
 
 geneLists <- readGeneLists(
     paths=snakemake@input[["gene_list"]],
     conditions=conditions
 );
+base::message("Libraries and datasets loaded");
 
-formula <- stats::as.formula(x="~Condition");
+formula <- stats::as.formula(x=base::paste0("~Condition");
 paramfunction <- base::as.character(
     x=snakemake@params[["fun"]]
 );
@@ -62,4 +64,12 @@ command <- base::paste0(
     "clusterProfiler::compareCluster(",
     extra,
     ")"
+);
+base::message(command);
+
+# Performing DisGeNET enrichment
+edgn <- base::eval(
+  base::parse(
+    text = command
+  )
 );
