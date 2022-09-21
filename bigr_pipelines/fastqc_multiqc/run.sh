@@ -3,15 +3,21 @@ set -e
 
 # This adds several functions and variable in the environment
 PIPELINE_PREFIX=$(readlink -e "$(dirname ${0})/../..")
-WRAPPERS_PATH=$(readlink -e "${PIPELINE_PATH}/../../")
 # shellcheck source=/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/bash/messages.sh
 source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/messages.sh"
 # shellcheck source=/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/bash/environment.sh
 source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/environment.sh"
 
-PROFILE="slurm";
-SUMMARY=""
+# Define pipeline related variables
+declare -x SNAKEMAKE_PROFILE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/common/profiles"
+declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/rnaseq"
+export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
+
+SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
+WRAPPERS_PATH=$(readlink -e "${PIPELINE_PATH}/../../")
 SNAKE_ARGS=("--wrapper-prefix" "${WRAPPERS_PATH}/")
+PROFILE="slurm"
+SUMMARY=""
 GRAPH=""
 
 while [ "$#" -gt 0 ]; do
