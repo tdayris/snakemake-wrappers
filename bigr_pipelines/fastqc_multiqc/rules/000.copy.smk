@@ -1,6 +1,6 @@
 rule bigr_copy:
     output:
-        "reads/{sample}.fq.gz"
+        temp("reads/{sample}.fq.gz")
     message:
         "Gathering {wildcards.sample} fastq file"
     threads: 1
