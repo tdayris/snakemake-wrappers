@@ -40,7 +40,7 @@ def bash_copy(src: str,
               extra_ln: str = extra_ln,
               log: str = log,
               cold: str = cold_storage) -> None:
-    if src.startswith(cold):
+    if not src.startswith(cold):
         shell(f"ln {extra_ln} {src} {dest} {log}")
     else:
         shell(f"cp {extra} {src} {dest} {log}")
