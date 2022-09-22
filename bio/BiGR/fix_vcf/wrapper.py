@@ -10,6 +10,8 @@ import gzip
 import logging
 import re
 
+from typing import List
+
 logging.basicConfig(
     filename=snakemake.log[0],
     filemode="w",
@@ -53,7 +55,7 @@ def add_sample(value: str, format: str) -> str:
 def add_format(format_header: str,
                key: str,
                value: str,
-               *formats: list[str]) -> str:
+               *formats: List[str]) -> str:
     result = [add_format_header(key, format_header)]
     for format in formats:
         result.append(add_sample(value, format))
@@ -84,7 +86,9 @@ def sort_headers(lines) -> str:
 
     return "".join(fileformats + filters + formats + infos + others + contigs)
 
-default_chr = list(map(str, range(23))) + ["MT", "X", "Y"]
+default_chr = list(map(str, range(1, 23))) + ["MT", "X", "Y"] + list(range(1, 23))
+default_chr += ["chr{c}" for c in default_chr]
+
 if "default_chr" in snakemake.params.keys():
     default_chr = snakemake.params["default_chr"]
 
