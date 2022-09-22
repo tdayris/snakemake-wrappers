@@ -42,13 +42,16 @@ message INFO "Environment loaded"
 message CMD "conda_activate ${CONDA_ENV_PATH}"
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
 
+BASE_CMD="snakemake -s ${SNAKEFILE_PATH} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} ${SNAKE_ARGS[*]}"
 if [ "${SUMMARY}" != "" ]; then
-  message CMD "snakemake -s ${SNAKEFILE_PATH} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --configfile ${CONFIG_PATH} ${SNAKE_ARGS[*]} --summary > ${SUMMARY}"
-  snakemake -s "${SNAKEFILE_PATH}" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" --configfile ${CONFIG_PATH} "${SNAKE_ARGS[@]}" --summary > "${SUMMARY}"
+  SUMMARY_CMD="${BASE_CMD} --summary > ${SUMMARY}"
+  message CMD "${SUMMARY_CMD}"
+  eval SUMMARY_CMD
 elif [ "${GRAPH}" != "" ]; then
-  message CMD "snakemake -s ${SNAKEFILE_PATH} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --configfile ${CONFIG_PATH} ${SNAKE_ARGS[*]} --runegraph | dot -Tpng > ${GRAPH}"
-  snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --cache bwa_fixmate_meta_bwa_index bwa_index --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" --rulegraph | dot -Tpng > "${GRAPH}"
+  RULEGRAPH_CMD="${BASE_CMD} --rulegraph | dot -Tpng > ${GRAPH}"
+  message CMD "${RULEGRAPH_CMD}"
+  eval ${SUMMARY_CMD}
 else
-  message CMD "snakemake -s ${SNAKEFILE_PATH} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --configfile ${CONFIG_PATH} ${SNAKE_ARGS[*]}"
-  snakemake -s "${SNAKEFILE_PATH}" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" --configfile ${CONFIG_PATH} "${SNAKE_ARGS[@]}" && message INFO "SnpEff/SnpSift successful" || error_handling "${LINENO}" 2 "Error while running SnpEff/SnpSift pipeline"
+  message CMD "${BASE_CMD}"
+  eval ${BASE_CMD}
 fi
