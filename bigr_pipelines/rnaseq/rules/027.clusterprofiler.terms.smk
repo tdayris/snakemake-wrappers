@@ -55,7 +55,7 @@ rule enricher_TERMS:
         time_min=get_35min_per_attempt,
         tmpdir="tmp"
     params:
-        extra = config.get("enricher_extra", {"enricher": "pvalueCutoff = 1, qvalueCutoff = 1"}).get("enricher", "pvalueCutoff = 1, qvalueCutoff = 1"),
+        extra = config["clusterprofiler"].get("enrich_gmt", "pvalueCutoff = 1, qvalueCutoff = 1"),
         org = config.get("organism", "Hs"),
         keytype = "ENSEMBLPROT"
     log:

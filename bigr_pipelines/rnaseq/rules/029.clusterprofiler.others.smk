@@ -17,7 +17,7 @@ rule enrichDO:
         time_min=get_35min_per_attempt,
         tmpdir="tmp"
     params:
-        enrichDO_extra=config["clusterprofiler"].get("do", "pvalueCutoff = 1, qvalueCutoff = 1"),
+        enrichDO_extra=config["clusterprofiler"].get("enrich_do", "pvalueCutoff = 1, qvalueCutoff = 1"),
         organism = config.get("organism", "Hs"),
     log:
         "logs/enrichdo/{comparison}.log"
@@ -44,7 +44,7 @@ rule enrichDGN:
         time_min=get_35min_per_attempt,
         tmpdir="tmp"
     params:
-        enrichDO_extra=config["clusterprofiler"].get("do", "pvalueCutoff = 1, qvalueCutoff = 1"),
+        enrichDO_extra=config["clusterprofiler"].get("enrich_dgn", "pvalueCutoff = 1, qvalueCutoff = 1"),
         organism = config.get("organism", "Hs"),
     log:
         "logs/enrichdgn/{comparison}.log"
@@ -71,7 +71,7 @@ rule enrichNCG:
         time_min=get_35min_per_attempt,
         tmpdir="tmp"
     params:
-        enrichDO_extra=config["clusterprofiler"].get("do", "pvalueCutoff = 1, qvalueCutoff = 1"),
+        enrichDO_extra=config["clusterprofiler"].get("enrich_ncg", "pvalueCutoff = 1, qvalueCutoff = 1"),
         organism = config.get("organism", "Hs"),
     log:
         "logs/enrichncg/{comparison}.log"
