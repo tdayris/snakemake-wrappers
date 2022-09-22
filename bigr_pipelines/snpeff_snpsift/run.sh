@@ -14,7 +14,7 @@ declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/snpeff_snpsift"
 export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH
 
 SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
-CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
+CONFIG_PATH="${PIPELINE_PATH}/config.hg38.nochr.yaml"
 WRAPPERS_PATH=$(readlink -e "${PIPELINE_PATH}/../../")
 SNAKE_ARGS=("--wrapper-prefix" "${WRAPPERS_PATH}/")
 PROFILE="slurm"
