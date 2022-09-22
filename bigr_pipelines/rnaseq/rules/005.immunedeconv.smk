@@ -221,4 +221,4 @@ rule multiqc_config_immunedeconv:
     conda:
         str(workflow_source_dir / "envs" / "python.yaml")
     script:
-        str(workflow_source_dir / "scripts" / "immunedeconv_to_multiqc.py")
+        str(workflow_source_dir / "scripts" / "005.immunedeconv_to_multiqc.py")

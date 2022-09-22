@@ -10,8 +10,13 @@ base::sink(log.file,type="message");
 
 base::library(package = "AnnotationDbi", quietly = TRUE);
 base::library(package="org.Hs.eg.db", quietly=TRUE);
+base::library(package="org.Mm.eg.db", quietly=TRUE);
 base::library(package = "clusterProfiler", quietly = TRUE);
+
 orgdb <- "org.Hs.eg.db";
+if ( "orgdb" %in% base::names(snakemake@params)) {
+  orgdb <- base::as.character(x = snakemake@params[["orgdb"]])
+}
 
 get_parameter <- function(param_name, default_value) {
   # Return the provided parameter or a default value otherwise

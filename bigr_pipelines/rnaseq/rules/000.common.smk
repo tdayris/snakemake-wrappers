@@ -32,6 +32,7 @@ from files_linker import *
 from graphics import *
 from write_yaml import *
 from reservation import *
+from gmt import *
 from messages import message
 
 #####################
@@ -137,6 +138,8 @@ batch_effect = any(level[0] == "BatchEffect" for level in comparison_levels)
 # Globals used in wildcards
 # List of samples
 sample_list = design.Sample_id.to_list()
+
+# QC: PCAExplorer
 # List of PCA axes to consider
 axes_list = ["ax_1_ax_2", "ax_2_ax_3", "ax_3_ax_4"]
 # Draw elipses on PCA ... or not, or both
@@ -145,14 +148,38 @@ elipsis_list = ["with_elipse", "without_elipse"]
 streams = ["1", "2"]
 # Features types
 features = ["gene", "transcript"]
+
+
+# Star Mappings
 # Type of mapping performed by the pipepline
 maptypes = ["variants", "chimera"]
+
+
 # DEseq2 results content list
 content_list = ["SortedOnLogFC", "SortedOnPadj", "Complete"]
+
+
 # Immune deconv tool list
 tool_list = ["cibersort", "cibersort_abs", "mcp_counter", "epic", "quantiseq", "xcell"]
+
+
+# VDJ alignment: MIXcr
 # List of possible segment export in mixcr
 segment_export_list = ["vUsage", "jUsage", "isotypeUsage", "vjUsage"]
+
+
+# GSEA: ClusterProfiler
+# List of PPI databases for clusterProfiler
+ppi_list = config["clusterprofiler"].get("ppi").keys()
+# List of Gene oriented databases for clusterProfiler
+gmt_list = config["clusterprofiler"].get("gmt").keys()
+# List of gene set analysis methods
+gse_method_list = ["enrich"]
+# List of clusterprofiler plots
+cprof_plots = ["barplot", "dotplot", "upsetplot"]
+# List of possible key types
+keytypes = ["ENSEMBL", "ENTREZID", "SYMBOL", "ENSEMBLPROT"]
+
 
 logging.info("Constraining wildcards...")
 
@@ -171,3 +198,8 @@ wildcard_constraints:
     content=r"|".join(content_list),
     tool=r"|".join(tool_list),
     segment=r"|".join(segment_export_list),
+    ppi=r"|".join(ppi_list),
+    gmt=r"|".join(gmt_list),
+    gse_method=r"|".join(gse_method_list),
+    cprof_plot=r"|".join(cprof_plots),
+    keytype=r"|".join(keytypes),
