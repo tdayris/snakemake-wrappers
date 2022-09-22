@@ -78,8 +78,6 @@ rule target_snpeff_snpsift:
         description="columns_description.txt"
     output:
         directory("results_to_upload")
-    message:
-        "Finishing the annotation pipeline"
     params:
         ln = "--symbolic --force --relative --verbose",
         mkdir = "--parents --verbose",
@@ -126,8 +124,6 @@ rule extractfields:
         call_index=get_tbi("snpsift/fixed/{sample}.vcf.gz")
     output:
         tsv="snpsift/extractFields/{sample}.tsv"
-    message:
-        "Making {wildcards.sample} annotated VCF readable"
     threads: 2
     resources:
         mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
@@ -145,9 +141,6 @@ rule fix_vcf:
         vcf=last_vcf
     output:
         vcf=temp("snpsift/fixed/{sample}.vcf")
-    message:
-        "Removing empty fields, trailing ';' and non-canonical chromosomes "
-        "for {wildcards.sample}"
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
