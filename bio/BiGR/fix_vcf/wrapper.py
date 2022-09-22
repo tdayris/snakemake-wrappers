@@ -15,7 +15,7 @@ from typing import List
 logging.basicConfig(
     filename=snakemake.log[0],
     filemode="w",
-    level=logging.INFO
+    level=logging.DEBUG
 )
 
 
@@ -129,9 +129,7 @@ with (open_function(snakemake.input["vcf"]) as vcfin,
             # Column names
             vcfout.write(sort_headers(header_list))
             vcfout.write(headers)
-            print(line)
             chomp = line[:-1].split("\t")
-            print(chomp)
             for idx, col in enumerate(chomp):
                 chomp[idx] = sample_rename_dict.get(col, col)
             line = "\t".join(chomp) + "\n"
@@ -141,10 +139,12 @@ with (open_function(snakemake.input["vcf"]) as vcfin,
         chrom, pos, idx, ref, alt, qual, fil, info, format, *samples = line[:-1].split("\t")
 
         if (snakemake.params.get("remove_non_conventional_chromosomes", True) is True) and (chrom not in default_chr):
+            logging.debug("Non conventional chromosome: %s", str(line[:-1]))
             continue
 
         info = info.replace(";;", ";").strip(";")
         line = "\t".join([chrom, pos, idx, ref, alt, qual, fil, info, format, *samples]) + "\n"
+        logging.debug("Saving: %s", line)
         vcfout.write(line)
 
 
