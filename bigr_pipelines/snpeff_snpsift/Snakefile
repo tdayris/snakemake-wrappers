@@ -14,9 +14,6 @@ worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
 common = str(worflow_source_dir / "../common/python")
 sys.path.append(common)
 
-print(worflow_source_dir.absolute())
-print(common)
-
 from file_manager import *
 from files_linker import *
 from write_yaml import *
@@ -426,7 +423,7 @@ rule additional_headers_mistic:
 
 rule vcftools_annotate_mistic:
     input:
-        vcf = "snpsift/gnomad/{sample}.vcf",
+        vcf = "splice_ai/annot/{sample}.vcf.gz",
         annotation = config["ref"]["mistic"],
         description = "mistic/description.txt"
     output:
