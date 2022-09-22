@@ -1,30 +1,4 @@
 
-rule snpsift_exac:
-    input:
-        call = "snpsift/gnomad/{sample}.vcf",
-        database = config["ref"]["exac"],
-        database_idx = config["ref"]["exac"] + ".tbi"
-    output:
-        call = temp("snpsift/exac/{sample}.vcf")
-    message:
-        "Annotating {wildcards.sample} with ExAC"
-    threads: 1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
-        time_min=lambda wildcards, attempt: attempt * 75,
-        tmpdir="tmp"
-    params:
-        extra=config["snpeff_snpsift"].get(
-            "snpsift_exac",
-            "-name 'gnomAD_exomes_' -exists 'ExistsInExac' -tabix -noDownload -noLog"
-        )
-    log:
-        "logs/snpsift/exac/{sample}.log"
-    wrapper:
-        "bio/snpsift/annotate"
-
-
-
 rule snpsift_gnomad:
     input:
         call = "snpsift/clinvar/{sample}.vcf",
