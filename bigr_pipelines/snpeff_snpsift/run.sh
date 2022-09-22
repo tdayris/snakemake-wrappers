@@ -38,6 +38,12 @@ while [ "$#" -gt 0 ]; do
 done
 message INFO "Environment loaded"
 
+if [ ! -f "config.yaml" ]; then
+  rsync -cv "${CONFIG_PATH}" "config.yaml"
+else
+  message INFO "Config file already provided"
+fi
+
 # Run pipeline
 message CMD "conda_activate ${CONDA_ENV_PATH}"
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
