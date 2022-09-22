@@ -43,12 +43,12 @@ message CMD "conda_activate ${CONDA_ENV_PATH}"
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
 
 if [ "${SUMMARY}" != "" ]; then
-  message CMD "snakemake -s ${SNAKEFILE} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --configfile ${CONFIG_PATH} ${SNAKE_ARGS[*]} --summary > ${SUMMARY}"
-  snakemake -s "${SNAKEFILE}" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" --configfile ${CONFIG_PATH} "${SNAKE_ARGS[@]}" --summary > "${SUMMARY}"
+  message CMD "snakemake -s ${SNAKEFILE_PATH} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --configfile ${CONFIG_PATH} ${SNAKE_ARGS[*]} --summary > ${SUMMARY}"
+  snakemake -s "${SNAKEFILE_PATH}" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" --configfile ${CONFIG_PATH} "${SNAKE_ARGS[@]}" --summary > "${SUMMARY}"
 elif [ "${GRAPH}" != "" ]; then
-  message CMD "snakemake -s ${SNAKEFILE} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --configfile ${CONFIG_PATH} ${SNAKE_ARGS[*]} --runegraph | dot -Tpng > ${GRAPH}"
+  message CMD "snakemake -s ${SNAKEFILE_PATH} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --configfile ${CONFIG_PATH} ${SNAKE_ARGS[*]} --runegraph | dot -Tpng > ${GRAPH}"
   snakemake -s "${SNAKEFILE_PATH}" --configfile "config.yaml" --cache bwa_fixmate_meta_bwa_index bwa_index --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" "${SNAKE_ARGS[@]}" --rulegraph | dot -Tpng > "${GRAPH}"
 else
-  message CMD "snakemake -s ${SNAKEFILE} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --configfile ${CONFIG_PATH} ${SNAKE_ARGS[*]}"
-  snakemake -s "${SNAKEFILE}" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" --configfile ${CONFIG_PATH} "${SNAKE_ARGS[@]}" && message INFO "SnpEff/SnpSift successful" || error_handling "${LINENO}" 2 "Error while running SnpEff/SnpSift pipeline"
+  message CMD "snakemake -s ${SNAKEFILE_PATH} --profile ${SNAKEMAKE_PROFILE_PATH}/${PROFILE} --configfile ${CONFIG_PATH} ${SNAKE_ARGS[*]}"
+  snakemake -s "${SNAKEFILE_PATH}" --profile "${SNAKEMAKE_PROFILE_PATH}/${PROFILE}" --configfile ${CONFIG_PATH} "${SNAKE_ARGS[@]}" && message INFO "SnpEff/SnpSift successful" || error_handling "${LINENO}" 2 "Error while running SnpEff/SnpSift pipeline"
 fi
