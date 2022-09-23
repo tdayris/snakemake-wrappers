@@ -79,7 +79,7 @@ rule sambamba_markdup:
             "sambamba_markdup", "--remove-duplicates --overflow-list-size 600000"
         ),
     wrapper:
-        f"{wrappers}/bio/sambamba/markdup"
+        "bio/sambamba/markdup"
 
 
 """
