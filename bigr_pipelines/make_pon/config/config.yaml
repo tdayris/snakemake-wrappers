@@ -1,0 +1,50 @@
+# Path to list of fastq files used in PoN
+# This must be a TSV with the following columns:
+# 1. Sample_id
+# 2. Upstream_file
+# 3. Downstream_file
+design: "../config/design.tsv"
+
+# Maximum number of threads used in a job
+max_threads: 20
+
+# Path to snakemake-wrapper directory,
+# or version number of git snakemake-wrappers
+snakemake_wrappers: "v1.7.0"
+
+# Optional parameters
+params:
+  fastp_extra: ""
+  fastp_adapters: none
+
+# One of the available genome below
+used_genome: hg38
+
+# Path to reference genome files
+# Providing optional file speeds-up the whole pipeline
+hg38:
+  # Genome name, version and patch
+  genome_assembly: GRCh38.99
+  # Name of the species
+  species: Homo_sapiens
+  # Path to genome sequence (.fasta) ! REQUIRED !
+  fasta: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta
+  # Path to genome annotation (.gtf, .gff3) ! REQUIRED !
+  gtf: /mnt/beegfs/database/bioinfo/Index_DB/GTF/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.gtf
+  # Path to known variants (.vcf.gz) ! REQUIRED !
+  vcf: /mnt/beegfs/database/bioinfo/Index_DB/GATK/mutect2_gnomad_af_only/hg38/somatic-hg38_af-only-gnomad.hg38.nochr.vcf.gz
+  # Path to genome index (.fasta.fai) (optional)
+  fai: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta.fai
+  # Path to genome dict (.dict) (optional)
+  dict: /mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.dict
+  # Path to known variants index (.vcf.gz.tbi) (optional)
+  tbi: /mnt/beegfs/database/bioinfo/Index_DB/GATK/mutect2_gnomad_af_only/hg38/somatic-hg38_af-only-gnomad.hg38.nochr.vcf.gz.tbi
+  # Path to BWA index (optional)
+  bwa_index: 
+    - /mnt/beegfs/database/bioinfo/Index_DB/BWA/2.2.1/GRCh38.99/GRCh38.99.homo_sapiens.dna.fasta.0123
+    - /mnt/beegfs/database/bioinfo/Index_DB/BWA/2.2.1/GRCh38.99/GRCh38.99.homo_sapiens.dna.fasta.amb
+    - /mnt/beegfs/database/bioinfo/Index_DB/BWA/2.2.1/GRCh38.99/GRCh38.99.homo_sapiens.dna.fasta.ann
+    - /mnt/beegfs/database/bioinfo/Index_DB/BWA/2.2.1/GRCh38.99/GRCh38.99.homo_sapiens.dna.fasta.bwt.2bit.64
+    - /mnt/beegfs/database/bioinfo/Index_DB/BWA/2.2.1/GRCh38.99/GRCh38.99.homo_sapiens.dna.fasta.pac
+  # Path to capturekit bed
+  bed: /mnt/beegfs/database/bioinfo/Index_DB/captureKitDesigns/hg38/v5/sureselect_v5.padded.nochr.bed

@@ -1,0 +1,25 @@
+include: "rules/000.commons.smk"
+include: "rules/001.index_reference.smk"
+include: "rules/002.copy_trim.smk"
+include: "rules/003.bwa.smk"
+include: "rules/004.correct_mappings.smk"
+include: "rules/005.mutect.smk"
+include: "rules/006.PoN.smk"
+include: "rules/007.qc.smk"
+
+
+onstart:
+    shell("rm --force --verbose ERROR DONE && touch ON_GOING")
+
+
+onerror:
+    shell("rm --force --verbose ON_GOING DONE && touch ERROR")
+
+
+onsuccess:
+    shell("rm --force --verbose ERROR ON_GOING && touch DONE")
+
+
+rule target:
+    input:
+        ""
