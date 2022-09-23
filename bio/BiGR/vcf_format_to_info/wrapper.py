@@ -147,7 +147,7 @@ def annotate_mutect2(genotype: str,
     else:
         annotation.append(f"{prefix}_MutationStatus=Heterozygous")
     logging.debug(filter, annotation)
-    return filter, ";".join(annotation)
+    return (filter, ";".join(annotation))
 
 colnames = None
 samples = None
