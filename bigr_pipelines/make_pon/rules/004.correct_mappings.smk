@@ -16,7 +16,7 @@ rule samtools_fixmate:
         time_min=get_75min_per_attempt,
         tmpdir="tmp"
     params:
-        config.get("fixmate_extra", "-c -m -r")
+        config["params"].get("fixmate_extra", "-c -m -r")
     log:
         "logs/samtools/fixmate/{sample}.log"
     wrapper:
@@ -68,7 +68,7 @@ rule sambamba_markdup:
     log:
         "logs/sambamba/markdup.log"
     params:
-        extra="--remove-duplicates --overflow-list-size 600000"
+        extra=config["params"].get("sambamba_markdup", "--remove-duplicates --overflow-list-size 600000")
     wrapper:
         f"{wrappers}/bio/sambamba/markdup"
 

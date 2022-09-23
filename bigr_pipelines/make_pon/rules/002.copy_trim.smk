@@ -43,8 +43,8 @@ rule fastp_clean:
         tmpdir="tmp",
     retries: 1
     params:
-        adapters=config["fastp"].get("fastp_adapters", None),
-        extra=config["fastp"].get("fastp_extra", ""),
+        adapters=config["params"].get("fastp_adapters", None),
+        extra=config["params"].get("fastp_extra", ""),
     log:
         "logs/fastp/{sample}.log",
     wrapper:
