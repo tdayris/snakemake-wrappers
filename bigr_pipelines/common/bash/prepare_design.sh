@@ -80,7 +80,7 @@ message CMD "${COMMAND}"
 eval ${COMMAND}
 
 read -p "Provide a space separated list of suffixes to remove from fastq file names to guess multiple sequencing (regex allowed, order does not matter): " regex_list
-COMMAND="python3 ${PIPELINE_PATH}/../pyton/pair_guesser.py -e ${regex_list}"
+COMMAND="python3 ${PIPELINE_PREFIX}/../pyton/pair_guesser.py -e ${regex_list}"
 message CMD "${COMMAND}"
 eval ${COMMAND}
 
