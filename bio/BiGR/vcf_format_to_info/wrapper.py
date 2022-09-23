@@ -184,7 +184,7 @@ with (open_function(snakemake.input["call"]) as instream,
             filter = None
             for idx, sample in enumerate(samples):
                 format_sample = dict(zip(chomp["FORMAT"].split(":"), chomp[sample].split(":")))
-                filter, sample_annotation = annotate_mutect2(
+                filter, *sample_annotation = annotate_mutect2(
                     genotype = format_sample.get("GT", "./."),
                     ref = chomp["REF"],
                     alt = chomp["ALT"],
@@ -196,6 +196,9 @@ with (open_function(snakemake.input["call"]) as instream,
                     normal = snakemake.params.get("normal_sample", None) == sample,
                     tumor = snakemake.params.get("tumor_sample", None) == sample
                 )
+                logging.debug(filter)
+                logging.debug(sample_annotation)
+                logging.debug(len(sample_annotation))
                 if chomp["INFO"] in ["." or ""]:
                     chomp["INFO"] = sample_annotation
                 else:
