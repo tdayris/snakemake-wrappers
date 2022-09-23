@@ -11,6 +11,30 @@ import sys
 from typing import Any, Dict, List, Optional
 
 
+class CustomFormatter(logging.Formatter):
+
+    cyan = "\033[1;36m"
+    orange = "\x1b[33;20m"
+    red = "\x1b[31;20m"
+    green = "\x1b[31;1m"
+    reset = "\x1b[0m"
+    format = "%(levelname)s - %(asctime)s - %(name)s - %(message)s (%(filename)s:%(lineno)d)"
+
+    FORMATS = {
+        logging.DEBUG: green + format + reset,
+        logging.INFO: cyan + format + reset,
+        logging.WARNING: orange + format + reset,
+        logging.ERROR: red + format + reset,
+        logging.CRITICAL: red + format + reset
+    }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt)
+        return formatter.format(record)
+
+
+
 def cmd_parser(args: Any) -> argparse.Namespace:
     """Parse command line arguments"""
     logging.info("Parsing command line...")
@@ -91,11 +115,17 @@ def create_design_file(path: str, index: Dict[str, Dict[str, List[str]]]) -> Non
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        # filename=snakemake.log[0],
-        # filemode="w",
-        level=logging.DEBUG
-    )
+    # create logger with 'spam_application'
+    logger = logging.getLogger("pair_guesser")
+    logger.setLevel(logging.DEBUG)
+
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+
+    ch.setFormatter(CustomFormatter())
+
+    logger.addHandler(ch)
 
     cmd = cmd_parser(sys.argv[1:])
     logging.debug(cmd)

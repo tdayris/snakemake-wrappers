@@ -45,7 +45,7 @@ done
 my_iquest() { iquest "%s/%s" "SELECT COLL_NAME,DATA_NAME WHERE COLL_NAME like '${1}%'"; }
 export -f my_iquest
 COMMAND="bash ${PIPELINE_PREFIX}/multiprocess_bash_command.sh -p ${MAX_THREADS} -f my_iquest $(cat datasetList | tr $'\n' ' ') > dataset_paths.txt"
-message CMD "${COMMAND:0:50}..."
+message CMD "${COMMAND:0:120}..."
 eval ${COMMAND}
 
 
@@ -80,7 +80,7 @@ message CMD "${COMMAND}"
 eval ${COMMAND}
 
 read -p "Provide a space separated list of suffixes to remove from fastq file names to guess multiple sequencing (regex allowed, order does not matter): " regex_list
-COMMAND="python3 ${PIPELINE_PREFIX}/../pyton/pair_guesser.py -e ${regex_list}"
+COMMAND="python3 ${PIPELINE_PREFIX}/../python/pair_guesser.py -e ${regex_list}"
 message CMD "${COMMAND}"
 eval ${COMMAND}
 
