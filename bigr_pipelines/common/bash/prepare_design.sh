@@ -17,7 +17,7 @@ while true; do
 
     case "${yn}" in
         [yY] ) message CMD "${COMMAND}"; eval ${COMMAND}; break;;
-        [nN] ) message INFO "Skipping iinit."; break;
+        [nN] ) message INFO "Skipping iinit."; break;;
         * ) message ERROR "Unknown response.";;
     esac
 done
