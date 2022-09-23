@@ -36,7 +36,7 @@ while true; do
 
     case "${yn}" in
         [yY] ) message INFO "Ok, I shall proceeed"; break;;
-        [nN] ) message ERROR "Exiting..."; exit ;;
+        [nN] ) message INFO "Exiting..."; exit ;;
         * ) message ERROR "Unknown response.";;
     esac
 done
@@ -54,7 +54,7 @@ while true; do
 
     case "${yn}" in
         [yY] ) message INFO "Ok, I will pair fastq files alphabetically"; break;;
-        [nN] ) message ERROR "Nothing more to do."; exit ;;
+        [nN] ) message INFO "Nothing more to do."; exit ;;
         * ) message ERROR "Unknown response.";;
     esac
 done
@@ -69,7 +69,7 @@ while true; do
 
     case "${yn}" in
         [yY] ) message INFO "Ok, I will guess multi-sequenced samples"; break;;
-        [nN] ) message ERROR "Nothing more to do."; exit ;;
+        [nN] ) message INFO "Nothing more to do."; exit ;;
         * ) message ERROR "Unknown response.";;
     esac
 done
@@ -81,6 +81,20 @@ eval ${COMMAND}
 
 read -p "Provide a space separated list of suffixes to remove from fastq file names to guess multiple sequencing (regex allowed, order does not matter): " regex_list
 COMMAND="python3 ${PIPELINE_PREFIX}/../python/pair_guesser.py -e ${regex_list}"
+message CMD "${COMMAND}"
+eval ${COMMAND}
+
+while true; do
+    read -p "Should I check if any of your sample name starts with an integer and prepend 'Sample' ? (y/n) " yn
+
+    case "${yn}" in
+        [yY] ) message INFO "Ok, I will add 'Sample' to samples which names starts with a number."; break;;
+        [nN] ) message INFO "Nothing more to do."; exit ;;
+        * ) message ERROR "Unknown response.";;
+    esac
+done
+
+COMMAND="sed -i 's/^\([0-9]\)/Sample\1/g' design.tsv"
 message CMD "${COMMAND}"
 eval ${COMMAND}
 
