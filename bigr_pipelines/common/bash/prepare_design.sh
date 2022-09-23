@@ -6,7 +6,7 @@ PIPELINE_PREFIX=$(readlink -e "$(dirname ${0})")
 source "${PIPELINE_PREFIX}/messages.sh"
 source "${PIPELINE_PREFIX}/environment.sh"
 
-MAX_THREADS=5
+MAX_THREADS=10
 
 message WARNING "This script is interactive, do not leave."
 message INFO "I need your password to access datasets..."
