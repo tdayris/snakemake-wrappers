@@ -1,7 +1,7 @@
 rule create_genomics_db:
     input:
         aln=expand(
-            "../results/mapping/{sample}.cram",
+            "samtools/filter/{sample}.bam",
             sample=design.index
         ),
         intervals=config[genome_id]["bed"],
@@ -34,7 +34,7 @@ rule creat_somatic_pon:
         ref_idx=fai_file,
         ref_dict=dict_file
         aln=expand(
-            "../results/mapping/{sample}.cram",
+            "samtools/filter/{sample}.bam",
             sample=design.index
         ),
         intervals=config[genome_id]["bed"],

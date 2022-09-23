@@ -7,9 +7,9 @@ with the rule below.
 """
 rule samtools_fixmate:
     input:
-        "../results/bwa/mem/{sample}.bam"
+        "bwa/mem/{sample}.bam"
     output:
-        temp("../results/samtools/fixmate/{sample}.bam")
+        temp("samtools/fixmate/{sample}.bam")
     threads: min(config.get("max_threads", 20), 20)
     resources:
         mem_mb=get_4gb_per_gb,
@@ -33,9 +33,9 @@ temporary files on error, which leads retry to fail
 """
 rule sambamba_sort_coordinate:
     input:
-        mapping="../results/samtools/fixmate/{sample}.bam"
+        mapping="samtools/fixmate/{sample}.bam"
     output:
-        mapping=temp("../results/sambamba/sort/{sample}.bam"),
+        mapping=temp("sambamba/sort/{sample}.bam"),
     threads: min(config.get("max_threads", 20), 8)
     resources:
         mem_mb=get_4gb_per_gb,  # Make sure memory matches --memory-limit
@@ -58,9 +58,9 @@ This rule removes deuplicate reads
 """
 rule sambamba_markdup:
     input:
-        "../results/sambamba/sort/{sample}.bam"
+        "sambamba/sort/{sample}.bam"
     output:
-        "../results/sambamba/markdup/{sample}.bam"
+        "sambamba/markdup/{sample}.bam"
     resources:
         mem_mb=get_4gb_per_gb,
         time_min=get_1h_per_gb,
@@ -81,12 +81,12 @@ This rule filters the BAM file over capture kit bed
 """
 rule samtools_view_filter:
     input:
-        bam="../results/sambamba/markdup/{sample}.bam",
+        bam="sambamba/markdup/{sample}.bam",
         bed=config[genome_id]["bed"],
         ref=config[genome_id]["fasta"],
         ref_idx=fai_file
     output:
-        bam=temp("../results/samtools/filter/{sample}.bam")
+        bam=temp("samtools/filter/{sample}.bam")
     threads: 5
     resources:
         mem_mb=get_1p5gb_per_gb,
@@ -116,9 +116,9 @@ This rule indexes the bam file since almost all downstream tools requires it
 """
 rule sambamba_index:
     input:
-        "../results/samtools/filter/{sample}.bam"
+        "samtools/filter/{sample}.bam"
     output:
-        temp("../results/samtools/filter/{sample}.bam.bai")
+        temp("samtools/filter/{sample}.bam.bai")
     threads: min(config.get("max_threads", 20), 5)
     resources:
         mem_mb=get_1p5gb_per_gb,
@@ -142,12 +142,12 @@ This rule compress BAM files in CRAM for future storage
 """
 rule samtools_view_cram:
     input:
-        bam="../results/samtools/filter/{sample}.bam",
-        bam_idx="../results/samtools/filter/{sample}.bam.bai",
+        bam="samtools/filter/{sample}.bam",
+        bam_idx="samtools/filter/{sample}.bam.bai",
         ref=config[genome_id]["fasta"],
         ref_idx=ancient(fai_file),
     output:
-        cram="../results/mapping/{sample}.cram",
+        cram="mapping/{sample}.cram",
     resources:
         mem_mb=get_1p5gb_per_gb,
         time_min=get_1h_per_gb,

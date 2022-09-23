@@ -21,7 +21,8 @@ rule mutect2_filter:
         fasta_index=fai_file,
         fasta_dict=dict_file,
         contamination="summary/{sample}_calculate_contamination.table",
-        bam="../results/mapping/{sample}.cram",
+        bam="samtools/filter/{sample}.bam",
+        bam_idx="samtools/filter/{sample}.bam.bai",
         f1r2="gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz"
     output:
         vcf=temp("mutect2/filter/{sample}.vcf.gz"),
@@ -107,7 +108,8 @@ Summarize the read support over known variants
 """
 rule get_pileup_summaries:
     input:
-        bam="../results/mapping/{sample}.cram",
+        bam="samtools/filter/{sample}.bam",
+        bam_idx="samtools/filter/{sample}.bam.bai",
         intervals=config[genome_id]["bed"],
         variants=config[genome_id]["vcf"],
         variants_index=tbi_file
@@ -144,7 +146,8 @@ rule mutect2_germline:
         fasta=config[genome_id]["fasta"],
         fasta_index=fai_file,
         fasta_dict=dict_file,
-        map="../results/mapping/{sample}.cram",
+        map="samtools/filter/{sample}.bam",
+        bam_idx="samtools/filter/{sample}.bam.bai",
         germline=config[genome_id]["vcf"],
         germline_tbi=tbi_file,
         intervals=config[genome_id]["bed"]

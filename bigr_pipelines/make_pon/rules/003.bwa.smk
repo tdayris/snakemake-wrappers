@@ -35,12 +35,12 @@ rule bwa_mem_align:
     input:
         idx=ancient(bwa_sequence_index),
         reads=expand(
-            "../results/fastp/trimmed/{sample}.{stream}.fastq",
+            "fastp/trimmed/{sample}.{stream}.fastq",
             stream=["1", "2"],
             allow_missing=True
         )
     output:
-        temp("../results/bwa/mem/{sample}.bam")
+        temp("bwa/mem/{sample}.bam")
     threads: min(config.get("max_threads", 20), 20)
     resources:
         mem_mb=get_75gb_and_2gb_per_attempt,

@@ -39,7 +39,7 @@ rule multiqc_report:
             sample=design.index
         )
     output:
-        "../results/multiqc/PoN.html"
+        protected("data_output/multiqc/PoN.html")
     threads: 1
     resources:
         mem_mb=get_1p5gb_per_attempt,
