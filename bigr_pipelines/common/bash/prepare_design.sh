@@ -17,7 +17,7 @@ eval ${COMMAND}
 
 message INFO "I will use ${MAX_THREADS} to search information about the project ${1}"
 
-COMMAND="imeta qu -C \"${1}\" | grep -v \"\-\-\-\" | cut -f2 -d\" \" > datasetList"
+COMMAND="imeta qu -C 'projectName' like \"${1}\" | grep -v \"\-\-\-\" | cut -f2 -d\" \" > datasetList"
 message CMD "${COMMAND}"
 eval ${COMMAND}
 message INFO "I have found $(wc -l datasetList) datasets (including re-sequencing)"
