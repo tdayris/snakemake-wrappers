@@ -87,7 +87,7 @@ rule sambamba_index_coordinate_raw_bam:
         temp("../results/bwa/coordinates/{sample}.bam.bai"),
     resources:
         mem_mb=get_1p5gb_per_attempt,
-        time_min=get_10_minutes_per_attempt,
+        time_min=get_10min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/sambamba/bwa/{sample}.index.log",
