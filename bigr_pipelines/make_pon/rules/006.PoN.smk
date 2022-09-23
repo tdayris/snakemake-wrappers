@@ -22,7 +22,7 @@ rule create_genomics_db:
         "logs/create_genomics_db.log"
     params:
         extra=""
-    env:
+    conda:
         "envs/gatk.yaml"
     script:
         str(workflow_source_dir / "006.PoN.GenomicsDBImport.py")
@@ -49,7 +49,7 @@ rule creat_somatic_pon:
         extra="--create-output-variant-index true --create-output-variant-md5 true"
     log:
         "logs/gatk/create_pon.log"
-    env:
+    conda:
         "envs/gatk.yaml"
     script:
         str(workflow_source_dir / "006.PoN.CreateSomaticPanelOfNormals.py")

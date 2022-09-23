@@ -41,7 +41,7 @@ rule sambamba_sort_coordinate:
         mem_mb=get_4gb_per_attempt,  # Make sure memory matches --memory-limit
         time_min=get_1h_per_attempt,
         tmpdir="tmp"
-    shadow: "minimal"
+    shadow: "shallow"
     params:
         extra = "--show-progress"
     log:
@@ -96,7 +96,7 @@ rule samtools_view_filter:
         "logs/samtools/view/{sample}.filter.log"
     params:
         "-h -b"
-    env:
+    conda:
         "envs/samtools.yaml"
     shell:
         "samtools view {params} " # Tool and optional parameters
@@ -156,7 +156,7 @@ rule samtools_view_cram:
         "logs/samtools/view/{sample}.cram.log"
     params:
         "-h -C"
-    env:
+    conda:
         "envs/samtools.yaml"
     shell:
         "samtools view {params} " # Tool and optional parameters
