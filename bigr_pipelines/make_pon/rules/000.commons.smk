@@ -44,7 +44,7 @@ logging.info("Additional utils loaded")
 
 
 # Find and load configfile
-default_config = read_yaml(workflow_source_dir / "config.hg38.yaml")
+default_config = read_yaml(workflow_source_dir / "config" / "config.yaml")
 
 
 configfile: get_config(default_config=default_config)
