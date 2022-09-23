@@ -29,7 +29,7 @@ rule remove_pending_chr:
         time_min=lambda wildcards, attempt: attempt * 60,
         tmpdir="tmp"
     params:
-        sed="'s/chr//g;s/##contig=<ID=chr/##contig=<ID=/g'",
+        sed="'s/^chr//g;s/##contig=<ID=chr/##contig=<ID=/g'",
         gunzip="--stdout"
     log:
         "logs/bigr/remove_pending_chr/{sample}.log"
