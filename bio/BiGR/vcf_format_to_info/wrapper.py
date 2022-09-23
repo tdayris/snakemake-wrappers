@@ -137,7 +137,7 @@ def annotate_mutect2(genotype: str,
                         annotation.append(f"MutationNumberAt={idx-1}")
         except IndexError:
             logging.error(
-                f"Genotype has a different length compaired to corresponding allele depth. Skipping: {genotype}, {prefix}, {ad}"
+                f"Genotype has a different length compared to corresponding allele depth. Skipping: {genotype}, {prefix}, {ad}"
             )
 
     if all(i == "0" for i in genotype_list):
@@ -184,30 +184,28 @@ with (open_function(snakemake.input["call"]) as instream,
             filter = None
             for idx, sample in enumerate(samples):
                 format_sample = dict(zip(chomp["FORMAT"].split(":"), chomp[sample].split(":")))
-                filter, *sample_annotation = annotate_mutect2(
-                    genotype = format_sample.get("GT", "./."),
-                    ref = chomp["REF"],
-                    alt = chomp["ALT"],
-                    prefix = sample,
-                    filter = chomp["FILTER"],
-                    ad = format_sample.get("AD", ".,."),
-                    af = format_sample.get("AF", "."),
-                    dp = format_sample.get("DP", "."),
-                    normal = snakemake.params.get("normal_sample", None) == sample,
-                    tumor = snakemake.params.get("tumor_sample", None) == sample
-                )
-                logging.debug(filter)
-                logging.debug(sample_annotation)
-                logging.debug(len(sample_annotation))
+                try:
+                    filter, sample_annotation = annotate_mutect2(
+                        genotype = format_sample.get("GT", "./."),
+                        ref = chomp["REF"],
+                        alt = chomp["ALT"],
+                        prefix = sample,
+                        filter = chomp["FILTER"],
+                        ad = format_sample.get("AD", ".,."),
+                        af = format_sample.get("AF", "."),
+                        dp = format_sample.get("DP", "."),
+                        normal = snakemake.params.get("normal_sample", None) == sample,
+                        tumor = snakemake.params.get("tumor_sample", None) == sample
+                    )
+                except ValueError:
+                    logging.error(chomp)
+                    logging.error(filter)
+                    logging.error(sample_annotation)
+                    raise
                 if chomp["INFO"] in ["." or ""]:
                     chomp["INFO"] = sample_annotation
                 else:
                     chomp["INFO"] += f";{sample_annotation}"
-
-            if chomp["FILTER"] in ["", ".", "PASS"]:
-                chomp["FILTER"] = filter
-            else:
-                chomp["FILTER"] += f";{filter}"
 
             outstream.write("\t".join([chomp[col] for col in colnames]) + "\n")
 
