@@ -62,8 +62,8 @@ rule tabix_index_known_variants:
         tbi_file
     threads: 1
     resources:
-        mem_mb=get_1p5gb_per_gb,
-        time_min=get_10_minutes_per_gb,
+        mem_mb=get_1p5gb_per_attempt,
+        time_min=get_10min_per_attempt,
         tmpdir="tmp"
     log:
         "logs/tabix/index/known_variants.log"

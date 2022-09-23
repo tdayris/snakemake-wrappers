@@ -12,8 +12,8 @@ rule samtools_fixmate:
         temp("samtools/fixmate/{sample}.bam")
     threads: min(config.get("max_threads", 20), 20)
     resources:
-        mem_mb=get_4gb_per_gb,
-        time_min=get_10_minutes_per_gb,
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_75min_per_attempt,
         tmpdir="tmp"
     params:
         config.get("fixmate_extra", "-c -m -r")
@@ -38,8 +38,8 @@ rule sambamba_sort_coordinate:
         mapping=temp("sambamba/sort/{sample}.bam"),
     threads: min(config.get("max_threads", 20), 8)
     resources:
-        mem_mb=get_4gb_per_gb,  # Make sure memory matches --memory-limit
-        time_min=get_1h_per_gb,
+        mem_mb=get_4gb_per_attempt,  # Make sure memory matches --memory-limit
+        time_min=get_1h_per_attempt,
         tmpdir="tmp"
     shadow: "minimal"
     params:
@@ -62,8 +62,8 @@ rule sambamba_markdup:
     output:
         "sambamba/markdup/{sample}.bam"
     resources:
-        mem_mb=get_4gb_per_gb,
-        time_min=get_1h_per_gb,
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_1h_per_attempt,
         tmpdir="tmp"
     log:
         "logs/sambamba/markdup.log"
@@ -89,8 +89,8 @@ rule samtools_view_filter:
         bam=temp("samtools/filter/{sample}.bam")
     threads: 5
     resources:
-        mem_mb=get_1p5gb_per_gb,
-        time_min=get_10_minutes_per_gb,
+        mem_mb=get_1p5gb_per_attempt,
+        time_min=get_20min_per_attempt,
         tmpdir="tmp"
     log:
         "logs/samtools/view/{sample}.filter.log"
@@ -121,8 +121,8 @@ rule sambamba_index:
         temp("samtools/filter/{sample}.bam.bai")
     threads: min(config.get("max_threads", 20), 5)
     resources:
-        mem_mb=get_1p5gb_per_gb,
-        time_min=get_10_minutes_per_gb,
+        mem_mb=get_1p5gb_per_attempt,
+        time_min=get_20min_per_attempt,
         tmpdir="tmp"
     params:
         extra = "--show-progress"
@@ -149,8 +149,8 @@ rule samtools_view_cram:
     output:
         cram="mapping/{sample}.cram",
     resources:
-        mem_mb=get_1p5gb_per_gb,
-        time_min=get_1h_per_gb,
+        mem_mb=get_1p5gb_per_attempt,
+        time_min=get_1h_per_attempt,
         tmpdir="tmp"
     log:
         "logs/samtools/view/{sample}.cram.log"

@@ -30,7 +30,7 @@ def get_resources_per_gb(
 
 
 # Explicit time reservations
-get_15min_per_attempt = functools.partial(get_resources_per_gb, multiplier=10)
+get_10min_per_attempt = functools.partial(get_resources_per_gb, multiplier=10)
 get_15min_per_attempt = functools.partial(get_resources_per_gb, multiplier=15)
 get_20min_per_attempt = functools.partial(get_resources_per_gb, multiplier=20)
 get_35min_per_attempt = functools.partial(get_resources_per_gb, multiplier=35)
