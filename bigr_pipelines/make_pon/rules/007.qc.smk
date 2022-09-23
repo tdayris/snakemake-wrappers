@@ -11,9 +11,10 @@ rule multiqc_report:
     input:
         fastp_json=expand("fastp/json/pe/{sample}.fastp.json", sample=design.index),
         fastp_html=expand("fastp/html/pe/{sample}.fastp.html", sample=design.index),
-        mappings=expand(
-            multiext(
-                "picard/collectmultiplemetrics/{sample}/{sample}",
+        mappings=[
+            f"picard/collectmultiplemetrics/{sample}/{sample}.{ext}"
+            for sample in design.index
+            for ext in [
                 ".alignment_summary_metrics",
                 ".insert_size_metrics",
                 ".insert_size_histogram.pdf",
@@ -26,10 +27,9 @@ rule multiqc_report:
                 ".pre_adapter_detail_metrics",
                 ".pre_adapter_summary_metrics",
                 ".quality_distribution_metrics",
-                ".quality_distribution.pdf",
-            ),
-            sample=design.index,
-        ),
+                ".quality_distribution.pdf"
+            ]
+        ],
         bcftools=expand("bcftools/stats/{sample}.stats.txt", sample=design.index),
     output:
         protected("data_output/multiqc/PoN.html"),

@@ -29,7 +29,7 @@ rule creat_somatic_pon:
         ref_dict=dict_file,
         aln=expand("samtools/filter/{sample}.bam", sample=design.index),
         intervals=config[genome_id]["bed"],
-        gdb=directory("PoN.gdb"),
+        gdb="PoN.gdb",
     output:
         pon=protected("data_output/PoN.vcf.gz"),
     resources:
