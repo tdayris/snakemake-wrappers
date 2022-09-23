@@ -5,7 +5,6 @@ __copyright__ = "Copyright 2021, Dayris Thibault"
 __email__ = "thibault.dayris@gustaveroussy.fr"
 __license__ = "MIT"
 
-from __future__ import annotations
 import datetime
 import gzip
 import logging
