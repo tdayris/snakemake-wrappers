@@ -78,7 +78,7 @@ def annotate_mutect2(genotype: str,
                      ad: str,
                      af: str,
                      normal: bool = False,
-                     tumor: bool = False) -> List[Union[List[str], str]]:
+                     tumor: bool = False) -> str:
     """Break down a genotype information, break down DP/AD/AF into info"""
 
     prefix = prefix.replace("-", "_")
@@ -147,7 +147,7 @@ def annotate_mutect2(genotype: str,
     else:
         annotation.append(f"{prefix}_MutationStatus=Heterozygous")
 
-    return filter, ";".join(annotation)
+    return ";".join(annotation)
 
 colnames = None
 samples = None
@@ -184,7 +184,7 @@ with (open_function(snakemake.input["call"]) as instream,
             filter = None
             for idx, sample in enumerate(samples):
                 format_sample = dict(zip(chomp["FORMAT"].split(":"), chomp[sample].split(":")))
-                filter, sample_annotation = annotate_mutect2(
+                sample_annotation = annotate_mutect2(
                     genotype = format_sample.get("GT", "./."),
                     ref = chomp["REF"],
                     alt = chomp["ALT"],
