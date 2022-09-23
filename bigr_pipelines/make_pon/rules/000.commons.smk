@@ -80,21 +80,17 @@ fasta_file = config[genome_id]["fasta"]
 
 # Given a fasta file: /path/to/sequence.fasta
 # The fasta index should be: /path/to/sequence.fasta.fai
-fai_file =  config[genome_id]["fasta"] + ".fai"
+fai_file = config[genome_id]["fasta"] + ".fai"
 
 # Given a fasta file: /path/to/sequence.fasta
 # The sequence dictionary should be: /path/to/sequence.dict
 dict_file = config[genome_id].get(
-    "dict", 
-    ".".join(os.path.splitext(fasta_file)[:-1]) + ".dict"
+    "dict", ".".join(os.path.splitext(fasta_file)[:-1]) + ".dict"
 )
 
 # Given a vcf file: /path/to/known.vcf.gz
 # The tabbix should be: /path/to/known.vcf.gz.tbi
-tbi_file = config[genome_id].get(
-    "tbi", 
-    config[genome_id]["vcf"] + ".tbi"
-)
+tbi_file = config[genome_id].get("tbi", config[genome_id]["vcf"] + ".tbi")
 
 # Given a fasta file: /path/to/sequence.fasta
 # The bwa index may be: /path/to/sequence.{0123,amb,ann,bwt.2bit.64,pac}
@@ -106,17 +102,11 @@ bwa_sequence_index = config[genome_id].get(
         ".amb",
         ".ann",
         ".bwt.2bit.64",
-        ".pac"
-    )
+        ".pac",
+    ),
 )
 
 # Loading list of samples used in the PoN
 design = pandas.read_csv(
-    config["design"], 
-    sep="\t", 
-    header=0, 
-    index_col=None
-).set_index(
-    "Sample_id"
-)
-
+    config["design"], sep="\t", header=0, index_col=None
+).set_index("Sample_id")

@@ -14,6 +14,8 @@
 
 Filter over estimated contaminations
 """
+
+
 rule mutect2_filter:
     input:
         vcf="mutect2/call/{sample}.vcf.gz",
@@ -23,26 +25,21 @@ rule mutect2_filter:
         contamination="summary/{sample}_calculate_contamination.table",
         bam="samtools/filter/{sample}.bam",
         bam_idx="samtools/filter/{sample}.bam.bai",
-        f1r2="gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz"
+        f1r2="gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz",
     output:
         vcf=temp("mutect2/filter/{sample}.vcf.gz"),
         vcf_tbi=temp("mutect2/filter/{sample}.vcf.gz.tbi"),
-    message:
-        "Filtering Mutect2 calls for {wildcards.sample}"
     threads: 1
     resources:
         time_min=get_45min_per_attempt,
         mem_mb=get_10gb_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        extra=(
-            "--create-output-variant-index"
-        )
+        extra=("--create-output-variant-index"),
     log:
-        "logs/mutect2/filter/{sample}.log"
+        "logs/mutect2/filter/{sample}.log",
     wrapper:
         "bio/gatk/filtermutectcalls"
-
 
 
 """
@@ -51,22 +48,22 @@ rule mutect2_filter:
 
 Build orientation model from f1r2 counts made in Mutect2
 """
+
+
 rule learn_read_orientation_model:
     input:
-        f1r2="mutect2/f1r2/{sample}.tar.gz"
+        f1r2="mutect2/f1r2/{sample}.tar.gz",
     output:
-        temp("gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz")
-    message:
-        "Build model over orientation bias on {wildcards.sample}"
+        temp("gatk/artifacts_prior/{sample}.artifacts_prior.tar.gz"),
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        extra=""
+        extra="",
     log:
-        "logs/gatk/learnreadorientationmodel/{sample}.log"
+        "logs/gatk/learnreadorientationmodel/{sample}.log",
     wrapper:
         "bio/gatk/learnreadorientationmodel"
 
@@ -77,23 +74,22 @@ rule learn_read_orientation_model:
 
 Estimate possible contaminations
 """
+
+
 rule calculate_contamination:
     input:
-        summary="gatk/getpileupsummaries/{sample}_getpileupsummaries.table"
+        summary="gatk/getpileupsummaries/{sample}_getpileupsummaries.table",
     output:
-        table=temp("summary/{sample}_calculate_contamination.table")
-    message:
-        "Summarizing read support for known variant sites to further "
-        "estimate contamination on {wildcards.sample}"
+        table=temp("summary/{sample}_calculate_contamination.table"),
     threads: 1
     resources:
         mem_mb=get_8gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        extra=""
+        extra="",
     log:
-        "logs/gatk/CalculateContamination/{sample}.log"
+        "logs/gatk/CalculateContamination/{sample}.log",
     wrapper:
         "bio/gatk/calculatecontamination"
 
@@ -106,27 +102,26 @@ rule calculate_contamination:
 
 Summarize the read support over known variants
 """
+
+
 rule get_pileup_summaries:
     input:
         bam="samtools/filter/{sample}.bam",
         bam_idx="samtools/filter/{sample}.bam.bai",
         intervals=config[genome_id]["bed"],
         variants=config[genome_id]["vcf"],
-        variants_index=tbi_file
+        variants_index=tbi_file,
     output:
-        table=temp("gatk/getpileupsummaries/{sample}_getpileupsummaries.table")
-    message:
-        "Summarizing read support for known variant sites to further "
-        "estimate contamination on {wildcards.sample}"
+        table=temp("gatk/getpileupsummaries/{sample}_getpileupsummaries.table"),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_2h_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        extra=""
+        extra="",
     log:
-        "logs/gatk/GetPileupSummaries/{sample}.log"
+        "logs/gatk/GetPileupSummaries/{sample}.log",
     wrapper:
         "bio/gatk/getpileupsummaries"
 
@@ -140,7 +135,13 @@ rule get_pileup_summaries:
 -> 001::tabix_index
 
 This rule calls germline variants with GATK Mutect2
+
+# https://gatk.broadinstitute.org/hc/en-us/articles/360042479112-CreateSomaticPanelOfNormals-BETA-
+# Note that as of May, 2019 -max-mnp-distance 
+# must be set to zero to avoid a bug in GenomicsDBImport.
 """
+
+
 rule mutect2_germline:
     input:
         fasta=config[genome_id]["fasta"],
@@ -150,28 +151,23 @@ rule mutect2_germline:
         bam_idx="samtools/filter/{sample}.bam.bai",
         germline=config[genome_id]["vcf"],
         germline_tbi=tbi_file,
-        intervals=config[genome_id]["bed"]
+        intervals=config[genome_id]["bed"],
     output:
         vcf=temp("mutect2/call/{sample}.vcf.gz"),
-        f1r2=temp("mutect2/f1r2/{sample}.tar.gz")
-    message:
-        "Calling variants on {wildcards.sample} with GATK Mutect2"
+        f1r2=temp("mutect2/f1r2/{sample}.tar.gz"),
     threads: 10
     resources:
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
-        mem_mb=get_15gb_per_attempt
+        mem_mb=get_15gb_per_attempt,
     params:
         extra=(
-            # https://gatk.broadinstitute.org/hc/en-us/articles/360042479112-CreateSomaticPanelOfNormals-BETA-
-            # Note that as of May, 2019 -max-mnp-distance 
-            # must be set to zero to avoid a bug in GenomicsDBImport.
-            "--max-mnp-distance 0 " 
+            "--max-mnp-distance 0 "
             "--max-reads-per-alignment-start 0 "
-            "--tumor-sample Mutect2_{wildcards.sample} "
+            "--tumor-sample Mutect2_{sample} "
             "--disable-read-filter MateOnSameContigOrNoMappedMateReadFilter "
-        )
+        ),
     log:
-        "logs/gatk/mutect2/call/{sample}.log"
+        "logs/gatk/mutect2/call/{sample}.log",
     wrapper:
         "bio/gatk/mutect"

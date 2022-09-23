@@ -5,6 +5,8 @@ it also renames fastq files based on the sample name in design
 
 No download is available now.
 """
+
+
 rule bigr_copy:
     output:
         temp("data_input/{sample}.{stream}.fq.gz"),
