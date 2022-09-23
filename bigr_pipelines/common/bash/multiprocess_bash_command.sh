@@ -109,11 +109,14 @@ if [ ${FUNCTION} == "" ]; then
   error_handling ${LINENO} 2 "Unknown function"
 fi
 
+>&2 message INFO "Number of process: ${PROCESS}"
+>&2 message INFO "Function is: ${FUNCTION}"
+
 i=0
 (
 for thing in "${POSITIONAL[@]}"; do
    ((i=i%PROCESS)); ((i++==0)) && wait
-   message INFO "${FUNCTION} ${thing}"
+   >&2 message INFO "${FUNCTION} ${thing}"
    ${FUNCTION} "${thing}" &
 done; wait
 )
