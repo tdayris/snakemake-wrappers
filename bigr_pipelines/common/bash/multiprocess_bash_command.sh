@@ -116,7 +116,7 @@ i=0
 (
 for thing in "${POSITIONAL[@]}"; do
    ((i=i%PROCESS)); ((i++==0)) && wait
-   >&2 message INFO "${FUNCTION} ${thing}"
+   >&2 message INFO "date -:- ${FUNCTION} ${thing}"
    ${FUNCTION} "${thing}" &
 done; wait
 )
