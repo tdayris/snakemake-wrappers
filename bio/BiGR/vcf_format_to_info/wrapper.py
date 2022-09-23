@@ -5,6 +5,7 @@ __copyright__ = "Copyright 2021, Dayris Thibault"
 __email__ = "thibault.dayris@gustaveroussy.fr"
 __license__ = "MIT"
 
+from __future__ import annotations
 import datetime
 import gzip
 import logging
@@ -147,7 +148,7 @@ def annotate_mutect2(genotype: str,
     else:
         annotation.append(f"{prefix}_MutationStatus=Heterozygous")
     logging.debug(f"{filter}, {str(annotation)}")
-    return (filter, ";".join(annotation))
+    return filter or "", ";".join(annotation)
 
 colnames = None
 samples = None
@@ -181,31 +182,30 @@ with (open_function(snakemake.input["call"]) as instream,
             outstream.write(line)
         else:
             chomp = dict(zip(colnames, line[:-1].split("\t")))
-            filter = None
+
             for idx, sample in enumerate(samples):
                 format_sample = dict(zip(chomp["FORMAT"].split(":"), chomp[sample].split(":")))
-                try:
-                    filter, sample_annotation = annotate_mutect2(
-                        genotype = format_sample.get("GT", "./."),
-                        ref = chomp["REF"],
-                        alt = chomp["ALT"],
-                        prefix = sample,
-                        filter = chomp["FILTER"],
-                        ad = format_sample.get("AD", ".,."),
-                        af = format_sample.get("AF", "."),
-                        dp = format_sample.get("DP", "."),
-                        normal = snakemake.params.get("normal_sample", None) == sample,
-                        tumor = snakemake.params.get("tumor_sample", None) == sample
-                    )
-                except ValueError:
-                    logging.error(chomp)
-                    logging.error(filter)
-                    logging.error(sample_annotation)
-                    raise
+                new_annotation = annotate_mutect2(
+                    genotype = format_sample.get("GT", "./."),
+                    ref = chomp["REF"],
+                    alt = chomp["ALT"],
+                    prefix = sample,
+                    filter = chomp["FILTER"],
+                    ad = format_sample.get("AD", ".,."),
+                    af = format_sample.get("AF", "."),
+                    dp = format_sample.get("DP", "."),
+                    normal = snakemake.params.get("normal_sample", None) == sample,
+                    tumor = snakemake.params.get("tumor_sample", None) == sample
+                )
+                if new_annotation[0] is not None:
+                    if new_annotation != chomp["FILTER"]:
+                        chomp["FILTER"] = new_annotation[0]
+
                 if chomp["INFO"] in ["." or ""]:
-                    chomp["INFO"] = sample_annotation
+                    chomp["INFO"] = new_annotation[1]
                 else:
-                    chomp["INFO"] += f";{sample_annotation}"
+                    chomp["INFO"] += f";{new_annotation[1]}"
+
 
             outstream.write("\t".join([chomp[col] for col in colnames]) + "\n")
 
