@@ -17,7 +17,7 @@ rule create_genomics_db:
     params:
         extra="",
     conda:
-        str(worflow_source_dir / "envs" / "gatk.yaml")
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     script:
         str(workflow_source_dir / "scripts" / "006.PoN.GenomicsDBImport.py")
 
