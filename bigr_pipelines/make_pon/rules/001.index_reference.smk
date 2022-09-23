@@ -11,8 +11,8 @@ rule samtools_index_genome:
         fai_file
     threads: 1
     resources:
-        mem_mb=get_768mb_per_gb,
-        time_min=get_10_minutes_per_gb,
+        mem_mb=get_1p5gb_per_attempt,
+        time_min=get_35min_per_attempt,
         tmpdir="tmp"
     params:
         extra="",
@@ -35,8 +35,8 @@ rule picard_createsequencedictionary:
         dict_file
     threads: 1
     resources:
-        mem_mb=get_768mb_per_gb,
-        time_min=get_10_minutes_per_gb,
+        mem_mb=get_1p5gb_per_attempt,
+        time_min=get_35min_per_attempt,
         tmpdir="tmp"
     params:
         extra=(

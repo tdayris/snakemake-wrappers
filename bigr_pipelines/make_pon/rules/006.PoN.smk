@@ -15,8 +15,8 @@ rule create_genomics_db:
     output:
         genomicsdb=directory("data_output/PoN.gdb")
     resources:
-        mem_mb=lambda wildcards: attempt * 1024 * 15,
-        time_min=lambda wildcards: attempt * 1024 * 45,
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_4h_per_attempt,
         tmpdir="tmp"
     log:
         "logs/create_genomics_db.log"
@@ -42,8 +42,8 @@ rule creat_somatic_pon:
     output:
         pon=protected("data_output/PoN.vcf.gz")
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 20,
-        time_min=lambda wildcards, attempt: attempt * 45,
+        mem_mb=get_20gb_per_attempt,
+        time_min=get_8h_per_attempt,
         tmpdir="tmp"
     params:
         extra="--create-output-variant-index true --create-output-variant-md5 true"

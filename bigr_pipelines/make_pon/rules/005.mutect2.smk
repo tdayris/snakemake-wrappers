@@ -31,8 +31,8 @@ rule mutect2_filter:
         "Filtering Mutect2 calls for {wildcards.sample}"
     threads: 1
     resources:
-        time_min=lambda wildcards, attempt: attempt * 45,
-        mem_mb=lambda wildcards, attempt: min(attempt * 8192, 20480),
+        time_min=get_45min_per_attempt,
+        mem_mb=get_10gb_per_attempt,
         tmpdir="tmp"
     params:
         extra=(
@@ -60,8 +60,8 @@ rule learn_read_orientation_model:
         "Build model over orientation bias on {wildcards.sample}"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 8192, 15360),
-        time_min=lambda wildcards, attempt: attempt * 45,
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp"
     params:
         extra=""
@@ -87,8 +87,8 @@ rule calculate_contamination:
         "estimate contamination on {wildcards.sample}"
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: min(attempt * 5120, 15360),
-        time_min=lambda wildcards, attempt: attempt * 35,
+        mem_mb=get_8gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp"
     params:
         extra=""
@@ -120,8 +120,8 @@ rule get_pileup_summaries:
         "estimate contamination on {wildcards.sample}"
     threads: 1
     resources:
-        mem_mb=get_4gb_per_gb,
-        time_min=get_1h_per_gb,
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp"
     params:
         extra=""
@@ -158,9 +158,9 @@ rule mutect2_germline:
         "Calling variants on {wildcards.sample} with GATK Mutect2"
     threads: 10
     resources:
-        time_min=get_1h_per_gb,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp",
-        mem_mb=get_12gb_per_gb
+        mem_mb=get_15gb_per_attempt
     params:
         extra=(
             # https://gatk.broadinstitute.org/hc/en-us/articles/360042479112-CreateSomaticPanelOfNormals-BETA-

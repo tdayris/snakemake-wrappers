@@ -43,7 +43,7 @@ rule multiqc_report:
     threads: 1
     resources:
         mem_mb=get_1p5gb_per_attempt,
-        time_min=get_10_minutes_per_gb,
+        time_min=get_10min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/sambamba/bwa/{sample}.log"
@@ -68,7 +68,7 @@ rule sambamba_sort_coordinate_raw_bam:
     threads: min(config.get("max_threads", 20), 20)
     resources:
         mem_mb=get_1p5gb_per_attempt,
-        time_min=get_10_minutes_per_gb,
+        time_min=get_10min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/sambamba/bwa/{sample}.log"
@@ -133,7 +133,7 @@ rule picard_collect_multiple_metrics:
             ".quality_distribution.pdf",
         ),
     resources:
-        mem_mb=get_4gb_per_gb,
+        mem_mb=get_4gb_per_attempt,
         time_min=get_1h_per_attempt,
         tmpdir="tmp"
     log:
