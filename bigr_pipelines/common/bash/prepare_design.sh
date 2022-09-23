@@ -11,11 +11,20 @@ MAX_THREADS=5
 message WARNING "This script is interactive, do not leave."
 message INFO "I need your password to access datasets..."
 COMMAND="iinit"
-message CMD "${COMMAND}"
-eval ${COMMAND}
+
+while true; do
+    read -p "Sould I run ${COMMAND} command ? (y/n) " yn
+
+    case "${yn}" in
+        [yY] ) message CMD "${COMMAND}"; eval ${COMMAND}; break;;
+        [nN] ) message INFO "Skipping iinit."; break;
+        * ) message ERROR "Unknown response.";;
+    esac
+done
 
 
-message INFO "I will use ${MAX_THREADS} to search information about the project ${1}"
+
+message INFO "I will use ${MAX_THREADS} threads to search information about the project ${1}"
 
 COMMAND="imeta qu -C 'projectName' like \"${1}\" | grep -v \"\-\-\-\" | cut -f2 -d\" \" > datasetList"
 message CMD "${COMMAND}"
