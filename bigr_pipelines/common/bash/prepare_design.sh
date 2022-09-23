@@ -33,7 +33,7 @@ while true; do
 done
 
 
-my_iquest() {iquest "%s/%s" "SELECT COLL_NAME,DATA_NAME WHERE COLL_NAME like '${1}%'"}
+my_iquest() { iquest "%s/%s" "SELECT COLL_NAME,DATA_NAME WHERE COLL_NAME like '${1}%'"; }
 export -f my_iquest
 COMMAND="bash ${PIPELINE_PREFIX}/multiprocess_bash_command.sh -p ${MAX_THREADS} -f my_iquest $(cat datasetList | tr $'\n' ' ') > dataset_paths.txt"
 message CMD "${COMMAND}"
