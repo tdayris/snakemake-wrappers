@@ -17,9 +17,9 @@ rule create_genomics_db:
     params:
         extra="",
     conda:
-        "envs/gatk.yaml"
+        str(worflow_source_dir / "envs" / "gatk.yaml")
     script:
-        str(workflow_source_dir / "006.PoN.GenomicsDBImport.py")
+        str(workflow_source_dir / "scripts" / "006.PoN.GenomicsDBImport.py")
 
 
 rule creat_somatic_pon:
@@ -41,6 +41,6 @@ rule creat_somatic_pon:
     log:
         "logs/gatk/create_pon.log",
     conda:
-        "envs/gatk.yaml"
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     script:
-        str(workflow_source_dir / "006.PoN.CreateSomaticPanelOfNormals.py")
+        str(workflow_source_dir / "scripts" / "006.PoN.CreateSomaticPanelOfNormals.py")

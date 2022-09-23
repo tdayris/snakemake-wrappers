@@ -108,7 +108,7 @@ rule samtools_view_filter:
     params:
         "-h -b",
     conda:
-        "envs/samtools.yaml"
+        str(workflow_source_dir / "envs" / "samtools.yaml")
     shell:
         "samtools view {params} "
         "-T {input.ref} "
@@ -172,7 +172,7 @@ rule samtools_view_cram:
     params:
         "-h -C",
     conda:
-        "envs/samtools.yaml"
+        str(workflow_source_dir / "envs" / "samtools.yaml")
     shell:
         "samtools view {params} "
         "-T {input.ref} "
