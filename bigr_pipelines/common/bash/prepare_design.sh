@@ -6,6 +6,8 @@ PIPELINE_PREFIX=$(readlink -e "$(dirname ${0})")
 source "${PIPELINE_PREFIX}/messages.sh"
 source "${PIPELINE_PREFIX}/environment.sh"
 
+MAX_THREADS=5
+
 message WARNING "This script is interactive, do not leave."
 message INFO "I need your password to access datasets..."
 COMMAND="iinit"
@@ -13,7 +15,7 @@ message CMD "${COMMAND}"
 eval ${COMMAND}
 
 
-message INFO "I search information about the project ${1}"
+message INFO "I will use ${MAX_THREADS} to search information about the project ${1}"
 
 COMMAND='imeta qu -C "${1}" | grep -v "\-\-\-" | cut -f2 -d" " > datasetList'
 message CMD "${COMMAND}"
