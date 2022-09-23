@@ -39,7 +39,7 @@ rule multiqc_report:
         time_min=get_10min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/sambamba/bwa/{sample}.log",
+        "logs/multiqc.log",
     params:
         extra="",
     wrapper:
