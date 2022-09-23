@@ -73,7 +73,7 @@ rule sambamba_markdup:
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/sambamba/markdup.log",
+        "logs/sambamba/markdup/{sample}.log",
     params:
         extra=config["params"].get(
             "sambamba_markdup", "--remove-duplicates --overflow-list-size 600000"
