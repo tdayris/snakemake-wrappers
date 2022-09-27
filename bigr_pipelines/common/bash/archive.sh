@@ -48,7 +48,7 @@ while true; do
     read -p "New destination: (leave empty if you belong to BiGR) " newdest
 
     case "${newdest}" in
-        ) break;;
+        "") message INFO "Destination remains default."; break;;
         * ) DESTINATION="${1}"; break;;
     esac
 done
