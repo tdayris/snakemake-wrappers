@@ -55,13 +55,10 @@ rule bwa_mem_align:
     log:
         "logs/bwa/mem/{sample}.log",
     params:
-        extra=config["params"].get(
-            "bwa_mem_extra",
-        r"-R '@RG\tID:{sample}\tSM:{sample}\tPU:{sample}\t"
-            "PL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
-        ),
-        sort="samtools",  # We chose Samtools to sort by queryname
-        sort_order="queryname",  # Queryname sort is needed for a fixmate
-        sort_extra="-m 1536M",  # We extand the sort buffer memory
+        index=lambda wildcards, input: os.path.splitext(input["index"][0])[0],
+        extra=r"-R '@RG\tID:{sample}_{status}\tSM:{sample}_{status}\tPU:{sample}_{status}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
+        sort="samtools",
+        sort_order="queryname",
+        sort_extra="-m 1536M",
     wrapper:
         "bio/bwa-mem2/mem"
