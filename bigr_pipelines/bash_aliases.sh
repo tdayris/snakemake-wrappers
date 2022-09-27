@@ -5,7 +5,7 @@
 # only the best.
 
 
-alias bigr_salmon_quant='bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/salmon_quant/run.sh"'
-alias bigr_ampliseq='bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/variant_calling_ampliseq/run.sh"'
-alias bigr_oncoscan='bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/oncoscan_eacon/run.sh"'
-alias bigr_cytoscan='bash "/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/cytoscan_eacon/run.sh"'
+alias bigr_rnaseq="bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh"
+alias bigr_wes_somatic="bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh"
+
+
