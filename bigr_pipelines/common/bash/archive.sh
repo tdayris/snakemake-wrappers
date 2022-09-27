@@ -23,9 +23,9 @@ function move_to_archive() {
 function remove_if_exists() {
     local TARGET="${1}"
     
-    if [[ ! -z $(find -type d -name "${TARGET}") ]]; then
+    if [[ ! -z $(find -type d -name "${TARGET}" -not -path  '.git') ]]; then
         message INFO "All data present in ${TARGET} directories will be deleted."
-        COMMAND="find -type d -name ${TARGET} | while read TMP; do rm --recursive --force --verbose ${TMP}; done"
+        COMMAND="find -type d -name ${TARGET} -not -path '.git' | while read TMP; do rm --recursive --force --verbose ${TMP}; done"
         message CMD "${COMMAND}"
         find -type d -name "${TARGET}" | while read TMP; do 
             rm --recursive --force --verbose ${TMP:?}
