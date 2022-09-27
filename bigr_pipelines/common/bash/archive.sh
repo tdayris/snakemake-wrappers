@@ -25,9 +25,11 @@ function remove_if_exists() {
     
     if [[ ! -z $(find -type d -name "${TARGET}") ]]; then
         message INFO "All data present in ${TARGET} directories will be deleted."
-        COMMAND="find -type d -name ${TARGET} | while read SNAKEMAKE_TMP; do rm --recursive --force --verbose ${SNAKEMAKE_TMP:?}; done"
+        COMMAND="find -type d -name ${TARGET} | while read TMP; do rm --recursive --force --verbose ${TMP}; done"
         message CMD "${COMMAND}"
-        eval ${COMMAND}
+        find -type d -name "${TARGET}" | while read TMP; do 
+            rm --recursive --force --verbose ${TMP:?}
+        done
     fi
 }
 
