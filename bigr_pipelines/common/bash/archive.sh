@@ -12,7 +12,7 @@ function move_to_archive() {
 
     message INFO "All data present in ${SOURCE} will be saved in ${DEST}"
     message INFO "This may take a while ..."
-    COMMAND="rsync --exclude='.fq' --exclude='.fq.gz' --exclude='.fastq' --exclude='.fastq.gz' --exclude='logs' --exclude='.snakemake' --exclude='tmp' --exclude='log' --links --perms --times --group --omit-dir-times --verbose --checksum --recursive --update --progress --human-readable --partial ${SOURCE} ${DEST}"
+    COMMAND="rsync --exclude='*.fq' --exclude='*.fq.gz' --exclude='*.fastq' --exclude='*.fastq.gz' --exclude='logs' --exclude='.snakemake' --exclude='tmp' --exclude='log'  --exclude='*.log' --links --perms --times --group --omit-dir-times --verbose --checksum --recursive --update --progress --human-readable --partial ${SOURCE} ${DEST}"
     message CMD "${COMMAND}"
     eval ${COMMAND}
     #COMMAND="gh issue comment ${ISSUE_URL} --body \"${SOURCE} was saved at ${DEST}\""
