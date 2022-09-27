@@ -16,9 +16,9 @@ rule make_rank_list:
     params:
         rank_on=config["clusterprofiler"].get("rank_on", "padj")
     conda:
-        str(worflow_source_dir / "envs" / "bash.yaml")
+        str(workflow_source_dir / "envs" / "bash.yaml")
     script:
-        str(worflow_source_dir / "scripts" / "030.make_rank_list.py")
+        str(workflow_source_dir / "scripts" / "030.make_rank_list.py")
 
 
 rule expand_rank_list:
