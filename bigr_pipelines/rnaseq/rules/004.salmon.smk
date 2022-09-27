@@ -1,19 +1,26 @@
 # This rule pseudo-map and quantifies your paired reads over the indexed
 # reference.
-rule salmon_quant:
+"""
+004.salmon_quant
+from:
+-> 002.fastp_clean
+by:
+-> 
+"""
+rule 004_salmon_quant:
     input:
-        r1="fastp/trimmed/{sample}.1.fastq",
-        r2="fastp/trimmed/{sample}.2.fastq",
+        r1="002.fastp/trimmed/{sample}.1.fastq",
+        r2="002.fastp/trimmed/{sample}.2.fastq",
         index=ancient(config["salmon"]["index"]),
         gtf=ancient(config["reference"]["gtf"]),
     output:
-        quant=temp("salmon/pseudo_mapping/{sample}/quant.sf"),
-        quant_genes=temp("salmon/pseudo_mapping/{sample}/quant.genes.sf"),
-        lib=temp("salmon/pseudo_mapping/{sample}/lib_format_counts.json"),
-        aux_info=temp(directory("salmon/pseudo_mapping/{sample}/aux_info")),
-        cmd_info=temp("salmon/pseudo_mapping/{sample}/cmd_info.json"),
-        libparams=temp(directory("salmon/pseudo_mapping/{sample}/libParams")),
-        logs=temp(directory("salmon/pseudo_mapping/{sample}/logs")),
+        quant=temp("004.salmon/pseudo_mapping/{sample}/quant.sf"),
+        quant_genes=temp("004.salmon/pseudo_mapping/{sample}/quant.genes.sf"),
+        lib=temp("004.salmon/pseudo_mapping/{sample}/lib_format_counts.json"),
+        aux_info=temp(directory("004.salmon/pseudo_mapping/{sample}/aux_info")),
+        cmd_info=temp("004.salmon/pseudo_mapping/{sample}/cmd_info.json"),
+        libparams=temp(directory("004.salmon/pseudo_mapping/{sample}/libParams")),
+        logs=temp(directory("004.salmon/pseudo_mapping/{sample}/logs")),
     threads: config.get("max_threads", 20)
     resources:
         time_min=get_90min_per_attempt,
@@ -26,22 +33,31 @@ rule salmon_quant:
             "salmon_quant_extra", "--numBootstraps 100 --gcBias --seqBias --posBias"
         ),
     log:
-        "logs/salmon/quant/{sample}.log",
+        "logs/004.salmon/quant/{sample}.log",
     wrapper:
         "bio/salmon/quant"
 
 
 # Required to annotate all previously described
 # count tables with human-readable gene names
-rule tx_to_gene:
+"""
+004.tx_to_gene
+from:
+-> Entry job
+by:
+-> 004.aggregate_raw_counts
+-> 004.aggregate_gene_counts
+-> 007.tximport
+"""
+rule 004_tx_to_gene:
     input:
         gtf=config["reference"]["gtf"],
     output:
-        tx2gene_small=temp("salmon/tx2gene_small.tsv"),
-        tx2gene=temp("salmon/tx2gene.tsv"),
-        tx2gene_large=temp("salmon/tx2gene_with_positions.tsv"),
-        gene2gene=temp("salmon/gene2gene.tsv"),
-        gene2gene_large=temp("salmon/gene2gene_with_chr.tsv"),
+        tx2gene_small=temp("004.salmon/tx2gene_small.tsv"),
+        tx2gene=temp("004.salmon/tx2gene.tsv"),
+        tx2gene_large=temp("004.salmon/tx2gene_with_positions.tsv"),
+        gene2gene=temp("004.salmon/gene2gene.tsv"),
+        gene2gene_large=temp("004.salmon/gene2gene_with_chr.tsv"),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
@@ -49,19 +65,27 @@ rule tx_to_gene:
         tmpdir="tmp",
     retries: 1
     log:
-        "logs/tx_to_gene.log",
+        "logs/004.tx_to_gene.log",
     wrapper:
         "bio/gtf/tx2gene"
 
 
 # Work on raw counts, usefull for manual
 # DESeq2/EdgeR/...
-rule aggregate_raw_counts:
+"""
+004.aggregate_raw_counts
+from:
+-> 004.tx_to_gene
+-> 004.salmon_quant
+by:
+-> End job
+"""
+rule 004_aggregate_raw_counts:
     input:
         quant=expand(
-            "salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=design["Sample_id"]
+            "004.salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=design["Sample_id"]
         ),
-        tx2gene="salmon/tx2gene.tsv",
+        tx2gene="004.salmon/tx2gene.tsv",
     output:
         tsv=report(
             "data_output/Quantification/Raw.genes.tsv",
@@ -83,19 +107,27 @@ rule aggregate_raw_counts:
         fillna="Unknown",
         column="NumReads",
     log:
-        "logs/aggregate/genes.log",
+        "logs/004.aggregate/genes.log",
     wrapper:
         "bio/pandas/salmon"
 
 
 # Aggregate per-gene TPM counts
 # Usefull for GSEA, PCA, ...
-rule aggregate_gene_counts:
+"""
+004.aggregate_gene_counts
+from:
+-> 004.tx_to_gene
+-> 004.salmon_quant
+by:
+-> 005.subset_gene_counts
+"""
+rule 004_aggregate_gene_counts:
     input:
         quant=expand(
-            "salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=design["Sample_id"]
+            "004.salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=design["Sample_id"]
         ),
-        tx2gene="salmon/tx2gene.tsv",
+        tx2gene="004.salmon/tx2gene.tsv",
     output:
         tsv=report(
             "data_output/Quantification/TPM.genes.tsv",
@@ -116,19 +148,27 @@ rule aggregate_gene_counts:
         index_label=True,
         fillna="Unknown",
     log:
-        "logs/aggregate/genes.log",
+        "logs/004.aggregate/genes.log",
     wrapper:
         "bio/pandas/salmon"
 
 
 # Aggregate transcript counts
 # Usefull for PCA, sample correlations, etc.
-rule aggregate_transcript_counts:
+"""
+004.aggregate_transcript_counts
+from:
+-> 004.tx_to_gene
+-> 004.salmon_quant
+by:
+-> End job
+"""
+rule 004_aggregate_transcript_counts:
     input:
         quant=expand(
-            "salmon/pseudo_mapping/{sample}/quant.sf", sample=design["Sample_id"]
+            "004.salmon/pseudo_mapping/{sample}/quant.sf", sample=design["Sample_id"]
         ),
-        tx2gene="salmon/tx2gene.tsv",
+        tx2gene="004.salmon/tx2gene.tsv",
     output:
         tsv=report(
             "data_output/Quantification/TPM.transcripts.tsv",
@@ -151,6 +191,6 @@ rule aggregate_transcript_counts:
         index_label=True,
         fillna="Unknown",
     log:
-        "logs/aggregate/transcripts.log",
+        "logs/004.aggregate/transcripts.log",
     wrapper:
         "bio/pandas/salmon"

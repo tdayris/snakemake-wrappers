@@ -16,6 +16,7 @@ import functools
 from snakemake.utils import min_version
 from pathlib import Path
 from yaml import dump
+from typing import Any, Dict
 
 min_version("7.5")
 
@@ -34,6 +35,25 @@ from write_yaml import *
 from reservation import *
 from gmt import *
 from messages import message
+
+def expected_targets(config: Dict[str, Any]):
+    results = {}
+    if config["steps"].get("qc", True) is True:
+        results["qc"] = "data_output/multiqc/MultiQC.QC.html"
+
+    if config["steps"].get("quant", False) is True:
+        results["quant"] = "data_output/multiqc/MultiQC.Salmon.html"
+
+    if config["steps"].get("dge", False) is True:
+        results["dge"] = "data_output/DEseq2/{comparison}/MultiQC.DEseq2.html"
+
+    if config["steps"].get("immunedeconv", False) is True:
+        results["immunedeconv"] = "data_output/MultiQC/ImmuneDeconv.html"
+
+    if config["steps"].get("fusions", False) is True:
+        results["fusions"] = "data_output/multiqc/MultiQC.Star.Chimera.html"
+
+    return results
 
 #####################
 # Setup environment #

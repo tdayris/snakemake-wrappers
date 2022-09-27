@@ -4,12 +4,24 @@ This snakefile calls fastqc on raw fastq files
 
 
 # Assess sample origin based on a wide range of potiential target genomes
-rule fastq_screen:
+"""
+003.fastq_screen:
+from:
+-> 002.fastp_clean
+by:
+-> Snakefile.deseq2_results
+-> Snakefile.star_fusion_results
+-> Snakefile.immunedeconv_results
+-> Snakefile.salmon_quant_results
+-> Snakefile.quality_control_results
+-> Snakefile.clusterprofiler_results
+"""
+rule 003_fastq_screen:
     input:
-        "fastp/trimmed/{sample}.{stream}.fastq",
+        "002.fastp/trimmed/{sample}.{stream}.fastq",
     output:
-        txt=temp("fastq_screen/{sample}.{stream}.fastq_screen.txt"),
-        png=temp("fastq_screen/{sample}.{stream}.fastq_screen.png"),
+        txt=temp("003.fastq_screen/{sample}.{stream}.fastq_screen.txt"),
+        png=temp("003.fastq_screen/{sample}.{stream}.fastq_screen.png"),
     threads: config.get("max_threads", 20)
     resources:
         mem_mb=get_10gb_per_attempt,
@@ -21,6 +33,6 @@ rule fastq_screen:
         subset=config["fastq_screen"].get("subset", 100000),
         aligner=config["fastq_screen"].get("aligner", "bowtie2"),
     log:
-        "logs/fastq_screen/{sample}.{stream}.log",
+        "logs/003.fastq_screen/{sample}.{stream}.log",
     wrapper:
         "bio/fastq_screen"

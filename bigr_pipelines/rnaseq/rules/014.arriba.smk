@@ -1,14 +1,14 @@
 rule arriba:
     input:
-        bam="star/{sample}/chimera/{sample}.bam",
-        bam_index="star/{sample}/chimera/{sample}.bam.bai",
+        bam="010.star/{sample}/chimera/{sample}.bam",
+        bam_index="010.star/{sample}/chimera/{sample}.bam.bai",
         genome=config["reference"]["genome"],
         genome_index=config["reference"]["genome_index"],
         annotation=config["reference"]["gtf"],
         blacklist=config["arriba"]["blacklist"],
     output:
         fusions=protected("data_output/arriba/{sample}.fusions.tsv"),
-        discarded=temp("results/arriva/{sample}.fusions.discarded.tsv"),
+        discarded=temp("014.arriba/{sample}.fusions.discarded.tsv"),
     threads: 1
     resources:
         mem_mb=get_20gb_per_attempt,
@@ -19,4 +19,6 @@ rule arriba:
         blacklist=config["arriba"]["blacklist"],
         extra=config["arriba"].get("extra", ""),
     log:
-        "logs/arriba/{sample}.log",
+        "logs/014.arriba/{sample}.log",
+    wrapper:
+        "bio/arriba"

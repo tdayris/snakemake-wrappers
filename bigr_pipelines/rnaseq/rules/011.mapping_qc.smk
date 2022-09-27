@@ -1,26 +1,40 @@
+"""
+011.samtools_stats
+from:
+-> 010.sambamba_sort_star
+by:
+-> snakefile.star_fusion_results
+"""
 rule samtools_stats:
     input:
-        aln="star/{sample}/{maptype}/{sample}.bam",
-        aln_idx="star/{sample}/{maptype}/{sample}.bam.bai",
+        aln="010.star/{sample}/{maptype}/{sample}.bam",
+        aln_idx="010.star/{sample}/{maptype}/{sample}.bam.bai",
         ref=config["reference"]["genome"],
         ref_idx=config["reference"]["genome_index"],
         ref_dict=config["reference"]["genome_dict"],
         bed=config["reference"]["capture_kit_bed"],
     output:
-        temp("samtools/stats/{sample}.{maptype}.stats"),
+        temp("011.samtools/stats/{sample}.{maptype}.stats"),
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_1h_per_attempt,
         tmpdir="tmp",
     retries: 1
     log:
-        "logs/samtools/stats/{sample}.{maptype}.log",
+        "logs/011.samtools/stats/{sample}.{maptype}.log",
     params:
         extra=config["samtools"].get("stats", ""),
     wrapper:
         "bio/samtools/stats"
 
 
+"""
+011.samtools_index_bam
+from:
+-> 010.sambamba_sort_star
+by:
+-> 011.samtools_stats
+"""
 rule samtools_index_bam:
     input:
         "star/{sample}/{maptype}/{sample}.bam",
@@ -35,11 +49,18 @@ rule samtools_index_bam:
     params:
         extra=config["samtools"].get("index_extra", ""),
     log:
-        "logs/samtools/index/{sample}.{maptype}.log",
+        "logs/011.samtools/index/{sample}.{maptype}.log",
     wrapper:
         "bio/samtools/index"
 
 
+"""
+011.samtools_cram
+from:
+-> 010.sambamba_sort_star
+by:
+-> End Job
+"""
 rule samtools_cram:
     input:
         aln="star/{sample}/{maptype}/{sample}.bam",
@@ -57,6 +78,6 @@ rule samtools_cram:
     params:
         extra=config["samtools"].get("cram_extra", ""),
     log:
-        "logs/samtools/cram/{sample}.{maptype}.log",
+        "logs/011.samtools/cram/{sample}.{maptype}.log",
     wrapper:
         "bio/samtools/view"

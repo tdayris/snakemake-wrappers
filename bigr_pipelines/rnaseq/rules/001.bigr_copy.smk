@@ -2,10 +2,16 @@
 This Snakefile deals with IO from and to iRODS
 """
 
-
 # Copy files on BiGR Flamingo
 # iRODS paths are accepted
-rule bigr_copy:
+"""
+001.bigr_copy:
+from:
+-> Entry job
+by:
+-> 002.fastp_clean
+"""
+rule 001_bigr_copy:
     output:
         temp("data_input/{sample}.{stream}.fq.gz"),
     threads: 1
@@ -16,6 +22,6 @@ rule bigr_copy:
     params:
         input=lambda wildcards, output: fastq_links[output[0]],
     log:
-        "logs/bigr_copy/{sample}.{stream}.log",
+        "logs/001.bigr_copy/{sample}.{stream}.log",
     wrapper:
         "bio/BiGR/copy"

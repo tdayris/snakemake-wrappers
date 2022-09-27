@@ -1,9 +1,12 @@
+"""
+013.star_fusion
+"""
 rule star_fusion:
     input:
-        junctions="star/{sample}/chimera/{sample}.Chimeric.out.junction",
+        junctions="010.star/{sample}/chimera/{sample}.Chimeric.out.junction",
         resource_lib=config["star_fusion"]["CTAT_resource_lib"],
     output:
-        directory("star-fusions/{sample}/"),
+        directory("011.star-fusions/{sample}/"),
     threads: config.get("max_threads", 20)
     resources:
         mem_mb=get_20gb_per_attempt,
@@ -11,7 +14,7 @@ rule star_fusion:
         tmpdir="tmp",
     retries: 1
     log:
-        "logs/star-fusion/{sample}.log",
+        "logs/011.star-fusion/{sample}.log",
     params:
         extra=config["star_fusion"].get("extra", "--FusionInspector inspect"),
     conda:

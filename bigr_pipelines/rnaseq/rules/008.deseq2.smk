@@ -1,15 +1,18 @@
+# This rule splits a complex design into small ones.
+# These simple designs contains only the required factors
+# and sample names.
 """
-This rule splits a complex design into small ones.
-These simple designs contains only the required factors
-and sample names.
+008.split_design
+from:
+-> Entry Job
+by:
+-> 008.deseq2_dataset_from_tximport
 """
-
-
-rule split_design:
+rule 008_split_design:
     input:
         design=config["design"],
     output:
-        expand("deseq2/designs/{comparison}.tsv", comparison=output_prefixes),
+        expand("008.deseq2/designs/{comparison}.tsv", comparison=output_prefixes),
     message:
         "Expanding design in order to make results more readeble"
     threads: 1
@@ -19,7 +22,7 @@ rule split_design:
         tmpdir="tmp",
     retries: 1
     log:
-        "logs/deseq2/split_design.log",
+        "logs/008.deseq2/split_design.log",
     params:
         columns_to_aggregate=config["deseq2"]["design"].get("columns_to_aggregate"),
         columns_to_remove=config["deseq2"]["design"].get("columns_to_remove"),
@@ -27,18 +30,20 @@ rule split_design:
         "bio/BiGR/split_design"
 
 
-"""
-This rule formats counts for DESeq2. The design matrix and its corresponding
-formula are included.
-"""
 
-
-rule deseq2_dataset_from_tximport:
+# This rule formats counts for DESeq2. The design matrix and its corresponding
+# formula are included.
+"""
+008.deseq2_dataset_from_tximport
+from:
+-> 008.split_design
+"""
+rule 008_deseq2_dataset_from_tximport:
     input:
-        tximport="tximport/txi.{comparison}.RDS",
-        coldata="deseq2/designs/{comparison}.tsv",
+        tximport="007.tximport/txi.{comparison}.RDS",
+        coldata="008.deseq2/designs/{comparison}.tsv",
     output:
-        dds=temp("deseq2/{comparison}/dds.{comparison}.RDS"),
+        dds=temp("008.deseq2/{comparison}/dds.{comparison}.RDS"),
     message:
         "Formatting {wildcards.comparison} counts for DESeq2"
     threads: 1
@@ -59,29 +64,32 @@ rule deseq2_dataset_from_tximport:
         remove_zeros=True,
         count_filter=0.01,
     log:
-        "logs/deseq2/deseq2_dataset_from_tximport/{comparison}.log",
+        "logs/008.deseq2/deseq2_dataset_from_tximport/{comparison}.log",
     wrapper:
         "bio/deseq2/DESeqDataSetFromTximport"
 
 
+# This rule performs the size factor and dispersions estimations as well as the
+# wald test.
 """
-This rule performs the size factor and dispersions estimations as well as the
-wald test.
+008.deseq2
+from:
+-> 008.deseq2_dataset_from_tximport
+by:
+-> 009.deseq2_readable
 """
-
-
-rule deseq2:
+rule 008_deseq2:
     input:
-        dds="deseq2/{comparison}/dds.{comparison}.RDS",
+        dds="008.deseq2/{comparison}/dds.{comparison}.RDS",
     output:
-        rds=temp("deseq2/{comparison}/wald.{comparison}.RDS"),
-        deseq2_tsv=temp("deseq2/{comparison}/wald.{comparison}.tsv"),
-        normalized_counts=temp("deseq2/{comparison}/dst.{comparison}.tsv"),
-        dst=temp("deseq2/{comparison}/dst.{comparison}.RDS"),
-        intermediar_values=temp("deseq2/{comparison}/mcols.{comparison}.tsv"),
-        assays_mu=temp("deseq2/{comparison}/assays.mu.{comparison}.tsv"),
-        filter_theta=temp("deseq2/{comparison}/filter.theta.{comparison}.tsv"),
-        metadata=temp("deseq2/{comparison}/metadata.{comparison}.tsv"),
+        rds=temp("008.deseq2/{comparison}/wald.{comparison}.RDS"),
+        deseq2_tsv=temp("008.deseq2/{comparison}/wald.{comparison}.tsv"),
+        normalized_counts=temp("008.deseq2/{comparison}/dst.{comparison}.tsv"),
+        dst=temp("008.deseq2/{comparison}/dst.{comparison}.RDS"),
+        intermediar_values=temp("008.deseq2/{comparison}/mcols.{comparison}.tsv"),
+        assays_mu=temp("008.deseq2/{comparison}/assays.mu.{comparison}.tsv"),
+        filter_theta=temp("008.deseq2/{comparison}/filter.theta.{comparison}.tsv"),
+        metadata=temp("008.deseq2/{comparison}/metadata.{comparison}.tsv"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -91,6 +99,6 @@ rule deseq2:
     params:
         contrast=lambda wildcards: contrasts[wildcards.comparison],
     log:
-        "logs/deseq2/deseq/{comparison}.log",
+        "logs/008.deseq2/deseq/{comparison}.log",
     wrapper:
         "bio/deseq2/DESeq"

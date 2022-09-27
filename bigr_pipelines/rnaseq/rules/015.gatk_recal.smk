@@ -1,9 +1,12 @@
+# This rule indexes the recalibrated bam
 """
-This rule indexes the recalibrated bam
+015.samtools_index_gatk
+from:
+-> 015.gatk_apply_baserecalibrator
+by:
+-> 
 """
-
-
-rule samtools_index_gatk:
+rule 015_samtools_index_gatk:
     input:
         "gatk/recal_bam/{sample}.bam",
     output:
@@ -17,7 +20,7 @@ rule samtools_index_gatk:
     params:
         extra=config["samtools"].get("index_extra", ""),
     log:
-        "logs/samtools/index/{sample}.gatk.log",
+        "logs/015.samtools/index/{sample}.gatk.log",
     wrapper:
         "bio/samtools/index"
 
