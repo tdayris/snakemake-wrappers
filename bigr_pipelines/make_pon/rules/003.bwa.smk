@@ -37,7 +37,7 @@ This rule should always be used in the pipeline
 
 rule bwa_mem_align:
     input:
-        idx=ancient(bwa_sequence_index),
+        index=ancient(bwa_sequence_index),
         reads=expand(
             "fastp/trimmed/{sample}.{stream}.fastq",
             stream=["1", "2"],
