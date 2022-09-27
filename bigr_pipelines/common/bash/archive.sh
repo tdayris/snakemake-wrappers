@@ -63,7 +63,7 @@ message CMD "${COMMAND}"
 eval ${COMMAND}
 
 move_to_archive "${PROJECT_PATH}/data_input/" "${DESTINATION}/data_input/"
-move_to_archive "${PROJECT_PATH}/script/" "${DESTINATION}/script/"
+move_to_archive "${PROJECT_PATH}/scripts/" "${DESTINATION}/scripts/"
 move_to_archive "${PROJECT_PATH}/com/" "${DESTINATION}/com/"
 move_to_archive "${PROJECT_PATH}/data_output" "${DESTINATION}/data_output/"
 message INFO "You can now delete ${PROJECT_PATH}/data_input/ ${PROJECT_PATH}/script/ ${PROJECT_PATH}/com/ and ${PROJECT_PATH}/data_output safely."
