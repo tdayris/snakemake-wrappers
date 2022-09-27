@@ -120,7 +120,7 @@ output_prefixes = [
 ]
 if config.get("write_comparisons", True):
     with open("list_of_possible_comparisons.txt", "w") as outcomplist:
-        outcomplist.write(str(output_prefixes) + "\n")
+        outcomplist.write("\n".join(output_prefixes) + "\n")
 
 # A dict containing comparison names and factors/levels
 contrasts = dict(zip(output_prefixes, comparison_levels))
