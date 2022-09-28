@@ -1,12 +1,14 @@
 # This rule indexes the recalibrated bam
 """
 015.samtools_index_gatk
-from:
+from
 -> 015.gatk_apply_baserecalibrator
-by:
+by
 -> 016.mutect2_germline
 """
-rule 015_samtools_index_gatk:
+
+
+rule samtools_index_gatk:
     input:
         "010.gatk/recal_bam/{sample}.bam",
     output:
@@ -25,17 +27,18 @@ rule 015_samtools_index_gatk:
         "bio/samtools/index"
 
 
-
 # This rule applies the BQSR to the mapped reads
 """
 015.gatk_apply_baserecalibrator
-from:
+from
 -> 015.gatk_compute_baserecalibration_table
 -> 010.gatk_split_n_cigar_reads
-by:
+by
 -> 016.mutect2_germline
 """
-rule 015_gatk_apply_baserecalibrator:
+
+
+rule gatk_apply_baserecalibrator:
     input:
         bam="010.gatk/splitncigarreads/{sample}.bam",
         bam_index="010.gatk/splitncigarreads/{sample}.bam.bai",
@@ -59,16 +62,17 @@ rule 015_gatk_apply_baserecalibrator:
         "bio/gatk/applybqsr"
 
 
-
 # This rule computes BQSR on mapped reads, given a knoledge database
 """
 015.gatk_compute_baserecalibration_table
-from:
+from
 -> 010.gatk_split_n_cigar_reads
-by:
+by
 -> 015.gatk_apply_baserecalibrator
 """
-rule 015_gatk_compute_baserecalibration_table:
+
+
+rule gatk_compute_baserecalibration_table:
     input:
         bam="010.gatk/splitncigarreads/{sample}.bam",
         bam_index="010.gatk/splitncigarreads/{sample}.bam.bai",

@@ -1,3 +1,4 @@
+# Align reads with parameters dedicated to chimera and fusions findings
 """
 012.star_align_chimera
 from
@@ -10,7 +11,9 @@ by:
 -> 019.rseqc_gene_body_coverage
 -> 019.seqc_junction_annotation
 """
-rule 012_star_align_chimera:
+
+
+rule star_align_chimera:
     input:
         fq1="002.fastp/trimmed/{sample}.1.fastq",
         fq2="002.fastp/trimmed/{sample}.2.fastq",

@@ -5,13 +5,15 @@ This Snakefile deals with IO from and to iRODS
 # Copy files on BiGR Flamingo
 # iRODS paths are accepted
 """
-001.bigr_copy:
-from:
+001.bigr_copy
+from
 -> Entry job
-by:
+by
 -> 002.fastp_clean
 """
-rule 001_bigr_copy:
+
+
+rule bigr_copy:
     output:
         temp("data_input/{sample}.{stream}.fq.gz"),
     threads: 1

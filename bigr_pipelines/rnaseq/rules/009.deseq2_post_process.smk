@@ -6,13 +6,15 @@
 # (and compatible with gseaapp from BiGR)
 """
 009.deseq2_readable
-from:
+from
 -> 004.tx_to_gene
 -> 008.deseq2
-by:
-->
+by
+-> End job
 """
-rule 009_deseq2_readable:
+
+
+rule deseq2_readable:
     input:
         tsv="008.deseq2/{comparison}/wald.{comparison}.tsv",
         gene2gene="004.salmon/gene2gene_with_chr.tsv",
@@ -55,12 +57,14 @@ rule 009_deseq2_readable:
 # This rule creates HTML reports from DESeq2 results
 """
 009.rbt_csv_report
-from:
+from
 -> 009.deseq2_readable
-by:
+by
 -> 009.zip_csv_report
 """
-rule 009_rbt_csv_report:
+
+
+rule rbt_csv_report:
     input:
         "data_output/DEseq2/{comparison}/{content}_{comparison}.tsv",
     output:
@@ -84,14 +88,17 @@ rule 009_rbt_csv_report:
     wrapper:
         "bio/rbt/csvreport"
 
+
 """
 009.zip_csv_report
-from:
+from
 -> 009.rbt_csv_report
-by:
+by
 -> End job
 """
-rule 009_zip_csv_report:
+
+
+rule zip_csv_report:
     input:
         "009.rbt/csvreport/{comparison}/{content}_html_table/",
     output:
@@ -119,12 +126,14 @@ rule 009_zip_csv_report:
 ################
 """
 009.multiqc_config
-from:
+from
 -> 009.plot_deseq_genes
-by:
+by
 -> Snakefile.deseq2_results
 """
-rule 009_multiqc_config:
+
+
+rule multiqc_config:
     input:
         clustermap_sample="009.figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/clustermap/ClusteredHeatmap.samples.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.png",
         pca_plot="009.figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca/pca_{factor}_ax_1_ax_2_with_elipse.png",
@@ -204,9 +213,15 @@ rule 009_multiqc_config:
 
 # This rule performs various quality control graphs and per-gene information plots
 """
-
+009.plot_deseq_genes
+from
+-> 008.deseq2
+by
+-> 009.multiqc_config
 """
-rule 009_plot_deseq_genes:
+
+
+rule plot_deseq_genes:
     input:
         deseq="008.deseq2/{comparison}/wald.{comparison}.tsv",
         intermediar="008.deseq2/{comparison}/mcols.{comparison}.tsv",
@@ -245,12 +260,17 @@ rule 009_plot_deseq_genes:
         "bio/seaborn/plot_deseq_genes"
 
 
+# This rule creates a sample-clustered heatmap
 """
-This rule creates a sample-clustered heatmap
+009.seaborn_clustermap_sample
+from
+-> 008.deseq2
+by
+-> 009.multiqc_config
 """
 
 
-rule 009_seaborn_clustermap_sample:
+rule seaborn_clustermap_sample:
     input:
         counts="008.deseq2/{comparison}/dst.{comparison}.tsv",
     output:
@@ -280,12 +300,18 @@ rule 009_seaborn_clustermap_sample:
 ### EnhancedVolcano ###
 #######################
 
+
+# This rules computes and plots a Volcano-plot
 """
-This rules computes and plots a Volcano-plot
+009.enhancedvolcano_volcanoplot
+from
+-> 008.deseq2
+by
+-> 009.multiqc_config
 """
 
 
-rule 009_enhancedvolcano_volcanoplot:
+rule enhancedvolcano_volcanoplot:
     input:
         deseq2_tsv="008.deseq2/{comparison}/wald.{comparison}.tsv",
     output:
@@ -308,12 +334,17 @@ rule 009_enhancedvolcano_volcanoplot:
 ##############
 ### DESeq2 ###
 ##############
+# This rule creates a MA-Plot
 """
-This rule creates a MA-Plot
+009.deseq2_maplot
+from
+-> 008.deseq2
+by
+-> 009.multiqc_config
 """
 
 
-rule 009_deseq2_maplot:
+rule deseq2_maplot:
     input:
         res="008.deseq2/{comparison}/wald.{comparison}.tsv",
     output:
@@ -333,13 +364,17 @@ rule 009_deseq2_maplot:
 ####################
 ### PCA Explorer ###
 ####################
-
+# This rule simply plots the PCA
 """
-This rule simply plots the PCA
+009.pcaexplorer_pca
+from
+-> 008.deseq2
+by
+-> 009.multiqc_config
 """
 
 
-rule 009_pcaexplorer_pca:
+rule pcaexplorer_pca:
     input:
         dst="008.deseq2/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/wald.DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}.RDS",
     output:
@@ -364,12 +399,17 @@ rule 009_pcaexplorer_pca:
         "bio/pcaExplorer/PCA"
 
 
+# This rule plots the distribution of the expression of Salmon counts
 """
-This rule plots the distribution of the expression of Salmon counts
+009.pca_explorer_distro_expr
+from
+-> 008.deseq2
+by
+-> 009.multiqc_config
 """
 
 
-rule 009_pca_explorer_distro_expr:
+rule pca_explorer_distro_expr:
     input:
         dst="008.deseq2/{comparison}/wald.{comparison}.RDS",
     output:

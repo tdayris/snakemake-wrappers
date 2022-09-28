@@ -5,10 +5,10 @@ This snakefile calls fastqc on raw fastq files
 
 # Assess sample origin based on a wide range of potiential target genomes
 """
-003.fastq_screen:
-from:
+003.fastq_screen
+from
 -> 002.fastp_clean
-by:
+by
 -> Snakefile.deseq2_results
 -> Snakefile.star_fusion_results
 -> Snakefile.immunedeconv_results
@@ -16,7 +16,9 @@ by:
 -> Snakefile.quality_control_results
 -> Snakefile.clusterprofiler_results
 """
-rule 003_fastq_screen:
+
+
+rule fastq_screen:
     input:
         "002.fastp/trimmed/{sample}.{stream}.fastq",
     output:

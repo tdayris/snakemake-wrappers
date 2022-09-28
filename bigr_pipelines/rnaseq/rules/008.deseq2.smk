@@ -3,12 +3,14 @@
 # and sample names.
 """
 008.split_design
-from:
+from
 -> Entry Job
-by:
+by
 -> 008.deseq2_dataset_from_tximport
 """
-rule 008_split_design:
+
+
+rule split_design:
     input:
         design=config["design"],
     output:
@@ -30,15 +32,18 @@ rule 008_split_design:
         "bio/BiGR/split_design"
 
 
-
 # This rule formats counts for DESeq2. The design matrix and its corresponding
 # formula are included.
 """
 008.deseq2_dataset_from_tximport
-from:
+from
 -> 008.split_design
+by
+-> 008.deseq2
 """
-rule 008_deseq2_dataset_from_tximport:
+
+
+rule deseq2_dataset_from_tximport:
     input:
         tximport="007.tximport/txi.{comparison}.RDS",
         coldata="008.deseq2/designs/{comparison}.tsv",
@@ -73,13 +78,15 @@ rule 008_deseq2_dataset_from_tximport:
 # wald test.
 """
 008.deseq2
-from:
+from
 -> 008.deseq2_dataset_from_tximport
-by:
+by
 -> 009.deseq2_readable
 -> 026.make_rank_list
 """
-rule 008_deseq2:
+
+
+rule deseq2:
     input:
         dds="008.deseq2/{comparison}/dds.{comparison}.RDS",
     output:

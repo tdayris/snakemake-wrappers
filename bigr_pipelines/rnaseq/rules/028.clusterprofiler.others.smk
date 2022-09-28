@@ -1,93 +1,103 @@
 # Disease Ontology analysis
 """
 028.enrichDO
-from:
+from
 -> 026.expand_rank_list
-by:
+by
 -> End job
 """
-rule 028_enrichDO:
+
+
+rule enrichDO:
     input:
-        rds = "026.gene_lists/ENTREZID/{comparison}.RDS",
-        universe = "026.gene_lists/universe/{comparison}.RDS"
+        rds="026.gene_lists/ENTREZID/{comparison}.RDS",
+        universe="026.gene_lists/universe/{comparison}.RDS",
     output:
-        rds = temp(
+        rds=temp(
             "027.enrich/DiseaseOnt/{comparison}/enrich.DiseaseOnt.{comparison}.ENTREZID.RDS"
         ),
-        tsv = "data_output/{comparison}/DiseaseOnt.ENTREZID/enrich.{comparison}.tsv"
+        tsv="data_output/{comparison}/DiseaseOnt.ENTREZID/enrich.{comparison}.tsv",
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        enrichDO_extra=config["clusterprofiler"].get("enrich_do", "pvalueCutoff = 1, qvalueCutoff = 1"),
-        organism = config.get("organism", "Hs"),
+        enrichDO_extra=config["clusterprofiler"].get(
+            "enrich_do", "pvalueCutoff = 1, qvalueCutoff = 1"
+        ),
+        organism=config.get("organism", "Hs"),
     log:
-        "logs/028.enrichdo/{comparison}.log"
+        "logs/028.enrichdo/{comparison}.log",
     wrapper:
         "bio/clusterProfiler/enrichDO"
-
 
 
 # DisGeNET analysis
 """
 028.enrichDGN
-from:
+from
 -> 026.expand_rank_list
-by:
+by
 -> End job
-""""
-rule 028_enrichDGN:
+"""
+
+
+rule enrichDGN:
     input:
-        rds = "026.gene_lists/ENTREZID/{comparison}.RDS",
-        universe = "026.gene_lists/universe/{comparison}.RDS"
+        rds="026.gene_lists/ENTREZID/{comparison}.RDS",
+        universe="026.gene_lists/universe/{comparison}.RDS",
     output:
-        rds = temp(
+        rds=temp(
             "027.enrich/DisGenNet/{comparison}/enrich.DisGenNet.{comparison}.ENTREZID.RDS"
         ),
-        tsv = "data_output/{comparison}/DisGenNet.ENTREZID/enrich.{comparison}.tsv"
+        tsv="data_output/{comparison}/DisGenNet.ENTREZID/enrich.{comparison}.tsv",
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        enrichDO_extra=config["clusterprofiler"].get("enrich_dgn", "pvalueCutoff = 1, qvalueCutoff = 1"),
-        organism = config.get("organism", "Hs"),
+        enrichDO_extra=config["clusterprofiler"].get(
+            "enrich_dgn", "pvalueCutoff = 1, qvalueCutoff = 1"
+        ),
+        organism=config.get("organism", "Hs"),
     log:
-        "logs/028.enrichdgn/{comparison}.log"
+        "logs/028.enrichdgn/{comparison}.log",
     wrapper:
         "bio/clusterProfiler/enrichDGN"
-
 
 
 # Network of Cancer Genes analysis
 """
 028.enrichNCG
-from:
+from
 -> 026.expand_rank_list
-by:
+by
 -> End job
-""""
-rule 028_enrichNCG:
+"""
+
+
+rule enrichNCG:
     input:
-        rds = "026.gene_lists/ENTREZID/{comparison}.RDS",
-        universe = "026.gene_lists/universe/{comparison}.RDS"
+        rds="026.gene_lists/ENTREZID/{comparison}.RDS",
+        universe="026.gene_lists/universe/{comparison}.RDS",
     output:
-        rds = temp(
+        rds=temp(
             "027.enrich/NetworkCancerGenes/{comparison}/enrich.NetworkCancerGenes.{comparison}.ENTREZID.RDS"
         ),
-        tsv = "data_output/{comparison}/NetworkCancerGenes.ENTREZID/enrich.{comparison}.tsv"
+        tsv="data_output/{comparison}/NetworkCancerGenes.ENTREZID/enrich.{comparison}.tsv",
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        enrichDO_extra=config["clusterprofiler"].get("enrich_ncg", "pvalueCutoff = 1, qvalueCutoff = 1"),
-        organism = config.get("organism", "Hs"),
+        enrichDO_extra=config["clusterprofiler"].get(
+            "enrich_ncg", "pvalueCutoff = 1, qvalueCutoff = 1"
+        ),
+        organism=config.get("organism", "Hs"),
     log:
-        "logs/028.enrichncg/{comparison}.log"
+        "logs/028.enrichncg/{comparison}.log",
     wrapper:
         "bio/clusterProfiler/enrichNCG"

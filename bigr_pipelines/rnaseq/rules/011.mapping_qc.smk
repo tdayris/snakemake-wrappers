@@ -1,11 +1,14 @@
+# Acquire multiple stats over BAM files
 """
 011.samtools_stats
-from:
+from
 -> 010.sambamba_sort_star
-by:
+by
 -> snakefile.star_fusion_results
 """
-rule 011_samtools_stats:
+
+
+rule samtools_stats:
     input:
         aln="010.star/{sample}/{maptype}/{sample}.bam",
         aln_idx="010.star/{sample}/{maptype}/{sample}.bam.bai",
@@ -28,14 +31,17 @@ rule 011_samtools_stats:
         "bio/samtools/stats"
 
 
+# Index star bam files
 """
 011.samtools_index_bam
-from:
+from
 -> 010.sambamba_sort_star
-by:
+by
 -> 011.samtools_stats
 """
-rule 011_samtools_index_bam:
+
+
+rule samtools_index_bam:
     input:
         "star/{sample}/{maptype}/{sample}.bam",
     output:
@@ -54,14 +60,17 @@ rule 011_samtools_index_bam:
         "bio/samtools/index"
 
 
+# CRAM star bam files for space saving
 """
 011.samtools_cram
-from:
+from
 -> 010.sambamba_sort_star
-by:
+by
 -> End Job
 """
-rule 011_samtools_cram:
+
+
+rule samtools_cram:
     input:
         aln="star/{sample}/{maptype}/{sample}.bam",
         aln_idx="star/{sample}/{maptype}/{sample}.bam.bai",

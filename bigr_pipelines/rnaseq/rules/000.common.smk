@@ -36,6 +36,7 @@ from reservation import *
 from gmt import *
 from messages import message
 
+
 def expected_targets(config: Dict[str, Any]):
     results = {}
     if config["steps"].get("qc", True) is True:
@@ -54,6 +55,7 @@ def expected_targets(config: Dict[str, Any]):
         results["fusions"] = "data_output/multiqc/MultiQC.Star.Chimera.html"
 
     return results
+
 
 #####################
 # Setup environment #

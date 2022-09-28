@@ -5,9 +5,11 @@ from:
 -> 010.star_align_variants
 -> 012.star_align_chimera
 by:
-->
+-> Snakefile.star_fusion_results
 """
-rule 019_rseqc_read_distribution:
+
+
+rule rseqc_read_distribution:
     input:
         bam="010.star/{sample}/{maptype}/{sample}.bam",
         bai="010.star/{sample}/{maptype}/{sample}.bam.bai",
@@ -38,9 +40,11 @@ from:
 -> 010.star_align_variants
 -> 012.star_align_chimera
 by:
-->
+-> Snakefile.star_fusion_results
 """
-rule 019_rseqc_tin:
+
+
+rule rseqc_tin:
     input:
         bam="010.star/{sample}/{maptype}/{sample}.bam",
         bai="010.star/{sample}/{maptype}/{sample}.bam.bai",
@@ -67,7 +71,6 @@ rule 019_rseqc_tin:
         "> {output} 2> {log} "
 
 
-
 # Acquire multiple stats over BAM file
 """
 019.rseqc_bam_stat
@@ -75,9 +78,11 @@ from:
 -> 010.star_align_variants
 -> 012.star_align_chimera
 by:
-->
+-> Snakefile.star_fusion_results
 """
-rule 019_rseqc_bam_stat:
+
+
+rule rseqc_bam_stat:
     input:
         bam="010.star/{sample}/{maptype}/{sample}.bam",
         bai="010.star/{sample}/{maptype}/{sample}.bam.bai",
@@ -102,13 +107,15 @@ rule 019_rseqc_bam_stat:
 # Compute RNA coverage bias over gene bodies
 """
 019.rseqc_gene_body_coverage
-from:
+from
 -> 010.star_align_variants
 -> 012.star_align_chimera
-by:
-->
+by
+-> Snakefile.star_fusion_results
 """
-rule 019_rseqc_gene_body_coverage:
+
+
+rule seqc_gene_body_coverage:
     input:
         bam="010.star/{sample}/{maptype}/{sample}.bam",
         bai="010.star/{sample}/{maptype}/{sample}.bam.bai",
@@ -141,17 +148,18 @@ rule 019_rseqc_gene_body_coverage:
         "> {log} 2>&1 "
 
 
-
 # Aggregate stats over junction coverage
 """
 019.seqc_junction_annotation
-from:
+from
 -> 010.star_align_variants
 -> 012.star_align_chimera
-by:
-->
+by
+-> Snakefile.star_fusion_results
 """
-rule 019_rseqc_junction_annotation:
+
+
+rule rseqc_junction_annotation:
     input:
         bam="010.star/{sample}/{maptype}/{sample}.bam",
         bai="010.star/{sample}/{maptype}/{sample}.bam.bai",

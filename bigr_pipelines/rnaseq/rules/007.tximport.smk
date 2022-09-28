@@ -2,13 +2,15 @@
 # are linked to the number of samples
 """
 007.tximport
-from:
+from
 -> 004.tx_to_gene
 -> 004.salmon_quant
-by:
+by
 -> 008.deseq2_dataset_from_tximport
 """
-rule 007_tximport:
+
+
+rule tximport:
     input:
         quant=lambda wildcards: expand(
             "004.salmon/pseudo_mapping/{sample}/quant.sf",

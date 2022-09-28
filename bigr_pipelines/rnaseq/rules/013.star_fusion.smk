@@ -1,7 +1,10 @@
+# Search for fusions with STAR
 """
 013.star_fusion
 """
-rule 013_star_fusion:
+
+
+rule star_fusion:
     input:
         junctions="010.star/{sample}/chimera/{sample}.Chimeric.out.junction",
         resource_lib=config["star_fusion"]["CTAT_resource_lib"],

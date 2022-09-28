@@ -1,6 +1,8 @@
 rule mixcr_align:
     input:
-        expand("fastp/trimmed/{sample}.{stream}.fastq", stream=streams, allow_missing=True)
+        expand(
+            "fastp/trimmed/{sample}.{stream}.fastq", stream=streams, allow_missing=True
+        ),
     output:
         json=temp("mixcr/align/reports/{sample}.json"),
         report=temp("mixcr/align/reports/{sample}.txt"),
@@ -9,18 +11,21 @@ rule mixcr_align:
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_3h_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        extra=config["mixcr"].get("align", "-s hsa -p rna-seq -OvParameters.geneFeatureToAlign=VTranscriptWithout5UTRWithP -OallowPartialAlignments=true")
+        extra=config["mixcr"].get(
+            "align",
+            "-s hsa -p rna-seq -OvParameters.geneFeatureToAlign=VTranscriptWithout5UTRWithP -OallowPartialAlignments=true",
+        ),
     log:
-        "logs/mixcr/align/{sample}.log"
+        "logs/mixcr/align/{sample}.log",
     wrapper:
         "bio/mixcr/align"
 
 
 rule mixcr_assemble_partial_round_one:
     input:
-        "mixcr/align/vdjca/{sample}.vdjca"
+        "mixcr/align/vdjca/{sample}.vdjca",
     output:
         report=temp("mixcr/assemblePartial/report1/{sample}.txt"),
         json=temp("mixcr/assemblePartial/report1/{sample}.json"),
@@ -30,18 +35,18 @@ rule mixcr_assemble_partial_round_one:
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_3h_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        extra=config["mixcr"].get("assemblePartial", "")
+        extra=config["mixcr"].get("assemblePartial", ""),
     log:
-        "logs/mixcr/assemble/{sample}.round1.log"
+        "logs/mixcr/assemble/{sample}.round1.log",
     wrapper:
         "bio/mixcr/assemblepartial"
 
 
 rule mixcr_assemble_partial_round_two:
     input:
-        "mixcr/assemblePartial/clna1/{sample}.vdjca"
+        "mixcr/assemblePartial/clna1/{sample}.vdjca",
     output:
         report=temp("mixcr/assemblePartial/report2/{sample}.txt"),
         json=temp("mixcr/assemblePartial/report2/{sample}.json"),
@@ -51,10 +56,10 @@ rule mixcr_assemble_partial_round_two:
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_3h_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        extra=config["mixcr"].get("assemblePartial", "")
+        extra=config["mixcr"].get("assemblePartial", ""),
     log:
-        "logs/mixcr/assemble/{sample}.round2.log"
+        "logs/mixcr/assemble/{sample}.round2.log",
     wrapper:
         "bio/mixcr/assemblepartial"

@@ -34,7 +34,7 @@ onstart:
 
 rule target:
     input:
-        **expected_targets(config)
+        **expected_targets(config),
 
 
 ##########################
@@ -52,6 +52,7 @@ include: "rules/001.bigr_copy.smk"
 include: "rules/002.trimming.smk"
 include: "rules/003.fastq_screen.smk"
 
+
 """
 Snakefile.quality_control_results
 from:
@@ -60,6 +61,8 @@ from:
 by:
 -> Snakefile.target
 """
+
+
 rule quality_control_results:
     input:
         fastp=expand(
@@ -104,6 +107,7 @@ simple salmon quantification, use:
 
 include: "rules/004.salmon.smk"
 
+
 """
 Snakefile.salmon_quant_results
 from:
@@ -113,6 +117,8 @@ from:
 by:
 -> Snakefile.target
 """
+
+
 rule salmon_quant_results:
     input:
         salmon_quant=expand(
@@ -162,7 +168,9 @@ simple immunedeconv, use:
 --until immunedeconv_results
 """
 
+
 include: "rules/005.immunedeconv.smk"
+
 
 """
 Snakefile.immunedeconv_results
@@ -174,6 +182,8 @@ from:
 by:
 -> Snakefile.target
 """
+
+
 rule immunedeconv_results:
     input:
         salmon_quant=lambda wildcards: expand(
@@ -235,6 +245,7 @@ include: "rules/012.star_chimera.smk"
 include: "rules/013.star_fusion.smk"
 include: "rules/019.rseqc.smk"
 
+
 """
 snakefile.star_fusion_results
 from:
@@ -246,6 +257,8 @@ from:
 by:
 -> End job
 """
+
+
 rule star_fusion_results:
     input:
         mappings=expand(
@@ -255,14 +268,17 @@ rule star_fusion_results:
         ),
         #cram=expand("data_output/Mapping/chimera/{sample}.cram", sample=sample_list),
         cj=expand(
-            "010.star/{sample}/chimera/{sample}.Chimeric.out.junction", sample=sample_list
+            "010.star/{sample}/chimera/{sample}.Chimeric.out.junction",
+            sample=sample_list,
         ),
         sj=expand("010.star/{sample}/chimera/{sample}.SJ.out.tab", sample=sample_list),
         log=expand("010.star/{sample}/chimera/{sample}.Log.out", sample=sample_list),
         logp=expand(
             "010.star/{sample}/chimera/{sample}.Log.progress.out", sample=sample_list
         ),
-        logf=expand("010.star/{sample}/chimera/{sample}.Log.final.out", sample=sample_list),
+        logf=expand(
+            "010.star/{sample}/chimera/{sample}.Log.final.out", sample=sample_list
+        ),
         samtools_stats=expand(
             "011samtools/stats/{sample}.chimera.stats", sample=sample_list
         ),
@@ -318,6 +334,7 @@ include: "rules/007.tximport.smk"
 include: "rules/008.deseq2.smk"
 include: "rules/009.deseq2_post_process.smk"
 
+
 """
 Snakefile.deseq2_results
 from:
@@ -328,6 +345,8 @@ from:
 by:
 -> Snakefile.target
 """
+
+
 rule deseq2_results:
     input:
         salmon_quant=lambda wildcards: expand(
@@ -386,12 +405,12 @@ rule deseq2_results:
         "bio/multiqc"
 
 
-
 ########################
 ### Cluster Profiler ###
 ########################
 
 # Used after DESeq2
+
 
 include: "rules/026.clusterprofiler.gmt.smk"
 include: "rules/027.clusterprofiler.terms.smk"
@@ -406,8 +425,6 @@ include: "rules/030.clusterprofiler.genelist.smk"
 #             comparison=output_prefixes,
 #         ),
 #     output:
-
-        
 
 
 #######################

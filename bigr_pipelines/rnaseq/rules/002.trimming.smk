@@ -6,13 +6,15 @@ This snakefile handles trimming and QC on raw fastq files
 # Clean and check quality of Fastq files
 """
 002.fastp_clean
-from:
+from
 -> 001.bigr_copy
-by:
+by
 -> 003.fastq_screen
 -> 004.salmon_quant
 """
-rule 002_fastp_clean:
+
+
+rule fastp_clean:
     input:
         sample=expand(
             "data_input/{sample}.{stream}.fq.gz", stream=["1", "2"], allow_missing=True

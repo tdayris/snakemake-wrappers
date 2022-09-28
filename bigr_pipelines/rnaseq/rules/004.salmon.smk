@@ -2,12 +2,14 @@
 # reference.
 """
 004.salmon_quant
-from:
+from
 -> 002.fastp_clean
-by:
+by
 -> 
 """
-rule 004_salmon_quant:
+
+
+rule salmon_quant:
     input:
         r1="002.fastp/trimmed/{sample}.1.fastq",
         r2="002.fastp/trimmed/{sample}.2.fastq",
@@ -42,14 +44,16 @@ rule 004_salmon_quant:
 # count tables with human-readable gene names
 """
 004.tx_to_gene
-from:
+from
 -> Entry job
-by:
+by
 -> 004.aggregate_raw_counts
 -> 004.aggregate_gene_counts
 -> 007.tximport
 """
-rule 004_tx_to_gene:
+
+
+rule tx_to_gene:
     input:
         gtf=config["reference"]["gtf"],
     output:
@@ -74,16 +78,19 @@ rule 004_tx_to_gene:
 # DESeq2/EdgeR/...
 """
 004.aggregate_raw_counts
-from:
+from
 -> 004.tx_to_gene
 -> 004.salmon_quant
-by:
+by
 -> End job
 """
-rule 004_aggregate_raw_counts:
+
+
+rule aggregate_raw_counts:
     input:
         quant=expand(
-            "004.salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=design["Sample_id"]
+            "004.salmon/pseudo_mapping/{sample}/quant.genes.sf",
+            sample=design["Sample_id"],
         ),
         tx2gene="004.salmon/tx2gene.tsv",
     output:
@@ -116,16 +123,19 @@ rule 004_aggregate_raw_counts:
 # Usefull for GSEA, PCA, ...
 """
 004.aggregate_gene_counts
-from:
+from
 -> 004.tx_to_gene
 -> 004.salmon_quant
-by:
+by
 -> 005.subset_gene_counts
 """
-rule 004_aggregate_gene_counts:
+
+
+rule aggregate_gene_counts:
     input:
         quant=expand(
-            "004.salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=design["Sample_id"]
+            "004.salmon/pseudo_mapping/{sample}/quant.genes.sf",
+            sample=design["Sample_id"],
         ),
         tx2gene="004.salmon/tx2gene.tsv",
     output:
@@ -157,13 +167,15 @@ rule 004_aggregate_gene_counts:
 # Usefull for PCA, sample correlations, etc.
 """
 004.aggregate_transcript_counts
-from:
+from
 -> 004.tx_to_gene
 -> 004.salmon_quant
-by:
+by
 -> End job
 """
-rule 004_aggregate_transcript_counts:
+
+
+rule aggregate_transcript_counts:
     input:
         quant=expand(
             "004.salmon/pseudo_mapping/{sample}/quant.sf", sample=design["Sample_id"]

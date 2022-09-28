@@ -1,13 +1,15 @@
 # This rule calls germline variants with GATK Mutect2
 """
 016.mutect2_germline
-from:
+from
 -> 010.gatk_split_n_cigar_reads
-by:
+by
 -> 017.learn_read_orientation_model
 -> 018.mutect2_filter
 """
-rule 016_mutect2_germline:
+
+
+rule mutect2_germline:
     input:
         fasta=config["reference"]["genome"],
         fasta_index=config["reference"]["genome_index"],

@@ -1,14 +1,9 @@
-"""
-This snakefile contains all rules related to immunedeconv
-"""
-
-
 # Subset salmon original TPM counts to fulfill immenedeconv requirements
 """
 005.subset_gene_counts
-from:
+from
 -> 004.aggregate_gene_counts
-by:
+by
 -> 005.immunedeconv_xcell
 -> 005.immunedeconv_quantiseq
 -> 005.immunedeconv_epic
@@ -16,7 +11,9 @@ by:
 -> 005.immunedeconv_cibersort_abs
 -> 005.immunedeconv_cibersort
 """
-rule 005_subset_gene_counts:
+
+
+rule subset_gene_counts:
     input:
         table="data_output/Quantification/TPM.genes.tsv",
     output:
@@ -44,11 +41,13 @@ rule 005_subset_gene_counts:
 # Run xCell to perform immune deconvolution
 """
 005.immunedeconv_xcell
-from:
+from
 -> 005.subset_gene_counts
 -> 005.multiqc_config_immunedeconv
 """
-rule 005_immunedeconv_xcell:
+
+
+rule immunedeconv_xcell:
     input:
         expr_mat="005.immunedeconv/TPM.tsv",
     output:
@@ -74,11 +73,13 @@ rule 005_immunedeconv_xcell:
 # Run Quantiseq to perform immune deconvolution
 """
 005.immunedeconv_quantiseq
-from:
+from
 -> 005.subset_gene_counts
 -> 005.multiqc_config_immunedeconv
 """
-rule 005_immunedeconv_quantiseq:
+
+
+rule immunedeconv_quantiseq:
     input:
         expr_mat="005.immunedeconv/TPM.tsv",
     output:
@@ -104,11 +105,13 @@ rule 005_immunedeconv_quantiseq:
 # Run Epic to perform immune deconvolution
 """
 005.immunedeconv_epic
-from:
+from
 -> 005.subset_gene_counts
 -> 005.multiqc_config_immunedeconv
 """
-rule 005_immunedeconv_epic:
+
+
+rule immunedeconv_epic:
     input:
         expr_mat="005.immunedeconv/TPM.tsv",
     output:
@@ -134,11 +137,13 @@ rule 005_immunedeconv_epic:
 # Use mcpcounter to perform immune deconvolution
 """
 005.immunedeconv_mcpcounter
-from:
+from
 -> 005.subset_gene_counts
 -> 005.multiqc_config_immunedeconv
 """
-rule 005_immunedeconv_mcpcounter:
+
+
+rule immunedeconv_mcpcounter:
     input:
         expr_mat="005.immunedeconv/TPM.tsv",
     output:
@@ -163,11 +168,13 @@ rule 005_immunedeconv_mcpcounter:
 
 """
 005.immunedeconv_cibersort_abs
-from:
+from
 -> 005.subset_gene_counts
 -> 005.multiqc_config_immunedeconv
 """
-rule 005_immunedeconv_cibersort_abs:
+
+
+rule immunedeconv_cibersort_abs:
     input:
         expr_mat="005.immunedeconv/TPM.tsv",
         cibersort_binary="CIBERSORT.R",
@@ -195,10 +202,12 @@ rule 005_immunedeconv_cibersort_abs:
 # Use civersort to perform immune deconvolution
 """
 005.immunedeconv_cibersort
-from:
+from
 -> 005.subset_gene_counts
 """
-rule 005_immunedeconv_cibersort:
+
+
+rule immunedeconv_cibersort:
     input:
         expr_mat="005.immunedeconv/TPM.tsv",
         cibersort_binary="CIBERSORT.R",
@@ -223,15 +232,18 @@ rule 005_immunedeconv_cibersort:
         "bio/immunedeconv/cibersort"
 
 
+# Build Civebsort datasets for immunedeconv
 """
 005.get_cibersort
-from:
+from
 -> Entry job
-by:
+by
 -> 005.immunedeconv_cibersort
 -> 005.immunedeconv_cibersort_abs
 """
-rule 005_get_cibersort:
+
+
+rule get_cibersort:
     input:
         cibersort_binary=config["immunedeconv"]["cibersort_binary"],
         cibersort_mat=config["immunedeconv"]["cibersort_mat"],
@@ -257,8 +269,17 @@ rule 005_get_cibersort:
         "rsync {params.rsync} {input.cibersort_mat} {output.cibersort_mat} >> {log} 2>&1"
 
 
+# Build multiqc config for immune deconv
+"""
+005.get_cibersort
+from
+-> 005.immunedeconv_cibersort
+by
+-> Snakefile.multiqc
+"""
 
-rule 005_multiqc_config_immunedeconv:
+
+rule multiqc_config_immunedeconv:
     input:
         expand("005.cibersort/celltypes.tsv", tool=tool_list),
     output:

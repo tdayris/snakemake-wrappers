@@ -1,15 +1,17 @@
 # Filter calls from mutect with estimated artifacts
 """
 018.mutect2_filter
-from:
+from
 -> 017.learn_read_orientation_model
 -> 017.calculate_contamination
 -> 016.mutect2_germline
 -> 010.gatk_split_n_cigar_reads
-by:
-->
+by
+-> End job
 """
-rule 018_mutect2_filter:
+
+
+rule mutect2_filter:
     input:
         vcf="016.mutect2/call/{sample}.vcf.gz",
         ref=config["reference"]["genome"],
