@@ -65,7 +65,7 @@ fi
 
 message INFO "Activating expected steps if available in the pipeline"
 for STEP in "${STEPS[@]}"; do
-  COMMAND="sed -i 's/^  - ${STEP}: false$/  - ${STEP}: true/g' config.yaml"
+  COMMAND="sed -i 's/^  ${STEP}: false$/  ${STEP}: true/g' config.yaml"
   message CMD "${COMMAND}"
   eval ${COMMAND}
 fi
