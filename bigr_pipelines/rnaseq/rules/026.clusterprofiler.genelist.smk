@@ -50,36 +50,36 @@ rule expand_rank_list:
     output:
         tsv=expand(
             "026.clusterprofiler/gene_lists/ENTREZID/{comparison}.tsv",
-            comparison=comparisons,
+            comparison=output_prefixes,
         ),
         entrez_rds=temp(
             expand(
                 "026.clusterprofiler/gene_lists/ENTREZID/{comparison}.RDS",
-                comparison=comparisons,
+                comparison=output_prefixes,
             )
         ),
         symbol_rds=temp(
             expand(
                 "026.clusterprofiler/gene_lists/SYMBOL/{comparison}.RDS",
-                comparison=comparisons,
+                comparison=output_prefixes,
             )
         ),
         ensembl_rds=temp(
             expand(
                 "026.clusterprofiler/gene_lists/ENSEMBL/{comparison}.RDS",
-                comparison=comparisons,
+                comparison=output_prefixes,
             )
         ),
         protein_rds=temp(
             expand(
                 "026.clusterprofiler/gene_lists/ENSEMBLPROT/{comparison}.RDS",
-                comparison=comparisons,
+                comparison=output_prefixes,
             )
         ),
         universe=temp(
             expand(
                 "026.clusterprofiler/gene_lists/universe/{comparison}.RDS",
-                comparison=comparisons,
+                comparison=output_prefixes,
             )
         ),
     threads: 1
