@@ -5,10 +5,9 @@
 from
 -> 002.fastp_clean
 by
--> 
+-> 007.tximport
+-> 005.subset_gene_counts
 """
-
-
 rule salmon_quant:
     input:
         r1="002.fastp/trimmed/{sample}.1.fastq",
@@ -51,8 +50,6 @@ by
 -> 004.aggregate_gene_counts
 -> 007.tximport
 """
-
-
 rule tx_to_gene:
     input:
         gtf=config["reference"]["gtf"],
@@ -84,13 +81,10 @@ from
 by
 -> End job
 """
-
-
 rule aggregate_raw_counts:
     input:
         quant=expand(
-            "004.salmon/pseudo_mapping/{sample}/quant.genes.sf",
-            sample=design["Sample_id"],
+            "004.salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=design["Sample_id"]
         ),
         tx2gene="004.salmon/tx2gene.tsv",
     output:
@@ -129,13 +123,10 @@ from
 by
 -> 005.subset_gene_counts
 """
-
-
 rule aggregate_gene_counts:
     input:
         quant=expand(
-            "004.salmon/pseudo_mapping/{sample}/quant.genes.sf",
-            sample=design["Sample_id"],
+            "004.salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=design["Sample_id"]
         ),
         tx2gene="004.salmon/tx2gene.tsv",
     output:
@@ -173,8 +164,6 @@ from
 by
 -> End job
 """
-
-
 rule aggregate_transcript_counts:
     input:
         quant=expand(
