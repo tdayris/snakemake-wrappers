@@ -9,4 +9,16 @@ then
     source "/mnt/beegfs/userdata/t_dayris/anaconda3/etc/profile.d/conda.sh"
 fi
 
-bash "${script_dir}/run.sh" -p demux output/multiqc.html "$@"
+params_demux=""
+
+if [ -n "$(find input/*/archive/*/unaligned/Stats/ -name "Stats.json.zip" | head -1)" ]; then
+    # Special case demux
+    bash "${script_dir}/run.sh" -p demux output/multiqc.html "$@"
+else
+    echo "Stats not found"
+    # Classic case, must fit demux-like behaviour
+    bash "${script_dir}/run.sh" -p demux "$@"
+    if [ -d "multiqc" ] ; then 
+        mv --verbose multiqc output
+    fi
+fi
