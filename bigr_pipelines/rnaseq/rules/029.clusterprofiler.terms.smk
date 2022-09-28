@@ -1,8 +1,16 @@
-rule term2name_TERMS:
+# Format term / gene relation from TSV
+"""
+029.term2gene_TERMS
+from:
+-> Entry Job
+by:
+-> 029.enricher_TERMS
+"""
+rule 029_term2gene_TERMS:
     input:
         lambda wildcards: config["ppi"][wildcards.database]
     output:
-        temp("clusterprofiler/term2gene/{database}.tsv")
+        temp("026.clusterprofiler/term2gene/{database}.tsv")
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
@@ -14,16 +22,25 @@ rule term2name_TERMS:
     group:
         "prepare_terms"
     log:
-        "logs/awk/prepare_terms2gene/{database}.log"
+        "logs/029.awk/prepare_terms2gene/{database}.log"
     wrapper:
         "bio/awk"
 
 
-rule terms2name_TERMS:
+
+# Expand terms in human readable format for TSV files
+"""
+029.terms2name_TERMS
+from:
+-> Entry Job
+by:
+-> 029.enricher_TERMS
+"""
+rule 029_terms2name_TERMS:
     input:
         lambda wildcards: config["ppi"][wildcards.database]
     output:
-        temp("clusterprofiler/term2name/{database}.tsv")
+        temp("026.clusterprofiler/term2name/{database}.tsv")
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
@@ -35,30 +52,40 @@ rule terms2name_TERMS:
     group:
         "prepare_terms"
     log:
-        "logs/awk/prepare_terms2name/{database}.log"
+        "logs/029.awk/prepare_terms2name/{database}.log"
     wrapper:
         "bio/awk"
 
 
-rule enricher_TERMS:
+
+# Perform term enrichment
+"""
+029.enricher_TERMS
+from:
+-> 029.terms2name_TERMS
+-> 029.term2gene_TERMS
+by:
+-> End job
+"""
+rule 029_enricher_TERMS:
     input:
-        rds = "gene_lists/ENSEMBLPROT/{comparison}.RDS",
-        universe = "gene_lists/universe/{comparison}.RDS",
-        term_name = "clusterprofiler/term2name/{database}.tsv",
-        term_gene = "clusterprofiler/term2gene/{database}.tsv"
+        rds="026.gclusterprofiler/ene_lists/ENSEMBLPROT/{comparison}.RDS",
+        universe="026.clusterprofiler/gene_lists/universe/{comparison}.RDS",
+        term_name="026.clusterprofiler/term2name/{database}.tsv",
+        term_gene="026.clusterprofiler/term2gene/{database}.tsv"
     output:
-        readable_rds = temp("enrich/{database}/{comparison}/enrich.{database}.{comparison}.ENSEMBLPROT.RDS"),
-        readable_tsv = "results/{comparison}/{database}.ENSEMBLPROT/enrich.{comparison}.ENSEMBLPROT.tsv"
+        readable_rds=temp("027.enrich/{database}/{comparison}/enrich.{database}.{comparison}.ENSEMBLPROT.RDS"),
+        readable_tsv="data_output/{comparison}/{database}.ENSEMBLPROT/enrich.{comparison}.ENSEMBLPROT.tsv"
     threads: 1
     resources:
         mem_mb=get_3gb_per_attempt,
         time_min=get_35min_per_attempt,
         tmpdir="tmp"
     params:
-        extra = config["clusterprofiler"].get("enrich_gmt", "pvalueCutoff = 1, qvalueCutoff = 1"),
-        org = config.get("organism", "Hs"),
-        keytype = "ENSEMBLPROT"
+        extra=config["clusterprofiler"].get("enrich_gmt", "pvalueCutoff = 1, qvalueCutoff = 1"),
+        org=config.get("organism", "Hs"),
+        keytype="ENSEMBLPROT"
     log:
-        "logs/enricher/{database}/{comparison}.ENSEMBLPROT.log"
+        "logs/029.enricher/{database}/{comparison}.ENSEMBLPROT.log"
     wrapper:
         "bio/clusterProfiler/enrichGMT"

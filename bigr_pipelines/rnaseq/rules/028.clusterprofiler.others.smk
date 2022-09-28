@@ -1,16 +1,20 @@
+# Disease Ontology analysis
 """
-Disease Ontology analysis
+028.enrichDO
+from:
+-> 026.expand_rank_list
+by:
+-> End job
 """
-rule enrichDO:
+rule 028_enrichDO:
     input:
-        rds = "gene_lists/ENTREZID/{comparison}.RDS",
-        universe = "gene_lists/universe/{comparison}.RDS"
+        rds = "026.gene_lists/ENTREZID/{comparison}.RDS",
+        universe = "026.gene_lists/universe/{comparison}.RDS"
     output:
         rds = temp(
-            "enrich/DiseaseOnt/{comparison}/enrich.DiseaseOnt.{comparison}.ENTREZID.RDS"
+            "027.enrich/DiseaseOnt/{comparison}/enrich.DiseaseOnt.{comparison}.ENTREZID.RDS"
         ),
-        tsv = "results/{comparison}/DiseaseOnt.ENTREZID/enrich.{comparison}.tsv"
-    message: "Running enrichDO on {wildcards.comparison}"
+        tsv = "data_output/{comparison}/DiseaseOnt.ENTREZID/enrich.{comparison}.tsv"
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -20,24 +24,29 @@ rule enrichDO:
         enrichDO_extra=config["clusterprofiler"].get("enrich_do", "pvalueCutoff = 1, qvalueCutoff = 1"),
         organism = config.get("organism", "Hs"),
     log:
-        "logs/enrichdo/{comparison}.log"
+        "logs/028.enrichdo/{comparison}.log"
     wrapper:
         "bio/clusterProfiler/enrichDO"
 
 
+
+# DisGeNET analysis
 """
-DisGeNET analysis
-"""
-rule enrichDGN:
+028.enrichDGN
+from:
+-> 026.expand_rank_list
+by:
+-> End job
+""""
+rule 028_enrichDGN:
     input:
-        rds = "gene_lists/ENTREZID/{comparison}.RDS",
-        universe = "gene_lists/universe/{comparison}.RDS"
+        rds = "026.gene_lists/ENTREZID/{comparison}.RDS",
+        universe = "026.gene_lists/universe/{comparison}.RDS"
     output:
         rds = temp(
-            "enrich/DisGenNet/{comparison}/enrich.DisGenNet.{comparison}.ENTREZID.RDS"
+            "027.enrich/DisGenNet/{comparison}/enrich.DisGenNet.{comparison}.ENTREZID.RDS"
         ),
-        tsv = "results/{comparison}/DisGenNet.ENTREZID/enrich.{comparison}.tsv"
-    message: "Running enrichDGN on {wildcards.comparison}"
+        tsv = "data_output/{comparison}/DisGenNet.ENTREZID/enrich.{comparison}.tsv"
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -47,24 +56,29 @@ rule enrichDGN:
         enrichDO_extra=config["clusterprofiler"].get("enrich_dgn", "pvalueCutoff = 1, qvalueCutoff = 1"),
         organism = config.get("organism", "Hs"),
     log:
-        "logs/enrichdgn/{comparison}.log"
+        "logs/028.enrichdgn/{comparison}.log"
     wrapper:
         "bio/clusterProfiler/enrichDGN"
 
 
+
+# Network of Cancer Genes analysis
 """
-Network of Cancer Genes analysis
-"""
-rule enrichNCG:
+028.enrichNCG
+from:
+-> 026.expand_rank_list
+by:
+-> End job
+""""
+rule 028_enrichNCG:
     input:
-        rds = "gene_lists/ENTREZID/{comparison}.RDS",
-        universe = "gene_lists/universe/{comparison}.RDS"
+        rds = "026.gene_lists/ENTREZID/{comparison}.RDS",
+        universe = "026.gene_lists/universe/{comparison}.RDS"
     output:
         rds = temp(
-            "enrich/NetworkCancerGenes/{comparison}/enrich.NetworkCancerGenes.{comparison}.ENTREZID.RDS"
+            "027.enrich/NetworkCancerGenes/{comparison}/enrich.NetworkCancerGenes.{comparison}.ENTREZID.RDS"
         ),
-        tsv = "results/{comparison}/NetworkCancerGenes.ENTREZID/enrich.{comparison}.tsv"
-    message: "Running enrichNCG on {wildcards.comparison}"
+        tsv = "data_output/{comparison}/NetworkCancerGenes.ENTREZID/enrich.{comparison}.tsv"
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -74,6 +88,6 @@ rule enrichNCG:
         enrichDO_extra=config["clusterprofiler"].get("enrich_ncg", "pvalueCutoff = 1, qvalueCutoff = 1"),
         organism = config.get("organism", "Hs"),
     log:
-        "logs/enrichncg/{comparison}.log"
+        "logs/028.enrichncg/{comparison}.log"
     wrapper:
         "bio/clusterProfiler/enrichNCG"
