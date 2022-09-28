@@ -1,4 +1,4 @@
-rule arriba:
+rule 014_arriba:
     input:
         bam="010.star/{sample}/chimera/{sample}.bam",
         bam_index="010.star/{sample}/chimera/{sample}.bam.bai",

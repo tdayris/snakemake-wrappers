@@ -1,21 +1,25 @@
+# This rule calls germline variants with GATK Mutect2
 """
-This rule calls germline variants with GATK Mutect2
+016.mutect2_germline
+from:
+-> 010.gatk_split_n_cigar_reads
+by:
+-> 017.learn_read_orientation_model
+-> 018.mutect2_filter
 """
-
-
-rule mutect2_germline:
+rule 016_mutect2_germline:
     input:
         fasta=config["reference"]["genome"],
         fasta_index=config["reference"]["genome_index"],
         fasta_dict=config["reference"]["genome_dict"],
-        map="gatk/splitncigarreads/{sample}.bam",
-        map_index="gatk/splitncigarreads/{sample}.bam.bai",
+        map="010.gatk/splitncigarreads/{sample}.bam",
+        map_index="010.gatk/splitncigarreads/{sample}.bam.bai",
         germline=config["reference"]["af_only"],
         germline_tbi=config["reference"]["af_only"],
         intervals=config["reference"]["capturekit_bed"],
     output:
-        vcf=temp("mutect2/call/{sample}.vcf.gz"),
-        f1r2=temp("mutect2/f1r2/{sample}.tar.gz"),
+        vcf=temp("016.mutect2/call/{sample}.vcf.gz"),
+        f1r2=temp("016.mutect2/f1r2/{sample}.tar.gz"),
     threads: config.get("max_threads", 20)
     resources:
         time_min=get_5h_per_attempt,
@@ -31,6 +35,6 @@ rule mutect2_germline:
             ),
         ),
     log:
-        "logs/gatk/mutect2/call/{sample}.log",
+        "logs/016.gatk/mutect2/call/{sample}.log",
     wrapper:
         "bio/gatk/mutect"

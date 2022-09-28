@@ -3,9 +3,14 @@
 from
 -> 002.fastp_clean
 by:
--> sambamba_sort_star
+-> 010.sambamba_sort_star
+-> 019.rseqc_read_distribution
+-> 019.rseqc_tin
+-> 019.rseqc_bam_stat
+-> 019.rseqc_gene_body_coverage
+-> 019.seqc_junction_annotation
 """
-rule star_align_chimera:
+rule 012_star_align_chimera:
     input:
         fq1="002.fastp/trimmed/{sample}.1.fastq",
         fq2="002.fastp/trimmed/{sample}.2.fastq",

@@ -3,9 +3,14 @@
 from
 -> 002.fastp_clean
 by:
--> sambamba_sort_star
+-> 010.sambamba_sort_star
+-> 019.rseqc_read_distribution
+-> 019.rseqc_tin
+-> 019.rseqc_bam_stat
+-> 019.rseqc_gene_body_coverage
+-> 019.seqc_junction_annotation
 """
-rule star_align_variants:
+rule 010_star_align_variants:
     input:
         fq1="002.fastp/trimmed/{sample}.1.fastq",
         fq2="002.fastp/trimmed/{sample}.2.fastq",
@@ -40,7 +45,7 @@ from
 by:
 -> 010.gatk_split_n_cigar_reads
 """
-rule sambamba_sort_star:
+rule 010_sambamba_sort_star:
     input:
         mapping="010.star/{sample}/{maptype}/{sample}.unsorted.bam",
     output:
@@ -66,9 +71,12 @@ rule sambamba_sort_star:
 from
 -> 002.sambamba_sort_star
 by:
--> 016.mutect2
+-> 016.mutect2_germline
+-> 017.get_pileup_summaries
+-> 018.mutect2_filter
+-> 
 """
-rule gatk_split_n_cigar_reads:
+rule 010_gatk_split_n_cigar_reads:
     input:
         bam="010.star/{sample}/{maptype}/{sample}.bam",
         bai="010.star/{sample}/{maptype}/{sample}.bam.bai",

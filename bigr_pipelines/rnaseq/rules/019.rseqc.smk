@@ -1,10 +1,19 @@
-rule rseqc_read_distribution:
+# Estimate read distribution among dna strands
+"""
+019.rseqc_read_distribution
+from:
+-> 010.star_align_variants
+-> 012.star_align_chimera
+by:
+->
+"""
+rule 019_rseqc_read_distribution:
     input:
-        bam="star/{sample}/{maptype}/{sample}.bam",
-        bai="star/{sample}/{maptype}/{sample}.bam.bai",
+        bam="010.star/{sample}/{maptype}/{sample}.bam",
+        bai="010.star/{sample}/{maptype}/{sample}.bam.bai",
         refgene=config["reference"]["refgene_model"],
     output:
-        temp("rseqc/read_distribution/{maptype}/{sample}.read_distribution.tsv"),
+        temp("019.rseqc/read_distribution/{maptype}/{sample}.read_distribution.tsv"),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
@@ -12,7 +21,7 @@ rule rseqc_read_distribution:
         tmpdir="tmp",
     retries: 1
     log:
-        "logs/rseqc/read_distribution/{sample}.{maptype}.log",
+        "logs/019.rseqc/read_distribution/{sample}.{maptype}.log",
     conda:
         str(workflow_source_dir / "envs" / "rseqc.yaml")
     shell:
@@ -22,13 +31,22 @@ rule rseqc_read_distribution:
         "> {output} 2> {log} "
 
 
-rule rseqc_tin:
+# Compute transcript integrity number
+"""
+019.rseqc_tin
+from:
+-> 010.star_align_variants
+-> 012.star_align_chimera
+by:
+->
+"""
+rule 019_rseqc_tin:
     input:
-        bam="star/{sample}/{maptype}/{sample}.bam",
-        bai="star/{sample}/{maptype}/{sample}.bam.bai",
+        bam="010.star/{sample}/{maptype}/{sample}.bam",
+        bai="010.star/{sample}/{maptype}/{sample}.bam.bai",
         refgene=config["reference"]["refgene_model"],
     output:
-        temp("rseqc/tin/{maptype}/{sample}.summary.txt"),
+        temp("019.rseqc/tin/{maptype}/{sample}.summary.txt"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -36,7 +54,7 @@ rule rseqc_tin:
         tmpdir="tmp",
     retries: 1
     log:
-        "logs/rseqc/tin/{sample}.{maptype}.log",
+        "logs/019.rseqc/tin/{sample}.{maptype}.log",
     conda:
         str(workflow_source_dir / "envs" / "rseqc.yaml")
     params:
@@ -49,12 +67,22 @@ rule rseqc_tin:
         "> {output} 2> {log} "
 
 
-rule rseqc_bam_stat:
+
+# Acquire multiple stats over BAM file
+"""
+019.rseqc_bam_stat
+from:
+-> 010.star_align_variants
+-> 012.star_align_chimera
+by:
+->
+"""
+rule 019_rseqc_bam_stat:
     input:
-        bam="star/{sample}/{maptype}/{sample}.bam",
-        bai="star/{sample}/{maptype}/{sample}.bam.bai",
+        bam="010.star/{sample}/{maptype}/{sample}.bam",
+        bai="010.star/{sample}/{maptype}/{sample}.bam.bai",
     output:
-        temp("rseqc/bam_stat/{maptype}/{sample}.txt"),
+        temp("019.rseqc/bam_stat/{maptype}/{sample}.txt"),
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
@@ -62,7 +90,7 @@ rule rseqc_bam_stat:
         tmpdir="tmp",
     retries: 1
     log:
-        "logs/rseqc/bam_stat/{sample}.{maptype}.log",
+        "logs/019.rseqc/bam_stat/{sample}.{maptype}.log",
     conda:
         str(workflow_source_dir / "envs" / "rseqc.yaml")
     params:
@@ -71,17 +99,26 @@ rule rseqc_bam_stat:
         "bam_stat.py --input-file {input.bam} > {output} 2> {log}"
 
 
-rule rseqc_gene_body_coverage:
+# Compute RNA coverage bias over gene bodies
+"""
+019.rseqc_gene_body_coverage
+from:
+-> 010.star_align_variants
+-> 012.star_align_chimera
+by:
+->
+"""
+rule 019_rseqc_gene_body_coverage:
     input:
-        bam="star/{sample}/{maptype}/{sample}.bam",
-        bai="star/{sample}/{maptype}/{sample}.bam.bai",
+        bam="010.star/{sample}/{maptype}/{sample}.bam",
+        bai="010.star/{sample}/{maptype}/{sample}.bam.bai",
         refgene=config["reference"]["refgene_model"],
     output:
-        txt=temp("rseqc/gene_body_coverage/{maptype}/{sample}.geneBodyCoverage.txt"),
+        txt=temp("019.rseqc/gene_body_coverage/{maptype}/{sample}.geneBodyCoverage.txt"),
         pdf=temp(
-            "rseqc/gene_body_coverage/{maptype}/{sample}.geneBodyCoverage.curves.pdf"
+            "019.rseqc/gene_body_coverage/{maptype}/{sample}.geneBodyCoverage.curves.pdf"
         ),
-        r=temp("rseqc/gene_body_coverage/{maptype}/{sample}.geneBodyCoverage.r"),
+        r=temp("019.rseqc/gene_body_coverage/{maptype}/{sample}.geneBodyCoverage.r"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -89,7 +126,7 @@ rule rseqc_gene_body_coverage:
         tmpdir="tmp",
     retries: 1
     log:
-        "logs/rseqc/gene_body_coverage/{sample}.{maptype}.log",
+        "logs/019.rseqc/gene_body_coverage/{sample}.{maptype}.log",
     conda:
         str(workflow_source_dir / "envs" / "rseqc.yaml")
     params:
@@ -104,24 +141,34 @@ rule rseqc_gene_body_coverage:
         "> {log} 2>&1 "
 
 
-rule rseqc_junction_annotation:
+
+# Aggregate stats over junction coverage
+"""
+019.seqc_junction_annotation
+from:
+-> 010.star_align_variants
+-> 012.star_align_chimera
+by:
+->
+"""
+rule 019_rseqc_junction_annotation:
     input:
-        bam="star/{sample}/{maptype}/{sample}.bam",
-        bai="star/{sample}/{maptype}/{sample}.bam.bai",
+        bam="010.star/{sample}/{maptype}/{sample}.bam",
+        bai="010.star/{sample}/{maptype}/{sample}.bam.bai",
         refgene=config["reference"]["refgene_model"],
     output:
-        txt=temp("rseqc/junction_annotation/{maptype}/{sample}.txt"),
+        txt=temp("019.rseqc/junction_annotation/{maptype}/{sample}.txt"),
         pdf_splice=temp(
-            "rseqc/junction_annotation/{maptype}/{sample}.splice_junction.pdf"
+            "019.seqc/junction_annotation/{maptype}/{sample}.splice_junction.pdf"
         ),
         pdf_events=temp(
-            "rseqc/junction_annotation/{maptype}/{sample}.splice_events.pdf"
+            "019.rseqc/junction_annotation/{maptype}/{sample}.splice_events.pdf"
         ),
-        xls=temp("rseqc/junction_annotation/{maptype}/{sample}.junction.xls"),
-        bed=temp("rseqc/junction_annotation/{maptype}/{sample}.junction.bed"),
+        xls=temp("019.rseqc/junction_annotation/{maptype}/{sample}.junction.xls"),
+        bed=temp("019.rseqc/junction_annotation/{maptype}/{sample}.junction.bed"),
         rscript=temp("rseqc/junction_annotation/{maptype}/{sample}.junction_plot.r"),
         interact=temp(
-            "rseqc/junction_annotation/{maptype}/{sample}.junction.Interact.bed"
+            "019.rseqc/junction_annotation/{maptype}/{sample}.junction.Interact.bed"
         ),
     threads: 1
     resources:
@@ -130,7 +177,7 @@ rule rseqc_junction_annotation:
         tmpdir="tmp",
     retries: 1
     log:
-        "logs/rseqc/junction_annotation/{sample}.{maptype}.log",
+        "logs/019.rseqc/junction_annotation/{sample}.{maptype}.log",
     conda:
         str(workflow_source_dir / "envs" / "rseqc.yaml")
     params:

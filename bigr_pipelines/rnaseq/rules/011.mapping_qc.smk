@@ -5,7 +5,7 @@ from:
 by:
 -> snakefile.star_fusion_results
 """
-rule samtools_stats:
+rule 011_samtools_stats:
     input:
         aln="010.star/{sample}/{maptype}/{sample}.bam",
         aln_idx="010.star/{sample}/{maptype}/{sample}.bam.bai",
@@ -35,7 +35,7 @@ from:
 by:
 -> 011.samtools_stats
 """
-rule samtools_index_bam:
+rule 011_samtools_index_bam:
     input:
         "star/{sample}/{maptype}/{sample}.bam",
     output:
@@ -61,7 +61,7 @@ from:
 by:
 -> End Job
 """
-rule samtools_cram:
+rule 011_samtools_cram:
     input:
         aln="star/{sample}/{maptype}/{sample}.bam",
         aln_idx="star/{sample}/{maptype}/{sample}.bam.bai",
