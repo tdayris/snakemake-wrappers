@@ -68,7 +68,7 @@ for STEP in "${STEPS[@]}"; do
   COMMAND="sed -i 's/^  ${STEP}: false$/  ${STEP}: true/g' config.yaml"
   message CMD "${COMMAND}"
   eval ${COMMAND}
-fi
+done
 
 # Run pipeline
 message CMD "conda_activate ${CONDA_ENV_PATH}"
