@@ -77,6 +77,7 @@ from:
 -> 008.deseq2_dataset_from_tximport
 by:
 -> 009.deseq2_readable
+-> 026.make_rank_list
 """
 rule 008_deseq2:
     input:
