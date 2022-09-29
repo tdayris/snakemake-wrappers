@@ -1,8 +1,15 @@
+# Copies / Links files from irods or fs path
+"""
+000.bigr_copy
+from
+-> Entry job
+by
+-> 001.fastqc
+-> 002.fastq_screen
+"""
 rule bigr_copy:
     output:
         temp("reads/{sample}.fq.gz")
-    message:
-        "Gathering {wildcards.sample} fastq file"
     threads: 1
     resources:
         mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),

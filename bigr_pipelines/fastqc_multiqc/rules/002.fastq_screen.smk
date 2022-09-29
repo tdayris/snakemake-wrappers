@@ -1,11 +1,18 @@
+# Contamination quality control
+"""
+001.fastq_screen
+from
+-> 000.bigr_copy
+by
+-> 003.multiqc
+-> 003.irods_complient
+"""
 rule fastq_screen:
     input:
         "reads/{sample}.{stream}.fq.gz"
     output:
-        txt=temp("fastq_screen/{sample}.{stream}.fastq_screen.txt"),
-        png=temp("fastq_screen/{sample}.{stream}.fastq_screen.png")
-    message:
-        "Assessing quality of {wildcards.sample}, stream {wildcards.stream}"
+        txt=temp("fastq_screen/{sample}.fastq_screen.txt"),
+        png=temp("fastq_screen/{sample}.fastq_screen.png")
     threads: config.get("threads", 20)
     resources:
         mem_mb=lambda wildcard, attempt: min(attempt * 8192, 1024 * 15),

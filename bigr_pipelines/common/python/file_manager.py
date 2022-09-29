@@ -166,7 +166,7 @@ def search_fastq_somatic(dirpath: FilePathType) -> Dict[str, str]:
 
     It returns fastq files four by four, according to alphanumerical order.
     """
-    suffixes = ["fastq", "fq", "fastq.gz", "fq.gz"]
+    suffixes = ("fastq", "fq", "fastq.gz", "fq.gz")
     return {
         remove_suffixes(basename(t1), suffixes): {
             "Upstream_file_tumor": t1,
@@ -184,7 +184,7 @@ def search_fastq_trio(dirpath: FilePathType) -> Dict[str, str]:
 
     It returns fastq files six by six, according to alphanumerical order.
     """
-    suffixes = ["fastq", "fq", "fastq.gz", "fq.gz"]
+    suffixes = ("fastq", "fq", "fastq.gz", "fq.gz")
     fqiter = zip(*[iter(search_fastq_files(dirpath))]*6)
     return {
         remove_suffixes(basename(t1), suffixes): {

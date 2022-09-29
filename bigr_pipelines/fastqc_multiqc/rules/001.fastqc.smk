@@ -1,11 +1,18 @@
+# Quality control
+"""
+001.fastqc
+from
+-> 000.bigr_copy
+by
+-> 003.multiqc
+-> 003.irods_complient
+"""
 rule fastqc:
     input:
         "reads/{sample}.{stream}.fq.gz"
     output:
-        html=temp("fastqc/{sample}.{stream}.html"),
-        zip=temp("fastqc/{sample}_{stream}_fastqc.zip")
-    message:
-        "Assessing quality of {wildcards.sample}, ({wildcards.stream})"
+        html=temp("fastqc/{sample}.html"),
+        zip=temp("fastqc/{sample}_fastqc.zip")
     threads: 1
     resources:
         mem_mb=lambda wildcard, attempt: min(attempt * 1024, 4096),

@@ -1,31 +1,33 @@
-
+# QC report aggregation
+"""
+003.multiqc
+from
+-> 001.fastqc
+-> 001.fastq_screen
+by
+-> End job
+"""
 rule multiqc:
     input:
         fqc_zip=expand(
-            "fastqc/{sample}_{stream}_fastqc.zip",
+            "fastqc/{sample}_fastqc.zip",
             sample=design["Sample_id"],
-            stream=["1", "2"]
         ),
         fqc_html=expand(
-            "fastqc/{sample}.{stream}.html",
+            "fastqc/{sample}.html",
             sample=design["Sample_id"],
-            stream=["1", "2"]
         ),
         txt=expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.txt",
+            "fastq_screen/{sample}.fastq_screen.txt",
             sample=design["Sample_id"],
-            stream=["1", "2"]
         ),
         png=expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.png",
+            "fastq_screen/{sample}.fastq_screen.png",
             sample=design["Sample_id"],
-            stream=["1", "2"]
         )
     output:
         "multiqc/multiqc.html",
         directory("multiqc/multiqc_data")
-    message:
-        "Gathering all quality reports in {output}"
     threads: 1
     resources:
         mem_mb=lambda wildcard, attempt: attempt * 2048,
@@ -34,34 +36,40 @@ rule multiqc:
     params:
         "--flat"
     log:
-        "logs/multiqc.log"
+        "logs/003.multiqc.log"
     wrapper:
         "bio/multiqc"
 
 
 
 # Additional behaviour for demultiplexing automaton
+# QC report aggregation
+"""
+003.multiqc
+from
+-> 001.fastqc
+-> 001.fastq_screen
+-> 003.unzip_stats
+by
+-> End job
+"""
 use rule multiqc as irods_complient with:
     input:
         fqc_zip=expand(
-            "fastqc/{sample}_{stream}_fastqc.zip",
+            "fastqc/{sample}_fastqc.zip",
             sample=design["Sample_id"],
-            stream=["1", "2"]
         ),
         fqc_html=expand(
-            "fastqc/{sample}.{stream}.html",
+            "fastqc/{sample}.html",
             sample=design["Sample_id"],
-            stream=["1", "2"]
         ),
         txt=expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.txt",
+            "fastq_screen/{sample}.fastq_screen.txt",
             sample=design["Sample_id"],
-            stream=["1", "2"]
         ),
         png=expand(
-            "fastq_screen/{sample}.{stream}.fastq_screen.png",
+            "fastq_screen/{sample}.fastq_screen.png",
             sample=design["Sample_id"],
-            stream=["1", "2"]
         ),
         bcl_json="Stats.json"
     output:
@@ -71,6 +79,14 @@ use rule multiqc as irods_complient with:
         "stats_inclusion"
 
 
+# Unzip Stats.json for multiqc inclusion
+"""
+003.unzip_stats
+from
+-> Entry job
+by
+-> 003.multiqc
+"""
 rule unzip_stats:
     output:
         temp("Stats.json")
@@ -80,7 +96,7 @@ rule unzip_stats:
         time_min=lambda wildcards, attempt: attempt * 15,
         tmpdir="tmp"
     log:
-        "logs/unzipping.log"
+        "logs/003.unzipping.log"
     group:
         "stats_inclusion"
     shell:
