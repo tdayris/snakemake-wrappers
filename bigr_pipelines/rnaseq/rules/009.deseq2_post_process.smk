@@ -20,24 +20,9 @@ rule deseq2_readable:
         gene2gene="004.salmon/gene2gene_with_chr.tsv",
         dst="008.deseq2/{comparison}/dst.{comparison}.tsv",
     output:
-        complete=report(
-            "data_output/DEseq2/{comparison}/Complete_{comparison}.tsv",
-            caption=str(workflow_source_dir / "reports" / "009.gseapp_complete.rst"),
-            category="DEseq2",
-            subcategory="{comparison}",
-        ),
-        fc_fc=report(
-            "data_output/DEseq2/{comparison}/SortedOnLogFC_{comparison}.tsv",
-            caption=str(workflow_source_dir / "reports" / "009.gseapp_fc_fc.rst"),
-            category="DEseq2",
-            subcategory="{comparison}",
-        ),
-        padj_fc=report(
-            "data_output/DEseq2/{comparison}/SortedOnPadj_{comparison}.tsv",
-            category="DESeq2",
-            caption=str(workflow_source_dir / "reports" / "009.gseapp_padj_fc.rst"),
-            subcategory="{comparison}",
-        ),
+        complete=protected("data_output/DEseq2/{comparison}/Complete_{comparison}.tsv"),
+        fc_fc=protected("data_output/DEseq2/{comparison}/SortedOnLogFC_{comparison}.tsv"),
+        padj_fc=protected("data_output/DEseq2/{comparison}/SortedOnPadj_{comparison}.tsv"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
