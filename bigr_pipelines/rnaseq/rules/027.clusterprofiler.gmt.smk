@@ -50,7 +50,7 @@ rule enrich_GMT:
             "027.enrich/{database}.{keytype}/{comparison}/enrich.{database}.{keytype}.RDS"
         ),
         readable_tsv=protected(
-            "data_output/{comparison}/{database}.{keytype}/enrichment.tsv"
+            "data_output/GSEA/{comparison}/{database}.{keytype}/enrichment.tsv"
         ),
     threads: 1
     resources:
