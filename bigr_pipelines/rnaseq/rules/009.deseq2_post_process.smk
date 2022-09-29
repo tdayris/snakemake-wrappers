@@ -148,7 +148,7 @@ rule multiqc_config:
         multiqc_config=temp(
             "009.multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/multiqc_config.yaml"
         ),
-        lots=[
+        plots=[
             temp(
                 "009.multiqc/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/clustermap_sample_mqc.png"
             ),
