@@ -15,7 +15,7 @@ rule fastq_screen:
         png=temp("fastq_screen/{sample}.fastq_screen.png")
     threads: config.get("threads", 20)
     resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 8192, 1024 * 15),
+        mem_mb=lambda wildcard, attempt: min(attempt * 1024 * 10),
         time_min=lambda wildcard, attempt: attempt * 50,
         tmpdir="tmp"
     params:
