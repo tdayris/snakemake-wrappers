@@ -68,13 +68,13 @@ rule quality_control_results:
         fastp=expand(
             "002.fastp/{ext}/{sample}.fastp.{ext}",
             sample=sample_list,
-            ext=["html", "json"],
+            ext=fastp_ext,
         ),
         fastq_screen=expand(
             "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
             sample=sample_list,
             stream=streams,
-            ext=["txt", "png"],
+            ext=fastqscreen_ext,
         ),
     output:
         report(
@@ -126,19 +126,19 @@ rule salmon_quant_results:
         ),
         tpm_table=expand(
             "data_output/Quantification/TPM.{feature}.tsv",
-            feature=["transcripts", "genes"],
+            feature=features,
         ),
         raw_counts="data_output/Quantification/Raw.genes.tsv",
         fastp=expand(
             "002.fastp/{ext}/{sample}.fastp.{ext}",
             sample=sample_list,
-            ext=["html", "json"],
+            ext=fastp_ext,
         ),
         fastq_screen=expand(
             "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
             sample=sample_list,
             stream=streams,
-            ext=["txt", "png"],
+            ext=fastqscreen_ext,
         ),
     output:
         report(
@@ -193,13 +193,13 @@ rule immunedeconv_results:
         fastp=lambda wildcards: expand(
             "002.fastp/{ext}/{sample}.fastp.{ext}",
             sample=sample_list,
-            ext=["html", "json"],
+            ext=fastp_ext,
         ),
         fastq_screen=lambda wildcards: expand(
             "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
             sample=sample_list,
             stream=streams,
-            ext=["txt", "png"],
+            ext=fastqscreen_ext,
         ),
         config="005.immunedeconv/multiqc_config_mqc.yaml",
         graphs=expand(
@@ -212,7 +212,7 @@ rule immunedeconv_results:
         ),
         tpm_table=expand(
             "data_output/Quantification/TPM.{feature}.tsv",
-            feature=["transcripts", "genes"],
+            feature=features,
         ),
         raw_counts="data_output/Quantification/Raw.genes.tsv",
     output:
@@ -285,13 +285,13 @@ rule star_fusion_results:
         fastp=expand(
             "002.fastp/{ext}/{sample}.fastp.{ext}",
             sample=sample_list,
-            ext=["html", "json"],
+            ext=fastp_ext,
         ),
         fastq_screen=expand(
             "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
             sample=sample_list,
             stream=streams,
-            ext=["txt", "png"],
+            ext=fastqscreen_ext,
         ),
         star_fusion=expand("013.star-fusions/{sample}/", sample=sample_list),
         read_distribution=expand(
@@ -355,19 +355,19 @@ rule deseq2_results:
         ),
         tpm_table=expand(
             "data_output/Quantification/TPM.{feature}.tsv",
-            feature=["transcripts", "genes"],
+            feature=features,
         ),
         raw_counts="data_output/Quantification/Raw.genes.tsv",
         fastp=lambda wildcards: expand(
             "002.fastp/{ext}/{sample}.fastp.{ext}",
             sample=samples_per_prefixes[wildcards.comparison],
-            ext=["html", "json"],
+            ext=fastp_ext,
         ),
         fastq_screen=lambda wildcards: expand(
             "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
             sample=samples_per_prefixes[wildcards.comparison],
             stream=streams,
-            ext=["txt", "png"],
+            ext=fastqscreen_ext,
         ),
         deseq2_results=expand(
             "data_output/DEseq2/{comparison}/{content}_{comparison}.tsv",

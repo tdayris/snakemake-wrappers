@@ -175,6 +175,11 @@ streams = ["1", "2"]
 features = ["gene", "transcript"]
 
 
+# Specific tools extensions
+fastp_ext = ["html", "json"]
+fastqscreen_ext = ["txt", "png"]
+
+
 # Star Mappings
 # Type of mapping performed by the pipepline
 maptypes = ["variants", "chimera"]
@@ -228,3 +233,4 @@ wildcard_constraints:
     gse_method=r"|".join(gse_method_list),
     cprof_plot=r"|".join(cprof_plots),
     keytype=r"|".join(keytypes),
+    ext=r"|".join(fastqscreen_ext + fastp_ext),
