@@ -63,7 +63,7 @@ def yield_comps(complete_design: pandas.DataFrame,
                # me, not guessing anymore and doing all possible comparisons
                # two by two.
                try:
-                  if any(i in contains for i in [f"test_{level}", f"reference_{ref}"]):
+                  if any(i in contains for i in [f"test_{level}", f"reference_{ref}", f"test_{l1}_vs_reference_{l2}", f"test_{l2}_vs_reference_{l1}"]):
                      yield [col, f"test_{level}", f"reference_{ref}"]
                except TypeError:
                      yield [col, f"test_{level}", f"reference_{ref}"]
