@@ -48,7 +48,7 @@ def expected_targets(config: Dict[str, Any]):
     if config["steps"].get("dge", False) is True:
         results["dge"] = expand(
             "data_output/DEseq2/{comparison}/MultiQC.DEseq2.html",
-            comparison=output_prefixes
+            comparison=output_prefixes,
         )
 
     if config["steps"].get("immunedeconv", False) is True:
