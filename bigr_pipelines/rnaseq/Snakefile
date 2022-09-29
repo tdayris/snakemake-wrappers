@@ -467,10 +467,20 @@ rule clusterprofiler_results:
             db_key=database_keytypes_list,
         ),
     output:
-        clusteerprofiler=expand(
-            "data_output/DEseq2/{comparison}/MultiQC.GSEA.html",
+        clusterprofiler=expand(
+            "data_output/GSEA/{comparison}/MultiQC.GSEA.html",
             comparison=output_prefixes,
         ),
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
+    retries: 2
+    log:
+        "logs/snakefile.multiqc/clusterprofiler.{comparison}.log",
+    wrapper:
+        "bio/multiqc"
 
 
 #######################
