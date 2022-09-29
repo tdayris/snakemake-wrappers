@@ -105,7 +105,7 @@ def yield_samples(complete_design: pandas.DataFrame,
             # me, not guessing anymore and doing all possible comparisons
             # two by two.
             try:
-               if any(i in contains for i in [f"test_{l1}", f"reference_{l2}"]):
+               if any(i in contains for i in [f"test_{l1}", f"reference_{l2}", f"test_{l1}_vs_reference_{l2}"]):
                   yield complete_design[complete_design[col].isin([l1, l2])].index.tolist()
                   yield complete_design[complete_design[col].isin([l1, l2])].index.tolist()
             except TypeError:
