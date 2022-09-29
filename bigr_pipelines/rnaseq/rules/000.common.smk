@@ -64,7 +64,6 @@ def expected_targets(steps: Dict[str, Any]) -> Dict[str, Any]:
     if steps.get("fusions", False) is True:
         results["fusions"] = "data_output/multiqc/MultiQC.Star.Chimera.html"
 
-    print(results)
     return results
 
 
