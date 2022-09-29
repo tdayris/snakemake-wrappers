@@ -106,14 +106,14 @@ rule samtools_view_filter:
     log:
         "logs/samtools/view/{sample}.filter.log",
     params:
-        "-h -b",
+        "-h -b -q 15",
     conda:
         str(workflow_source_dir / "envs" / "samtools.yaml")
     shell:
         "samtools view {params} "
         "-T {input.ref} "
         "-t {input.ref_idx} "
-        "--region-file {input.bed} "
+        # "--region-file {input.bed} "
         "-o {output.bam} "
         "{input.bam} "
         "> {log} 2>&1"
