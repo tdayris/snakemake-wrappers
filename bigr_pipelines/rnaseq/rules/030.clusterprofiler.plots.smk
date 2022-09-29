@@ -53,7 +53,7 @@ rule barplot:
         rds="027.enrich/{database}.{keytype}/{comparison}/enrich.{database}.{keytype}.RDS",
     output:
         png=protected(
-            "data_output/GSEA/{comparison}/{database}.{keytype}/dotplot.enrich.png"
+            "data_output/GSEA/{comparison}/{database}.{keytype}/barplot.enrich.png"
         ),
     threads: 1
     resources:
