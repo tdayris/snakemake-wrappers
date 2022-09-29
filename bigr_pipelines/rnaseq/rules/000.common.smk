@@ -172,7 +172,7 @@ elipsis_list = ["with_elipse", "without_elipse"]
 # Up/down stream reads, this pipeline takes only pair-ended libraries
 streams = ["1", "2"]
 # Features types
-features = ["gene", "transcript"]
+features = ["genes", "transcripts"]
 
 
 # Specific tools extensions
