@@ -64,6 +64,7 @@ def expected_targets(steps: Dict[str, Any]) -> Dict[str, Any]:
     if steps.get("fusions", False) is True:
         results["fusions"] = "data_output/multiqc/MultiQC.Star.Chimera.html"
 
+    print(results)
     return results
 
 
@@ -216,10 +217,13 @@ gse_method_list = ["enrich"]
 cprof_plots = ["barplot", "dotplot", "upsetplot"]
 # List of possible key types
 keytypes = ["ENSEMBL", "ENTREZID", "SYMBOL", "ENSEMBLPROT"]
-database_keytypes_list = db_keytype(
-    config["clusterprofiler"]["gmt"],
-    config["clusterprofiler"]["ppi"],
-)
+database_keytypes_list = [
+    f"{db}.{key}" 
+    for db, key in db_keytype(
+        config["clusterprofiler"]["gmt"],
+        config["clusterprofiler"]["ppi"],
+    ).items()
+]
 
 
 logging.info("Constraining wildcards...")
