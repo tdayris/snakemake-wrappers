@@ -88,11 +88,7 @@ rule aggregate_raw_counts:
         ),
         tx2gene="004.salmon/tx2gene.tsv",
     output:
-        tsv=report(
-            "data_output/Quantification/Raw.genes.tsv",
-            caption=str(workflow_source_dir / "reports" / "salmon.raw.genes.rst"),
-            category="Counts",
-        ),
+        tsv=protected("data_output/Quantification/Raw.genes.tsv")
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
@@ -130,11 +126,7 @@ rule aggregate_gene_counts:
         ),
         tx2gene="004.salmon/tx2gene.tsv",
     output:
-        tsv=report(
-            "data_output/Quantification/TPM.genes.tsv",
-            caption=str(workflow_source_dir / "reports" / "salmon.tpm.genes.rst"),
-            category="Counts",
-        ),
+        tsv=protected("data_output/Quantification/TPM.genes.tsv")
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
@@ -171,13 +163,7 @@ rule aggregate_transcript_counts:
         ),
         tx2gene="004.salmon/tx2gene.tsv",
     output:
-        tsv=report(
-            "data_output/Quantification/TPM.transcripts.tsv",
-        caption=str(
-        workflow_source_dir / "reports" / "salmon.tpm.transcripts.rst"
-            ),
-            category="Counts",
-        ),
+        tsv=protected("data_output/Quantification/TPM.transcripts.tsv")
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
