@@ -85,7 +85,7 @@ by
 
 rule upsetplot:
     input:
-        rds="027.enrich/{database}/{comparison}/enrich.{database}.{keytype}.RDS",
+        rds="027.enrich/{database}.{keytype}/{comparison}/enrich.{database}.{keytype}.RDS",
     output:
         png=protected(
             "data_output/GSEA/{comparison}/{database}.{keytype}/upsetplot.enrich.png"
