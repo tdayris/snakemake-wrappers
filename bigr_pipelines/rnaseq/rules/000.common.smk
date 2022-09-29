@@ -52,7 +52,7 @@ def expected_targets(steps: Dict[str, Any]) -> Dict[str, Any]:
             comparison=output_prefixes,
         )
 
-    if steps.get("clusterprofiler", False) is True:
+    if steps.get("gsea", False) is True:
         results["clusterprofiler"] = expand(
             "data_output/GSEA/{comparison}/MultiQC.GSEA.html",
             comparison=output_prefixes,
@@ -217,13 +217,11 @@ gse_method_list = ["enrich"]
 cprof_plots = ["barplot", "dotplot", "upsetplot"]
 # List of possible key types
 keytypes = ["ENSEMBL", "ENTREZID", "SYMBOL", "ENSEMBLPROT"]
-database_keytypes_list = [
-    f"{db}.{key}" 
-    for db, key in db_keytype(
-        config["clusterprofiler"]["gmt"],
-        config["clusterprofiler"]["ppi"],
-    ).items()
-]
+db_key_dict = db_keytype(
+    gmts=config["clusterprofiler"]["gmt"],
+    ppis=config["clusterprofiler"]["ppi"],
+)
+database_keytypes_list = [f"{db}.{key}" for db, key in db_key_dict.items()]
 
 
 logging.info("Constraining wildcards...")
