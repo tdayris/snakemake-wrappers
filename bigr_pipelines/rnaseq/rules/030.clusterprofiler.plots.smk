@@ -12,20 +12,23 @@ by
 -> End job
 """
 
+
 rule dotplot:
     input:
-        rds="027.enrich/{database}/{comparison}/enrich.{database}.{keytype}.RDS"
+        rds="027.enrich/{database}/{comparison}/enrich.{database}.{keytype}.RDS",
     output:
-        png=protected("data_output/GSEA/{comparison}/{database}.{keytype}/dotplot.enrich.png")
+        png=protected(
+            "data_output/GSEA/{comparison}/{database}.{keytype}/dotplot.enrich.png"
+        ),
     threads: 1
     resources:
-        time_min=lambda wildcards, attempt: attempt * 15,
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
-        tmpdir="tmp"
+        time_min=get_15min_per_attempt,
+        mem_mb=get_4gb_per_attempt,
+        tmpdir="tmp",
     params:
-        dotplot_extra=config["clusterprofiler"].get("dotplot_extra", "")
+        dotplot_extra=config["clusterprofiler"].get("dotplot_extra", ""),
     log:
-        "logs/030.clusterprofiler/dotplot/enrich.{db}.{comparison}.{keytype}.log"
+        "logs/030.clusterprofiler/dotplot/enrich.{db}.{comparison}.{keytype}.log",
     wrapper:
         "bio/clusterProfiler/dotplot"
 
@@ -43,20 +46,24 @@ from
 by
 -> End job
 """
+
+
 rule barplot:
     input:
-        rds="027.enrich/{database}/{comparison}/enrich.{database}.{keytype}.RDS"
+        rds="027.enrich/{database}/{comparison}/enrich.{database}.{keytype}.RDS",
     output:
-        png=protected("data_output/GSEA/{comparison}/{database}.{keytype}/dotplot.enrich.png")
+        png=protected(
+            "data_output/GSEA/{comparison}/{database}.{keytype}/dotplot.enrich.png"
+        ),
     threads: 1
     resources:
-        time_min=lambda wildcards, attempt: attempt * 15,
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
-        tmpdir="tmp"
+        time_min=get_15min_per_attempt,
+        mem_mb=get_4gb_per_attempt,
+        tmpdir="tmp",
     params:
-        barplot_extra=config["clusterprofiler"].get("barplot_extra", "")
+        barplot_extra=config["clusterprofiler"].get("barplot_extra", ""),
     log:
-        "logs/030.clusterprofiler/barplot/{method}.{db}.{comparison}.{keytype}.log"
+        "logs/030.clusterprofiler/barplot/{method}.{db}.{comparison}.{keytype}.log",
     wrapper:
         "bio/clusterProfiler/barplot"
 
@@ -74,19 +81,23 @@ from
 by
 -> End job
 """
+
+
 rule upsetplot:
     input:
-        rds="027.enrich/{database}/{comparison}/enrich.{database}.{keytype}.RDS"
+        rds="027.enrich/{database}/{comparison}/enrich.{database}.{keytype}.RDS",
     output:
-        png=protected("data_output/GSEA/{comparison}/{database}.{keytype}/upsetplot.enrich.png")
+        png=protected(
+            "data_output/GSEA/{comparison}/{database}.{keytype}/upsetplot.enrich.png"
+        ),
     threads: 1
     resources:
-        time_min=lambda wildcards, attempt: attempt * 15,
-        mem_mb=lambda wildcards, attempt: attempt * 1024 * 2,
-        tmpdir="tmp"
+        time_min=get_15min_per_attempt,
+        mem_mb=get_4gb_per_attempt,
+        tmpdir="tmp",
     params:
-        upsetplot_extra=config.get("upsetplot_extra", "n = 5")
+        upsetplot_extra=config.get("upsetplot_extra", "n = 5"),
     log:
-        "logs/upsetplot/{method}.{db}.{comparison}.{keytype}.log"
+        "logs/upsetplot/{method}.{db}.{comparison}.{keytype}.log",
     wrapper:
         "bio/clusterProfiler/upsetplot"

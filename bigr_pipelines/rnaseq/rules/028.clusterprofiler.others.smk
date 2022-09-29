@@ -86,7 +86,9 @@ rule enrichNCG:
         rds=temp(
             "027.enrich/NetworkCancerGenes.ENTREZID/{comparison}/enrich.NetworkCancerGenes.ENTREZID.RDS"
         ),
-        tsv=protected("data_output/{comparison}/NetworkCancerGenes.ENTREZID/enrichment.tsv"),
+        tsv=protected(
+            "data_output/{comparison}/NetworkCancerGenes.ENTREZID/enrichment.tsv"
+        ),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
