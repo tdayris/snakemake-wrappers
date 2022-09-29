@@ -21,8 +21,12 @@ rule deseq2_readable:
         dst="008.deseq2/{comparison}/dst.{comparison}.tsv",
     output:
         complete=protected("data_output/DEseq2/{comparison}/Complete_{comparison}.tsv"),
-        fc_fc=protected("data_output/DEseq2/{comparison}/SortedOnLogFC_{comparison}.tsv"),
-        padj_fc=protected("data_output/DEseq2/{comparison}/SortedOnPadj_{comparison}.tsv"),
+        fc_fc=protected(
+            "data_output/DEseq2/{comparison}/SortedOnLogFC_{comparison}.tsv"
+        ),
+        padj_fc=protected(
+            "data_output/DEseq2/{comparison}/SortedOnPadj_{comparison}.tsv"
+        ),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,

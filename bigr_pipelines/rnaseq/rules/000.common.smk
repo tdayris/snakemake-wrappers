@@ -61,19 +61,6 @@ def expected_targets(steps: Dict[str, Any]) -> Dict[str, Any]:
     return results
 
 
-def database_keytypes(deconv_gmt: Dict[str, str], deconv_ppi: Dict[str, str]) -> List[str]:
-    """Return the list of database with their gene identifier format"""
-    result = [f"{db_name}.ENSEMBLPROT" for db_name in ppi.keys()]
-    result += ["DiseaseOnt.ENTREZID", "DisGenNet.ENTREZID", "NetworkCancerGenes.ENTREZID"]
-
-    for db_name, gmt in deconv_gmt.items():
-        keytype = gmt.split(".")[-2]
-        result.append(f"{db_name}.{keytype}")
-
-    for db_name in ppi.keys()
-    return result
-
-
 #####################
 # Setup environment #
 #####################
@@ -223,7 +210,10 @@ gse_method_list = ["enrich"]
 cprof_plots = ["barplot", "dotplot", "upsetplot"]
 # List of possible key types
 keytypes = ["ENSEMBL", "ENTREZID", "SYMBOL", "ENSEMBLPROT"]
-database_keytypes_list = db_keytype(config["clusterprofiler"]["gmt"], config["clusterprofiler"]["ppi"],)
+database_keytypes_list = db_keytype(
+    config["clusterprofiler"]["gmt"],
+    config["clusterprofiler"]["ppi"],
+)
 
 
 logging.info("Constraining wildcards...")
