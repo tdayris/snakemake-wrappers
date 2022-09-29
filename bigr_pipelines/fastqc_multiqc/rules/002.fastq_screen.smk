@@ -23,6 +23,6 @@ rule fastq_screen:
         subset=100000,
         aligner='bowtie2'
     log:
-        "logs/fastq_screen/{sample}.{stream}.log"
+        "logs/fastq_screen/{sample}.log"
     wrapper:
         "bio/fastq_screen"

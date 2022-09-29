@@ -21,6 +21,6 @@ rule fastqc:
     params:
         ""
     log:
-        "logs/fastqc/{sample}.{stream}.log"
+        "logs/fastqc/{sample}.log"
     wrapper:
         "bio/fastqc"
