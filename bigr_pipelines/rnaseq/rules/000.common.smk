@@ -16,7 +16,7 @@ import functools
 from snakemake.utils import min_version
 from pathlib import Path
 from yaml import dump
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 min_version("7.5")
 
@@ -37,27 +37,41 @@ from gmt import *
 from messages import message
 
 
-def expected_targets(config: Dict[str, Any]):
+def expected_targets(steps: Dict[str, Any]) -> Dict[str, Any]:
+    """Return the list of expected output files"""
     results = {}
-    if config["steps"].get("qc", True) is True:
+    if steps.get("qc", True) is True:
         results["qc"] = "data_output/multiqc/MultiQC.QC.html"
 
-    if config["steps"].get("quant", False) is True:
+    if steps.get("quant", False) is True:
         results["quant"] = "data_output/multiqc/MultiQC.Salmon.html"
 
-    if config["steps"].get("dge", False) is True:
+    if steps.get("dge", False) is True:
         results["dge"] = expand(
             "data_output/DEseq2/{comparison}/MultiQC.DEseq2.html",
             comparison=output_prefixes,
         )
 
-    if config["steps"].get("immunedeconv", False) is True:
+    if steps.get("immunedeconv", False) is True:
         results["immunedeconv"] = "data_output/MultiQC/ImmuneDeconv.html"
 
-    if config["steps"].get("fusions", False) is True:
+    if steps.get("fusions", False) is True:
         results["fusions"] = "data_output/multiqc/MultiQC.Star.Chimera.html"
 
     return results
+
+
+def database_keytypes(deconv_gmt: Dict[str, str], deconv_ppi: Dict[str, str]) -> List[str]:
+    """Return the list of database with their gene identifier format"""
+    result = [f"{db_name}.ENSEMBLPROT" for db_name in ppi.keys()]
+    result += ["DiseaseOnt.ENTREZID", "DisGenNet.ENTREZID", "NetworkCancerGenes.ENTREZID"]
+
+    for db_name, gmt in deconv_gmt.items():
+        keytype = gmt.split(".")[-2]
+        result.append(f"{db_name}.{keytype}")
+
+    for db_name in ppi.keys()
+    return result
 
 
 #####################
@@ -209,6 +223,7 @@ gse_method_list = ["enrich"]
 cprof_plots = ["barplot", "dotplot", "upsetplot"]
 # List of possible key types
 keytypes = ["ENSEMBL", "ENTREZID", "SYMBOL", "ENSEMBLPROT"]
+database_keytypes_list = db_keytype(config["clusterprofiler"]["gmt"], config["clusterprofiler"]["ppi"],)
 
 
 logging.info("Constraining wildcards...")

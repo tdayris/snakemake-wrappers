@@ -14,9 +14,9 @@ rule enrichDO:
         universe="026.gene_lists/universe/{comparison}.RDS",
     output:
         rds=temp(
-            "027.enrich/DiseaseOnt/{comparison}/enrich.DiseaseOnt.{comparison}.ENTREZID.RDS"
+            "027.enrich/DiseaseOnt.ENTREZID/{comparison}/enrich.DiseaseOnt.ENTREZID.RDS"
         ),
-        tsv="data_output/{comparison}/DiseaseOnt.ENTREZID/enrich.{comparison}.tsv",
+        tsv=protected("data_output/{comparison}/DiseaseOnt.ENTREZID/enrichment.tsv"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -49,9 +49,9 @@ rule enrichDGN:
         universe="026.gene_lists/universe/{comparison}.RDS",
     output:
         rds=temp(
-            "027.enrich/DisGenNet/{comparison}/enrich.DisGenNet.{comparison}.ENTREZID.RDS"
+            "027.enrich/DisGenNet.ENTREZID/{comparison}/enrich.DisGenNet.ENTREZID.RDS"
         ),
-        tsv="data_output/{comparison}/DisGenNet.ENTREZID/enrich.{comparison}.tsv",
+        tsv=protected("data_output/{comparison}/DisGenNet.ENTREZID/enrichment.tsv"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -84,9 +84,9 @@ rule enrichNCG:
         universe="026.gene_lists/universe/{comparison}.RDS",
     output:
         rds=temp(
-            "027.enrich/NetworkCancerGenes/{comparison}/enrich.NetworkCancerGenes.{comparison}.ENTREZID.RDS"
+            "027.enrich/NetworkCancerGenes.ENTREZID/{comparison}/enrich.NetworkCancerGenes.ENTREZID.RDS"
         ),
-        tsv="data_output/{comparison}/NetworkCancerGenes.ENTREZID/enrich.{comparison}.tsv",
+        tsv=protected("data_output/{comparison}/NetworkCancerGenes.ENTREZID/enrichment.tsv"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,

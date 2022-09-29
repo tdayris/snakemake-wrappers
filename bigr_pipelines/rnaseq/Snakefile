@@ -34,7 +34,7 @@ onstart:
 
 rule target:
     input:
-        **expected_targets(config),
+        **expected_targets(config.get("steps", {"qc": True})),
 
 
 ##########################
@@ -418,14 +418,60 @@ include: str(workflow_source_dir / "rules" / "028.clusterprofiler.others.smk")
 include: str(workflow_source_dir / "rules" / "026.clusterprofiler.genelist.smk")
 
 
-# rule clusterprofiler_results:
-#     input:
-#         dge=expand(
-#             "data_output/DEseq2/{comparison}/MultiQC.DEseq2.html",
-#             comparison=output_prefixes,
-#         ),
-#     output:
-
+rule clusterprofiler_results:
+    input:
+        salmon_quant=lambda wildcards: expand(
+            "004.salmon/pseudo_mapping/{sample}/quant.genes.sf",
+            sample=samples_per_prefixes[wildcards.comparison],
+        ),
+        tpm_table=expand(
+            "data_output/Quantification/TPM.{feature}.tsv",
+            feature=features,
+        ),
+        raw_counts="data_output/Quantification/Raw.genes.tsv",
+        fastp=lambda wildcards: expand(
+            "002.fastp/{ext}/{sample}.fastp.{ext}",
+            sample=samples_per_prefixes[wildcards.comparison],
+            ext=fastp_ext,
+        ),
+        fastq_screen=lambda wildcards: expand(
+            "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+            sample=samples_per_prefixes[wildcards.comparison],
+            stream=streams,
+            ext=fastqscreen_ext,
+        ),
+        deseq2_results=expand(
+            "data_output/DEseq2/{comparison}/{content}_{comparison}.tsv",
+            content=content_list,
+            allow_missing=True,
+        ),
+        config="009.multiqc/{comparison}/multiqc_config.yaml",
+        gene_plot="data_output/DEseq2/{comparison}/gene_plots/",
+        plots=[
+            "009.multiqc/{comparison}/pca_plot_mqc.png",
+            "009.multiqc/{comparison}/volcanoplot_mqc.png",
+            "009.multiqc/{comparison}/distro_expr_mqc.png",
+            "009.multiqc/{comparison}/distro_mu_mqc.png",
+            "009.multiqc/{comparison}/ma_plot_mqc.png",
+            "009.multiqc/{comparison}/independent_filter_mqc.png",
+            "009.multiqc/{comparison}/inde_theta_filter_mqc.png",
+            "009.multiqc/{comparison}/pvalue_qc_mqc.png",
+        ],
+        clusterprofiler_tsv=tsv_list(
+            db_key=database_keytypes, 
+            comparisons=output_prefixes
+        ),
+        clusterprofiler_png=plot_list(
+            plots=cprof_plots,
+            methods=gse_method_list,
+            comparisons=output_prefixes,
+            db_key=database_keytypes,
+        )
+    output:
+        clusteerprofiler=expand(
+            "data_output/DEseq2/{comparison}/MultiQC.GSEA.html",
+            comparison=output_prefixes,
+        ),
 
 #######################
 ### Variant Calling ###

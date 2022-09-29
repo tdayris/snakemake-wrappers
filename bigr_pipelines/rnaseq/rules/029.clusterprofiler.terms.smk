@@ -79,9 +79,9 @@ rule enricher_TERMS:
         term_gene="026.clusterprofiler/term2gene/{database}.tsv",
     output:
         readable_rds=temp(
-            "027.enrich/{database}/{comparison}/enrich.{database}.{comparison}.ENSEMBLPROT.RDS"
+            "027.enrich/{database}.ENSEMBLPROT/{comparison}/enrich.{database}.ENSEMBLPROT.RDS"
         ),
-        readable_tsv="data_output/{comparison}/{database}.ENSEMBLPROT/enrich.{comparison}.ENSEMBLPROT.tsv",
+        readable_tsv="data_output/{comparison}/{database}.ENSEMBLPROT/enrichment.tsv",
     threads: 1
     resources:
         mem_mb=get_3gb_per_attempt,

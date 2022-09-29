@@ -82,22 +82,24 @@ def plot_list(plots: List[str],
               db_key: Dict[str, str]) -> List[str]:
     """Return list of plots with correct key type and database"""
     result = [
-        f"data_output/{comparison}/{db_name}.{keytype}/{plot}.{method}.png"
+        f"data_output/GSEA/{comparison}/{db_name}.{keytype}/{plot}.{method}.png"
         for comparison in comparisons
         for db_name, keytype in db_key.items()
         for plot in plots
         for method in methods
     ]
-    result += [
-        f"data_output/all_comparisons/{db_name}.{keytype}.png"
-        for db_name, keytype in db_key.items()
-    ]
+    # result += [
+    #     f"data_output/GSEA/all_comparisons/{db_name}.{keytype}.{method}.png"
+    #     for db_name, keytype in db_key.items()
+    #     for method in methods
+    # ]
     return result
+
 
 def tsv_list(db_key: Dict[str, str], comparisons: List[str]) -> List[str]:
     """Return list of expected TSV files"""
     return [
-        f"results/{comparison}/{db_name}.{keytype}/enrich.{comparison}.{keytype}.tsv"
+        f"data_output/GSEA/{comparison}/{db_name}.{keytype}/enrichment.tsv"
         for comparison in comparisons
         for db_name, keytype in db_key.items()
     ]

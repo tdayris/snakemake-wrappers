@@ -47,10 +47,10 @@ rule enrich_GMT:
         term2name="026.clusterprofiler/gmt/{database}.term2name.tsv",
     output:
         readable_rds=temp(
-            "027.enrich/{database}/{comparison}/enrich.{database}.{comparison}.{keytype}.RDS"
+            "027.enrich/{database}.{keytype}/{comparison}/enrich.{database}.{keytype}.RDS"
         ),
         readable_tsv=protected(
-            "data_output/{comparison}/{database}.{keytype}/enrich.{comparison}.tsv"
+            "data_output/{comparison}/{database}.{keytype}/enrichment.tsv"
         ),
     threads: 1
     resources:
