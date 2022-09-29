@@ -10,7 +10,7 @@ by
 
 rule term2gene_TERMS:
     input:
-        lambda wildcards: config["ppi"][wildcards.database],
+        lambda wildcards: config["clusterprofiler"]["ppi"][wildcards.database],
     output:
         temp("026.clusterprofiler/term2gene/{database}.tsv"),
     threads: 1
@@ -41,7 +41,7 @@ by
 
 rule terms2name_TERMS:
     input:
-        lambda wildcards: config["ppi"][wildcards.database],
+        lambda wildcards: config["clusterprofiler"]["ppi"][wildcards.database],
     output:
         temp("026.clusterprofiler/term2name/{database}.tsv"),
     threads: 1

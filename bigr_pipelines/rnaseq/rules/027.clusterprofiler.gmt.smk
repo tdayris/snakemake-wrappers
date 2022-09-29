@@ -10,7 +10,7 @@ by
 
 rule term2name_GMT:
     input:
-        lambda wildcards: config["gmt"][wildcards.database],
+        lambda wildcards: config["clusterprofiler"]["gmt"][wildcards.database],
     output:
         temp("026.clusterprofiler/gmt/{database}.{keytype}.term2name.tsv"),
     threads: 1
@@ -43,7 +43,7 @@ rule enrich_GMT:
     input:
         rds="026.clusterprofiler/gene_lists/{keytype}/{comparison}.RDS",
         universe="026.clusterprofiler/gene_lists/universe/{comparison}.RDS",
-        gmt=lambda wildcards: config["gmt"][wildcards.database],
+        gmt=lambda wildcards: config["clusterprofiler"]["gmt"][wildcards.database],
         term2name="026.clusterprofiler/gmt/{database}.term2name.tsv",
     output:
         readable_rds=temp(
