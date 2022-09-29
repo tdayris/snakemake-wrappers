@@ -73,7 +73,7 @@ by
 
 rule enricher_TERMS:
     input:
-        rds="026.gclusterprofiler/ene_lists/ENSEMBLPROT/{comparison}.RDS",
+        rds="026.gclusterprofiler/gene_lists/ENSEMBLPROT/{comparison}.RDS",
         universe="026.clusterprofiler/gene_lists/universe/{comparison}.RDS",
         term_name="026.clusterprofiler/term2name/{database}.tsv",
         term_gene="026.clusterprofiler/term2gene/{database}.tsv",
