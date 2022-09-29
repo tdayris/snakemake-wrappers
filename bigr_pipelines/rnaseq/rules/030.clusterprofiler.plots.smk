@@ -28,7 +28,7 @@ rule dotplot:
     params:
         dotplot_extra=config["clusterprofiler"].get("dotplot_extra", ""),
     log:
-        "logs/030.clusterprofiler/dotplot/enrich.{db}.{comparison}.{keytype}.log",
+        "logs/030.clusterprofiler/dotplot/enrich.{database}.{comparison}.{keytype}.log",
     wrapper:
         "bio/clusterProfiler/dotplot"
 
@@ -63,7 +63,7 @@ rule barplot:
     params:
         barplot_extra=config["clusterprofiler"].get("barplot_extra", ""),
     log:
-        "logs/030.clusterprofiler/barplot/enrich.{db}.{comparison}.{keytype}.log",
+        "logs/030.clusterprofiler/barplot/enrich.{database}.{comparison}.{keytype}.log",
     wrapper:
         "bio/clusterProfiler/barplot"
 
@@ -98,6 +98,6 @@ rule upsetplot:
     params:
         upsetplot_extra=config.get("upsetplot_extra", "n = 5"),
     log:
-        "logs/upsetplot/enrich..{db}.{comparison}.{keytype}.log",
+        "logs/upsetplot/enrich.{database}.{comparison}.{keytype}.log",
     wrapper:
         "bio/clusterProfiler/upsetplot"
