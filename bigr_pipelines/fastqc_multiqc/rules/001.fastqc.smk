@@ -9,7 +9,7 @@ by
 """
 rule fastqc:
     input:
-        "reads/{sample}.{stream}.fq.gz"
+        "reads/{sample}.fq.gz"
     output:
         html=temp("fastqc/{sample}.html"),
         zip=temp("fastqc/{sample}_fastqc.zip")
