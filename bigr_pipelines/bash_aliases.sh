@@ -53,7 +53,7 @@ alias bigr_utils_list_users="who | cut -f 1 -d ' ' | sort | uniq -c"
 # Multi process a bash command
 alias bigr_utils_multiprocess_bash="bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/bash/multiprocess_bash_command.sh"
 alias bigr_utils_update_dev_git="cd /mnt/beegfs/userdata/${USER}/snakemake-wrappers/ && git pull && cd -"
-alias bigr_utils_update_prod_git"cd /mnt/beegfs/pipelines/snakemake-wrappers/ && git pull && cd -"
+alias bigr_utils_update_prod_git="cd /mnt/beegfs/pipelines/snakemake-wrappers/ && git pull && cd -"
 
 # Goto functions
 alias bigr_cd_scratch_bioinfo="cd /mnt/beegfs/scratch/bioinfo_core/"
