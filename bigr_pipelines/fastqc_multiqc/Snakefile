@@ -31,7 +31,10 @@ logging.basicConfig(
 default_config = read_yaml(worflow_source_dir / "config.yaml")
 config_path = get_config(default_config)
 design = get_design(os.getcwd(), search_fastq_files)
-design.columns = ["Sample_id", "Upstream_file"]
+try:
+    design.columns = ["Sample_id", "Upstream_file"]
+except ValueError:
+    pass
 
 fastq_links = link_fq(
     design.Sample_id,
