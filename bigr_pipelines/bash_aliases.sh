@@ -62,4 +62,4 @@ alias bigr_cd_userdata="cd /mnt/beegfs/userdata/${USER}/"
 
 # Today: Fun with flags
 alias bigr_utils_meteo="curl https://fr.wttr.in/Villejuif"
-alias bigr_utils_best_employee="echo This user is the bast, by far: ${USER}"
+alias bigr_utils_best_employee="echo This user is the best, by far: ${USER}"
