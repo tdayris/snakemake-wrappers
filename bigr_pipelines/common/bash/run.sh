@@ -15,16 +15,17 @@ declare -x WRAPPERS_PATH=$(readlink -e "${PIPELINE_PATH}/../../")
 export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH WRAPPERS_PATH
 
 if [ -f "${PIPELINE_PATH}/Snakefile" ]; then
-    SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
+  SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
 else
-    message ERROR "Could not find Snakefile in: ${PIPELINE_PATH}"
-    exit 1
+  message ERROR "Could not find Snakefile in: ${PIPELINE_PATH}"
+  exit 1
 fi
 
+CONFIG_PATH="${PIPELINE_PATH}/config/config.yaml"
 if [ -f "${PIPELINE_PATH}/config/config.hg38.yaml" ]; then
-    CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"
+  CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"
 elif [ -f "${PIPELINE_PATH}/config.hg38.yaml" ]; then
-    CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
+  CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
 fi
 
 SNAKE_ARGS=("--wrapper-prefix" "${WRAPPERS_PATH}/")
@@ -55,7 +56,7 @@ message INFO "Environment loaded"
 
 if [ ! -f "config.yaml" ]; then
   if [ ! -f "${CONFIG_PATH}" ]; then
-    message ERROR "Config file does not exist at ${CONFIG_PATH}. The ${1} pipeline may not be available for this genome."
+    message ERROR "Config file does not exist at `${CONFIG_PATH}`. The ${1} pipeline may not be available for this genome."
   fi
   COMMAND="rsync --verbose ${CONFIG_PATH} config.yaml"
   message CMD "${COMMAND}"
