@@ -81,7 +81,9 @@ rule enricher_TERMS:
         readable_rds=temp(
             "027.enrich/{database}.ENSEMBLPROT/{comparison}/enrich.{database}.ENSEMBLPROT.RDS"
         ),
-        readable_tsv=protected("data_output/GSEA/{comparison}/{database}.ENSEMBLPROT/enrichment.tsv"),
+        readable_tsv=protected(
+            "data_output/GSEA/{comparison}/{database}.ENSEMBLPROT/enrichment.tsv"
+        ),
     threads: 1
     resources:
         mem_mb=get_3gb_per_attempt,

@@ -372,7 +372,11 @@ rule deseq2_results:
             "009.multiqc/{comparison}/pvalue_qc_mqc.png",
         ],
         clustermap_sample="009.figures/{comparison}/clustermap/ClusteredHeatmap.samples.{comparison}.png",
-        pca_plot=expand("009.figures/{comparison}/pca/pca_{factor}_ax_1_ax_2_with_elipse.png", factor=factor_list, allow_missing=True),
+        pca_plot=expand(
+            "009.figures/{comparison}/pca/pca_{factor}_ax_1_ax_2_with_elipse.png",
+            factor=factor_list,
+            allow_missing=True,
+        ),
         volcanoplot="009.figures/{comparison}/volcano/Volcano.{comparison}.png",
         distro_expr="009.figures/{comparison}/log_counts/log_dst.{comparison}.png",
         ma_plot="009.figures/{comparison}/maplot/maplot.{comparison}.png",
@@ -382,7 +386,7 @@ rule deseq2_results:
         inde_theta_filter="009.figures/{comparison}/deseq2/theta.{comparison}.png",
         # deseq_rbt="data_output/DESeq2/{comparison}/Complete_html_table.tar.bz2",
     output:
-        "data_output/DEseq2/{comparison}/MultiQC.DEseq2.html"
+        "data_output/DEseq2/{comparison}/MultiQC.DEseq2.html",
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
@@ -448,7 +452,11 @@ rule clusterprofiler_results:
             "009.multiqc/{comparison}/pvalue_qc_mqc.png",
         ],
         clustermap_sample="009.figures/{comparison}/clustermap/ClusteredHeatmap.samples.{comparison}.png",
-        pca_plot=expand("009.figures/{comparison}/pca/pca_{factor}_ax_1_ax_2_with_elipse.png", factor=factor_list, allow_missing=True),
+        pca_plot=expand(
+            "009.figures/{comparison}/pca/pca_{factor}_ax_1_ax_2_with_elipse.png",
+            factor=factor_list,
+            allow_missing=True,
+        ),
         volcanoplot="009.figures/{comparison}/volcano/Volcano.{comparison}.png",
         distro_expr="009.figures/{comparison}/log_counts/log_dst.{comparison}.png",
         ma_plot="009.figures/{comparison}/maplot/maplot.{comparison}.png",
@@ -456,9 +464,7 @@ rule clusterprofiler_results:
         independent_filter="009.figures/{comparison}/deseq2/independent_filter.{comparison}.png",
         pvalue_qc="009.figures/{comparison}/deseq2/pval.{comparison}.png",
         inde_theta_filter="009.figures/{comparison}/deseq2/theta.{comparison}.png",
-        clusterprofiler_tsv=tsv_list(
-            db_key=db_key_dict, comparisons=output_prefixes
-        ),
+        clusterprofiler_tsv=tsv_list(db_key=db_key_dict, comparisons=output_prefixes),
         clusterprofiler_png=plot_list(
             plots=cprof_plots,
             methods=gse_method_list,
@@ -466,7 +472,7 @@ rule clusterprofiler_results:
             db_key=db_key_dict,
         ),
     output:
-        "data_output/GSEA/{comparison}/MultiQC.GSEA.html"
+        "data_output/GSEA/{comparison}/MultiQC.GSEA.html",
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
