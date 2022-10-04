@@ -16,7 +16,7 @@ def read_enrich(path: str) -> pandas.DataFrame:
     comparison = os.sep.split(path)[-2]
     logging.info(f"Reading {path} in memory (cluster = {comparison}")
     tmp = pandas.read_csv(path, sep=" ", header=0, index_col=None)
-    tmp["Comparison"] = [comparison for _ in tmp["p.adjusted"]]
+    tmp["Comparison"] = [comparison for _ in tmp["p.adjust"]]
     return tmp
 
 
@@ -31,7 +31,7 @@ df = pandas.concat(
     read_enrich(path=p) 
     for p in snakemake.input["tsv"]
 )
-df.sort_values(by="p.adjusted", inplace=True)
+df.sort_values(by="p.adjust", inplace=True)
 
 seaborn.relplot(data=df, y="ID", x="p.adjust", hue="Comparison", size="Count")
 matplotlib.pyplot.savefig(
