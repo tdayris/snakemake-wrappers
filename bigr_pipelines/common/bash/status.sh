@@ -33,6 +33,11 @@ if [ -f "ON_GOING" ] ; then
     # exit 0
 fi
 
+if [[ $(grep -iP "(Wildcard|Workflow|Syntax)Error" *.log --quiet) -eq 0 ]]; then
+    echo "ERROR"
+    # exit 1
+fi
+
 echo "UNKNOWN"
 # exit 2
 
