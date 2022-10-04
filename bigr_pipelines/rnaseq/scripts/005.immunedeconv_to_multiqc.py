@@ -26,7 +26,7 @@ def read_immunedeconv(path: str) -> pandas.DataFrame:
     )
 
     # Drop lines full of zeros
-    tmp = tmp.loc[~(tmp==0).all(axis=1)]
+    tmp = tmp.loc[~(tmp == 0).all(axis=1)]
     logging.debug(tmp.head())
     return tmp
 
@@ -40,23 +40,22 @@ def load_config(path: str) -> Dict[str, Any]:
         return yaml_data
 
 
-
 def get_permissions(tool_name: str) -> str:
     """
-    From the name of a tool handled by ImmuneDeconv, 
+    From the name of a tool handled by ImmuneDeconv,
     return comparison permissions
     """
     logging.info(f"Building permission text for {tool_name}:")
     text = ""
     between_samples = [
-        "mcp_counter", 
-        "xcell", 
-        "timer", 
-        "consensus_tme", 
-        "estimate", 
-        "absis", 
-        "mmcp_counter", 
-        "base"
+        "mcp_counter",
+        "xcell",
+        "timer",
+        "consensus_tme",
+        "estimate",
+        "absis",
+        "mmcp_counter",
+        "base",
     ]
 
     between_cell_types = ["cibersort", "dcq"]
@@ -90,30 +89,28 @@ def get_ylab(tool_name: str) -> str:
     return "fraction"
 
 
-def get_description(tool_name: str, 
-                    tumor: Optional[str] = None) -> str:
+def get_description(tool_name: str, tumor: Optional[str] = None) -> str:
     """
-    Return a description for a given tool, 
+    Return a description for a given tool,
     on an optional given tumor type
     """
     logging.info(f"Description for {tool_name} ({tumor}):")
     text = f"This deconvolution has been made by {tool_name}. "
     if tumor:
         text += (
-            "It was performed against a known "
-            f"dataset composed of TCGA's {tumor}. "
+            "It was performed against a known " f"dataset composed of TCGA's {tumor}. "
         )
-    
+
     text += get_permissions(tool_name)
     logging.debug(text)
     return text
-    
 
-def build_config(tool_name: str, 
-                 deconv_path: str, 
-                 tumor: Optional[str] = None) -> Dict[str, Any]:
+
+def build_config(
+    tool_name: str, deconv_path: str, tumor: Optional[str] = None
+) -> Dict[str, Any]:
     """
-    From a tool, path to its results and tumor name, 
+    From a tool, path to its results and tumor name,
     return a custom config section
     """
     logging.info("Building config")
@@ -128,18 +125,14 @@ def build_config(tool_name: str,
             "title": f"Call-type deconvolution with {tool_name}",
             "ylab": get_ylab(tool_name=tool_name),
         },
-        "data": data
+        "data": data,
     }
     logging.debug(config)
     return config
 
 
 # Main program
-logging.basicConfig(
-    filename=snakemake.log[0],
-    filemode="w",
-    level=logging.DEBUG
-)
+logging.basicConfig(filename=snakemake.log[0], filemode="w", level=logging.DEBUG)
 
 tumor_abbreviation = {
     "kich": "Kidney Chromophobe",
@@ -179,7 +172,7 @@ tumor_abbreviation = {
 prefix = snakemake.params.get("prefix", "data_output/")
 suffix = snakemake.params.get("suffix", ".tsv")
 multiqc_config = {
-    "title": "Immune cell type deconvolution", 
+    "title": "Immune cell type deconvolution",
     "custom_data": {},
     "show_analysis_paths": False,
     "show_analysis_time": False,
@@ -194,7 +187,7 @@ for deconv_result in snakemake.input:
     logging.debug(deconv_result)
 
     if deconv_result.startswith(prefix):
-        names = deconv_result[len(prefix):-len(suffix)]
+        names = deconv_result[len(prefix) : -len(suffix)]
 
     tool_name, tumor = names.split("/")
     logging.info(f"Tool name: {tool_name}")
@@ -204,18 +197,12 @@ for deconv_result in snakemake.input:
     logging.info(f"Tumor name: {tumor}")
 
     multiqc_config["custom_data"][f"{tool_name.lower()}_results"] = build_config(
-        tool_name=tool_name, 
-        deconv_path=deconv_result, 
-        tumor=tumor
+        tool_name=tool_name, deconv_path=deconv_result, tumor=tumor
     )
     logging.info("Config built:")
     logging.debug(multiqc_config)
 
 with open(snakemake.output["yaml"], "w") as yaml_outstream:
-    yaml.safe_dump(
-        data=multiqc_config, 
-        stream=yaml_outstream, 
-        default_flow_style=False
-    )
+    yaml.safe_dump(data=multiqc_config, stream=yaml_outstream, default_flow_style=False)
 
 logging.info("Process over")

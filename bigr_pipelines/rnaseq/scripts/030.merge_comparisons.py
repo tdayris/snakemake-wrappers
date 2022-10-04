@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding: utf-8
+# coding: utf-8
 
 import logging
 import os
@@ -20,22 +20,12 @@ def read_enrich(path: str) -> pandas.DataFrame:
     return tmp
 
 
-logging.basicConfig(
-    filename=snakemake.log[0],
-    filemode="w",
-    level=logging.DEBUG
-)
+logging.basicConfig(filename=snakemake.log[0], filemode="w", level=logging.DEBUG)
 seaborn.set_theme()
 
-df = pandas.concat(
-    read_enrich(path=p) 
-    for p in snakemake.input["tsv"]
-)
+df = pandas.concat(read_enrich(path=p) for p in snakemake.input["tsv"])
 df.sort_values(by="p.adjust", inplace=True)
 
 seaborn.relplot(data=df, y="ID", x="p.adjust", hue="Comparison", size="Count")
-matplotlib.pyplot.savefig(
-    snakemake.output["relplot"],
-    bbox_inches="tight"
-)
+matplotlib.pyplot.savefig(snakemake.output["relplot"], bbox_inches="tight")
 matplotlib.pyplot.close()

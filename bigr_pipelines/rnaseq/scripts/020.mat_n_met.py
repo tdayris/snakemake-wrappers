@@ -5,13 +5,15 @@
 
 from typing import Optional
 
+
 def is_default(params: Optional[str] = None) -> bool:
     if params is None:
         return True
     elif params.lower() in ["none", "null", "None", "NULL", ""]:
         return True
-    
+
     return False
+
 
 def parameters_explained(params: Optional[str] = None) -> str:
     if is_default(params) is True:
@@ -19,13 +21,16 @@ def parameters_explained(params: Optional[str] = None) -> str:
     return "the following default parameters: `{params}`"
 
 
-def fastp_parameters(adapters: Optional[str] = None, extra: Optional[str] = None) -> str:
+def fastp_parameters(
+    adapters: Optional[str] = None, extra: Optional[str] = None
+) -> str:
     result = ""
     if not is_default(adapters):
         result = "custom adapter list, and using "
     result += parameters_explained(extra)
 
     return result
+
 
 config = snakemake.params["all_parameters"]
 text = f"""
