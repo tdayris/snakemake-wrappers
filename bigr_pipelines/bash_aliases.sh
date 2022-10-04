@@ -11,9 +11,9 @@ function bigr_conda_activate () {
 
 # Search a bigr project
 function bigr_search_project () {
-    ls -dlh "/mnt/beegfs/scratch/bioinfo_core/*${1}*" 
-    ls -dlh "/mnt/isilon/data_bioinfo/Projets/*${1}*" 
-    ls -dlh "/mnt/isilon/data_bioinfo/Projets/bioinfo_core/*${1}*"
+    ls -dlh /mnt/beegfs/scratch/bioinfo_core/*${1}*
+    ls -dlh /mnt/isilon/data_bioinfo/Projets/*${1}* 
+    ls -dlh /mnt/isilon/data_bioinfo/Projets/bioinfo_core/*${1}*
 }
 
 # Source this file to add new pipelines to your
