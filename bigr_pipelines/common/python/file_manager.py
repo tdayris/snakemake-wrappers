@@ -319,3 +319,14 @@ def design_config(
     Shortcut to build/load both design and config at once.
     """
     return [get_design(dirpath, search_func), get_config(default_config)]
+
+def search_h5_files(dirpath: FilePathType) -> Dict[str, str]:
+    """
+    Within a given directory, search all h5 files. If a path leads to a
+    directory, the subfunction is called recursively.
+    """
+    suffixes = ("h5")
+    return {
+        remove_suffixes(basename(h5), suffixes): {"Upstream_file": h5}
+        for h5 in search_files(dirpath, ext=suffixes)
+    }
