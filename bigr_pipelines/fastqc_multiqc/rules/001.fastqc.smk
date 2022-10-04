@@ -15,8 +15,8 @@ rule fastqc:
         zip=temp("fastqc/{sample}_fastqc.zip")
     threads: 1
     resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 1024, 4096),
-        time_min=lambda wildcard, attempt: attempt * 50,
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp"
     params:
         ""

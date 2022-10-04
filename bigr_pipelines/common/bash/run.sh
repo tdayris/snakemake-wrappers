@@ -47,7 +47,7 @@ while [ "$#" -gt 0 ]; do
     qc|QC) STEPS+=("qc"); message INFO "Quality Controls is in the expected result list"; shift;;
     immu|deconv) STEPS+=("immunedeconv"); message INFO "Immune Deconvolution is in the expected result list"; shift;;
     gsea|clusterprofiler) STEPS+=("gsea"); message INFO "GSEA is in the expected result list"; shift;;
-    rnaseq) shift;;
+    rnaseq|fastqc_multiqc) shift;;
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac
 done

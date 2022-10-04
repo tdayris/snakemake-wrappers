@@ -12,8 +12,8 @@ rule bigr_copy:
         temp("reads/{sample}.fq.gz")
     threads: 1
     resources:
-        mem_mb=lambda wildcard, attempt: min(attempt * 1024, 2048),
-        time_min=lambda wildcard, attempt: attempt * 45,
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_45min_per_attempt,
         tmpdir="tmp"
     params:
         input=lambda wildcards, output: fastq_links[output[0]]
