@@ -119,7 +119,7 @@ comparison_levels = list(
     )
 )
 
-factor_list = (map(str, [i[0] for i in comparison_levels]),)
+factor_list = list(map(str, [i[0] for i in comparison_levels]))
 
 # An iterator that holds all samples involved in the comparisons
 # listed above
