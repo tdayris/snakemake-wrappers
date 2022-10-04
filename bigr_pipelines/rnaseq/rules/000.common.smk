@@ -130,7 +130,7 @@ samples_iterator = yield_samples(
 # A list containing all expected PCA at the end of DESeq2.
 # This is done in order to avoid checkpoints
 expected_pcas = [
-    f"figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca/pca_{factor}_{axes}_{elipse}.png"
+    f"009.figures/DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}/pca/pca_{factor}_{axes}_{elipse}.png"
     for (factor, test, ref) in comparison_levels
     for axes in ["ax_1_ax_2", "ax_2_ax_3"]  # , "ax_3_ax_4"]
     for elipse in ["with_elipse", "without_elipse"]
