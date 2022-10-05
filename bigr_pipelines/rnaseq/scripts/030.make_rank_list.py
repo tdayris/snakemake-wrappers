@@ -68,7 +68,7 @@ def merge_tables(
 
 
 merged = merge_tables(
-    paths=snakemake.input["deseq"],
+    paths=snakemake.input["tsv"],
     on=snakemake.params.get("rank_on", "padj"),
     padj_threshold=snakemake.params.get("padj_threshold", 0.05),
     fc_threshold=snakemake.params.get("fc_threshold", 0.7),
