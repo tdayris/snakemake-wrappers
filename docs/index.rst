@@ -124,8 +124,25 @@ with ``make clean``.
    :maxdepth: 4
    :glob:
    :hidden:
-   :caption: Wrappers, Meta-Wrappers and Pipelines
+   :caption: Wrappers, Meta-Wrappers
 
    wrappers
    meta-wrappers
+
+
+.. toctree::
+   :maxdepth: 4
+   :glob:
+   :hidden:
+   :caption: Pipelines
+
    pipelines
+
+
+.. toctree::
+   :maxdepth: 4
+   :glob:
+   :hidden:
+   :caption: Development
+
+   contributing

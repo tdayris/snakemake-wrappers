@@ -1,5 +1,13 @@
 .. _contributing:
 
+Contributing to Unofficial BiGR Snakemake wrappers
+==================================================
+
+Follow the contribution steps from official guideline, don't forget to:
+
+#. Switch to Unofficial branch: `git checkout Unofficial`
+#. Create a new branch for your work: `git checkout -B my_new_branch_name`
+
 Contributing
 ============
 
