@@ -241,7 +241,64 @@ instead.
 
 So, we need to acquire the list of samples, either from user input, of though disc search.
 
-Unofficial provides the functions for that. Here, we search for pairs fastq files.
+Unofficial provides the functions for that. Here, we search for pairs fastq files. The snakemake-unofficial API lists a 
+function named ``search_fastq_pairs`` in the ``file_manager`` module. This function returns a dictionary formatted 
+as follows::
+
+    {Sample1: {Upstream_file: /path/to/R1.fq.gz, Downstream_file: /path/to/R2.fq.gz}, Sample2 ...}
+
+
+This can be passed to the function ``get_design`` in the module ``file_manager`` to produce a design file.
+
+As easy as is sound, we just need to import a single module, use two function and *BAM*! A design file and a
+list of available pairs of fastq file per sample is available !
+
+So, in `000.commons.smk`, let's write the following:
+
+
+
+    # Manage paths easily in Python
+    from pathlib import Path
+
+    # Get workflow path (the one you're working on!)
+    workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
+
+    # Get path to shared libraries in Unofficial Snakemake wrappers
+    common = str(workflow_source_dir / ".." / "common" / "python")
+
+    # Add this to the list of available libraries in Python
+    import sys
+    sys.path.append(common)
+
+    # Finally ! Add the module file_manager
+    from file_manager import *
+
+
+The search of all fastq files and the build of the design file is made by the following::
+
+    import os # To deal with operating system in Python
+    design = get_design(
+        dirpath=os.getcwd(),           # Where to search for fastq files
+        search_func=search_fastq_pairs # What function to use in order to search for fastq files
+    )
+
+
+This saves on disk the result, if and only if another design *does not* exist. No file will be deleted.
+
+The list of available sample files is available with::
+
+    print(design.Sample_id)
+
+
+We want to constrain our wildcards, this is easily done with the following command::
+
+    wildcard_constraints:
+        sample=r"|".join(design.Sample_id),
+        stream=r"1|2",
+
+
+Tadaaaam ! Our pipeline now finds fastq files by itself. By the way, if your sample name ends
+with a number, Snakemake won't confuse it with sequencing strands.
 
 
 Resources reservation made easier

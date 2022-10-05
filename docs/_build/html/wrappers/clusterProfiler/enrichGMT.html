@@ -628,6 +628,9 @@ hg38_genelist wrapper</p>
 <span class="c1"># Loading input datasets</span>
 <span class="n">geneList</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">readRDS</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;rds&quot;</span><span class="p">]])</span>
 
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Head of gene list:&quot;</span><span class="p">)</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">geneList</span><span class="p">))</span>
+
 <span class="c1"># Annotation</span>
 <span class="n">term2gene</span> <span class="o">&lt;-</span> <span class="kc">NULL</span>
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;gmt&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">))</span> <span class="p">{</span>
@@ -646,6 +649,9 @@ hg38_genelist wrapper</p>
   <span class="p">)</span>
 <span class="p">}</span>
 
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Head of term to gene&quot;</span><span class="p">)</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">term2gene</span><span class="p">))</span>
+
 <span class="c1"># Annotation names</span>
 <span class="n">term2name</span> <span class="o">&lt;-</span> <span class="kc">NULL</span>
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;term_name&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">))</span> <span class="p">{</span>
@@ -657,6 +663,9 @@ hg38_genelist wrapper</p>
     <span class="n">header</span> <span class="o">=</span> <span class="kc">TRUE</span>
   <span class="p">)</span>
 <span class="p">}</span>
+
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Head of term to name&quot;</span><span class="p">)</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">term2name</span><span class="p">))</span>
 
 <span class="c1"># Gene annotations</span>
 <span class="n">org</span> <span class="o">&lt;-</span> <span class="s">&quot;org.Hs.eg.db&quot;</span>
@@ -683,6 +692,9 @@ hg38_genelist wrapper</p>
   <span class="p">)</span>
 <span class="p">}</span>
 
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Head of universe&quot;</span><span class="p">)</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">universe</span><span class="p">))</span>
+
 <span class="nf">if </span><span class="p">(</span><span class="s">&quot;extra&quot;</span> <span class="o">%in%</span> <span class="n">base</span><span class="o">::</span><span class="nf">names</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">))</span> <span class="p">{</span>
   <span class="n">extra</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste</span><span class="p">(</span>
     <span class="n">extra</span><span class="p">,</span>
@@ -690,6 +702,8 @@ hg38_genelist wrapper</p>
     <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;, &quot;</span>
   <span class="p">)</span>
 <span class="p">}</span>
+
+
 
 <span class="n">command</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span>
   <span class="s">&quot;clusterProfiler::enricher(&quot;</span><span class="p">,</span>
