@@ -203,7 +203,7 @@ possible combinations of strings between “{}”. If I write:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;My example is very awesome&quot;</span><span class="p">,</span>
  <span class="s2">&quot;My example is truly awesome&quot;</span><span class="p">,</span>
  <span class="s2">&quot;My example is very cool&quot;</span><span class="p">,</span>
- <span class="s2">&quot;My example is very cool&quot;</span><span class="p">]</span>
+ <span class="s2">&quot;My example is truly cool&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Got it ? Good.</p>
@@ -299,7 +299,50 @@ and it contains only pure python functions and intructions.</p>
 <p>Remember, <code class="docutils literal notranslate"><span class="pre">&quot;{samlple}&quot;</span></code> is solved as <code class="docutils literal notranslate"><span class="pre">&quot;.+&quot;</span></code> (any character, at least once). We would like to have the list of samples
 instead.</p>
 <p>So, we need to acquire the list of samples, either from user input, of though disc search.</p>
-<p>Unofficial provides the functions for that. Here, we search for pairs fastq files.</p>
+<p>Unofficial provides the functions for that. Here, we search for pairs fastq files. The snakemake-unofficial API lists a
+function named <code class="docutils literal notranslate"><span class="pre">search_fastq_pairs</span></code> in the <code class="docutils literal notranslate"><span class="pre">file_manager</span></code> module. This function returns a dictionary formatted
+as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="n">Sample1</span><span class="p">:</span> <span class="p">{</span><span class="n">Upstream_file</span><span class="p">:</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">R1</span><span class="o">.</span><span class="n">fq</span><span class="o">.</span><span class="n">gz</span><span class="p">,</span> <span class="n">Downstream_file</span><span class="p">:</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">R2</span><span class="o">.</span><span class="n">fq</span><span class="o">.</span><span class="n">gz</span><span class="p">},</span> <span class="n">Sample2</span> <span class="o">...</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>This can be passed to the function <code class="docutils literal notranslate"><span class="pre">get_design</span></code> in the module <code class="docutils literal notranslate"><span class="pre">file_manager</span></code> to produce a design file.</p>
+<p>As easy as is sound, we just need to import a single module, use two function and <em>BAM</em>! A design file and a
+list of available pairs of fastq file per sample is available !</p>
+<p>So, in <cite>000.commons.smk</cite>, let’s write the following:</p>
+<blockquote>
+<div><p># Manage paths easily in Python
+from pathlib import Path</p>
+<p># Get workflow path (the one you’re working on!)
+workflow_source_dir = Path(snakemake.workflow.srcdir(“..”))</p>
+<p># Get path to shared libraries in Unofficial Snakemake wrappers
+common = str(workflow_source_dir / “..” / “common” / “python”)</p>
+<p># Add this to the list of available libraries in Python
+import sys
+sys.path.append(common)</p>
+<p># Finally ! Add the module file_manager
+from file_manager import *</p>
+</div></blockquote>
+<p>The search of all fastq files and the build of the design file is made by the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span> <span class="c1"># To deal with operating system in Python</span>
+<span class="n">design</span> <span class="o">=</span> <span class="n">get_design</span><span class="p">(</span>
+    <span class="n">dirpath</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>           <span class="c1"># Where to search for fastq files</span>
+    <span class="n">search_func</span><span class="o">=</span><span class="n">search_fastq_pairs</span> <span class="c1"># What function to use in order to search for fastq files</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>This saves on disk the result, if and only if another design <em>does not</em> exist. No file will be deleted.</p>
+<p>The list of available sample files is available with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We want to constrain our wildcards, this is easily done with the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wildcard_constraints</span><span class="p">:</span>
+    <span class="n">sample</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">design</span><span class="o">.</span><span class="n">Sample_id</span><span class="p">),</span>
+    <span class="n">stream</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;1|2&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>Tadaaaam ! Our pipeline now finds fastq files by itself. By the way, if your sample name ends
+with a number, Snakemake won’t confuse it with sequencing strands.</p>
 </section>
 <section id="resources-reservation-made-easier">
 <h3>Resources reservation made easier<a class="headerlink" href="#resources-reservation-made-easier" title="Permalink to this headline"></a></h3>

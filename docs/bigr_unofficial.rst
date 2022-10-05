@@ -115,7 +115,7 @@ Then it will result in::
     ["My example is very awesome", 
      "My example is truly awesome", 
      "My example is very cool", 
-     "My example is very cool"]
+     "My example is truly cool"]
 
 Got it ? Good.
 
