@@ -1,4 +1,8 @@
+.. rnaseq_bulk:
+
 # RNA-Seq bulk
+
+## Summary
 
 This pipeline aims to perform classical RNASeq-bulk analyzes:
 
@@ -20,23 +24,23 @@ This pipeline aims to perform classical RNASeq-bulk analyzes:
 
 Each subsection can be selected one by one, or the whole pipeline may be executed.
 
-# TLDR: run this pipeline
+## TLDR: run this pipeline
 
 ```{sh}
-# Go to your project directory
+## Go to your project directory
 cd /path/to/my/project/tmp
 
-# Setup IO repositories
+## Setup IO repositories
 ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 
-# Put design file in ${PWD}
+## Put design file in ${PWD}
 
-# Run this pipeline
+## Run this pipeline
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
 ```
 
-# Design file
+## Design file
 
 The design file contains a description of your samples and experimental design. It should look like:
 
@@ -66,7 +70,7 @@ Each column will be considered as a factor. Each value in each cell will be cons
 1. A factor with less than two levels will be ignored.
 
 
-# Config.yaml
+## Config.yaml
 
 This file describes all optional parameters set in the pipeline. 
 
@@ -82,48 +86,48 @@ Do not change command line parameters if you do not know what you are doing. Do 
 Changing anything else shall be done at your own risks.
 
 
-# Classical use
+## Classical use
 
 ```{sh}
-# Go to your project directory
+## Go to your project directory
 cd /path/to/my/project/tmp
 
-# Setup IO repositories
+## Setup IO repositories
 ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 
-# Put design file in ${PWD}
+## Put design file in ${PWD}
 
-# Run basic quality controls, keep intermediary files
+## Run basic quality controls, keep intermediary files
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh QC --nt
 
-# Choose wether to continue the analysis or not.
+## Choose wether to continue the analysis or not.
 
-# Edit config file
-# 1. with your genes of interest
-# 1. subset list of DGE
-# 1. aggregate factors, etc.
+## Edit config file
+## 1. with your genes of interest
+## 1. subset list of DGE
+## 1. aggregate factors, etc.
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh quant --nt
 
-# Have a look at mapping rates and basic quantification QC
+## Have a look at mapping rates and basic quantification QC
 
-# Run Differential Gene Expression
+## Run Differential Gene Expression
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh dge --nt
 
-# Have a look at the DGE results
+## Have a look at the DGE results
 
-# Run fusions
+## Run fusions
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh fusions --nt
 
-# Have a look at the results
+## Have a look at the results
 
-# Clean TEMPORARY files and temporary files only
+## Clean TEMPORARY files and temporary files only
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh --delete-temp-output
 ```
 
-# Quality controls
+## Quality controls
 
-## Pipeline
+### Pipeline
 
 1. iRODS copy 
 1. Fastp
@@ -133,27 +137,27 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh --del
 Use iRODS command to get your fastq files, then clean them with Fastp. Assess organism quality with FastqScreen, then aggregate quality reports with MultiQC.
 
 
-## Command line
+### Command line
 
 Command line argument order does not matter.
 
 ```{sh}
-# Go to your project directory
+## Go to your project directory
 cd /path/to/my/project/tmp
 
-# Setup IO repositories
+## Setup IO repositories
 ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 
-# Put design file in ${PWD}
+## Put design file in ${PWD}
 
-# GRCh38 / HG38
+## GRCh38 / HG38
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh QC --nt
-# GRCm38 / MM10
+## GRCm38 / MM10
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 QC --nt
 ```
 
-## Results
+### Results
 
 The only output is a MultiQC report. By default, all other output are deleted, use `--nt` to keep cleaned fastq files.
 
@@ -170,9 +174,9 @@ data_output/
     └── MultiQC.QC.html
 ```
 
-# Quantification
+## Quantification
 
-## Pipeline
+### Pipeline
 
 1. iRODS copy 
 1. Fastp
@@ -184,27 +188,27 @@ data_output/
 Use iRODS command to get your fastq files, then clean them with Fastp. Assess organism quality with FastqScreen. Salmon estimates transcripts abundance, then aggregate quality reports with MultiQC. Salmon results are annotated with a basic GTF.
 
 
-## Command line
+### Command line
 
 Command line argument order does not matter.
 
 ```{sh}
-# Go to your project directory
+## Go to your project directory
 cd /path/to/my/project/tmp
 
-# Setup IO repositories
+## Setup IO repositories
 ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 
-# Put design file in ${PWD}
+## Put design file in ${PWD}
 
-# GRCh38 / HG38
+## GRCh38 / HG38
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh quant --nt
-# GRCm38 / MM10
+## GRCm38 / MM10
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 quant --nt
 ```
 
-## Output
+### Output
 
 The repository `multiqc` contains two multiqc reports: basic quality controls and salmon. MultiQC.Salmon.html contains all information present in MultiQC.QC.html, and adds the results of Salmon.
 
@@ -242,9 +246,9 @@ data_output/
 
 
 
-# Differential Gene Expression
+## Differential Gene Expression
 
-## Pipeline
+### Pipeline
 
 1. iRODS copy 
 1. Fastp
@@ -255,25 +259,25 @@ data_output/
 1. In-house scripts
 1. MultiQC
 
-## Command line
+### Command line
 
 ```{sh}
-# Go to your project directory
+## Go to your project directory
 cd /path/to/my/project/tmp
 
-# Setup IO repositories
+## Setup IO repositories
 ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 
-# Put design file in ${PWD}
+## Put design file in ${PWD}
 
-# GRCh38 / HG38
+## GRCh38 / HG38
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh dge --nt
-# GRCm38 / MM10
+## GRCm38 / MM10
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 dge --nt
 ```
 
-## Results
+### Results
 
 The repository `multiqc` contains two multiqc reports: basic quality controls and salmon. MultiQC.Salmon.html contains all information present in MultiQC.QC.html, and adds the results of Salmon.
 
@@ -335,9 +339,9 @@ data_output/
 ```
 
 
-# Aggregate factors
+## Aggregate factors
 
-## Problem
+### Problem
 
 Consider the following design:
 
@@ -365,7 +369,7 @@ DEseq2/
 Let us imagine we are interested in the effect of the treatment itself, AND the effect of the treatment on sample under "relapse" in relation to sample on relapse but without treatment.
 
 
-## Solution 1
+### Solution 1
 
 The first easy solution is to create an additional column, called as you wish (lets say Treatment_On_Relapse) and concatenate the two columns values. As a result, the design would be:
 
@@ -400,7 +404,7 @@ DEseq2/
 
 You do have the levels you are interested in.
 
-## Solution 2
+### Solution 2
 
 Within the `config.yaml` file, modify the value of 
 
@@ -422,9 +426,9 @@ deseq2:
 
 It will have the very same consequences as described in [solution 1](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#solution-1) above. Please, note that the new factor will be named `Treatment_Status`. You cannot rename factors with this solution.
 
-# Ignore factors
+## Ignore factors
 
-## Problem
+### Problem
 
 Sometimes, factors are not interesting anymore (not relevant in PCA, loss of interest by project research investigator, ...). We want this pipeline to ignore this factor. Consider the following `design.tsv`:
 
@@ -443,11 +447,11 @@ Sometimes, factors are not interesting anymore (not relevant in PCA, loss of int
 
 Let's pretend we want to ignore the sample status Diseased/Relapse.
 
-## Solution 1
+### Solution 1
 
 Remove this column from your design. Then the pipeline won't be aware of it and will not consider this factor anymore.
 
-## Solution 2
+### Solution 2
 
 Within the `config.yaml` file, modify the value of 
 
@@ -469,10 +473,10 @@ deseq2:
 It will have the very same consequences as described in [solution 1](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#solution-1-1) above.
 
 
-# Perform only a subset of DGE
+## Perform only a subset of DGE
 
 
-## Problem
+### Problem
 
 Sometimes, we are not interested in all possible comparisons. For instance, the should be only one reference through all the comparisons. Let us consider the following `design.tsv`:
 
@@ -489,7 +493,7 @@ Sometimes, we are not interested in all possible comparisons. For instance, the 
 
 We want "Untreated" level within "Treatment" factor to always be a reference level. We also want "Untreated_Relapse" to be our reference while comparing Treatment/Status interactions.
 
-## Solution
+### Solution
 
 Within the `config.yaml` file, modify the value of 
 
@@ -521,12 +525,12 @@ DEseq2/
     └── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Diseased_vs_reference_Untreated_Relapse
 ```
 
-# Gene set enrichment analysis
+## Gene set enrichment analysis
 
-## Pipeline
+### Pipeline
 
 
-## Pipeline
+### Pipeline
 
 1. iRODS copy 
 1. Fastp
@@ -539,25 +543,25 @@ DEseq2/
 1. In-house scripts
 1. MultiQC
 
-## Command line
+### Command line
 
 ```{sh}
-# Go to your project directory
+## Go to your project directory
 cd /path/to/my/project/tmp
 
-# Setup IO repositories
+## Setup IO repositories
 ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 
-# Put design file in ${PWD}
+## Put design file in ${PWD}
 
-# GRCh38 / HG38
+## GRCh38 / HG38
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh gsea --nt
-# GRCm38 / MM10
+## GRCm38 / MM10
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 gsea --nt
 ```
 
-## Results
+### Results
 
 The repository `multiqc` contains two multiqc reports: basic quality controls and salmon. MultiQC.Salmon.html contains all information present in MultiQC.QC.html, and adds the results of Salmon.
 
@@ -619,9 +623,9 @@ data_output/
 ```
 
 
-# Fusions
+## Fusions
 
-## Pipeline
+### Pipeline
 
 1. iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)
 1. Fastp (trimm fastq reads)
@@ -630,21 +634,21 @@ data_output/
 1. FusionInspector
 1. MultiQC
 
-## Command line
+### Command line
 
 ```{sh}
-# Go to your project directory
+## Go to your project directory
 cd /path/to/my/project/tmp
 
-# Setup IO repositories
+## Setup IO repositories
 ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
-# Run basic quality controls, keep intermediary files, search, check and annotate fusions
+## Run basic quality controls, keep intermediary files, search, check and annotate fusions
 bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh fusions --nt
 ```
 
-# Variant Calling
+## Variant Calling
 
 Under construction
