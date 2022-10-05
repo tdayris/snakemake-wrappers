@@ -22,6 +22,7 @@ base::library(package = "org.Mm.eg.db", quietly = TRUE)
 
 # Loading input datasets
 geneList <- base::readRDS(file = snakemake@input[["rds"]])
+base::message(head(geneList))
 
 # Annotation
 term2gene <- NULL
@@ -40,6 +41,7 @@ if ("term_gene" %in% base::names(snakemake@input)) {
     header = TRUE
   )
 }
+base::message(head(term2gene))
 
 # Annotation names
 term2name <- NULL
@@ -52,6 +54,7 @@ if ("term_name" %in% base::names(snakemake@input)) {
     header = TRUE
   )
 }
+base::message(head(term2name))
 
 # Gene annotations
 org <- "org.Hs.eg.db"
@@ -77,6 +80,7 @@ if ("universe" %in% base::names(snakemake@input)) {
     sep = ", "
   )
 }
+base::message(head(universe))
 
 if ("extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
@@ -85,6 +89,8 @@ if ("extra" %in% base::names(snakemake@params)) {
     sep = ", "
   )
 }
+
+
 
 command <- base::paste0(
   "clusterProfiler::enricher(",
