@@ -44,7 +44,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers and Pipelines</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../../wrappers.html">Wrappers</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../BiGR.html">BIGR</a></li>
@@ -62,6 +62,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../bcl2fastq.html">BCF2FASTQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bedtools.html">BEDTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../benchmark.html">BENCHMARK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bgzip.html">BGZIP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../biobambam2.html">BIOBAMBAM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bioinfokit.html">BIOINFOKIT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../biomaRt.html">BIOMART</a></li>
@@ -125,6 +126,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../delly.html">DELLY</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../deseq2.html">DESEQ2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../diamond.html">DIAMOND</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dragmap.html">DRAGMAP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../eacon.html">EACON</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../enhancedVolcano.html">ENHANCEDVOLCANO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ensembl.html">ENSEMBL</a></li>
@@ -162,6 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../lofreq.html">LOFREQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../macs2.html">MACS2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../maftools.html">MAFTOOLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../manta.html">MANTA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mapdamage2.html">MAPDAMAGE2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mashmap.html">MASHMAP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../md5sum.html">MD5SUM</a></li>
@@ -173,6 +176,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../msisensor.html">MSISENSOR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msisensor_pro.html">MSISENSOR_PRO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiqc.html">MULTIQC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../muscle.html">MUSCLE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../nanosim-h.html">NANOSIM-H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../nextflow.html">NEXTFLOW</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ngs-disambiguate.html">NGS-DISAMBIGUATE</a></li>
@@ -246,13 +250,27 @@
 <li class="toctree-l2"><a class="reference internal" href="../vcftools.html">VCFTOOLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../vembrane.html">VEMBRANE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../vep.html">VEP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifybamid.html">VERIFYBAMID</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../vg.html">VG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../wgsim.html">WGSIM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../wisecondorx.html">WISECONDORX</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../meta-wrappers.html">Meta-Wrappers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipelines</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../pipelines.html">BiGR Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme/readme_long.html">Long help</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bigr_unofficial.html">BiGR Unofficial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../apidocs/api.html">Unofficial API</a></li>
 </ul>
 
         </div>
@@ -584,17 +602,17 @@ DESeq2_to_geneList wrapper</p>
 
 <span class="c1"># Sink the stderr and stdout to the snakemake log file</span>
 <span class="c1"># https://stackoverflow.com/a/48173272</span>
-<span class="n">log.file</span><span class="o">&lt;-</span><span class="nf">file</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">log</span><span class="p">[[</span><span class="m">1</span><span class="p">]],</span><span class="n">open</span><span class="o">=</span><span class="s">&quot;wt&quot;</span><span class="p">);</span>
-<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">log.file</span><span class="p">);</span>
-<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">log.file</span><span class="p">,</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;message&quot;</span><span class="p">);</span>
+<span class="n">log.file</span> <span class="o">&lt;-</span> <span class="nf">file</span><span class="p">(</span><span class="n">snakemake</span><span class="o">@</span><span class="n">log</span><span class="p">[[</span><span class="m">1</span><span class="p">]],</span> <span class="n">open</span> <span class="o">=</span> <span class="s">&quot;wt&quot;</span><span class="p">)</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">log.file</span><span class="p">)</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">sink</span><span class="p">(</span><span class="n">log.file</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&quot;message&quot;</span><span class="p">)</span>
 
 
 <span class="n">readGeneList</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">genelist</span> <span class="o">&lt;-</span> <span class="n">utils</span><span class="o">::</span><span class="nf">read.table</span><span class="p">(</span>
-        <span class="n">file</span><span class="o">=</span><span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">path</span><span class="p">),</span>
-        <span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>
-        <span class="n">sep</span><span class="o">=</span><span class="s">&quot;\t&quot;</span>
-    <span class="p">);</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">path</span><span class="p">),</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span>
+        <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;\t&quot;</span>
+    <span class="p">)</span>
     <span class="nf">return</span><span class="p">(</span><span class="n">genelist</span><span class="p">)</span>
 <span class="p">}</span>
 
@@ -610,15 +628,17 @@ DESeq2_to_geneList wrapper</p>
 
 <span class="n">conditions</span> <span class="o">&lt;-</span> <span class="nf">sapply</span><span class="p">(</span>
     <span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;condition&quot;</span><span class="p">]]),</span>
-    <span class="nf">function</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+    <span class="nf">function</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">c</span><span class="p">)</span>
 <span class="p">);</span>
+
 
 <span class="n">geneLists</span> <span class="o">&lt;-</span> <span class="nf">readGeneLists</span><span class="p">(</span>
     <span class="n">paths</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">input</span><span class="p">[[</span><span class="s">&quot;gene_list&quot;</span><span class="p">]],</span>
     <span class="n">conditions</span><span class="o">=</span><span class="n">conditions</span>
 <span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="s">&quot;Libraries and datasets loaded&quot;</span><span class="p">);</span>
 
-<span class="n">formula</span> <span class="o">&lt;-</span> <span class="n">stats</span><span class="o">::</span><span class="nf">as.formula</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&quot;~Condition&quot;</span><span class="p">);</span>
+<span class="n">formula</span> <span class="o">&lt;-</span> <span class="n">stats</span><span class="o">::</span><span class="nf">as.formula</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">base</span><span class="o">::</span><span class="nf">paste0</span><span class="p">(</span><span class="s">&quot;~Condition&quot;</span><span class="p">);</span>
 <span class="n">paramfunction</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">as.character</span><span class="p">(</span>
     <span class="n">x</span><span class="o">=</span><span class="n">snakemake</span><span class="o">@</span><span class="n">params</span><span class="p">[[</span><span class="s">&quot;fun&quot;</span><span class="p">]]</span>
 <span class="p">);</span>
@@ -636,6 +656,14 @@ DESeq2_to_geneList wrapper</p>
     <span class="s">&quot;clusterProfiler::compareCluster(&quot;</span><span class="p">,</span>
     <span class="n">extra</span><span class="p">,</span>
     <span class="s">&quot;)&quot;</span>
+<span class="p">);</span>
+<span class="n">base</span><span class="o">::</span><span class="nf">message</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+
+<span class="c1"># Performing DisGeNET enrichment</span>
+<span class="n">edgn</span> <span class="o">&lt;-</span> <span class="n">base</span><span class="o">::</span><span class="nf">eval</span><span class="p">(</span>
+  <span class="n">base</span><span class="o">::</span><span class="nf">parse</span><span class="p">(</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">command</span>
+  <span class="p">)</span>
 <span class="p">);</span>
 </pre></div>
 </div>

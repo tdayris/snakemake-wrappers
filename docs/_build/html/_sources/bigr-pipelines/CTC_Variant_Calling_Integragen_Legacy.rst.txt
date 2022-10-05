@@ -51,6 +51,7 @@ The pipeline contains the following steps:
 
 .. code-block:: python
 
+    include: "rules/000.common.smk"
     include: "rules/001.picard.samtofq.smk"
     include: "rules/002.cutadapt.smk"
     include: "rules/003.bwa.mem.smk"
@@ -62,19 +63,18 @@ The pipeline contains the following steps:
     include: "rules/009.gatk.somatic.smk"
     include: "rules/010.bam_readcount.smk"
     include: "rules/011.bcr2vep.smk"
+    include: "rules/012.vep.smk"
+    include: "rules/013.bigr_copy.smk"
 
-    import pandas
-
-    configfile: config.yaml
-    design = pandas.read_csv(config["design"], sep="\t", header=0)
 
     rule target:
         input:
-            expand(
-                "gatk/mutect2/{sample}.vcf.gz",
-                sample=design["Sample_id"]
+            raw=expand("gatk/mutect2/{sample}.vcf.gz", sample=samples_list),
+            raw_indexes=expand("gatk/mutect2/{sample}.vcf.gz.tbi", sample=samples_list),
+            annotated=expand("data_output/Annotated/{sample}.vcf.gz", sample=samples_list),
+            annotated_indexes=expand(
+                "data_output/Annotated/{sample}.vcf.gz.tbi", sample=samples_list
             ),
-
 
 
 

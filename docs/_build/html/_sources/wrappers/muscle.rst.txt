@@ -1,0 +1,109 @@
+.. _`bio/muscle`:
+
+MUSCLE
+======
+
+build multiple sequence alignments using MUSCLE. Documentation found at https://www.drive5.com/muscle/manual/index.html
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule muscle_fasta:
+        input:
+            fasta="{sample}.fa",  # Input fasta file
+        output:
+            alignment="{sample}.afa",  # Output alignment file
+        log:
+            "logs/muscle/{sample}.log",
+        params:
+            extra="",  # Additional arguments
+        wrapper:
+            "v1.7.0-11-g0da21ba89/bio/muscle"
+
+
+    rule muscle_clw:
+        input:
+            fasta="{sample}.fa",
+        output:
+            alignment="{sample}.clw",
+        log:
+            "logs/muscle/{sample}.log",
+        params:
+            extra="-clw",
+        wrapper:
+            "v1.7.0-11-g0da21ba89/bio/muscle"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+Notes
+-----
+
+* MUSCLE is a single-core program. It cannot utilize more than 1 thread.
+
+
+Software dependencies
+---------------------
+
+* ``muscle==3.8.1551``
+
+Input/Output
+------------
+**Input:**
+
+* FASTA file
+
+**Output:**
+
+* Alignment file, with FASTA as default file format
+
+
+
+
+Authors
+-------
+
+* Nikos Tsardakas Renhuldt
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Nikos Tsardakas Renhuldt"
+    __copyright__ = "Copyright 2021, Nikos Tsardakas Renhuldt"
+    __email__ = "nikos.tsardakas_renhuldt@tbiokem.lth.se"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+    extra = snakemake.params.get("extra", "")
+
+    shell(
+        "muscle "
+        "{extra} "
+        "-in {snakemake.input.fasta} "
+        "-out {snakemake.output.alignment} "
+        "{log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

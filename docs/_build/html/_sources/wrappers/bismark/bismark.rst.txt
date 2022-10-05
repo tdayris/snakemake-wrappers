@@ -52,7 +52,7 @@ This wrapper can be used in the following way:
             extra=' --ambiguous --unmapped --nucleotide_coverage',
             basename='{sample}_{genome}'
         wrapper:
-            "0.50.4-1991-g7872381db/bio/bismark/bismark"
+            "0.79.0-2111-gcaef468e5/bio/bismark/bismark"
 
     # Example: Single-ended reads
     rule bismark_se:
@@ -74,7 +74,7 @@ This wrapper can be used in the following way:
             extra=' --ambiguous --unmapped --nucleotide_coverage',
             basename='{sample}_{genome}'
         wrapper:
-            "0.50.4-1991-g7872381db/bio/bismark/bismark"
+            "0.79.0-2111-gcaef468e5/bio/bismark/bismark"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -202,10 +202,12 @@ Code
 
     # log
     log = snakemake.log_fmt_shell(stdout=True, stderr=True)
-    cmdline_args.append("{log}")
 
     # run
-    shell(" ".join(cmdline_args))
+    with TemporaryDirectory() as tempdir:
+        cmdline_args.append(f"--temp_dir {tempdir}" )
+        cmdline_args.append("{log}")
+        shell(" ".join(cmdline_args))
 
     # Move outputs into proper position.
     expected_2_actual_paths = [
@@ -235,7 +237,7 @@ Code
     log_append = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
     for (exp_path, actual_path) in expected_2_actual_paths:
         if exp_path and (exp_path != actual_path):
-            shell("mv {actual_path:q} {exp_path:q} {log_append}")
+            shell("mv --verbose {actual_path:q} {exp_path:q} {log_append}")
 
 
 .. |nl| raw:: html

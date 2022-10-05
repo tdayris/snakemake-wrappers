@@ -150,6 +150,7 @@ The pipeline contains the following steps:
 
 .. code-block:: python
 
+    import os
     import sys
     from pathlib import Path
     from snakemake.utils import min_version
@@ -166,6 +167,7 @@ The pipeline contains the following steps:
     from files_linker import *
     from graphics import *
     from write_yaml import *
+    from reservation import *
     from messages import message
 
     from snakemake.utils import min_version
@@ -180,13 +182,15 @@ The pipeline contains the following steps:
 
     default_config = read_yaml(worflow_source_dir / "config.yaml")
     config_path = get_config(default_config)
-    design = get_design(os.getcwd(), search_fastq_pairs)
-
+    design = get_design(os.getcwd(), search_fastq_files)
+    try:
+        design.columns = ["Sample_id", "Upstream_file"]
+    except ValueError:
+        pass
 
     fastq_links = link_fq(
         design.Sample_id,
         design.Upstream_file,
-        design.Downstream_file
     )
 
     configfile: config_path
@@ -212,7 +216,7 @@ The pipeline contains the following steps:
     ##################################
 
 
-    include: "003.multiqc.smk"
+    include: "rules/003.multiqc.smk"
 
 
     #########################################
@@ -220,8 +224,8 @@ The pipeline contains the following steps:
     #########################################
 
 
-    include: "001.fastqc.smk"
-    include: "002.fastq_screen.smk"
+    include: "rules/001.fastqc.smk"
+    include: "rules/002.fastq_screen.smk"
 
 
     #################################################
@@ -230,6 +234,14 @@ The pipeline contains the following steps:
 
 
     include: "rules/000.copy.smk"
+
+
+    prefix = "multiqc"
+
+
+    rule target:
+        input:
+            f"{prefix}/multiqc.html"
 
 
 

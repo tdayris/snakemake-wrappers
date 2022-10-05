@@ -1,0 +1,199 @@
+.. _`bio/manta`:
+
+MANTA
+=====
+
+Call structural variants with manta.
+
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule manta:
+        input:
+            ref="human_g1k_v37_decoy.small.fasta",
+            samples=["mapped/a.bam"],
+            index=["mapped/a.bam.bai"],
+            bed="test.bed.gz",  # optional
+        output:
+            vcf="results/out.bcf",
+            idx="results/out.bcf.csi",
+            cand_indel_vcf="results/small_indels.vcf.gz",
+            cand_indel_idx="results/small_indels.vcf.gz.tbi",
+            cand_sv_vcf="results/cand_sv.vcf.gz",
+            cand_sv_idx="results/cand_sv.vcf.gz.tbi",
+        params:
+            extra_cfg="",  # optional
+            extra_run="",  # optional
+        log:
+            "logs/manta.log",
+        threads: 2
+        resources:
+            mem_mb=4096,
+        wrapper:
+            "v1.7.0-11-g0da21ba89/bio/manta"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+Notes
+-----
+
+* The `extra_cfg` param allows for additional program arguments to `configManta.py`.
+* The `extra_run` param allows for additional program arguments to `runWorkflow.py`.
+* The `runDir` is created using pythons `tempfile`, meaning that all intermediate files are deleted on job completion
+* For more information see, https://github.com/Illumina/manta
+
+
+Software dependencies
+---------------------
+
+* ``manta=1.6``
+* ``bcftools=1.14``
+
+Input/Output
+------------
+**Input:**
+
+* BAM/CRAM file(s)
+* reference genome
+* BED file (optional)
+
+**Output:**
+
+* SVs and indels scored and genotyped under a diploid model (diploidSV.vcf.gz).
+* Unfiltered SV and indel candidates (candidateSV.vcf.gz).
+* Subset of the previous file containing only simple insertion and deletion variants less than the minimum scored variant size (candidateSmallIndels.vcf.gz).
+
+
+
+
+Authors
+-------
+
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Filipe G. Vieira"
+    __copyright__ = "Copyright 2021, Filipe G. Vieira"
+    __license__ = "MIT"
+
+
+    import math
+    from snakemake.shell import shell
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+
+
+    extra_cfg = snakemake.params.get("extra_cfg", "")
+    extra_run = snakemake.params.get("extra_run", "")
+
+    bed = snakemake.input.get("bed", "")
+    if bed:
+        bed = f"--callRegions {bed}"
+
+
+    mem_gb = snakemake.resources.get("mem_gb", "")
+    if not mem_gb:
+        # 20 Gb of mem by default
+        mem_gb = math.ceil(snakemake.resources.get("mem_mb", 20480) / 1024)
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
+
+
+    with TemporaryDirectory() as tempdir:
+        tempdir = Path(tempdir)
+        run_dir = tempdir / "runDir"
+        bams = []
+
+        # Symlink BAM/CRAM files to avoid problems with filenames
+        for aln, idx in zip(snakemake.input.samples, snakemake.input.index):
+            aln = Path(aln)
+            idx = Path(idx)
+            (tempdir / aln.name).symlink_to(aln.resolve())
+            bams.append(tempdir / aln.name)
+
+            if idx.name.endswith(".bam.bai") or idx.name.endswith(".cram.crai"):
+                (tempdir / idx.name).symlink_to(idx.resolve())
+            if idx.name.endswith(".bai"):
+                (tempdir / idx.name).with_suffix(".bam.bai").symlink_to(idx.resolve())
+            elif idx.name.endswith(".crai"):
+                (tempdir / idx.name).with_suffix(".cram.crai").symlink_to(idx.resolve())
+            else:
+                raise ValueError(f"invalid index file name provided: {idx}")
+
+        bams = list(map("--normalBam {}".format, bams))
+
+        shell(
+            # Configure Manta
+            "configManta.py {extra_cfg} {bams} --referenceFasta {snakemake.input.ref} {bed} --runDir {run_dir} {log}; "
+            # Run Manta
+            "python2 {run_dir}/runWorkflow.py {extra_run} --jobs {snakemake.threads} --memGb {mem_gb} {log}; "
+        )
+
+        # Copy outputs into proper position.
+        def infer_vcf_ext(vcf):
+            if vcf.endswith(".vcf.gz"):
+                return "z"
+            elif vcf.endswith(".bcf"):
+                return "b"
+            else:
+                raise ValueError(
+                    "invalid VCF extension. Only '.vcf.gz' and '.bcf' are supported."
+                )
+
+        def copy_vcf(origin_vcf, dest_vcf, dest_idx):
+            if dest_vcf and dest_vcf != origin_vcf:
+                dest_vcf_format = infer_vcf_ext(dest_vcf)
+                shell(
+                    "bcftools view --threads {snakemake.threads} --output {dest_vcf:q} --output-type {dest_vcf_format} {origin_vcf:q} {log}"
+                )
+
+                origin_idx = str(origin_vcf) + ".tbi"
+                if dest_idx and dest_idx != origin_idx:
+                    shell(
+                        "bcftools index --threads {snakemake.threads} --output {dest_idx:q} {dest_vcf:q} {log}"
+                    )
+
+        results_base = run_dir / "results" / "variants"
+
+        # Copy main VCF output
+        vcf_temp = results_base / "diploidSV.vcf.gz"
+        vcf_final = snakemake.output.get("vcf")
+        idx_final = snakemake.output.get("idx")
+        copy_vcf(vcf_temp, vcf_final, idx_final)
+
+        # Copy candidate small indels VCF
+        cand_indel_vcf_temp = results_base / "candidateSmallIndels.vcf.gz"
+        cand_indel_vcf_final = snakemake.output.get("cand_indel_vcf")
+        cand_indel_idx_final = snakemake.output.get("cand_indel_idx")
+        copy_vcf(cand_indel_vcf_temp, cand_indel_vcf_final, cand_indel_idx_final)
+
+        # Copy candidates structural variants VCF
+        cand_sv_vcf_temp = results_base / "candidateSV.vcf.gz"
+        cand_sv_vcf_final = snakemake.output.get("cand_sv_vcf")
+        cand_sv_idx_final = snakemake.output.get("cand_sv_idx")
+        copy_vcf(cand_sv_vcf_temp, cand_sv_vcf_final, cand_sv_idx_final)
+
+
+.. |nl| raw:: html
+
+   <br>

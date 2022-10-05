@@ -8,6 +8,7 @@ If you want to contribute we suggest the following procedure:
 
 #. Fork the repository: https://github.com/snakemake/snakemake-wrappers
 #. Clone your fork locally.
+#. Switch to Unofficial branch: ``git checkout Unofficial``
 #. Locally, create a new branch: ``git checkout -b my-new-snakemake-wrapper``
 #. Commit your contributions to that branch and push them to your fork: ``git push -u origin my-new-snakemake-wrapper``
 #. Create a pull request.
@@ -143,3 +144,20 @@ with ``make clean``.
 .. _mamba: https://github.com/mamba-org/mamba
 .. |conda| replace:: ``conda``
 .. _conda: https://conda.io
+
+
+Unofficial Documentation
+------------------------
+
+Create and install the following environment::
+
+  mamba create -n test-snakemake-wrappers -c conda-forge -c bioconda -c defaults snakemake pytest conda snakefmt black  sphinxcontrib-apidoc sphinx sphinx_rtd_theme pyyaml sphinx-copybutton markupsafe==2.0.1 mistune=0.8.4 m2r
+  conda activate test-snakemake-wrappers
+
+
+Then use the following commands::
+
+  sphinx-apidoc -o api_reference/ ../../bigr_pipelines/common/python
+  m2r ../bigr_pipelines/rnaseq/readme.md
+  find ../ -type f -name "readme.rst" | while read READMD; do echo ln -sfr "${READMD}" "readme/long/$(basename $(dirname ${READMD})).rst"; done
+  make html

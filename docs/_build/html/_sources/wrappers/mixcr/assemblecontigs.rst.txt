@@ -1,0 +1,113 @@
+.. _`bio/mixcr/assemblecontigs`:
+
+MIXCR ASSEMBLE CONTIGS
+======================
+
+Assembles longest possible TCR/Ig receptor contig sequences.
+
+**URL**: https://docs.milaboratories.com/mixcr/reference/mixcr-assembleContigs/
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule test_mixcr_assemble:
+        input:
+            "alignment.vdjca"
+        output:
+            clns="assembly.clns",
+            report="report.txt"
+        params:
+            extra=""
+        wrapper:
+            "0.79.0-2111-gcaef468e5/bio/mixcr/assembleContigs"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+Software dependencies
+---------------------
+
+* ``mixcr==4.0.0``
+
+Input/Output
+------------
+**Input:**
+
+* Clones (clna) from mixcr
+
+**Output:**
+
+* ``clns``: Assembled clones
+* ``report``: txt assembly report
+* ``json``: json assembly report
+
+
+
+
+Notes
+-----
+
+It is strongly encouraged to name your output file: *.clna when the `-a/--write-alignments` is used, and *.clns otherwise.
+
+
+
+Authors
+-------
+
+* Thibault Dayris
+
+
+Code
+----
+
+.. code-block:: python
+
+    #!/usr/bin/python3
+    # -*- coding: utf-8 -*-
+
+    """This is the Snakemake Wrapper for mixcr assemble contigs"""
+
+    __author__ = "Thibault Dayris"
+    __copyright__ = "Copyright 2020, Thibault Dayris"
+    __email__ = "thibault.dayris@gustaveroussy.fr"
+    __license__ = "MIT"
+
+    from snakemake.shell import shell
+
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    extra = snakemake.params.get("extra", "")
+
+
+    if "report" in snakemake.output.keys():
+        extra += " --report {} ".format(snakemake.output["report"])
+
+
+    if "json" in snakemake.output.keys():
+        extra += "----json-report {}".format(snakemake.output["json"])
+
+
+    if snakemake.output.clones.endswith((".clna", ".clns")):
+        extra += " --write-alignments"
+
+
+    shell(
+        "mixcr assembleContigs --verbose --force-overwrite {extra} --threads {snakemake.threads} "
+        "{snakemake.input} {snakemake.output.clones} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

@@ -20,7 +20,7 @@ This wrapper can be used in the following way:
         output:
             call = "out.vcf"
         wrapper:
-            "0.50.4-1991-g7872381db/bio/BiGR/vcf_format_to_info"
+            "0.79.0-2111-gcaef468e5/bio/BiGR/vcf_format_to_info"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -209,7 +209,7 @@ Code
                             annotation.append(f"MutationNumberAt={idx-1}")
             except IndexError:
                 logging.error(
-                    f"Genotype has a different length compaired to corresponding allele depth. Skipping: {genotype}, {prefix}, {ad}"
+                    f"Genotype has a different length compared to corresponding allele depth. Skipping: {genotype}, {prefix}, {ad}"
                 )
 
         if all(i == "0" for i in genotype_list):
@@ -218,8 +218,8 @@ Code
             annotation.append(f"{prefix}_MutationStatus=HomozygousMutant")
         else:
             annotation.append(f"{prefix}_MutationStatus=Heterozygous")
-
-        return filter, ";".join(annotation)
+        logging.debug(f"{filter}, {str(annotation)}")
+        return [filter, ";".join(annotation)]
 
     colnames = None
     samples = None
@@ -253,10 +253,10 @@ Code
                 outstream.write(line)
             else:
                 chomp = dict(zip(colnames, line[:-1].split("\t")))
-                filter = None
+
                 for idx, sample in enumerate(samples):
                     format_sample = dict(zip(chomp["FORMAT"].split(":"), chomp[sample].split(":")))
-                    filter, sample_annotation = annotate_mutect2(
+                    new_annotation = annotate_mutect2(
                         genotype = format_sample.get("GT", "./."),
                         ref = chomp["REF"],
                         alt = chomp["ALT"],
@@ -268,15 +268,15 @@ Code
                         normal = snakemake.params.get("normal_sample", None) == sample,
                         tumor = snakemake.params.get("tumor_sample", None) == sample
                     )
-                    if chomp["INFO"] in ["." or ""]:
-                        chomp["INFO"] = sample_annotation
-                    else:
-                        chomp["INFO"] += f";{sample_annotation}"
+                    if new_annotation[0] is not None:
+                        if new_annotation != chomp["FILTER"]:
+                            chomp["FILTER"] = new_annotation[0]
 
-                if chomp["FILTER"] in ["", ".", "PASS"]:
-                    chomp["FILTER"] = filter
-                else:
-                    chomp["FILTER"] += f";{filter}"
+                    if chomp["INFO"] in ["." or ""]:
+                        chomp["INFO"] = new_annotation[1]
+                    else:
+                        chomp["INFO"] += f";{new_annotation[1]}"
+
 
                 outstream.write("\t".join([chomp[col] for col in colnames]) + "\n")
 

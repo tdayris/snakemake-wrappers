@@ -1,0 +1,122 @@
+.. _`bio/samtools/fastq/separate`:
+
+SAMTOOLS FASTQ SEPARATE
+=======================
+
+Convert a bam file with paired end reads back to unaligned reads in a two separate fastq files with `samtools`. Reads that are not properly paired are discarded (READ_OTHER and singleton reads in `samtools fastq` documentation), as are secondary (0x100) and supplementary reads (0x800).
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule samtools_fastq_separate:
+        input:
+            "mapped/{sample}.bam",
+        output:
+            "reads/{sample}.1.fq",
+            "reads/{sample}.2.fq",
+        log:
+            "{sample}.separate.log",
+        params:
+            sort="-m 4G",
+            fastq="-n",
+        # Remember, this is the number of samtools' additional threads. At least 2 threads have to be requested on cluster sumbission. This value - 2 will be sent to samtools sort -@ argument.
+        threads: 3
+        wrapper:
+            "v1.7.0-11-g0da21ba89/bio/samtools/fastq/separate"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+Notes
+-----
+
+* The `extra` param allows for additional program arguments.
+* For more information see, http://www.htslib.org/doc/samtools-fasta.html
+
+
+Software dependencies
+---------------------
+
+* ``samtools=1.14``
+* ``snakemake-wrapper-utils=0.3``
+
+
+
+
+Authors
+-------
+
+* David Laehnemann
+* Victoria Sack
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "David Laehnemann, Victoria Sack"
+    __copyright__ = "Copyright 2018, David Laehnemann, Victoria Sack"
+    __email__ = "david.laehnemann@hhu.de"
+    __license__ = "MIT"
+
+
+    import os
+    import tempfile
+    from pathlib import Path
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.snakemake import get_mem
+
+    params_sort = snakemake.params.get("sort", "")
+    params_fastq = snakemake.params.get("fastq", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+    # Samtools takes additional threads through its option -@
+    # One thread is used bu Samtools sort
+    # One thread is used by Samtools fastq
+    # So snakemake.threads has to take them into account
+    # before allowing additional threads through samtools sort -@
+    threads = 0 if snakemake.threads <= 2 else snakemake.threads - 2
+
+    mem = get_mem(snakemake, "MiB")
+    mem = "-m {0:.0f}M".format(mem / threads) if mem and threads else ""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_prefix = Path(tmpdir) / "samtools_fastq.sort"
+
+        shell(
+            "(samtools sort -n"
+            " --threads {threads}"
+            " {mem}"
+            " -T {tmp_prefix}"
+            " {params_sort}"
+            " {snakemake.input[0]} | "
+            "samtools fastq"
+            " {params_fastq}"
+            " -1 {snakemake.output[0]}"
+            " -2 {snakemake.output[1]}"
+            " -0 /dev/null"
+            " -s /dev/null"
+            " -F 0x900"
+            " - "
+            ") {log}"
+        )
+
+
+.. |nl| raw:: html
+
+   <br>

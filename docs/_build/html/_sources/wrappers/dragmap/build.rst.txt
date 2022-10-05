@@ -1,0 +1,117 @@
+.. _`bio/dragmap/build`:
+
+DRAGMAP
+=======
+
+Build hash table for Dragmap read mapper.
+
+
+**URL**: https://github.com/Illumina/DRAGMAP
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule dragmap_build:
+        input:
+            ref="{genome}.fasta",
+        output:
+            idx=multiext(
+                "{genome}/",
+                "hash_table.cfg",
+                "hash_table.cfg.bin",
+                "hash_table.cmp",
+                "hash_table_stats.txt",
+                "reference.bin",
+                "ref_index.bin",
+                "repeat_mask.bin",
+                "str_table.bin",
+            ),
+        log:
+            "logs/dragmap/{genome}.build.log",
+        params:
+            extra="",
+        threads: 2
+        wrapper:
+            "v1.7.0-11-g0da21ba89/bio/dragmap/build"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+Notes
+-----
+
+* The `extra` param allows for additional program arguments.
+
+
+Software dependencies
+---------------------
+
+* ``dragmap=1.2``
+
+Input/Output
+------------
+**Input:**
+
+* FASTA reference
+
+**Output:**
+
+* reference hash table
+
+
+
+
+Authors
+-------
+
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "Filipe G. Vieira"
+    __copyright__ = "Copyright 2022, Filipe G. Vieira"
+    __license__ = "MIT"
+
+
+    from pathlib import Path
+    from snakemake.shell import shell
+
+
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+
+    # Prefix that should be used for the database
+    prefix = Path(snakemake.output[0]).parent
+
+
+    shell(
+        "dragen-os"
+        " --ht-num-threads {snakemake.threads}"
+        " --build-hash-table true"
+        " --ht-reference {snakemake.input[0]}"
+        " --output-directory {prefix}"
+        " {extra}"
+        " {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

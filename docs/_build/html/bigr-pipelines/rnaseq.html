@@ -44,15 +44,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers and Pipelines</span></p>
-<ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipelines</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../pipelines.html">BiGR Pipelines</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="CTC_Variant_Calling_Integragen_Legacy.html">CTC_VARIANT_CALLING_INTEGRAGEN_LEGACY</a></li>
-<li class="toctree-l2"><a class="reference internal" href="WES_germline.html">WES_GERMLINE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="annot_sv.html">ANNO_SV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="annot_sv.html">ANNOT_SV</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCL2FASTQ (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bs_ampliseq.html">BS_AMPLISEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="celltype_deconvolution_rnaseq.html">CELLTYPE_DECONVOLUTION_RNASEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chipseq.html">CHIPSEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
@@ -61,6 +64,7 @@
 <li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gene_set_enrichment.html">GENE_SET_ENRICHMENT (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="low_pass_wgs_copy_number.html">LOW_PASS_WGS_COPY_NUMBER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="make_pon.html">MAKE_PON</a></li>
 <li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nfcore_chipseq.html">NFCORE-CHIPSEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
@@ -73,19 +77,25 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sarek_enhanced.html">SAREK ENHANCED</a></li>
 <li class="toctree-l2"><a class="reference internal" href="seqoia.html">SEQOIA SINGLE-SAMPLE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sigprofiler_signatures.html">SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_calling_germline.html">VARIANT_CALLING_GERMLINE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline_wes.html">VARIANT_CALLING_GERMLINE_WES (UNDER DEVELOPMENT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="variant_calling_somatic.html">VARIANT_CALLING_SOMATIC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="variant_callling_germline.html">VARIANT_CALLING_GERMLINE (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="variant_occurence_cohort.html">VARIANT_OCCURENCE_COHORT (UNDER DEVELOPMENT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wes_somatic.html">VARIANT_CALLING_SOMATIC</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../readme/readme_long.html">Long help</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bigr_unofficial.html">BiGR Unofficial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../apidocs/api.html">Unofficial API</a></li>
 </ul>
 
         </div>
@@ -119,7 +129,7 @@
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
 <p>In order to run the pipeline, use the following commands</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Go to your directory containing VCF files</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Go to your directory containing Fastq files</span>
 
 <span class="nb">cd</span> /path/to/project
 
@@ -179,13 +189,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
 
 <span class="n">rule</span> <span class="n">target</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
-        <span class="n">general_qc</span><span class="o">=</span><span class="s2">&quot;data_output/multiqc/MultiQC.QC.html&quot;</span><span class="p">,</span>
-        <span class="n">quantification_qc</span><span class="o">=</span><span class="s2">&quot;data_output/multiqc/MultiQC.Salmon.html&quot;</span><span class="p">,</span>
-        <span class="n">dge_qc</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;data_output/DEseq2/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.DEseq2.html&quot;</span><span class="p">,</span>
-            <span class="n">comparison</span><span class="o">=</span><span class="n">output_prefixes</span><span class="p">,</span>
-        <span class="p">),</span>
-        <span class="n">chimera_qc</span><span class="o">=</span><span class="s2">&quot;data_output/multiqc/MultiQC.Star.Chimera.html&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">expected_targets</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;qc&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})),</span>
 
 
 <span class="c1">##########################</span>
@@ -199,38 +203,43 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/001.bigr_copy.smk&quot;</span>
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/002.trimming.smk&quot;</span>
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/003.fastq_screen.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;001.bigr_copy.smk&quot;</span><span class="p">)</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;002.trimming.smk&quot;</span><span class="p">)</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;003.fastq_screen.smk&quot;</span><span class="p">)</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Snakefile.quality_control_results</span>
+<span class="sd">from:</span>
+<span class="sd">-&gt; 002.fastp_clean</span>
+<span class="sd">-&gt; 003.fastq_screen</span>
+<span class="sd">by:</span>
+<span class="sd">-&gt; Snakefile.target</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">quality_control_results</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">fastp</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;fastp/</span><span class="si">{ext}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.fastp.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;002.fastp/</span><span class="si">{ext}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.fastp.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
-            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;html&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="n">fastp_ext</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">fastq_screen</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;003.fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
             <span class="n">stream</span><span class="o">=</span><span class="n">streams</span><span class="p">,</span>
-            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="n">fastqscreen_ext</span><span class="p">,</span>
         <span class="p">),</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">report</span><span class="p">(</span>
-            <span class="s2">&quot;data_output/multiqc/MultiQC.QC.html&quot;</span><span class="p">,</span>
-            <span class="n">caption</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;reports&quot;</span> <span class="o">/</span> <span class="s2">&quot;multiqc.rst&quot;</span><span class="p">),</span>
-            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;Quality Controls&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
+        <span class="s2">&quot;data_output/multiqc/MultiQC.QC.html&quot;</span><span class="p">,</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="n">get_1gb_per_attempt</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="n">get_45min_per_attempt</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span>
-    <span class="n">retries</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/multiqc.salmon.log&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;logs/snakefile.multiqc/salmon.log&quot;</span><span class="p">,</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/multiqc&quot;</span>
 
@@ -246,50 +255,50 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/004.salmon.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;004.salmon.smk&quot;</span><span class="p">)</span>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This snakefile calls salmon and aggregates counts in human-readable tables</span>
+<span class="sd">Snakefile.salmon_quant_results</span>
+<span class="sd">from:</span>
+<span class="sd">-&gt; 002.fastp_clean</span>
+<span class="sd">-&gt; 004.salmon_quant</span>
+<span class="sd">-&gt; 003.fastq_screen</span>
+<span class="sd">by:</span>
+<span class="sd">-&gt; Snakefile.target</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<span class="c1"># Call this fantom rule to access salmon quand only&quot;</span>
 <span class="n">rule</span> <span class="n">salmon_quant_results</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">salmon_quant</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
+            <span class="s2">&quot;004.salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
         <span class="p">),</span>
         <span class="n">tpm_table</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;data_output/Quantification/TPM.</span><span class="si">{feature}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
-            <span class="n">feature</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;transcripts&quot;</span><span class="p">,</span> <span class="s2">&quot;genes&quot;</span><span class="p">],</span>
+            <span class="n">feature</span><span class="o">=</span><span class="n">features</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">raw_counts</span><span class="o">=</span><span class="s2">&quot;data_output/Quantification/Raw.genes.tsv&quot;</span><span class="p">,</span>
         <span class="n">fastp</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;fastp/</span><span class="si">{ext}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.fastp.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;002.fastp/</span><span class="si">{ext}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.fastp.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
-            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;html&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="n">fastp_ext</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">fastq_screen</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;003.fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
             <span class="n">stream</span><span class="o">=</span><span class="n">streams</span><span class="p">,</span>
-            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="n">fastqscreen_ext</span><span class="p">,</span>
         <span class="p">),</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">report</span><span class="p">(</span>
-            <span class="s2">&quot;data_output/multiqc/MultiQC.Salmon.html&quot;</span><span class="p">,</span>
-            <span class="n">caption</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;reports&quot;</span> <span class="o">/</span> <span class="s2">&quot;multiqc.rst&quot;</span><span class="p">),</span>
-            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;Quality Controls&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
+        <span class="s2">&quot;data_output/multiqc/MultiQC.Salmon.html&quot;</span><span class="p">,</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="n">get_1gb_per_attempt</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="n">get_45min_per_attempt</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span>
-    <span class="n">retries</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/multiqc.salmon.log&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;logs/snakefile.multiqc/salmon.log&quot;</span><span class="p">,</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/multiqc&quot;</span>
 
@@ -305,45 +314,50 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/005.immunedeconv.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;005.immunedeconv.smk&quot;</span><span class="p">)</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Snakefile.immunedeconv_results</span>
+<span class="sd">from:</span>
+<span class="sd">-&gt; 002.fastp_clean</span>
+<span class="sd">-&gt; 004.salmon_quant</span>
+<span class="sd">-&gt; 003.fastq_screen</span>
+<span class="sd">-&gt; 005.multiqc_config_immunedeconv</span>
+<span class="sd">by:</span>
+<span class="sd">-&gt; Snakefile.target</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">immunedeconv_results</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">salmon_quant</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;004.salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">fastp</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;fastp/</span><span class="si">{ext}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.fastp.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;002.fastp/</span><span class="si">{ext}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.fastp.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
-            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;html&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="n">fastp_ext</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">fastq_screen</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;003.fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
             <span class="n">stream</span><span class="o">=</span><span class="n">streams</span><span class="p">,</span>
-            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="n">fastqscreen_ext</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;immunedeconv/multiqc_config.yaml&quot;</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;005.immunedeconv/multiqc_config_mqc.yaml&quot;</span><span class="p">,</span>
         <span class="n">graphs</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;data_output/</span><span class="si">{tool}</span><span class="s2">/celltypes.</span><span class="si">{graph}</span><span class="s2">.png&quot;</span><span class="p">,</span>
             <span class="n">tool</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;immunedeconv&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                 <span class="s2">&quot;tool_list&quot;</span><span class="p">,</span>
-                <span class="p">[</span>
-                    <span class="s2">&quot;xcell&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;quantiseq&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;epic&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;mcpcounter&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;cibersort&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;cibersort_abs&quot;</span><span class="p">,</span>
-                <span class="p">],</span>
+                <span class="n">tool_list</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">graph</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;histogram&quot;</span><span class="p">,</span> <span class="s2">&quot;dotplot&quot;</span><span class="p">],</span>
+            <span class="n">graph</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hist&quot;</span><span class="p">,</span> <span class="s2">&quot;dotplot&quot;</span><span class="p">],</span>
         <span class="p">),</span>
         <span class="n">tpm_table</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;data_output/Quantification/TPM.</span><span class="si">{feature}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
-            <span class="n">feature</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;transcripts&quot;</span><span class="p">,</span> <span class="s2">&quot;genes&quot;</span><span class="p">],</span>
+            <span class="n">feature</span><span class="o">=</span><span class="n">features</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">raw_counts</span><span class="o">=</span><span class="s2">&quot;data_output/Quantification/Raw.genes.tsv&quot;</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span>
@@ -354,7 +368,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
         <span class="n">time_min</span><span class="o">=</span><span class="n">get_45min_per_attempt</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/multiqc/immunedeconv.log&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;logs/snakefile.multiqc/immunedeconv.log&quot;</span><span class="p">,</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/multiqc&quot;</span>
 
@@ -371,71 +385,76 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/011.mapping_qc.smk&quot;</span>
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/012.star_chimera.smk&quot;</span>
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/013.star_fusion.smk&quot;</span>
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/019.rseqc.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;011.mapping_qc.smk&quot;</span><span class="p">)</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;012.star_chimera.smk&quot;</span><span class="p">)</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;013.star_fusion.smk&quot;</span><span class="p">)</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;019.rseqc.smk&quot;</span><span class="p">)</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">snakefile.star_fusion_results</span>
+<span class="sd">from:</span>
+<span class="sd">-&gt; 011.samtools_stats</span>
+<span class="sd">-&gt; 010.sambamba_sort_star</span>
+<span class="sd">-&gt; 002.fastp_clean</span>
+<span class="sd">-&gt; 003.fastq_screen</span>
+<span class="sd">-&gt; 013.star_fusion</span>
+<span class="sd">by:</span>
+<span class="sd">-&gt; End job</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">star_fusion_results</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">mappings</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;star/</span><span class="si">{sample}</span><span class="s2">/chimera/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;010.star/</span><span class="si">{sample}</span><span class="s2">/chimera/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
             <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;bam&quot;</span><span class="p">,</span> <span class="s2">&quot;bam.bai&quot;</span><span class="p">],</span>
         <span class="p">),</span>
         <span class="c1">#cram=expand(&quot;data_output/Mapping/chimera/{sample}.cram&quot;, sample=sample_list),</span>
         <span class="n">cj</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;star/</span><span class="si">{sample}</span><span class="s2">/chimera/</span><span class="si">{sample}</span><span class="s2">.Chimeric.out.junction&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
+            <span class="s2">&quot;010.star/</span><span class="si">{sample}</span><span class="s2">/chimera/</span><span class="si">{sample}</span><span class="s2">.Chimeric.out.junction&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="n">sj</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;star/</span><span class="si">{sample}</span><span class="s2">/chimera/</span><span class="si">{sample}</span><span class="s2">.SJ.out.tab&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">),</span>
-        <span class="n">log</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;star/</span><span class="si">{sample}</span><span class="s2">/chimera/</span><span class="si">{sample}</span><span class="s2">.Log.out&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">),</span>
+        <span class="n">sj</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;010.star/</span><span class="si">{sample}</span><span class="s2">/chimera/</span><span class="si">{sample}</span><span class="s2">.SJ.out.tab&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">),</span>
+        <span class="n">log</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;010.star/</span><span class="si">{sample}</span><span class="s2">/chimera/</span><span class="si">{sample}</span><span class="s2">.Log.out&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">),</span>
         <span class="n">logp</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;star/</span><span class="si">{sample}</span><span class="s2">/chimera/</span><span class="si">{sample}</span><span class="s2">.Log.progress.out&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
+            <span class="s2">&quot;010.star/</span><span class="si">{sample}</span><span class="s2">/chimera/</span><span class="si">{sample}</span><span class="s2">.Log.progress.out&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
         <span class="p">),</span>
-        <span class="n">logf</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;star/</span><span class="si">{sample}</span><span class="s2">/chimera/</span><span class="si">{sample}</span><span class="s2">.Log.final.out&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">),</span>
+        <span class="n">logf</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;010.star/</span><span class="si">{sample}</span><span class="s2">/chimera/</span><span class="si">{sample}</span><span class="s2">.Log.final.out&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
+        <span class="p">),</span>
         <span class="n">samtools_stats</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;samtools/stats/</span><span class="si">{sample}</span><span class="s2">.chimera.stats&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
+            <span class="s2">&quot;011samtools/stats/</span><span class="si">{sample}</span><span class="s2">.chimera.stats&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
         <span class="p">),</span>
         <span class="n">fastp</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;fastp/</span><span class="si">{ext}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.fastp.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;002.fastp/</span><span class="si">{ext}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.fastp.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
-            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;html&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="n">fastp_ext</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">fastq_screen</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;003.fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
             <span class="n">stream</span><span class="o">=</span><span class="n">streams</span><span class="p">,</span>
-            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="n">fastqscreen_ext</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="n">star_fusion</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;star-fusions/</span><span class="si">{sample}</span><span class="s2">/&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">),</span>
+        <span class="n">star_fusion</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;013.star-fusions/</span><span class="si">{sample}</span><span class="s2">/&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">),</span>
         <span class="n">read_distribution</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;rseqc/read_distribution/chimera/</span><span class="si">{sample}</span><span class="s2">.read_distribution.tsv&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="n">tin</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;rseqc/tin/chimera/</span><span class="si">{sample}</span><span class="s2">.summary.txt&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">),</span>
         <span class="n">bam_stat</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;rseqc/bam_stat/chimera/</span><span class="si">{sample}</span><span class="s2">.txt&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">),</span>
-        <span class="n">genebosycov</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;rseqc/gene_body_coverage/chimera/</span><span class="si">{sample}</span><span class="s2">.geneBodyCoverage.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
-            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;pdf&quot;</span><span class="p">],</span>
-        <span class="p">),</span>
         <span class="n">txt</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;rseqc/junction_annotation/chimera/</span><span class="si">{sample}</span><span class="s2">.txt&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">),</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">report</span><span class="p">(</span>
-            <span class="s2">&quot;data_output/multiqc/MultiQC.Star.Chimera.html&quot;</span><span class="p">,</span>
-            <span class="n">caption</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;reports&quot;</span> <span class="o">/</span> <span class="s2">&quot;multiqc.rst&quot;</span><span class="p">),</span>
-            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;Quality Controls&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
+        <span class="s2">&quot;data_output/multiqc/MultiQC.Star.Chimera.html&quot;</span><span class="p">,</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="n">get_1gb_per_attempt</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="n">get_45min_per_attempt</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span>
-    <span class="n">retries</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/multiqc.star.chimera.log&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;logs/snakefile.multiqc/star.chimera.log&quot;</span><span class="p">,</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/multiqc&quot;</span>
 
@@ -451,69 +470,163 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/007.tximport.smk&quot;</span>
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/008.deseq2.smk&quot;</span>
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/009.deseq2_post_process.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;007.tximport.smk&quot;</span><span class="p">)</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;008.deseq2.smk&quot;</span><span class="p">)</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;009.deseq2_post_process.smk&quot;</span><span class="p">)</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Snakefile.deseq2_results</span>
+<span class="sd">from:</span>
+<span class="sd">-&gt; 002.fastp_clean</span>
+<span class="sd">-&gt; 004.salmon_quant</span>
+<span class="sd">-&gt; 003.fastq_screen</span>
+<span class="sd">-&gt; 009.multiqc_config</span>
+<span class="sd">by:</span>
+<span class="sd">-&gt; Snakefile.target</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 
 <span class="n">rule</span> <span class="n">deseq2_results</span><span class="p">:</span>
     <span class="nb">input</span><span class="p">:</span>
         <span class="n">salmon_quant</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;004.salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
         <span class="p">),</span>
         <span class="n">tpm_table</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;data_output/Quantification/TPM.</span><span class="si">{feature}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
-            <span class="n">feature</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;transcripts&quot;</span><span class="p">,</span> <span class="s2">&quot;genes&quot;</span><span class="p">],</span>
+            <span class="n">feature</span><span class="o">=</span><span class="n">features</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">raw_counts</span><span class="o">=</span><span class="s2">&quot;data_output/Quantification/Raw.genes.tsv&quot;</span><span class="p">,</span>
         <span class="n">fastp</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;fastp/</span><span class="si">{ext}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.fastp.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;002.fastp/</span><span class="si">{ext}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.fastp.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
-            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;html&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="n">fastp_ext</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">fastq_screen</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;003.fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
             <span class="n">stream</span><span class="o">=</span><span class="n">streams</span><span class="p">,</span>
-            <span class="n">ext</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="n">fastqscreen_ext</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">deseq2_results</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
             <span class="s2">&quot;data_output/DEseq2/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{content}</span><span class="s2">_</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
             <span class="n">content</span><span class="o">=</span><span class="n">content_list</span><span class="p">,</span>
             <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/multiqc_config.yaml&quot;</span><span class="p">,</span>
-        <span class="n">gene_plot</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
-            <span class="s2">&quot;data_output/DEseq2/</span><span class="si">{comparison}</span><span class="s2">/gene_plots/</span><span class="si">{gene}</span><span class="s2">.png&quot;</span><span class="p">,</span>
-            <span class="n">gene</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;genes_of_interest&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;ENSG00000141510&quot;</span><span class="p">]),</span>
-            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/multiqc_config.yaml&quot;</span><span class="p">,</span>
+        <span class="n">gene_plot</span><span class="o">=</span><span class="s2">&quot;data_output/DEseq2/</span><span class="si">{comparison}</span><span class="s2">/gene_plots/&quot;</span><span class="p">,</span>
         <span class="n">plots</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/pca_plot_mqc.png&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/volcanoplot_mqc.png&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_expr_mqc.png&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_mu_mqc.png&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/ma_plot_mqc.png&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/independent_filter_mqc.png&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/inde_theta_filter_mqc.png&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;multiqc/</span><span class="si">{comparison}</span><span class="s2">/pvalue_qc_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/pca_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/volcanoplot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_expr_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_mu_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/ma_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/independent_filter_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/inde_theta_filter_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/pvalue_qc_mqc.png&quot;</span><span class="p">,</span>
         <span class="p">],</span>
-        <span class="n">deseq_rbt</span><span class="o">=</span><span class="s2">&quot;data_output/DESeq2/</span><span class="si">{comparison}</span><span class="s2">/Complete_html_table.tar.bz2&quot;</span><span class="p">,</span>
+        <span class="n">clustermap_sample</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/clustermap/ClusteredHeatmap.samples.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">pca_plot</span><span class="o">=</span><span class="n">expected_pcas</span><span class="p">,</span>
+        <span class="n">volcanoplot</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/volcano/Volcano.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">distro_expr</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/log_counts/log_dst.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">ma_plot</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/maplot/maplot.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">distro_mu</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/log_counts/log_mu.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">independent_filter</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/deseq2/independent_filter.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">pvalue_qc</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/deseq2/pval.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">inde_theta_filter</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/deseq2/theta.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="c1"># deseq_rbt=&quot;data_output/DESeq2/{comparison}/Complete_html_table.tar.bz2&quot;,</span>
     <span class="n">output</span><span class="p">:</span>
-        <span class="n">report</span><span class="p">(</span>
-            <span class="s2">&quot;data_output/DEseq2/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.DEseq2.html&quot;</span><span class="p">,</span>
-            <span class="n">caption</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;reports&quot;</span> <span class="o">/</span> <span class="s2">&quot;multiqc.rst&quot;</span><span class="p">),</span>
-            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;Quality Controls&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
+        <span class="s2">&quot;data_output/DEseq2/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.DEseq2.html&quot;</span><span class="p">,</span>
     <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
     <span class="n">resources</span><span class="p">:</span>
         <span class="n">mem_mb</span><span class="o">=</span><span class="n">get_1gb_per_attempt</span><span class="p">,</span>
         <span class="n">time_min</span><span class="o">=</span><span class="n">get_45min_per_attempt</span><span class="p">,</span>
         <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span>
-    <span class="n">retries</span><span class="p">:</span> <span class="mi">2</span>
     <span class="n">log</span><span class="p">:</span>
-        <span class="s2">&quot;logs/multiqc.deseq2/</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;logs/snakefile.multiqc/deseq2.</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span><span class="p">,</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;bio/multiqc&quot;</span>
+
+
+<span class="c1">########################</span>
+<span class="c1">### Cluster Profiler ###</span>
+<span class="c1">########################</span>
+
+<span class="c1"># Used after DESeq2</span>
+
+
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;027.clusterprofiler.gmt.smk&quot;</span><span class="p">)</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;029.clusterprofiler.terms.smk&quot;</span><span class="p">)</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;028.clusterprofiler.others.smk&quot;</span><span class="p">)</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;026.clusterprofiler.genelist.smk&quot;</span><span class="p">)</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;030.clusterprofiler.plots.smk&quot;</span><span class="p">)</span>
+
+
+<span class="n">rule</span> <span class="n">clusterprofiler_results</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">salmon_quant</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;004.salmon/pseudo_mapping/</span><span class="si">{sample}</span><span class="s2">/quant.genes.sf&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
+        <span class="p">),</span>
+        <span class="n">tpm_table</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;data_output/Quantification/TPM.</span><span class="si">{feature}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+            <span class="n">feature</span><span class="o">=</span><span class="n">features</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">raw_counts</span><span class="o">=</span><span class="s2">&quot;data_output/Quantification/Raw.genes.tsv&quot;</span><span class="p">,</span>
+        <span class="n">fastp</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;002.fastp/</span><span class="si">{ext}</span><span class="s2">/</span><span class="si">{sample}</span><span class="s2">.fastp.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
+            <span class="n">ext</span><span class="o">=</span><span class="n">fastp_ext</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">fastq_screen</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wildcards</span><span class="p">:</span> <span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;003.fastq_screen/</span><span class="si">{sample}</span><span class="s2">.</span><span class="si">{stream}</span><span class="s2">.fastq_screen.</span><span class="si">{ext}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">samples_per_prefixes</span><span class="p">[</span><span class="n">wildcards</span><span class="o">.</span><span class="n">comparison</span><span class="p">],</span>
+            <span class="n">stream</span><span class="o">=</span><span class="n">streams</span><span class="p">,</span>
+            <span class="n">ext</span><span class="o">=</span><span class="n">fastqscreen_ext</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">deseq2_results</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;data_output/DEseq2/</span><span class="si">{comparison}</span><span class="s2">/</span><span class="si">{content}</span><span class="s2">_</span><span class="si">{comparison}</span><span class="s2">.tsv&quot;</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">content_list</span><span class="p">,</span>
+            <span class="n">allow_missing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/multiqc_config.yaml&quot;</span><span class="p">,</span>
+        <span class="n">gene_plot</span><span class="o">=</span><span class="s2">&quot;data_output/DEseq2/</span><span class="si">{comparison}</span><span class="s2">/gene_plots/&quot;</span><span class="p">,</span>
+        <span class="n">plots</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/pca_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/volcanoplot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_expr_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/distro_mu_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/ma_plot_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/independent_filter_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/inde_theta_filter_mqc.png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;009.multiqc/</span><span class="si">{comparison}</span><span class="s2">/pvalue_qc_mqc.png&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">clustermap_sample</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/clustermap/ClusteredHeatmap.samples.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">pca_plot</span><span class="o">=</span><span class="n">expected_pcas</span><span class="p">,</span>
+        <span class="n">volcanoplot</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/volcano/Volcano.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">distro_expr</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/log_counts/log_dst.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">ma_plot</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/maplot/maplot.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">distro_mu</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/log_counts/log_mu.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">independent_filter</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/deseq2/independent_filter.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">pvalue_qc</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/deseq2/pval.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">inde_theta_filter</span><span class="o">=</span><span class="s2">&quot;009.figures/</span><span class="si">{comparison}</span><span class="s2">/deseq2/theta.</span><span class="si">{comparison}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+        <span class="n">clusterprofiler_tsv</span><span class="o">=</span><span class="n">tsv_list</span><span class="p">(</span><span class="n">db_key</span><span class="o">=</span><span class="n">db_key_dict</span><span class="p">,</span> <span class="n">comparisons</span><span class="o">=</span><span class="n">output_prefixes</span><span class="p">),</span>
+        <span class="n">clusterprofiler_png</span><span class="o">=</span><span class="n">plot_list</span><span class="p">(</span>
+            <span class="n">plots</span><span class="o">=</span><span class="n">cprof_plots</span><span class="p">,</span>
+            <span class="n">methods</span><span class="o">=</span><span class="n">gse_method_list</span><span class="p">,</span>
+            <span class="n">comparisons</span><span class="o">=</span><span class="n">output_prefixes</span><span class="p">,</span>
+            <span class="n">db_key</span><span class="o">=</span><span class="n">db_key_dict</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;data_output/GSEA/</span><span class="si">{comparison}</span><span class="s2">/MultiQC.GSEA.html&quot;</span><span class="p">,</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">resources</span><span class="p">:</span>
+        <span class="n">mem_mb</span><span class="o">=</span><span class="n">get_1gb_per_attempt</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="n">get_45min_per_attempt</span><span class="p">,</span>
+        <span class="n">tmpdir</span><span class="o">=</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/snakefile.multiqc/clusterprofiler.</span><span class="si">{comparison}</span><span class="s2">.log&quot;</span><span class="p">,</span>
     <span class="n">wrapper</span><span class="p">:</span>
         <span class="s2">&quot;bio/multiqc&quot;</span>
 
@@ -523,7 +636,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
 <span class="c1">#######################</span>
 
 
-<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/010.star.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">workflow_source_dir</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span> <span class="o">/</span> <span class="s2">&quot;010.star.smk&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

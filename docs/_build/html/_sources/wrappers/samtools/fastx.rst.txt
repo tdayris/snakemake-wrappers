@@ -1,0 +1,105 @@
+.. _`bio/samtools/fastx`:
+
+SAMTOOLS FASTX
+==============
+
+Converts a SAM, BAM or CRAM into FASTQ or FASTA format.
+
+
+Example
+-------
+
+This wrapper can be used in the following way:
+
+.. code-block:: python
+
+    rule samtools_fastq:
+        input:
+            "{prefix}.sam",
+        output:
+            "{prefix}.fasta",
+        log:
+            "{prefix}.log",
+        message:
+            ""
+        # Samtools takes additional threads through its option -@
+        threads: 2  # This value - 1 will be sent to -@
+        params:
+            outputtype="fasta",
+            extra="",
+        wrapper:
+            "v1.7.0-11-g0da21ba89/bio/samtools/fastx/"
+
+Note that input, output and log file paths can be chosen freely.
+
+When running with
+
+.. code-block:: bash
+
+    snakemake --use-conda
+
+the software dependencies will be automatically deployed into an isolated environment before execution.
+
+
+Notes
+-----
+
+* The `extra` param allows for additional program arguments (not `-@/--threads` or `-o`).
+* For more information see, http://www.htslib.org/doc/samtools-fasta.html
+
+
+Software dependencies
+---------------------
+
+* ``samtools=1.14``
+* ``snakemake-wrapper-utils=0.3``
+
+Input/Output
+------------
+**Input:**
+
+* bam or sam file (.bam, .sam)
+
+**Output:**
+
+* fastq file (.fastq) or fasta file (.fasta)
+
+
+
+
+Authors
+-------
+
+* William Rowell
+* Filipe G. Vieira
+
+
+Code
+----
+
+.. code-block:: python
+
+    __author__ = "William Rowell"
+    __copyright__ = "Copyright 2020, William Rowell"
+    __email__ = "wrowell@pacb.com"
+    __license__ = "MIT"
+
+
+    from snakemake.shell import shell
+    from snakemake_wrapper_utils.samtools import get_samtools_opts
+
+    samtools_opts = get_samtools_opts(
+        snakemake, parse_write_index=False, parse_output_format=False
+    )
+    extra = snakemake.params.get("extra", "")
+    log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+
+
+    shell(
+        "samtools {snakemake.params.outputtype} {samtools_opts} {extra} {snakemake.input} {log}"
+    )
+
+
+.. |nl| raw:: html
+
+   <br>

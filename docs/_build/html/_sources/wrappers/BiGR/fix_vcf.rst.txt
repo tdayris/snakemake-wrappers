@@ -24,7 +24,7 @@ This wrapper can be used in the following way:
         params:
             rename_sample={"fake_KJ660346": 'Sample1'}
         wrapper:
-            "0.50.4-1991-g7872381db/bio/BiGR/fix_vcf"
+            "0.79.0-2111-gcaef468e5/bio/BiGR/fix_vcf"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -97,10 +97,12 @@ Code
     import logging
     import re
 
+    from typing import List
+
     logging.basicConfig(
         filename=snakemake.log[0],
         filemode="w",
-        level=logging.INFO
+        level=logging.DEBUG
     )
 
 
@@ -140,7 +142,7 @@ Code
     def add_format(format_header: str,
                    key: str,
                    value: str,
-                   *formats: list[str]) -> str:
+                   *formats: List[str]) -> str:
         result = [add_format_header(key, format_header)]
         for format in formats:
             result.append(add_sample(value, format))
@@ -171,7 +173,9 @@ Code
 
         return "".join(fileformats + filters + formats + infos + others + contigs)
 
-    default_chr = list(map(str, range(23))) + ["MT", "X", "Y"]
+    default_chr = list(map(str, range(1, 23))) + ["MT", "X", "Y"] + list(range(1, 23))
+    default_chr += ["chr{c}" for c in default_chr]
+
     if "default_chr" in snakemake.params.keys():
         default_chr = snakemake.params["default_chr"]
 
@@ -200,16 +204,19 @@ Code
             if line.startswith("##"):
                 # Header/formats/filters...
                 #vcfout.write(line)
-                header_list.append(line)
+                if line[:-1] == '##FILTER=<ID=IsGermline,Number=.,Type=String,Description="Variant exists in Normal">':
+                    header_list.append('##FILTER=<ID=IsGermline,Description="Variant exists in Normal">\n')
+                elif line[:-1] == '##FILTER=<ID=IsSomatic,Number=.,Type=String,Description="Variant does not exists in Normal, but exists in Tumor">':
+                    header_list.append('##FILTER=<ID=IsSomatic,Description="Variant does not exists in Normal, but exists in Tumor">\n')
+                else:
+                    header_list.append(line)
                 continue
 
             elif line.startswith("#"):
                 # Column names
                 vcfout.write(sort_headers(header_list))
                 vcfout.write(headers)
-                print(line)
                 chomp = line[:-1].split("\t")
-                print(chomp)
                 for idx, col in enumerate(chomp):
                     chomp[idx] = sample_rename_dict.get(col, col)
                 line = "\t".join(chomp) + "\n"
@@ -219,10 +226,12 @@ Code
             chrom, pos, idx, ref, alt, qual, fil, info, format, *samples = line[:-1].split("\t")
 
             if (snakemake.params.get("remove_non_conventional_chromosomes", True) is True) and (chrom not in default_chr):
+                logging.debug("Non conventional chromosome: %s", str(line[:-1]))
                 continue
 
             info = info.replace(";;", ";").strip(";")
             line = "\t".join([chrom, pos, idx, ref, alt, qual, fil, info, format, *samples]) + "\n"
+            logging.debug("Saving: %s", line)
             vcfout.write(line)
 
 

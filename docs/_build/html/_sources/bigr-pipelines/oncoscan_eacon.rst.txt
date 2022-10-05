@@ -230,7 +230,7 @@ The pipeline contains the following steps:
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/rcnorm_0.1.5.tar.gz"
             ],
             git_packages = [
-                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.50.4-1991-g7872381db.tar.gz",
+                "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_0.79.0-2111-gcaef468e5.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/EaCoN_Chromosomes.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.cytoscan.2.4.0.tar.gz",
                 "/mnt/beegfs/database/bioinfo/Index_DB/EaCoN/packages/apt.oncoscan.2.4.0.tar.gz"

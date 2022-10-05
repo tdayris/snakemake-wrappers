@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TABIX &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Snakemake Wrappers
+          </a>
+              <div class="version">
+                heads/Unofficial
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta-wrappers.html">Meta-Wrappers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../pipelines.html">BiGR Pipelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to Unofficial BiGR Snakemake wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html#id1">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bigr_unofficial.html">Why BiGR Unofficial snakemake Wrappers ?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bigr_unofficial.html#bigr-pipeline-template">BiGR pipeline template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bigr_unofficial.html#snakemake-basics-with-a-simple-rule">Snakemake basics with a simple rule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bigr_unofficial.html#snakemake-level-up-with-unofficial-environment">Snakemake level up with Unofficial environment</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Snakemake Wrappers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>TABIX</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/wrappers/tabix/query.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tabix">
+<span id="bio-tabix-query"></span><h1>TABIX<a class="headerlink" href="#tabix" title="Permalink to this headline"></a></h1>
+<p>Query given file with tabix.</p>
+<p><strong>URL</strong>: <a class="reference external" href="https://github.com/samtools/htslib">https://github.com/samtools/htslib</a></p>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h2>
+<p>This wrapper can be used in the following way:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="n">tabix</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.bed.gz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.bed.gz.tbi&quot;</span>
+        <span class="c1">## list the VCF/BCF as the first input</span>
+        <span class="c1">## and the index as the second input</span>
+    <span class="n">output</span><span class="p">:</span>
+        <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">.output.bed&quot;</span>
+    <span class="n">params</span><span class="p">:</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+    <span class="n">log</span><span class="p">:</span>
+        <span class="s2">&quot;logs/tabix/query/</span><span class="si">{prefix}</span><span class="s2">.log&quot;</span>
+    <span class="n">wrapper</span><span class="p">:</span>
+        <span class="s2">&quot;v1.7.0-11-g0da21ba89/bio/tabix/query&quot;</span>
+</pre></div>
+</div>
+<p>Note that input, output and log file paths can be chosen freely.</p>
+<p>When running with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>snakemake --use-conda
+</pre></div>
+</div>
+<p>the software dependencies will be automatically deployed into an isolated environment before execution.</p>
+</section>
+<section id="software-dependencies">
+<h2>Software dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">htslib==1.12</span></code></p></li>
+</ul>
+</section>
+<section id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline"></a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>Bgzip compressed file (e.g. BED.gz, GFF.gz, or VCF.gz)</p></li>
+<li><p>Tabix index file</p></li>
+<li><p>Region of interest to retrieve (params.region)</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>Uncompressed subset of the input file from the given region</p></li>
+</ul>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>William Rowell</p></li>
+</ul>
+</section>
+<section id="code">
+<h2>Code<a class="headerlink" href="#code" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;William Rowell&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, William Rowell&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;wrowell@pacb.com&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="kn">from</span> <span class="nn">snakemake.shell</span> <span class="kn">import</span> <span class="n">shell</span>
+
+<span class="n">extra</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">snakemake</span><span class="o">.</span><span class="n">log_fmt_shell</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">shell</span><span class="p">(</span>
+    <span class="s2">&quot;tabix </span><span class="si">{extra}</span><span class="s2"> </span><span class="si">{snakemake.input[0]}</span><span class="s2"> </span><span class="si">{snakemake.params.region}</span><span class="s2"> &gt; </span><span class="si">{snakemake.output}</span><span class="s2"> </span><span class="si">{log}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016, The Snakemake team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

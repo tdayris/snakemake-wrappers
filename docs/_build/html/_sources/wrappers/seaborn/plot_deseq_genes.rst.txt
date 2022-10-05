@@ -137,13 +137,14 @@ Code
     import matplotlib
     import matplotlib.pyplot
     import numpy
+    import os
     import pandas
     import seaborn
 
     from typing import Any, Dict, List, Optional
 
     logging.basicConfig(
-        #filename=snakemake.log[0],
+        filename=snakemake.log[0],
         filemode="w",
         level=logging.DEBUG
     )
@@ -181,6 +182,8 @@ Code
                       metadata_path: str,
                       gene2gene_path: str,
                       padj_threshold: float = 0.05) -> List[pandas.DataFrame]:
+        """Load table in memory"""
+        logging.info("Starting loading data in memory...")
         deseq = pandas.merge(
             left=read_deseq(deseq_path),
             right=read_deseq(intermediar_path),
@@ -190,6 +193,7 @@ Code
             validate="1:1",
             suffixes=["_results", "_mcols"]
         )
+        logging.info("Loading %s", gene2gene_path)
         deseq = pandas.merge(
             left=deseq,
             right=read_gene2gene(gene2gene_path),
@@ -209,9 +213,16 @@ Code
         ]
         print(deseq.columns)
 
+        logging.info("Loading counts: %s", dst_path)
         counts = read_deseq(dst_path)
+
+        logging.info("Loading assays: %s", assays_path)
         mu = read_deseq(assays_path)
+
+        logging.info("Loading metadata: %s", metadata_path)
         metadata = read_deseq(metadata_path)
+
+        logging.info("Loading theta filter data: %s", filter_theta_path)
         theta = read_deseq(filter_theta_path)
         return deseq, counts, mu, theta, metadata
 
@@ -249,6 +260,7 @@ Code
         )
         g.set(xscale="log")
 
+        logging.info("Counts plot saved to %s", png_out)
         matplotlib.pyplot.savefig(
             png_out,
             bbox_inches="tight"
@@ -280,20 +292,23 @@ Code
         mubox["Condition"] = [condition_dict[s] for s in mubox['Sample ID']]
 
         for gene in genes:
-            logging.info(f"Plotting information on {gene}")
+            logging.info("Plotting gene information on %s", gene)
             gene_count = dstbox[dstbox.index == gene]
             gene_mu = mubox[mubox.index == gene]
             gene_dge = deseq[deseq.index == gene]
-            png_out = png_prefix + f"{gene}.png"
             status = gene_dge["Status"][0]
 
             padj = round(gene_dge["padj"][0], 4)
 
             try:
-                name = gene_dge["Gene_Name"][0]
-                name = f"{name} ({gene})"
+                gene_name = gene_dge["Gene_Name"][0]
+                name = f"{gene_name} ({gene})"
+                png_out = png_prefix + f"{gene_name}.{gene}.png"
             except KeyError:
                 name = gene
+                gene_name = gene
+                png_out = png_prefix + f"{gene}.png"
+            logging.info(f"Plotting gene information on {name} to {png_out}")
 
             fig = matplotlib.pyplot.figure(figsize=(20,10))
 
@@ -303,9 +318,6 @@ Code
             axes.append(fig.add_subplot(1, 4, 3, sharey=axes[0]))
             axes.append(fig.add_subplot(1, 4, 4))
 
-            # fig, axes = matplotlib.pyplot.subplots(
-            #     1, 4, figsize=(20,10)#, sharey=True
-            # )
             fig.suptitle(
                 f"Expression of {name} among samples\n"
                 "Differential gene expression on "
@@ -345,6 +357,7 @@ Code
                 matplotlib.pyplot.sca(ax)
                 matplotlib.pyplot.xticks(rotation=90)
 
+            logging.info("Gene plot saved to %s", png_out)
             matplotlib.pyplot.savefig(
                 png_out,
                 bbox_inches="tight"
@@ -412,6 +425,7 @@ Code
             style="Status"
         )
 
+        logging.info("Independent filtering results saved to %s", png_out)
         matplotlib.pyplot.savefig(
             png_out,
             bbox_inches="tight"
@@ -468,6 +482,7 @@ Code
             hue="Chromosomes"
         )
 
+        logging.info("P-Value distribution saved to %s", png_out)
         matplotlib.pyplot.savefig(
             png_out,
             bbox_inches="tight"
@@ -491,6 +506,8 @@ Code
             color="red",
             linestyle="--"
         )
+
+        logging.info("Theta filter saved to %s", png_out)
         matplotlib.pyplot.savefig(
             png_out,
             bbox_inches="tight"
@@ -525,58 +542,101 @@ Code
 
     # Plotting
     if "log_counts" in snakemake.output.keys():
-        plot_counts(
-            dst=counts,
-            colors=sample_colors,
-            png_out=snakemake.output["log_counts"]
-        )
+        logging.info("Log counts plot...")
+        try:
+            plot_counts(
+                dst=counts,
+                colors=sample_colors,
+                png_out=snakemake.output["log_counts"]
+            )
+        except Error as e:
+            logging.error(e)
+            raise
 
     if "log_mu" in snakemake.output.keys():
-        plot_counts(
-            dst=mu,
-            colors=sample_colors,
-            png_out=snakemake.output["log_mu"],
-            is_mu=True
-        )
+        logging.info("Log µ count plot ...")
+        try:
+            plot_counts(
+                dst=mu,
+                colors=sample_colors,
+                png_out=snakemake.output["log_mu"],
+                is_mu=True
+            )
+        except Error as e:
+            logging.error(e)
+            raise
 
     if "gene_plots" in snakemake.output.keys():
+        logging.info("Performing gene plots ...")
+        if not os.path.exists(snakemake.output["gene_plots"]):
+            logging.info(
+                "Building output directory: %s", 
+                snakemake.output["gene_plots"]
+            )
+            os.makedirs(str(snakemake.output["gene_plots"]))
+        else:
+            logging.info(
+                "Output directory '%s' already exists ", 
+                snakemake.output["gene_plots"]
+            )
+
         try:
             gene_list = snakemake.wildcards["gene"]
         except AttributeError:
             gene_list = snakemake.params["gene_list"]
 
-        plot_single_gene(
-            dst=counts,
-            deseq=deseq,
-            mu=mu,
-            condition_dict=snakemake.params["condition_dict"],
-            genes=gene_list,
-            png_prefix=snakemake.params["gene_plots_prefix"],
-            comparison=snakemake.params["comparison"]
-        )
+        try:
+            plot_single_gene(
+                dst=counts,
+                deseq=deseq,
+                mu=mu,
+                condition_dict=snakemake.params["condition_dict"],
+                genes=gene_list,
+                png_prefix=snakemake.params["gene_plots_prefix"],
+                comparison=snakemake.params["comparison"]
+            )
+        except Error as e:
+            logging.error(e)
+            raise
 
     if "pval" in snakemake.output.keys():
-        pval_distribution(
-            deseq=deseq,
-            comparison=snakemake.params["comparison"],
-            png_out=snakemake.output["pval"],
-            chromosomes=snakemake.params.get("chromosomes", None)
-        )
+        logging.info("P-Value distribution plot ...")
+        try:
+            pval_distribution(
+                deseq=deseq,
+                comparison=snakemake.params["comparison"],
+                png_out=snakemake.output["pval"],
+                chromosomes=snakemake.params.get("chromosomes", None)
+            )
+        except Error as e:
+            logging.error(e)
+            raise
 
     if "independent_filtering" in snakemake.output.keys():
-        independent_filtering(
-            deseq=deseq,
-            comparison=snakemake.params["comparison"],
-            png_out=snakemake.output["independent_filtering"]
-        )
+        logging.info("Independent filtering plot ...")
+        try:
+            independent_filtering(
+                deseq=deseq,
+                comparison=snakemake.params["comparison"],
+                png_out=snakemake.output["independent_filtering"]
+            )
+        except Error as e:
+            logging.error(e)
+            raise
 
     if "filter_theta" in snakemake.output.keys():
-        filter_theta(
-            theta=theta,
-            metadata=metadata,
-            png_out=snakemake.output["filter_theta"]
-        )
+        logging.info("Theta filter plot ...")
+        try:
+            filter_theta(
+                theta=theta,
+                metadata=metadata,
+                png_out=snakemake.output["filter_theta"]
+            )
+        except Error as e:
+            logging.error(e)
+            raise
 
+    logging.info("Process over")
 
 .. |nl| raw:: html
 

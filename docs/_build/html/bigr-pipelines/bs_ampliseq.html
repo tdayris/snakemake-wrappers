@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BS_AMPLISEQ &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CELLTYPE_DECONVOLUTION_RNASEQ" href="celltype_deconvolution_rnaseq.html" />
+    <link rel="prev" title="BCL2FASTQ (UNDER DEVELOPMENT)" href="bcl2fastq.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Snakemake Wrappers
+          </a>
+              <div class="version">
+                heads/Unofficial
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta-wrappers.html">Meta-Wrappers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipelines</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../pipelines.html">BiGR Pipelines</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="CTC_Variant_Calling_Integragen_Legacy.html">CTC_VARIANT_CALLING_INTEGRAGEN_LEGACY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="annot_sv.html">ANNOT_SV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bcl2fastq.html">BCL2FASTQ (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">BS_AMPLISEQ</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snakefile">Snakefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="celltype_deconvolution_rnaseq.html">CELLTYPE_DECONVOLUTION_RNASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chipseq.html">CHIPSEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cytoscan_eacon.html">EACON_CYTOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design_builder.html">DESIGN_BUILDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dge_deseq2.html">DGE_DESEQ2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fastqc_multiqc.html">FASTQC_MULTIQC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_set_enrichment.html">GENE_SET_ENRICHMENT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low_pass_wgs_copy_number.html">LOW_PASS_WGS_COPY_NUMBER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="make_pon.html">MAKE_PON</a></li>
+<li class="toctree-l2"><a class="reference internal" href="miraseq.html">MIRASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nfcore_chipseq.html">NFCORE-CHIPSEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oncoscan_eacon.html">EACON_ONCOSCAN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="retrotransposons.html">RETROTRANSPOSONS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rnaseq.html">RNASEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="salmon_quant.html">SALMON_QUANT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="seqoia.html">SEQOIA SINGLE-SAMPLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sigprofiler_signatures.html">SIGPROFILER_SIGNATURES (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="snpeff_snpsift.html">SNPEFF_SNPSIFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_ampliseq.html">VARIANT_CALLING_AMPLISEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_calling_germline.html">VARIANT_CALLING_GERMLINE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variant_occurence_cohort.html">VARIANT_OCCURENCE_COHORT (UNDER DEVELOPMENT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wes_somatic.html">VARIANT_CALLING_SOMATIC</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../readme/readme_long.html">Long help</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bigr_unofficial.html">BiGR Unofficial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../apidocs/api.html">Unofficial API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Snakemake Wrappers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../pipelines.html">BiGR Pipelines</a> &raquo;</li>
+      <li>BS_AMPLISEQ</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/bigr-pipelines/bs_ampliseq.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bs-ampliseq">
+<span id="id1"></span><h1>BS_AMPLISEQ<a class="headerlink" href="#bs-ampliseq" title="Permalink to this headline"></a></h1>
+<p>Analyse bisulfite ampliseq with Bismark</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
+<p>In order to run the pipeline, use the following commands</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> /path/to/project
+
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/bs_ampliseq/run.sh
+</pre></div>
+</div>
+</section>
+<section id="input-output">
+<h2>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline"></a></h2>
+<p><strong>Input:</strong></p>
+<ul class="simple">
+<li><p>Fastq files</p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul class="simple">
+<li><p>Bismark mapping + Methylation</p></li>
+</ul>
+</section>
+<section id="snakefile">
+<h2>Snakefile<a class="headerlink" href="#snakefile" title="Permalink to this headline"></a></h2>
+<p>The pipeline contains the following steps:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/000.common.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/001.bigr_copy.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/002.trimming.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/003.bismark.mapping.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/004.bismark.extract.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/005.bismark.report.smk&quot;</span>
+<span class="n">include</span><span class="p">:</span> <span class="s2">&quot;rules/006.multiqc.smk&quot;</span>
+
+
+<span class="n">rule</span> <span class="n">target</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span>
+        <span class="n">multiqc</span><span class="o">=</span><span class="s2">&quot;data_output/MultiQC/Bismark.html&quot;</span><span class="p">,</span>
+        <span class="n">mbias_r1</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;data_output/Bismark/</span><span class="si">{sample}</span><span class="s2">.M-bias_R1.png&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
+        <span class="p">),</span>
+        <span class="n">mbias_r2</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;data_output/Bismark/</span><span class="si">{sample}</span><span class="s2">.M-bias_R2.png&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
+        <span class="p">),</span>
+        <span class="n">mbias_report</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;bismark/meth/</span><span class="si">{sample}</span><span class="s2">.M-bias.txt&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">),</span>
+        <span class="n">splitting_report</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;bismark/meth/</span><span class="si">{sample}</span><span class="s2">_splitting_report.txt&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
+        <span class="p">),</span>
+        <span class="n">methylome_CpG_cov</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;data_output/Bismark/</span><span class="si">{sample}</span><span class="s2">.cpg.cov.gz&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
+        <span class="p">),</span>
+        <span class="n">methylome_CpG_mlevel_bedGraph</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;data_output/Bismark/</span><span class="si">{sample}</span><span class="s2">.cpg.bedGraph.gz&quot;</span><span class="p">,</span>
+            <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">read_base_meth_state_cpg</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;data_output/Bismark/CpG_context_</span><span class="si">{sample}</span><span class="s2">.txt.gz&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
+        <span class="p">),</span>
+        <span class="n">read_base_meth_state_chg</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;data_output/Bismark/CHG_context_</span><span class="si">{sample}</span><span class="s2">.txt.gz&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
+        <span class="p">),</span>
+        <span class="n">read_base_meth_state_chh</span><span class="o">=</span><span class="n">expand</span><span class="p">(</span>
+            <span class="s2">&quot;data_output/Bismark/CHH_context_</span><span class="si">{sample}</span><span class="s2">.txt.gz&quot;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_list</span>
+        <span class="p">),</span>
+</pre></div>
+</div>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Thibault Dayris</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="bcl2fastq.html" class="btn btn-neutral float-left" title="BCL2FASTQ (UNDER DEVELOPMENT)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="celltype_deconvolution_rnaseq.html" class="btn btn-neutral float-right" title="CELLTYPE_DECONVOLUTION_RNASEQ" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016, The Snakemake team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

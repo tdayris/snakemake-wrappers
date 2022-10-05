@@ -3,9 +3,9 @@
 MIXCR ALIGN
 ===========
 
-align raw sequencing reads to reference V, D, J and C genes of T- and B- cell receptors with `mixcr <https://mixcr.readthedocs.io/en/master/align.html>`_
+align raw sequencing reads to reference V, D, J and C genes of T- and B- cell receptors.
 
-**URL**: 
+**URL**: https://docs.milaboratories.com/mixcr/reference/mixcr-align/
 
 Example
 -------
@@ -24,7 +24,7 @@ This wrapper can be used in the following way:
             species = "hs",
             extra = ""
         wrapper:
-            "0.50.4-1991-g7872381db/bio/mixcr/align"
+            "0.79.0-2111-gcaef468e5/bio/mixcr/align"
 
 Note that input, output and log file paths can be chosen freely.
 
@@ -39,7 +39,7 @@ the software dependencies will be automatically deployed into an isolated enviro
 Software dependencies
 ---------------------
 
-* ``mixcr==3.0.3``
+* ``mixcr==4.0.0``
 
 Input/Output
 ------------
@@ -49,10 +49,26 @@ Input/Output
 
 **Output:**
 
-* Alignments
+* ``report``: txt alignment report
+* ``json``: json alignment report
+* ``vdjca``: alignment
 
 
 
+Params
+------
+
+* ``extra``: Optional parameters
+
+* ``species``: Name of the organism.
+
+
+
+
+Notes
+-----
+
+For species name, see: https://github.com/repseqio/library-imgt/releases
 
 
 Authors
@@ -87,9 +103,11 @@ Code
     if "report" in snakemake.output.keys():
         extra += " --report {} ".format(snakemake.output["report"])
 
+    if "json" in snakemake.output.keys():
+        extra += "----json-report {}".format(snakemake.output["json"])
 
     shell(
-        "mixcr align --species {species} {extra} --threads {snakemake.threads} "
+        "mixcr align --verbose --force-overwrite --species {species} {extra} --threads {snakemake.threads} "
         "{snakemake.input} {snakemake.output.vdjca} {log}"
     )
 

@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RNA-Seq bulk &mdash; Snakemake Wrappers heads/Unofficial documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Contributing" href="../../contributing.html" />
+    <link rel="prev" title="Long help" href="../readme_long.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Snakemake Wrappers
+          </a>
+              <div class="version">
+                heads/Unofficial
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Wrappers, Meta-Wrappers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta-wrappers.html">Meta-Wrappers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipelines</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../pipelines.html">BiGR Pipelines</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../readme_long.html">Long help</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RNA-Seq bulk</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tldr-run-this-pipeline">TLDR: run this pipeline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#design-file">Design file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#config-yaml">Config.yaml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Classical use</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Quality controls</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pipeline">Pipeline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#command-line">Command line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Quantification</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id6">Pipeline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id7">Command line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#output">Output</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Differential Gene Expression</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id9">Pipeline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id10">Command line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id11">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">Aggregate factors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#problem">Problem</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#solution-1">Solution 1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#solution-2">Solution 2</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id14">Ignore factors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id15">Problem</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id16">Solution 1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id17">Solution 2</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id19">Perform only a subset of DGE</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id20">Problem</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#solution">Solution</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id21">Gene set enrichment analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id22">Pipeline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id23">Pipeline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id24">Command line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id25">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id26">Fusions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id27">Pipeline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id28">Command line</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id29">Variant Calling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bigr_unofficial.html">BiGR Unofficial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Snakemake Wrappers</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../readme_long.html">Long help</a> &raquo;</li>
+      <li>RNA-Seq bulk</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/readme/long/rnaseq.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rna-seq-bulk">
+<h1>RNA-Seq bulk<a class="headerlink" href="#rna-seq-bulk" title="Permalink to this headline"></a></h1>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline"></a></h2>
+<p>This pipeline aims to perform classical RNASeq-bulk analyzes:</p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#tldr-run-this-pipeline">TLDR</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#design-file">design.tsv file</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#configyaml">config.yaml file</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#classical-use">Classical use</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#quality-controls">Quality controls</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#quantification">Quantification</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#differential-gene-expression">Differential Gene Expression</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#aggregate-factors">Aggregate factors</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#ignore-factors">Ignore factors</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#perform-only-a-subset-of-dge">Perform only a subset of DGE</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#gene-set-enrichment-analysis">Gene set enrichment analysis</a></p></li>
+<li><p><a href="#id30"><span class="problematic" id="id31">`Immune cell population deconvolution &lt;&gt;`_</span></a> Under construction</p></li>
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#fusions">Fusions</a> Under construction</p></li>
+<li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#variant-calling">Variant Calling</a> Under construction</p></li>
+</ol>
+<p>Each subsection can be selected one by one, or the whole pipeline may be executed.</p>
+</section>
+<section id="tldr-run-this-pipeline">
+<h2>TLDR: run this pipeline<a class="headerlink" href="#tldr-run-this-pipeline" title="Permalink to this headline"></a></h2>
+<div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
+cd /path/to/my/project/tmp
+
+## Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+
+## Put design file in ${PWD}
+
+## Run this pipeline
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
+</pre></div>
+</div>
+</section>
+<section id="design-file">
+<h2>Design file<a class="headerlink" href="#design-file" title="Permalink to this headline"></a></h2>
+<p>The design file contains a description of your samples and experimental design. It should look like:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sample_id</p></th>
+<th class="head"><p>Upstream_file</p></th>
+<th class="head"><p>Downstream_file</p></th>
+<th class="head"><p>{ConditionA}</p></th>
+<th class="head"><p>{ConditionB}</p></th>
+<th class="head"><p>…</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Sample1</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>BatchA</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample2</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>BatchB</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample3</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>BatchA</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample4</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>BatchB</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample5</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>BatchA</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample6</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>BatchB</p></td>
+<td><p>…</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">ConditionA</span></code> and <code class="docutils literal notranslate"><span class="pre">ConditionB</span></code> are example names. Put the name of your own conditions instead of ConditionA and ConditionB. Add as many conditions as you with below. Keep in mind that <em>all</em> possible comparisons will be done (using <code class="docutils literal notranslate"><span class="pre">~{condition_name}</span></code>, see below for accounting batch effects).</p>
+<p>Header line <strong>must</strong> be the first line:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Sample_id</span></code> <strong>must</strong> be in the header (first line). Column order does not matter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Upstream_file</span></code> <strong>must</strong> be in the header (first line). Column order does not matter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Downstream_file</span></code> <strong>must</strong> be in the header (first line). No single-ended analyzes here. Column order does not matter.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">BatchEffect</span></code> is present in header (first line), and only if <code class="docutils literal notranslate"><span class="pre">BatchEffect</span></code> is present in header (first line), then the Differential Expression Analysis will take this column as batch effect (using <code class="docutils literal notranslate"><span class="pre">~BatchEffect+{condition_name}</span></code>).</p></li>
+</ol>
+<p>Only one batch effect can be considered. Do not call any of your conditions <code class="docutils literal notranslate"><span class="pre">BatchEffect</span></code> if you don’t know what you are doing.</p>
+<p>Each column will be considered as a factor. Each value in each cell will be considered as a level of its corresponding factor:</p>
+<ol class="arabic simple">
+<li><p>A level with less than two replicates will be ignored.</p></li>
+<li><p>A factor with less than two levels will be ignored.</p></li>
+</ol>
+</section>
+<section id="config-yaml">
+<h2>Config.yaml<a class="headerlink" href="#config-yaml" title="Permalink to this headline"></a></h2>
+<p>This file describes all optional parameters set in the pipeline.</p>
+<p>Possible edition:</p>
+<ol class="arabic simple">
+<li><p>You may want to modify the list of genes of interest by adding a list after the provided example.</p></li>
+<li><p>You may change the path to your design file by changing the default <code class="docutils literal notranslate"><span class="pre">design:</span> <span class="pre">design.tsv</span></code>.</p></li>
+<li><p>You may want to analyze two factors as together (see: <a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#aggregate-factors">aggregate factors</a>)</p></li>
+<li><p>You may want to ignore factors present in your design file (see <a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#ignore-factors">ignore factors</a>)</p></li>
+<li><p>You may want to run a subset of possible DGE (see <a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#perform-only-a-subset-of-dge">subset DGE</a>)</p></li>
+</ol>
+<p>Do not change command line parameters if you do not know what you are doing. Do not set neither threading, temporary files, memory management, nor IO files in command line. This has already been done by the pipeline.</p>
+<p>Changing anything else shall be done at your own risks.</p>
+</section>
+<section id="id3">
+<h2>Classical use<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h2>
+<div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
+cd /path/to/my/project/tmp
+
+## Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+
+## Put design file in ${PWD}
+
+## Run basic quality controls, keep intermediary files
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh QC --nt
+
+## Choose wether to continue the analysis or not.
+
+## Edit config file
+## 1. with your genes of interest
+## 1. subset list of DGE
+## 1. aggregate factors, etc.
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh quant --nt
+
+## Have a look at mapping rates and basic quantification QC
+
+## Run Differential Gene Expression
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh dge --nt
+
+## Have a look at the DGE results
+
+## Run fusions
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh fusions --nt
+
+## Have a look at the results
+
+## Clean TEMPORARY files and temporary files only
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh --delete-temp-output
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h2>Quality controls<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h2>
+<section id="pipeline">
+<h3>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this headline"></a></h3>
+<ol class="arabic simple">
+<li><p>iRODS copy</p></li>
+<li><p>Fastp</p></li>
+<li><p>FastqScreen</p></li>
+<li><p>MultiQC</p></li>
+</ol>
+<p>Use iRODS command to get your fastq files, then clean them with Fastp. Assess organism quality with FastqScreen, then aggregate quality reports with MultiQC.</p>
+</section>
+<section id="command-line">
+<h3>Command line<a class="headerlink" href="#command-line" title="Permalink to this headline"></a></h3>
+<p>Command line argument order does not matter.</p>
+<div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
+cd /path/to/my/project/tmp
+
+## Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+
+## Put design file in ${PWD}
+
+## GRCh38 / HG38
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh QC --nt
+## GRCm38 / MM10
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 QC --nt
+</pre></div>
+</div>
+</section>
+<section id="results">
+<h3>Results<a class="headerlink" href="#results" title="Permalink to this headline"></a></h3>
+<p>The only output is a MultiQC report. By default, all other output are deleted, use <code class="docutils literal notranslate"><span class="pre">--nt</span></code> to keep cleaned fastq files.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>data_output/
+├── multiqc
+    ├── MultiQC.QC_data
+    ├── multiqc_data.json
+    │   ├── multiqc_fastp.txt
+    │   ├── multiqc_fastq_screen.txt
+    │   ├── multiqc_general_stats.txt
+    │   ├── multiqc.log
+    │   └── multiqc_sources.txt
+    └── MultiQC.QC.html
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id5">
+<h2>Quantification<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h2>
+<section id="id6">
+<h3>Pipeline<a class="headerlink" href="#id6" title="Permalink to this headline"></a></h3>
+<ol class="arabic simple">
+<li><p>iRODS copy</p></li>
+<li><p>Fastp</p></li>
+<li><p>FastqScreen</p></li>
+<li><p>Salmon</p></li>
+<li><p>MultiQC</p></li>
+</ol>
+<p>Use iRODS command to get your fastq files, then clean them with Fastp. Assess organism quality with FastqScreen. Salmon estimates transcripts abundance, then aggregate quality reports with MultiQC. Salmon results are annotated with a basic GTF.</p>
+</section>
+<section id="id7">
+<h3>Command line<a class="headerlink" href="#id7" title="Permalink to this headline"></a></h3>
+<p>Command line argument order does not matter.</p>
+<div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
+cd /path/to/my/project/tmp
+
+## Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+
+## Put design file in ${PWD}
+
+## GRCh38 / HG38
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh quant --nt
+## GRCm38 / MM10
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 quant --nt
+</pre></div>
+</div>
+</section>
+<section id="output">
+<h3>Output<a class="headerlink" href="#output" title="Permalink to this headline"></a></h3>
+<p>The repository <code class="docutils literal notranslate"><span class="pre">multiqc</span></code> contains two multiqc reports: basic quality controls and salmon. MultiQC.Salmon.html contains all information present in MultiQC.QC.html, and adds the results of Salmon.</p>
+<p>The repository <code class="docutils literal notranslate"><span class="pre">Quantification</span></code> contains three quantification files:</p>
+<ol class="arabic simple">
+<li><p>The file: <code class="docutils literal notranslate"><span class="pre">Raw.genes.tsv</span></code> contains the raw gene expression estimates, obtained from dummy summary of the expression of each transcripts counting for a same gene. This is <strong>not</strong> normalized. Useful for DESeq2, etc.</p></li>
+<li><p>The file: <code class="docutils literal notranslate"><span class="pre">TPM.genes.tsv</span></code> contains TPM normalized gene expression estimates, obtained from dummy summary of the expression of each transcripts counting for a same gene. This is normalized by TPM. It does not take the factors and levels present in the <code class="docutils literal notranslate"><span class="pre">design.tsv</span></code> into account while normalizing.</p></li>
+<li><p>The file: <code class="docutils literal notranslate"><span class="pre">TPM.transcripts.tsv</span></code> contains TPM normalized transcripts expression estimates, obtained Salmon. This is normalized by TPM. It does not take the factors and levels present in the <code class="docutils literal notranslate"><span class="pre">design.tsv</span></code> into account while normalizing.</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>data_output/
+├── multiqc
+│   ├── MultiQC.QC_data
+│   │   ├── multiqc_data.json
+│   │   ├── multiqc_fastp.txt
+│   │   ├── multiqc_fastq_screen.txt
+│   │   ├── multiqc_general_stats.txt
+│   │   ├── multiqc.log
+│   │   └── multiqc_sources.txt
+│   ├── MultiQC.QC.html
+│   ├── MultiQC.Salmon_data
+│   │   ├── multiqc_data.json
+│   │   ├── multiqc_fastp.txt
+│   │   ├── multiqc_fastq_screen.txt
+│   │   ├── multiqc_general_stats.txt
+│   │   ├── multiqc.log
+│   │   └── multiqc_sources.txt
+│   └── MultiQC.Salmon.html
+└── Quantification
+    ├── Raw.genes.tsv
+    ├── TPM.genes.tsv
+    └── TPM.transcripts.tsv
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id8">
+<h2>Differential Gene Expression<a class="headerlink" href="#id8" title="Permalink to this headline"></a></h2>
+<section id="id9">
+<h3>Pipeline<a class="headerlink" href="#id9" title="Permalink to this headline"></a></h3>
+<ol class="arabic simple">
+<li><p>iRODS copy</p></li>
+<li><p>Fastp</p></li>
+<li><p>FastqScreen</p></li>
+<li><p>Salmon</p></li>
+<li><p>tximport</p></li>
+<li><p>DESeq2</p></li>
+<li><p>In-house scripts</p></li>
+<li><p>MultiQC</p></li>
+</ol>
+</section>
+<section id="id10">
+<h3>Command line<a class="headerlink" href="#id10" title="Permalink to this headline"></a></h3>
+<div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
+cd /path/to/my/project/tmp
+
+## Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+
+## Put design file in ${PWD}
+
+## GRCh38 / HG38
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh dge --nt
+## GRCm38 / MM10
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 dge --nt
+</pre></div>
+</div>
+</section>
+<section id="id11">
+<h3>Results<a class="headerlink" href="#id11" title="Permalink to this headline"></a></h3>
+<p>The repository <code class="docutils literal notranslate"><span class="pre">multiqc</span></code> contains two multiqc reports: basic quality controls and salmon. MultiQC.Salmon.html contains all information present in MultiQC.QC.html, and adds the results of Salmon.</p>
+<p>The repository <code class="docutils literal notranslate"><span class="pre">Quantification</span></code> contains three quantification files:</p>
+<ol class="arabic simple">
+<li><p>The file: <code class="docutils literal notranslate"><span class="pre">Raw.genes.tsv</span></code> contains the raw gene expression estimates, obtained from dummy summary of the expression of each transcripts counting for a same gene. This is <strong>not</strong> normalized. Useful for DESeq2, etc.</p></li>
+<li><p>The file: <code class="docutils literal notranslate"><span class="pre">TPM.genes.tsv</span></code> contains TPM normalized gene expression estimates, obtained from dummy summary of the expression of each transcripts counting for a same gene. This is normalized by TPM. It does not take the factors and levels present in the <code class="docutils literal notranslate"><span class="pre">design.tsv</span></code> into account while normalizing.</p></li>
+<li><p>The file: <code class="docutils literal notranslate"><span class="pre">TPM.transcripts.tsv</span></code> contains TPM normalized transcripts expression estimates, obtained Salmon. This is normalized by TPM. It does not take the factors and levels present in the <code class="docutils literal notranslate"><span class="pre">design.tsv</span></code> into account while normalizing.</p></li>
+</ol>
+<p>The <code class="docutils literal notranslate"><span class="pre">DEseq2</span></code> repository contains one sub-folder for each comparison between two levels, for each factor. Aggregation, sub-setting and factor ignore may reduce of increase the number of sub-folders. See config file modification to know how to master the list of DESeq2 results. TODO</p>
+<p>In each DESeq2 sub-folder:</p>
+<ol class="arabic simple">
+<li><p>The file <code class="docutils literal notranslate"><span class="pre">Complete_XXX.tsv</span></code> contains annotated results of DESeq2 with both differentially expressed genes under provided alpha threshold and the other ones. XXX being the name of the comparison.</p></li>
+<li><p>The file <code class="docutils literal notranslate"><span class="pre">SortedOnLogFC_XXX.tsv</span></code> contains the differentially expressed genes only. They have been annotated and sorted on Log(FC). XXX being the name of the comparison.</p></li>
+<li><p>The file <code class="docutils literal notranslate"><span class="pre">SortedOnPadj_XXX.tsv</span></code> contains the differentially expressed genes only. They have been annotated and sorted on adjusted P-Values. XXX being the name of the comparison.</p></li>
+<li><p>The folder <code class="docutils literal notranslate"><span class="pre">gene_plots</span></code> contains a list of plots, one for each gene of interest. This is a highlight on its status, expression and per-condition weight.</p></li>
+<li><p>The MultiQC report contains information about the samples belonging to the given comparison, and no other sample. It also contains Volcanoplot, PCAs, Expression weights, etc. Each of these plots is unique to this comparison, since expressions were normalized with DESeq2, which takes factors/levels into account.</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>data_output/
+├── DEseq2
+│   ├── DGE_considering_factor_Batch_comparing_test_B1_vs_reference_B2
+│   │   ├── Complete_DGE_considering_factor_Batch_comparing_test_B1_vs_reference_B2.tsv
+│   │   ├── gene_plots
+│   │   │   └── ENSG00000141510.png
+│   │   ├── MultiQC.DEseq2_data
+│   │   │   ├── multiqc_data.json
+│   │   │   ├── multiqc_fastp.txt
+│   │   │   ├── multiqc_fastq_screen.txt
+│   │   │   ├── multiqc_general_stats.txt
+│   │   │   ├── multiqc.log
+│   │   │   └── multiqc_sources.txt
+│   │   ├── MultiQC.DEseq2.html
+│   │   ├── SortedOnLogFC_DGE_considering_factor_Batch_comparing_test_B1_vs_reference_B2.tsv
+│   │   └── SortedOnPadj_DGE_considering_factor_Batch_comparing_test_B1_vs_reference_B2.tsv
+├── multiqc
+│   ├── MultiQC.QC_data
+│   │   ├── multiqc_data.json
+│   │   ├── multiqc_fastp.txt
+│   │   ├── multiqc_fastq_screen.txt
+│   │   ├── multiqc_general_stats.txt
+│   │   ├── multiqc.log
+│   │   └── multiqc_sources.txt
+│   ├── MultiQC.QC.html
+│   ├── MultiQC.Salmon_data
+│   │   ├── multiqc_data.json
+│   │   ├── multiqc_fastp.txt
+│   │   ├── multiqc_fastq_screen.txt
+│   │   ├── multiqc_general_stats.txt
+│   │   ├── multiqc.log
+│   │   └── multiqc_sources.txt
+│   └── MultiQC.Salmon.html
+└── Quantification
+    ├── Raw.genes.tsv
+    ├── TPM.genes.tsv
+    └── TPM.transcripts.tsv
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id12">
+<h2>Aggregate factors<a class="headerlink" href="#id12" title="Permalink to this headline"></a></h2>
+<section id="problem">
+<h3>Problem<a class="headerlink" href="#problem" title="Permalink to this headline"></a></h3>
+<p>Consider the following design:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sample_id</p></th>
+<th class="head"><p>Upstream_file</p></th>
+<th class="head"><p>Downstream_file</p></th>
+<th class="head"><p>Treatment</p></th>
+<th class="head"><p>Status</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Sample1</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Diseased</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample2</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Relapse</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample3</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Diseased</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample4</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Relapse</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample5</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Relapse</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample6</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Diseased</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample7</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Relapse</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample8</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Diseased</p></td>
+</tr>
+</tbody>
+</table>
+<p>It will produce the following comparisons:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>DEseq2/
+    ├── DGE_considering_factor_ConditionA_comparing_test_Untreated_vs_reference_Treated
+    ├── DGE_considering_factor_ConditionB_comparing_test_Relapse_vs_reference_Diseased
+    ├── DGE_considering_factor_ConditionA_comparing_test_Treated_vs_reference_Untreated
+    └── DGE_considering_factor_ConditionB_comparing_test_Diseased_vs_reference_Relapse
+</pre></div>
+</div>
+<p>Let us imagine we are interested in the effect of the treatment itself, AND the effect of the treatment on sample under “relapse” in relation to sample on relapse but without treatment.</p>
+</section>
+<section id="solution-1">
+<h3>Solution 1<a class="headerlink" href="#solution-1" title="Permalink to this headline"></a></h3>
+<p>The first easy solution is to create an additional column, called as you wish (lets say Treatment_On_Relapse) and concatenate the two columns values. As a result, the design would be:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sample_id</p></th>
+<th class="head"><p>Upstream_file</p></th>
+<th class="head"><p>Downstream_file</p></th>
+<th class="head"><p>Treatment</p></th>
+<th class="head"><p>Status</p></th>
+<th class="head"><p>Treatment_On_Relapse</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Sample1</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Diseased</p></td>
+<td><p>Treated_Diseased</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample2</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Relapse</p></td>
+<td><p>Treated_Relapse</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample3</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Diseased</p></td>
+<td><p>Treated_Diseased</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample4</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Relapse</p></td>
+<td><p>Treated_Relapse</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample5</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Relapse</p></td>
+<td><p>Untreated_Relapse</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample6</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Diseased</p></td>
+<td><p>Untreated_Diseased</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample7</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Relapse</p></td>
+<td><p>Untreated_Relapse</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample8</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Diseased</p></td>
+<td><p>Untreated_Diseased</p></td>
+</tr>
+</tbody>
+</table>
+<p>Now, the pipeline will produce the following results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>DEseq2/
+    ├── DGE_considering_factor_ConditionA_comparing_test_Untreated_vs_reference_Treated
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Relapse_vs_reference_Treated_Diseased
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Relapse_vs_reference_Treated_Diseased
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Diseased_vs_reference_Treated_Diseased
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Relapse_vs_reference_Untreated_Diseased
+    ├── DGE_considering_factor_ConditionB_comparing_test_Relapse_vs_reference_Diseased
+    ├── DGE_considering_factor_ConditionA_comparing_test_Treated_vs_reference_Untreated
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Diseased_vs_reference_Treated_Relapse
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Diseased_vs_reference_Untreated_Relapse
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Diseased_vs_reference_Untreated_Diseased
+    ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Diseased_vs_reference_Untreated_Relapse
+    └── DGE_considering_factor_ConditionB_comparing_test_Diseased_vs_reference_Relapse
+</pre></div>
+</div>
+<p>You do have the levels you are interested in.</p>
+</section>
+<section id="solution-2">
+<h3>Solution 2<a class="headerlink" href="#solution-2" title="Permalink to this headline"></a></h3>
+<p>Within the <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code> file, modify the value of</p>
+<div class="highlight-{yaml} notranslate"><div class="highlight"><pre><span></span>deseq2:
+    design:
+        columns_to_aggregate: null
+</pre></div>
+</div>
+<p>to:</p>
+<div class="highlight-{yaml} notranslate"><div class="highlight"><pre><span></span>deseq2:
+    design:
+        columns_to_aggregate:
+            - - Treatment
+              - Status
+</pre></div>
+</div>
+<p>It will have the very same consequences as described in <a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#solution-1">solution 1</a> above. Please, note that the new factor will be named <code class="docutils literal notranslate"><span class="pre">Treatment_Status</span></code>. You cannot rename factors with this solution.</p>
+</section>
+</section>
+<section id="id14">
+<h2>Ignore factors<a class="headerlink" href="#id14" title="Permalink to this headline"></a></h2>
+<section id="id15">
+<h3>Problem<a class="headerlink" href="#id15" title="Permalink to this headline"></a></h3>
+<p>Sometimes, factors are not interesting anymore (not relevant in PCA, loss of interest by project research investigator, …). We want this pipeline to ignore this factor. Consider the following <code class="docutils literal notranslate"><span class="pre">design.tsv</span></code>:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sample_id</p></th>
+<th class="head"><p>Upstream_file</p></th>
+<th class="head"><p>Downstream_file</p></th>
+<th class="head"><p>Treatment</p></th>
+<th class="head"><p>Status</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Sample1</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Diseased</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample2</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Relapse</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample3</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Diseased</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample4</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Relapse</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample5</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Relapse</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample6</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Diseased</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample7</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Relapse</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample8</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Diseased</p></td>
+</tr>
+</tbody>
+</table>
+<p>Let’s pretend we want to ignore the sample status Diseased/Relapse.</p>
+</section>
+<section id="id16">
+<h3>Solution 1<a class="headerlink" href="#id16" title="Permalink to this headline"></a></h3>
+<p>Remove this column from your design. Then the pipeline won’t be aware of it and will not consider this factor anymore.</p>
+</section>
+<section id="id17">
+<h3>Solution 2<a class="headerlink" href="#id17" title="Permalink to this headline"></a></h3>
+<p>Within the <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code> file, modify the value of</p>
+<div class="highlight-{yaml} notranslate"><div class="highlight"><pre><span></span>deseq2:
+    design:
+        columns_to_ignore: null
+</pre></div>
+</div>
+<p>to:</p>
+<div class="highlight-{yaml} notranslate"><div class="highlight"><pre><span></span>deseq2:
+    design:
+        columns_to_ignore:
+            - Status
+</pre></div>
+</div>
+<p>It will have the very same consequences as described in <a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#solution-1-1">solution 1</a> above.</p>
+</section>
+</section>
+<section id="id19">
+<h2>Perform only a subset of DGE<a class="headerlink" href="#id19" title="Permalink to this headline"></a></h2>
+<section id="id20">
+<h3>Problem<a class="headerlink" href="#id20" title="Permalink to this headline"></a></h3>
+<p>Sometimes, we are not interested in all possible comparisons. For instance, the should be only one reference through all the comparisons. Let us consider the following <code class="docutils literal notranslate"><span class="pre">design.tsv</span></code>:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sample_id</p></th>
+<th class="head"><p>Upstream_file</p></th>
+<th class="head"><p>Downstream_file</p></th>
+<th class="head"><p>Treatment</p></th>
+<th class="head"><p>Status</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Sample1</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Diseased</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample2</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Relapse</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample3</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Diseased</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample4</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Treated</p></td>
+<td><p>Relapse</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample5</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Relapse</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample6</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Diseased</p></td>
+</tr>
+<tr class="row-even"><td><p>Sample7</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Relapse</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample8</p></td>
+<td><p>/path/file.1.fq.gz</p></td>
+<td><p>/path/file.2.fq.gz</p></td>
+<td><p>Untreated</p></td>
+<td><p>Diseased</p></td>
+</tr>
+</tbody>
+</table>
+<p>We want “Untreated” level within “Treatment” factor to always be a reference level. We also want “Untreated_Relapse” to be our reference while comparing Treatment/Status interactions.</p>
+</section>
+<section id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline"></a></h3>
+<p>Within the <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code> file, modify the value of</p>
+<div class="highlight-{yaml} notranslate"><div class="highlight"><pre><span></span>deseq2:
+    design:
+        columns_to_aggregate: null
+        include_only: null
+</pre></div>
+</div>
+<p>to:</p>
+<div class="highlight-{yaml} notranslate"><div class="highlight"><pre><span></span>deseq2:
+    design:
+        columns_to_aggregate:
+            - - Treatment
+              - Status
+        include_only:
+            - _reference_Untreated_Relapse
+            - _reference_Untreated
+</pre></div>
+</div>
+<p>Now, the pipeline will produce the following results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>DEseq2/
+    ├── DGE_considering_factor_ConditionA_comparing_test_Treated_vs_reference_Untreated
+    └── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Diseased_vs_reference_Untreated_Relapse
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id21">
+<h2>Gene set enrichment analysis<a class="headerlink" href="#id21" title="Permalink to this headline"></a></h2>
+<section id="id22">
+<h3>Pipeline<a class="headerlink" href="#id22" title="Permalink to this headline"></a></h3>
+</section>
+<section id="id23">
+<h3>Pipeline<a class="headerlink" href="#id23" title="Permalink to this headline"></a></h3>
+<ol class="arabic simple">
+<li><p>iRODS copy</p></li>
+<li><p>Fastp</p></li>
+<li><p>FastqScreen</p></li>
+<li><p>Salmon</p></li>
+<li><p>tximport</p></li>
+<li><p>DESeq2</p></li>
+<li><p>In-house scripts</p></li>
+<li><p>ClusterProfiler</p></li>
+<li><p>In-house scripts</p></li>
+<li><p>MultiQC</p></li>
+</ol>
+</section>
+<section id="id24">
+<h3>Command line<a class="headerlink" href="#id24" title="Permalink to this headline"></a></h3>
+<div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
+cd /path/to/my/project/tmp
+
+## Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+
+## Put design file in ${PWD}
+
+## GRCh38 / HG38
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh gsea --nt
+## GRCm38 / MM10
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 gsea --nt
+</pre></div>
+</div>
+</section>
+<section id="id25">
+<h3>Results<a class="headerlink" href="#id25" title="Permalink to this headline"></a></h3>
+<p>The repository <code class="docutils literal notranslate"><span class="pre">multiqc</span></code> contains two multiqc reports: basic quality controls and salmon. MultiQC.Salmon.html contains all information present in MultiQC.QC.html, and adds the results of Salmon.</p>
+<p>The repository <code class="docutils literal notranslate"><span class="pre">Quantification</span></code> contains three quantification files:</p>
+<ol class="arabic simple">
+<li><p>The file: <code class="docutils literal notranslate"><span class="pre">Raw.genes.tsv</span></code> contains the raw gene expression estimates, obtained from dummy summary of the expression of each transcripts counting for a same gene. This is <strong>not</strong> normalized. Useful for DESeq2, etc.</p></li>
+<li><p>The file: <code class="docutils literal notranslate"><span class="pre">TPM.genes.tsv</span></code> contains TPM normalized gene expression estimates, obtained from dummy summary of the expression of each transcripts counting for a same gene. This is normalized by TPM. It does not take the factors and levels present in the <code class="docutils literal notranslate"><span class="pre">design.tsv</span></code> into account while normalizing.</p></li>
+<li><p>The file: <code class="docutils literal notranslate"><span class="pre">TPM.transcripts.tsv</span></code> contains TPM normalized transcripts expression estimates, obtained Salmon. This is normalized by TPM. It does not take the factors and levels present in the <code class="docutils literal notranslate"><span class="pre">design.tsv</span></code> into account while normalizing.</p></li>
+</ol>
+<p>The <code class="docutils literal notranslate"><span class="pre">DEseq2</span></code> repository contains one sub-folder for each comparison between two levels, for each factor. Aggregation, sub-setting and factor ignore may reduce of increase the number of sub-folders. See config file modification to know how to master the list of DESeq2 results. TODO</p>
+<p>In each DESeq2 sub-folder:</p>
+<ol class="arabic simple">
+<li><p>The file <code class="docutils literal notranslate"><span class="pre">Complete_XXX.tsv</span></code> contains annotated results of DESeq2 with both differentially expressed genes under provided alpha threshold and the other ones. XXX being the name of the comparison.</p></li>
+<li><p>The file <code class="docutils literal notranslate"><span class="pre">SortedOnLogFC_XXX.tsv</span></code> contains the differentially expressed genes only. They have been annotated and sorted on Log(FC). XXX being the name of the comparison.</p></li>
+<li><p>The file <code class="docutils literal notranslate"><span class="pre">SortedOnPadj_XXX.tsv</span></code> contains the differentially expressed genes only. They have been annotated and sorted on adjusted P-Values. XXX being the name of the comparison.</p></li>
+<li><p>The folder <code class="docutils literal notranslate"><span class="pre">gene_plots</span></code> contains a list of plots, one for each gene of interest. This is a highlight on its status, expression and per-condition weight.</p></li>
+<li><p>The MultiQC report contains information about the samples belonging to the given comparison, and no other sample. It also contains Volcanoplot, PCAs, Expression weights, etc. Each of these plots is unique to this comparison, since expressions were normalized with DESeq2, which takes factors/levels into account.</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>data_output/
+├── DEseq2
+│   ├── DGE_considering_factor_Batch_comparing_test_B1_vs_reference_B2
+│   │   ├── Complete_DGE_considering_factor_Batch_comparing_test_B1_vs_reference_B2.tsv
+│   │   ├── gene_plots
+│   │   │   └── ENSG00000141510.png
+│   │   ├── MultiQC.DEseq2_data
+│   │   │   ├── multiqc_data.json
+│   │   │   ├── multiqc_fastp.txt
+│   │   │   ├── multiqc_fastq_screen.txt
+│   │   │   ├── multiqc_general_stats.txt
+│   │   │   ├── multiqc.log
+│   │   │   └── multiqc_sources.txt
+│   │   ├── MultiQC.DEseq2.html
+│   │   ├── SortedOnLogFC_DGE_considering_factor_Batch_comparing_test_B1_vs_reference_B2.tsv
+│   │   └── SortedOnPadj_DGE_considering_factor_Batch_comparing_test_B1_vs_reference_B2.tsv
+├── multiqc
+│   ├── MultiQC.QC_data
+│   │   ├── multiqc_data.json
+│   │   ├── multiqc_fastp.txt
+│   │   ├── multiqc_fastq_screen.txt
+│   │   ├── multiqc_general_stats.txt
+│   │   ├── multiqc.log
+│   │   └── multiqc_sources.txt
+│   ├── MultiQC.QC.html
+│   ├── MultiQC.Salmon_data
+│   │   ├── multiqc_data.json
+│   │   ├── multiqc_fastp.txt
+│   │   ├── multiqc_fastq_screen.txt
+│   │   ├── multiqc_general_stats.txt
+│   │   ├── multiqc.log
+│   │   └── multiqc_sources.txt
+│   └── MultiQC.Salmon.html
+└── Quantification
+    ├── Raw.genes.tsv
+    ├── TPM.genes.tsv
+    └── TPM.transcripts.tsv
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id26">
+<h2>Fusions<a class="headerlink" href="#id26" title="Permalink to this headline"></a></h2>
+<section id="id27">
+<h3>Pipeline<a class="headerlink" href="#id27" title="Permalink to this headline"></a></h3>
+<ol class="arabic simple">
+<li><p>iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)</p></li>
+<li><p>Fastp (trimm fastq reads)</p></li>
+<li><p>STAR (mapping + fusions)</p></li>
+<li><p>FusionAnnotator</p></li>
+<li><p>FusionInspector</p></li>
+<li><p>MultiQC</p></li>
+</ol>
+</section>
+<section id="id28">
+<h3>Command line<a class="headerlink" href="#id28" title="Permalink to this headline"></a></h3>
+<div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
+cd /path/to/my/project/tmp
+
+## Setup IO repositories
+ln -sfrv ../data_output data_output || mkdir -pv data_output
+ln -sfrv ../data_input data_input || mkdir -pv data_input
+ln -sfrv data_input/design.tsv design.tsv || echo &quot;No design found. Create it, or let the pipeline guess sample pairs (risky)&quot;
+
+## Run basic quality controls, keep intermediary files, search, check and annotate fusions
+bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh fusions --nt
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id29">
+<h2>Variant Calling<a class="headerlink" href="#id29" title="Permalink to this headline"></a></h2>
+<p>Under construction</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../readme_long.html" class="btn btn-neutral float-left" title="Long help" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016, The Snakemake team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
