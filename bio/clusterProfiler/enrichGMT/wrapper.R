@@ -22,6 +22,8 @@ base::library(package = "org.Mm.eg.db", quietly = TRUE)
 
 # Loading input datasets
 geneList <- base::readRDS(file = snakemake@input[["rds"]])
+
+base::message("Head of gene list:")
 base::message(head(geneList))
 
 # Annotation
@@ -41,6 +43,8 @@ if ("term_gene" %in% base::names(snakemake@input)) {
     header = TRUE
   )
 }
+
+base::message("Head of term to gene")
 base::message(head(term2gene))
 
 # Annotation names
@@ -54,6 +58,8 @@ if ("term_name" %in% base::names(snakemake@input)) {
     header = TRUE
   )
 }
+
+base::message("Head of term to name")
 base::message(head(term2name))
 
 # Gene annotations
@@ -80,6 +86,8 @@ if ("universe" %in% base::names(snakemake@input)) {
     sep = ", "
   )
 }
+
+base::message("Head of universe")
 base::message(head(universe))
 
 if ("extra" %in% base::names(snakemake@params)) {
