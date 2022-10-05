@@ -137,6 +137,7 @@ with ``make clean``.
    :caption: Pipelines
 
    pipelines
+   readme/readme_long
 
 
 .. toctree::
@@ -146,3 +147,13 @@ with ``make clean``.
    :caption: Development
 
    contributing
+   bigr_unofficial
+
+
+.. toctree::
+    :caption: API Reference
+    :name: api-reference
+    :hidden:
+    :maxdepth: 1
+
+    apidocs/api
