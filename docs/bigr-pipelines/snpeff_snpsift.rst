@@ -118,7 +118,7 @@ The pipeline contains the following steps:
     from snakemake.utils import min_version
     min_version("6.0")
 
-    default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
+    default_config = read_yaml(worflow_source_dir / "config.hg38.nochr.yaml")
     configfile: get_config(default_config)
     design = get_design(os.getcwd(), search_vcf_files)
     design["Sample_id"] = design["Sample_id"].str.replace("-", "_")
@@ -175,8 +175,6 @@ The pipeline contains the following steps:
             description="columns_description.txt"
         output:
             directory("results_to_upload")
-        message:
-            "Finishing the annotation pipeline"
         params:
             ln = "--symbolic --force --relative --verbose",
             mkdir = "--parents --verbose",
@@ -223,8 +221,6 @@ The pipeline contains the following steps:
             call_index=get_tbi("snpsift/fixed/{sample}.vcf.gz")
         output:
             tsv="snpsift/extractFields/{sample}.tsv"
-        message:
-            "Making {wildcards.sample} annotated VCF readable"
         threads: 2
         resources:
             mem_mb=lambda wildcards, attempt: min(attempt * 4096, 15360),
@@ -242,9 +238,6 @@ The pipeline contains the following steps:
             vcf=last_vcf
         output:
             vcf=temp("snpsift/fixed/{sample}.vcf")
-        message:
-            "Removing empty fields, trailing ';' and non-canonical chromosomes "
-            "for {wildcards.sample}"
         threads: 1
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -617,7 +610,7 @@ The pipeline contains the following steps:
 
     rule splice_ai:
         input:
-            vcf = "bigr/occurence_annotated/{sample}.vcf",
+            vcf = "snpsift/gnomad/{sample}.vcf",
             fasta = config["ref"]["fasta"]
         output:
             vcf = temp("splice_ai/annot/{sample}.vcf.gz")
@@ -642,20 +635,7 @@ The pipeline contains the following steps:
     ### snpeff-snpsift annotation ###
     #################################
 
-    snpeff_snpsift_config = {
-        "ref": config["ref"],
-        **config["snpeff_snpsift"]
-    }
-
-    module snpeff_meta:
-        snakefile: "../../meta/bio/snpeff_annotate/test/Snakefile"
-        config: snpeff_snpsift_config
-
-    use rule snpeff from snpeff_meta with:
-        input:
-            calls="data_input/calls/{sample}.vcf.gz",
-            calls_index="data_input/calls/{sample}.vcf.gz.tbi",
-            db=config["ref"]["snpeff"]
+    include: "rules/001.snpeff.smk"
 
 
     ##########################
@@ -663,11 +643,7 @@ The pipeline contains the following steps:
     ##########################
 
 
-    module snpsift:
-        snakefile: "../../meta/bio/snpsift/test/Snakefile"
-        config: snpeff_snpsift_config
-
-    use rule * from snpsift
+    include: "rules/002.snpsift.smk"
 
 
     #################################################

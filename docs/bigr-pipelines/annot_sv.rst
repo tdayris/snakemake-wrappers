@@ -1,7 +1,7 @@
-.. _`anno_sv`:
+.. _`annot_sv`:
 
-ANNO_SV
-=======
+ANNOT_SV
+========
 
 Annotate Facets VCF with AnnotSV
 

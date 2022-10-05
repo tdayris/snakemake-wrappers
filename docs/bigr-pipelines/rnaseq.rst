@@ -12,7 +12,7 @@ In order to run the pipeline, use the following commands
 
 .. code-block:: bash 
 
-  # Go to your directory containing VCF files
+  # Go to your directory containing Fastq files
 
   cd /path/to/project
 
@@ -93,13 +93,7 @@ The pipeline contains the following steps:
 
     rule target:
         input:
-            general_qc="data_output/multiqc/MultiQC.QC.html",
-            quantification_qc="data_output/multiqc/MultiQC.Salmon.html",
-            dge_qc=expand(
-                "data_output/DEseq2/{comparison}/MultiQC.DEseq2.html",
-                comparison=output_prefixes,
-            ),
-            chimera_qc="data_output/multiqc/MultiQC.Star.Chimera.html",
+            **expected_targets(config.get("steps", {"qc": True})),
 
 
     ##########################
@@ -113,38 +107,43 @@ The pipeline contains the following steps:
     """
 
 
-    include: "rules/001.bigr_copy.smk"
-    include: "rules/002.trimming.smk"
-    include: "rules/003.fastq_screen.smk"
+    include: str(workflow_source_dir / "rules" / "001.bigr_copy.smk")
+    include: str(workflow_source_dir / "rules" / "002.trimming.smk")
+    include: str(workflow_source_dir / "rules" / "003.fastq_screen.smk")
+
+
+    """
+    Snakefile.quality_control_results
+    from:
+    -> 002.fastp_clean
+    -> 003.fastq_screen
+    by:
+    -> Snakefile.target
+    """
 
 
     rule quality_control_results:
         input:
             fastp=expand(
-                "fastp/{ext}/{sample}.fastp.{ext}",
+                "002.fastp/{ext}/{sample}.fastp.{ext}",
                 sample=sample_list,
-                ext=["html", "json"],
+                ext=fastp_ext,
             ),
             fastq_screen=expand(
-                "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+                "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
                 sample=sample_list,
                 stream=streams,
-                ext=["txt", "png"],
+                ext=fastqscreen_ext,
             ),
         output:
-            report(
-                "data_output/multiqc/MultiQC.QC.html",
-                caption=str(workflow_source_dir / "reports" / "multiqc.rst"),
-                category="Quality Controls",
-            ),
+            "data_output/multiqc/MultiQC.QC.html",
         threads: 1
         resources:
             mem_mb=get_1gb_per_attempt,
             time_min=get_45min_per_attempt,
             tmpdir="tmp",
-        retries: 2
         log:
-            "logs/multiqc.salmon.log",
+            "logs/snakefile.multiqc/salmon.log",
         wrapper:
             "bio/multiqc"
 
@@ -160,50 +159,50 @@ The pipeline contains the following steps:
     """
 
 
-    include: "rules/004.salmon.smk"
+    include: str(workflow_source_dir / "rules" / "004.salmon.smk")
 
 
     """
-    This snakefile calls salmon and aggregates counts in human-readable tables
+    Snakefile.salmon_quant_results
+    from:
+    -> 002.fastp_clean
+    -> 004.salmon_quant
+    -> 003.fastq_screen
+    by:
+    -> Snakefile.target
     """
 
 
-    # Call this fantom rule to access salmon quand only"
     rule salmon_quant_results:
         input:
             salmon_quant=expand(
-                "salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=sample_list
+                "004.salmon/pseudo_mapping/{sample}/quant.genes.sf", sample=sample_list
             ),
             tpm_table=expand(
                 "data_output/Quantification/TPM.{feature}.tsv",
-                feature=["transcripts", "genes"],
+                feature=features,
             ),
             raw_counts="data_output/Quantification/Raw.genes.tsv",
             fastp=expand(
-                "fastp/{ext}/{sample}.fastp.{ext}",
+                "002.fastp/{ext}/{sample}.fastp.{ext}",
                 sample=sample_list,
-                ext=["html", "json"],
+                ext=fastp_ext,
             ),
             fastq_screen=expand(
-                "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+                "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
                 sample=sample_list,
                 stream=streams,
-                ext=["txt", "png"],
+                ext=fastqscreen_ext,
             ),
         output:
-            report(
-                "data_output/multiqc/MultiQC.Salmon.html",
-                caption=str(workflow_source_dir / "reports" / "multiqc.rst"),
-                category="Quality Controls",
-            ),
+            "data_output/multiqc/MultiQC.Salmon.html",
         threads: 1
         resources:
             mem_mb=get_1gb_per_attempt,
             time_min=get_45min_per_attempt,
             tmpdir="tmp",
-        retries: 2
         log:
-            "logs/multiqc.salmon.log",
+            "logs/snakefile.multiqc/salmon.log",
         wrapper:
             "bio/multiqc"
 
@@ -219,45 +218,50 @@ The pipeline contains the following steps:
     """
 
 
-    include: "rules/005.immunedeconv.smk"
+    include: str(workflow_source_dir / "rules" / "005.immunedeconv.smk")
+
+
+    """
+    Snakefile.immunedeconv_results
+    from:
+    -> 002.fastp_clean
+    -> 004.salmon_quant
+    -> 003.fastq_screen
+    -> 005.multiqc_config_immunedeconv
+    by:
+    -> Snakefile.target
+    """
 
 
     rule immunedeconv_results:
         input:
             salmon_quant=lambda wildcards: expand(
-                "salmon/pseudo_mapping/{sample}/quant.genes.sf",
+                "004.salmon/pseudo_mapping/{sample}/quant.genes.sf",
                 sample=sample_list,
             ),
             fastp=lambda wildcards: expand(
-                "fastp/{ext}/{sample}.fastp.{ext}",
+                "002.fastp/{ext}/{sample}.fastp.{ext}",
                 sample=sample_list,
-                ext=["html", "json"],
+                ext=fastp_ext,
             ),
             fastq_screen=lambda wildcards: expand(
-                "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+                "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
                 sample=sample_list,
                 stream=streams,
-                ext=["txt", "png"],
+                ext=fastqscreen_ext,
             ),
-            config="immunedeconv/multiqc_config.yaml",
+            config="005.immunedeconv/multiqc_config_mqc.yaml",
             graphs=expand(
                 "data_output/{tool}/celltypes.{graph}.png",
                 tool=config["immunedeconv"].get(
                     "tool_list",
-                    [
-                        "xcell",
-                        "quantiseq",
-                        "epic",
-                        "mcpcounter",
-                        "cibersort",
-                        "cibersort_abs",
-                    ],
+                    tool_list,
                 ),
-                graph=["histogram", "dotplot"],
+                graph=["hist", "dotplot"],
             ),
             tpm_table=expand(
                 "data_output/Quantification/TPM.{feature}.tsv",
-                feature=["transcripts", "genes"],
+                feature=features,
             ),
             raw_counts="data_output/Quantification/Raw.genes.tsv",
         output:
@@ -268,7 +272,7 @@ The pipeline contains the following steps:
             time_min=get_45min_per_attempt,
             tmpdir="tmp",
         log:
-            "logs/multiqc/immunedeconv.log",
+            "logs/snakefile.multiqc/immunedeconv.log",
         wrapper:
             "bio/multiqc"
 
@@ -285,71 +289,76 @@ The pipeline contains the following steps:
     """
 
 
-    include: "rules/011.mapping_qc.smk"
-    include: "rules/012.star_chimera.smk"
-    include: "rules/013.star_fusion.smk"
-    include: "rules/019.rseqc.smk"
+    include: str(workflow_source_dir / "rules" / "011.mapping_qc.smk")
+    include: str(workflow_source_dir / "rules" / "012.star_chimera.smk")
+    include: str(workflow_source_dir / "rules" / "013.star_fusion.smk")
+    include: str(workflow_source_dir / "rules" / "019.rseqc.smk")
+
+
+    """
+    snakefile.star_fusion_results
+    from:
+    -> 011.samtools_stats
+    -> 010.sambamba_sort_star
+    -> 002.fastp_clean
+    -> 003.fastq_screen
+    -> 013.star_fusion
+    by:
+    -> End job
+    """
 
 
     rule star_fusion_results:
         input:
             mappings=expand(
-                "star/{sample}/chimera/{sample}.{ext}",
+                "010.star/{sample}/chimera/{sample}.{ext}",
                 sample=sample_list,
                 ext=["bam", "bam.bai"],
             ),
             #cram=expand("data_output/Mapping/chimera/{sample}.cram", sample=sample_list),
             cj=expand(
-                "star/{sample}/chimera/{sample}.Chimeric.out.junction", sample=sample_list
+                "010.star/{sample}/chimera/{sample}.Chimeric.out.junction",
+                sample=sample_list,
             ),
-            sj=expand("star/{sample}/chimera/{sample}.SJ.out.tab", sample=sample_list),
-            log=expand("star/{sample}/chimera/{sample}.Log.out", sample=sample_list),
+            sj=expand("010.star/{sample}/chimera/{sample}.SJ.out.tab", sample=sample_list),
+            log=expand("010.star/{sample}/chimera/{sample}.Log.out", sample=sample_list),
             logp=expand(
-                "star/{sample}/chimera/{sample}.Log.progress.out", sample=sample_list
+                "010.star/{sample}/chimera/{sample}.Log.progress.out", sample=sample_list
             ),
-            logf=expand("star/{sample}/chimera/{sample}.Log.final.out", sample=sample_list),
+            logf=expand(
+                "010.star/{sample}/chimera/{sample}.Log.final.out", sample=sample_list
+            ),
             samtools_stats=expand(
-                "samtools/stats/{sample}.chimera.stats", sample=sample_list
+                "011samtools/stats/{sample}.chimera.stats", sample=sample_list
             ),
             fastp=expand(
-                "fastp/{ext}/{sample}.fastp.{ext}",
+                "002.fastp/{ext}/{sample}.fastp.{ext}",
                 sample=sample_list,
-                ext=["html", "json"],
+                ext=fastp_ext,
             ),
             fastq_screen=expand(
-                "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+                "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
                 sample=sample_list,
                 stream=streams,
-                ext=["txt", "png"],
+                ext=fastqscreen_ext,
             ),
-            star_fusion=expand("star-fusions/{sample}/", sample=sample_list),
+            star_fusion=expand("013.star-fusions/{sample}/", sample=sample_list),
             read_distribution=expand(
                 "rseqc/read_distribution/chimera/{sample}.read_distribution.tsv",
                 sample=sample_list,
             ),
-            tin=expand("rseqc/tin/chimera/{sample}.summary.txt", sample=sample_list),
             bam_stat=expand("rseqc/bam_stat/chimera/{sample}.txt", sample=sample_list),
-            genebosycov=expand(
-                "rseqc/gene_body_coverage/chimera/{sample}.geneBodyCoverage.{ext}",
-                sample=sample_list,
-                ext=["txt", "pdf"],
-            ),
             txt=expand("rseqc/junction_annotation/chimera/{sample}.txt", sample=sample_list),
         threads: 1
         output:
-            report(
-                "data_output/multiqc/MultiQC.Star.Chimera.html",
-                caption=str(workflow_source_dir / "reports" / "multiqc.rst"),
-                category="Quality Controls",
-            ),
+            "data_output/multiqc/MultiQC.Star.Chimera.html",
         threads: 1
         resources:
             mem_mb=get_1gb_per_attempt,
             time_min=get_45min_per_attempt,
             tmpdir="tmp",
-        retries: 2
         log:
-            "logs/multiqc.star.chimera.log",
+            "logs/snakefile.multiqc/star.chimera.log",
         wrapper:
             "bio/multiqc"
 
@@ -365,69 +374,163 @@ The pipeline contains the following steps:
     """
 
 
-    include: "rules/007.tximport.smk"
-    include: "rules/008.deseq2.smk"
-    include: "rules/009.deseq2_post_process.smk"
+    include: str(workflow_source_dir / "rules" / "007.tximport.smk")
+    include: str(workflow_source_dir / "rules" / "008.deseq2.smk")
+    include: str(workflow_source_dir / "rules" / "009.deseq2_post_process.smk")
+
+
+    """
+    Snakefile.deseq2_results
+    from:
+    -> 002.fastp_clean
+    -> 004.salmon_quant
+    -> 003.fastq_screen
+    -> 009.multiqc_config
+    by:
+    -> Snakefile.target
+    """
 
 
     rule deseq2_results:
         input:
             salmon_quant=lambda wildcards: expand(
-                "salmon/pseudo_mapping/{sample}/quant.genes.sf",
+                "004.salmon/pseudo_mapping/{sample}/quant.genes.sf",
                 sample=samples_per_prefixes[wildcards.comparison],
             ),
             tpm_table=expand(
                 "data_output/Quantification/TPM.{feature}.tsv",
-                feature=["transcripts", "genes"],
+                feature=features,
             ),
             raw_counts="data_output/Quantification/Raw.genes.tsv",
             fastp=lambda wildcards: expand(
-                "fastp/{ext}/{sample}.fastp.{ext}",
+                "002.fastp/{ext}/{sample}.fastp.{ext}",
                 sample=samples_per_prefixes[wildcards.comparison],
-                ext=["html", "json"],
+                ext=fastp_ext,
             ),
             fastq_screen=lambda wildcards: expand(
-                "fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+                "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
                 sample=samples_per_prefixes[wildcards.comparison],
                 stream=streams,
-                ext=["txt", "png"],
+                ext=fastqscreen_ext,
             ),
             deseq2_results=expand(
                 "data_output/DEseq2/{comparison}/{content}_{comparison}.tsv",
                 content=content_list,
                 allow_missing=True,
             ),
-            config="multiqc/{comparison}/multiqc_config.yaml",
-            gene_plot=expand(
-                "data_output/DEseq2/{comparison}/gene_plots/{gene}.png",
-                gene=config.get("genes_of_interest", ["ENSG00000141510"]),
-                allow_missing=True,
-            ),
+            config="009.multiqc/{comparison}/multiqc_config.yaml",
+            gene_plot="data_output/DEseq2/{comparison}/gene_plots/",
             plots=[
-                "multiqc/{comparison}/pca_plot_mqc.png",
-                "multiqc/{comparison}/volcanoplot_mqc.png",
-                "multiqc/{comparison}/distro_expr_mqc.png",
-                "multiqc/{comparison}/distro_mu_mqc.png",
-                "multiqc/{comparison}/ma_plot_mqc.png",
-                "multiqc/{comparison}/independent_filter_mqc.png",
-                "multiqc/{comparison}/inde_theta_filter_mqc.png",
-                "multiqc/{comparison}/pvalue_qc_mqc.png",
+                "009.multiqc/{comparison}/pca_plot_mqc.png",
+                "009.multiqc/{comparison}/volcanoplot_mqc.png",
+                "009.multiqc/{comparison}/distro_expr_mqc.png",
+                "009.multiqc/{comparison}/distro_mu_mqc.png",
+                "009.multiqc/{comparison}/ma_plot_mqc.png",
+                "009.multiqc/{comparison}/independent_filter_mqc.png",
+                "009.multiqc/{comparison}/inde_theta_filter_mqc.png",
+                "009.multiqc/{comparison}/pvalue_qc_mqc.png",
             ],
-            deseq_rbt="data_output/DESeq2/{comparison}/Complete_html_table.tar.bz2",
+            clustermap_sample="009.figures/{comparison}/clustermap/ClusteredHeatmap.samples.{comparison}.png",
+            pca_plot=expected_pcas,
+            volcanoplot="009.figures/{comparison}/volcano/Volcano.{comparison}.png",
+            distro_expr="009.figures/{comparison}/log_counts/log_dst.{comparison}.png",
+            ma_plot="009.figures/{comparison}/maplot/maplot.{comparison}.png",
+            distro_mu="009.figures/{comparison}/log_counts/log_mu.{comparison}.png",
+            independent_filter="009.figures/{comparison}/deseq2/independent_filter.{comparison}.png",
+            pvalue_qc="009.figures/{comparison}/deseq2/pval.{comparison}.png",
+            inde_theta_filter="009.figures/{comparison}/deseq2/theta.{comparison}.png",
+            # deseq_rbt="data_output/DESeq2/{comparison}/Complete_html_table.tar.bz2",
         output:
-            report(
-                "data_output/DEseq2/{comparison}/MultiQC.DEseq2.html",
-                caption=str(workflow_source_dir / "reports" / "multiqc.rst"),
-                category="Quality Controls",
-            ),
+            "data_output/DEseq2/{comparison}/MultiQC.DEseq2.html",
         threads: 1
         resources:
             mem_mb=get_1gb_per_attempt,
             time_min=get_45min_per_attempt,
             tmpdir="tmp",
-        retries: 2
         log:
-            "logs/multiqc.deseq2/{comparison}.log",
+            "logs/snakefile.multiqc/deseq2.{comparison}.log",
+        wrapper:
+            "bio/multiqc"
+
+
+    ########################
+    ### Cluster Profiler ###
+    ########################
+
+    # Used after DESeq2
+
+
+    include: str(workflow_source_dir / "rules" / "027.clusterprofiler.gmt.smk")
+    include: str(workflow_source_dir / "rules" / "029.clusterprofiler.terms.smk")
+    include: str(workflow_source_dir / "rules" / "028.clusterprofiler.others.smk")
+    include: str(workflow_source_dir / "rules" / "026.clusterprofiler.genelist.smk")
+    include: str(workflow_source_dir / "rules" / "030.clusterprofiler.plots.smk")
+
+
+    rule clusterprofiler_results:
+        input:
+            salmon_quant=lambda wildcards: expand(
+                "004.salmon/pseudo_mapping/{sample}/quant.genes.sf",
+                sample=samples_per_prefixes[wildcards.comparison],
+            ),
+            tpm_table=expand(
+                "data_output/Quantification/TPM.{feature}.tsv",
+                feature=features,
+            ),
+            raw_counts="data_output/Quantification/Raw.genes.tsv",
+            fastp=lambda wildcards: expand(
+                "002.fastp/{ext}/{sample}.fastp.{ext}",
+                sample=samples_per_prefixes[wildcards.comparison],
+                ext=fastp_ext,
+            ),
+            fastq_screen=lambda wildcards: expand(
+                "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+                sample=samples_per_prefixes[wildcards.comparison],
+                stream=streams,
+                ext=fastqscreen_ext,
+            ),
+            deseq2_results=expand(
+                "data_output/DEseq2/{comparison}/{content}_{comparison}.tsv",
+                content=content_list,
+                allow_missing=True,
+            ),
+            config="009.multiqc/{comparison}/multiqc_config.yaml",
+            gene_plot="data_output/DEseq2/{comparison}/gene_plots/",
+            plots=[
+                "009.multiqc/{comparison}/pca_plot_mqc.png",
+                "009.multiqc/{comparison}/volcanoplot_mqc.png",
+                "009.multiqc/{comparison}/distro_expr_mqc.png",
+                "009.multiqc/{comparison}/distro_mu_mqc.png",
+                "009.multiqc/{comparison}/ma_plot_mqc.png",
+                "009.multiqc/{comparison}/independent_filter_mqc.png",
+                "009.multiqc/{comparison}/inde_theta_filter_mqc.png",
+                "009.multiqc/{comparison}/pvalue_qc_mqc.png",
+            ],
+            clustermap_sample="009.figures/{comparison}/clustermap/ClusteredHeatmap.samples.{comparison}.png",
+            pca_plot=expected_pcas,
+            volcanoplot="009.figures/{comparison}/volcano/Volcano.{comparison}.png",
+            distro_expr="009.figures/{comparison}/log_counts/log_dst.{comparison}.png",
+            ma_plot="009.figures/{comparison}/maplot/maplot.{comparison}.png",
+            distro_mu="009.figures/{comparison}/log_counts/log_mu.{comparison}.png",
+            independent_filter="009.figures/{comparison}/deseq2/independent_filter.{comparison}.png",
+            pvalue_qc="009.figures/{comparison}/deseq2/pval.{comparison}.png",
+            inde_theta_filter="009.figures/{comparison}/deseq2/theta.{comparison}.png",
+            clusterprofiler_tsv=tsv_list(db_key=db_key_dict, comparisons=output_prefixes),
+            clusterprofiler_png=plot_list(
+                plots=cprof_plots,
+                methods=gse_method_list,
+                comparisons=output_prefixes,
+                db_key=db_key_dict,
+            ),
+        output:
+            "data_output/GSEA/{comparison}/MultiQC.GSEA.html",
+        threads: 1
+        resources:
+            mem_mb=get_1gb_per_attempt,
+            time_min=get_45min_per_attempt,
+            tmpdir="tmp",
+        log:
+            "logs/snakefile.multiqc/clusterprofiler.{comparison}.log",
         wrapper:
             "bio/multiqc"
 
@@ -437,7 +540,7 @@ The pipeline contains the following steps:
     #######################
 
 
-    include: "rules/010.star.smk"
+    include: str(workflow_source_dir / "rules" / "010.star.smk")
 
 
 
