@@ -14,7 +14,7 @@ rule make_rank_list:
             "008.deseq2/{comparison}/wald.{comparison}.tsv", comparison=output_prefixes
         ),
     output:
-        temp("026.clusterprofiler/rank.list.tsv"),
+        tsv=temp("026.clusterprofiler/rank.list.tsv"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
