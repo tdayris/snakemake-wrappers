@@ -5,6 +5,7 @@ import numpy
 import logging
 import pandas
 
+from typing import List
 
 def read_deseq2(
     path: str, padj_threshold: float = 1.0, fc_threshold: float = 0.0
