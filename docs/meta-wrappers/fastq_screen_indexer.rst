@@ -66,7 +66,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
             "logs/get_genome/{build}.{release}.{organism}.{datatype}.log"
         cache: True  # save space and time with between workflow caching (see docs)
         wrapper:
-            "0.79.0-2122-g358d17155/bio/reference/ensembl-sequence"
+            "0.50.4-2418-g8fefa1e53/bio/reference/ensembl-sequence"
 
 
     rule download_tair10:
@@ -118,7 +118,7 @@ This meta-wrapper can be used by integrating the following into your workflow:
         params:
             extra=""
         wrapper:
-            "0.79.0-2122-g358d17155/bio/bowtie2/build"
+            "0.50.4-2418-g8fefa1e53/bio/bowtie2/build"
 
 Note that input, output and log file paths can be chosen freely, as long as the dependencies between the rules remain as listed here.
 For additional parameters in each individual wrapper, please refer to their corresponding documentation (see links below).

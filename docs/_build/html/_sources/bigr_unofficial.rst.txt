@@ -21,6 +21,7 @@ requirements of such pipeline:
 #. Default parameters must be fine with Human genome, and oncology studies.
 #. If user provided fastq files in working directories, search them, use them.
 #. If user provided a list of fastq files in a file called ``design.tsv``, use this file instead of searching for fastq.
+#. If user provided optional parameters through a file called ``config.yaml``, use this file. Else, create one with default parameters.
 #. Input datasets must be in a directory called "data_input" and should be deleted once they are not useful anymore.
 #. Output reports and datasets must be in a directory called "data_output".
 #. Temporary files must be in a directory called "tmp" or deleted once they are not useful anymore.
@@ -45,9 +46,20 @@ We need a working environment. Let's create a working branch::
 Let's now create our working environment::
     
     mkdir -pv bigr_pipelines/fastp_fastqscreen/{rules,script,config}
-    touch bigr_pipelines/fastp_fastqscreen/{Snakefile,meta.yam,readme.md,run.sh}
+    touch bigr_pipelines/fastp_fastqscreen/{Snakefile,meta.yaml,readme.md,run.sh}
     tree bigr_pipelines/fastp_fastqscreen
 
+
+This gives::
+
+    bigr_pipelines/fastp_fastqscreen/
+    ├── Snakefile      # <- This is the Snakemake entry point
+    ├── meta.yaml      # <- Short codified help
+    ├── readme.md      # <- The long help. Feel free to write anything you want
+    ├── run.sh         # <- This is our bash entry point
+    ├── rules          # <- There will be our snakemake rules
+    ├── script         # <- Your in-house scripts
+    └── config         # <- Default configuration for human/mouse/...
 
 .. _snakemake_basics:
 
@@ -59,6 +71,17 @@ We need a fastp / fastq_screen pipeline. Let us start with fastp, the easier rul
 create a file in which to store the snakemake rule::
 
     touch bigr_pipelines/fastp_fastqscreen/rules/001.fastp.smk
+    tree bigr_pipelines/fastp_fastqscreen/
+
+    bigr_pipelines/fastp_fastqscreen/
+    ├── Snakefile
+    ├── meta.yaml
+    ├── readme.md
+    ├── run.sh
+    ├── rules
+    │   └── 001.fastp.smk
+    ├── script
+    └── config
 
 
 I called it ``001.fastp.smk`` because it's the first rule in out pipeline, and the file will contain fastp only.
@@ -216,6 +239,43 @@ already available, then Snakemake won't re-install it. Environments are sha-sign
 people's environments, you can only share them ! Enjoy !
 
 
+Conclusion
+^^^^^^^^^^
+
+Our file ``rules/001.fastp.smk`` contains::
+    
+
+    rule fastp:
+        input:
+            sample=expand(
+                "data_input/{sample}.{stream}.fq.gz",   # Input are in data_input
+                sample="{sample}",                      # Regular expression for sample names
+                stream=["1", "2"]                       # List of sample names
+            )
+        output:
+            trimmed=expand(  # We expect two trimmed fastq files, 1 for R1, 1 for R2.
+                "001.fastp/trimmed/{sample}.{stream}.fastq",
+                sample="{sample}",
+                stream=["1", "2"]
+            ),
+            # failed= We are not interested in discarded reads, this parameter is flagged optional in wrapper doc.
+            html="001.fastp/html/{sample}.html",  # We want only one report per sample
+            json="001.fastp/json/{sample}.json",  # We want only one report per sample
+        threads: 4
+        resources:
+            mem_mb=1024 * 2, # Two GB should be enough
+            time_min=20,     # 20 minutes should be enough
+            tmp="tmp",       # "tmp" not "/tmp" ! This is very important.
+        log:
+            "logs/fastp/{sample}.log"
+        params:
+            extra=""      # Optional parameters, see fastp CLI documentation
+            # adapters="" # Optional according to the fastp wrapper documentation.
+        wrapper:
+            "bio/fastp"
+
+
+
 .. _snakemake_advanced:
 
 Snakemake level up with Unofficial environment
@@ -298,13 +358,281 @@ We want to constrain our wildcards, this is easily done with the following comma
 
 
 Tadaaaam ! Our pipeline now finds fastq files by itself. By the way, if your sample name ends
-with a number, Snakemake won't confuse it with sequencing strands.
+with a number, Snakemake won't confuse it with sequencing strands. 
+
+Let's imagine we have two samples called: `Sample1` and `Sample2`. The ``expand`` in `001.fastp.smk`
+contains::
+
+    sample=expand(
+        "data_input/{sample}.{stream}.fq.gz",   # Input are in data_input
+        sample="{sample}",                      # Regular expression for sample names
+        stream=["1", "2"]                       # List of sample names
+    )
+
+
+and solves itself as::
+
+    ["data_input/Sample1|Sample2.1.fq.gz", "data_input/Sample1|Sample2.2.fq.gz"]
+
+
+No ambiguity is allowed in Snakemake.
 
 
 Resources reservation made easier
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+We said earlier that resources could be set upon input file size. These resources should be adjusted
+in case we need more memory and/or time for our job on the cluster.
 
-Profile: Slurm made easier
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+This can be done with functions respecting the `signature <https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#resources>`_ 
+described in official snakemake documentation. Unofficial Snakemake Wrapper has a set of function designed 
+to make it easy and human readable. These functions are in ``reservation`` module. Just like before, they 
+will be imported in your `000.commons.smk`::
 
+    # Manage paths easily in Python
+    from pathlib import Path
+
+    # Get workflow path (the one you're working on!)
+    workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
+
+    # Get path to shared libraries in Unofficial Snakemake wrappers
+    common = str(workflow_source_dir / ".." / "common" / "python")
+
+    # Add this to the list of available libraries in Python
+    import sys
+    sys.path.append(common)
+
+    # Finally ! Add the module file_manager
+    from file_manager import *
+
+    # Import the functions for easy time/memory reservation
+    from reservation import *
+
+    import os # To deal with operating system in Python
+    design = get_design(
+        dirpath=os.getcwd(),           # Where to search for fastq files
+        search_func=search_fastq_pairs # What function to use in order to search for fastq files
+    )
+
+And your ``fastp`` rule goes from::
+
+    resources:
+        mem_mb=1024 * 2, # Two GB should be enough
+        time_min=20,     # 20 minutes should be enough
+        tmp="tmp",       # "tmp" not "/tmp" ! This is very important.
+
+
+to::
+
+    resources:
+        mem_mb=get_2gb_per_attempt,   # 2gb on first try, then 4gb, then 6gb, ...
+        time_min=get_20m_per_attempt, # 20min on first try, then 40min, 1h, ...
+        tmp="tmp",
+
+
+Unofficial Snakemake Wrappers will handle the re-submission.
+
+
+Configuration and user-defined parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Depending on a project content, on the biological question, or simply based on the organism, many
+tools and command line may differ. For instance, read adapters may be provided depending on the
+sequencing library that was designed. Trimming parameters differ from bulk-rnaseq and whole exome
+sequencing.
+
+These information will be stored in a configuration (yaml formatted) that your fellow bioinformatician
+may change (or not). These parameters must be forewarded while executing the pipeline instructions.
+
+Let us create the first configuration file::
+
+    touch bigr_pipelines/fastp_fastqscreen/config/config.yaml
+    tree bigr_pipelines/fastp_fastqscreen/
+
+    bigr_pipelines/fastp_fastqscreen/
+    ├── Snakefile
+    ├── meta.yaml
+    ├── readme.md
+    ├── run.sh
+    ├── rules
+    │   ├── 000.common.smk
+    │   └── 001.fastp.smk
+    ├── script
+    └── config
+        └── config.yaml
+
+
+Let us define some variables in this configuragion file::
+
+    # Maximum number of threads
+    max_threads: 20
+
+    fastp:
+        extra: "" # Optional parameters
+        adapters: null # Optional adapters
+
+
+This file is stored in the pipeline source. We cannot allow the user to modify it. We must provide
+a copy of the default parameters for the user to change them.
+
+Once again, Unofficial Snakemake Wrappers provide a function for that. In the file `000.common.smk`
+let's write::
+
+    # Manage paths easily in Python
+    from pathlib import Path
+
+    # Get workflow path (the one you're working on!)
+    workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
+
+    # Get path to shared libraries in Unofficial Snakemake wrappers
+    common = str(workflow_source_dir / ".." / "common" / "python")
+
+    # Add this to the list of available libraries in Python
+    import sys
+    sys.path.append(common)
+
+    # Finally ! Add the module file_manager
+    from file_manager import *
+
+    # Import the functions for easy time/memory reservation
+    from reservation import *
+
+    # Import Config file if needed, use user-defined one if present.
+    default_config = read_yaml(workflow_source_dir / "config" / "config.yaml")
+    configfile: get_config(default_config=default_config)
+
+    import os # To deal with operating system in Python
+    design = get_design(
+        dirpath=os.getcwd(),           # Where to search for fastq files
+        search_func=search_fastq_pairs # What function to use in order to search for fastq files
+    )
+
+
+We can now modify our file `001.fastp.smk` in order to include configurations::
+
+    rule fastp:
+        input:
+            sample=expand(
+                "data_input/{sample}.{stream}.fq.gz",   # Input are in data_input
+                sample="{sample}",                      # Regular expression for sample names
+                stream=["1", "2"]                       # List of sample names
+            )
+        output:
+            trimmed=expand(  # We expect two trimmed fastq files, 1 for R1, 1 for R2.
+                "001.fastp/trimmed/{sample}.{stream}.fastq",
+                sample="{sample}",
+                stream=["1", "2"]
+            ),
+            # failed= We are not interested in discarded reads, this parameter is flagged optional in wrapper doc.
+            html="001.fastp/html/{sample}.html",  # We want only one report per sample
+            json="001.fastp/json/{sample}.json",  # We want only one report per sample
+        threads: 4
+        resources:
+            mem_mb=1024 * 2, # Two GB should be enough
+            time_min=20,     # 20 minutes should be enough
+            tmp="tmp",       # "tmp" not "/tmp" ! This is very important.
+        log:
+            "logs/fastp/{sample}.log"
+        params:
+            # If user deleted 'extra' in fastp, then leave it empty and do not raise error
+            extra=config["fastp"].get('extra', '')
+            # If user deleted 'adapters' in fastp, then leave it to `None` and do not raise error
+            adapters=config["fastp"].get('extra', None)
+        wrapper:
+            "bio/fastp"
+
+
+Fastq Screen the final example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Fastq screen requires a new file in the repository ``rules``, we name it ``002.fastq_screen.smk``::
+
+    touch bigr_pipelines/fastp_fastqscreen/rules/002.fastq_screen.smk
+    tree bigr_pipelines/fastp_fastqscreen/
+
+    bigr_pipelines/fastp_fastqscreen/
+    ├── Snakefile
+    ├── meta.yaml
+    ├── readme.md
+    ├── run.sh
+    ├── rules
+    │   ├── 000.common.smk
+    │   ├── 001.fastp.smk
+    │   └── 002.fastq_screen.smk
+    ├── script
+    └── config
+        └── config.yaml
+
+
+Thanks to the `wrapper documentation <https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/fastq_screen.html>`_, 
+we know that the file ``rules/002.fastq_screen.smk`` contains::
+
+    rule fastq_screen:
+        input:
+            "data_input/{sample}.{stream}.fq.gz"
+        output:
+            txt=temp("fastq_screen/{sample}.fastq_screen.txt"),
+            png=temp("fastq_screen/{sample}.fastq_screen.png")
+        threads: config.get("threads", 20)
+        resources:
+            mem_mb=get_15gb_per_attempt,
+            time_min=get_1h_per_attempt,
+            tmpdir="tmp"
+        params:
+            fastq_screen_config=config["fastq_screen"],
+            subset=100000,     # We do not allow user to change the default number of mapped reads
+            aligner='bowtie2'  # We do not allow user to change default mapper
+        log:
+            "logs/fastq_screen/{sample}.log"
+        wrapper:
+            "bio/fastq_screen"
+
+
+In the file ``config/config.yaml`` we add the databases::
+
+    # Maximum number of threads
+    max_threads: 20
+
+    # Fastp parameters
+    fastp:
+        extra: "" # Optional parameters
+        adapters: null # Optional adapters
+    
+    # Fastq Screen info
+    fastq_screen:
+        database:
+            Contaminants:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Adapters/Contaminants
+            AThaliana:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Arabidopsis/Arabidopsis_thaliana.TAIR10
+            Drosophila:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Drosophila/BDGP6
+            Ecoli:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/E_coli/Ecoli
+            Human:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Human/Homo_sapiens.GRCh38
+            Lambda:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Lambda/Lambda
+            Mitochondria:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Mitochondria/mitochondria
+            Mouse:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Mouse/Mus_musculus.GRCm38
+            PhiX:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/PhiX/phi_plus_SNPs
+            Rat:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Rat/Rnor_6.0
+            rRNA:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/rRNA/GRCm38_rRNA
+            Vectors:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Vectors/Vectors
+            Worm:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Worm/Caenorhabditis_elegans.WBcel235
+            Yeast:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/Yeast/Saccharomyces_cerevisiae.R64-1-1
+            SalmoSalar:
+            bowtie2: /mnt/beegfs/database/bioinfo/Index_DB/Fastq_Screen/0.14.0/SalmoSalar/Salmo_salar.ICSASG_v2
+        aligner_paths:
+            bowtie2: bowtie2
+
+
+The file `000.commons.smk` does not need to be changed.

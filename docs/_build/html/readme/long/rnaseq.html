@@ -16,7 +16,9 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -117,6 +119,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../bigr_unofficial.html">BiGR Unofficial</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../apidocs/api.html">Unofficial API</a></li>
+</ul>
 
         </div>
       </div>
@@ -144,9 +150,9 @@
            <div itemprop="articleBody">
              
   <section id="rna-seq-bulk">
-<h1>RNA-Seq bulk<a class="headerlink" href="#rna-seq-bulk" title="Permalink to this headline"></a></h1>
+<h1>RNA-Seq bulk<a class="headerlink" href="#rna-seq-bulk" title="Permalink to this heading"></a></h1>
 <section id="summary">
-<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline"></a></h2>
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this heading"></a></h2>
 <p>This pipeline aims to perform classical RNASeq-bulk analyzes:</p>
 <ol class="arabic simple">
 <li><p><a class="reference external" href="https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines/rnaseq#tldr-run-this-pipeline">TLDR</a></p></li>
@@ -167,7 +173,7 @@
 <p>Each subsection can be selected one by one, or the whole pipeline may be executed.</p>
 </section>
 <section id="tldr-run-this-pipeline">
-<h2>TLDR: run this pipeline<a class="headerlink" href="#tldr-run-this-pipeline" title="Permalink to this headline"></a></h2>
+<h2>TLDR: run this pipeline<a class="headerlink" href="#tldr-run-this-pipeline" title="Permalink to this heading"></a></h2>
 <div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
 cd /path/to/my/project/tmp
 
@@ -183,7 +189,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
 </div>
 </section>
 <section id="design-file">
-<h2>Design file<a class="headerlink" href="#design-file" title="Permalink to this headline"></a></h2>
+<h2>Design file<a class="headerlink" href="#design-file" title="Permalink to this heading"></a></h2>
 <p>The design file contains a description of your samples and experimental design. It should look like:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -264,7 +270,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
 </ol>
 </section>
 <section id="config-yaml">
-<h2>Config.yaml<a class="headerlink" href="#config-yaml" title="Permalink to this headline"></a></h2>
+<h2>Config.yaml<a class="headerlink" href="#config-yaml" title="Permalink to this heading"></a></h2>
 <p>This file describes all optional parameters set in the pipeline.</p>
 <p>Possible edition:</p>
 <ol class="arabic simple">
@@ -278,7 +284,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
 <p>Changing anything else shall be done at your own risks.</p>
 </section>
 <section id="id3">
-<h2>Classical use<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h2>
+<h2>Classical use<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h2>
 <div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
 cd /path/to/my/project/tmp
 
@@ -317,9 +323,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh --del
 </div>
 </section>
 <section id="id4">
-<h2>Quality controls<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h2>
+<h2>Quality controls<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h2>
 <section id="pipeline">
-<h3>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this headline"></a></h3>
+<h3>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p>iRODS copy</p></li>
 <li><p>Fastp</p></li>
@@ -329,7 +335,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh --del
 <p>Use iRODS command to get your fastq files, then clean them with Fastp. Assess organism quality with FastqScreen, then aggregate quality reports with MultiQC.</p>
 </section>
 <section id="command-line">
-<h3>Command line<a class="headerlink" href="#command-line" title="Permalink to this headline"></a></h3>
+<h3>Command line<a class="headerlink" href="#command-line" title="Permalink to this heading"></a></h3>
 <p>Command line argument order does not matter.</p>
 <div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
 cd /path/to/my/project/tmp
@@ -348,7 +354,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </div>
 </section>
 <section id="results">
-<h3>Results<a class="headerlink" href="#results" title="Permalink to this headline"></a></h3>
+<h3>Results<a class="headerlink" href="#results" title="Permalink to this heading"></a></h3>
 <p>The only output is a MultiQC report. By default, all other output are deleted, use <code class="docutils literal notranslate"><span class="pre">--nt</span></code> to keep cleaned fastq files.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>data_output/
 ├── multiqc
@@ -365,9 +371,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </section>
 </section>
 <section id="id5">
-<h2>Quantification<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h2>
+<h2>Quantification<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h2>
 <section id="id6">
-<h3>Pipeline<a class="headerlink" href="#id6" title="Permalink to this headline"></a></h3>
+<h3>Pipeline<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p>iRODS copy</p></li>
 <li><p>Fastp</p></li>
@@ -378,7 +384,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 <p>Use iRODS command to get your fastq files, then clean them with Fastp. Assess organism quality with FastqScreen. Salmon estimates transcripts abundance, then aggregate quality reports with MultiQC. Salmon results are annotated with a basic GTF.</p>
 </section>
 <section id="id7">
-<h3>Command line<a class="headerlink" href="#id7" title="Permalink to this headline"></a></h3>
+<h3>Command line<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
 <p>Command line argument order does not matter.</p>
 <div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
 cd /path/to/my/project/tmp
@@ -397,7 +403,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </div>
 </section>
 <section id="output">
-<h3>Output<a class="headerlink" href="#output" title="Permalink to this headline"></a></h3>
+<h3>Output<a class="headerlink" href="#output" title="Permalink to this heading"></a></h3>
 <p>The repository <code class="docutils literal notranslate"><span class="pre">multiqc</span></code> contains two multiqc reports: basic quality controls and salmon. MultiQC.Salmon.html contains all information present in MultiQC.QC.html, and adds the results of Salmon.</p>
 <p>The repository <code class="docutils literal notranslate"><span class="pre">Quantification</span></code> contains three quantification files:</p>
 <ol class="arabic simple">
@@ -432,9 +438,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </section>
 </section>
 <section id="id8">
-<h2>Differential Gene Expression<a class="headerlink" href="#id8" title="Permalink to this headline"></a></h2>
+<h2>Differential Gene Expression<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h2>
 <section id="id9">
-<h3>Pipeline<a class="headerlink" href="#id9" title="Permalink to this headline"></a></h3>
+<h3>Pipeline<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p>iRODS copy</p></li>
 <li><p>Fastp</p></li>
@@ -447,7 +453,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </ol>
 </section>
 <section id="id10">
-<h3>Command line<a class="headerlink" href="#id10" title="Permalink to this headline"></a></h3>
+<h3>Command line<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h3>
 <div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
 cd /path/to/my/project/tmp
 
@@ -465,7 +471,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </div>
 </section>
 <section id="id11">
-<h3>Results<a class="headerlink" href="#id11" title="Permalink to this headline"></a></h3>
+<h3>Results<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h3>
 <p>The repository <code class="docutils literal notranslate"><span class="pre">multiqc</span></code> contains two multiqc reports: basic quality controls and salmon. MultiQC.Salmon.html contains all information present in MultiQC.QC.html, and adds the results of Salmon.</p>
 <p>The repository <code class="docutils literal notranslate"><span class="pre">Quantification</span></code> contains three quantification files:</p>
 <ol class="arabic simple">
@@ -524,9 +530,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </section>
 </section>
 <section id="id12">
-<h2>Aggregate factors<a class="headerlink" href="#id12" title="Permalink to this headline"></a></h2>
+<h2>Aggregate factors<a class="headerlink" href="#id12" title="Permalink to this heading"></a></h2>
 <section id="problem">
-<h3>Problem<a class="headerlink" href="#problem" title="Permalink to this headline"></a></h3>
+<h3>Problem<a class="headerlink" href="#problem" title="Permalink to this heading"></a></h3>
 <p>Consider the following design:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -606,7 +612,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 <p>Let us imagine we are interested in the effect of the treatment itself, AND the effect of the treatment on sample under “relapse” in relation to sample on relapse but without treatment.</p>
 </section>
 <section id="solution-1">
-<h3>Solution 1<a class="headerlink" href="#solution-1" title="Permalink to this headline"></a></h3>
+<h3>Solution 1<a class="headerlink" href="#solution-1" title="Permalink to this heading"></a></h3>
 <p>The first easy solution is to create an additional column, called as you wish (lets say Treatment_On_Relapse) and concatenate the two columns values. As a result, the design would be:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -704,7 +710,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 <p>You do have the levels you are interested in.</p>
 </section>
 <section id="solution-2">
-<h3>Solution 2<a class="headerlink" href="#solution-2" title="Permalink to this headline"></a></h3>
+<h3>Solution 2<a class="headerlink" href="#solution-2" title="Permalink to this heading"></a></h3>
 <p>Within the <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code> file, modify the value of</p>
 <div class="highlight-{yaml} notranslate"><div class="highlight"><pre><span></span>deseq2:
     design:
@@ -723,9 +729,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </section>
 </section>
 <section id="id14">
-<h2>Ignore factors<a class="headerlink" href="#id14" title="Permalink to this headline"></a></h2>
+<h2>Ignore factors<a class="headerlink" href="#id14" title="Permalink to this heading"></a></h2>
 <section id="id15">
-<h3>Problem<a class="headerlink" href="#id15" title="Permalink to this headline"></a></h3>
+<h3>Problem<a class="headerlink" href="#id15" title="Permalink to this heading"></a></h3>
 <p>Sometimes, factors are not interesting anymore (not relevant in PCA, loss of interest by project research investigator, …). We want this pipeline to ignore this factor. Consider the following <code class="docutils literal notranslate"><span class="pre">design.tsv</span></code>:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -797,11 +803,11 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 <p>Let’s pretend we want to ignore the sample status Diseased/Relapse.</p>
 </section>
 <section id="id16">
-<h3>Solution 1<a class="headerlink" href="#id16" title="Permalink to this headline"></a></h3>
+<h3>Solution 1<a class="headerlink" href="#id16" title="Permalink to this heading"></a></h3>
 <p>Remove this column from your design. Then the pipeline won’t be aware of it and will not consider this factor anymore.</p>
 </section>
 <section id="id17">
-<h3>Solution 2<a class="headerlink" href="#id17" title="Permalink to this headline"></a></h3>
+<h3>Solution 2<a class="headerlink" href="#id17" title="Permalink to this heading"></a></h3>
 <p>Within the <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code> file, modify the value of</p>
 <div class="highlight-{yaml} notranslate"><div class="highlight"><pre><span></span>deseq2:
     design:
@@ -819,9 +825,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </section>
 </section>
 <section id="id19">
-<h2>Perform only a subset of DGE<a class="headerlink" href="#id19" title="Permalink to this headline"></a></h2>
+<h2>Perform only a subset of DGE<a class="headerlink" href="#id19" title="Permalink to this heading"></a></h2>
 <section id="id20">
-<h3>Problem<a class="headerlink" href="#id20" title="Permalink to this headline"></a></h3>
+<h3>Problem<a class="headerlink" href="#id20" title="Permalink to this heading"></a></h3>
 <p>Sometimes, we are not interested in all possible comparisons. For instance, the should be only one reference through all the comparisons. Let us consider the following <code class="docutils literal notranslate"><span class="pre">design.tsv</span></code>:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -893,7 +899,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 <p>We want “Untreated” level within “Treatment” factor to always be a reference level. We also want “Untreated_Relapse” to be our reference while comparing Treatment/Status interactions.</p>
 </section>
 <section id="solution">
-<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline"></a></h3>
+<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this heading"></a></h3>
 <p>Within the <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code> file, modify the value of</p>
 <div class="highlight-{yaml} notranslate"><div class="highlight"><pre><span></span>deseq2:
     design:
@@ -921,12 +927,12 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </section>
 </section>
 <section id="id21">
-<h2>Gene set enrichment analysis<a class="headerlink" href="#id21" title="Permalink to this headline"></a></h2>
+<h2>Gene set enrichment analysis<a class="headerlink" href="#id21" title="Permalink to this heading"></a></h2>
 <section id="id22">
-<h3>Pipeline<a class="headerlink" href="#id22" title="Permalink to this headline"></a></h3>
+<h3>Pipeline<a class="headerlink" href="#id22" title="Permalink to this heading"></a></h3>
 </section>
 <section id="id23">
-<h3>Pipeline<a class="headerlink" href="#id23" title="Permalink to this headline"></a></h3>
+<h3>Pipeline<a class="headerlink" href="#id23" title="Permalink to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p>iRODS copy</p></li>
 <li><p>Fastp</p></li>
@@ -941,7 +947,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </ol>
 </section>
 <section id="id24">
-<h3>Command line<a class="headerlink" href="#id24" title="Permalink to this headline"></a></h3>
+<h3>Command line<a class="headerlink" href="#id24" title="Permalink to this heading"></a></h3>
 <div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
 cd /path/to/my/project/tmp
 
@@ -959,7 +965,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </div>
 </section>
 <section id="id25">
-<h3>Results<a class="headerlink" href="#id25" title="Permalink to this headline"></a></h3>
+<h3>Results<a class="headerlink" href="#id25" title="Permalink to this heading"></a></h3>
 <p>The repository <code class="docutils literal notranslate"><span class="pre">multiqc</span></code> contains two multiqc reports: basic quality controls and salmon. MultiQC.Salmon.html contains all information present in MultiQC.QC.html, and adds the results of Salmon.</p>
 <p>The repository <code class="docutils literal notranslate"><span class="pre">Quantification</span></code> contains three quantification files:</p>
 <ol class="arabic simple">
@@ -1018,9 +1024,9 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </section>
 </section>
 <section id="id26">
-<h2>Fusions<a class="headerlink" href="#id26" title="Permalink to this headline"></a></h2>
+<h2>Fusions<a class="headerlink" href="#id26" title="Permalink to this heading"></a></h2>
 <section id="id27">
-<h3>Pipeline<a class="headerlink" href="#id27" title="Permalink to this headline"></a></h3>
+<h3>Pipeline<a class="headerlink" href="#id27" title="Permalink to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p>iRODS copy (access iRODS collections and merge samples that were sequenced through multiple runs)</p></li>
 <li><p>Fastp (trimm fastq reads)</p></li>
@@ -1031,7 +1037,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 
 </ol>
 </section>
 <section id="id28">
-<h3>Command line<a class="headerlink" href="#id28" title="Permalink to this headline"></a></h3>
+<h3>Command line<a class="headerlink" href="#id28" title="Permalink to this heading"></a></h3>
 <div class="highlight-{sh} notranslate"><div class="highlight"><pre><span></span>## Go to your project directory
 cd /path/to/my/project/tmp
 
@@ -1047,7 +1053,7 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh fusio
 </section>
 </section>
 <section id="id29">
-<h2>Variant Calling<a class="headerlink" href="#id29" title="Permalink to this headline"></a></h2>
+<h2>Variant Calling<a class="headerlink" href="#id29" title="Permalink to this heading"></a></h2>
 <p>Under construction</p>
 </section>
 </section>
