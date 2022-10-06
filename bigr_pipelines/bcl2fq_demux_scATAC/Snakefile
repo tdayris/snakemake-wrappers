@@ -1,0 +1,51 @@
+####################################
+### Demux Pipeline  ###
+####################################
+
+include: str(workflow_source_dir / "rules" / "rules/000.common.smk")
+
+##################
+### Flag rules ###
+##################
+include: "rules/000.common.smk"
+
+
+onerror:
+    shell("touch ERROR && rm --force --verbose ON_GOING DONE")
+    logging.error("scATAC-seq pipeline failed.")
+
+
+onstart:
+    shell("touch ON_GOING && rm --force --verbose ERROR DONE")
+    logging.info("Starting scATAC-seq pipeline.")
+
+
+#############################
+### Main target rule      ###
+### Add new targets below ###
+#############################
+
+
+rule target:
+    input:
+        **expected_targets(config.get("steps", {"qc": True})),
+
+
+##########################
+### Seuencng run folder handling ###
+##########################
+
+##########################
+### Raw fastq handling ###
+##########################
+
+include: str(workflow_source_dir / "rules" / "001.import_files.smk")
+#include: str(workflow_source_dir / "rules" / "002.bcl2fq.smk")
+#include: str(workflow_source_dir / "rules" / "003.multiQC.smk")
+
+
+
+
+
+
+
