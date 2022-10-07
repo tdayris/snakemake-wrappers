@@ -10,26 +10,8 @@ source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/environment.sh"
 
 # Define pipeline related variables
 declare -x SNAKEMAKE_PROFILE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/common/profiles"
-declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/${1}"
-declare -x WRAPPERS_PATH=$(readlink -e "${PIPELINE_PATH}/../../")
-export SNAKEMAKE_PROFILE_PATH PIPELINE_PATH WRAPPERS_PATH
-
-# Default snakefile path
-if [ -f "${PIPELINE_PATH}/Snakefile" ]; then
-  SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
-  message INFO "Snakefile found: ${SNAKEFILE_PATH}"
-else
-  message ERROR "Could not find Snakefile in: ${PIPELINE_PATH}"
-  exit 1
-fi
-
-# Default config file path
-CONFIG_PATH="${PIPELINE_PATH}/config/config.yaml"
-if [ -f "${PIPELINE_PATH}/config/config.hg38.yaml" ]; then
-  CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"
-elif [ -f "${PIPELINE_PATH}/config.hg38.yaml" ]; then
-  CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
-fi
+declare -x WRAPPERS_PATH=$(readlink -e "${PIPELINE_PREFIX}/../../")
+export SNAKEMAKE_PROFILE_PATH WRAPPERS_PATH
 
 
 # Default IO directories
@@ -69,6 +51,7 @@ STEPS=()
 PROFILE="slurm"
 SUMMARY=""
 GRAPH=""
+NAME=""
 
 
 # Command line parser
@@ -86,11 +69,33 @@ while [ "$#" -gt 0 ]; do
     qc|QC) STEPS+=("qc"); message INFO "Quality Controls is in the expected result list"; shift;;
     immu|deconv) STEPS+=("immunedeconv"); message INFO "Immune Deconvolution is in the expected result list"; shift;;
     gsea|clusterprofiler) STEPS+=("gsea"); message INFO "GSEA is in the expected result list"; shift;;
-    rnaseq|fastqc_multiqc) shift;;
+    --name) NAME="${2}"; shift 2;;
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac
 done
 message INFO "Environment loaded"
+
+
+declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/${NAME}"
+export PIPELINE_PATH
+
+
+# Default snakefile path
+if [ -f "${PIPELINE_PATH}/Snakefile" ]; then
+  SNAKEFILE_PATH="${PIPELINE_PATH}/Snakefile"
+  message INFO "Snakefile found: ${SNAKEFILE_PATH}"
+else
+  message ERROR "Could not find Snakefile in: ${PIPELINE_PATH}"
+  exit 1
+fi
+
+# Default config file path
+CONFIG_PATH="${PIPELINE_PATH}/config/config.yaml"
+if [ -f "${PIPELINE_PATH}/config/config.hg38.yaml" ]; then
+  CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"
+elif [ -f "${PIPELINE_PATH}/config.hg38.yaml" ]; then
+  CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
+fi
 
 
 # If config is not available in local repository, then add it !
