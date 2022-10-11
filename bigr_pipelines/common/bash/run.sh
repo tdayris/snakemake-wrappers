@@ -46,13 +46,17 @@ else
 fi
 
 # Default snakemake arguments
-SNAKE_ARGS=("--wrapper-prefix" "${WRAPPERS_PATH}/")
+CWD=$(readlink -e ${PWD})
+SNAKE_ARGS=(
+  "--wrapper-prefix" "${WRAPPERS_PATH}/"
+  "--singularity-args '-B ${CWD}:${CWD} -B /mnt/beegfs/database/bioinfo/:/mnt/beegfs/database/bioinfo/ -B ${CWD}/tmp/:/tmp/'"
+)
 STEPS=()
 PROFILE="slurm"
 SUMMARY=""
 GRAPH=""
 NAME=""
-
+CONFIG_PATH=""
 
 # Command line parser
 while [ "$#" -gt 0 ]; do
@@ -61,7 +65,7 @@ while [ "$#" -gt 0 ]; do
     --summary) SUMMARY="${2}"; shift 2;;
     --rulegraph|--dag) GRAPH="${2}"; shift 2;;
     hg19|HG19|GRCh37) CONFIG_PATH="${PIPELINE_PATH}/config/config.hg19.yaml"; message WARNING "Some operations are not available for hg19 genome"; shift;;
-    hg38|HG38|GRCh38) shift;;
+    hg38|HG38|GRCh38) CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"; shift;;
     mm10|MM10|GRCm38) CONFIG_PATH="${PIPELINE_PATH}/config/config.mm10.yaml"; message WARNING "Some operations are not available for mice datasets"; shift;;
     DESeq2|deseq2|DGE|dge) STEPS+=("dge"); message INFO "DGE is in the expected result list"; shift;;
     salmon|Salmon|quant) STEPS+=("quant"); message INFO "Quantification is in the expected result list"; shift;;
@@ -70,6 +74,7 @@ while [ "$#" -gt 0 ]; do
     immu|deconv) STEPS+=("immunedeconv"); message INFO "Immune Deconvolution is in the expected result list"; shift;;
     gsea|clusterprofiler) STEPS+=("gsea"); message INFO "GSEA is in the expected result list"; shift;;
     --name) NAME="${2}"; shift 2;;
+    -h|--help) help_message(); shift;;
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac
 done
@@ -90,18 +95,22 @@ else
 fi
 
 # Default config file path
-CONFIG_PATH="${PIPELINE_PATH}/config/config.yaml"
-if [ -f "${PIPELINE_PATH}/config/config.hg38.yaml" ]; then
-  CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"
-elif [ -f "${PIPELINE_PATH}/config.hg38.yaml" ]; then
-  CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
+
+if [! -f CONFIG_PATH ]; then
+  if [ -f "${PIPELINE_PATH}/config/config.yaml" ]; then
+    CONFIG_PATH="${PIPELINE_PATH}/config/config.yaml"
+  if [ -f "${PIPELINE_PATH}/config/config.hg38.yaml" ]; then
+    CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"
+  elif [ -f "${PIPELINE_PATH}/config.hg38.yaml" ]; then
+    CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
+  fi
 fi
 
 
 # If config is not available in local repository, then add it !
 if [ ! -f "config.yaml" ]; then
   if [ ! -f "${CONFIG_PATH}" ]; then
-    message ERROR "Config file does not exist at `${CONFIG_PATH}`. The ${1} pipeline may not be available for this genome."
+    message ERROR "Config file does not exist at `${CONFIG_PATH}`. The ${NAME} pipeline may not be available for this genome."
   fi
   message INFO "Config file not found, falling back to default arguments."
   COMMAND="rsync --verbose ${CONFIG_PATH} config.yaml"

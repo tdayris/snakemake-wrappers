@@ -1,5 +1,5 @@
 #!/bin/sh
-
+SNAKEMAKE_WRAPPER_VERSION="1.0.0"
 
 # Activate main snakemake environment
 

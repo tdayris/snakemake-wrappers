@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-bash "$(dirname ${0})/../common/bash/run.sh" fastqc_multiqc "$@"
+PIPELINE_NAME=$(basename $(dirname "${0}"))
+
+bash "$(dirname ${0})/../common/bash/run.sh" --name ${PIPELINE_NAME} "$@"
