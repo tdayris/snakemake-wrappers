@@ -9,7 +9,7 @@ by
 """
 rule fastq_screen:
     input:
-        "002.fastp/trimmed/{sample}.{stream}.fastq",
+        "fastp/trimmed/{sample}.{stream}.fastq",
     output:
         txt=temp("fastq_screen/{sample}.{stream}.fastq_screen.txt"),
         png=temp("fastq_screen/{sample}.{stream}.fastq_screen.png"),
