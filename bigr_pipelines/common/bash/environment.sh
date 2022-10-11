@@ -25,8 +25,7 @@ function profiles () {
 
 function iodirectories() {
   CWD="${1}"
-  DIRNAME="${1}"
-
+  DIRNAME="${2}"
 
   # Default IO directories
   DIRNAME_PATH="$(readlink -e ${CWD})/${DIRNAME}"
