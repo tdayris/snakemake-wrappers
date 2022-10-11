@@ -58,6 +58,7 @@ done
 message INFO "Environment loaded"
 
 
+message INFO "Working with pipeline ${NAME}"
 declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/${NAME}"
 export PIPELINE_PATH
 
