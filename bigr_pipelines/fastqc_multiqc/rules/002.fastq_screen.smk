@@ -11,8 +11,8 @@ rule fastq_screen:
     input:
         "002.fastp/trimmed/{sample}.{stream}.fastq",
     output:
-        txt=temp("003.fastq_screen/{sample}.{stream}.fastq_screen.txt"),
-        png=temp("003.fastq_screen/{sample}.{stream}.fastq_screen.png"),
+        txt=temp("fastq_screen/{sample}.{stream}.fastq_screen.txt"),
+        png=temp("fastq_screen/{sample}.{stream}.fastq_screen.png"),
     threads: config.get("max_threads", 20)
     resources:
         mem_mb=get_10gb_per_attempt,
