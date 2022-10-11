@@ -16,7 +16,7 @@ rule fastq_screen:
     threads: config.get("threads", 20)
     resources:
         mem_mb=get_15gb_per_attempt,
-        time_min=get_1h_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp"
     params:
         fastq_screen_config=config["fastq_screen"],
