@@ -2,7 +2,7 @@
 set -e
 
 # This adds several functions and variable in the environment
-PIPELINE_PREFIX=$(readlink -e "$(dirname ${0})/../../..")
+PIPELINE_PREFIX=$(readlink -e "$(dirname ${0})/../..")
 # shellcheck source=/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/bash/messages.sh
 source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/messages.sh"
 # shellcheck source=/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/bash/environment.sh
