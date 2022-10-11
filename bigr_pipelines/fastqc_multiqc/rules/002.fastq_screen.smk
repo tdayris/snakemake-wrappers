@@ -9,20 +9,21 @@ by
 """
 rule fastq_screen:
     input:
-        "reads/{sample}.fq.gz"
+        "002.fastp/trimmed/{sample}.{stream}.fastq",
     output:
-        txt=temp("fastq_screen/{sample}.fastq_screen.txt"),
-        png=temp("fastq_screen/{sample}.fastq_screen.png")
-    threads: config.get("threads", 20)
+        txt=temp("003.fastq_screen/{sample}.{stream}.fastq_screen.txt"),
+        png=temp("003.fastq_screen/{sample}.{stream}.fastq_screen.png"),
+    threads: config.get("max_threads", 20)
     resources:
-        mem_mb=get_15gb_per_attempt,
-        time_min=get_2h_per_attempt,
-        tmpdir="tmp"
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_75min_per_attempt,
+        tmpdir="tmp",
+    retries: 1
     params:
-        fastq_screen_config=config["fastq_screen"],
-        subset=100000,
-        aligner='bowtie2'
+        fastq_screen_config=config["fastq_screen"]["fastq_screen_config"],
+        subset=config["fastq_screen"].get("subset", 100000),
+        aligner=config["fastq_screen"].get("aligner", "bowtie2"),
     log:
-        "logs/fastq_screen/{sample}.log"
+        "logs/003.fastq_screen/{sample}.{stream}.log",
     wrapper:
         "bio/fastq_screen"
