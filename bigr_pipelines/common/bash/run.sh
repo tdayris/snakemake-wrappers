@@ -111,7 +111,7 @@ done
 
 # Run pipeline
 # Activate singularity
-CMD="module load singularity/3.4.1"
+CMD="module load singularity/3.6.3"
 message CMD "${CMD}"
 eval ${CMD}
 
