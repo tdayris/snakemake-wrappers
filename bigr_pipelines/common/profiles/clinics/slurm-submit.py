@@ -112,6 +112,9 @@ if "resources" in job_properties:
             arg_dict["nodes"] = 1
             arg_dict["partition"] = "visuq"
 
+    if resources.get("chdir", None) is not None:
+        arg_dict["chdir"] = resources["chrdir"]
+
 
 # Threads
 if "threads" in job_properties:
@@ -120,7 +123,7 @@ if "threads" in job_properties:
 opt_keys = ["array", "account", "begin", "cpus_per_task",
             "dependency", "workdir", "error", "job_name", "mail_type",
             "mail_user", "ntasks", "nodes", "output", "partition",
-            "quiet", "time", "wrap", "constraint", "mem", "gres"]
+            "quiet", "time", "wrap", "constraint", "mem", "gres", "chdir"]
 
 arg_dict["output"] = "logs/slurm/slurm-%x-%j-%N.out"
 if arg_dict["output"] is not None:
