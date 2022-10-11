@@ -51,7 +51,8 @@ while [ "$#" -gt 0 ]; do
     immu|deconv) STEPS+=("immunedeconv"); message INFO "Immune Deconvolution is in the expected result list"; shift;;
     gsea|clusterprofiler) STEPS+=("gsea"); message INFO "GSEA is in the expected result list"; shift;;
     --name) NAME="${2}"; shift 2;;
-    -h|--help) help_message; shift;;
+    -h|--help) message INFO "Please see official documentation at: https://github.com/tdayris/snakemake-wrappers"; exit 0; shift;;
+    --snake-help) SNAKE_ARGS+=("--help"); shift;;
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac
 done
