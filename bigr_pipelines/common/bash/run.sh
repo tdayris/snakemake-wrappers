@@ -12,7 +12,7 @@ source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/environment.sh"
 declare -x SNAKEMAKE_PROFILE_PATH
 SNAKEMAKE_PROFILE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/common/profiles"
 declare -x WRAPPERS_PATH
-WRAPPERS_PATH=$(readlink -e "${PIPELINE_PREFIX}/../../")
+WRAPPERS_PATH=$(readlink -e "${PIPELINE_PREFIX}/../")
 export SNAKEMAKE_PROFILE_PATH WRAPPERS_PATH
 
 
