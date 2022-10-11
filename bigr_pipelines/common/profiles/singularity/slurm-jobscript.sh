@@ -1,3 +1,7 @@
 #!/bin/bash
 # properties = {properties}
-{exec_job}
+
+hostname
+date
+
+/usr/bin/time -v -p bash -c "{exec_job}"
