@@ -360,10 +360,10 @@ It will produce the following comparisons:
 
 ```
 DEseq2/
-    ├── DGE_considering_factor_ConditionA_comparing_test_Untreated_vs_reference_Treated
-    ├── DGE_considering_factor_ConditionB_comparing_test_Relapse_vs_reference_Diseased
-    ├── DGE_considering_factor_ConditionA_comparing_test_Treated_vs_reference_Untreated
-    └── DGE_considering_factor_ConditionB_comparing_test_Diseased_vs_reference_Relapse
+    ├── DGE_considering_factor_Treatment_comparing_test_Untreated_vs_reference_Treated
+    ├── DGE_considering_factor_Status_comparing_test_Relapse_vs_reference_Diseased
+    ├── DGE_considering_factor_Treatment_comparing_test_Treated_vs_reference_Untreated
+    └── DGE_considering_factor_Status_comparing_test_Diseased_vs_reference_Relapse
 ```
 
 Let us imagine we are interested in the effect of the treatment itself, AND the effect of the treatment on sample under "relapse" in relation to sample on relapse but without treatment.
@@ -388,18 +388,18 @@ Now, the pipeline will produce the following results:
 
 ```
 DEseq2/
-    ├── DGE_considering_factor_ConditionA_comparing_test_Untreated_vs_reference_Treated
+    ├── DGE_considering_factor_Status_comparing_test_Untreated_vs_reference_Treated
     ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Relapse_vs_reference_Treated_Diseased
     ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Relapse_vs_reference_Treated_Diseased
     ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Diseased_vs_reference_Treated_Diseased
     ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Relapse_vs_reference_Untreated_Diseased
-    ├── DGE_considering_factor_ConditionB_comparing_test_Relapse_vs_reference_Diseased
-    ├── DGE_considering_factor_ConditionA_comparing_test_Treated_vs_reference_Untreated
+    ├── DGE_considering_factor_Treatment_comparing_test_Relapse_vs_reference_Diseased
+    ├── DGE_considering_factor_Status_comparing_test_Treated_vs_reference_Untreated
     ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Diseased_vs_reference_Treated_Relapse
     ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Diseased_vs_reference_Untreated_Relapse
     ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Treated_Diseased_vs_reference_Untreated_Diseased
     ├── DGE_considering_factor_Treatment_On_Relapse_comparing_test_Untreated_Diseased_vs_reference_Untreated_Relapse
-    └── DGE_considering_factor_ConditionB_comparing_test_Diseased_vs_reference_Relapse
+    └── DGE_considering_factor_Treatment_comparing_test_Diseased_vs_reference_Relapse
 ```
 
 You do have the levels you are interested in.
