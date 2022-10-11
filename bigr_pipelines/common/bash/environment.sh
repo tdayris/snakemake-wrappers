@@ -23,6 +23,33 @@ function profiles () {
   esac
 }
 
+function iodirectories() {
+  CWD="${1}"
+  DIRNAME="${1}"
+
+
+  # Default IO directories
+  DIRNAME_PATH="$(readlink -e ${CWD})/${DIRNAME}"
+  if [ -L "${DIRNAME_PATH}" ]; then
+    if [ -e "${DIRNAME_PATH}" ]; then
+      # Case DIRNAME is a symlink
+      message INFO "${DIRNAME} symlink directory already available: ${DIRNAME_PATH}"
+    else
+      message ERROR "${DIRNAME} is a broken symlink: ${DIRNAME_PATH}. This will raise error in the future."
+    fi
+  elif [ -d "${DIRNAME_PATH}" ]; then
+    # case DIRNAME is a dir
+    message WARNING "${DIRNAME} directory already available: ${DIRNAME_PATH}. It does not seem to be linked to official BiGR data managment"
+  elif [ -d $(readlink -e "${CWD}/../${DIRNAME}") ]; then
+    # Case DIRNAME is missing but available in parent dir
+    ln -sfrv $(readlink -e "${CWD}/../${DIRNAME}") "${DIRNAME_PATH}"
+    message INFO "${DIRNAME} directory available from parent dir and linked to: ${DIRNAME_PATH}"
+  else
+    # Case DIRNAME never found
+    message WARNING "Data input was not found. It will be created by snakemake, but not linked to official BiGR data managment"
+  fi
+}
+
 # Add shortcut to conda environment, the main environment with resources to execute all pipelines
 declare -x CONDA_ENV_PATH="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/env2/"
 

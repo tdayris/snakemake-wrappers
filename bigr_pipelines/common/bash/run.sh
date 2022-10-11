@@ -14,42 +14,19 @@ declare -x WRAPPERS_PATH=$(readlink -e "${PIPELINE_PREFIX}/../../")
 export SNAKEMAKE_PROFILE_PATH WRAPPERS_PATH
 
 
-# Default IO directories
-DATA_INPUT_PATH="$(readlink -e ${PWD})/data_input"
-if [ -L "${DATA_INPUT_PATH}" ] && [ -e "${DATA_INPUT_PATH}" ]; then
-  # Case data_input is a symlink
-  message INFO "Data input directory already available: ${DATA_INPUT_PATH}"
-elif [ -d "${DATA_INPUT_PATH}" ]; then
-  # case data_input is a dir
-  message INFO "Data input directory already available: ${DATA_INPUT_PATH}"
-elif [ -d $(readlink -e "${PWD}/../data_input") ]; then
-  # Case data_input is missing but available in parent dir
-  ln -sfrv $(readlink -e "${PWD}/../data_input") "${DATA_INPUT_PATH}"
-else
-  # Case data_input never found
-  message WARNING "Data input was not found. It will be created, but not linked to official BiGR data managment"
-fi
+CWD=$(readlink -e ${PWD})
 
-DATA_OUTPUT_PATH="$(readlink -e ${PWD})/data_input"
-if [ -L "${DATA_OUTPUT_PATH}" ] && [ -e "${DATA_OUTPUT_PATH}" ]; then
-  # Case data_output is a symlink
-  message INFO "Data output directory already available: ${DATA_OUTPUT_PATH}"
-elif [ -d "${DATA_OUTPUT_PATH}" ]; then
-  # case data_output is a dir
-  message INFO "Data output directory already available: ${DATA_OUTPUT_PATH}"
-elif [ -d $(readlink -e "${PWD}/../data_input") ]; then
-  # Case data_output is missing but available in parent dir
-  ln -sfrv $(readlink -e "${PWD}/../data_input") "${DATA_OUTPUT_PATH}"
-else
-  # Case data_output never found
-  message WARNING "Data output was not found. It will be created, but not linked to official BiGR data managment"
-fi
+# Default IO directories
+iodirectories "${CWD}" "data_input"
+iodirectories "${CWD}" "data_output"
+
+# Flamingo databases path
+FLAMINGO_DB="/mnt/beegfs/database/bioinfo/"
 
 # Default snakemake arguments
-CWD=$(readlink -e ${PWD})
 SNAKE_ARGS=(
   "--wrapper-prefix" "${WRAPPERS_PATH}/"
-  "--singularity-args '-B ${CWD}:${CWD} -B /mnt/beegfs/database/bioinfo/:/mnt/beegfs/database/bioinfo/ -B ${CWD}/tmp/:/tmp/'"
+  "--singularity-args '-B ${CWD}:${CWD} -B ${FLAMINGO_DB}:${FLAMINGO_DB} -B ${CWD}/tmp/:/tmp/'"
 )
 STEPS=()
 PROFILE="slurm"
@@ -129,6 +106,11 @@ for STEP in "${STEPS[@]}"; do
 done
 
 # Run pipeline
+# Activate singularity
+CMD="module load singularity/3.4.1"
+message CMD "${CMD}"
+eval ${CMD}
+
 # Activate conda
 message CMD "conda_activate ${CONDA_ENV_PATH}"
 conda_activate "${CONDA_ENV_PATH}" && message INFO "Conda loaded" || error_handling "${LINENO}" 1 "Could not activate conda environment"
@@ -147,5 +129,7 @@ else
   message CMD "${BASE_CMD}"
   eval ${BASE_CMD}
 fi
+
+CMD="${PIPELINE_PREFIX}/"
 
 message INFO "Process over."
