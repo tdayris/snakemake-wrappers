@@ -2,19 +2,21 @@
 set -e
 
 # This adds several functions and variable in the environment
-PIPELINE_PREFIX=$(readlink -e "$(dirname ${0})/../../..")
+PIPELINE_PREFIX=$(readlink -e "$(dirname "${0}")/../../..")
 # shellcheck source=/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/bash/messages.sh
 source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/messages.sh"
 # shellcheck source=/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/bash/environment.sh
 source "${PIPELINE_PREFIX}/bigr_pipelines/common/bash/environment.sh"
 
 # Define pipeline related variables
-declare -x SNAKEMAKE_PROFILE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/common/profiles"
-declare -x WRAPPERS_PATH=$(readlink -e "${PIPELINE_PREFIX}/../../")
+declare -x SNAKEMAKE_PROFILE_PATH
+SNAKEMAKE_PROFILE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/common/profiles"
+declare -x WRAPPERS_PATH
+WRAPPERS_PATH=$(readlink -e "${PIPELINE_PREFIX}/../../")
 export SNAKEMAKE_PROFILE_PATH WRAPPERS_PATH
 
 
-CWD=$(readlink -e ${PWD})
+CWD=$(readlink -e "${PWD}")
 
 # Default IO directories
 iodirectories "${CWD}" "data_input"
@@ -75,10 +77,10 @@ fi
 
 # Default config file path
 
-if [! -f CONFIG_PATH ]; then
+if [ ! -f "${CONFIG_PATH}" ]; then
   if [ -f "${PIPELINE_PATH}/config/config.yaml" ]; then
     CONFIG_PATH="${PIPELINE_PATH}/config/config.yaml"
-  if [ -f "${PIPELINE_PATH}/config/config.hg38.yaml" ]; then
+  elif [ -f "${PIPELINE_PATH}/config/config.hg38.yaml" ]; then
     CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"
   elif [ -f "${PIPELINE_PATH}/config.hg38.yaml" ]; then
     CONFIG_PATH="${PIPELINE_PATH}/config.hg38.yaml"
@@ -89,7 +91,7 @@ fi
 # If config is not available in local repository, then add it !
 if [ ! -f "config.yaml" ]; then
   if [ ! -f "${CONFIG_PATH}" ]; then
-    message ERROR "Config file does not exist at `${CONFIG_PATH}`. The ${NAME} pipeline may not be available for this genome."
+    message ERROR "Config file does not exist at ${CONFIG_PATH}. The ${NAME} pipeline may not be available for this genome."
   fi
   message INFO "Config file not found, falling back to default arguments."
   COMMAND="rsync --verbose ${CONFIG_PATH} config.yaml"
@@ -132,6 +134,9 @@ else
   eval ${BASE_CMD}
 fi
 
-CMD="${PIPELINE_PREFIX}/"
+CMD="python3 ${PIPELINE_PREFIX}/bigr_pipelines/common/python/woops.py > logs/woops.log 2>&1"
+message CMD "${CMD}"
+eval ${CMD}
+message INFO "See run info in logs."
 
 message INFO "Process over."
