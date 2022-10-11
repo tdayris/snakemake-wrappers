@@ -53,4 +53,9 @@ function error_handling() {
   exit "${code}"
 }
 
+function help_message() {
+  message INFO "Please see official documentation at: https://github.com/tdayris/snakemake-wrappers"
+  exit 1
+}
+
 message INFO "sourced: message functions"
