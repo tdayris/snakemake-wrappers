@@ -19,6 +19,6 @@ else
     # Classic case, must fit demux-like behaviour
     bash "${script_dir}/run.sh" fastqc_multiqc -p demux "$@"
     if [ -d "multiqc" ] ; then 
-        mv --verbose multiqc output
+        mv --verbose multiqc/* output
     fi
 fi
