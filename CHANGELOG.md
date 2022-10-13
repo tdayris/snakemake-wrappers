@@ -1,5 +1,41 @@
 # Changelog
 
+## [1.16.0](https://www.github.com/tdayris/snakemake-wrappers/compare/v1.15.0...v1.16.0) (2022-10-13)
+
+
+### Features
+
+* bazam wrapper ([#580](https://www.github.com/tdayris/snakemake-wrappers/issues/580)) ([f9332c2](https://www.github.com/tdayris/snakemake-wrappers/commit/f9332c21e5781ce8adecf20913c1caa4bd86d265))
+
+
+### Bug Fixes
+
+* set RG tag ([#593](https://www.github.com/tdayris/snakemake-wrappers/issues/593)) ([141e09e](https://www.github.com/tdayris/snakemake-wrappers/commit/141e09e7114641ecc94eb83bc394ee1f8e669af9))
+
+
+### Performance Improvements
+
+* autobump bio/bcftools/index/environment.yaml ([#570](https://www.github.com/tdayris/snakemake-wrappers/issues/570)) ([1c444dc](https://www.github.com/tdayris/snakemake-wrappers/commit/1c444dc57592877fed4307de7bbde466d4bc8aeb))
+* autobump bio/deepvariant ([#583](https://www.github.com/tdayris/snakemake-wrappers/issues/583)) ([de6ce85](https://www.github.com/tdayris/snakemake-wrappers/commit/de6ce8530baa67eaa14474890018ea9bdaa808eb))
+* update bio/adapterremoval/environment.yaml. ([#573](https://www.github.com/tdayris/snakemake-wrappers/issues/573)) ([ff74710](https://www.github.com/tdayris/snakemake-wrappers/commit/ff74710cd1b7c9299a75cae5e53caf29f7da45dc))
+* update bio/assembly-stats/environment.yaml. ([#575](https://www.github.com/tdayris/snakemake-wrappers/issues/575)) ([963bedf](https://www.github.com/tdayris/snakemake-wrappers/commit/963bedf2fe0c66fa3241aaf079318d4aa005d5bd))
+* update bio/bcftools/call/environment.yaml. ([#567](https://www.github.com/tdayris/snakemake-wrappers/issues/567)) ([88c479c](https://www.github.com/tdayris/snakemake-wrappers/commit/88c479c7a645478129de28bd8ce9842cc63bc549))
+* update bio/bcftools/concat/environment.yaml. ([#568](https://www.github.com/tdayris/snakemake-wrappers/issues/568)) ([8d92bb5](https://www.github.com/tdayris/snakemake-wrappers/commit/8d92bb553869d722a7d1e9dda25c725b74de3450))
+* update bio/bellerophon/environment.yaml. ([#576](https://www.github.com/tdayris/snakemake-wrappers/issues/576)) ([63f8acb](https://www.github.com/tdayris/snakemake-wrappers/commit/63f8acbba81f926b63a36d6496ee668e60ed5099))
+* update bio/bgzip/environment.yaml. ([#577](https://www.github.com/tdayris/snakemake-wrappers/issues/577)) ([7eb277c](https://www.github.com/tdayris/snakemake-wrappers/commit/7eb277c0f2cfeda2910deddd2d23ccc9791c3e0a))
+* update bio/busco/environment.yaml. ([#581](https://www.github.com/tdayris/snakemake-wrappers/issues/581)) ([e0220d2](https://www.github.com/tdayris/snakemake-wrappers/commit/e0220d24499a1ebf1171275f99b128ee5afe8273))
+* update bio/clustalo/environment.yaml. ([#582](https://www.github.com/tdayris/snakemake-wrappers/issues/582)) ([ae10993](https://www.github.com/tdayris/snakemake-wrappers/commit/ae10993c0e9fe2d54b9fedb40d0cacd0aef0e0cd))
+* update bio/delly/environment.yaml. ([#584](https://www.github.com/tdayris/snakemake-wrappers/issues/584)) ([d9a7a6a](https://www.github.com/tdayris/snakemake-wrappers/commit/d9a7a6a07ab3ddd05bddd6eacfbbaf8df508f545))
+* update bio/fastp/environment.yaml. ([#585](https://www.github.com/tdayris/snakemake-wrappers/issues/585)) ([76c9845](https://www.github.com/tdayris/snakemake-wrappers/commit/76c984548ecec43767c5a7f87dd1ecd9800ff981))
+* update bio/fastq_screen/environment.yaml. ([#586](https://www.github.com/tdayris/snakemake-wrappers/issues/586)) ([853a36d](https://www.github.com/tdayris/snakemake-wrappers/commit/853a36dc2bd1ef297d3289785d21d6f1c4399354))
+* update bio/fastqc/environment.yaml. ([#587](https://www.github.com/tdayris/snakemake-wrappers/issues/587)) ([e473ff7](https://www.github.com/tdayris/snakemake-wrappers/commit/e473ff76012e3e67aff2ae6b4a4e841bf7a97e2b))
+* update bio/fasttree/environment.yaml. ([#588](https://www.github.com/tdayris/snakemake-wrappers/issues/588)) ([576c54a](https://www.github.com/tdayris/snakemake-wrappers/commit/576c54a8776d3007222d5f2a98c8be60a7faa195))
+* update bio/filtlong/environment.yaml. ([#589](https://www.github.com/tdayris/snakemake-wrappers/issues/589)) ([6f5f48f](https://www.github.com/tdayris/snakemake-wrappers/commit/6f5f48f79ce8c1fcbc5547aa85f2f3c6d0a0f6f3))
+* update bio/freebayes/environment.yaml. ([#590](https://www.github.com/tdayris/snakemake-wrappers/issues/590)) ([5a1f598](https://www.github.com/tdayris/snakemake-wrappers/commit/5a1f5986710f8e1daa125b0959fe763362b99fb0))
+* update bio/genefuse/environment.yaml. ([#591](https://www.github.com/tdayris/snakemake-wrappers/issues/591)) ([f60db66](https://www.github.com/tdayris/snakemake-wrappers/commit/f60db66ecd380614e74251cbbf60244a113d3c99))
+* update bio/genomepy/environment.yaml. ([#592](https://www.github.com/tdayris/snakemake-wrappers/issues/592)) ([cb6b616](https://www.github.com/tdayris/snakemake-wrappers/commit/cb6b6167b09c4fc271275129651c3a0f641956f7))
+* update utils/datavzrd/environment.yaml. ([#566](https://www.github.com/tdayris/snakemake-wrappers/issues/566)) ([ac4ac81](https://www.github.com/tdayris/snakemake-wrappers/commit/ac4ac819fee80f7ed27b6b801aed37b76f0a84ef))
+
 ## [1.16.0](https://www.github.com/snakemake/snakemake-wrappers/compare/v1.15.2...v1.16.0) (2022-10-13)
 
 
