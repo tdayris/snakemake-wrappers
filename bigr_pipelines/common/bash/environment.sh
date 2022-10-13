@@ -50,13 +50,17 @@ function iodirectories() {
 }
 
 # Add shortcut to conda environment, the main environment with resources to execute all pipelines
-declare -x CONDA_ENV_PATH="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/env2/"
+declare -x CONDA_ENV_PATH="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/bigr_snakemake"
 
 # Declare snakemake cache directory. Used to avoid indexation steps and redundant operations
-declare -x SNAKEMAKE_OUTPUT_CACHE="/mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/common/cache"
+declare -x SNAKEMAKE_OUTPUT_CACHE="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/snakemake_cache"
+
+# Declare conda cache directory. Used to avoid conda reinstallations
+declare -x CONDA_CACHE_PATH="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/conda_cache"
 
 # Export previously defined variables to current environment
-export SNAKEMAKE_OUTPUT_CACHE CONDA_ENV_PATH
+export SNAKEMAKE_OUTPUT_CACHE CONDA_ENV_PATH CONDA_CACHE_PATH
+
 mkdir --parents --verbose tmp/shadow
 
 message INFO "sourced: environment.sh"
