@@ -49,9 +49,14 @@ while [ "$#" -gt 0 ]; do
     DESeq2|deseq2|DGE|dge) STEPS+=("dge"); message INFO "DGE is in the expected result list"; shift;;
     salmon|Salmon|quant) STEPS+=("quant"); message INFO "Quantification is in the expected result list"; shift;;
     fusions|fusion) STEPS+=("fusions"); message INFO "Fusions are in the expected result list"; shift;;
-    qc|QC) STEPS+=("qc"); message INFO "Quality Controls is in the expected result list"; shift;;
+    qc|QC) STEPS+=("qc"); message INFO "Quality Controls are in the expected result list"; shift;;
     immu|deconv) STEPS+=("immunedeconv"); message INFO "Immune Deconvolution is in the expected result list"; shift;;
-    gsea|clusterprofiler) STEPS+=("gsea"); message INFO "GSEA is in the expected result list"; shift;;
+    gsea|clusterprofiler) STEPS+=("gsea"); message INFO "GSEA are in the expected result list"; shift;;
+    tmb|TMB) STEPS+=("tmb"); message INFO "TMB are in the expected result list"; shift;;
+    msi|MSI) STEPS+=("msi"); message INFO "MSI are in the expected result list"; shift;;
+    cnv|CNV|facets) STEPS+=("cnv"); message INFO "CNV are in the expected result list"; shift;;
+    map|mapping) STEPS+=("aln"); message INFO "Alignments are in the expected result list"; shift;;
+    vc|variant|variants|calling) STEPS+=("variant_calling"); message INFO "Variant callings are in the expected result list"; shift;;
     --name) NAME="${2}"; shift 2;;
     -h|--help) message INFO "Please see official documentation at: https://github.com/tdayris/snakemake-wrappers"; exit 0; shift;;
     --snake-help) SNAKE_ARGS+=("--help"); shift;;
