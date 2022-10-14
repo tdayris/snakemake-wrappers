@@ -84,6 +84,33 @@ extra_parameters <- function(parameters, param_key) {
     base::return(parameters)
 }
 
+# This function performs optional graphs on user demand.
+plot_enrichment <- function(plot_function, plot_base_extra, output_plot_key, param_plot_key) {
+    # Acquire grDevices::png parameters
+    out_png <- base::as.character(x = snakemake@output[[output_plot_key]])
+    png_params <- extra_parameters(
+        parameters = "filename = out_png",
+        param_key = "png_extra"
+    )
+
+    # Acquire plot parameters
+    plot_params <- extra_parameters(
+        parameters = plot_base_extra,
+        param_key = param_plot_key
+    )
+
+    # Build command lines
+    png_command <- base::paste0("grDevices::png(", png_params, ")")
+    base::message(png_command)
+
+    plot_command <- base::paste0(plot_function, "(", plot_params, ")")
+    base::message(plot_command)
+
+    base::eval(base::parse(text = png_command))
+    base::eval(base::parse(text = plot_command))
+    grDevices::dev.off()
+}
+
 # Load gene information
 weight <- build_gene_list(
     gene_data_frame = read_input(data_path = snakemake@input[["gene"]])
@@ -96,8 +123,8 @@ universe <- term2gene[, 1]
 
 # Build enricher function parameters
 enrich_parameters <- extra_parameters(
-    paramters = "gene = genes, TERM2GENE = term2gene, universe = universe", 
-    param_key = "enrich_extra"
+    paramters = "geneList = weight, TERM2GENE = term2gene, universe = universe", 
+    param_key = "gsea_extra"
 )
 
 # Add optional human-readable term names
@@ -112,7 +139,7 @@ if ("term2name" %in% base::names(snakemake@input)) {
 }
 
 # Build and execute command line
-enrich_command <- base::paste0("clusterProfiler::enricher(", extra, ")")
+enrich_command <- base::paste0("clusterProfiler::GSEA(", extra, ")")
 base::message(enrich_command)
 enriched_terms <- base::eval(base::parse(text=enrich_command))
 
@@ -134,7 +161,6 @@ if ("tsv" %in% base::names(snakemake@output)) {
         sep = "\t",
     )
 }
-
 
 # Proper syntax to close the connection for the log file
 # but could be optional for Snakemake wrapper
