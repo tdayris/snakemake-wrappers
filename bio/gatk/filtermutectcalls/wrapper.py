@@ -3,7 +3,7 @@ __copyright__ = "Copyright 2021, Patrik Smeds"
 __email__ = "patrik.smeds@gmail.com"
 __license__ = "MIT"
 
-
+import tempfile
 from snakemake.shell import shell
 from snakemake_wrapper_utils.java import get_java_opts
 
@@ -12,43 +12,42 @@ java_opts = get_java_opts(snakemake)
 
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
-bam = ""
-if "bam" in snakemake.input.keys():
-    bam = " --input {}".format(snakemake.input["bam"])
 
+aln = snakemake.input.get("aln", "")
+if aln:
+    aln = f"--input {aln}"
 
-contamination = ""
-if "contamination" in snakemake.input.keys():
-    contamination = "--contamination-table {}".format(
-        snakemake.input["contamination"]
+contamination = snakemake.input.get("contemination_table", "")
+if contamination:
+    contamination = f"--contamination-table {contamination}"
+
+segmentation = snakemake.input.get("segmentation", "")
+if segmentation:
+    segmentation = f"--tumor-segmentation {segmentation}"
+
+f1r2 = snakemake.input.get("f1r2", "")
+if f1r2:
+    f1r2 = f"--orientation-bias-artifact-priors {f1r2}"
+
+intervals = snakemake.input.get("bed", "")
+if intervals:
+    intervals = f"--intervals {intervals}"
+
+with tempfile.TemporaryDirectory() as tmpdir:
+    shell(
+        "gatk --java-options '{java_opts}' FilterMutectCalls"
+        " --variant {snakemake.input.vcf}"
+        " --reference {snakemake.input.ref}"
+        " {aln}"  # BAM/SAM/CRAM file containing reads
+        " {contamination}"  # Tables containing contamination information
+        " {segmentation}"  # Tumor segments' minor allele fractions
+        " {f1r2}"  # .tar.gz files containing tables of prior artifact
+        " {intervals}"  # Genomic intervals over which to operate
+        " {extra}"
+        " --tmp-dir {tmpdir}"
+        " --output {snakemake.output.vcf}"
+        " {log}"
     )
-
-
-segmentation = ""
-if "segmentation" in snakemake.input.keys():
-    segmentation = "--tumor-segmentation {}".format(
-        snakemake.input["segmentation"]
-    )
-
-
-stats = ""
-if "stats" in snakemake.output.keys():
-    stats = "--stats {}".format(snakemake.output["stats"])
-
-
-f1r2 = ""
-if "f1r2" in snakemake.input.keys():
-    f1r2 = "--orientation-bias-artifact-priors {}".format(
-        snakemake.input["f1r2"]
-    )
-
-shell(
-    "gatk --java-options '{java_opts}' FilterMutectCalls "
-    "-R {snakemake.input.ref} -V {snakemake.input.vcf} "
-    "{extra} {contamination} {f1r2} {segmentation} {stats} {bam} "
-    "-O {snakemake.output.vcf} "
-    "{log}"
-)
 
 # Checking VCF format in search for truncated files
 shell(" ( echo 'Removing {snakemake.output.vcf} if it is truncated.' ; ( gunzip -c {snakemake.output.vcf} | tail ) || rm --verbose {snakemake.output.vcf} ) {log} ")

@@ -1,4 +1,5 @@
 import os
+import re
 import textwrap
 from jinja2 import Template
 import yaml
@@ -78,12 +79,8 @@ def render_tool(tool, subcmds):
 
 
 def render_snakefile(path):
-    render_snakefile_path = os.path.join(path, "test", "Snakefile")
-    if not os.path.exists(os.path.join(path, "test", "Snakefile")):
-        render_snakefile_path = path
-
-    with open(render_snakefile_path) as snakefile:
-        lines = filter(lambda line: "# [hide]" not in line, snakefile)
+    with open(os.path.join(path, "test", "Snakefile")) as snakefile:
+        lines = filter(lambda line: re.search(r"# ?\[hide\]", line) is None, snakefile)
         snakefile = textwrap.indent(
             "\n".join(l.rstrip() for l in lines), "    "
         ).replace("master", TAG)
@@ -94,6 +91,8 @@ def render_wrapper(path, target, wrapper_id):
     print("rendering", path)
     with open(os.path.join(path, "meta.yaml")) as meta:
         meta = yaml.load(meta, Loader=yaml.BaseLoader)
+    if "blacklisted" not in meta:
+        meta["blacklisted"] = None
 
     envpath = os.path.join(path, "environment.yaml")
     if os.path.exists(envpath):
@@ -143,7 +142,6 @@ def render_meta(path, target):
             ]
     else:
         used_wrappers = []
-
     snakefile = render_snakefile(path)
 
     name = meta["name"].replace(" ", "_") + ".rst"

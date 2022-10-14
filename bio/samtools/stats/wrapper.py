@@ -7,6 +7,19 @@ __license__ = "MIT"
 
 
 from snakemake.shell import shell
+from snakemake_wrapper_utils.samtools import get_samtools_opts
+
+
+
+extra = snakemake.params.get("extra", "")
+region = snakemake.params.get("region", "")
+bed = snakemake.input.get("bed", "")
+if bed:
+    extra += " -t " + bed
+
+samtools_opts = get_samtools_opts(
+    snakemake, parse_write_index=False, parse_output=False, parse_output_format=False
+)
 
 
 extra = snakemake.params.get("extra", "")
@@ -15,12 +28,8 @@ log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 reference = snakemake.input.get("ref", "")
 if reference:
-    reference = f"-r {reference}"
+    extra += f" -r {reference}"
 
-
-regions = snakemake.input.get("bed", "")
-if regions:
-    regions = f"-t {regions}"
-
-
-shell("samtools stats {extra} {reference} {regions} {snakemake.input.aln} {region} > {snakemake.output} {log}")
+shell(
+    "samtools stats {samtools_opts} {extra} {snakemake.input.bam} {bed} {region} > {snakemake.output} {log}"
+)

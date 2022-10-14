@@ -1,14 +1,13 @@
-name: gatk GetPileupSummaries
-description: |
-  Run gatk GetPileupSummaries on the tumor BAM to summarize read support for a set number of known variant sites.
-authors:
+name: GATK Get pileup summaries
+url: https://gatk.broadinstitute.org/hc/en-us/articles/360037593451-GetPileupSummaries
+description: Summarizes counts of reads that support reference, alternate and other alleles
+author:
   - Thibault Dayris
 input:
-  - BAM formatted mapped reads
-  - VCF formatted variants
+  - bam: Path to bam file (sorted and indexed)
+  - intervals: Path to one or more BED genomic intervals over which to operate
+  - variants: Path to a VCF containing allele frequencies (pbgzipped and tabix indexed)
 output:
-  - pileup summaries table
-notes: |
-  * The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
-  * The `extra` param alllows for additional program arguments.
-  * For more inforamtion see, https://software.broadinstitute.org/gatk/documentation/article?id=11050
+  - Path to output table
+params:
+  - extra: Optional parameters

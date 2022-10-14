@@ -23,8 +23,6 @@ if not snakemake.output[0].endswith(".gz"):
         'output file will be compressed and therefore filename should end with ".gz"'
     )
 
-log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
 shell(
     "samtools mpileup "
     "{extra} "

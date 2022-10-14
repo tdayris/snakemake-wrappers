@@ -1,22 +1,16 @@
-rule get_pileup_summaries:
+rule test_gatk_get_pileup_summaries:
     input:
-        # single or list of bam files
-        bam="mapped/{sample}.bam",
-        # single or list of intervals
-        interval="intervals.bed",
-        variants="known.vcf"
+        bam="mapped/a.bam",
+        intervals="genome/intervals.bed",
+        variants="genome/variants.vcf.gz",
     output:
-        table="summary/{sample}_tumor_pileup_summary.table",
-    log:
-        "logs/gatk/GetPileupSummaries/{sample}.log"
-    params:
-        extra="",  # optional
-        java_opts="", # optional
-    # optional specification of memory usage of the JVM that snakemake will respect with global
-    # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
-    # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
-    # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+        "summaries.table",
+    threads: 1
     resources:
-        mem_mb=1024
+        mem_mb=1024,
+    params:
+        extra="",
+    log:
+        "logs/summary.log",
     wrapper:
         "master/bio/gatk/getpileupsummaries"

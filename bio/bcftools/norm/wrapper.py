@@ -5,6 +5,10 @@ __license__ = "MIT"
 
 
 from snakemake.shell import shell
+from snakemake_wrapper_utils.bcftools import get_bcftools_opts
+
+bcftools_opts = get_bcftools_opts(snakemake, parse_memory=False)
+extra = snakemake.params.get("extra", "")
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 extra = snakemake.params.get("extra", "")
@@ -27,7 +31,7 @@ if "region" in snakemake.input.keys():
     region = "--regions {}".format(snakemake.input["region"])
 
 shell(
-    "bcftools norm {extra} {region} {fasta} "
+    "bcftools norm {bcftools_opts} {extra} {region} {fasta} "
     "{output_type} --threads {snakemake.threads} "
     "{snakemake.input.call} -o {snakemake.output[0]} {log}"
 )

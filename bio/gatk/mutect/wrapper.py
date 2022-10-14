@@ -5,6 +5,7 @@ __copyright__ = "Copyright 2019, Dayris Thibault"
 __email__ = "thibault.dayris@gustaveroussy.fr"
 __license__ = "MIT"
 
+import tempfile
 from snakemake.shell import shell
 from snakemake.utils import makedirs
 from snakemake_wrapper_utils.java import get_java_opts
@@ -47,21 +48,24 @@ java_opts = get_java_opts(snakemake)
 
 java_opts += f" -XX:+UseParallelGC -XX:ParallelGCThreads={snakemake.threads}"
 
-shell(
-    "OMP_NUM_THREADS={snakemake.threads} && export OMP_NUM_THREADS && "
-    "gatk --java-options '{java_opts}' Mutect2 "  # Tool and its subprocess
-    " {tumor} "  # Path to tumor input file
-    "--input {snakemake.input.map} "  # Path to input mapping file
-    "{bam_output} "  # Path to output bam file, optional
-    "{f1r2} "  # Path to output f1r2 count file
-    "{germline_resource} "  # Path to optional germline resource VCF
-    "{intervals} "  # Path to optional intervals
-    "--output {snakemake.output.vcf} "  # Path to output vcf file
-    "--reference {snakemake.input.fasta} "  # Path to reference fasta file
-    "--native-pair-hmm-threads {snakemake.threads} "  # Maximum number of threads
-    "{extra} "  # Extra parameters
-    "{log}"  # Logging behaviour
-)
+
+with tempfile.TemporaryDirectory() as tmpdir:
+    shell(
+        "OMP_NUM_THREADS={snakemake.threads} && export OMP_NUM_THREADS && "
+        "gatk --java-options '{java_opts}' Mutect2 "  # Tool and its subprocess
+        " {tumor} "  # Path to tumor input file
+        "--input {snakemake.input.map} "  # Path to input mapping file
+        "{bam_output} "  # Path to output bam file, optional
+        "{f1r2} "  # Path to output f1r2 count file
+        "{germline_resource} "  # Path to optional germline resource VCF
+        "{intervals} "  # Path to optional intervals
+        "--output {snakemake.output.vcf} "  # Path to output vcf file
+        "--reference {snakemake.input.fasta} "  # Path to reference fasta file
+        "--native-pair-hmm-threads {snakemake.threads} "  # Maximum number of threads
+        " --tmp-dir {tmpdir}"
+        "{extra} "  # Extra parameters
+        "{log}"  # Logging behaviour
+    )
 
 # Checking VCF format in search for truncated files
 shell(" ( echo 'Removing {snakemake.output.vcf} if it is truncated.' ; ( gunzip -c {snakemake.output.vcf} | tail ) || rm --verbose {snakemake.output.vcf} ) {log} ")

@@ -15,6 +15,12 @@ sort_extra = snakemake.params.get("sort_extra", "")
 samblaster_extra = snakemake.params.get("samblaster_extra", "")
 sambamba_view_extra = snakemake.params.get("sambamba_view_extra", "")
 
+index = snakemake.input.get("index", "")
+if isinstance(index, str):
+    index = path.splitext(snakemake.input.idx)[0]
+else:
+    index = path.splitext(snakemake.input.idx[0])[0]
+
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 # Check inputs/arguments.
@@ -41,7 +47,7 @@ shell(
     "(bwa mem"
     " -t {bwa_threads}"
     " {extra}"
-    " {snakemake.params.index}"
+    " {index}"
     " {snakemake.input.reads}"
     " | samblaster"
     " {samblaster_extra}"

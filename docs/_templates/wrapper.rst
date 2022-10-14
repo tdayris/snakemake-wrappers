@@ -3,9 +3,15 @@
 {{ name|upper }}
 {{ name | length * '=' }}
 
+{% if blacklisted %}
+.. image:: https://img.shields.io/badge/blacklisted-{{ blacklisted|urlencode }}-red
+{% endif %}
+
 {{ description }}
 
+{% if url %}
 **URL**: {{ url }}
+{% endif %}
 
 Example
 -------
@@ -25,6 +31,14 @@ When running with
     snakemake --use-conda
 
 the software dependencies will be automatically deployed into an isolated environment before execution.
+
+{% if notes %}
+
+Notes
+-----
+
+{{ notes }}
+{% endif %}
 
 {% if pkgs|length %}
 Software dependencies
@@ -72,14 +86,6 @@ Params
 
 {% endfor %}
 
-{% endif %}
-
-{% if notes %}
-
-Notes
------
-
-{{ notes }}
 {% endif %}
 
 

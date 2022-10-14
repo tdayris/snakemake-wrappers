@@ -3,18 +3,20 @@ rule gatk_applybqsr_spark:
         bam="mapped/{sample}.bam",
         ref="genome.fasta",
         dict="genome.dict",
-        recal_table="recal/{sample}.grp"
+        recal_table="recal/{sample}.grp",
     output:
-        bam="recal/{sample}.bam"
+        bam="recal/{sample}.bam",
     log:
-        "logs/gatk/gatk_applybqsr_spark/{sample}.log"
+        "logs/gatk/gatk_applybqsr_spark/{sample}.log",
     params:
         extra="",  # optional
-        java_opts="", # optional
+        java_opts="",  # optional
         #spark_runner="",  # optional, local by default
         #spark_master="",  # optional
         #spark_extra="", # optional
+        embed_ref=True,  # embed reference in cram output
+        exceed_thread_limit=True,  # samtools is also parallized and thread limit is not guaranteed anymore
     resources:
-        mem_mb=1024
+        mem_mb=1024,
     wrapper:
         "master/bio/gatk/applybqsrspark"

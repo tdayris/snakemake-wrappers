@@ -5,8 +5,27 @@ __license__ = "MIT"
 
 
 from snakemake.shell import shell
+from snakemake_wrapper_utils.bcftools import get_bcftools_opts
 
-## Extract arguments
+
+bcftools_opts = get_bcftools_opts(
+    snakemake, parse_ref=False, parse_output_format=False, parse_memory=False
+)
 extra = snakemake.params.get("extra", "")
+log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
-shell("bcftools index" " {extra}" " {snakemake.input[0]}")
+
+if "--tbi" in extra or "--csi" in extra:
+    raise ValueError(
+        "You have specified index format (`--tbi/--csi`) in `params.extra`; this is automatically infered from the first output file."
+    )
+
+if snakemake.output[0].endswith(".tbi"):
+    extra += " --tbi"
+elif snakemake.output[0].endswith(".csi"):
+    extra += " --csi"
+else:
+    raise ValueError("invalid index file format ('.tbi', '.csi').")
+
+
+shell("bcftools index {bcftools_opts} {extra} {snakemake.input[0]} {log}")
