@@ -4,27 +4,28 @@ url: https://yulab-smu.top/biomedical-knowledge-mining-book/universal-api.html
 authors:
   - Thibault Dayris
 input:
-  - gene: List of gene ids. These ids must match with the ones provided in `term2gene`.
-  - term2gene: Enrichment term <-> gene id mapping file. Either a TSV text file, or a R `data.frame` as RDS binary file.
-  - term2name: Optional enrichment term <-> enrichment name mapping file. TSV/CSV formatted. Either a TSV text file, or a R dataframe as RDS binary file.
-  - fold_change: Optional gene id <-> fold change mapping file. Either a TSV text file, or a R `data.frame` as a RDS binary file.
+  - gene: Two columned dataset, containing `gene_id \t weight`. These ids must match with the ones provided in `term2gene`.
+  - term2gene: Enrichment term <-> gene id mapping file. Either a TSV-formatted text file, a GMT-formatted text file, or a R `data.frame` as RDS binary file with two columns `term \t gene`.
+  - term2name: Optional enrichment term <-> enrichment name mapping file. TSV/CSV formatted. Either a TSV text file, or a R dataframe as RDS binary file with two column `term \t name`.
 output:
   - tsv: Enrichment analysis result as a TSV formatted text file.
   - rds: Enrichment analysis result as a RDS formatted binary file.
   - barplot: Enrichment analysis result as a PNG formatted image representing a barplot of selected/best enriched terms.
   - dotplot: Enrichment analysis result as a PNG formatted image representing a dotplot of selected/best enriched terms.
   - cnetplot: Linkage of gene and terms, as a PNG formatted image representing a concept network of enriched terms.
-  - heatplot: Linkage of gene and terms, as a PNG formatted image representing a (coloured) heatmap. Colors requires `input.fold_change`.
+  - heatplot: Linkage of gene and terms, as a PNG formatted image representing a coloured heatmap.
+  - emapplot: Linkage of terms, as PNG formatted image representing the network.
+  - upsetplot: Linkage of gene and terms, as a PNG formatted image representing up-sets.
+  - pmcplot: Pubmed central trend plot, as a PNG formatted image.
 params:
   - enrich_extra: Optional parameters for `clusterprofiler::enricher <https://rdrr.io/bioc/clusterProfiler/man/enricher.html>`_ .
+  - png_extra: Optional parameters for `grDevices::png <https://www.rdocumentation.org/packages/grDevices/versions/3.4.1/topics/png>`_ .
   - barplot_extra: Optional parameters for `graphics::barplot <https://rdrr.io/r/graphics/barplot.html>`_ .
   - dotplot_extra: Optional parameters for `enrichplot::dotplot <https://rdrr.io/bioc/enrichplot/man/dotplot.html>`_ .
   - cnetplot_extra: Optional parameters for `enrichplot::cnetplot <https://rdrr.io/bioc/enrichplot/man/cnetplot.html>`_ .
   - heatplot_extra: Optional parameters for `enrichplot::heatplot <https://rdrr.io/bioc/enrichplot/man/heatplot.html>`_ .
+  - emapplot_extra: Optional parameters for `enrichplot::emapplot <https://rdrr.io/bioc/enrichplot/man/emapplot.html>`_ .
+  - upsetplot_extra: Optional parameters for `enrichplot::upsetplot <https://rdrr.io/bioc/enrichplot/man/upsetplot-methods.html>`_ .
+  - pmcplot_extra: Optional parameters for `enrichplot::pmcplot <https://rdrr.io/bioc/enrichplot/man/pmcplot.html>`_ .
 notes: |
-  * In `input` section, if `fold_change` is provided, then `gene` is optional.
-  * Genes id present in `input.fold_change` and missing in `input.gene` will be excluded from analysis. (default ClusterProfiler behavior)
-  * Genes id present in `input.gene` and missing in `input.fold_change` will lead to an error.
   * The universe corresponds to the list of genes provided in term2gene. (default ClusterProfiler behavior)
-  * Genes present in `input.gene` or `input.fold_change` and missing in `input.term2gene` will be excluded from analysis. (default ClusterProfiler behavior)
-  * While ClusterProfiler explicitly refers to fold changes, any continuous numerical value may be provided as a fold_change.
