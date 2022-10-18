@@ -2,101 +2,11 @@
 import sys
 import os
 import re
-import math
 import argparse
 import subprocess
+
 from snakemake.utils import read_job_properties
 
-
-##############################
-# Helper functions
-##############################
-def _get_default_partition():
-    """Retrieve default partition for cluster"""
-    if "shortq":
-        return "shortq"
-    cmd = "sinfo -O \"partition\""
-    res = subprocess.run(cmd, check=True, shell=True,
-                         stdout=subprocess.PIPE)
-    m = re.search("(?P<partition>\S+)\*", res.stdout.decode(), re.M)
-    partition = m.group("partition")
-    return partition
-
-
-def _get_cluster_configuration(partition):
-    """Retrieve cluster configuration for a partition."""
-    # Retrieve partition info; we tacitly assume we only get one response
-    cmd = " ".join(
-        ["sinfo -e -O \"partition,cpus,memory,time,size,maxcpuspernode\"",
-         "-h -p {}".format(partition)])
-    res = subprocess.run(cmd, check=True, shell=True, stdout=subprocess.PIPE)
-    m = re.search("(?P<partition>\S+)\s+(?P<cpus>\d+)\s+(?P<memory>\S+)\s+((?P<days>\d+)-)?(?P<hours>\d+):(?P<minutes>\d+):(?P<seconds>\d+)\s+(?P<size>\S+)\s+(?P<maxcpus>\S+)",
-                  res.stdout.decode())
-    d = m.groupdict()
-    if not 'days' in d or not d['days']:
-        d['days'] = 0
-    d["time"] = int(d['days']) * 24 * 60 + \
-        int(d['hours']) * 60 + int(d['minutes']) + \
-        math.ceil(int(d['seconds']) / 60)
-    return d
-
-
-def _get_features_and_memory(partition):
-    """Retrieve features and memory for a partition in the cluster
-    configuration. """
-    cmd = " ".join(
-        ["sinfo -e -O \"memory,features_act\"",
-         "-h -p {}".format(partition)])
-    res = subprocess.run(cmd, check=True, shell=True, stdout=subprocess.PIPE)
-    mem_feat = []
-    for x in res.stdout.decode().split("\n"):
-        if not re.search("^\d+", x):
-            continue
-        m = re.search("^(?P<mem>\d+)\s+(?P<feat>\S+)", x)
-        mem_feat.append({'mem': m.groupdict()["mem"],
-                         'features': m.groupdict()["feat"].split(",")})
-    return mem_feat
-
-
-def _get_available_memory(mem_feat, constraints=None):
-    """Get available memory
-
-    If constraints are given, parse constraint string into array of
-    constraints and compare them to active features. Currently only
-    handles comma-separated strings and not the more advanced
-    constructs described in the slurm manual.
-
-    Else, the minimum memory for a given partition is returned.
-
-    """
-    if constraints is None:
-        return min([int(x['mem']) for x in mem_feat])
-    try:
-        constraint_set = set(constraints.split(","))
-        for x in mem_feat:
-            if constraint_set.intersection(x["features"]) == constraint_set:
-                return int(x["mem"])
-    except Exception as e:
-        print(e)
-        raise
-
-
-def _update_memory_and_ntasks(arg_dict, MEMORY_PER_CPU, MEMORY_PER_PARTITION):
-    """Given a one-node job, update memory and ntasks if the requested
-    configuration is unavailable"""
-    if arg_dict["mem"] is not None:
-        arg_dict["mem"] = min(int(arg_dict["mem"]),
-                              MEMORY_PER_PARTITION)
-        AVAILABLE_MEM = arg_dict["ntasks"] * MEMORY_PER_CPU
-        if arg_dict["mem"] > AVAILABLE_MEM:
-            arg_dict["ntasks"] = int(math.ceil(arg_dict["mem"] /
-                                               MEMORY_PER_CPU))
-    arg_dict["ntasks"] = min(int(config["cpus"]),
-                             int(arg_dict["ntasks"]))
-
-##############################
-# Main script
-##############################
 parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument(
     "--help", help="Display help message.", action="store_true")
@@ -105,10 +15,7 @@ parser.add_argument(
     nargs="?", metavar="POS",
     help="additional arguments not in slurm parser group to pass to sbatch")
 
-# A subset of SLURM-specific arguments. Note that the parser is used
-# implicitly in that the parsed arguments are used to construct a
-# dictionary of arguments to be processed. Specific arguments can be
-# modified via the cluster configuration file.
+# A subset of SLURM-specific arguments
 slurm_parser = parser.add_argument_group("slurm-specific arguments")
 slurm_parser.add_argument(
     "-a", "--array", help="job array index values")
@@ -117,16 +24,12 @@ slurm_parser.add_argument(
 slurm_parser.add_argument(
     "--begin", help="defer job until HH:MM MM/DD/YY")
 slurm_parser.add_argument(
-    "-c", "--cpus-per-task", help="number of cpus required per task",
-    type=int, default=1)
+    "-c", "--cpus-per-task", help="number of cpus required per task")
 slurm_parser.add_argument(
     "-d", "--dependency",
     help="defer job until condition on jobid is satisfied")
 slurm_parser.add_argument(
     "-D", "--workdir", help="set working directory for batch script")
-slurm_parser.add_argument(
-    "-e", "--error", help="file for batch script's standard error",
-    default="slurm_error" if "slurm_error" else None)
 slurm_parser.add_argument(
     "-J", "--job-name", help="name of job")
 slurm_parser.add_argument(
@@ -134,16 +37,11 @@ slurm_parser.add_argument(
 slurm_parser.add_argument(
     "--mail-user", help="who to send email notification for job state changes")
 slurm_parser.add_argument(
-    "-n", "--ntasks", help="number of tasks to run", type=int, default=1)
+    "-n", "--ntasks", help="number of tasks to run")
 slurm_parser.add_argument(
-    "-N", "--nodes", help="number of nodes on which to run (N = min[-max])",
-    type=int)
+    "-N", "--nodes", help="number of nodes on which to run (N = min[-max])")
 slurm_parser.add_argument(
-    "-o", "--output", help="file for batch script's standard output",
-    default="slurm_output" if "slurm_output" else None)
-slurm_parser.add_argument(
-    "-p", "--partition", help="partition requested",
-    default=_get_default_partition(), type=str)
+    "-p", "--partition", help="partition requested")
 slurm_parser.add_argument(
     "-q", "--qos", help="quality of service")
 slurm_parser.add_argument(
@@ -156,11 +54,6 @@ slurm_parser.add_argument(
     "-C", "--constraint", help="specify a list of constraints")
 slurm_parser.add_argument(
     "--mem", help="minimum amount of real memory")
-
-opt_keys = ["array", "account", "begin", "cpus_per_task",
-            "dependency", "workdir", "error", "job_name", "mail_type",
-            "mail_user", "ntasks", "nodes", "output", "partition",
-            "quiet", "time", "wrap", "constraint", "mem"]
 
 args = parser.parse_args()
 
@@ -180,16 +73,6 @@ if args.positional:
 arg_dict = dict(args.__dict__)
 
 
-# Ensure output folder for Slurm log files exist.
-# This is a bit hacky; will run for every Slurm submission...
-if arg_dict["output"] is not None:
-    if not os.path.exists(os.path.dirname(arg_dict["output"])):
-        os.makedirs(os.path.dirname(arg_dict["output"]))
-if arg_dict["error"] is not None:
-    if not os.path.exists(os.path.dirname(arg_dict["error"])):
-        os.makedirs(os.path.dirname(arg_dict["error"]))
-
-
 # Process resources
 if "resources" in job_properties:
     resources = job_properties["resources"]
@@ -198,62 +81,59 @@ if "resources" in job_properties:
             arg_dict["time"] = resources["time_min"]
         elif "walltime" in resources:
             arg_dict["time"] = resources["walltime"]
+        elif "runtime" in resources:
+            arg_dict["time"] = resources["runtime"]
+        else:
+            arg_dict["time"] = 30
     if arg_dict["mem"] is None:
-        if "mem" in resources:
-            arg_dict["mem"] = resources["mem"]
-        elif "mem_mb" in resources:
+        if "mem_mb" in resources:
             arg_dict["mem"] = resources["mem_mb"]
+        elif "mem" in resources:
+            arg_dict["mem"] = resources["mem"]
+        else:
+            arg_dict["mem"] = 1024
+    if arg_dict["partition"] is None:
+        if arg_dict["time"] < 360:
+            arg_dict["partition"] = "shortq"
+        elif 360 <= arg_dict["time"] < 1440:
+            arg_dict["partition"] = "mediumq"
+        elif 1440 <= arg_dict["time"] < 10080:
+            arg_dict["partition"] = "longq"
+        elif 10080 <= arg_dict["time"] < 86400:
+            arg_dict["partition"] = "verylongq"
+        else:
+            raise ValueError(
+                "Too much time requested: {}".format(str(arg_dict["time"]))
+            )
+    if resources.get("gres", None) is not None:
+        if "T4" in resources["gres"].upper():
+            arg_dict["gres"] = resources["gres"]
+            arg_dict["ntasks"] = 1
+            arg_dict["nodes"] = 1
+            arg_dict["partition"] = "visuq"
+
+    if resources.get("chdir", None) is not None:
+        arg_dict["chdir"] = resources["chrdir"]
+
 
 # Threads
 if "threads" in job_properties:
-    arg_dict["ntasks"] = job_properties["threads"]
+    arg_dict["cpus_per_task"] = job_properties["threads"]
 
+opt_keys = ["array", "account", "begin", "cpus_per_task",
+            "dependency", "workdir", "error", "job_name", "mail_type",
+            "mail_user", "ntasks", "nodes", "output", "partition",
+            "quiet", "time", "wrap", "constraint", "mem", "gres", "chdir"]
 
-# Process cluster configuration. Note that setting time, ntasks, and
-# mem will override any setting in resources. It is assumed that the
-# cluster configuration parameters are named according to the sbatch
-# long options names
-cluster_config = job_properties.get("cluster", {})
-arg_dict.update(job_properties.get("cluster", {}))
+arg_dict["output"] = "logs/slurm/slurm-%x-%j-%N.out"
+if arg_dict["output"] is not None:
+    os.makedirs(os.path.dirname(arg_dict["output"]), exist_ok=True)
+arg_dict["error"] = "logs/slurm/slurm-%x-%j-%N.err"
+if arg_dict["error"] is not None:
+    os.makedirs(os.path.dirname(arg_dict["error"]), exist_ok=True)
 
-# Determine partition with features. If no constraints have been set,
-# select the partition with lowest memory
-try:
-    part = arg_dict["partition"]
-    config = _get_cluster_configuration(part)
-    mem_feat = _get_features_and_memory(part)
-    MEMORY_PER_PARTITION = _get_available_memory(mem_feat,
-                                                 arg_dict["constraint"])
-    MEMORY_PER_CPU = MEMORY_PER_PARTITION / int(config["cpus"])
-except subprocess.CalledProcessError as e:
-    print(e)
-    raise e
-except Exception as e:
-    print(e)
-    raise e
-
-
-# Update time. If requested time is larger than maximum allowed time,
-# reset
-try:
-    if arg_dict["time"] is not None:
-        arg_dict["time"] = min(int(config["time"]), int(arg_dict["time"]))
-except Exception as e:
-    print(e)
-    raise e
-
-
-# Adjust memory in the single-node case only; getting the
-# functionality right for multi-node multi-cpu jobs requires more
-# development
-if arg_dict["nodes"] is None or int(arg_dict["nodes"]) == 1:
-    _update_memory_and_ntasks(arg_dict, MEMORY_PER_CPU,
-                              MEMORY_PER_PARTITION)
-else:
-    if int(arg_dict["ntasks"]) == 1:
-        # Allocate at least as many tasks as requested nodes
-        arg_dict["ntasks"] = int(arg_dict["nodes"])
-
+arg_dict["mail_type"] = "END,FAIL"
+arg_dict["mail_user"] = "thibault.dayris@gustaveroussy.fr"
 
 opts = ""
 for k, v in arg_dict.items():

@@ -29,7 +29,7 @@ slurm_parser.add_argument(
     "-d", "--dependency",
     help="defer job until condition on jobid is satisfied")
 slurm_parser.add_argument(
-    "-D", "--chdir", help="set working directory for batch script")
+    "-D", "--workdir", help="set working directory for batch script")
 slurm_parser.add_argument(
     "-J", "--job-name", help="name of job")
 slurm_parser.add_argument(
@@ -92,7 +92,6 @@ if "resources" in job_properties:
             arg_dict["mem"] = resources["mem"]
         else:
             arg_dict["mem"] = 1024
-
     if arg_dict["partition"] is None:
         if arg_dict["time"] < 360:
             arg_dict["partition"] = "shortq"
@@ -114,7 +113,7 @@ if "resources" in job_properties:
             arg_dict["partition"] = "visuq"
 
     if resources.get("chdir", None) is not None:
-        arg_dict["chdir"] = resources["chdir"]
+        arg_dict["chdir"] = resources["chrdir"]
 
 
 # Threads
@@ -122,9 +121,9 @@ if "threads" in job_properties:
     arg_dict["cpus_per_task"] = job_properties["threads"]
 
 opt_keys = ["array", "account", "begin", "cpus_per_task",
-            "dependency", "chdir", "error", "job_name", "mail_type",
+            "dependency", "workdir", "error", "job_name", "mail_type",
             "mail_user", "ntasks", "nodes", "output", "partition",
-            "quiet", "time", "wrap", "constraint", "mem", "gres"]
+            "quiet", "time", "wrap", "constraint", "mem", "gres", "chdir"]
 
 arg_dict["output"] = "logs/slurm/slurm-%x-%j-%N.out"
 if arg_dict["output"] is not None:
