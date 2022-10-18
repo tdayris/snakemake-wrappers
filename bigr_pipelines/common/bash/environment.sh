@@ -58,6 +58,8 @@ declare -x SNAKEMAKE_OUTPUT_CACHE="/mnt/beegfs/pipelines/unofficial-snakemake-wr
 # Declare conda cache directory. Used to avoid conda reinstallations
 declare -x CONDA_CACHE_PATH="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/conda_cache"
 
+declare -x SHARED_SINGULARITY_PATH="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/singularity/"
+
 # Export previously defined variables to current environment
 export SNAKEMAKE_OUTPUT_CACHE CONDA_ENV_PATH CONDA_CACHE_PATH
 
