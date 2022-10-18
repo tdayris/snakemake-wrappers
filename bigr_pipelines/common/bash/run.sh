@@ -5,8 +5,8 @@ set -e
 PIPELINE_PREFIX=$(readlink -e "$(dirname "${0}")/../../..")
 
 COMMAND="source \"${PIPELINE_PREFIX}/bigr_pipelines/common/bash/messages.sh\""
-message CMD "${COMMAND}"
 eval ${COMMAND}
+message CMD "${COMMAND}"
 
 COMMAND="source \"${PIPELINE_PREFIX}/bigr_pipelines/common/bash/environment.sh\""
 message CMD "${COMMAND}"
