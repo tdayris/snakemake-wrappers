@@ -14,9 +14,9 @@ base::sink(log.file)
 base::sink(log.file, type = "message")
 
 # Load packages
-base::library(package = "clusterProfiler", character.only = TRUE);
-base::library(package = "Cairo", character.only = TRUE);
-base::library(package = "enrichplot", character.only = TRUE);
+base::library(package = "clusterProfiler", character.only = TRUE)
+base::library(package = "Cairo", character.only = TRUE)
+base::library(package = "enrichplot", character.only = TRUE)
 
 
 # This function gathers optional parameters
