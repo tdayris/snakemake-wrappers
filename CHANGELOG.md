@@ -1,4 +1,19 @@
-# Changelog
+# BiGR Changelog
+
+## 1.0.1
+
+### Features
+
+* add unique launcher for rnaseq, wes, fastqc_multiqc pipelines
+* add singularity images
+* Shared conda is now separated from sources
+
+### Bug fixes
+
+* Wrong links in case of not-bigr-project-repository
+* Wrong move for demultiplexing automatic QC
+
+# Official Changelog
 
 ## [1.15.0](https://www.github.com/snakemake/snakemake-wrappers/compare/v1.14.1...v1.15.0) (2022-10-11)
 
