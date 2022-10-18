@@ -41,7 +41,9 @@ function iodirectories() {
     message WARNING "${DIRNAME} directory already available: ${DIRNAME_PATH}. It does not seem to be linked to official BiGR data managment"
   elif [ -d $(readlink -e "${CWD}/../${DIRNAME}") ]; then
     # Case DIRNAME is missing but available in parent dir
-    ln -sfrv $(readlink -e "${CWD}/../${DIRNAME}") "${DIRNAME_PATH}"
+    CMD="ln -sfrv $(readlink -e \"${CWD}/../${DIRNAME}\") \"${DIRNAME_PATH}\""
+    message CMD "${CMD}"
+    eval ${CMD}
     message INFO "${DIRNAME} directory available from parent dir and linked to: ${DIRNAME_PATH}"
   else
     # Case DIRNAME never found
@@ -63,6 +65,8 @@ declare -x SHARED_SINGULARITY_PATH="/mnt/beegfs/pipelines/unofficial-snakemake-w
 # Export previously defined variables to current environment
 export SNAKEMAKE_OUTPUT_CACHE CONDA_ENV_PATH CONDA_CACHE_PATH
 
-mkdir --parents --verbose tmp/shadow
+CMD="mkdir --parents --verbose tmp/shadow"
+message CMD "${CMD}"
+eval ${CMD}
 
 message INFO "sourced: environment.sh"
