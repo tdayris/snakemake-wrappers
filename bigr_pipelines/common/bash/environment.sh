@@ -47,7 +47,10 @@ function iodirectories() {
     message INFO "${DIRNAME} directory available from parent dir and linked to: ${DIRNAME_PATH}"
   else
     # Case DIRNAME never found
-    message WARNING "Data input was not found. It will be created by snakemake, but not linked to official BiGR data managment"
+    message WARNING "Data input was not found. It will be created, but not linked to official BiGR data managment"
+    CMD="mkdir --parents --verbose data_{input,output}"
+    message CMD "${CMD}"
+    eval ${CMD}
   fi
 }
 
