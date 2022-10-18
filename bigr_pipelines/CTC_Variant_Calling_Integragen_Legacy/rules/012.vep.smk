@@ -72,7 +72,7 @@ rule ensemblvep_hc:
     params:
         organism=config.get("vep_db", "hg38"),
     conda:
-        str(workflow_source_dir / "conda" / "B20002_FRFA_20200409")
+        str(workflow_source_dir / "conda" / "B20002_FRFA_20200409.yaml")
     script:
         str(workflow_source_dir / "scripts" / "ensemblVEP_hc.R")
 
