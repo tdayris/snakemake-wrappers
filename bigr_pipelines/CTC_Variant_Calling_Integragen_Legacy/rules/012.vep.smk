@@ -72,7 +72,7 @@ rule ensemblvep_hc:
     params:
         organism=config.get("vep_db", "hg38"),
     conda:
-        "B20002_FRFA_20200409"
+        str(workflow_source_dir / "envs" / "r.yaml")
     script:
         str(workflow_source_dir / "scripts" / "ensemblVEP_hc.R")
 
@@ -93,7 +93,7 @@ rule ensemblvep_mutect:
     params:
         organism=config.get("vep_db", "hg38"),
     conda:
-        "B20002_FRFA_20200409"
+        str(workflow_source_dir / "envs" / "r.yaml")
     script:
         str(workflow_source_dir / "scripts" / "ensemblVEP_mutect.R")
 
@@ -114,7 +114,7 @@ rule ensemblvep_bcr:
     params:
         organism=config.get("vep_db", "hg38"),
     conda:
-        "B20002_FRFA_20200409"
+        str(workflow_source_dir / "envs" / "r.yaml")
     script:
         str(workflow_source_dir / "scripts" / "ensemblVEP_bcr.R")
 
