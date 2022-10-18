@@ -1,29 +1,15 @@
-rule test_clusterprofiler_enricher_minimal:
+rule test_clusterprofiler_enricher:
     input:
         gene="genes.table.tsv",
-        term2gene="term2gene.tsv",
+        term2gene="term2gene.csv",
+        term2name="term2name.csv", # Optional
     output:
-        rds="enrichment.RDS",
-        tsv="enrichment.tsv",
-        barplot="enrichment.barplot.png",
-        dotplot="enrichment.dotplot.png",
-        cnetplot="enrichment.cntplot.png",
-        heatplot="enrichment.heatplot.png",
-        emapplot="enrichment.emapplot.png",
-        upsetplot="enrichment.upsetplot.png",
-        pmcplot="enrichment.pmcplot.png",
+        rds="enrichment.RDS", # Optional
+        tsv="enrichment.tsv", # Optional
     threads: 1
     log:
-        "logs/clusterprofiler.log"
+        "logs/enricher.log"
     params:
         enricher_extra="pvalueCutoff = 1, qvalueCutoff = 1",
-        barplot_extra="showCategory = 2",
-        dotplot_extra="showCategory = 2",
-        cnetplot_extra="showCategory = 2",
-        heatplot_extra="showCategory = 2",
-        emapplot_extra="showCategory = 2",
-        upsetplot_extra="n = 2",
-        pmcplot_extra="period=2010:2020",
-        png_extra="",
     wrapper:
         "master/bio/clusterprofiler/enricher"

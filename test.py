@@ -148,6 +148,22 @@ def test_purge_dups_calcuts():
 
 
 @skip_if_not_modified
+def test_clusterprofiler_enricher():
+    run(
+        "bio/clusterprofiler/enricher",
+        ["snakemake", "--cores", "1", "enrichment.RDS", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_clusterprofiler_gsea():
+    run(
+        "bio/clusterprofiler/gsea",
+        ["snakemake", "--cores", "1", "gsea.RDS", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
 def test_purge_dups_get_seqs():
     run(
         "bio/purge_dups/get_seqs",
