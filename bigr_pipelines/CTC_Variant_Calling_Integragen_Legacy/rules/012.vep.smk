@@ -71,8 +71,8 @@ rule ensemblvep_hc:
         "logs/vep/hc/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
-    # conda:
-    #     str(workflow_source_dir / "envs" / "r.yaml")
+    conda:
+        str(workflow_source_dir / "envs" / "r.yaml")
     script:
         str(workflow_source_dir / "scripts" / "ensemblVEP_hc.R")
 
