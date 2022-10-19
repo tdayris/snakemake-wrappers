@@ -72,7 +72,7 @@ rule ensemblvep_hc:
     params:
         organism=config.get("vep_db", "hg38"),
     container:
-        str(workflow_source_dir / ".." / ".." / ".." / "singularity" / "2022.05")
+        str(workflow_source_dir / ".." / ".." / ".." / "singularity" / "anaconda3_2022_05.sif")
     conda:
         str(workflow_source_dir / "envs" / "r.yaml")
     script:
@@ -94,6 +94,8 @@ rule ensemblvep_mutect:
         "logs/vep/mutect/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
+    container:
+        str(workflow_source_dir / ".." / ".." / ".." / "singularity" / "anaconda3_2022_05.sif")
     conda:
         str(workflow_source_dir / "envs" / "r.yaml")
     script:
@@ -115,6 +117,8 @@ rule ensemblvep_bcr:
         "logs/vep/bcr/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
+    container:
+        str(workflow_source_dir / ".." / ".." / ".." / "singularity" / "anaconda3_2022_05.sif")
     conda:
         str(workflow_source_dir / "envs" / "r.yaml")
     script:
