@@ -1,6 +1,6 @@
 #!/bin/sh
 SNAKEMAKE_WRAPPER_VERSION="1.1.0"
-SNAKEMAKE_WRAPPER_PREFIX=$(readlink -e "${1}/../../../")
+SNAKEMAKE_WRAPPER_PREFIX=$(readlink -e "${BASH_SOURCE[0]}/../../../")
 
 # Activate main snakemake environment
 
@@ -98,4 +98,4 @@ alias bigr_cd_pipeline="cd ${SNAKEMAKE_WRAPPER_PREFIX}/${SNAKEMAKE_WRAPPER_VERSI
 # Today: Fun with flags
 alias bigr_utils_meteo="curl https://fr.wttr.in/Villejuif"
 alias bigr_utils_best_employee="echo This user is the best, by far: ${USER}"
-alias bigr_utils_version="echo Using Unofficial Snakemake-wrapper, version: ${SNAKEMAKE_WRAPPER_VERSION}"
+alias bigr_utils_version="echo Using Unofficial Snakemake-wrapper, version: ${SNAKEMAKE_WRAPPER_VERSION} at ${SNAKEMAKE_WRAPPER_PREFIX}"
