@@ -1,3 +1,5 @@
+base::system("conda activate /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_install/B20002_FRFA_20200409")
+
 library(ensemblVEP)
 library(dplyr)
 library(VariantAnnotation)
