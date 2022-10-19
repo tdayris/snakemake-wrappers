@@ -4,14 +4,16 @@
 
 ### Features
 
-* add unique launcher for rnaseq, wes, fastqc_multiqc pipelines
-* add singularity images
+* Add unique launcher for rnaseq, wes, fastqc_multiqc pipelines
+* Add singularity images
 * Shared conda is now separated from sources
+* New aliases and bigr functions for command line interface
 
 ### Bug fixes
 
 * Wrong links in case of not-bigr-project-repository
 * Wrong move for demultiplexing automatic QC
+* Fix CTC legacy pipeline environment
 
 # Official Changelog
 
