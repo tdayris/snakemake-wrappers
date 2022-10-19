@@ -71,6 +71,8 @@ rule ensemblvep_hc:
         "logs/vep/hc/{sample}.log",
     params:
         organism=config.get("vep_db", "hg38"),
+    container:
+        str(workflow_source_dir / ".." / ".." / ".." / "singularity" / "miniconda3_4.4.10.sif")
     conda:
         str(workflow_source_dir / "envs" / "r.yaml")
     script:
