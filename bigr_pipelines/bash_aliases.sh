@@ -1,6 +1,6 @@
 #!/bin/sh
 SNAKEMAKE_WRAPPER_VERSION="1.1.0"
-SNAKEMAKE_WRAPPER_PREFIX=$(readlink -e "${BASH_SOURCE[0]}/../../../")
+SNAKEMAKE_WRAPPER_PREFIX=$(readlink -e "$(dirname ${BASH_SOURCE[0]})/../../../")
 
 # Activate main snakemake environment
 
