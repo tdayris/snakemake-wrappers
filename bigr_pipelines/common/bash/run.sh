@@ -31,7 +31,7 @@ FLAMINGO_DB="/mnt/beegfs/database/bioinfo/"
 # Default snakemake arguments
 SNAKE_ARGS=(
   "--wrapper-prefix" "${WRAPPERS_PATH}/"
-  "--singularity-args '-B ${CONDA_ENV_PATH}:${CONDA_ENV_PATH} -B ${SNAKEMAKE_OUTPUT_CACHE}:${SNAKEMAKE_OUTPUT_CACHE} -B ${CONDA_CACHE_PATH}:${CONDA_CACHE_PATH} -B ${CWD}:${CWD} -B ${FLAMINGO_DB}:${FLAMINGO_DB} -B ${CWD}/tmp/:/tmp/'"
+  "--singularity-args '-B ${SHARED_CONDA_INDSTALL}:${SHARED_CONDA_INDSTALL} -B ${CONDA_ENV_PATH}:${CONDA_ENV_PATH} -B ${SNAKEMAKE_OUTPUT_CACHE}:${SNAKEMAKE_OUTPUT_CACHE} -B ${CONDA_CACHE_PATH}:${CONDA_CACHE_PATH} -B ${CWD}:${CWD} -B ${FLAMINGO_DB}:${FLAMINGO_DB} -B ${CWD}/tmp/:/tmp/'"
 )
 STEPS=()
 PROFILE="slurm"
