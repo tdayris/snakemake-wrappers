@@ -30,7 +30,7 @@ rule multiqc:
         directory("multiqc/multiqc_data")
     threads: 1
     resources:
-        mem_mb=get_2gb_per_attempt,
+        mem_mb=get_2gb_and_6gb_per_attempt,
         time_min=get_1h_per_attempt,
         tmpdir="tmp"
     params:

@@ -61,6 +61,9 @@ get_8gb_per_attempt = functools.partial(get_resources_per_attempt, multiplier=10
 get_10gb_per_attempt = functools.partial(get_resources_per_attempt, multiplier=1024 * 10)
 get_15gb_per_attempt = functools.partial(get_resources_per_attempt, multiplier=1024 * 15)
 get_20gb_per_attempt = functools.partial(get_resources_per_attempt, multiplier=1024 * 20)
+get_2gb_and_6gb_per_attempt = functools.partial(
+    get_resources_per_attempt, multiplier=1025 * 6, base=1024 * 2
+)
 get_75gb_and_2gb_per_attempt = functools.partial(
     get_resources_per_attempt, multiplier=1024 * 2, base=1024 * 75
 )
