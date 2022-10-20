@@ -13,11 +13,18 @@ message CMD "${COMMAND}"
 eval ${COMMAND}
 
 # Define pipeline related variables
-declare -x SNAKEMAKE_PROFILE_PATH
-SNAKEMAKE_PROFILE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/common/profiles"
-declare -x WRAPPERS_PATH
-WRAPPERS_PATH=$(readlink -e "${PIPELINE_PREFIX}")
-export SNAKEMAKE_PROFILE_PATH WRAPPERS_PATH
+COMMAND="declare -x SNAKEMAKE_PROFILE_PATH=\"${PIPELINE_PREFIX}/bigr_pipelines/common/profiles\""
+message CMD "${COMMAND}"
+eval ${COMMAND}
+
+
+COMMAND="declare -x WRAPPERS_PATH=$(readlink -e \"${PIPELINE_PREFIX}\")"
+message CMD "${COMMAND}"
+eval ${COMMAND}
+
+COMMAND="export SNAKEMAKE_PROFILE_PATH WRAPPERS_PATH"
+message CMD "${COMMAND}"
+eval ${COMMAND}
 
 
 # Default IO directories
@@ -66,12 +73,17 @@ while [ "$#" -gt 0 ]; do
     *) SNAKE_ARGS+=("${1}"); shift;;
   esac
 done
-message INFO "Environment loaded"
+message INFO "Command line parsed"
 
 
 message INFO "Working with pipeline ${NAME}"
-declare -x PIPELINE_PATH="${PIPELINE_PREFIX}/bigr_pipelines/${NAME}"
-export PIPELINE_PATH
+COMMAND="declare -x PIPELINE_PATH=\"${PIPELINE_PREFIX}/bigr_pipelines/${NAME}\""
+message CMD "${COMMAND}"
+eval ${COMMAND}
+
+COMMAND="export PIPELINE_PATH"
+message CMD "${COMMAND}"
+eval ${COMMAND}
 
 
 # Default snakefile path
