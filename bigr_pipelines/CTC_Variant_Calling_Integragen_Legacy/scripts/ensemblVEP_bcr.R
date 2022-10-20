@@ -12,7 +12,7 @@ files_to_process <- sapply(
 )
 
 for (invcf in files_to_process) {
-    input_brc <- ensemblVEP::readVcf(invcf, "hg38")
+    input_brc <- readVcf(invcf, "hg38")
     name_normal <- NA
     name_tumor <- gsub(
         pattern = "",
