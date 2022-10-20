@@ -9,7 +9,7 @@ hotspot_list <- read.table(
 
 files_to_process <- sapply(
     snakemake@input[["vcfs"]],
-    base::as.character
+    function(path) as.character(x = path)
 )
 
 for (invcf in files_to_process) {
