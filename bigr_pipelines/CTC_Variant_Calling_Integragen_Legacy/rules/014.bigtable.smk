@@ -3,7 +3,7 @@ rule concat_to_bigtable:
         expand(
             "vep/{annot}/{sample}.tsv",
             annot=["bcr", "hc", "mutect"],
-            sample=design["Sample_id"],
+            sample=samples_list,
         ),
     output:
         temp("bigtable/raw.tsv"),
