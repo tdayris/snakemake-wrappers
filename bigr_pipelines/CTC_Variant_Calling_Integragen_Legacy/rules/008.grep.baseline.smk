@@ -58,4 +58,4 @@ rule tabix_baseline_variants:
     params:
         "-p vcf"
     wrapper:
-        "bio/tabix"
+        "bio/tabix/index"

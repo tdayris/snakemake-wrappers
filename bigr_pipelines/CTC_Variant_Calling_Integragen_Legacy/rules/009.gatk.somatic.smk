@@ -52,7 +52,7 @@ rule tabix_mutect2:
     params:
         "-p vcf",
     wrapper:
-        "bio/tabix"
+        "bio/tabix/index"
 
 
 rule unzip_mutect2:
