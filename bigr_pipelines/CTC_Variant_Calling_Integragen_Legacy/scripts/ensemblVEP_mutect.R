@@ -207,7 +207,7 @@ for (invcf in files_to_process) {
     )
     write.table(
         table_to_write,
-        file = gsub(pattern = ".vcf", replacement = ".tsv", invcf),
+        file = snakemake@output[["tsv"]],
         quote = FALSE,
         sep = "\t",
         row.names = FALSE

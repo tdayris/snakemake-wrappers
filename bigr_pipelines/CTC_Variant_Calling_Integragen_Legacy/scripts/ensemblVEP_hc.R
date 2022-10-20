@@ -273,7 +273,7 @@ for (invcf in files_to_process) {
 
     utils::write.table(
         table_to_write,
-        file = base::gsub(".vcf", ".tsv", invcf),
+        file = snakemake@output[["tsv"]],
         quote = FALSE,
         sep = "\t",
         row.names = FALSE
