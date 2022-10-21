@@ -122,7 +122,7 @@ else
 fi
 
 # If setps are defined in command line, the activate them
-if [ ${#STEPS[@]} -gt 0]; then
+if [ ${#STEPS[@]} -gt 0 ]; then
   message INFO "Activating expected steps"
   for STEP in "${STEPS[@]}"; do
     COMMAND="sed -i 's/  ${STEP}: false/  ${STEP}: true/g' config.yaml"
