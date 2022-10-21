@@ -50,85 +50,27 @@ read_input <- function(data_path) {
     base::return(data)
 }
 
-# This function creates ClusterProfiler gene_list object
-build_gene_list <- function(gene_data_frame) {
-    # ClusterProfiler requires its input dataset (aka
-    # `gene_list`) to be named vectors. This function
-    # turn dataframes into named vectors.
-    gene_list <- gene_data_frame[, 2]
-    gene_list <- base::as.numeric(gene_list)
-
-    # Note ENTREZ-genes id should be all numeric in case of
-    # intersection with databases like org.XX.eg.db or
-    # DOSE, KEGG, NCG, ...
-    # If any of the identifier is not full numeric,
-    # then genes identifiers are not ENTREZ-gene id,
-    # and should be left as they are.
-    genes_id <- gene_data_frame[, 1]
-    genes_id <- base::tryCatch(
-        {
-            base::message("Trying to convert gene id as integers")
-            base::message("(required with ENTREZ)")
-            base::as.numeric(x = genes_id)
-        },
-        error = function(error) {
-            base::message("Could not convert to numeric")
-            base::message("Original error was:")
-            base::message(error)
-        },
-        warning = function(warning) {
-            base::message("Conversion produced warning message.")
-            base::message("Original warning was:")
-            base::message(warning)
-        },
-        finally = {
-            base::message("Named vector build")
-            genes_id
-        }
-    )
-
-    base::names(gene_list) <- genes_id
-    base::return(gene_list)
-}
-
-# This function gathers optional parameters
-extra_parameters <- function(parameters, param_key) {
-    # if optional parameters are provided by use
-    # in snakemake@params, then add them to the
-    # already existing parameters
-    if (param_key %in% base::names(snakemake@params)) {
-        parameters <- base::paste(
-            parameters,
-            as.character(x = snakemake@params[[param_key]]),
-            sep = ", "
-        )
-    }
-
-    base::return(parameters)
-}
-
 # Load gene information
 genes <- read_input(data_path = snakemake@input[["gene"]])
-weight <- build_gene_list(gene_data_frame = genes)
+weight <- weight <- stats::setNames(genes[, 2], genes[, 1])
 genes <- base::names(weight)
 
 # Load set of enrichment terms
 term2gene <- read_input(data_path = snakemake@input[["term2gene"]])
 universe <- term2gene[, 1]
 
-# Build enricher function parameters
-enrich_parameters <- extra_parameters(
-    parameters = "gene = genes, TERM2GENE = term2gene, universe = universe",
-    param_key = "enrich_extra"
-)
-
-# Add optional human-readable term names
-term2name <- NULL
+# Optional human readable terms
+term2name <- NA
 if ("term2name" %in% base::names(snakemake@input)) {
     term2name <- read_input(data_path = snakemake@input[["term2name"]])
+}
+
+# Build enricher function parameters
+enrich_parameters <- "gene = genes, TERM2GENE = term2gene, universe = universe, TERM2NAME = term2name"
+if ("enrich_extra" %in% base::names(snakemake@params)) {
     enrich_parameters <- base::paste(
         enrich_parameters,
-        "TERM2NAME = term2name",
+        as.character(x = snakemake@params[["enrich_extra"]]),
         sep = ", "
     )
 }
