@@ -167,7 +167,7 @@ def test_clusterprofiler_gsea():
 def test_clusterprofiler_enrichplot():
     run(
         "bio/clusterprofiler/enrichplot",
-        ["snakemake", "--cores", "1", "barplot.png", "--use-conda", "-F"]
+        ["snakemake", "--cores", "1", "upsetplot.png", "--use-conda", "-F"]
     )
 
 
