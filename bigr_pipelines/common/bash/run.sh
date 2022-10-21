@@ -122,12 +122,16 @@ else
 fi
 
 # If setps are defined in command line, the activate them
-message INFO "Activating expected steps if available in the pipeline"
-for STEP in "${STEPS[@]}"; do
-  COMMAND="sed -i 's/  ${STEP}: false/  ${STEP}: true/g' config.yaml"
-  message CMD "${COMMAND}"
-  eval ${COMMAND}
-done
+if [ ${#STEPS[@]} -gt 0]; then
+  message INFO "Activating expected steps"
+  for STEP in "${STEPS[@]}"; do
+    COMMAND="sed -i 's/  ${STEP}: false/  ${STEP}: true/g' config.yaml"
+    message CMD "${COMMAND}"
+    eval ${COMMAND}
+  done
+else
+  message INFO "No step to activate. Running default pipeline behaviour"
+fi
 
 # Run pipeline
 # Activate singularity
