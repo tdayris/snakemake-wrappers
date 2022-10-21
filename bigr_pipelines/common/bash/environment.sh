@@ -28,7 +28,7 @@ function iodirectories() {
   DIRNAME="${2}"
 
   # Default IO directories
-  DIRNAME_PATH="$(readlink -e ${CWD})/${DIRNAME}"
+  DIRNAME_PATH="${CWD}/${DIRNAME}"
   if [ -L "${DIRNAME_PATH}" ]; then
     if [ -e "${DIRNAME_PATH}" ]; then
       # Case DIRNAME is a symlink
@@ -39,9 +39,9 @@ function iodirectories() {
   elif [ -d "${DIRNAME_PATH}" ]; then
     # case DIRNAME is a dir
     message WARNING "${DIRNAME} directory already available: ${DIRNAME_PATH}. It does not seem to be linked to official BiGR data managment"
-  elif [ -d $(readlink -e "${CWD}/../${DIRNAME}") ]; then
+  elif [ -d "${CWD}/../${DIRNAME}" ]; then
     # Case DIRNAME is missing but available in parent dir
-    CMD="ln -sfrv $(readlink -e \"${CWD}/../${DIRNAME}\") \"${DIRNAME_PATH}\""
+    CMD="ln -sfrv \"${CWD}/../${DIRNAME}\" \"${DIRNAME_PATH}\""
     message CMD "${CMD}"
     eval ${CMD}
     message INFO "${DIRNAME} directory available from parent dir and linked to: ${DIRNAME_PATH}"
