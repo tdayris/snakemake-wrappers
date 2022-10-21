@@ -9,7 +9,7 @@
 
 # Sink the stderr and stdout to the snakemake log file
 # https://stackoverflow.com/a/48173272
-log.file<-file(snakemake@log[[1]], open = "wt")
+log.file <- file(snakemake@log[[1]], open = "wt")
 base::sink(log.file)
 base::sink(log.file, type = "message")
 
@@ -35,7 +35,7 @@ extra_parameters <- function(parameters, param_key) {
     base::return(parameters)
 }
 
-# This function performs optional graphs on user demand.
+# This function performs graphs.
 plot_enrichment <- function(plot_function, plot_base_extra, output_plot_key, param_plot_key) {
     # Acquire grDevices::png parameters
     out_png <- base::as.character(x = snakemake@output[[output_plot_key]])
@@ -64,16 +64,18 @@ plot_enrichment <- function(plot_function, plot_base_extra, output_plot_key, par
 
 
 # Load enrichment/gsea input data
-enrichment <- base::readRDS(base::as.character(x = snakemake@input[["enricher"]]))
+enrichment <- base::readRDS(
+    file = base::as.character(x = snakemake@input[["rds"]])
+)
 
 
 
 # On user request, save barplot
 if ("barplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
-        plot_function = "barplot", 
-        plot_base_extra = "enrichment", 
-        output_plot_key = "barplot", 
+        plot_function = "barplot",
+        plot_base_extra = "enrichment",
+        output_plot_key = "barplot",
         param_plot_key = "barplot_extra"
     )
 }
@@ -81,9 +83,9 @@ if ("barplot" %in% base::names(snakemake@output)) {
 # On user request, save dotplot
 if ("dotplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
-        plot_function = "dotplot", 
-        plot_base_extra = "object = enrichment", 
-        output_plot_key = "dotplot", 
+        plot_function = "dotplot",
+        plot_base_extra = "object = enrichment",
+        output_plot_key = "dotplot",
         param_plot_key = "dotplot_extra"
     )
 }
@@ -91,9 +93,9 @@ if ("dotplot" %in% base::names(snakemake@output)) {
 # On user request, save cnetplot
 if ("cnetplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
-        plot_function = "cnetplot", 
-        plot_base_extra = "x = enrichment", 
-        output_plot_key = "cnetplot", 
+        plot_function = "cnetplot",
+        plot_base_extra = "x = enrichment",
+        output_plot_key = "cnetplot",
         param_plot_key = "cnetplot_extra"
     )
 }
@@ -103,7 +105,7 @@ if ("heatplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
         plot_function = "heatplot",
         plot_base_extra = "x = enrichment, foldChange = weights",
-        output_plot_key = "heatplot", 
+        output_plot_key = "heatplot",
         param_plot_key = "heatplot_extra"
     )
 }
@@ -113,7 +115,7 @@ if ("emapplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
         plot_function = "emapplot",
         plot_base_extra = "x = enrichment",
-        output_plot_key = "emapplot", 
+        output_plot_key = "emapplot",
         param_plot_key = "emapplot_extra"
     )
 }
@@ -123,7 +125,7 @@ if ("upsetplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
         plot_function = "upsetplot",
         plot_base_extra = "x = enrichment",
-        output_plot_key = "upsetplot", 
+        output_plot_key = "upsetplot",
         param_plot_key = "upsetplot_extra"
     )
 }
@@ -135,7 +137,7 @@ if ("pmcplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
         plot_function = "pmcplot",
         plot_base_extra = "query = terms",
-        output_plot_key = "pmcplot", 
+        output_plot_key = "pmcplot",
         param_plot_key = "pmcplot_extra"
     )
 }
