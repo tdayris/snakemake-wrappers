@@ -18,7 +18,7 @@ message CMD "${COMMAND}"
 eval ${COMMAND}
 
 
-COMMAND="declare -x WRAPPERS_PATH=$(readlink -e \"${PIPELINE_PREFIX}\")"
+COMMAND="declare -x WRAPPERS_PATH=\"${PIPELINE_PREFIX}\""
 message CMD "${COMMAND}"
 eval ${COMMAND}
 
