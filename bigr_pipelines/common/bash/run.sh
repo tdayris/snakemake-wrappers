@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -xveuiop pipefail
 
 # This adds several functions and variable in the environment
 PIPELINE_PREFIX=$(readlink -e "$(dirname "${0}")/../../..")
