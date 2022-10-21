@@ -60,7 +60,7 @@ plot_enrichment <- function(plot_function, plot_base_extra, output_plot_key, par
     base::message(plot_command)
 
     base::eval(base::parse(text = png_command))
-    base::eval(base::parse(text = plot_command))
+    base::print(base::eval(base::parse(text = plot_command)))
     grDevices::dev.off()
 }
 
