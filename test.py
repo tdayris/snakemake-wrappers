@@ -164,6 +164,14 @@ def test_clusterprofiler_gsea():
 
 
 @skip_if_not_modified
+def test_clusterprofiler_enrichplot():
+    run(
+        "bio/clusterprofiler/enrichplot",
+        ["snakemake", "--cores", "1", "barplot.png", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
 def test_purge_dups_get_seqs():
     run(
         "bio/purge_dups/get_seqs",

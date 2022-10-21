@@ -1,17 +1,14 @@
-rule test_clusterprofiler_enricher_minimal:
+rule test_clusterprofiler_enrichplot:
     input:
-        gene="genes.table.tsv",
-        term2gene="term2gene.tsv",
+        rds="gsea.RDS"
     output:
-        rds="enrichment.RDS",
-        tsv="enrichment.tsv",
-        barplot="enrichment.barplot.png",
-        dotplot="enrichment.dotplot.png",
-        cnetplot="enrichment.cntplot.png",
-        heatplot="enrichment.heatplot.png",
-        emapplot="enrichment.emapplot.png",
-        upsetplot="enrichment.upsetplot.png",
-        pmcplot="enrichment.pmcplot.png",
+        barplot="barplot.png",
+        dotplot="dotplot.png",
+        cnetplot="cntplot.png",
+        heatplot="heatplot.png",
+        emapplot="emapplot.png",
+        upsetplot="upsetplot.png",
+        pmcplot="pmcplot.png",
     threads: 1
     log:
         "logs/clusterprofiler.log"
@@ -24,6 +21,6 @@ rule test_clusterprofiler_enricher_minimal:
         emapplot_extra="showCategory = 2",
         upsetplot_extra="n = 2",
         pmcplot_extra="period=2010:2020",
-        png_extra="",
+        png_extra="height = 480, width = 480, units = 'px'",
     wrapper:
-        "master/bio/clusterprofiler/enricher"
+        "master/bio/clusterprofiler/enrichplot"
