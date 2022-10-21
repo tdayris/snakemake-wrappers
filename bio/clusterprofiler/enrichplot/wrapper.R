@@ -73,7 +73,7 @@ enrichment <- base::readRDS(
 # On user request, save barplot
 if ("barplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
-        plot_function = "barplot",
+        plot_function = "graphics::barplot",
         plot_base_extra = "enrichment",
         output_plot_key = "barplot",
         param_plot_key = "barplot_extra"
