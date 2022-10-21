@@ -16,6 +16,7 @@ base::sink(log.file, type = "message")
 # Load packages
 base::library(package = "clusterProfiler", character.only = TRUE)
 base::library(package = "Cairo", character.only = TRUE)
+base::library(package = "UpSetR", character.only = TRUE)
 base::library(package = "enrichplot", character.only = TRUE)
 
 
@@ -39,6 +40,7 @@ extra_parameters <- function(parameters, param_key) {
 plot_enrichment <- function(plot_function, plot_base_extra, output_plot_key, param_plot_key) {
     # Acquire grDevices::png parameters
     out_png <- base::as.character(x = snakemake@output[[output_plot_key]])
+    base::message("Saving plot to ", out_png)
     png_params <- extra_parameters(
         parameters = "filename = out_png",
         param_key = "png_extra"
@@ -67,6 +69,7 @@ plot_enrichment <- function(plot_function, plot_base_extra, output_plot_key, par
 enrichment <- base::readRDS(
     file = base::as.character(x = snakemake@input[["rds"]])
 )
+base::print(head(enrichment))
 
 
 
@@ -104,7 +107,7 @@ if ("cnetplot" %in% base::names(snakemake@output)) {
 if ("heatplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
         plot_function = "heatplot",
-        plot_base_extra = "x = enrichment, foldChange = weights",
+        plot_base_extra = "x = enrichment",
         output_plot_key = "heatplot",
         param_plot_key = "heatplot_extra"
     )

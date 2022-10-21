@@ -53,11 +53,11 @@ read_input <- function(data_path) {
 # Load gene information
 genes <- read_input(data_path = snakemake@input[["gene"]])
 weight <- weight <- stats::setNames(genes[, 2], genes[, 1])
-genes <- base::names(weight)
+genes <- base::unique(x = base::names(weight))
 
 # Load set of enrichment terms
 term2gene <- read_input(data_path = snakemake@input[["term2gene"]])
-universe <- term2gene[, 1]
+universe <- term2gene[, 2]
 
 # Optional human readable terms
 term2name <- NA
@@ -67,10 +67,10 @@ if ("term2name" %in% base::names(snakemake@input)) {
 
 # Build enricher function parameters
 enrich_parameters <- "gene = genes, TERM2GENE = term2gene, universe = universe, TERM2NAME = term2name"
-if ("enrich_extra" %in% base::names(snakemake@params)) {
+if ("enricher_extra" %in% base::names(snakemake@params)) {
     enrich_parameters <- base::paste(
         enrich_parameters,
-        as.character(x = snakemake@params[["enrich_extra"]]),
+        as.character(x = snakemake@params[["enricher_extra"]]),
         sep = ", "
     )
 }
@@ -84,6 +84,11 @@ enrich_command <- base::paste0(
 base::message(enrich_command)
 enriched_terms <- base::eval(base::parse(text = enrich_command))
 
+base::print(genes)
+base::print(universe)
+base::print(term2gene)
+base::print(term2name)
+base::print(enriched_terms)
 
 # On user request, save enriched terms as RDS binary file.
 if ("rds" %in% base::names(snakemake@output)) {
@@ -100,6 +105,9 @@ if ("tsv" %in% base::names(snakemake@output)) {
         x = as.data.frame(x = enriched_terms),
         file = base::as.character(x = snakemake@output[["tsv"]]),
         sep = "\t",
+        quote = FALSE,
+        row.names = FALSE,
+        col.names = TRUE
     )
 }
 

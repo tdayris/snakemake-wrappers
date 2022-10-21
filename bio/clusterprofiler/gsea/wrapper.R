@@ -131,6 +131,9 @@ if ("tsv" %in% base::names(snakemake@output)) {
         x = as.data.frame(x = gsea_terms),
         file = base::as.character(x = snakemake@output[["tsv"]]),
         sep = "\t",
+        quote = FALSE,
+        row.names = FALSE,
+        col.names = TRUE
     )
 }
 
