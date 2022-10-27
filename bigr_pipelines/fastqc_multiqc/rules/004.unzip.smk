@@ -18,7 +18,9 @@ rule unzip_stats:
         mem_mb=get_768mb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    params:
+        extra="-o -p"
     log:
         "logs/003.unzip_stats.log",
     shell:
-        'unzip -n -d "${{PWD}}" {input} > {log} 2>&1'
+        "unzip {params.extra} {input} > output 2> {log}"
