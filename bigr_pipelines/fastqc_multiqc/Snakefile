@@ -43,16 +43,16 @@ include: "rules/001.copy.smk"
 ### Find and load additional files from demultiplexing ###
 ##########################################################
 
-if stats != config["miniconda"]:
+if stats != default_existing_path:
     include: "rules/004.unzip.smk"
 
-if all(zipfile != config["miniconda"] for zipfile in [interop, runinfo, runparams]):
+if all(zipfile != default_existing_path for zipfile in [interop, runinfo, runparams]):
     include: "rules/006.illumina.smk"
 
 
 prefix = (
     "output"
-    if any(zipfile != config["minoconda"] for zipfile in [interop, runinfo, runparams, stats])
+    if any(zipfile != default_existing_path for zipfile in [interop, runinfo, runparams, stats])
     else "data_output"
 )
 
