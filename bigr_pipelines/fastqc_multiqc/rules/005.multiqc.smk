@@ -28,8 +28,8 @@ rule multiqc:
             sample=design["Sample_id"],
         ),
     output:
-        "multiqc/multiqc.html",
-        directory("multiqc/multiqc_data"),
+        "data_output/multiqc.html",
+        directory("data_output/multiqc_data"),
     threads: 1
     resources:
         mem_mb=get_2gb_and_6gb_per_attempt,
@@ -51,43 +51,6 @@ from
 -> 002.fastqc
 -> 002.fastq_screen
 -> 004.unzip_stats
-by
--> End job
-"""
-
-
-use rule multiqc as multiqc_stats with:
-    input:
-        fqc_zip=expand(
-            "fastqc/{sample}_fastqc.zip",
-            sample=design["Sample_id"],
-        ),
-        fqc_html=expand(
-            "fastqc/{sample}.html",
-            sample=design["Sample_id"],
-        ),
-        txt=expand(
-            "fastq_screen/{sample}.fastq_screen.txt",
-            sample=design["Sample_id"],
-        ),
-        png=expand(
-            "fastq_screen/{sample}.fastq_screen.png",
-            sample=design["Sample_id"],
-        ),
-        bcl_json="Stats.json",
-    output:
-        "output/multiqc.html",
-        directory("output/multiqc_data"),
-
-
-
-# QC report aggregation
-"""
-005.multiqc
-from
--> 002.fastqc
--> 002.fastq_screen
--> 004.unzip_stats
 -> 004.unzip_runparams
 -> 004.unzip_runinfo
 -> 004.unzip_interop
@@ -96,28 +59,9 @@ by
 """
 
 
-use rule multiqc as multiqc_xml with:
+use rule multiqc as multiqc_stats with:
     input:
-        fqc_zip=expand(
-            "fastqc/{sample}_fastqc.zip",
-            sample=design["Sample_id"],
-        ),
-        fqc_html=expand(
-            "fastqc/{sample}.html",
-            sample=design["Sample_id"],
-        ),
-        txt=expand(
-            "fastq_screen/{sample}.fastq_screen.txt",
-            sample=design["Sample_id"],
-        ),
-        png=expand(
-            "fastq_screen/{sample}.fastq_screen.png",
-            sample=design["Sample_id"],
-        ),
-        bcl_json="Stats.json",
-        interop="InterOp",
-        runinfo="RunInfo.xml",
-        runparameters="RunParameters.xml",
+        **demux_input(stats, interop, runinfo, runparams)
     output:
-        "xml/multiqc.html",
-        directory("xml/multiqc_data"),
+        "output/multiqc.html",
+        directory("output/multiqc_data"),
