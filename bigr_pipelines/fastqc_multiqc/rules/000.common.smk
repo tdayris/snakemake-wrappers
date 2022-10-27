@@ -90,7 +90,7 @@ prefix = (
     else "data_output"
 )
 
-def demux_input(stats, interop, runinfo, runparams, stats) -> Dict[str, str]:
+def demux_input(stats, interop, runinfo, runparams) -> Dict[str, str]:
     """Return list of dmux-related expected input"""
     base = {
         "fqc_zip": expand(
