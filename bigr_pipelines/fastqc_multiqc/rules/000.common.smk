@@ -32,7 +32,7 @@ logging.basicConfig(
     level=logging.DEBUG
 )
 
-default_config = read_yaml(worflow_source_dir / "config" / "config.yaml")
+default_config = read_yaml(workflow_source_dir / "config" / "config.yaml")
 config_path = get_config(default_config)
 design = get_design(os.getcwd(), search_fastq_files)
 try:
