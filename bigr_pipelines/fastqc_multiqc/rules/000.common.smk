@@ -53,7 +53,6 @@ def get_archives(file: str, prefix: str = ".") -> List[str]:
     """
     Search file in prefix, recursively
     """
-    print(f"Looking for {file} in {prefix}")
     prefix = Path(prefix)
     for content in prefix.iterdir():
         if content.is_dir() and content.name not in [".snakemake", "logs", "tmp", "data_output"]:
