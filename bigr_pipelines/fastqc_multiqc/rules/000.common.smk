@@ -56,7 +56,7 @@ def get_archives(file: str, prefix: str = ".") -> List[str]:
     print(f"Looking for {file} in {prefix}")
     prefix = Path(prefix)
     for content in prefix.iterdir():
-        if content.is_dir() and content.name not in [".snakemake", "logs", "tmp", "data_output"]
+        if content.is_dir() and content.name not in [".snakemake", "logs", "tmp", "data_output"]:
             yield from get_archives(file, str(content.absolute()))
         elif content.name == file:
             file_path = str(content.absolute())
