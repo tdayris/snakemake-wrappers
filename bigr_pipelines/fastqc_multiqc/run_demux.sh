@@ -11,8 +11,8 @@ fi
 
 params_demux="-p demux"
 
-if [ -f "InterOp.zip" ]; then
-    echo "InterOp found"
+if [ -f "input/*/archive/uploadToKDIAnalysis/" ]; then
+    echo "uploadToKDIAnalysis found"
     # Special case InterOp Demux
     bash "${script_dir}/run.sh" ${params_demux} "$@" multiqc_xml/multiqc.html
     if [ -d "multiqc" ] ; then 

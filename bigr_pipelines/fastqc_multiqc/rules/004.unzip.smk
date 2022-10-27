@@ -16,11 +16,13 @@ rule unzip_stats:
         mem_mb=get_768mb_per_attempt,
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
+    params:
+        regex="input/*/archive/*/unaligned/Stats/Stats.json.zip"
     log:
         "logs/003.unzip_stats.log",
     shell:
         'unzip -n -d "${{PWD}}" '
-        "input/*/archive/*/unaligned/Stats/Stats.json.zip "
+        '{params.regex} '
         "> {log} 2>&1"
 
 
@@ -33,20 +35,15 @@ by
 """
 
 
-rule uzip_interop:
+use rule unzip_stats as uzip_interop with:
     input:
         "InterOp.zip",
     output:
         directory("InterOp"),
-    threads: 1
-    resources:
-        mem_mb=get_768mb_per_attempt,
-        time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+    params:
+        regex="input/*/archive/uploadToKDIAnalysis/InterOp.zip"
     log:
         "logs/003.unzip_interop.log",
-    shell:
-        'unzip -n -d "${{PWD}}" {input} > {log} 2>&1'
 
 
 """
@@ -58,11 +55,13 @@ by
 """
 
 
-use rule uzip_interop as unzip_runinfo with:
+use rule unzip_stats as unzip_runinfo with:
     input:
         "RunInfo.xml.zip",
     output:
         "RunInfo.xml",
+    params:
+        regex="input/*/archive/uploadToKDIAnalysis/RunInfo.xml.zip"
     log:
         "logs/003.unzip_runinfo.log",
 
@@ -76,10 +75,12 @@ by
 """
 
 
-use rule uzip_interop as unzip_runparams with:
+use rule unzip_stats as unzip_runparams with:
     input:
         "RunParameters.xml.zip",
     output:
         "RunParameters.xml",
+    params:
+        regex="input/*/archive/uploadToKDIAnalysis/RunParameters.xml.zip"
     log:
         "logs/003.unzip_runparams.log",

@@ -11,9 +11,16 @@ fi
 
 params_demux="-p demux"
 
-if [ -n "$(find input/*/archive/*/unaligned/Stats/ -name "Stats.json.zip" | head -1)" ]; then
-    # Special case demux
-    bash "${script_dir}/run.sh" output/multiqc.html ${params_demux} "$@"
+if [ -f "input/*/archive/uploadToKDIAnalysis/" ]; then
+    echo "uploadToKDIAnalysis found"
+    # Special case InterOp Demux
+    bash "${script_dir}/run.sh" ${params_demux} "$@" multiqc_xml/multiqc.html
+    if [ -d "multiqc" ] ; then 
+        mv --verbose --force --update multiqc_xml/* output
+    fi
+elif [ -n "$(find input/*/archive/*/unaligned/Stats/ -name "Stats.json.zip" | head -1)" ]; then
+    # Base case demux
+    bash "${script_dir}/run.sh" ${params_demux} output/multiqc.html "$@"
 else
     echo "Stats not found"
     # Classic case, must fit demux-like behaviour
