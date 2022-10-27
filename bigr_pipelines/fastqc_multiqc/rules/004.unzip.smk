@@ -36,8 +36,6 @@ by
 
 
 use rule unzip_stats as uzip_interop with:
-    input:
-        "InterOp.zip",
     output:
         directory("InterOp"),
     params:
@@ -56,8 +54,6 @@ by
 
 
 use rule unzip_stats as unzip_runinfo with:
-    input:
-        "RunInfo.xml.zip",
     output:
         "RunInfo.xml",
     params:
@@ -76,8 +72,6 @@ by
 
 
 use rule unzip_stats as unzip_runparams with:
-    input:
-        "RunParameters.xml.zip",
     output:
         "RunParameters.xml",
     params:
