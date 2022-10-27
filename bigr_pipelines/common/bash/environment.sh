@@ -8,8 +8,15 @@
 # This script is used to export variables to a running environment
 
 function conda_activate () {
-  # shellcheck source=/mnt/beegfs/userdata/t_dayris/anaconda3/etc/profile.d/conda.sh
-  source "$(conda info --base)/etc/profile.d/conda.sh" && conda activate && conda activate "${1}"
+  CMD="source \"$(conda info --base)/etc/profile.d/conda.sh\" || source \"/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_conda/anaconda3/etc/profile.d/conda.sh\""
+  message CMD "${CMD}"
+  eval ${CMD}
+  CMD="conda activate"
+  message CMD "${CMD}"
+  eval ${CMD}
+  CMD="conda activate \"${1}\""
+  message CMD "${CMD}"
+  eval ${CMD}
 }
 
 function profiles () {
