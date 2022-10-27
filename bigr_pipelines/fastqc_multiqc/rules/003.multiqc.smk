@@ -7,6 +7,8 @@ from
 by
 -> End job
 """
+
+
 rule multiqc:
     input:
         fqc_zip=expand(
@@ -24,22 +26,21 @@ rule multiqc:
         png=expand(
             "fastq_screen/{sample}.fastq_screen.png",
             sample=design["Sample_id"],
-        )
+        ),
     output:
         "multiqc/multiqc.html",
-        directory("multiqc/multiqc_data")
+        directory("multiqc/multiqc_data"),
     threads: 1
     resources:
         mem_mb=get_2gb_and_6gb_per_attempt,
         time_min=get_1h_per_attempt,
-        tmpdir="tmp"
+        tmpdir="tmp",
     params:
-        "--flat"
+        "--flat",
     log:
-        "logs/003.multiqc.log"
+        "logs/003.multiqc.log",
     wrapper:
         "bio/multiqc"
-
 
 
 # Additional behaviour for demultiplexing automaton
@@ -49,11 +50,13 @@ rule multiqc:
 from
 -> 001.fastqc
 -> 001.fastq_screen
--> 003.unzip_stats
+-> 004.unzip_stats
 by
 -> End job
 """
-use rule multiqc as irods_complient with:
+
+
+use rule multiqc as multiqc_stats with:
     input:
         fqc_zip=expand(
             "fastqc/{sample}_fastqc.zip",
@@ -71,35 +74,50 @@ use rule multiqc as irods_complient with:
             "fastq_screen/{sample}.fastq_screen.png",
             sample=design["Sample_id"],
         ),
-        bcl_json="Stats.json"
+        bcl_json="Stats.json",
     output:
         "output/multiqc.html",
-        directory("output/multiqc_data")
-    group:
-        "stats_inclusion"
+        directory("output/multiqc_data"),
 
 
-# Unzip Stats.json for multiqc inclusion
+
+# QC report aggregation
 """
-003.unzip_stats
+003.multiqc
 from
--> Entry job
+-> 001.fastqc
+-> 001.fastq_screen
+-> 004.unzip_stats
+-> 004.unzip_runparams
+-> 004.unzip_runinfo
+-> 004.unzip_interop
 by
--> 003.multiqc
+-> End job
 """
-rule unzip_stats:
+
+
+use rule multiqc as multiqc_xml with:
+    input:
+        fqc_zip=expand(
+            "fastqc/{sample}_fastqc.zip",
+            sample=design["Sample_id"],
+        ),
+        fqc_html=expand(
+            "fastqc/{sample}.html",
+            sample=design["Sample_id"],
+        ),
+        txt=expand(
+            "fastq_screen/{sample}.fastq_screen.txt",
+            sample=design["Sample_id"],
+        ),
+        png=expand(
+            "fastq_screen/{sample}.fastq_screen.png",
+            sample=design["Sample_id"],
+        ),
+        bcl_json="Stats.json",
+        interop="InterOp",
+        runinfo="RunInfo.xml",
+        runparameters="RunParameters.xml",
     output:
-        temp("Stats.json")
-    threads: 1
-    resources:
-        mem_mb=get_768mb_per_attempt,
-        time_min=get_15min_per_attempt,
-        tmpdir="tmp"
-    log:
-        "logs/003.unzipping.log"
-    group:
-        "stats_inclusion"
-    shell:
-        'unzip -n -d "${{PWD}}" '
-        'input/*/archive/*/unaligned/Stats/Stats.json.zip '
-        '> {log} 2>&1'
+        "xml/multiqc.html",
+        directory("xml/multiqc_data"),
