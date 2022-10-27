@@ -49,7 +49,7 @@ configfile: config_path
 container: config.get("miniconda", "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/singularity/mambaforge_4.14.0-0.sif")
 
 
-def get_archives(file: str, prefix: str = "input") -> List[str]:
+def get_archives(file: str, prefix: str = ".") -> List[str]:
     """
     Search file in prefix, recursively
     """
