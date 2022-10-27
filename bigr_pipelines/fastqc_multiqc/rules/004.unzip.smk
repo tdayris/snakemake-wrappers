@@ -19,8 +19,9 @@ rule unzip_stats:
         time_min=get_15min_per_attempt,
         tmpdir="tmp",
     params:
-        extra="-o -p"
+        wd=f"-d {os.getcwd()}/tmp",
+        extra="-o"
     log:
         "logs/003.unzip_stats.log",
     shell:
-        "unzip {params.extra} {input} > output 2> {log}"
+        "unzip {params.extra} {params.wd} {input} > {log} 2>&1"
