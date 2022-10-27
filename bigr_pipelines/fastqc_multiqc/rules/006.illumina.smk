@@ -12,8 +12,6 @@ use rule unzip_stats as uzip_interop with:
         interop,
     output:
         temp(directory("tmp/InterOp")),
-    params:
-        regex="input/*/archive/uploadToKDIAnalysis/InterOp.zip"
     log:
         "logs/003.unzip_interop.log",
 
@@ -32,8 +30,6 @@ use rule unzip_stats as unzip_runinfo with:
         runinfo,
     output:
         temp("tmp/RunInfo.xml"),
-    params:
-        regex="input/*/archive/uploadToKDIAnalysis/RunInfo.xml.zip"
     log:
         "logs/003.unzip_runinfo.log",
 
@@ -52,7 +48,5 @@ use rule unzip_stats as unzip_runparams with:
         runparams,
     output:
         temp("tmp/RunParameters.xml"),
-    params:
-        regex="input/*/archive/uploadToKDIAnalysis/RunParameters.xml.zip"
     log:
         "logs/003.unzip_runparams.log",
