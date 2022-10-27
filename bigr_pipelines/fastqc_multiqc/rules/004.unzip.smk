@@ -12,7 +12,7 @@ rule unzip_stats:
     input:
         stats
     output:
-        temp("Stats.json"),
+        temp("tmp/Stats.json"),
     threads: 1
     resources:
         mem_mb=get_768mb_per_attempt,
