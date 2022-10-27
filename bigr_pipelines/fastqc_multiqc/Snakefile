@@ -1,50 +1,3 @@
-import os
-import sys
-from pathlib import Path
-from snakemake.utils import min_version
-min_version("7.0")
-
-
-worflow_source_dir = Path(snakemake.workflow.srcdir("."))
-common = str(worflow_source_dir / ".." / "common" / "python")
-sys.path.append(common)
-
-
-from dataframes import *
-from file_manager import *
-from files_linker import *
-from graphics import *
-from write_yaml import *
-from reservation import *
-from messages import message
-
-from snakemake.utils import min_version
-from snakemake.shell import shell
-min_version("6.0")
-
-logging.basicConfig(
-    filename="snakemake.fastqc_multiqc.log",
-    filemode="w",
-    level=logging.DEBUG
-)
-
-default_config = read_yaml(worflow_source_dir / "config" / "config.yaml")
-config_path = get_config(default_config)
-design = get_design(os.getcwd(), search_fastq_files)
-try:
-    design.columns = ["Sample_id", "Upstream_file"]
-except ValueError:
-    pass
-
-fastq_links = link_fq(
-    design.Sample_id,
-    design.Upstream_file,
-)
-
-configfile: config_path
-container: config.get("miniconda", "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/singularity/mambaforge_4.14.0-0.sif")
-    
-
 ##################
 ### Flag rules ###
 ##################
@@ -59,12 +12,14 @@ onstart:
     shell("touch ON_GOING && rm --force --verbose ERROR DONE")
 
 
+include: "rules/000.common.smk"
+
 ##################################
 ### Gather all quality reports ###
 ##################################
 
 
-include: "rules/003.multiqc.smk"
+include: "rules/005.multiqc.smk"
 
 
 #########################################
@@ -72,8 +27,8 @@ include: "rules/003.multiqc.smk"
 #########################################
 
 
-include: "rules/001.fastqc.smk"
-include: "rules/002.fastq_screen.smk"
+include: "rules/002.fastqc.smk"
+include: "rules/003.fastq_screen.smk"
 
 
 #################################################
@@ -81,10 +36,26 @@ include: "rules/002.fastq_screen.smk"
 #################################################
 
 
-include: "rules/000.copy.smk"
+include: "rules/001.copy.smk"
 
 
-prefix = "multiqc"
+##########################################################
+### Find and load additional files from demultiplexing ###
+##########################################################
+
+if stats != config["miniconda"]:
+    include: "rules/004.unzip.smk"
+
+if all(zipfile != config["miniconda"] for zipfile in [interop, runinfo, runparams]):
+    include: "rules/006.illumina.smk"
+
+
+prefix = (
+    "output"
+    if any(zipfile != config["minoconda"] for zipfile in [interop, runinfo, runparams, stats])
+    else "data_output"
+)
+
 
 
 rule target:

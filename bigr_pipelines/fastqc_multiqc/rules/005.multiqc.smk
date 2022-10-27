@@ -1,9 +1,9 @@
 # QC report aggregation
 """
-003.multiqc
+005.multiqc
 from
--> 001.fastqc
--> 001.fastq_screen
+-> 002.fastqc
+-> 002.fastq_screen
 by
 -> End job
 """
@@ -46,10 +46,10 @@ rule multiqc:
 # Additional behaviour for demultiplexing automaton
 # QC report aggregation
 """
-003.multiqc
+005.multiqc
 from
--> 001.fastqc
--> 001.fastq_screen
+-> 002.fastqc
+-> 002.fastq_screen
 -> 004.unzip_stats
 by
 -> End job
@@ -83,10 +83,10 @@ use rule multiqc as multiqc_stats with:
 
 # QC report aggregation
 """
-003.multiqc
+005.multiqc
 from
--> 001.fastqc
--> 001.fastq_screen
+-> 002.fastqc
+-> 002.fastq_screen
 -> 004.unzip_stats
 -> 004.unzip_runparams
 -> 004.unzip_runinfo
