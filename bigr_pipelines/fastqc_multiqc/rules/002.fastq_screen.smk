@@ -20,7 +20,7 @@ rule fastq_screen:
         tmpdir="tmp",
     retries: 1
     params:
-        fastq_screen_config=config["fastq_screen"]["database"],
+        fastq_screen_config=config["fastq_screen"],
         subset=config["fastq_screen"].get("subset", 100000),
         aligner=config["fastq_screen"].get("aligner", "bowtie2"),
     log:
