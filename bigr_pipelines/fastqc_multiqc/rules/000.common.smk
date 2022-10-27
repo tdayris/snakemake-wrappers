@@ -9,8 +9,8 @@ from snakemake.utils import min_version
 min_version("7.0")
 
 
-worflow_source_dir = Path(snakemake.workflow.srcdir("."))
-common = str(worflow_source_dir / ".." / "common" / "python")
+workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
+common = str(workflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
 
 
