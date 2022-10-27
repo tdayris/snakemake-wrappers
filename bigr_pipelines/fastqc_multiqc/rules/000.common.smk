@@ -56,7 +56,7 @@ def get_archives(file: str, prefix: str = "input") -> List[str]:
     print(f"Looking for {file} in {prefix}")
     prefix = Path(prefix)
     for content in prefix.iterdir():
-        if content.is_dir():
+        if content.is_dir() and content.name not in [".snakemake", "logs", "tmp", "data_output"]
             yield from get_archives(file, str(content.absolute()))
         elif content.name == file:
             file_path = str(content.absolute())
@@ -111,22 +111,22 @@ def demux_input(stats, interop, runinfo, runparams, stats) -> Dict[str, str]:
         ),
     }
     if stats != default_existing_path:
-        base["bcl_json"] = stats
+        base["bcl_json"] = "tmp/Stats.json"
     else:
         logging.warning("Stats.json.zip was not found")
 
     if interop != default_existing_path:
-        base["interop"] = interop
+        base["interop"] = "tmp/InterOp"
     else:
         logging.warning("InterOp.zip was not found")
 
     if runinfo != default_existing_path:
-        base["runinfo"] = runinfo
+        base["runinfo"] = "tmp/RunInfo.xml"
     else:
         logging.warning("RunInfo.xml.zip was not found")
     
     if runparams != default_existing_path:
-        base["runparams"] = runparams
+        base["runparams"] = "tmp/RunParameters.xml"
     else:
         logging.warning("RunParameters.xml.zip was not found")
 
