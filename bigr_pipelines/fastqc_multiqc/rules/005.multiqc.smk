@@ -59,9 +59,20 @@ by
 """
 
 
-use rule multiqc as multiqc_stats with:
+rule multiqc_stats:
     input:
         **demux_input(stats, interop, runinfo, runparams)
     output:
         "output/multiqc.html",
         directory("output/multiqc_data"),
+    threads: 1
+    resources:
+        mem_mb=get_2gb_and_6gb_per_attempt,
+        time_min=get_1h_per_attempt,
+        tmpdir="tmp",
+    params:
+        "--flat",
+    log:
+        "logs/003.multiqc.log",
+    wrapper:
+        "bio/BiGR/multiqc_illumina"
