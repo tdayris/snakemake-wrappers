@@ -14,10 +14,46 @@ base::sink(log.file)
 base::sink(log.file, type = "message")
 
 # Load packages
+base::library(package = "ggplot2", character.only = TRUE)
 base::library(package = "clusterProfiler", character.only = TRUE)
 base::library(package = "Cairo", character.only = TRUE)
 base::library(package = "UpSetR", character.only = TRUE)
 base::library(package = "enrichplot", character.only = TRUE)
+
+
+
+# Read snakemake input, and guess wether it's a RDS, a TSV, or a GMT file
+read_input <- function(data_path) {
+    base::message(base::paste("Loading", data_path))
+
+    data <- NULL
+    if (base::endsWith(x = data_path, suffix = ".RDS")) {
+        # Then the binary RDS file is loaded
+        data <- readRDS(file = data_path)
+    } else if (base::endsWith(x = data_path, suffix = ".gmt")) {
+        # Then the file is a GMT file (e.g. from MSigDB)
+        data <- clusterProfiler::read.gmt(gmtfile = gmt_path)
+    } else if (base::endsWith(x = data_path, suffix = ".csv")) {
+        # Then the file is a CSV
+        data <- utils::read.table(
+            file = data_path,
+            header = FALSE,
+            sep = ",",
+            stringsAsFactors = FALSE
+        )
+    } else {
+        # Then it is a TSV text file, since it's the only
+        # other expected format.
+        data <- utils::read.table(
+            file = data_path,
+            header = FALSE,
+            sep = "\t",
+            stringsAsFactors = FALSE
+        )
+    }
+
+    base::return(data)
+}
 
 
 # This function gathers optional parameters
@@ -64,14 +100,30 @@ plot_enrichment <- function(plot_function, plot_base_extra, output_plot_key, par
     grDevices::dev.off()
 }
 
-
 # Load enrichment/gsea input data
-enrichment <- base::readRDS(
-    file = base::as.character(x = snakemake@input[["rds"]])
+enrichment <- read_input(
+    data_path = base::as.character(x = snakemake@input[["rds"]])
 )
 base::print(head(enrichment))
 
+# In order to color heatplot, provide gene weights
+genes <- NULL
+weights <- NULL
+if ("genes" %in% base::names(snakemake@input)) {
+    genes <- read_input(
+        data_path = base::as.character(x = snakemake@input[["genes"]])
+    )
+    weights <- stats::setNames(genes[, 2], genes[, 1])
+}
 
+# In order to plot emapplot, one need to simplify terms with
+# a GO semantic similarity object
+go_sem_sim_object <- NULL
+if ("go_sem_sim" %in% base::names(snakemake@input)) {
+    go_sem_sim_object <- read_input(
+        data_path = base::as.character(x = snakemake@input[["go_sem_sim"]])
+    )
+}
 
 # On user request, save barplot
 if ("barplot" %in% base::names(snakemake@output)) {
@@ -86,7 +138,7 @@ if ("barplot" %in% base::names(snakemake@output)) {
 # On user request, save dotplot
 if ("dotplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
-        plot_function = "dotplot",
+        plot_function = "enrichplot::dotplot",
         plot_base_extra = "object = enrichment",
         output_plot_key = "dotplot",
         param_plot_key = "dotplot_extra"
@@ -96,7 +148,7 @@ if ("dotplot" %in% base::names(snakemake@output)) {
 # On user request, save cnetplot
 if ("cnetplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
-        plot_function = "cnetplot",
+        plot_function = "enrichplot::cnetplot",
         plot_base_extra = "x = enrichment",
         output_plot_key = "cnetplot",
         param_plot_key = "cnetplot_extra"
@@ -106,8 +158,8 @@ if ("cnetplot" %in% base::names(snakemake@output)) {
 # On user request, save heatmap
 if ("heatplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
-        plot_function = "heatplot",
-        plot_base_extra = "x = enrichment",
+        plot_function = "enrichplot::heatplot",
+        plot_base_extra = "x = enrichment, foldChange = weights",
         output_plot_key = "heatplot",
         param_plot_key = "heatplot_extra"
     )
@@ -116,7 +168,7 @@ if ("heatplot" %in% base::names(snakemake@output)) {
 # On user request, save emapplot
 if ("emapplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
-        plot_function = "emapplot",
+        plot_function = "enrichplot::emapplot",
         plot_base_extra = "x = enrichment",
         output_plot_key = "emapplot",
         param_plot_key = "emapplot_extra"
@@ -126,7 +178,7 @@ if ("emapplot" %in% base::names(snakemake@output)) {
 # On user request, save upsetplot
 if ("upsetplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
-        plot_function = "upsetplot",
+        plot_function = "enrichplot::upsetplot",
         plot_base_extra = "x = enrichment",
         output_plot_key = "upsetplot",
         param_plot_key = "upsetplot_extra"
@@ -138,7 +190,7 @@ if ("upsetplot" %in% base::names(snakemake@output)) {
 if ("pmcplot" %in% base::names(snakemake@output)) {
     terms <- enrichment$Description
     plot_enrichment(
-        plot_function = "pmcplot",
+        plot_function = "enrichplot::pmcplot",
         plot_base_extra = "query = terms",
         output_plot_key = "pmcplot",
         param_plot_key = "pmcplot_extra"
@@ -148,7 +200,7 @@ if ("pmcplot" %in% base::names(snakemake@output)) {
 # On user request, save a ridgeplot
 if ("ridgeplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
-        plot_function = "ridgeplot",
+        plot_function = "enrichplot::ridgeplot",
         plot_base_extra = "x = enrichment",
         output_plot_key = "ridgeplot",
         param_plot_key = "ridgeplot_extra"
@@ -158,9 +210,40 @@ if ("ridgeplot" %in% base::names(snakemake@output)) {
 # On user request, save a gsea plot
 if ("gseaplot" %in% base::names(snakemake@output)) {
     plot_enrichment(
-        plot_function = "gseaplot2",
+        plot_function = "enrichplot::gseaplot2",
         plot_base_extra = "x = enrichment",
-        output_plot_key = "gseaplot"
+        output_plot_key = "gseaplot",
+        param_plot_key = "gseaplot_extra"
+    )
+}
+
+if ("gsearank" %in% base::names(snakemake@output)) {
+    plot_enrichment(
+        plot_function = "enrichplot::gsearank",
+        plot_base_extra = "x = enrichment",
+        output_plot_key = "gsearank",
+        param_plot_key = "gsearank_extra"
+    )
+}
+
+if ("emapplot" %in% base::names(snakemake@output)) {
+    pairwise_termism_params <- extra_parameters(
+        parameters = "x = enrichment, semData = go_sem_sim_object",
+        param_key = "pairwise_termism"
+    )
+    pairwise_termism_command <- paste0(
+        "enrichplot::pairwise_termism(",
+        pairwise_termism_params,
+        ")"
+    )
+    base::message(pairwise_termism_command)
+    enrichment <- base::eval(base::parse(text = pairwise_termism_command))
+
+    plot_enrichment(
+        plot_function = "enrichplot::emapplot",
+        plot_base_extra = "x = enrichment",
+        output_plot_key = "emapplot",
+        param_plot_key = "emapplot_extra"
     )
 }
 
