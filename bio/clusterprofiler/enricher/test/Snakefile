@@ -1,0 +1,15 @@
+rule test_clusterprofiler_enricher:
+    input:
+        gene="genes.table.tsv",
+        term2gene="term2gene.csv",
+        term2name="term2name.csv", # Optional
+    output:
+        rds="enrichment.RDS", # Optional
+        tsv="enrichment.tsv", # Optional
+    threads: 1
+    log:
+        "logs/enricher.log"
+    params:
+        enricher_extra="pvalueCutoff = 1, qvalueCutoff = 1, minGSSize = 1, maxGSSize = 10",
+    wrapper:
+        "file:///home/tdayris/Documents/Developments/snakemake-wrappers/bio/clusterprofiler/enricher"

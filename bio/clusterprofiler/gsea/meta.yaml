@@ -1,0 +1,16 @@
+name: cluster profiler enricher
+description: Perform gene term enrichment analysis with Cluster Profiler
+url: https://yulab-smu.top/biomedical-knowledge-mining-book/universal-api.html
+authors:
+  - Thibault Dayris
+input:
+  - gene: Two columned dataset, containing `gene_id \t weight`. These ids must match with the ones provided in `term2gene`.
+  - term2gene: Enrichment term <-> gene id mapping file. Either a TSV-formatted text file, a GMT-formatted text file, or a R `data.frame` as RDS binary file with two columns `term \t gene`.
+  - term2name: Optional enrichment term <-> enrichment name mapping file. TSV/CSV formatted. Either a TSV text file, or a R dataframe as RDS binary file with two column `term \t name`.
+output:
+  - tsv: GSEA analysis result as a TSV formatted text file.
+  - rds: GSEA analysis result as a RDS formatted binary file.
+params:
+  - extra: Optional parameters for `clusterprofiler::GSEA <https://rdrr.io/bioc/clusterProfiler/man/GSEA.html>`_ .
+notes: |
+  * The universe corresponds to the list of genes provided in term2gene. (default ClusterProfiler behavior)

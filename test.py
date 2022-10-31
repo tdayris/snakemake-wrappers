@@ -149,6 +149,35 @@ def test_purge_dups_calcuts():
 
 
 @skip_if_not_modified
+def test_clusterprofiler_enricher():
+    run(
+        "bio/clusterprofiler/enricher",
+        ["snakemake", "--cores", "1", "enrichment.RDS", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_clusterprofiler_gsea():
+    run(
+        "bio/clusterprofiler/gsea",
+        ["snakemake", "--cores", "1", "gsea.RDS", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
+def test_clusterprofiler_enrichplot():
+    run(
+        "bio/clusterprofiler/enrichplot",
+        ["snakemake", "--cores", "1", "barplot.png", "--use-conda", "-F"]
+    )
+
+    run(
+        "bio/clusterprofiler/enrichplot",
+        ["snakemake", "--cores", "1", "gseaplot.png", "--use-conda", "-F"]
+    )
+
+
+@skip_if_not_modified
 def test_purge_dups_get_seqs():
     run(
         "bio/purge_dups/get_seqs",
@@ -6107,6 +6136,20 @@ def test_collapse_reads_to_fragments_bam():
 @skip_if_not_modified
 def test_calc_consensus_reads():
     run(
-        "meta/bio/rbt_calc_consensus/",
+        "meta/bio/calc_consensus_reads/",
         ["snakemake", "--cores", "1", "--use-conda", "-F", "results/consensus/sampleA.bam"],
+    )
+
+@skip_if_not_modified
+def test_bazam_interleaved():
+    run(
+        "bio/bazam",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "results/reads/a.fastq.gz"],
+    )
+
+@skip_if_not_modified
+def test_bazam_separated():
+    run(
+        "bio/bazam",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "results/reads/a.r1.fastq.gz"],
     )

@@ -1,0 +1,15 @@
+rule test_clusterprofiler_gsea:
+    input:
+        gene="genes.table.tsv",
+        term2gene="term2gene.csv",
+        #term2name="term2name.csv", # Optional
+    output:
+        rds="gsea.RDS", # Optional
+        tsv="gsea.tsv", # Optional
+    threads: 1
+    log:
+        "logs/enricher.log"
+    params:
+        gsea_extra="pvalueCutoff = 1, minGSSize = 1, maxGSSize = 10",
+    wrapper:
+        "file:///home/tdayris/Documents/Developments/snakemake-wrappers/bio/clusterprofiler/gsea"

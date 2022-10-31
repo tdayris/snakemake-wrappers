@@ -1,0 +1,70 @@
+rule test_clusterprofiler_enrichplot_enricher:
+    input:
+        rds="enrichment.RDS",
+        genes="genes.table.tsv", # Optional, used for colors in Heatmap
+    output:
+        barplot="barplot.png",
+        dotplot="dotplot.png",
+        cnetplot="cntplot.png",
+        # emapplot="emapplot.png",
+        heatplot="heatplot.png",
+        upsetplot="upsetplot.png",
+        pmcplot="pmcplot.png",
+        # ridgeplot="ridgeplot.png", # Available for GSEA only
+        # gseaplot="gseaplot.png", # Available for GSEA only
+        # gsearank="gsearank.png", # Available for GSEA only
+    threads: 1
+    log:
+        "logs/clusterprofiler.log"
+    params:
+        enricher_extra="pvalueCutoff = 1, qvalueCutoff = 1",
+        barplot_extra="showCategory = 2",
+        dotplot_extra="showCategory = 2",
+        cnetplot_extra="showCategory = 2",
+        emapplot_extra="showCategory = 2",
+        pairwise_termism_extra="",
+        heatplot_extra="showCategory = 2",
+        # ridgeplot_extra="showCategory = 2",
+        # gseaplot_extra="showCategory = 2",
+        # gsearank_extra="geneSetID = 1",
+        upsetplot_extra="n = 2",
+        pmcplot_extra="period=2010:2020",
+        png_extra="height = 480, width = 480, units = 'px', type = 'cairo'",
+    wrapper:
+        "master/bio/clusterprofiler/enrichplot"
+
+
+rule test_clusterprofiler_enrichplot_gsea:
+    input:
+        rds="gsea.RDS",
+        genes="genes.table.tsv", # Optional, used for colors in Heatmap
+    output:
+        # barplot="barplot.png", # Available for enricher only
+        # dotplot="dotplot.png", # Available for enricher only
+        # cnetplot="cntplot.png", # Available for enricher only
+        # emapplot="emapplot.png", # Available for enricher only
+        heatplot="heatplot.png",
+        upsetplot="upsetplot.png",
+        pmcplot="pmcplot.png",
+        ridgeplot="ridgeplot.png",
+        gseaplot="gseaplot.png",
+        gsearank="gsearank.png",
+    threads: 1
+    log:
+        "logs/clusterprofiler.log"
+    params:
+        enricher_extra="pvalueCutoff = 1, qvalueCutoff = 1",
+        # barplot_extra="showCategory = 2",
+        # dotplot_extra="showCategory = 2",
+        # cnetplot_extra="showCategory = 2",
+        # emapplot_extra="showCategory = 2",
+        # pairwise_termism_extra="",
+        heatplot_extra="showCategory = 2",
+        ridgeplot_extra="showCategory = 2",
+        gseaplot_extra="geneSetID = 1",
+        gsearank_extra="geneSetID = 1",
+        upsetplot_extra="n = 2",
+        pmcplot_extra="period=2010:2020",
+        png_extra="height = 480, width = 480, units = 'px', type = 'cairo'",
+    wrapper:
+        "master/bio/clusterprofiler/enrichplot"
