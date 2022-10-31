@@ -10,7 +10,7 @@ by
 
 rule enrichDO:
     input:
-        rds="026.gene_lists/ENTREZID/{comparison}.RDS",
+        rds="0.26.clusterprofiler/gene_lists/ENTREZID/{comparisons}.RDS",
         universe="026.gene_lists/universe/{comparison}.RDS",
     output:
         rds=temp(

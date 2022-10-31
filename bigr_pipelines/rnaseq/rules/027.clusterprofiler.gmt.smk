@@ -39,12 +39,11 @@ by
 """
 
 
-rule enrich_GMT:
+rule enricher_GMT:
     input:
         rds="026.clusterprofiler/gene_lists/{keytype}/{comparison}.RDS",
-        universe="026.clusterprofiler/gene_lists/universe/{comparison}.RDS",
-        gmt=lambda wildcards: config["clusterprofiler"]["gmt"][wildcards.database],
-        term_name="026.clusterprofiler/gmt/{database}.{keytype}.term2name.tsv",
+        term2gene="026.clusterprofiler/databases/{database}.{keytype}.term2gene.gmt",
+        term2name="026.clusterprofiler/databases/{database}.{keytype}.term2name.tsv",
     output:
         readable_rds=temp(
             "027.enrich/{database}.{keytype}/{comparison}/enrich.{database}.{keytype}.RDS"
@@ -61,9 +60,7 @@ rule enrich_GMT:
         extra=config["clusterprofiler"].get(
             "enricher", "pvalueCutoff = 1, qvalueCutoff = 1"
         ),
-        org=config.get("organism", "Hs"),
-        keytype=lambda wildcards: str(wildcards.keytype),
     log:
         "logs/027.enricher/{database}/{comparison}.{keytype}.log",
     wrapper:
-        "bio/clusterProfiler/enrichGMT"
+        "bio/clusterprofiler/enricher"

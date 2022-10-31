@@ -1,7 +1,7 @@
 # Perform dot plots on DGE results
 
 """
-030.dotplot
+030.enrichplot_enricher
 from
 -> 029.enricher_TERMS
 -> 028.enrichDO
@@ -13,91 +13,43 @@ by
 """
 
 
-rule dotplot:
+rule enrichplot_enricher:
     input:
         rds="027.enrich/{database}.{keytype}/{comparison}/enrich.{database}.{keytype}.RDS",
     output:
-        png=protected(
+        barplot=protected(
+            "data_output/GSEA/{comparison}/{database}.{keytype}/barplot.enrich.png"
+        ),
+        dotplot=protected(
             "data_output/GSEA/{comparison}/{database}.{keytype}/dotplot.enrich.png"
+        ),
+        cnetplot=protected(
+            "data_output/GSEA/{comparison}/{database}.{keytype}/cnetplot.enrich.png"
+        ),
+        heatplot=protected(
+            "data_output/GSEA/{comparison}/{database}.{keytype}/heatplot.enrich.png"
+        ),
+        upsetplot=protected(
+            "data_output/GSEA/{comparison}/{database}.{keytype}/upsetplot.enrich.png"
+        ),
+        pmcplot=protected(
+            "data_output/GSEA/{comparison}/{database}.{keytype}/pmcplot.enrich.png"
         ),
     threads: 1
     resources:
-        time_min=get_15min_per_attempt,
+        time_min=get_35min_per_attempt,
         mem_mb=get_4gb_per_attempt,
         tmpdir="tmp",
     params:
-        dotplot_extra=config["clusterprofiler"].get("dotplot_extra", ""),
+        enricher_extra="pvalueCutoff = 0.1, qvalueCutoff = 0.1",
+        barplot_extra="showCategory = 5",
+        dotplot_extra="showCategory = 5",
+        cnetplot_extra="showCategory = 5",
+        heatplot_extra="showCategory = 5",
+        upsetplot_extra="n = 5",
+        pmcplot_extra="period=2012:2022",
+        png_extra="height = 768, width = 1024, units = 'px', type = 'cairo'",
     log:
         "logs/030.clusterprofiler/dotplot/enrich.{database}.{comparison}.{keytype}.log",
     wrapper:
-        "bio/clusterProfiler/dotplot"
-
-
-# Perform bar plots on DGE results
-
-"""
-030.barplot
-from
--> 029.enricher_TERMS
--> 028.enrichDO
--> 028.enrichDGN
--> 028.enrichDO
--> 027.enrich_GMT
-by
--> End job
-"""
-
-
-rule barplot:
-    input:
-        rds="027.enrich/{database}.{keytype}/{comparison}/enrich.{database}.{keytype}.RDS",
-    output:
-        png=protected(
-            "data_output/GSEA/{comparison}/{database}.{keytype}/barplot.enrich.png"
-        ),
-    threads: 1
-    resources:
-        time_min=get_15min_per_attempt,
-        mem_mb=get_4gb_per_attempt,
-        tmpdir="tmp",
-    params:
-        barplot_extra=config["clusterprofiler"].get("barplot_extra", ""),
-    log:
-        "logs/030.clusterprofiler/barplot/enrich.{database}.{comparison}.{keytype}.log",
-    wrapper:
-        "bio/clusterProfiler/barplot"
-
-
-# Perform dot plots on DGE results
-
-"""
-030.upsetplot
-from
--> 029.enricher_TERMS
--> 028.enrichDO
--> 028.enrichDGN
--> 028.enrichDO
--> 027.enrich_GMT
-by
--> End job
-"""
-
-
-rule upsetplot:
-    input:
-        rds="027.enrich/{database}.{keytype}/{comparison}/enrich.{database}.{keytype}.RDS",
-    output:
-        png=protected(
-            "data_output/GSEA/{comparison}/{database}.{keytype}/upsetplot.enrich.png"
-        ),
-    threads: 1
-    resources:
-        time_min=get_15min_per_attempt,
-        mem_mb=get_4gb_per_attempt,
-        tmpdir="tmp",
-    params:
-        upsetplot_extra=config.get("upsetplot_extra", "n = 5"),
-    log:
-        "logs/upsetplot/enrich.{database}.{comparison}.{keytype}.log",
-    wrapper:
-        "bio/clusterProfiler/upsetplot"
+        "bio/clusterprofiler/enrichplot"

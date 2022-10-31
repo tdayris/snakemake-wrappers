@@ -10,24 +10,22 @@ by
 
 rule make_rank_list:
     input:
-        tsv=lambda wildcards: expand(
-            "008.deseq2/{comparison}/wald.{comparison}.tsv", comparison=output_prefixes
-        ),
+        tsv="008.deseq2/{comparison}/wald.{comparison}.tsv"
     output:
-        tsv=temp("026.clusterprofiler/rank.list.tsv"),
+        tsv=temp("026.clusterprofiler/{comparison}/wald.{comparison}.tsv"),
     threads: 1
     resources:
-        mem_mb=get_2gb_per_attempt,
-        time_min=get_35min_per_attempt,
+        mem_mb=get_768mb_per_attempt,
+        time_min=get_10min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/026.clusterprofiler/make_rank_list.log",
+        "logs/026.clusterprofiler/make_rank_list.{comparison}.log",
     params:
-        rank_on=config["clusterprofiler"].get("rank_on", "padj"),
+        "-f1,3"
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     script:
-        str(workflow_source_dir / "scripts" / "030.make_rank_list.py")
+        "cut {params} {input} > {output} 2> {log}"
 
 
 # Expand and annotate gene rank list
@@ -46,42 +44,20 @@ by
 
 rule expand_rank_list:
     input:
-        tsv="026.clusterprofiler/rank.list.tsv",
+        tsv="026.clusterprofiler/{comparison}/wald.{comparison}.tsv",
     output:
-        tsv=expand(
-            "026.clusterprofiler/gene_lists/ENTREZID/{comparison}.tsv",
-            comparison=output_prefixes,
-        ),
-        entrez_rds=temp(
-            expand(
-                "026.clusterprofiler/gene_lists/ENTREZID/{comparison}.RDS",
-                comparison=output_prefixes,
-            )
-        ),
-        symbol_rds=temp(
-            expand(
-                "026.clusterprofiler/gene_lists/SYMBOL/{comparison}.RDS",
-                comparison=output_prefixes,
-            )
-        ),
-        ensembl_rds=temp(
-            expand(
-                "026.clusterprofiler/gene_lists/ENSEMBL/{comparison}.RDS",
-                comparison=output_prefixes,
-            )
-        ),
-        protein_rds=temp(
-            expand(
-                "026.clusterprofiler/gene_lists/ENSEMBLPROT/{comparison}.RDS",
-                comparison=output_prefixes,
-            )
-        ),
-        universe=temp(
-            expand(
-                "026.clusterprofiler/gene_lists/universe/{comparison}.RDS",
-                comparison=output_prefixes,
-            )
-        ),
+        tsv_ensembl=temp("026.clusterprofiler/gene_lists/ENSEMBL/{comparisons}.tsv")
+        tsv_ensemblprot=temp("026.clusterprofiler/gene_lists/ENSEMBLPROT/{comparisons}.tsv")
+        tsv_symbol=temp("026.clusterprofiler/gene_lists/SYMBOL/{comparisons}.tsv")
+        tsv_entrez=temp("026.clusterprofiler/gene_lists/ENTREZID/{comparisons}.tsv")
+        rds_ensembl=temp("026.clusterprofiler/gene_lists/ENSEMBL/{comparisons}.RDS")
+        rds_ensemblprot=temp("026.clusterprofiler/gene_lists/ENSEMBLPROT/{comparisons}.RDS")
+        rds_symbol=temp("026.clusterprofiler/gene_lists/SYMBOL/{comparisons}.RDS")
+        rds_entrez=temp("026.clusterprofiler/gene_lists/ENTREZID/{comparisons}.RDS")
+        universe_entrez=temp("026.clusterprofiler/universe/ENTREZID/{comparison}.tsv"),
+        universe_ensembl=temp("026.clusterprofiler/universe/ENSEMBL/{comparison}.tsv"),
+        universe_ensemblprot=temp("026.clusterprofiler/universe/ENSEMBLPROT/{comparison}.tsv"),
+        universe_symbol=temp("026.clusterprofiler/universe/SYMBOL/{comparison}.tsv"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -95,6 +71,8 @@ rule expand_rank_list:
             else "org.Mm.eg.db"
         ),
     log:
-        "logs/026.clusterprofiler/expand.log",
-    wrapper:
-        "bio/clusterProfiler/hg38_genelist"
+        "logs/026.clusterprofiler/expand.{comparison}.log",
+    conda:
+        str(workflow_source_dir / "envs" / "clusterprofiler.R")
+    script:
+        str(workflow_source_dir / "scripts" / "bitr.R")
