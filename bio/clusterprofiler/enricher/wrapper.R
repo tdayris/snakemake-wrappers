@@ -52,7 +52,7 @@ read_input <- function(data_path) {
 
 # Load gene information
 genes <- read_input(data_path = snakemake@input[["gene"]])
-weight <- weight <- stats::setNames(genes[, 2], genes[, 1])
+weight <- stats::setNames(genes[, 2], genes[, 1])
 genes <- base::unique(x = base::names(weight))
 
 # Load set of enrichment terms
