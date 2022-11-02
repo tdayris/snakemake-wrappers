@@ -49,7 +49,7 @@ save_rds <- function(data, keytype, weights, out_key) {
 
   base::saveRDS(
     object = geneList,
-    file = rds_path
+    file = out_path
   )
 }
 
@@ -58,11 +58,9 @@ save_universe <- function(data, keytype, out_key) {
   out_path <- base::as.character(x = snakemake@out_key)
   base::message("Saving RDS to ", out_path)
 
-  universe <- data[keytype, ]
-  utils::write.table(
-    x = data[keytype, ],
-    file = out_path,
-    sep = "\t"
+  base::saveRDS(
+    object = data[keytype, ],
+    file = out_path
   )
 }
 
@@ -81,7 +79,7 @@ base::message("Dataset and libraries loaded")
 if (! "ENSEMBL" %in% colnames(tsv)) {
   base::message("Adding ENSEMBL keys to the gene table")
   tsv$ENSEMBL <- mapIds(
-    org.Hs.eg.db,
+    orgdb,
     keys = tsv$SYMBOL,
     colum = 'ENSEMBL',
     keytype = "SYMBOL",
@@ -92,7 +90,7 @@ if (! "ENSEMBL" %in% colnames(tsv)) {
 if (! "SYMBOL" %in% colnames(tsv)) {
   base::message("Adding SYMBOL keys to the gene table")
   tsv$SYMBOL <- mapIds(
-    org.Hs.eg.db,
+    orgdb,
     keys = tsv$ENSEMBL,
     colum = 'SYMBOL',
     keytype = "ENSEMBL",
@@ -102,7 +100,7 @@ if (! "SYMBOL" %in% colnames(tsv)) {
 
 base::message("Adding ENTREZID keys to the gene table ", gene_id_type)
 tsv$ENTREZID <- mapIds(
-  org.Hs.eg.db,
+  orgdb,
   keys = tsv$ENSEMBL,
   column = "ENTREZID",
   keytype = "ENSEMBL",
@@ -111,7 +109,7 @@ tsv$ENTREZID <- mapIds(
 
 base::message("Adding ENSEMBLPROT keys to the gene table")
 tsv$ENSEMBLPROT <- mapIds(
-  org.Hs.eg.db,
+  orgdb,
   keys = tsv$ENSEMBL,
   column = "ENSEMBLPROT",
   keytype = "ENSEMBL",
