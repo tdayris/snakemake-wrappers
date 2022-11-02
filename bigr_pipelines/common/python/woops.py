@@ -10,8 +10,8 @@ import matplotlib.pyplot
 
 from functools import partial
 from pathlib import Path
-from subprocess import call
-from tkinter.ttk import Separator
+
+
 from typing import Any, Callable, Dict, Generator, Optional, Union
 
 PathType = Union[str, Path]

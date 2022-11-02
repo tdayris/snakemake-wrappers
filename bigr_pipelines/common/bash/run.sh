@@ -137,7 +137,7 @@ fi
 # Activate singularity
 CMD="module load singularity/3.6.3"
 message CMD "${CMD}"
-eval ${CMD}
+eval ${CMD} && message INFO "Singularity loaded in case your pipeline requires it."
 
 # Activate conda
 message CMD "conda_activate ${CONDA_ENV_PATH}"
@@ -158,9 +158,11 @@ else
   eval ${BASE_CMD}
 fi
 
+message INFO "Gathering cluster usage information"
+conda_activate "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_install/Woops" || message ERROR "Could not read cluster usage statistics, but pipeline was OK and results can be trusted."
 CMD="python3 ${PIPELINE_PREFIX}/bigr_pipelines/common/python/woops.py > logs/woops.log 2>&1"
 message CMD "${CMD}"
-eval ${CMD}
+eval ${CMD} || message ERROR "Could not read cluster usage statistics, but pipeline was OK and results can be trusted."
 message INFO "See run info in logs."
 
 message INFO "Process over."
