@@ -115,9 +115,10 @@ def parse_error_log(path: str, start: int, end: int) -> Dict[str, Union[float, s
 logging.basicConfig(level=logging.DEBUG)
 parsed_logs_path = "logs/parsed.logs.tsv"
 barplot = True
+kde = True
 
 if not os.path.exists(parsed_logs_path):
-    logging.info("Creating the %s file", parsed_logs_path)
+    logging.info("Creating the file: %s", parsed_logs_path)
     jobs_dict = {}
 
     for log in search_logs(Path("logs/slurm/")):
@@ -135,11 +136,26 @@ else:
 logging.debug(jobs.head())
 
 if barplot is True:
-    png_out = "MemoryConsumption.png"
+    png_out = "MemoryConsumption.barplot.png"
     seaborn.catplot(data=jobs, x="name", y="max_memory", kind="bar")
     matplotlib.pyplot.xticks(rotation=90)
 
-    logging.info("Gene plot saved to %s", png_out)
+    logging.info("barplot saved to %s", png_out)
+    matplotlib.pyplot.savefig(
+        png_out,
+        bbox_inches="tight"
+    )
+
+
+if kde is True:
+    png_out = "MemoryAndTimeConsumption.kdeplot.png"
+    seaborn.jointplot(
+        data=jobs,
+        x="Memory_Usage", y="CPU_Usage", hue="name",
+        kind="kde",
+    )
+
+    logging.info("kdrplot saved to %s", png_out)
     matplotlib.pyplot.savefig(
         png_out,
         bbox_inches="tight"
