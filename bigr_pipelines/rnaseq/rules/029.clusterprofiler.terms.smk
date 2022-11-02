@@ -71,6 +71,6 @@ by
 
 use rule enricher_GMT as enricher_TSV with:
     input:
-        rds="026.clusterprofiler/gene_lists/{keytype}/{comparison}.RDS",
+        gene="026.clusterprofiler/gene_lists/{keytype}/{comparison}.tsv",
         term2gene="026.clusterprofiler/databases/{database}.{keytype}.term2gene.tsv",
         term2name="026.clusterprofiler/databases/{database}.{keytype}.term2name.tsv",
