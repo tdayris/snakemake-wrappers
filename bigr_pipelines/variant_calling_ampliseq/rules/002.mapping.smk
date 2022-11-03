@@ -66,6 +66,6 @@ use rule bwa_mem from bwa_fixmate_meta with:
             stream=["1", "2"],
             allow_missing=True
         ),
-        index=multiext(
+        idx=multiext(
             "bwa_mem2/index/genome", ".0123", ".amb", ".ann", ".pac"
         )
