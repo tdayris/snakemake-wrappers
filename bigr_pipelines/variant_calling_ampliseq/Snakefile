@@ -1,46 +1,4 @@
-import logging
-import os
-import pandas
-import sys
-from pathlib import Path
-
-worflow_source_dir = Path(snakemake.workflow.srcdir("."))
-common = str(worflow_source_dir / ".." / "common" / "python")
-sys.path.append(common)
-
-from file_manager import *
-from files_linker import *
-from write_yaml import *
-from messages import *
-from snakemake.utils import min_version
-min_version("6.0")
-
-logging.basicConfig(
-    filename="snakemake.variant_calling_ampliseq.log",
-    filemode="w",
-    level=logging.DEBUG
-)
-
-container: "docker://continuumio/miniconda3:4.4.10"
-localrules: bigr_copy_fq
-ruleorder: bwa_mem > bwa_fixmate_meta_bwa_mem
-
-
-default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
-configfile: get_config(default_config)
-design = get_design(os.getcwd(), search_fastq_pairs)
-
-
-wildcard_constraints:
-    sample = r"|".join(design["Sample_id"]),
-    stream = r"1|2|R1|R2"
-
-
-fastq_links = link_fq(
-    design.Sample_id,
-    design.Upstream_file,
-    design.Downstream_file
-)
+include: "rules/008.common.smk"
 
 rule target_ampliseq:
     input:
@@ -140,14 +98,14 @@ rule annotate_vcf:
 ###############################
 
 
-include: "rules/007.region.depth.smk"
+include: str(workflow_source_dir / "rules" / "007.region.depth.smk")
 
 
 #####################################
 ### Merge variant calling results ###
 #####################################
 
-include: "rules/006.metacaller.smk"
+include: str(workflow_source_dir / "rules" / "006.metacaller.smk")
 
 
 ###############################
@@ -155,7 +113,7 @@ include: "rules/006.metacaller.smk"
 ###############################
 
 
-include: "rules/005.mutect2.smk"
+include: str(workflow_source_dir / "rules" / "005.mutect2.smk")
 
 
 ################################
@@ -163,7 +121,7 @@ include: "rules/005.mutect2.smk"
 ################################
 
 
-include: "rules/004.varscan.call.smk"
+include: str(workflow_source_dir / "rules" / "004.varscan.call.smk")
 
 
 ##############################
@@ -171,7 +129,7 @@ include: "rules/004.varscan.call.smk"
 ##############################
 
 
-include: "rules/003.recalibration.smk"
+include: str(workflow_source_dir / "rules" / "003.recalibration.smk")
 
 
 ########################################
@@ -182,7 +140,7 @@ include: "rules/003.recalibration.smk"
 ########################################
 
 
-include: "rules/002.mapping.smk"
+include: str(workflow_source_dir / "rules" / "002.mapping.smk")
 
 
 ############################
@@ -190,11 +148,11 @@ include: "rules/002.mapping.smk"
 ############################
 
 
-include: "rules/001.QC_Trimming.smk"
+include: str(workflow_source_dir / "rules" / "001.QC_Trimming.smk")
 
 
 #################################################
 ### Gather files from iRODS or mounting point ###
 #################################################
 
-include: "rules/000.bigr_copy.smk"
+include: str(workflow_source_dir / "rules" / "000.bigr_copy.smk")
