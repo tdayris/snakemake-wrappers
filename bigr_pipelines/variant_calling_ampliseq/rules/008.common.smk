@@ -24,7 +24,7 @@ import sys
 
 # My own libraries
 workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
-common = str(workflow_source_dir / ".." / / "common" / "python")
+common = str(workflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
 
 from dataframes import *
