@@ -9,6 +9,7 @@ try:
 except NameError:
     config = defualt_config_bwa_fixmate
 
+
 def get_best_bwa_index():
     """Return cached data if available"""
     if config["genome"] == "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta":
@@ -113,7 +114,7 @@ rule bwa_mem:
             stream=["1", "2"],
             allow_missing=True
         ),
-        index=get_best_bwa_index()
+        idx=get_best_bwa_index()
     output:
         temp("bwa_mem2/mem/{sample}.bam")
     message: "Mapping {wildcards.sample} with BWA"
@@ -124,7 +125,7 @@ rule bwa_mem:
         tmpdir="tmp"
     shadow: "shallow"
     params:
-        index=lambda wildcards, input: os.path.splitext(input["index"][0])[0],
+        index=lambda wildcards, input: os.path.splitext(input["idx"][0])[0],
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}\tPU:{sample}\tPL:ILLUMINA\tCN:IGR\tDS:WES\tPG:BWA-MEM2' -M -A 2 -E 1",
         sort="samtools",         # We chose Samtools to sort by queryname
         sort_order="queryname",  # Queryname sort is needed for a fixmate
