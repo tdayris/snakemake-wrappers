@@ -1,12 +1,3 @@
-import sys
-from pathlib import Path
-
-worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
-common = str(worflow_source_dir / "../../../../bigr_pipelines/common/python")
-sys.path.append(common)
-
-from file_manager import *
-
 rule bcftools_merge:
     input:
         calls=[
@@ -14,8 +5,8 @@ rule bcftools_merge:
             "mutect2/corrected/{sample}.vcf.gz"
         ],
         calls_index=[
-            get_tbi("varscan2/mpileup2cns_reheaded/{sample}.vcf.gz"),
-            get_tbi("mutect2/corrected/{sample}.vcf.gz")
+            "varscan2/mpileup2cns_reheaded/{sample}.vcf.gz.tbi",
+            "mutect2/corrected/{sample}.vcf.gz.tbi"
         ],
         regions=config["bed"]
     output:
@@ -41,8 +32,8 @@ rule bcftools_merge:
 rule rehead_before_merge:
     input:
         vcf="{tool}/{subcommand}/{sample}.vcf.gz",
-        vcf_index=get_tbi("{tool}/{subcommand}/{sample}.vcf.gz"),
-        fai=get_fai(config["genome"]),
+        vcf_index="{tool}/{subcommand}/{sample}.vcf.gz.tbi",
+        fai=config["genome"] + ".fai",
         samples = "{tool}/{subcommand}/reheader/{sample}.renamed.sample.list",
     output:
         temp("{tool}/{subcommand}_reheaded/{sample}.vcf.gz")
