@@ -46,7 +46,7 @@ logging.basicConfig(
 localrules: bigr_copy_fq
 ruleorder: bwa_mem > bwa_fixmate_meta_bwa_mem
 
-default_config = read_yaml(worflow_source_dir / "config.hg38.yaml")
+default_config = read_yaml(workflow_source_dir / "config.hg38.yaml")
 configfile: get_config(default_config)
 design = get_design(os.getcwd(), search_fastq_pairs)
 
