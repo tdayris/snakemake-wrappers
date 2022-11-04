@@ -10,8 +10,8 @@ logging.basicConfig(
     level=logging.DEBUG
 )
 
-worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
-common = str(worflow_source_dir / "../common/python")
+workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
+common = str(workflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
 
 from file_manager import *
