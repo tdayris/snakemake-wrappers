@@ -10,8 +10,8 @@ logging.basicConfig(
     level=logging.DEBUG
 )
 
-worflow_source_dir = Path(next(iter(workflow.get_sources()))).absolute().parent
-common = str(worflow_source_dir / "../common/python")
+workflow_source_dir = Path(snakemake.workflow.srcdir("."))
+common = str(workflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
 
 from file_manager import *
@@ -21,7 +21,7 @@ from messages import *
 from snakemake.utils import min_version
 min_version("6.0")
 
-default_config = read_yaml(worflow_source_dir / "config.hg38.nochr.yaml")
+default_config = read_yaml(workflow_source_dir / "config.hg38.nochr.yaml")
 configfile: get_config(default_config)
 design = get_design(os.getcwd(), search_vcf_files)
 design["Sample_id"] = design["Sample_id"].str.replace("-", "_")
@@ -96,7 +96,7 @@ rule target_snpeff_snpsift:
 #################################
 
 module compress_index_vcf_meta:
-    snakefile: "../../meta/bio/compress_index_vcf/test/Snakefile"
+    snakefile: str(workflow_source_dir / ".." / ".." / "meta" / "bio" / "compress_index_vcf" / "test" / "Snakefile")
     config: config
 
 
@@ -539,7 +539,7 @@ rule splice_ai:
 ### snpeff-snpsift annotation ###
 #################################
 
-include: "rules/001.snpeff.smk"
+include: str(workflow_source_dir / "rules" / "001.snpeff.smk")
 
 
 ##########################
@@ -547,7 +547,7 @@ include: "rules/001.snpeff.smk"
 ##########################
 
 
-include: "rules/002.snpsift.smk"
+include: str(workflow_source_dir / "rules" / "002.snpsift.smk")
 
 
 #################################################

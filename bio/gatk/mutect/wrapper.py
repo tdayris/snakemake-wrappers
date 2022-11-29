@@ -62,7 +62,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
         "--output {snakemake.output.vcf} "  # Path to output vcf file
         "--reference {snakemake.input.fasta} "  # Path to reference fasta file
         "--native-pair-hmm-threads {snakemake.threads} "  # Maximum number of threads
-        " --tmp-dir {tmpdir}"
+        "--tmp-dir {tmpdir} "
         "{extra} "  # Extra parameters
         "{log}"  # Logging behaviour
     )
