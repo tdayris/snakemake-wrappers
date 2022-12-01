@@ -75,4 +75,5 @@ rule multiqc_stats:
     log:
         "logs/003.multiqc.log",
     wrapper:
-        "bio/BiGR/multiqc_illumina"
+        # "bio/BiGR/multiqc_illumina"
+        "bio/multiqc"
