@@ -100,14 +100,14 @@ def demux_input(stats, interop, runinfo, runparams) -> Dict[str, str]:
             "fastqc/{sample}.html",
             sample=design["Sample_id"],
         ),
-        "txt": expand(
-            "fastq_screen/{sample}.fastq_screen.txt",
-            sample=design["Sample_id"],
-        ),
-        "png": expand(
-            "fastq_screen/{sample}.fastq_screen.png",
-            sample=design["Sample_id"],
-        ),
+        # "txt": expand(
+        #     "fastq_screen/{sample}.fastq_screen.txt",
+        #     sample=design["Sample_id"],
+        # ),
+        # "png": expand(
+        #     "fastq_screen/{sample}.fastq_screen.png",
+        #     sample=design["Sample_id"],
+        # ),
     }
     if stats != default_existing_path:
         base["bcl_json"] = "tmp/Stats.json"

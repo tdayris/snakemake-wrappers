@@ -19,14 +19,14 @@ rule multiqc:
             "fastqc/{sample}.html",
             sample=design["Sample_id"],
         ),
-        txt=expand(
-            "fastq_screen/{sample}.fastq_screen.txt",
-            sample=design["Sample_id"],
-        ),
-        png=expand(
-            "fastq_screen/{sample}.fastq_screen.png",
-            sample=design["Sample_id"],
-        ),
+        # txt=expand(
+        #     "fastq_screen/{sample}.fastq_screen.txt",
+        #     sample=design["Sample_id"],
+        # ),
+        # png=expand(
+        #     "fastq_screen/{sample}.fastq_screen.png",
+        #     sample=design["Sample_id"],
+        # ),
     output:
         "data_output/multiqc.html",
         directory("data_output/multiqc_data"),
@@ -75,4 +75,5 @@ rule multiqc_stats:
     log:
         "logs/003.multiqc.log",
     wrapper:
-        "bio/BiGR/multiqc_illumina"
+        # "bio/BiGR/multiqc_illumina"
+        "bio/multiqc"
