@@ -15,13 +15,13 @@ rule multiqc_variant:
             sample=design["Sample_id"],
             status=status_list,
         ),
-        fastq_screen=expand(
-            "fastq_screen/{sample}.{stream}.{status}.fastq_screen.{ext}",
-            sample=design["Sample_id"],
-            stream=streams,
-            ext=["txt", "png"],
-            status=status_list,
-        ),
+        # fastq_screen=expand(
+        #     "fastq_screen/{sample}.{stream}.{status}.fastq_screen.{ext}",
+        #     sample=design["Sample_id"],
+        #     stream=streams,
+        #     ext=["txt", "png"],
+        #     status=status_list,
+        # ),
         samtools_stats=expand(
             "samtools/stats/{sample}_{status}.{cleaning}.stats",
             sample=sample_list,
