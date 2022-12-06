@@ -37,7 +37,7 @@ rule split_multiallelic_mutect2:
     threads: 2
     resources:
         mem_mb=get_8gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        time_min=get_3h_per_attempt,
         tmpdir="tmp",
     retries: 1
     params:
@@ -70,7 +70,7 @@ rule gatk_filter_mutect_calls:
     threads: 1
     resources:
         mem_mb=get_8gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        time_min=get_3h_per_attempt,
         tmpdir="tmp",
     retries: 1
     params:
@@ -101,7 +101,7 @@ rule calculate_tumor_contamination:
     threads: 1
     resources:
         mem_mb=get_8gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        time_min=get_3h_per_attempt,
         tmpdir="tmp",
     retries: 1
     params:
@@ -130,8 +130,8 @@ rule get_pileup_summaries:
         "Contamination_Estimate"
     threads: 1
     resources:
-        mem_mb=get_8gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        mem_mb=get_10gb_per_attempt,
+        time_min=get_3h_per_attempt,
         tmpdir="tmp",
     retries: 1
     params:
@@ -154,7 +154,7 @@ rule gatk_learn_read_orientation_model:
         temp("gatk/orientation_model/{sample}/{sample}.artifacts-prior.tar.gz"),
     threads: 1
     resources:
-        time_min=get_1h_per_attempt,
+        time_min=get_3h_per_attempt,
         mem_mb=get_8gb_per_attempt,
         tmpdir="tmp",
     retries: 1
@@ -193,8 +193,8 @@ rule mutect2_somatic:
         f1r2=temp("mutect2/f1r2/{sample}.tar.gz"),
     threads: config.get("max_threads", 20)
     resources:
-        time_min=get_5h_per_attempt,
-        mem_mb=get_8gb_per_attempt,
+        time_min=get_5h_and_10h_per_attempt,
+        mem_mb=get_10gb_per_attempt,
         tmpdir="tmp",
     retries: 1
     params:

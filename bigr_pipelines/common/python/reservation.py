@@ -46,6 +46,9 @@ get_8h_per_attempt = functools.partial(get_resources_per_attempt, multiplier=60 
 get_10h_per_attempt = functools.partial(get_resources_per_attempt, multiplier=60 * 10)
 get_16h_per_attempt = functools.partial(get_resources_per_attempt, multiplier=60 * 16)
 get_90min_per_attempt = functools.partial(get_resources_per_attempt, multiplier=90)
+get_5h_and_10h_per_attempt = functools.partial(
+    get_resources_per_attempt, multiplier=60 * 10, base=-60 * 5
+)
 
 # Explicit memory reservation
 get_768mb_per_attempt = functools.partial(get_resources_per_attempt, multiplier=768)
