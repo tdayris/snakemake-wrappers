@@ -23,7 +23,7 @@ rule bigr_copy:
     retries: 2
     params:
         input=lambda wildcards: io_dict[wildcards.output_file],
-        irods_extra=irods_extra
+        irods_extra=irods_extra,
     log:
         "logs/001.bigr_copy/{output_file}.log",
     wrapper:
