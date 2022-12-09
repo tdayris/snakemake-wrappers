@@ -15,7 +15,7 @@ import pandas
 
 from pathlib import Path
 
-from os.path import commonprefix, basename
+from os.path import basename
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from write_yaml import *
@@ -187,9 +187,9 @@ def search_fastq_trio(dirpath: FilePathType) -> Dict[str, str]:
     suffixes = ("fastq", "fq", "fastq.gz", "fq.gz")
     fqiter = zip(*[iter(search_fastq_files(dirpath))]*6)
     return {
-        remove_suffixes(basename(t1), suffixes): {
-            "Tumor_upstream_file": t1,
-            "Tumor_downstream_file": t2,
+        remove_suffixes(basename(n1), suffixes): {
+            "Tumor_upstream_file": n1,
+            "Tumor_downstream_file": n2,
             "Father_upstream_file": f1,
             "Father_downstream_file": f2,
             "Mother_upstream_file": m1,
