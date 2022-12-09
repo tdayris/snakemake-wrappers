@@ -1,0 +1,37 @@
+from pathlib import Path
+
+workflow_source_dir = Path(os.path.relpath(snakemake.workflow.srcdir(".."), ".")).parent
+
+####################################
+### Pure Python / Pre-processing ###
+####################################
+
+include: str(workflow_source_dir / "rules" / "001.commons.environment.smk")
+include: str(workflow_source_dir / "rules" / "002.commons.config.smk")
+include: str(workflow_source_dir / "rules" / "003.commons.design.smk")
+include: str(workflow_source_dir / "rules" / "004.commons.unpack.smk")
+include: str(workflow_source_dir / "rules" / "005.commons.wildcards.smk")
+include: str(workflow_source_dir / "rules" / "006.commons.target.smk")
+include: str(workflow_source_dir / "rules" / "007.commons.reservation.smk")
+
+##################################
+### Gather resources / Indexes ###
+##################################
+
+include: str(workflow_source_dir / "rules" / "010.resources.sequences.smk")
+include: str(workflow_source_dir / "rules" / "011.resources.annotations.smk")
+include: str(workflow_source_dir / "rules" / "012.resources.salmon.smk")
+
+
+#####################################
+### Copy / Aggregation / Trimming ###
+#####################################
+
+include: str(workflow_source_dir / "rules" / "020.bigr.copy.smk")
+include: str(workflow_source_dir / "rules" / "021.trimming.fastp.smk")
+
+################################
+### Mapping / Pseudo-Mapping ###
+################################
+
+include: str(workflow_source_dir / "rules" / "030.quantification.salmon.smk")
