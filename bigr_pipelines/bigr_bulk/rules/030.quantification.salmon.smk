@@ -15,3 +15,21 @@ rule salmon_quantification:
         extra="--numBootstraps 100 --gcBias --seqBias --posBias"
     wrapper:
         "v1.20.0/bio/salmon/quant"
+
+
+
+            salmon_logs=snakemake.input["salmon_logs"],
+            salmon_metas=snakemake.input["salmon_meta"],
+            salmon_mapping_plot=snakemake.output["mapping_status_mqc"],
+            salmon_assigned_fragments=snakemake.output["mapping_counts_mqc"],
+            salmon_mapping_rates_general_stat=snakemake.output["salmon_general_table"],
+
+rule salmon_to_multiqc:
+    input:
+        salmon_logs=expand(""),
+        salmon_meta=expand(""),
+    output:
+        mapping_status_mqc=temp(""),
+        mapping_counts_mqc=temp(""),
+        salmon_general_table=temp(""),
+    
