@@ -13,7 +13,7 @@ def get_sample_name(salmon_log: str) -> str:
     return salmon_log.split("/")[-2]
 
 
-def read_salmon_log(salmon_log: str, percent: bool = False) -> Dict[str, int]:
+def read_salmon_log(salmon_log: str, salmon_meta: str) -> Dict[str, int]:
     """
     Read a salmon log file and builds output dictionary with
     number/percent of mapped fragments
@@ -44,6 +44,28 @@ def read_salmon_log(salmon_log: str, percent: bool = False) -> Dict[str, int]:
         "Inconsistent_Fregments": data["num_frags_with_inconsistent_or_orphan_mappings"],
     }
 
+
+    with open(salmon_meta, "r") as salmon_stream:
+        data = json.load(salmon_stream)
+
+    result["fragments_length"] = {
+        "Length": data["frag_length_mean"],
+        "SD": data["frag_length_sd"],
+    }
+
+    result["percent"] = {
+        "Percent_Mapped": data["percent_mapped"],
+    }
+
+    result["fragments_num"] = {
+        "Mapped": data["num_mapped"],
+        "Decoy": data["num_decoy_fragments"],
+        "Dovetail": data["num_dovetail_fragments"],
+        "Filtered_VM": data["num_fragments_filtered_vm"],
+        "Alignment_below_threshold": data["num_alignments_below_threshold_for_mapped_fragments_vm"],
+    }
+
+    return result
 
 def main(salmon_logs: List[str], salmon_metas: List[str], outfile: str) -> None:
     """
