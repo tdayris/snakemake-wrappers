@@ -18,6 +18,26 @@ rule download_GRCh38_108_dna_sequence:
         "v1.20.0/bio/reference/ensembl-sequence"
 
 
+rule download_GRCm39_108_dna_sequence:
+    output:
+        "resources/GRCm39.108.dna.fasta",
+    threads: 2
+    resources:
+        mem_mb=get_512mo_per_attempt,
+        time_min=get_2h_per_attempt,
+        tmpdir="tmp",
+    params:
+        species="homo_sapiens",
+        datatype="dna",
+        build="GRCm39",
+        release="108",
+    log:
+        "logs/010.resources.sequences/GRCm39.108.dna.log"
+    cache: "omit-software"
+    wrapper:
+        "v1.20.0/bio/reference/ensembl-sequence"
+
+
 rule download_GRCh38_108_cdna_sequence:
     output:
         "resources/GRCh38.108.cdna.fasta",
@@ -33,6 +53,26 @@ rule download_GRCh38_108_cdna_sequence:
         release="108",
     log:
         "logs/010.resources.sequences/GRCh38.108.cdna.log"
+    cache: "omit-software"
+    wrapper:
+        "v1.20.0/bio/reference/ensembl-sequence"
+
+
+rule download_GRCm39_108_cdna_sequence:
+    output:
+        "resources/GRCm39.108.cdna.fasta",
+    threads: 2
+    resources:
+        mem_mb=get_512mo_per_attempt,
+        time_min=get_2h_per_attempt,
+        tmpdir="tmp",
+    params:
+        species="homo_sapiens",
+        datatype="cdna",
+        build="GRCm39",
+        release="108",
+    log:
+        "logs/010.resources.sequences/GRCm39.108.cdna.log"
     cache: "omit-software"
     wrapper:
         "v1.20.0/bio/reference/ensembl-sequence"

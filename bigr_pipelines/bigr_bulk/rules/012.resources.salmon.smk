@@ -2,15 +2,15 @@ rule salmon_build_gentrome:
     input:
         **unpack(get_gentrome),
     output:
-        gentrome=temp("resources/gentrome.fasta"),
-        decoys=temp("resources/decoys.txt"),
+        gentrome=temp("resources/{genome_build}.{genome_release}.gentrome.fasta"),
+        decoys=temp("resources/{genome_build}.{genome_release}.decoys.txt"),
     threads: 1
     resources:
         mem_mb=get_512mo_per_attempt,
         time_min=get_10min_per_go,
         tmpdir="tmp",
     log:
-        "logs/012.resources/salmon_build_gentrome.smk"
+        "logs/012.resources/salmon_build_gentrome/{genome_build}.{genome_release}.log"
     wrapper:
         "v1.20.0/bio/salmon/decoys"
 

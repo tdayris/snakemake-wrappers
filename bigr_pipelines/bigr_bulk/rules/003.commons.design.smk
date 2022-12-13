@@ -5,6 +5,7 @@ design = pandas.read_table(
 ).set_index(
     keys="Sample_id", drop=False, verify_integrity=True
 )
+validate(design, str(workflow_source_dir / "schema" / "config.design.yaml"))
 
 if not "Protocol" in snakemake.columns.tolist():
     logging.warning(

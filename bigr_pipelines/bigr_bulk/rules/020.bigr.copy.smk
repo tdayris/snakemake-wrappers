@@ -13,3 +13,7 @@ rule bigr_copy:
         extra_ln="-sfrv",
     log:
         "logs/020.bigr.copy/{sample_stream}.fq.gz"
+    conda:
+        str(workflow_source_dir / "envs" / "020.bigr.copy.yaml")
+    script:
+        str(workflow_source_dir / "scripts" / "020.bigr.copy.py")
