@@ -18,6 +18,7 @@ logging.basicConfig(
 ### Check versions and environment variables ###
 ################################################
 min_version("7.18")
+bigr_bulk_version = "0.0.1"
 
 envvars:
     "SNAKEMAKE_OUTPUT_CACHE"

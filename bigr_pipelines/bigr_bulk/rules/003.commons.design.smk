@@ -18,7 +18,7 @@ if not "Capturekit_bed" in snakemake.columns.tolist():
     logging.warning(
         "Capturekit_bed was not set in design, "
         "all samples are treated as belonging to "
-        "the same (default) capturekit bed."
+        "the same    capturekit bed."
     )
 
 
