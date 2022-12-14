@@ -1,3 +1,8 @@
+"""
+This snakefile contains python functions for:
+* Unpacking input files for various snakemake rules
+"""
+
 import logging
 
 from typing import Dict, List, Union
@@ -91,3 +96,80 @@ def get_salmon_fastq(wildcards) -> Dict[str, str]:
         f"Salmon quant uses single-ended mode for {wildcards.sample}"
     )
     return {"r": f"020.trimming/fastp/se/{wildcards.sample}.fastq"}
+
+
+def get_tximport(wildcards) -> Dict[str, Any]:
+    """
+    Unpack function for 032.tximport::tximport
+    """
+    comparison_sample_list = get_sample_list(wildcards.comparison)
+    return {
+        "quant": expand(
+            "030.quantification/salmon_{genome_build}.{genome_release}/{sample}/quant.sf",
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        "quant_genes": expand(
+            "030.quantification/salmon_{genome_build}.{genome_release}/{sample}/quant.genes.sf",
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        "lib_format": expand(
+            "030.quantification/salmon_{genome_build}.{genome_release}/{sample}/lib_format_counts.json",
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        "cmd_info": expand(
+            "030.quantification/salmon_{genome_build}.{genome_release}/{sample}/cmd_info.json",
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        "logs": expand(
+            "030.quantification/salmon_{genome_build}.{genome_release}/{sample}/logs/salmon_quant.log",
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        'flendist': expand(
+            "030.quantification/salmon_{genome_build}.{genome_release}/{sample}/libParams/flenDist.txt",
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        "ambig_info": expand(
+            "030.quantification/salmon_{genome_build}.{genome_release}/{sample}/aux_info/ambig_info.tsv",
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        "bootstraps": expand(
+            directory("030.quantification/salmon_{genome_build}.{genome_release}/{sample}/aux_info/bootstrap"),
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        "exp": expand(
+            "030.quantification/salmon_{genome_build}.{genome_release}/{sample}/aux_info/exp{ext}", 
+            ext=["3_pos.gz", "3_seq.gz", "5_pos.gz", "5_seq.gz", "cted_bias.gz", "_gc.gz"],
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        "obs": expand(
+            "030.quantification/salmon_{genome_build}.{genome_release}/{sample}/aux_info/obs{ext}", 
+            ext=["3_pos.gz", "3_seq.gz", "5_pos.gz", "5_seq.gz", "erved_bias_3p.gz", "erved_bias.gz", "_gc.gz"],
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        "expected_bias": expand(
+            "030.quantification/salmon_{genome_build}.{genome_release}/{sample}/aux_info/expected_bias.gz",
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        "fld": expand(
+            "030.quantification/salmon_{genome_build}.{genome_release}/{sample}/aux_info/fld.gz",
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        "meta_info": expand(
+            "030.quantification/salmon_{genome_build}.{genome_release}/{sample}/aux_info/meta_info.json",
+            sample=comparison_sample_list,
+            allow_missing=True,
+        ),
+        "tx2gene": "resources/{genome_build}.{genome_release}.tx2gene_small.tsv",
+    }

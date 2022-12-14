@@ -1,3 +1,9 @@
+"""
+This snakefile contains python functions for:
+* Checking Snakemake version
+* Checking environment variables
+"""
+
 import datetime
 import os
 import logging

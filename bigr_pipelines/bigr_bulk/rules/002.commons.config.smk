@@ -1,3 +1,9 @@
+"""
+This snakefile contains python functions for:
+* Loading configuration file
+* Validating configuration file
+"""
+
 from snakemake.utils import validate
 
 configfile: str(workflow_source_dir / "config" / "config.yaml")

@@ -1,3 +1,9 @@
+"""
+This snakefile contains python functions for:
+* Listing possible values taken by every single snakemake wildcard
+* Constraining wildcards
+"""
+
 import itertools
 
 sample_list = design["Sample_id"]

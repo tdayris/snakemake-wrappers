@@ -1,3 +1,9 @@
+"""
+This snakefile contains python functions for:
+* Loading experimental design
+* Validating experimental design
+"""
+
 import pandas
 
 design = pandas.read_table(
