@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""Snakemake wrapper for bash copy within the IGR's Flamingo cluster"""
+"""Snakemake script for bash copy within the IGR's Flamingo cluster"""
 
 __author__ = "Thibault Dayris"
 __copyright__ = "Copyright 2019, Thibault Dayris"
@@ -16,7 +16,7 @@ from tempfile import TemporaryDirectory
 
 # Prepare logging
 log = snakemake.log_fmt_shell(stdout=False, stderr=True, append=True)
-extra_cp = snakemake.params.get("extra", "-v")
+extra_rsync = snakemake.params.get("extra", "-cvrhP")
 extra_iget = snakemake.params.get("extra_irods", "-vK")
 extra_ln = snakemake.params.get("extra_ln", "-sfrv")
 
@@ -36,14 +36,14 @@ def cat_files(dest: str, *src: str, log: str = log) -> None:
 
 def bash_copy(src: str,
               dest: str,
-              extra: str = extra_cp,
+              extra: str = extra_rsync,
               extra_ln: str = extra_ln,
               log: str = log,
               cold: str = cold_storage) -> None:
     if not src.startswith(cold):
         shell(f"ln {extra_ln} {src} {dest} {log}")
     else:
-        shell(f"cp {extra} {src} {dest} {log}")
+        shell(f"rsync {extra} {src} {dest} {log}")
 
 
 def iRODS_copy(src: str,

@@ -1,6 +1,13 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+"""Snakemake script to build multiqc additional figures from Salmon"""
+
+__author__ = "Thibault Dayris"
+__copyright__ = "Copyright 2019, Thibault Dayris"
+__email__ = "thibault.dayris@gustaveroussy.fr"
+__license__ = "MIT"
+
 import json
 import logging
 
