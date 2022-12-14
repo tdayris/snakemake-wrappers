@@ -169,7 +169,7 @@ tumor_sample_vcf_VAFs_TUMOR_DP20_called_ALT10_VAF3$identifier <- apply(
 vep_input <- tumor_sample_vcf_VAFs_TUMOR_DP20_called_ALT10_VAF3[c(1,2,2,16,17,19)]
 write.table(
     vep_input,
-    file = base::as.character(x = snakemake@output[[0]]),
+    file = base::as.character(x = snakemake@output[["filtered"]]),
     row.names = FALSE,
     col.names = FALSE,
     quote = FALSE,

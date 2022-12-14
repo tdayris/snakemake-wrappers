@@ -7,8 +7,8 @@ rule brc2vep:
     input:
         readcount="bam_readcount/{sample}.{status}.tsv",
     output:
-        dp20=temp("bcr2vep/dp/{sample}.csv"),
-        filtered=temp("bcr2vep/filtered/{sample}.csv"),
+        tumor_dp20=temp("bcr2vep/dp/{sample}.tsv"),
+        filtered=temp("bcr2vep/filtered/{sample}.tsv"),
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,

@@ -25,7 +25,7 @@ ensembl VEP 87.0 refseq (on each normal VCF/TSV) : singularity run -B /mnt/beegf
 
 rule ensembl_vep:
     input:
-        vcf="gatk/mutect2/{sample}.vcf",
+        vcf="bcr2vep/filtered/{sample}.tsv",
         cache=config["ref"]["vep"],
         fasta="resources/GRCh38.fasta",
     output:
