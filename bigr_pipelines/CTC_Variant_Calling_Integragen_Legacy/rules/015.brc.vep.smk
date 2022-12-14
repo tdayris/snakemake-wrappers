@@ -9,14 +9,14 @@ rule ensembl_vep_brc:
         cache=config["ref"]["vep"],
         fasta="resources/GRCh38.fasta",
     output:
-        vcf=temp("vep/annotate/{sample}.brc.vcf"),
+        vcf=temp("vep/annotate/{sample}.{status}.brc.vcf"),
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/vep/{sample}.log",
+        "logs/vep/{sample}.{status}.log",
     params:
         "--species homo_sapiens "
         "--assembly GRCh38 "
@@ -40,7 +40,7 @@ rule ensembl_vep_brc:
 rule ensemblvep_bcr:
     input:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
-        vcfs=["vep/annotate/{sample}.brc.vcf"],
+        vcfs=["vep/annotate/{sample}.ctc.brc.vcf"],
     output:
         tsv=temp("vep/bcr/{sample}.tsv"),
     threads: 1
