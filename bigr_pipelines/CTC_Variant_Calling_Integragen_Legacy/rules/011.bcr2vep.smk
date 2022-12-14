@@ -15,7 +15,7 @@ rule brc2vep:
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
-        "logs/bcr2vep/{sample}.log",
+        "logs/bcr2vep/{sample}.{status}.log",
     params:
         dp=config["params"].get("min_dp", 20),
         alt_ad=config["params"].get("min_alt_ad", 10),
