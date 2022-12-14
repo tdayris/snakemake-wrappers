@@ -4,7 +4,9 @@
 import json
 import logging
 
-from typing import Dict, List
+from typing import Dict, List, Union
+
+Numbers = Union[int, float]
 
 def get_sample_name(salmon_log: str) -> str:
     """
@@ -13,7 +15,7 @@ def get_sample_name(salmon_log: str) -> str:
     return salmon_log.split("/")[-2]
 
 
-def read_salmon_log(salmon_log: str, salmon_meta: str) -> Dict[str, int]:
+def read_salmon_log(salmon_log: str, salmon_meta: str) -> Dict[str, Numbers]:
     """
     Read a salmon log file and builds output dictionary with
     number/percent of mapped fragments
