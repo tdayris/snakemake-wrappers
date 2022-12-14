@@ -1,9 +1,9 @@
 #!/usr/bin/python3.8
-# conding: utf-8
+# coding: utf-8
 
 """
 This script extracts a tsv from a GTF. This tsv contains Gene_ID,
-transcript_id, Gene_Name. Optionaly, headers and positions can
+transcript_id, Gene_Name. Optionally, headers and positions can
 also be given.
 """
 
