@@ -23,13 +23,13 @@ ensembl VEP 87.0 refseq (on each normal VCF/TSV) : singularity run -B /mnt/beegf
 """
 
 
-rule ensembl_vep:
+rule ensembl_vep_mutect:
     input:
         vcf="gatk/mutect2/{sample}.vcf",
         cache=config["ref"]["vep"],
         fasta="resources/GRCh38.fasta",
     output:
-        vcf=temp("vep/annotate/{sample}.vcf"),
+        vcf=temp("vep/annotate/{sample}.mutect.vcf"),
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
@@ -58,40 +58,10 @@ rule ensembl_vep:
         "> {log} 2>&1 "
 
 
-rule ensemblvep_hc:
-    input:
-        cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
-        vcfs=["vep/annotate/{sample}.vcf"],
-    output:
-        tsv=temp("vep/hc/{sample}.tsv"),
-    threads: 1
-    resources:
-        mem_mb=get_10gb_per_attempt,
-        time_min=get_45min_per_attempt,
-        tmpdir="tmp",
-    log:
-        "logs/vep/hc/{sample}.log",
-    params:
-        organism=config.get("vep_db", "hg38"),
-    container:
-        str(
-            workflow_source_dir
-            / ".."
-            / ".."
-            / ".."
-            / "singularity"
-            / "mambaforge_4.14.0-0.sif"
-        )
-    conda:
-        str(workflow_source_dir / "envs" / "r.yaml")
-    script:
-        str(workflow_source_dir / "scripts" / "ensemblVEP_hc.R")
-
-
 rule ensemblvep_mutect:
     input:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
-        vcfs=["vep/annotate/{sample}.vcf"],
+        vcfs=["vep/annotate/{sample}.mutect.vcf"],
     output:
         tsv=temp("vep/mutect/{sample}.tsv"),
     threads: 1
@@ -118,31 +88,4 @@ rule ensemblvep_mutect:
         str(workflow_source_dir / "scripts" / "ensemblVEP_mutect.R")
 
 
-rule ensemblvep_bcr:
-    input:
-        cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
-        vcfs=["vep/annotate/{sample}.vcf"],
-    output:
-        tsv=temp("vep/bcr/{sample}.tsv"),
-    threads: 1
-    resources:
-        mem_mb=get_10gb_per_attempt,
-        time_min=get_45min_per_attempt,
-        tmpdir="tmp",
-    log:
-        "logs/vep/bcr/{sample}.log",
-    params:
-        organism=config.get("vep_db", "hg38"),
-    container:
-        str(
-            workflow_source_dir
-            / ".."
-            / ".."
-            / ".."
-            / "singularity"
-            / "mambaforge_4.14.0-0.sif"
-        )
-    conda:
-        str(workflow_source_dir / "envs" / "r.yaml")
-    script:
-        str(workflow_source_dir / "scripts" / "ensemblVEP_bcr.R")
+

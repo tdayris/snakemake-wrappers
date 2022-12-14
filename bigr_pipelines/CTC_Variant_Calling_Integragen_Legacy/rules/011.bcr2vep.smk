@@ -5,10 +5,10 @@ No command line provided
 
 rule brc2vep:
     input:
-        readcount="bam_readcount/{sample}.ctc.tsv",
+        readcount="bam_readcount/{sample}.{status}.tsv",
     output:
-        tumor_dp20=temp("bcr2vep/dp/{sample}.ctc.tsv"),
-        filtered=temp("bcr2vep/filtered/{sample}.ctc.tsv"),
+        tumor_dp20=temp("bcr2vep/dp/{sample}.{status}.tsv"),
+        filtered=temp("bcr2vep/filtered/{sample}.{status}.tsv"),
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
