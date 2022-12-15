@@ -30,6 +30,6 @@ checkpoint rsync_cbs:
     log:
         "logs/copy/rsync_acbs.log"
     params:
-        extra="--human-readable --partial --progress --verbose --checksum ",
+        extra="--verbose ",
     shell:
-        "rsync {params.extra} --files-from={input} {output} > {log} 2>&1"
+        "cat {input} | while read FILE; do rsync {params.extra} ${{FILE}} {output} >> {log} 2>&1; done"
