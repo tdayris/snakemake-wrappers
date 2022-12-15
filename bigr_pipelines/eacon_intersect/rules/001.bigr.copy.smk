@@ -9,8 +9,8 @@ rule find_acbs_files:
     log:
         "logs/copy/find_acbs.log"
     params:
-        extra='-type f -name "*Cut.csb"',
-        exec_dir=config["OncoCytoDir"],
+        extra='-type f -name "*Cut.cbs"',
+        exec_dir=config.get("OncoCytoDir", '"${PWD}"'),
     shell:
         "find {params.exec_dir} {params.extra} > {output} 2> {log}"
 
