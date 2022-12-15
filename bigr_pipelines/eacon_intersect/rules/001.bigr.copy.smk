@@ -32,4 +32,4 @@ checkpoint rsync_cbs:
     params:
         extra="--human-readable --partial --progress --verbose --checksum ",
     shell:
-        "rsync {params.extra} --files-from {input} {output} > {log} 2>&1"
+        "rsync {params.extra} --files-from={input} {output} > {log} 2>&1"
