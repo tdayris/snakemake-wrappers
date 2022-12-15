@@ -25,6 +25,8 @@ checkpoint rsync_cbs:
         mem_mb=512,
         time_min=lambda wildcards, attempt: attempt * 90,
         tmpdir="tmp",
+    conda:
+        "../envs/rsync.yaml"
     log:
         "logs/copy/rsync_acbs.log"
     params:
