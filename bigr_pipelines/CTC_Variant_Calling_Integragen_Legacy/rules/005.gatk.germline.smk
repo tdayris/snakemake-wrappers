@@ -33,7 +33,7 @@ rule gatk_haplotype_caller:
         "{params.extra} "
         "-R {input.fasta} "
         "-I {input.bam} "
-        "-O {output.vcf} "
+        "-o {output.vcf} "
         "-bamout {output.bam} "
         "> {log} 2>&1"
 
