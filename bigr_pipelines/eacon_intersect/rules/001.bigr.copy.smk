@@ -19,7 +19,7 @@ checkpoint rsync_cbs:
     input:
         "acbs_list.txt"
     output:
-        directory("data_input")
+        directory("data_input/cbs_files/")
     threads: 1
     resources:
         mem_mb=512,
