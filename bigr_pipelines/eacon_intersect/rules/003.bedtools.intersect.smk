@@ -8,10 +8,19 @@ def acbs_file_list(wildcards):
     return results
 
 
+def bed_file_list(wildcards):
+    bedfiles = checkpoints.rsync_cbs.get(**wildcards).output[0]
+    return expand(
+        "bed/{sample}.bed",
+        sample=glob_wildcards(os.path.join(bedfiles, "{sample}.Cut.cbs")).sample
+    )
+
+
 
 rule bedtools_multi_intersect:
     input:
-        acbs_file_list
+        genome=config["ref"]["fasta_index"],
+        bed=bed_file_list
     output: 
         "bedtools/multi_intersect.bed",
     threads: 1
