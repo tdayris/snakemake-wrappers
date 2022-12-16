@@ -1,5 +1,5 @@
-require(tidyr)
-require(dplyr)
+library(tidyr)
+library(dplyr)
 
 tumor_sample_vcf_VAFs <- read.delim(
     base::as.character(x = snakemake@input[["readcount"]]),

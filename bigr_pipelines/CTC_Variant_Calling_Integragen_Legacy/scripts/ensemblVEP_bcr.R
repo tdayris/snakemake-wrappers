@@ -1,5 +1,5 @@
-require(ensemblVEP)
-require(dplyr)
+library(ensemblVEP)
+library(dplyr)
 hotspot_list <- utils::read.table(
     file = snakemake@input[["cancer_genes"]], # "Cancer.genes.cleaned.txt",
     header = TRUE,
