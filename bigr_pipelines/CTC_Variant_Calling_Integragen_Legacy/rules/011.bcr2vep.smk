@@ -23,4 +23,4 @@ rule brc2vep:
     conda:
         str(workflow_source_dir / "envs" / "r.yaml")
     script:
-        "scripts/bcr2vep.R"
+        str(workflow_source_dir / "scripts" / "bcr2vep.R")
