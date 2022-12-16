@@ -32,7 +32,7 @@ rule ensembl_vep_mutect:
         vcf=temp("vep/annotate/{sample}.mutect.vcf"),
     threads: 1
     resources:
-        mem_mb=get_10gb_per_attempt,
+        mem_mb=get_20gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
