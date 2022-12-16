@@ -46,7 +46,7 @@ rule ensemblvep_bcr:
     threads: 1
     resources:
         mem_mb=get_20gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        time_min=get_3h_per_attempt,
         tmpdir="tmp",
     log:
         "logs/vep/bcr/{sample}.log",
