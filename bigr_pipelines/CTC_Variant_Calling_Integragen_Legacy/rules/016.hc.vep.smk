@@ -7,7 +7,7 @@ rule ensemblvep_hc:
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp",
     log:
         "logs/vep/hc/{sample}.log",

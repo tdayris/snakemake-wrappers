@@ -1,4 +1,4 @@
-rule gatk_genotype_gvcf:
+rule gatk_genotype_gvcf_ctc:
     input:
         ctc="gatk/haplotypecaller/{sample}.ctc.g.vcf.gz",
         fasta=config["ref"]["fasta"],
@@ -96,7 +96,7 @@ rule filter_haplotype_ctc_vcf_custom:
         "> {log} 2>&1"
 
 
-rule grep_out_homozygote:
+rule grep_out_homozygote_ctc:
     input:
         "gatk/select_variants/hc_ctc/{sample}.tmp.vcf",
     output:
@@ -116,7 +116,7 @@ rule grep_out_homozygote:
         "grep {params} {input} > {output} 2> {log}"
 
 
-rule grep_out_filtered:
+rule grep_out_filtered_ctc:
     input:
         "gatk/select_variants/hc_ctc/{sample}.no_homoz.vcf"
     output:
@@ -136,9 +136,9 @@ rule grep_out_filtered:
         "awk {params} {input} > {output} 2> {log}"
 
 
-rule zip_baseline_variants:
+rule zip_baseline_variants_ctc:
     input:
-        "gatk/select_variants/baseline/{sample}.vcf"
+        "gatk/select_variants/hc_ctc/{sample}.vcf"
     output:
         protected("data_output/HC_CTC/{sample}.vcf.gz")
     threads: 2
@@ -154,9 +154,9 @@ rule zip_baseline_variants:
         "bio/bcftools/view"
 
 
-rule tabix_baseline_variants:
+rule tabix_baseline_variants_ctc:
     input:
-        "gatk/select_variants/baseline/{sample}.vcf.gz"
+        "gatk/select_variants/hc_ctc/{sample}.vcf.gz"
     output:
         protected("data_output/HC_CTC/{sample}.vcf.gz.tbi")
     threads: 1
