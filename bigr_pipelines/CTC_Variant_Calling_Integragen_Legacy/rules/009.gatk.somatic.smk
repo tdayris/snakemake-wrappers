@@ -29,7 +29,7 @@ rule mutect2:
         #"gatk -Xmx{resources.java_mem_gb}MB "
         "gatk "
         "-Xmx{resources.java_mem_gb}GB "
-        "-Djava.io.tmpdir='{resources.tmpdir}' "
+        "-Djava.io.tmpdir=\"{resources.tmpdir}\" "
         "{params.extra} "
         "-T MuTect2 "
         "-I:tumor {input.tumor} "
