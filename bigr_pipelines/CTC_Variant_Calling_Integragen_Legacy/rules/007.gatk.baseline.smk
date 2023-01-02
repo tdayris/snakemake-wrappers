@@ -28,6 +28,8 @@ rule gatk_select_variants_wbc:
         # "java -Xmx{resources.java_mem_gb}GB "
         # "-jar {params.jar} "
         "gatk "
+        "-Xmx{resources.java_mem_gb}GB "
+        "-Djava.io.tmpdir='{resources.tmpdir}' "
         "-T SelectVariants "
         "{params.extra} "
         "-R {input.fasta} "
