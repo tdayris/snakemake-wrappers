@@ -136,7 +136,7 @@ rule grep_out_filtered_ctc:
         "awk {params} {input} > {output} 2> {log}"
 
 
-rule zip_baseline_variants_ctc:
+rule zip_variants_ctc:
     input:
         "gatk/select_variants/hc_ctc/{sample}.vcf"
     output:
@@ -154,9 +154,9 @@ rule zip_baseline_variants_ctc:
         "bio/bcftools/view"
 
 
-rule tabix_baseline_variants_ctc:
+rule tabix_variants_ctc:
     input:
-        "gatk/select_variants/hc_ctc/{sample}.vcf.gz"
+        "data_output/HC_CTC/{sample}.vcf.gz"
     output:
         protected("data_output/HC_CTC/{sample}.vcf.gz.tbi")
     threads: 1
