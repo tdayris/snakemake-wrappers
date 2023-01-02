@@ -7,7 +7,7 @@ rule gatk_genotype_gvcf_ctc:
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
     log:
@@ -18,10 +18,10 @@ rule gatk_genotype_gvcf_ctc:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        # "java -Xmx{resources.java_mem_gb}GB "
+        # "java -Xmx{resources.java_mem_gb}MB "
         # "-jar {params.jar} "
         "gatk "
-        "-Xmx{resources.java_mem_gb}GB "
+        "-Xmx{resources.java_mem_gb}MB "
         "-Djava.io.tmpdir='{resources.tmpdir}' "
         "-T GenotypeGVCFs "
         "{params.extra} "
@@ -40,7 +40,7 @@ rule filter_haplotype_ctc_vcf_non_snp:
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
     log:
@@ -51,10 +51,10 @@ rule filter_haplotype_ctc_vcf_non_snp:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        # "java -Xmx{resources.java_mem_gb}GB "
+        # "java -Xmx{resources.java_mem_gb}MB "
         # "-jar {params.jar} "
         "gatk "
-        "-Xmx{resources.java_mem_gb}GB "
+        "-Xmx{resources.java_mem_gb}MB "
         "-Djava.io.tmpdir='{resources.tmpdir}' "
         "-T SelectVariants "
         "{params.extra} "
@@ -73,7 +73,7 @@ rule filter_haplotype_ctc_vcf_custom:
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
     log:
@@ -87,7 +87,7 @@ rule filter_haplotype_ctc_vcf_custom:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "gatk "
-        "-Xmx{resources.java_mem_gb}GB "
+        "-Xmx{resources.java_mem_gb}MB "
         "-Djava.io.tmpdir='{resources.tmpdir}' "
         "-T VariantFiltration "
         "{params.extra} "

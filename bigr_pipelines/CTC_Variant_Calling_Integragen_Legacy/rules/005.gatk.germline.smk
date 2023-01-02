@@ -13,7 +13,7 @@ rule gatk_haplotype_caller:
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_10gb_per_attempt,
         time_min=get_8h_per_attempt,
         tmpdir="tmp",
     group:
@@ -26,10 +26,10 @@ rule gatk_haplotype_caller:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        # "java -Xmx{resources.java_mem_gb}GB "
+        # "java -Xmx{resources.java_mem_gb}MB "
         # "-jar {params.jar} "
         "gatk "
-        "-Xmx{resources.java_mem_gb}GB "
+        "-Xmx{resources.java_mem_gb}MB "
         "-Djava.io.tmpdir='{resources.tmpdir}' "
         "-T HaplotypeCaller "
         "{params.extra} "
@@ -55,7 +55,7 @@ rule gatk_genotype_gvcf:
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
     group:
@@ -68,10 +68,10 @@ rule gatk_genotype_gvcf:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        # "java -Xmx{resources.java_mem_gb}GB "
+        # "java -Xmx{resources.java_mem_gb}MB "
         # "-jar {params.jar} "
         "gatk "
-        "-Xmx{resources.java_mem_gb}GB "
+        "-Xmx{resources.java_mem_gb}MB "
         "-Djava.io.tmpdir='{resources.tmpdir}' "
         "-T GenotypeGVCFs "
         "{params.extra} "
@@ -96,7 +96,7 @@ rule gatk_select_variants_baseline:
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
     group:
@@ -109,10 +109,10 @@ rule gatk_select_variants_baseline:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        # "java -Xmx{resources.java_mem_gb}GB "
+        # "java -Xmx{resources.java_mem_gb}MB "
         # "-jar {params.jar} "
         "gatk "
-        "-Xmx{resources.java_mem_gb}GB "
+        "-Xmx{resources.java_mem_gb}MB "
         "-Djava.io.tmpdir='{resources.tmpdir}' "
         "-T SelectVariants "
         "{params.extra} "
@@ -136,7 +136,7 @@ rule gatk_variant_filtration:
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
     group:
@@ -152,10 +152,10 @@ rule gatk_variant_filtration:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        # "java -Xmx{resources.java_mem_gb}GB "
+        # "java -Xmx{resources.java_mem_gb}MB "
         # "-jar {params.jar} "
         "gatk "
-        "-Xmx{resources.java_mem_gb}GB "
+        "-Xmx{resources.java_mem_gb}MB "
         "-Djava.io.tmpdir='{resources.tmpdir}' "
         "-T VariantFiltration "
         "{params.extra} "
