@@ -7,7 +7,7 @@ rule gatk_genotype_gvcf_ctc:
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_10gb_per_attempt,
+        java_mem_gb=get_2gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
     log:
@@ -40,7 +40,7 @@ rule filter_haplotype_ctc_vcf_non_snp:
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_10gb_per_attempt,
+        java_mem_gb=get_2gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
     log:
@@ -73,7 +73,7 @@ rule filter_haplotype_ctc_vcf_custom:
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_10gb_per_attempt,
+        java_mem_gb=get_2gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir="tmp",
     log:
