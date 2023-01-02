@@ -35,7 +35,8 @@ ensembl VEP 87.0 refseq (on each normal VCF/TSV) : singularity run -B /mnt/beegf
 
 rule ensembl_vep_haplotype_caller:
     input:
-        vcf="gatk/haplotypecaller/{sample}.{status}.g.vcf.gz",
+        vcf="data_output/HC_CTC/{sample}.vcf.gz",
+        vcf_tbi="data_output/HC_CTC/{sample}.vcf.gz.tbi",
         cache=config["ref"]["vep"],
         fasta="resources/GRCh38.fasta",
     output:
