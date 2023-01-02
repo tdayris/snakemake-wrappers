@@ -66,7 +66,7 @@ rule filter_haplotype_ctc_vcf_non_snp:
 
 rule filter_haplotype_ctc_vcf_custom:
     input:
-        vcf="gatk/select_variants/hc_ctc/{sample}.g.vcf",
+        gvcf="gatk/select_variants/hc_ctc/{sample}.g.vcf",
         fasta=config["ref"]["fasta"],
     output:
         vcf=temp("gatk/select_variants/hc_ctc/{sample}.tmp.vcf"),
