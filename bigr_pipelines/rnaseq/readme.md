@@ -37,7 +37,7 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ## Put design file in ${PWD}
 
 ## Run this pipeline
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh
 ```
 
 ## Design file
@@ -99,7 +99,7 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ## Put design file in ${PWD}
 
 ## Run basic quality controls, keep intermediary files
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh QC --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh QC --nt
 
 ## Choose wether to continue the analysis or not.
 
@@ -107,22 +107,22 @@ bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh QC --
 ## 1. with your genes of interest
 ## 1. subset list of DGE
 ## 1. aggregate factors, etc.
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh quant --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh quant --nt
 
 ## Have a look at mapping rates and basic quantification QC
 
 ## Run Differential Gene Expression
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh dge --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh dge --nt
 
 ## Have a look at the DGE results
 
 ## Run fusions
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh fusions --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh fusions --nt
 
 ## Have a look at the results
 
 ## Clean TEMPORARY files and temporary files only
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh --delete-temp-output
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh --delete-temp-output
 ```
 
 ## Quality controls
@@ -152,9 +152,9 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ## Put design file in ${PWD}
 
 ## GRCh38 / HG38
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh QC --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh QC --nt
 ## GRCm38 / MM10
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 QC --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh mm10 QC --nt
 ```
 
 ### Results
@@ -203,9 +203,9 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ## Put design file in ${PWD}
 
 ## GRCh38 / HG38
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh quant --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh quant --nt
 ## GRCm38 / MM10
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 quant --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh mm10 quant --nt
 ```
 
 ### Output
@@ -272,9 +272,9 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ## Put design file in ${PWD}
 
 ## GRCh38 / HG38
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh dge --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh dge --nt
 ## GRCm38 / MM10
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 dge --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh mm10 dge --nt
 ```
 
 ### Results
@@ -556,9 +556,9 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ## Put design file in ${PWD}
 
 ## GRCh38 / HG38
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh gsea --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh gsea --nt
 ## GRCm38 / MM10
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh mm10 gsea --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh mm10 gsea --nt
 ```
 
 ### Results
@@ -646,7 +646,7 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
 ## Run basic quality controls, keep intermediary files, search, check and annotate fusions
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/rnaseq/run.sh fusions --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/rnaseq/run.sh fusions --nt
 ```
 
 ## Variant Calling

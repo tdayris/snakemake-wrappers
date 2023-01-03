@@ -1,3 +1,9 @@
+#Sources:
+
+Find these pipelines on Flamingo at: /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/ 
+
+In doubt, use the latest available version.
+
 # Pipelines available in Gustave Roussy only:
 
 1. [RNA-seq](https://github.com/tdayris/snakemake-wrappers/tree/Unofficial/bigr_pipelines#rna-seq-bulk) bulk
