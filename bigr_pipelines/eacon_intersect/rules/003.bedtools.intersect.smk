@@ -16,7 +16,7 @@ rule bedtools_multi_intersect:
     threads: 1
     resources:
         mem_mb=lambda wildcards, input: input.size_mb + (1024 * 4),
-        time_min=lambda wildcards, input: (input.size_mb / 1024) * 30,
+        time_min=get_2h_per_attempt,
         tmpdir="tmp"
     params:
         extra="-header"
