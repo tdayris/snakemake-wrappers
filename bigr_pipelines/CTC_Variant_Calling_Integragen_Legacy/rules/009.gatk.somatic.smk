@@ -27,7 +27,6 @@ rule mutect2:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        #"gatk -Xmx{resources.java_mem_gb}MB "
         "gatk "
         "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
