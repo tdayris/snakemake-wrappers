@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euiop pipefail
+shopt -s nullglob
 
 # This adds several functions and variable in the environment
 PIPELINE_PREFIX=$(readlink -e "$(dirname "${0}")/../../..")

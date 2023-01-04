@@ -91,13 +91,13 @@ if [ ! -d "${BIGR_DEFAULT_TMP}" ]; then
 fi
 
 # Used in many bash / Python scripts
-if [ -z ${TMP} ]; then
+if [ -z "${TMP:-}" ]; then
   message WARNING "TMP environment variable was not set. This can lead to OS errors due to lack of space in /tmp"
   message WARNING "TMP now points to ${BIGR_DEFAULT_TMP}"
   declare -x TMP
   TMP="${BIGR_DEFAULT_TMP}"
   export TMP
-elif [ "${TMP}" == "/tmp" ]; then
+elif [ "${TMP:-}" == "/tmp" ]; then
   message WARNING "TMP currently points to '/tmp'. This can lead to OS errors due to lack of space in /tmp"
   message WARNING "This value is now changed to ${BIGR_DEFAULT_TMP}"
   TMP="${BIGR_DEFAULT_TMP}"
@@ -107,13 +107,13 @@ else
 fi
 
 # Used in some bash / R / perl / Python scripts
-if [ -z ${TEMP} ]; then
+if [ -z "${TEMP:-}" ]; then
   message WARNING "TEMP environment variable was not set. This can lead to OS errors due to lack of space in /tmp"
   message WARNING "TEMP now points to ${BIGR_DEFAULT_TMP}"
   declare -x TEMP
   TEMP="${BIGR_DEFAULT_TMP}"
   export TEMP
-elif [ "${TEMP}" == "/tmp" ]; then
+elif [ "${TEMP:-}" == "/tmp" ]; then
   message WARNING "TEMP currently points to '/tmp'. This can lead to OS errors due to lack of space in /tmp"
   message WARNING "TEMP now points to ${BIGR_DEFAULT_TMP}"
   TEMP="${BIGR_DEFAULT_TMP}"
@@ -123,13 +123,13 @@ else
 fi
 
 # Used in some bash / R / perl / Python scripts
-if [ -z ${TMPDIR} ]; then
+if [ -z "${TMPDIR:-}" ]; then
   message WARNING "TMPDIR environment variable was not set. This can lead to OS errors due to lack of space in /tmp"
   message WARNING "TMPDIR now points to ${BIGR_DEFAULT_TMP}"
   declare -x TMPDIR
   TMPDIR="${BIGR_DEFAULT_TMP}"
   export TMPDIR
-elif [ "${TMPDIR}" == "/tmp" ]; then
+elif [ "${TMPDIR:-}" == "/tmp" ]; then
   message WARNING "TMPDIR currently points to '/tmp'. This can lead to OS errors due to lack of space in /tmp"
   message WARNING "TMPDIR now points to ${BIGR_DEFAULT_TMP}"
   TMPDIR="${BIGR_DEFAULT_TMP}"
@@ -139,13 +139,13 @@ else
 fi
 
 # Used in some bash / R / perl scripts
-if [ -z ${TEMPDIR} ]; then
+if [ -z "${TEMPDIR:-}" ]; then
   message WARNING "TEMPDIR environment variable was not set. This can lead to OS errors due to lack of space in /tmp"
   message WARNING "TEMPDIR now points to ${BIGR_DEFAULT_TMP}"
   declare -x TEMPDIR
   TEMPDIR="${BIGR_DEFAULT_TMP}"
   export TEMPDIR
-elif [ "${TEMPDIR}" == "/tmp" ]; then
+elif [ "${TEMPDIR:-}" == "/tmp" ]; then
   message WARNING "TEMPDIR currently points to '/tmp'. This can lead to OS errors due to lack of space in /tmp"
   message WARNING "TEMPDIR now points to ${BIGR_DEFAULT_TMP}"
   TEMPDIR="${BIGR_DEFAULT_TMP}"
@@ -155,13 +155,13 @@ else
 fi
 
 # Used in nextflow scripts
-if [ -z ${NXF_TEMP} ]; then
+if [ -z "${NXF_TEMP:-}" ]; then
   message WARNING "NXF_TEMP environment variable was not set. This can lead to NextFlow errors due to lack of space in /tmp"
   message WARNING "NXF_TEMP now points to ${BIGR_DEFAULT_TMP}"
   declare -x NXF_TEMP
   NXF_TEMP="${BIGR_DEFAULT_TMP}"
   export NXF_TEMP
-elif [ "${NXF_TEMP}" == "/tmp" ]; then
+elif [ "${NXF_TEMP:-}" == "/tmp" ]; then
   message WARNING "NXF_TEMP currently points to '/tmp'. This can lead to OS errors due to lack of space in /tmp"
   message WARNING "NXF_TEMP now points to ${BIGR_DEFAULT_TMP}"
   NXF_TEMP="${BIGR_DEFAULT_TMP}"
@@ -171,13 +171,13 @@ else
 fi
 
 # Used in nextflow / java scripts
-if [ -z ${_JAVA_OPTIONS} ]; then
+if [ -z "${_JAVA_OPTIONS:-}" ]; then
   message WARNING "_JAVA_OPTIONS environment variable was not set. This can lead to Java errors due to lack of space in /tmp"
   message WARNING "_JAVA_OPTIONS now points to ${BIGR_DEFAULT_TMP}"
   declare -x _JAVA_OPTIONS
   _JAVA_OPTIONS="${BIGR_DEFAULT_TMP}"
   export _JAVA_OPTIONS
-elif [ "${_JAVA_OPTIONS}" == "/tmp" ]; then
+elif [ "${_JAVA_OPTIONS:-}" == "/tmp" ]; then
   message WARNING "_JAVA_OPTIONS currently points to '/tmp'. This can lead to OS errors due to lack of space in /tmp"
   message WARNING "_JAVA_OPTIONS now points to ${BIGR_DEFAULT_TMP}"
   _JAVA_OPTIONS="${BIGR_DEFAULT_TMP}"
