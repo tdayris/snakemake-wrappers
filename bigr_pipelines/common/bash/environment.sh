@@ -182,12 +182,12 @@ if [ -z "${_JAVA_OPTIONS:-}" ]; then
   message WARNING "_JAVA_OPTIONS environment variable was not set. This can lead to Java errors due to lack of space in /tmp"
   message WARNING "_JAVA_OPTIONS now points to ${BIGR_DEFAULT_TMP}"
   declare -x _JAVA_OPTIONS
-  _JAVA_OPTIONS="${BIGR_DEFAULT_TMP}"
+  _JAVA_OPTIONS="-Djava.io.tmpdir='${BIGR_DEFAULT_TMP}'"
   export _JAVA_OPTIONS
 elif [ "${_JAVA_OPTIONS:-}" == "/tmp" ]; then
   message WARNING "_JAVA_OPTIONS currently points to '/tmp'. This can lead to OS errors due to lack of space in /tmp"
   message WARNING "_JAVA_OPTIONS now points to ${BIGR_DEFAULT_TMP}"
-  _JAVA_OPTIONS="${BIGR_DEFAULT_TMP}"
+  _JAVA_OPTIONS="-Djava.io.tmpdir='${BIGR_DEFAULT_TMP}'"
   export _JAVA_OPTIONS
 else
   message INFO "_JAVA_OPTIONS -> ${_JAVA_OPTIONS}"
