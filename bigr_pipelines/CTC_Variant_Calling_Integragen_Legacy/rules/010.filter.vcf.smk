@@ -6,8 +6,8 @@ rule gatk_genotype_gvcf_ctc:
         temp("gatk/genotype_gvcf/hc_ctc/{sample}.g.vcf.gz"),
     threads: 1
     resources:
-        mem_mb=get_2gb_per_attempt,,
-        java_mem_gb=get_2gb_per_attempt,,
+        mem_mb=get_2gb_per_attempt,
+        java_mem_gb=get_2gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     log:
@@ -40,8 +40,8 @@ rule filter_haplotype_ctc_vcf_non_snp:
         temp("gatk/select_variants/hc_ctc/{sample}.g.vcf"),
     threads: 1
     resources:
-        mem_mb=get_2gb_per_attempt,,
-        java_mem_gb=get_2gb_per_attempt,,
+        mem_mb=get_2gb_per_attempt,
+        java_mem_gb=get_2gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     log:
@@ -74,8 +74,8 @@ rule filter_haplotype_ctc_vcf_custom:
         vcf=temp("gatk/select_variants/hc_ctc/{sample}.tmp.vcf"),
     threads: 1
     resources:
-        mem_mb=get_2gb_per_attempt,,
-        java_mem_gb=get_2gb_per_attempt,,
+        mem_mb=get_2gb_per_attempt,
+        java_mem_gb=get_2gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     log:
