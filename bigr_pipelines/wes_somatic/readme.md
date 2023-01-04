@@ -24,7 +24,7 @@ ln -sfrv ../data_output data_output || mkdir -pv data_output
 ln -sfrv ../data_input data_input || mkdir -pv data_input
 
 # Run this pipeline
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/wes_somatic/run.sh
 ```
 
 # Design file
@@ -76,22 +76,22 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv . || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
 # Run basic quality controls, keep intermediary files
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh QC --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/wes_somatic/run.sh QC --nt
 
 # Choose wether to continue the analysis or not.
 
 # Edit config file
 # 1. with your annotations of interest
 # 1. raise minimum mapping quality, etc
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh variants --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/wes_somatic/run.sh variants --nt
 
 # Have a look at mapping and calling results
 
 # Run CNV calling
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh cnv --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/wes_somatic/run.sh cnv --nt
 
 # Run TMB estimation
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh tnb --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/wes_somatic/run.sh tnb --nt
 
 # Run fusion analysis
 # Under construction
@@ -120,7 +120,7 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
 # Run basic quality controls, keep intermediary files
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh QC --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/wes_somatic/run.sh QC --nt
 ```
 
 # Mapping only
@@ -146,7 +146,7 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
 # Run basic quality controls, keep intermediary files, map files
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh mapping --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/wes_somatic/run.sh mapping --nt
 ```
 
 # Variant Calling
@@ -178,7 +178,7 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
 # Run basic quality controls, keep intermediary files, call variants, CNV, TMB, and MSI
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh variants --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/wes_somatic/run.sh variants --nt
 ```
 
 # CNV calling
@@ -206,7 +206,7 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
 # Run basic quality controls, keep intermediary files, call CNV
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh cnv --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/wes_somatic/run.sh cnv --nt
 ```
 
 # Tumor molecular burden
@@ -234,7 +234,7 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
 # Run basic quality controls, keep intermediary files, estimates TMB
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh tmb --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/wes_somatic/run.sh tmb --nt
 ```
 
 # Micro satellites instability
@@ -262,7 +262,7 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
 # Run basic quality controls, keep intermediary files, estimate msi status
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh msi --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/wes_somatic/run.sh msi --nt
 ```
 
 # Fusions
@@ -288,5 +288,5 @@ ln -sfrv ../data_input data_input || mkdir -pv data_input
 ln -sfrv data_input/design.tsv design.tsv || echo "No design found. Create it, or let the pipeline guess sample pairs (risky)"
 
 # Run basic quality controls, keep intermediary files, search, check and annotate fusions
-bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/wes_somatic/run.sh fusions --nt
+bash /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/1.1.0/bigr_pipelines/wes_somatic/run.sh fusions --nt
 ```
