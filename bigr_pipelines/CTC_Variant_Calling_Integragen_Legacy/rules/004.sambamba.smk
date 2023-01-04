@@ -12,7 +12,7 @@ rule sambamba_view:
     resources:
         mem_mb=get_8gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     conda:
         str(workflow_source_dir / "envs" / "sambamba.yaml")
     params:
@@ -37,7 +37,7 @@ rule sambamba_sort:
     resources:
         time_min=get_45min_per_attempt,
         mem_mb=get_8gb_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     conda:
         str(workflow_source_dir / "envs" / "sambamba.yaml")
     params:
@@ -62,7 +62,7 @@ rule sambamba_markdup:
     resources:
         time_min=get_45min_per_attempt,
         mem_mb=get_8gb_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     conda:
         str(workflow_source_dir / "envs" / "sambamba.yaml")
     params:

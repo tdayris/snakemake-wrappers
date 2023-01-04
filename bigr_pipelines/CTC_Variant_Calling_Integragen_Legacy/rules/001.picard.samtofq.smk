@@ -12,7 +12,7 @@ rule picard_sam_to_fastq:
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     group:
         "clean_input"
     log:

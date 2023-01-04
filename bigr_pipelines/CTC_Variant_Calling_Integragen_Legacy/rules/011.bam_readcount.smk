@@ -13,7 +13,7 @@ rule bam_readcount:
     resources:
         mem_mb=get_8gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/bam_readcount/{sample}.{status}.log",
     conda:

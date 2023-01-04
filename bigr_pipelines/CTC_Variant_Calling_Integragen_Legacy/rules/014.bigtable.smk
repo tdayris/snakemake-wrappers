@@ -11,7 +11,7 @@ rule concat_to_bigtable:
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/bigtable/raw.log",
     conda:
@@ -31,7 +31,7 @@ rule bigtable_header:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/bigtable/header.log",
     params:
@@ -51,7 +51,7 @@ rule bigtable_noheader:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/bigtable/noheader.log",
     params:
@@ -71,7 +71,7 @@ rule bigtable_sort:
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/bigtable/sort.log",
     params:
@@ -92,7 +92,7 @@ rule bigtable_output:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/bigtable/output.log",
     params:

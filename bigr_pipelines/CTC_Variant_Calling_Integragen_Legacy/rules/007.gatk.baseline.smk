@@ -14,7 +14,7 @@ rule gatk_select_variants_wbc:
         mem_mb=get_10gb_per_attempt,
         time_min=get_45min_per_attempt,
         java_mem_gb=get_10gb_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     group:
         "retrieve_baseline"
     log:

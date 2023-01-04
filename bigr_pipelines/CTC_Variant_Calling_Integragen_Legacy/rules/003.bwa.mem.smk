@@ -19,7 +19,7 @@ rule bwa_index:
     resources:
         mem_mb=get_75gb_and_2gb_per_attempt,
         time_min=get_2h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     envmodules:
         "bwa/0.7.15",
     log:
@@ -55,7 +55,7 @@ rule bwa_mem:
     resources:
         mem_mb=get_75gb_and_2gb_per_attempt,
         time_min=get_2h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     envmodules:
         "bwa/0.7.15",
     log:

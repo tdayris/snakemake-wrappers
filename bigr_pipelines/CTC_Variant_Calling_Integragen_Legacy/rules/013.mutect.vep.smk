@@ -7,7 +7,7 @@ rule link_fasta_for_vep:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     log:
@@ -26,7 +26,7 @@ rule grep_pass:
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
         time_min=get_20min_per_attempt,
     params:
         '-P "^#|\tPASS\t"'
@@ -52,7 +52,7 @@ rule ensembl_vep_mutect:
     resources:
         mem_mb=get_20gb_per_attempt,
         time_min=get_3h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/vep/{sample}.log",
     params:
@@ -86,7 +86,7 @@ rule ensemblvep_mutect:
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/vep/mutect/{sample}.log",
     params:

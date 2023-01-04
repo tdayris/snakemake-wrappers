@@ -12,7 +12,7 @@ rule cutadapt:
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     group:
         "clean_input"
     conda:

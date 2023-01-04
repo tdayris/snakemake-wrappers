@@ -9,7 +9,7 @@ rule gatk_genotype_gvcf_ctc:
         mem_mb=get_10gb_per_attempt,
         java_mem_gb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/gatk/genotype_gvcf/baseline_ctc/{sample}.log",
     params:
@@ -42,7 +42,7 @@ rule filter_haplotype_ctc_vcf_non_snp:
         mem_mb=get_10gb_per_attempt,
         java_mem_gb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/gatk/select_variants/baseline_ctc/{sample}.log",
     params:
@@ -75,7 +75,7 @@ rule filter_haplotype_ctc_vcf_custom:
         mem_mb=get_10gb_per_attempt,
         java_mem_gb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/gatk/variant_filtration/hc_ctc/{sample}.log",
     params:
@@ -106,7 +106,7 @@ rule grep_out_homozygote_ctc:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/grep/{sample}.log",
     conda:
@@ -126,7 +126,7 @@ rule grep_out_filtered_ctc:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/grep/{sample}.log",
     conda:

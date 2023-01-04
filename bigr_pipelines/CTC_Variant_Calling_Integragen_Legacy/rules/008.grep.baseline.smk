@@ -12,7 +12,7 @@ rule grep_out_homozygote:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     group:
         "retrieve_baseline"
     log:
