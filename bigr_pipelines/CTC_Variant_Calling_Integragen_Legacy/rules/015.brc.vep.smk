@@ -25,6 +25,7 @@ rule ensembl_vep_brc:
         "--offline "
         "--vcf "
         "--force_overwrite "
+        "--format ensembl "
         "--refseq ",
     container:
         "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
