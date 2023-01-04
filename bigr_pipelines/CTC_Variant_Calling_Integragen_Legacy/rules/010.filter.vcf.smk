@@ -14,7 +14,8 @@ rule gatk_genotype_gvcf_ctc:
         "logs/gatk/genotype_gvcf/baseline_ctc/{sample}.log",
     params:
         extra="",
-        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar"
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar",
+        tmp=tmp,
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
@@ -22,7 +23,7 @@ rule gatk_genotype_gvcf_ctc:
         # "-jar {params.jar} "
         "gatk "
         "-Xmx{resources.java_mem_gb}MB "
-        "-Djava.io.tmpdir=\"{resources.tmpdir}\" "
+        "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T GenotypeGVCFs "
         "{params.extra} "
         "-R {input.fasta} "
@@ -47,7 +48,8 @@ rule filter_haplotype_ctc_vcf_non_snp:
         "logs/gatk/select_variants/baseline_ctc/{sample}.log",
     params:
         extra="-selectType SNP",
-        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar"
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar",
+        tmp=tmp,
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
@@ -55,7 +57,7 @@ rule filter_haplotype_ctc_vcf_non_snp:
         # "-jar {params.jar} "
         "gatk "
         "-Xmx{resources.java_mem_gb}MB "
-        "-Djava.io.tmpdir=\"{resources.tmpdir}\" "
+        "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T SelectVariants "
         "{params.extra} "
         "-R {input.fasta} "
@@ -88,7 +90,7 @@ rule filter_haplotype_ctc_vcf_custom:
     shell:
         "gatk "
         "-Xmx{resources.java_mem_gb}MB "
-        "-Djava.io.tmpdir=\"{resources.tmpdir}\" "
+        "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T VariantFiltration "
         "{params.extra} "
         "-R {input.fasta} "

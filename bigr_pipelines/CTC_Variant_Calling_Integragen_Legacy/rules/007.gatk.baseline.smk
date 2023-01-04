@@ -21,7 +21,8 @@ rule gatk_select_variants_wbc:
         "logs/gatk/select_variants/baseline_wbc/{sample}.pass.log",
     params:
         extra="-sn {sample}.baseline",
-        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar"
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar",
+        tmp=tmp,
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
@@ -29,7 +30,7 @@ rule gatk_select_variants_wbc:
         # "-jar {params.jar} "
         "gatk "
         "-Xmx{resources.java_mem_gb}GB "
-        "-Djava.io.tmpdir=\"{resources.tmpdir}\" "
+        "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T SelectVariants "
         "{params.extra} "
         "-R {input.fasta} "
