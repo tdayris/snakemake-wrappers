@@ -186,16 +186,16 @@ else
   message INFO "_JAVA_OPTIONS -> ${_JAVA_OPTIONS}"
 fi
 
-if [ ! -f "~/.Renviron" ]; then
-  message WARNING "~/.Renviron does not exists. This can lead to OS errors in R due to lack of space in /tmp"
-  message WARNING "~/.Renviron was created with: TMP = '${BIGR_DEFAULT_TMP}'"
-  echo -e "TMP = '${BIGR_DEFAULT_TMP}'" > "~/.Renviron"
+if [ ! -f "${HOME}/.Renviron" ]; then
+  message WARNING "${HOME}/.Renviron does not exists. This can lead to OS errors in R due to lack of space in /tmp"
+  message WARNING "${HOME}/.Renviron was created with: TMP = '${BIGR_DEFAULT_TMP}'"
+  echo -e "TMP = '${BIGR_DEFAULT_TMP}'" > "${HOME}/.Renviron"
 fi
 
-if [ ! -f "~/.condarc" ]; then
-  message WARNING "~/.condarc does not exists. This can lead to OS errors in conda due to lack of space in /tmp"
-  message WARNING "~/.condarc was created with: env_dir, pkgs_dir, and conda-build:root_dir overloaded"
-  echo -e "envs_dir:\n\t- /mnt/beegfs/userdata/${USER}/anaconda/envs\npkgs_dir:\n\t- /mnt/beegfs/userdata/${USER}/anaconda/pkgs\nconda-build:\n\troot_dir: /mnt/beegfs/userdata/${USER}/conda-builds" > "~/.condarc"
+if [ ! -f "${HOME}/.condarc" ]; then
+  message WARNING "${HOME}/.condarc does not exists. This can lead to OS errors in conda due to lack of space in /tmp"
+  message WARNING "${HOME}/.condarc was created with: env_dir, pkgs_dir, and conda-build:root_dir overloaded"
+  echo -e "envs_dir:\n\t- /mnt/beegfs/userdata/${USER}/anaconda/envs\npkgs_dir:\n\t- /mnt/beegfs/userdata/${USER}/anaconda/pkgs\nconda-build:\n\troot_dir: /mnt/beegfs/userdata/${USER}/conda-builds" > "${HOME}/.condarc"
 fi
 
 
