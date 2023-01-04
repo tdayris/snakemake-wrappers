@@ -7,7 +7,7 @@ rule gatk_genotype_gvcf_ctc:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_1p5gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     log:
@@ -22,7 +22,7 @@ rule gatk_genotype_gvcf_ctc:
         # "java -Xmx{resources.java_mem_gb}MB "
         # "-jar {params.jar} "
         "gatk "
-        "-Xmx{resources.java_mem_gb}MB "
+        "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T GenotypeGVCFs "
         "{params.extra} "
@@ -41,7 +41,7 @@ rule filter_haplotype_ctc_vcf_non_snp:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_1p5gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     log:
@@ -56,7 +56,7 @@ rule filter_haplotype_ctc_vcf_non_snp:
         # "java -Xmx{resources.java_mem_gb}MB "
         # "-jar {params.jar} "
         "gatk "
-        "-Xmx{resources.java_mem_gb}MB "
+        "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T SelectVariants "
         "{params.extra} "
@@ -75,7 +75,7 @@ rule filter_haplotype_ctc_vcf_custom:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_1p5gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     log:
@@ -89,7 +89,7 @@ rule filter_haplotype_ctc_vcf_custom:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "gatk "
-        "-Xmx{resources.java_mem_gb}MB "
+        "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T VariantFiltration "
         "{params.extra} "

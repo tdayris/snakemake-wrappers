@@ -11,7 +11,7 @@ rule mutect2:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_1p5gb_per_attempt,
         time_min=get_6h_per_attempt,
         tmpdir=tmp,
     log:
@@ -29,7 +29,7 @@ rule mutect2:
     shell:
         #"gatk -Xmx{resources.java_mem_gb}MB "
         "gatk "
-        "-Xmx{resources.java_mem_gb}GB "
+        "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
         "{params.extra} "
         "-T MuTect2 "

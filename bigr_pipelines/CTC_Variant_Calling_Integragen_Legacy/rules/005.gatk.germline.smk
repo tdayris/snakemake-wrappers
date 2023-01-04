@@ -13,7 +13,7 @@ rule gatk_haplotype_caller:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_1p5gb_per_attempt,
         time_min=get_8h_per_attempt,
         tmpdir=tmp,
     group:
@@ -30,7 +30,7 @@ rule gatk_haplotype_caller:
         # "java -Xmx{resources.java_mem_gb}MB "
         # "-jar {params.jar} "
         "gatk "
-        "-Xmx{resources.java_mem_gb}MB "
+        "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T HaplotypeCaller "
         "{params.extra} "
@@ -56,7 +56,7 @@ rule gatk_genotype_gvcf:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_1p5gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     group:
@@ -73,7 +73,7 @@ rule gatk_genotype_gvcf:
         # "java -Xmx{resources.java_mem_gb}MB "
         # "-jar {params.jar} "
         "gatk "
-        "-Xmx{resources.java_mem_gb}MB "
+        "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T GenotypeGVCFs "
         "{params.extra} "
@@ -98,7 +98,7 @@ rule gatk_select_variants_baseline:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_1p5gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     group:
@@ -115,7 +115,7 @@ rule gatk_select_variants_baseline:
         # "java -Xmx{resources.java_mem_gb}MB "
         # "-jar {params.jar} "
         "gatk "
-        "-Xmx{resources.java_mem_gb}MB "
+        "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T SelectVariants "
         "{params.extra} "
@@ -139,7 +139,7 @@ rule gatk_variant_filtration:
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
-        java_mem_gb=get_2gb_per_attempt,
+        java_mem_gb=get_1p5gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     group:
@@ -159,7 +159,7 @@ rule gatk_variant_filtration:
         # "java -Xmx{resources.java_mem_gb}MB "
         # "-jar {params.jar} "
         "gatk "
-        "-Xmx{resources.java_mem_gb}MB "
+        "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T VariantFiltration "
         "{params.extra} "
