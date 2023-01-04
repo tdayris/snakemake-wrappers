@@ -1,4 +1,8 @@
-include: "rules/000.common.smk"
+from pathlib import Path
+
+workflow_source_dir = Path(os.path.relpath(snakemake.workflow.srcdir(".."), ".")).parent
+
+include: str(workflow_source_dir / "rules" / "000.common.smk")
 include: str(workflow_source_dir / "rules" / "001.bigr_copy.smk")
 
 rule target:
