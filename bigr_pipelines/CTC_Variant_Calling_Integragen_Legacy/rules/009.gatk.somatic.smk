@@ -10,8 +10,8 @@ rule mutect2:
         "gatk/mutect2/{sample}.vcf.gz",
     threads: 1
     resources:
-        mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_10gb_per_attempt,
+        mem_mb=get_2gb_per_attempt,
+        java_mem_gb=get_2gb_per_attempt,
         time_min=get_6h_per_attempt,
         tmpdir=tmp,
     log:

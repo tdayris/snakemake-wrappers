@@ -12,8 +12,8 @@ rule gatk_haplotype_caller:
         bam="gatk/haplotypecaller/{sample}.{status}.bam",
     threads: 1
     resources:
-        mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_10gb_per_attempt,
+        mem_mb=get_2gb_per_attempt,
+        java_mem_gb=get_2gb_per_attempt,
         time_min=get_8h_per_attempt,
         tmpdir=tmp,
     group:
@@ -55,8 +55,8 @@ rule gatk_genotype_gvcf:
         temp("gatk/genotype_gvcf/baseline_wbc/{sample}.g.vcf.gz"),
     threads: 1
     resources:
-        mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_10gb_per_attempt,
+        mem_mb=get_2gb_per_attempt,
+        java_mem_gb=get_2gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     group:
@@ -97,8 +97,8 @@ rule gatk_select_variants_baseline:
         temp("gatk/select_variants/baseline_wbc/{sample}.g.vcf"),
     threads: 1
     resources:
-        mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_10gb_per_attempt,
+        mem_mb=get_2gb_per_attempt,
+        java_mem_gb=get_2gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     group:
@@ -138,8 +138,8 @@ rule gatk_variant_filtration:
         temp("gatk/variant_filtration/baseline_wbc/{sample}.g.vcf"),
     threads: 1
     resources:
-        mem_mb=get_10gb_per_attempt,
-        java_mem_gb=get_10gb_per_attempt,
+        mem_mb=get_2gb_per_attempt,
+        java_mem_gb=get_2gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     group:
