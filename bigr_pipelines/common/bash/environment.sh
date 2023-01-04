@@ -82,7 +82,7 @@ eval ${CMD}
 
 # Overloading TMP directories
 # Our main temporary directory.
-if [ -z "${BIGR_DEFAULT_TMP:-}" ];
+if [ -z "${BIGR_DEFAULT_TMP:-}" ]; then
   declare -x BIGR_DEFAULT_TMP
   BIGR_DEFAULT_TMP="/mnt/beegfs/userdata/${USER}/tmp"
   export BIGR_DEFAULT_TMP
