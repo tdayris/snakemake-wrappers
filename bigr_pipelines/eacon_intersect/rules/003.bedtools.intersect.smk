@@ -1,18 +1,8 @@
-def acbs_file_list(wildcards):
-    results = {"genome": config["ref"]["fasta_index"]}
-    bedfiles = checkpoints.rsync_cbs.get(**wildcards).output[0]
-    results["bed"] = expand(
-        "bed/{sample}.bed",
-        sample=glob_wildcards(os.path.join(bedfiles, "{sample}.Cut.cbs")).sample
-    )
-    return results
-
-
 def bed_file_list(wildcards):
     bedfiles = checkpoints.rsync_cbs.get(**wildcards).output[0]
     return expand(
         "bed/{sample}.bed",
-        sample=glob_wildcards(os.path.join(bedfiles, "{sample}.Cut.cbs")).sample
+        sample=glob_wildcards(os.path.join(bedfiles, "data_input/cbs_files/{sample}.Cut.cbs")).sample
     )
 
 
@@ -20,7 +10,7 @@ def bed_file_list(wildcards):
 rule bedtools_multi_intersect:
     input:
         genome=config["ref"]["fasta_index"],
-        bed=bed_file_list
+        bed="data_input/cbs_files"
     output: 
         "bedtools/multi_intersect.bed",
     threads: 1
@@ -36,5 +26,5 @@ rule bedtools_multi_intersect:
         "bedtools multiinter "
         "{params.extra} "
         "-g {input.genome} "
-        "-i {input.bed} "
+        "-i {input.bed}/*.bed "
         "> {output} 2>&1"
