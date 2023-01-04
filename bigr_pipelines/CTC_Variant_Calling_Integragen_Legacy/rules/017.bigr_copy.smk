@@ -12,6 +12,7 @@ rule bigr_copy:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_45min_per_attempt,
+        tmpdir=tmp,
     retries: 1
     params:
         input=lambda wildcards, output: link_bams[output[0]],

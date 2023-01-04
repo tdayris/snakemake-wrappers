@@ -15,7 +15,7 @@ rule gatk_haplotype_caller:
         mem_mb=get_10gb_per_attempt,
         java_mem_gb=get_10gb_per_attempt,
         time_min=get_8h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     group:
         "baseline_wbc_calling"
     log:
@@ -57,7 +57,7 @@ rule gatk_genotype_gvcf:
         mem_mb=get_10gb_per_attempt,
         java_mem_gb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     group:
         "baseline_wbc_calling"
     log:
@@ -98,7 +98,7 @@ rule gatk_select_variants_baseline:
         mem_mb=get_10gb_per_attempt,
         java_mem_gb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     group:
         "baseline_wbc_variant_filters"
     log:
@@ -138,7 +138,7 @@ rule gatk_variant_filtration:
         mem_mb=get_10gb_per_attempt,
         java_mem_gb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     group:
         "baseline_wbc_variant_filters"
     log:

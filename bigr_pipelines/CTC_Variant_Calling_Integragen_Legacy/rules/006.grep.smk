@@ -12,7 +12,7 @@ rule grep:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     log:

@@ -8,7 +8,7 @@ rule ensemblvep_hc:
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/vep/hc/{sample}.log",
     params:
@@ -45,7 +45,7 @@ rule ensembl_vep_haplotype_caller:
     resources:
         mem_mb=get_20gb_per_attempt,
         time_min=get_3h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/vep/{sample}.{status}.log",
     params:

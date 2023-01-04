@@ -14,7 +14,7 @@ rule ensembl_vep_brc:
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/vep/{sample}.{status}.log",
     params:
@@ -48,7 +48,7 @@ rule ensemblvep_bcr:
     resources:
         mem_mb=get_20gb_per_attempt,
         time_min=get_3h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/vep/bcr/{sample}.log",
     params:

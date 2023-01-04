@@ -13,7 +13,7 @@ rule brc2vep:
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/bcr2vep/{sample}.{status}.log",
     params:

@@ -13,7 +13,7 @@ rule mutect2:
         mem_mb=get_10gb_per_attempt,
         java_mem_gb=get_10gb_per_attempt,
         time_min=get_6h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/gatk/mutect2/{sample}.log",
     params:
@@ -48,7 +48,7 @@ rule tabix_mutect2:
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/tabix/{sample}.mutect2.log",
     params:
@@ -66,7 +66,7 @@ rule unzip_mutect2:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     log:

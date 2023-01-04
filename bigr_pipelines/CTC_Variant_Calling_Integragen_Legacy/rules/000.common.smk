@@ -167,6 +167,7 @@ replicate_list = list(set(design["Replicate"]))
 version_list = list(set(design["Version"]))
 manip_list = list(set(design["Manip"]))
 status_list = list(set(design["Status"]))
+tmp = os.environ.get("BIGR_DEFAULT_TMP", "tmp")
 
 
 wildcard_constraints:
