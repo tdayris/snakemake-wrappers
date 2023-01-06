@@ -101,7 +101,7 @@ rule grep_out_homozygote_ctc:
     input:
         "gatk/select_variants/hc_ctc/{sample}.tmp.vcf",
     output:
-        pipe("gatk/select_variants/hc_ctc/{sample}.no_homoz.vcf"),
+        temp("gatk/select_variants/hc_ctc/{sample}.no_homoz.vcf"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
