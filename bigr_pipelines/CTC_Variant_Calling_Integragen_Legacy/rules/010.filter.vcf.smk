@@ -128,7 +128,7 @@ rule grep_out_filtered_ctc:
         time_min=get_35min_per_attempt,
         tmp=tmp
     log:
-        "logs/grep/{sample}.log",
+        "logs/awk/{sample}.log",
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     params:
