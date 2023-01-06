@@ -74,8 +74,7 @@ rule filter_haplotype_ctc_vcf_custom:
     resources:
         mem_mb=get_2gb_per_attempt,
         java_mem_gb=get_1p5gb_per_attempt,
-        time_min=get_2h_per_attempt,
-        tmp=tmp
+        time_min=get_2h_per_attempt
     log:
         "logs/gatk/variant_filtration/hc_ctc/{sample}.log",
     params:
@@ -83,6 +82,7 @@ rule filter_haplotype_ctc_vcf_custom:
             "--filterExpression 'QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0' "
             "--filterName 'custom_snp_filter'"
         ),
+        tmp=tmp
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
