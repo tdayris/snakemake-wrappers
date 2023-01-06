@@ -134,7 +134,7 @@ rule grep_out_filtered_ctc:
     params:
         '{if ($0 ~ "^#") {print $0} else {if ($7 == ".") {print $0} else {if ($7 == "PASS") {print $0} } } }',
     shell:
-        "awk {params} {input} > {output} 2> {log}"
+        "awk '{params}' {input} > {output} 2> {log}"
 
 
 rule zip_variants_ctc:
