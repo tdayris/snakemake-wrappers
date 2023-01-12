@@ -104,7 +104,11 @@ def parse_error_log(path: str, start: int, end: int) -> Dict[str, Union[float, s
     content["name"] = chomp[0].split("-")[-1]
     content["jobid"] = int(chomp[4].split("-")[1])
     content["node"] = chomp[4].split("-")[-1]
-    content["step"] = int(chomp[1])
+
+    try:
+        content["step"] = int(chomp[1])
+    except:
+        content["step"] = chomp[1]
 
     content["Memory_Usage"] = content["max_memory"] / content["Reserved_memory"]
     content["CPU_Usage"] = (content["CPU"] / 100) * content["Reserved_threads"]
