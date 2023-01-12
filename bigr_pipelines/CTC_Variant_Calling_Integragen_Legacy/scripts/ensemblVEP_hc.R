@@ -262,10 +262,11 @@ for (invcf in files_to_process) {
 
         CODING <- grepl("HIGH|MODERATE", IMPACT)
         EXON_splitted <- strsplit(x = csq_df_aggregated$EXON, split = ",")
-        test <- sapply(EXON_splitted, function(y) which(y != "NA"))
         inExon <- NA
-        if(!identical(test[[1]], integer(0)) && !is.integer(test)){
-          inExon <- lengths(test[1,])
+        for(i in 1:length(EXON_splitted)){
+          for(j in 1:length(EXON_splitted[[i]])){
+            inExon[i]<-paste(EXON_splitted[[i]], collapse = "_")
+          }
         }
         BIOTYPE <- csq_df_aggregated$BIOTYPE
         Position_Type <- csq_df_aggregated$EXON
@@ -302,7 +303,7 @@ for (invcf in files_to_process) {
             normal_depth, normal_ref_count, input_hc, Patient, PolyPhen, POS,
             pos_in_canonical_vectors, Position_Type, Protein_position,
             Protein_position_splitted, REF, SampleName, SIFT, STRAND,
-            table_to_write, test, tmp, tumor_alt_count, tumor_alt_freq,
+            table_to_write, tmp, tumor_alt_count, tumor_alt_freq,
             tumor_depth, tumor_ref_count, uniqueID, VARIANT_CLASS, varID
         )
     }else{
