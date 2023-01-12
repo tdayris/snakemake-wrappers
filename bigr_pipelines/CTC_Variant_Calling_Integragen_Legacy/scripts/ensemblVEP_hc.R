@@ -154,109 +154,109 @@ for (invcf in files_to_process) {
         IMPACT_splitted <- NA
         Protein_position_splitted <- NA   
         if(!identical(pos_in_canonical_vectors[[1]], integer(0)) && !is.integer(pos_in_canonical_vectors)){
-          for (i in 1:length(pos_in_canonical_vectors[1,])){
-              if (length(pos_in_canonical_vectors[,1]) > 0) {
-                  for (j in 1:length(pos_in_canonical_vectors[,1])) {
-                      if (is.null(Canonical_NM[i]) || is.na(Canonical_NM[i])) {
-                          Canonical_NM[i] <- Feature_RefSeq_splitted[[i]][pos_in_canonical_vectors[,i][j]]
-                      } else {
-                          Canonical_NM[i] <- paste(
-                              Canonical_NM[i],
-                              Feature_RefSeq_splitted[[i]][pos_in_canonical_vectors[,i][j]],
-                              sep = ","
-                          )
-                      }
-                  }
-              } else {
-                  Canonical_NM[i] <- NA
+          for (i in 1:length(pos_in_canonical_vectors)){
+            if (length(pos_in_canonical_vectors[[i]]) > 0) {
+              for (j in 1:length(pos_in_canonical_vectors[[i]])) {
+                if (is.null(Canonical_NM[i]) || is.na(Canonical_NM[i])) {
+                  Canonical_NM[i] <- Feature_RefSeq_splitted[[i]][pos_in_canonical_vectors[[i]][j]]
+                } else {
+                  Canonical_NM[i] <- paste(
+                    Canonical_NM[i],
+                    Feature_RefSeq_splitted[[i]][pos_in_canonical_vectors[[i]][j]],
+                    sep = ","
+                  )
+                }
               }
+            } else {
+              Canonical_NM[i] <- NA
+            }
           }    
-  
+          
           Protein_position_splitted <- strsplit(
-              x = Protein_position, split = ","
+            x = Protein_position, split = ","
           )
           Canonical_Protein_position <- NULL    
-  
-          for (i in 1:length(pos_in_canonical_vectors[1,])) {
-              if (length(pos_in_canonical_vectors[,1]) > 0) {
-                  for (j in 1:length(pos_in_canonical_vectors[,1])){
-                      if (is.null(Canonical_Protein_position[i]) || is.na(Canonical_Protein_position[i])) {
-                          Canonical_Protein_position[i] <- Protein_position_splitted[[i]][pos_in_canonical_vectors[,i][j]]
-                      } else {
-                          Canonical_Protein_position[i] <- paste(
-                              Canonical_Protein_position[i],
-                              Protein_position_splitted[[i]][pos_in_canonical_vectors[,i][j]],
-                              sep = ","
-                          )
-                      }
-                  }
-              } else {
-                  Canonical_Protein_position[i] <- NA
+          
+          for (i in 1:length(pos_in_canonical_vectors)) {
+            if (length(pos_in_canonical_vectors[[i]]) > 0) {
+              for (j in 1:length(pos_in_canonical_vectors[[i]])){
+                if (is.null(Canonical_Protein_position[i]) || is.na(Canonical_Protein_position[i])) {
+                  Canonical_Protein_position[i] <- Protein_position_splitted[[i]][pos_in_canonical_vectors[[i]][j]]
+                } else {
+                  Canonical_Protein_position[i] <- paste(
+                    Canonical_Protein_position[i],
+                    Protein_position_splitted[[i]][pos_in_canonical_vectors[[i]][j]],
+                    sep = ","
+                  )
+                }
               }
+            } else {
+              Canonical_Protein_position[i] <- NA
+            }
           }    
-  
+          
           Amino_acids_splitted <- strsplit(Amino_acids, split = ",")
           Canonical_Amino_acids <- NULL    
-  
-          for (i in 1:length(pos_in_canonical_vectors[1,])){
-              if (length(pos_in_canonical_vectors[,1]) > 0) {
-                  for (j in 1:length(pos_in_canonical_vectors[,1])){
-                      if (is.null(Canonical_Amino_acids[i]) || is.na(Canonical_Amino_acids[i])) {
-                          Canonical_Amino_acids[i] <- Amino_acids_splitted[[i]][pos_in_canonical_vectors[,i][j]]
-                      } else {
-                          Canonical_Amino_acids[i] <- paste(
-                              Canonical_Amino_acids[i],
-                              Amino_acids_splitted[[i]][pos_in_canonical_vectors[,i][j]],
-                              sep = ","
-                          )
-                      }
-                  }
-              } else {
-                  Canonical_Amino_acids[i] <- NA
+          
+          for (i in 1:length(pos_in_canonical_vectors)){
+            if (length(pos_in_canonical_vectors[[i]]) > 0) {
+              for (j in 1:length(pos_in_canonical_vectors[[i]])){
+                if (is.null(Canonical_Amino_acids[i]) || is.na(Canonical_Amino_acids[i])) {
+                  Canonical_Amino_acids[i] <- Amino_acids_splitted[[i]][pos_in_canonical_vectors[[i]][j]]
+                } else {
+                  Canonical_Amino_acids[i] <- paste(
+                    Canonical_Amino_acids[i],
+                    Amino_acids_splitted[[i]][pos_in_canonical_vectors[[i]][j]],
+                    sep = ","
+                  )
+                }
               }
+            } else {
+              Canonical_Amino_acids[i] <- NA
+            }
           }
-        
+          
           IMPACT_splitted <- strsplit(IMPACT,",")
           Canonical_IMPACT <- NULL
-        
-          for (i in 1:length(pos_in_canonical_vectors[1,])) {
-              if (length(pos_in_canonical_vectors[,1]) > 0) {
-                  for (j in 1:length(pos_in_canonical_vectors[,1])) {
-                      if (is.null(Canonical_IMPACT[i]) || is.na(Canonical_IMPACT[i])) {
-                          Canonical_IMPACT[i] <- IMPACT_splitted[[i]][pos_in_canonical_vectors[,i][j]]
-                      } else {
-                          Canonical_IMPACT[i] <- paste(
-                              Canonical_IMPACT[i],
-                              IMPACT_splitted[[i]][pos_in_canonical_vectors[,i][j]],
-                              sep = ","
-                          )
-                      }
-              
-                  }
-              } else {
-                  Canonical_IMPACT[i] <- NA
+          
+          for (i in 1:length(pos_in_canonical_vectors)) {
+            if (length(pos_in_canonical_vectors[[i]]) > 0) {
+              for (j in 1:length(pos_in_canonical_vectors[[i]])) {
+                if (is.null(Canonical_IMPACT[i]) || is.na(Canonical_IMPACT[i])) {
+                  Canonical_IMPACT[i] <- IMPACT_splitted[[i]][pos_in_canonical_vectors[[i]][j]]
+                } else {
+                  Canonical_IMPACT[i] <- paste(
+                    Canonical_IMPACT[i],
+                    IMPACT_splitted[[i]][pos_in_canonical_vectors[[i]][j]],
+                    sep = ","
+                  )
+                }
+                
               }
+            } else {
+              Canonical_IMPACT[i] <- NA
+            }
           }    
-  
+          
           Consequence_splitted <- strsplit(x = Consequence, split = ",")
           Canonical_Consequence <- NULL    
-  
-          for (i in 1:length(pos_in_canonical_vectors[1,])) {
-              if (length(pos_in_canonical_vectors[,1]) > 0) {
-                  for (j in 1:length(pos_in_canonical_vectors[,1])){
-                      if (is.null(Canonical_Consequence[i]) || is.na(Canonical_Consequence[i])) {
-                          Canonical_Consequence[i] <- Consequence_splitted[[i]][pos_in_canonical_vectors[,i][j]]
-                      } else {
-                          Canonical_Consequence[i] <- paste(
-                              Canonical_Consequence[i],
-                              Consequence_splitted[[i]][pos_in_canonical_vectors[,i][j]],
-                              sep = ","
-                          )
-                      }
-                  }
-              } else {
-                  Canonical_Consequence[i] <- NA
+          
+          for (i in 1:length(pos_in_canonical_vectors)) {
+            if (length(pos_in_canonical_vectors[[i]]) > 0) {
+              for (j in 1:length(pos_in_canonical_vectors[[i]])){
+                if (is.null(Canonical_Consequence[i]) || is.na(Canonical_Consequence[i])) {
+                  Canonical_Consequence[i] <- Consequence_splitted[[i]][pos_in_canonical_vectors[[i]][j]]
+                } else {
+                  Canonical_Consequence[i] <- paste(
+                    Canonical_Consequence[i],
+                    Consequence_splitted[[i]][pos_in_canonical_vectors[[i]][j]],
+                    sep = ","
+                  )
+                }
               }
+            } else {
+              Canonical_Consequence[i] <- NA
+            }
           }
         }
 
