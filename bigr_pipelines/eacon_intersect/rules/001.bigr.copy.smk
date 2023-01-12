@@ -15,7 +15,7 @@ rule find_acbs_files:
         "find {params.exec_dir} {params.extra} > {output} 2> {log}"
 
 
-checkpoint rsync_cbs:
+rule rsync_cbs:
     input:
         "acbs_list.txt"
     output:

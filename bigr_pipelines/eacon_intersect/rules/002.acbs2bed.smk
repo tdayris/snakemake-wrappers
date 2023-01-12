@@ -1,6 +1,6 @@
 rule cut_acbs:
     input:
-        acbs="data_input/{sample}.Cut.cbs"
+        acbs="data_input/cbs_files/{sample}.Cut.cbs"
     output:
         bedlike=pipe("bed/{sample}.unsorted.bedlike")
     threads: 1
