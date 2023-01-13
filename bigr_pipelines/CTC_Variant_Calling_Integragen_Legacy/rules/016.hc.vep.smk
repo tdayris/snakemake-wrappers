@@ -10,7 +10,7 @@ rule ensemblvep_hc:
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     log:
-        "logs/vep/hc/{sample}.log",
+        "logs/vep/hc/{sample}.{status}.log",
     params:
         organism=config.get("vep_db", "hg38"),
     container:
