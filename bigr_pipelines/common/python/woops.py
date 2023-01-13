@@ -119,7 +119,7 @@ def parse_error_log(path: str, start: int, end: int) -> Dict[str, Union[float, s
 logging.basicConfig(level=logging.DEBUG)
 parsed_logs_path = "logs/parsed.logs.tsv"
 barplot = True
-kde = True
+kde = False
 
 if not os.path.exists(parsed_logs_path):
     logging.info("Creating the file: %s", parsed_logs_path)
