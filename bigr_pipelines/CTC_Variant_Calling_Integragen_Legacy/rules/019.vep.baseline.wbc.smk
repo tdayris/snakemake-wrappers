@@ -1,5 +1,5 @@
 
-rule ensembl_vep_haplotype_caller:
+rule ensembl_vep_haplotype_caller_baseline:
     input:
         vcf="data_output/Baseline/{sample}.vcf.gz",
         vcf_tbi="data_output/Baseline/{sample}.vcf.gz.tbi",
@@ -35,7 +35,7 @@ rule ensembl_vep_haplotype_caller:
         "> {log} 2>&1 "
 
 
-rule ensembl_vep_haplotype_caller:
+rule ensembl_vep_haplotype_caller_wbc:
     input:
         vcf="data_output/WBC/{sample}.vcf.gz",
         vcf_tbi="data_output/WBC/{sample}.vcf.gz.tbi",

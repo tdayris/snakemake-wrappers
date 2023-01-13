@@ -1,4 +1,4 @@
-rule gatk_select_variants_wbc:
+rule gatk_select_variants_wbconly:
     input:
         vcf="grep/baseline_wbc/{sample}.vcf",
         fasta=config["ref"]["fasta"],
@@ -11,7 +11,7 @@ rule gatk_select_variants_wbc:
         java_mem_gb=get_2gb_per_attempt,
         tmpdir=tmp,
     group:
-        "retrieve_baseline"
+        "retrieve_wbc"
     log:
         "logs/gatk/select_variants/wbc/{sample}.pass.log",
     params:
@@ -47,7 +47,7 @@ rule grep_out_homozygote_wbc:
         time_min=get_35min_per_attempt,
         tmpdir=tmp,
     group:
-        "retrieve_baseline"
+        "retrieve_wbc"
     log:
         "logs/grep/{sample}.log",
     conda:
