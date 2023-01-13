@@ -162,7 +162,7 @@ def get_hc(wildcards):
     }
 
 
-def get_ensembl_vep_hc(wilcards):
+def get_ensembl_vep_hc(wildcards):
     subdir = None
     if wildcards.status == "baseline":
         subdir = "Baseline"
