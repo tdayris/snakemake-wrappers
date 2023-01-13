@@ -105,7 +105,7 @@ rule tabix_wbc_variants:
     input:
         "data_output/WBC/{sample}.vcf.gz"
     output:
-        protected("data_output/Baseline/{sample}.vcf.gz.tbi")
+        protected("data_output/WBC/{sample}.vcf.gz.tbi")
     threads: 1
     resources:
         mem_mb=get_4gb_per_attempt,
