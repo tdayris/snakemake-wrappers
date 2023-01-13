@@ -6,7 +6,7 @@ rule ensembl_vep_haplotype_caller_baseline:
         cache=config["ref"]["vep"],
         fasta="resources/GRCh38.fasta",
     output:
-        vcf=temp("vep/annotate/{sample}.baseline.vcf"),
+        vcf=temp("vep/annotate/{sample}.baseline.hc.vcf"),
     threads: 1
     resources:
         mem_mb=get_20gb_per_attempt,
@@ -42,7 +42,7 @@ rule ensembl_vep_haplotype_caller_wbc:
         cache=config["ref"]["vep"],
         fasta="resources/GRCh38.fasta",
     output:
-        vcf=temp("vep/annotate/{sample}.wbc.vcf"),
+        vcf=temp("vep/annotate/{sample}.wbc.hc.vcf"),
     threads: 1
     resources:
         mem_mb=get_20gb_per_attempt,
