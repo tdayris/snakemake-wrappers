@@ -163,7 +163,7 @@ def get_hc(wildcards):
         }
     except KeyError:
         return {
-            "bam": f"data_input/{wildcards.sample}/{wildcards.status}.bam",
+            "bam": f"data_input/{wildcards.sample}.{wildcards.status}.bam",
             "fasta": config["ref"]["fasta"],
         }
 
