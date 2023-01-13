@@ -2,15 +2,9 @@ rule concat_to_bigtable:
     input:
         expand(
             "vep/{annot}/{sample}.tsv",
-            annot=["bcr", "mutect"],
+            annot=["bcr", "hc", "mutect"],
             sample=samples_list,
         ),
-        expand(
-            "vep/hc/{sample}.{status}.tsv",
-            annot=["bcr", "mutect"],
-            status=["wbc", "ctc"],
-            sample=samples_list,
-        )
     output:
         temp("bigtable/raw.tsv"),
     threads: 1
@@ -61,7 +55,7 @@ rule bigtable_noheader:
     log:
         "logs/bigtable/noheader.log",
     params:
-        "'1d;s|.ctc.brc.vcf\\t|\\t|g;s|Baseline|Germline|g'",
+        "'1d'",
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     shell:
