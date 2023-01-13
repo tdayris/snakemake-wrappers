@@ -8,7 +8,7 @@ rule concat_to_bigtable:
         expand(
             "vep/hc/{sample}.{status}.tsv",
             annot=["bcr", "mutect"],
-            status=["baseline", "wbc", "ctc"]
+            status=["baseline", "wbc", "ctc"],
             sample=samples_list,
         )
     output:
