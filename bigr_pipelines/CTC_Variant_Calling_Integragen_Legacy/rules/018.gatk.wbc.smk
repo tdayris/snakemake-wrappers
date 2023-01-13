@@ -78,7 +78,7 @@ rule zip_wbc_variants:
 
 rule tabix_wbc_variants:
     input:
-        "gatk/select_variants/wbc/{sample}.vcf.gz"
+        "data_output/wbc/{sample}.vcf.gz"
     output:
         protected("data_output/WBC/{sample}.vcf.gz.tbi")
     threads: 1
