@@ -2,9 +2,15 @@ rule concat_to_bigtable:
     input:
         expand(
             "vep/{annot}/{sample}.tsv",
-            annot=["bcr", "ctc.hc", "wbc.hc", "baseline.hc", "mutect"],
+            annot=["bcr", "mutect"],
             sample=samples_list,
         ),
+        expand(
+            "vep/hc/{sample}.{status}.tsv",
+            annot=["bcr", "mutect"],
+            status=["baseline", "wbc", "ctc"]
+            sample=samples_list,
+        )
     output:
         temp("bigtable/raw.tsv"),
     threads: 1
