@@ -11,7 +11,7 @@ rule concat_to_bigtable:
         ),
         expand(
             "vep/hc/{sample}.ctc.hc.tsv",
-            sample=sample_list,
+            sample=samples_list,
         ),
     output:
         temp("bigtable/raw.tsv"),
