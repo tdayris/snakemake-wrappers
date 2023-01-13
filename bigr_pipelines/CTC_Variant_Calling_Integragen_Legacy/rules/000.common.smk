@@ -156,10 +156,16 @@ def get_trio(wildcards):
 
 
 def get_hc(wildcards):
-    return {
-        "bam": link_sample_baseline[wildcards.sample][wilcards.status],
-        "fasta": config["ref"]["fasta"],
-    }
+    try:
+        return {
+            "bam": link_sample_baseline[wildcards.sample][wilcards.status],
+            "fasta": config["ref"]["fasta"],
+        }
+    except KeyError:
+        return {
+            "bam": f"data_input/{wildcards.sample}/{wildcards.status}.bam"
+            "fasta": config["ref"]["fasta"],
+        }
 
 
 def get_ensembl_vep_hc(wildcards):
