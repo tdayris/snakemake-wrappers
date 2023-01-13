@@ -1,9 +1,9 @@
 rule ensemblvep_hc:
     input:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
-        vcfs=["vep/annotate/{sample}.ctc.hc.vcf"],
+        vcfs=["vep/annotate/{sample}.{status}.hc.vcf"],
     output:
-        tsv=temp("vep/hc/{sample}.tsv"),
+        tsv=temp("vep/hc/{sample}.{status}.tsv"),
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
@@ -40,14 +40,14 @@ rule ensembl_vep_haplotype_caller:
         cache=config["ref"]["vep"],
         fasta="resources/GRCh38.fasta",
     output:
-        vcf=temp("vep/annotate/{sample}.{status}.hc.vcf"),
+        vcf=temp("vep/annotate/{sample}.ctc.hc.vcf"),
     threads: 1
     resources:
         mem_mb=get_20gb_per_attempt,
         time_min=get_3h_per_attempt,
         tmpdir=tmp,
     log:
-        "logs/vep/{sample}.{status}.log",
+        "logs/vep/{sample}.ctc.log",
     params:
         "--species homo_sapiens "
         "--assembly GRCh38 "

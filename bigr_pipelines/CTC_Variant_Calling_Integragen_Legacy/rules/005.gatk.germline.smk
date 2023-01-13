@@ -112,8 +112,6 @@ rule gatk_select_variants_baseline:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        # "java -Xmx{resources.java_mem_gb}MB "
-        # "-jar {params.jar} "
         "gatk "
         "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
