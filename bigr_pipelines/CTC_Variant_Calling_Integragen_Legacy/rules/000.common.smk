@@ -168,7 +168,7 @@ def get_hc(wildcards):
         }
     else:
         return {
-            "bam": f"data_input/{'_'.join(str(wildcards.sample).split('_')[:1])}.{wildcards.status}.bam",
+            "bam": f"data_input/{'_'.join(str(wildcards.sample).split('_')[:2])}.{wildcards.status}.bam",
             "fasta": config["ref"]["fasta"],
         }
 
