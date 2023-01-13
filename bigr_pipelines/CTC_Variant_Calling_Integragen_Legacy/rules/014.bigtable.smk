@@ -2,7 +2,12 @@ rule concat_to_bigtable:
     input:
         expand(
             "vep/{annot}/{sample}.tsv",
-            annot=["bcr", "hc", "mutect"],
+            annot=["bcr", "mutect"],
+            sample=samples_list,
+        ),
+        expand(
+            "vep/{annot}/{sample}.tsv",
+            annot=["ctc.hc", "wbc.hc"],
             sample=samples_list,
         ),
     output:

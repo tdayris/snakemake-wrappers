@@ -3,7 +3,7 @@ grep -v "./.:0,0:0:0,0,0" {patient}_CTC_all.cutadapt.sorted.rmmarkdup.hc.snps.fi
 """
 
 
-rule grep_out_homozygote:
+rule grep_out_homozygote_bseline:
     input:
         "gatk/select_variants/baseline/{sample}.tmp.vcf",
     output:
@@ -16,7 +16,29 @@ rule grep_out_homozygote:
     group:
         "retrieve_baseline"
     log:
-        "logs/grep/{sample}.log",
+        "logs/grep/{sample}.baseline.log",
+    conda:
+        str(workflow_source_dir / "envs" / "bash.yaml")
+    params:
+        ' -v "./.:0,0:0:0,0,0"',
+    shell:
+        "grep {params} {input} > {output} 2> {log}"
+
+
+rule grep_out_homozygote_wbc:
+    input:
+        "gatk/select_variants/wbc/{sample}.tmp.vcf",
+    output:
+        temp("gatk/select_variants/wbc/{sample}.vcf"),
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_35min_per_attempt,
+        tmpdir=tmp,
+    group:
+        "retrieve_wbc"
+    log:
+        "logs/grep/{sample}.wbc.log",
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     params:
@@ -43,9 +65,27 @@ rule zip_baseline_variants:
         "bio/bcftools/view"
 
 
+rule zip_wbc_variants:
+    input:
+        "gatk/select_variants/wbc/{sample}.vcf"
+    output:
+        protected("data_output/WBC/{sample}.vcf.gz")
+    threads: 2
+    resources:
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/bcftools/view/{sample}.wbc.log"
+    params:
+        extra=""
+    wrapper:
+        "bio/bcftools/view"
+
+
 rule tabix_baseline_variants:
     input:
-        "gatk/select_variants/baseline/{sample}.vcf.gz"
+        "data_output/Baseline/{sample}.vcf.gz"
     output:
         protected("data_output/Baseline/{sample}.vcf.gz.tbi")
     threads: 1
@@ -55,6 +95,24 @@ rule tabix_baseline_variants:
         tmpdir="tmp"
     log:
         "logs/tabix/{sample}.baseline.log"
+    params:
+        "-p vcf"
+    wrapper:
+        "bio/tabix/index"
+
+
+rule tabix_wbc_variants:
+    input:
+        "data_output/WBC/{sample}.vcf.gz"
+    output:
+        protected("data_output/Baseline/{sample}.vcf.gz.tbi")
+    threads: 1
+    resources:
+        mem_mb=get_4gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp"
+    log:
+        "logs/tabix/{sample}.wbc.log"
     params:
         "-p vcf"
     wrapper:

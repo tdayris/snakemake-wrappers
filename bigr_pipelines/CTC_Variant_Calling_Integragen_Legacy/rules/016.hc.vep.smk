@@ -1,16 +1,16 @@
 rule ensemblvep_hc:
     input:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
-        vcfs=["vep/annotate/{sample}.ctc.hc.vcf"],
+        vcfs=["vep/annotate/{sample}.{status}.hc.vcf"],
     output:
-        tsv=temp("vep/hc/{sample}.tsv"),
+        tsv=temp("vep/hc/{sample}.{status}.tsv"),
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     log:
-        "logs/vep/hc/{sample}.log",
+        "logs/vep/hc/{sample}.{status}.log",
     params:
         organism=config.get("vep_db", "hg38"),
     container:
@@ -35,10 +35,7 @@ ensembl VEP 87.0 refseq (on each normal VCF/TSV) : singularity run -B /mnt/beegf
 
 rule ensembl_vep_haplotype_caller:
     input:
-        vcf="data_output/HC_CTC/{sample}.vcf.gz",
-        vcf_tbi="data_output/HC_CTC/{sample}.vcf.gz.tbi",
-        cache=config["ref"]["vep"],
-        fasta="resources/GRCh38.fasta",
+        unpack(get_ensembl_vep_hc)
     output:
         vcf=temp("vep/annotate/{sample}.{status}.hc.vcf"),
     threads: 1

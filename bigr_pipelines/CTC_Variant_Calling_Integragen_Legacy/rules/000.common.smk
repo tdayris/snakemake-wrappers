@@ -155,6 +155,32 @@ def get_trio(wildcards):
     }
 
 
+def get_hc(wildcards):
+    return {
+        "bam": link_sample_baseline[wildcards.sample][wilcards.status],
+        "fasta": config["ref"]["fasta"],
+    }
+
+
+def get_ensembl_vep_hc(wilcards):
+    subdir = None
+    if wildcards.status == "baseline":
+        subdir = "Baseline"
+    elif wildcards.status == "wbc":
+        subdir = "WBC"
+    elif wildcards.status == "ctc":
+        subdir = "HC_CTC"
+    else:
+        raise ValueError(f"Uknown status: {wildcards.status}")
+
+    return {
+        "cache": config["ref"]["vep"],
+        "fasta": "resources/GRCh38.fasta",
+        "vcf": f"data_output/{subdir}/{wildcards.sample}.vcf.gz",
+        "vcf": f"data_output/{subdir}/{wildcards.sample}.vcf.gz.tbi",
+    }
+
+
 link_bams, samples_list, link_sample_baseline, baseline_sample_list, wbc_sample_list = parse_design(design.copy())
 
 sample_baseline_table = pandas.DataFrame.from_dict(link_sample_baseline, orient="index")
