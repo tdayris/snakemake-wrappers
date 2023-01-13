@@ -62,7 +62,7 @@ rule zip_wbc_variants:
     input:
         "gatk/select_variants/wbc/{sample}.vcf"
     output:
-        protected("data_output/wbc/{sample}.vcf.gz")
+        protected("data_output/WBC/{sample}.vcf.gz")
     threads: 2
     resources:
         mem_mb=get_4gb_per_attempt,
