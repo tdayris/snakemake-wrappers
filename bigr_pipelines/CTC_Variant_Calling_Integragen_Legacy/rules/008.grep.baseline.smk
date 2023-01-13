@@ -45,7 +45,7 @@ rule zip_baseline_variants:
 
 rule tabix_baseline_variants:
     input:
-        "gatk/select_variants/Baseline/{sample}.vcf.gz"
+        "data_output/Baseline/{sample}.vcf.gz"
     output:
         protected("data_output/Baseline/{sample}.vcf.gz.tbi")
     threads: 1
