@@ -6,11 +6,11 @@ rule concat_to_bigtable:
             sample=samples_list,
         ),
         expand(
-            "vep/hc/{sample}.wbc.hc.tsv",
+            "vep/hc/{sample}.wbc.tsv",
             sample=wbc_sample_list,
         ),
         expand(
-            "vep/hc/{sample}.ctc.hc.tsv",
+            "vep/hc/{sample}.ctc.tsv",
             sample=samples_list,
         ),
     output:
