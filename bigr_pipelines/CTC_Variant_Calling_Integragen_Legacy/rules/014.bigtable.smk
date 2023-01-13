@@ -61,7 +61,7 @@ rule bigtable_noheader:
     log:
         "logs/bigtable/noheader.log",
     params:
-        "'1d'",
+        "'1d;s|.ctc.brc.vcf\\t|\\t|g'",
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     shell:
