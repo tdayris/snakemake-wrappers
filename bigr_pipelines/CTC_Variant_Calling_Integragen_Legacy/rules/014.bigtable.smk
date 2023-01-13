@@ -6,9 +6,12 @@ rule concat_to_bigtable:
             sample=samples_list,
         ),
         expand(
-            "vep/{annot}/{sample}.tsv",
-            annot=["ctc.hc", "wbc.hc"],
-            sample=samples_list,
+            "vep/hc/{sample}.wbc.hc.tsv",
+            sample=wbc_sample_list,
+        ),
+        expand(
+            "vep/hc/{sample}.ctc.hc.tsv",
+            sample=sample_list,
         ),
     output:
         temp("bigtable/raw.tsv"),
