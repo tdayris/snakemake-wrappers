@@ -156,12 +156,12 @@ def get_trio(wildcards):
 
 
 def get_hc(wildcards):
-    if wildcards.status == "ctc"
+    if wildcards.status == "ctc":
         return {
             "bam": link_sample_baseline[wildcards.sample][wilcards.status],
             "fasta": config["ref"]["fasta"],
         }
-    elif wildcards.status == "wbc"
+    elif wildcards.status == "wbc":
         return {
             "bam": f"data_input/{wildcards.sample}.{wildcards.status}.bam",
             "fasta": config["ref"]["fasta"],
