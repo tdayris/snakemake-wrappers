@@ -156,16 +156,10 @@ def get_trio(wildcards):
 
 
 def get_hc(wildcards):        
-    if wildcards.status == "wbc":
-        return {
-            "bam": f"data_input/{wildcards.sample}.{wildcards.status}.bam",
-            "fasta": config["ref"]["fasta"],
-        }
-    else:
-        return {
-            "bam": link_sample_baseline[wildcards.sample][wilcards.status],
-            "fasta": config["ref"]["fasta"],
-        }
+    return {
+        "bam": link_sample_baseline[wildcards.sample][wilcards.status],
+        "fasta": config["ref"]["fasta"],
+    }
 
 
 def get_ensembl_vep_hc(wildcards):
