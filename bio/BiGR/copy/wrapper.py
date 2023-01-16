@@ -56,7 +56,7 @@ if ("-N" not in extra_iget) and snakemake.threads > 1:
     if parallel:
         logging.info("Internal parallelization")
         max_threads = 1
-    extra_iget += f" -N {snakemake.threads} "
+    extra_iget += f" -N {max_threads} "
 
 # No node can access a cold storage
 # these files must be copied. However,
