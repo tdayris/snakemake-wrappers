@@ -12,7 +12,7 @@ rule samtools_stats_raw:
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/samtools/stats/{sample}.{status}.raw.log",
     params:
@@ -35,7 +35,7 @@ rule samtools_stats_cleaned:
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/samtools/stats/{sample}.{status}.cleaned.log",
     params:
@@ -58,7 +58,7 @@ rule samtools_stats_fusions:
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_35min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/samtools/stats/{sample}.{status}.chimera.log",
     params:
@@ -77,7 +77,7 @@ rule fastq_screen:
     resources:
         mem_mb=get_8gb_per_attempt,
         time_min=get_75min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     params:
         fastq_screen_config=config["fastq_screen"],

@@ -19,7 +19,7 @@ rule fastp_clean:
     resources:
         mem_mb=get_4gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     params:
         adapters=config["fastp"].get("fastp_adapters", None),

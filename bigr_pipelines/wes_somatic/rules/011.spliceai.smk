@@ -1,6 +1,6 @@
 rule splice_ai:
     input:
-        vcf="snpeff/calls/{sample}.vcf",
+        vcf="gatk/selectvariant/{sample}.preannot.vcf",
         fasta=config["reference"]["fasta"],
         fasta_index=config["reference"]["fasta_index"],
     output:
@@ -9,7 +9,7 @@ rule splice_ai:
     resources:
         mem_mb=get_8gb_per_attempt,
         time_min=get_6h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     params:
         annotation=config["reference"].get("ncbi_build", "grch38").lower(),

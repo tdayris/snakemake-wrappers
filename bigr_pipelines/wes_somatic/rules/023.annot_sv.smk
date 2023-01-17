@@ -8,7 +8,7 @@ rule annot_sv:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/annot_sv/raw/{sample}.log",
@@ -42,7 +42,7 @@ rule add_census:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024 * 3,
         time_min=lambda wildcards, attempt: attempt * 5,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/annot_sv/census/{sample}.log",

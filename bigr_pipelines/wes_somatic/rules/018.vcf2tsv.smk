@@ -8,10 +8,9 @@ rule filter_tsv:
     resources:
         mem_mb=get_8gb_per_attempt,
         time_min=get_20min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     params:
         drop_duplicated_lines=True,
-        contains=[["FILTER", "PASS"]],
         prefixes=[["Chromosome", "chr"]],
         new_cols=lambda wildcards: [
             ["Mutect2_Allele_Frequency", "=", f"{wildcards.sample}_tumor_AF"],
@@ -55,7 +54,7 @@ rule extractfields:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_20min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/snpsift/extractAllFields/{sample}.log",
@@ -74,7 +73,7 @@ rule fix_vcf:
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/bigr_scripts/fix_vcf/{sample}.log",
@@ -98,7 +97,7 @@ rule gleaves_compatibility:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/BiGR/gleaves_compatibility/{sample}.log",
@@ -114,18 +113,39 @@ rule gatk_variant_filtration:
         ref_idx=config["reference"]["fasta_index"],
         ref_dict=config["reference"]["fasta_dict"],
     output:
-        vcf=protected("data_output/VCF/{sample}.vcf.gz"),
-        vcf_tbi=protected("data_output/VCF/{sample}.vcf.gz.tbi"),
+        vcf=temp("gatk/variantfiltration/{sample}.post.annot.vcf.gz"),
+        vcf_tbi=temp("gatk/variantfiltration/{sample}.post.annot.vcf.gz.tbi"),
     threads: 1
     resources:
         mem_mb=get_8gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/gatk/variant_filtration/{sample}.log",
     params:
-        filters=config["gatk"].get("filters", {"DepthBelow10X": "DP < 10"}),
+        filters=config["gatk"].get("filtgatk_filters_annotationers", {"DepthBelow10X": "DP < 10"}),
         extra="--create-output-variant-index --create-output-variant-md5",
     wrapper:
         "bio/gatk/variantfiltration"
+
+
+rule gatk_select_variants:
+    input:
+        vcf="gatk/variantfiltration/{sample}.post.annot.vcf.gz",
+        vcf_tbi="gatk/variantfiltration/{sample}.post.annot.vcf.gz",
+    output:
+        vcf=protected("data_output/VCF/{sample}.vcf.gz"),
+        vcf_tbi=protected("data_output/VCF/{sample}.vcf.gz.tbi"),
+        md5=protected("data_output/VCF/{sample}.vcf.gz.md5"),
+    threads: 1
+    resources:
+        mem_mb=get_8gb_per_attempt,
+        time_min=get_90min_per_attempt,
+        tmpdir=tmp,
+    params:
+        extra="-select 'vc.isNotFiltered()' --create-output-variant-index --create-output-variant-md5"
+    log:
+        "logs/gatk/selectvariants/{sample}.pre.annotation.log"
+    wrapper:
+        "bio/gatk/selectvariants"

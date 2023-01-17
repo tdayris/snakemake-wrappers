@@ -7,12 +7,12 @@ rule tabix_index:
     input:
         "{tool}/{subcommand}/{sample}.vcf.gz",
     output:
-        "{tool}/{subcommand}/{sample}.vcf.gz.tbi",
+        temp("{tool}/{subcommand}/{sample}.vcf.gz.tbi"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     params:
         "-p vcf",
@@ -31,12 +31,12 @@ rule pbgzip_compress:
     input:
         "{tool}/{subcommand}/{sample}.vcf",
     output:
-        "{tool}/{subcommand}/{sample}.vcf.gz",
+        temp("{tool}/{subcommand}/{sample}.vcf.gz"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_1h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     params:
         "",

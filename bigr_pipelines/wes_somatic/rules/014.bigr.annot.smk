@@ -19,7 +19,7 @@ rule cancer_gene_census_annotate:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/bigr/cancer_gene_census_annotate/{sample}.log",
@@ -37,7 +37,7 @@ rule oncokb_annotate:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/bigr/oncokb/{sample}.log",
@@ -59,7 +59,7 @@ rule format_to_info:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/bigr/format_to_info/{sample}.log",

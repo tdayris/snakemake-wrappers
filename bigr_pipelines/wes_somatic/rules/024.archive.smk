@@ -22,7 +22,7 @@ rule bcftools_archive:
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_5h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/archive/vcf/{sample}.log",
     params:
@@ -40,7 +40,7 @@ rule gzip_tsv:
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_5h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/archive/tsv/{sample}.log",
     params:
@@ -98,7 +98,7 @@ rule cram_mapping:
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/archive/cram/{sample}.{status}.log",
     params:

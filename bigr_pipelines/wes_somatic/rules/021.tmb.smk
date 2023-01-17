@@ -12,7 +12,7 @@ rule estimate_igs:
     resources:
         mem_mb=get_5gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/igs_estimation.log",
@@ -35,7 +35,7 @@ rule extract_somatic_mutations:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/extract_somatic_mutations/{sample}.log",
@@ -63,7 +63,7 @@ rule compute_tmb:
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/tmb.log",

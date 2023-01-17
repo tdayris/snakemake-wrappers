@@ -10,7 +10,7 @@ rule additional_headers_mane:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     group:
         "additional_headers"
     log:
@@ -46,7 +46,7 @@ rule vcftools_annotate_mane:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/vcftools/annotate/{sample}.mane.log",
@@ -75,7 +75,7 @@ rule additional_headers_revel:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     group:
         "additional_headers"
     log:
@@ -101,7 +101,7 @@ rule vcftools_annotate_revel:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/vcftools/annotate/{sample}.revel.log",
@@ -128,7 +128,7 @@ rule additional_headers_mistic:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     group:
         "additional_headers"
     log:
@@ -152,7 +152,7 @@ rule vcftools_annotate_mistic:
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/vcftools/annotate/{sample}.mistic.log",

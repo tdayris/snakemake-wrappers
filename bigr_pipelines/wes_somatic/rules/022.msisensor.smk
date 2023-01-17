@@ -20,7 +20,7 @@ rule msisensor_pro_msi:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/msisensor_pro/msi/{sample}.log",
@@ -39,7 +39,7 @@ rule msi_results:
     resources:
         mem_mb=get_5gb_per_attempt,
         time_min=get_15min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     log:
         "logs/msisensor/table.log",
     params:

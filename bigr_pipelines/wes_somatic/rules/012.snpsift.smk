@@ -10,7 +10,7 @@ rule snpsift_gwascat:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     params:
         extra=config.get("snpsift_gwascat", "-noDownload -noLog"),
@@ -31,7 +31,7 @@ rule snpsift_dbvar:
     resources:
         mem_mb=get_20gb_and_10gb_per_attempt,
         time_min=get_5h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     params:
         extra=config["snpsift"].get("dbvar", "-name 'dbVar_' -tabix -noDownload -noLog"),
@@ -52,7 +52,7 @@ rule snpsift_exac:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_75min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     params:
         extra=config["snpsift"].get(
@@ -75,7 +75,7 @@ rule snpsift_gnomad:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     params:
         extra=config["snpsift"].get(
@@ -98,7 +98,7 @@ rule snpsift_clinvar:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     params:
         extra=config["snpsift"].get(
@@ -120,7 +120,7 @@ rule snpsift_dbnsfp:
     resources:
         mem_mb=get_20gb_and_10gb_per_attempt,
         time_min=lambda wildcards, attempt: attempt * 45,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     params:
         extra=config["snpsift"].get(
@@ -143,7 +143,7 @@ rule snpsift_cosmic:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_2h_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     params:
         extra=config["snpsift"].get(
@@ -168,7 +168,7 @@ rule snpsift_kaviar:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1020 + 4096,
         time_min=lambda wildcards, attempt: attempt * 45,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/snpsift/kaviar/{sample}.log",
@@ -190,7 +190,7 @@ rule snpsift_gmt:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/snpsift/gmt/{sample}.log",
@@ -209,7 +209,7 @@ rule snpsift_dbsnp:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/snpsift/dbsnp/{sample}.log",
@@ -229,7 +229,7 @@ rule snpsift_vartype:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/snpsift/varType/{sample}.log",

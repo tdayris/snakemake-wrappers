@@ -14,7 +14,7 @@ rule star_align_chimera:
     resources:
         mem_mb=get_75gb_and_5gb_per_attempt,
         time_min=get_90min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/star/{sample}_{status}.log",
@@ -34,7 +34,7 @@ rule sambamba_sort_star:
     resources:
         mem_mb=get_6gb_per_attempt,
         time_min=get_90min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     shadow:
         "shallow"

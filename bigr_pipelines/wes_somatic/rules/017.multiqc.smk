@@ -35,7 +35,7 @@ rule multiqc_variant:
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/multiqc.log",
@@ -79,7 +79,7 @@ rule multiqc_mapping:
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/multiqc.log",
@@ -121,7 +121,7 @@ rule multiqc_fusions:
     resources:
         mem_mb=get_2gb_per_attempt,
         time_min=get_45min_per_attempt,
-        tmpdir="tmp",
+        tmpdir=tmp,
     retries: 1
     log:
         "logs/multiqc.log",
