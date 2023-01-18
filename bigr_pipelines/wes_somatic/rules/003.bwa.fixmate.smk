@@ -128,7 +128,7 @@ rule bwa_mem:
             stream=["1", "2"],
             allow_missing=True,
         ),
-        index=config["reference"]["bwa_index"],
+        idx=config["reference"]["bwa_index"],
     output:
         temp("bwa_mem2/mem/{sample}_{status}.sam"),
     threads: config.get("max_threads", 20)
