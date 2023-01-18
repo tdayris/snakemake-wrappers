@@ -130,7 +130,7 @@ rule gatk_variant_filtration:
         "bio/gatk/variantfiltration"
 
 
-rule gatk_select_variants:
+rule gatk_select_variants_postannot:
     input:
         vcf="gatk/variantfiltration/{sample}.post.annot.vcf.gz",
         vcf_tbi="gatk/variantfiltration/{sample}.post.annot.vcf.gz",

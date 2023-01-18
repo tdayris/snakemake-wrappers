@@ -68,7 +68,7 @@ rule gatk_hard_filtering:
         "bio/gatk/variantfiltration"
 
 
-rule gatk_select_variants:
+rule gatk_select_variants_preannot:
     input:
         vcf="gatk/variantfiltration/{sample}.vcf.gz",
         vcf_tbi="gatk/variantfiltration/{sample}.vcf.gz.tbi",
