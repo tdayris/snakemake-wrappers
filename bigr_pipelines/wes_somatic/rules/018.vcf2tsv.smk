@@ -134,6 +134,9 @@ rule gatk_select_variants_postannot:
     input:
         vcf="gatk/variantfiltration/{sample}.post.annot.vcf.gz",
         vcf_tbi="gatk/variantfiltration/{sample}.post.annot.vcf.gz",
+        ref=config["reference"]["fasta"],
+        ref_index=config["reference"]["fasta_index"],
+        ref_dict=config["reference"]["fasta_dict"],
     output:
         vcf=protected("data_output/VCF/{sample}.vcf.gz"),
         vcf_tbi=protected("data_output/VCF/{sample}.vcf.gz.tbi"),

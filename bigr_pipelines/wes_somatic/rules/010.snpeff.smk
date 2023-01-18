@@ -72,6 +72,9 @@ rule gatk_select_variants_preannot:
     input:
         vcf="gatk/variantfiltration/{sample}.vcf.gz",
         vcf_tbi="gatk/variantfiltration/{sample}.vcf.gz.tbi",
+        ref=config["reference"]["fasta"],
+        ref_index=config["reference"]["fasta_index"],
+        ref_dict=config["reference"]["fasta_dict"],
     output:
         vcf=temp("gatk/selectvariant/{sample}.preannot.vcf"),
     threads: 1
