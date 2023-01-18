@@ -59,7 +59,7 @@ design.index = design["Sample_id"]
 ### Global variables ###
 ########################
 
-tmp = os.getev("BIGR_DEFAULT_TMP", "tmp")
+tmp = os.getenv("BIGR_DEFAULT_TMP", "tmp")
 sample_list = design["Sample_id"].tolist()
 streams = ["1", "2"]
 status_list = ["normal", "tumor"]
