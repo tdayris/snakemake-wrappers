@@ -41,7 +41,7 @@ rule gatk_hard_filtering:
         ref_dict=config["reference"]["fasta_dict"],
     output:
         vcf=temp("gatk/variantfiltration/{sample}.vcf.gz"),
-        vcf_tbi=temp("gatk/variantfiltration/{sample}.vcf.gz"),
+        vcf_tbi=temp("gatk/variantfiltration/{sample}.vcf.gz.tbi"),
     threads: 1
     resources:
         mem_mb=get_8gb_per_attempt,
@@ -71,7 +71,7 @@ rule gatk_hard_filtering:
 rule gatk_select_variants:
     input:
         vcf="gatk/variantfiltration/{sample}.vcf.gz",
-        vcf_tbi="gatk/variantfiltration/{sample}.vcf.gz",
+        vcf_tbi="gatk/variantfiltration/{sample}.vcf.gz.tbi",
     output:
         vcf=temp("gatk/selectvariant/{sample}.preannot.vcf"),
     threads: 1
