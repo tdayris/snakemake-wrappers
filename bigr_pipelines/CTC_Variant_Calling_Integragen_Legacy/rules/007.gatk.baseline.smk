@@ -12,7 +12,7 @@ rule gatk_select_variants_baseline:
     threads: 1
     resources:
         mem_mb=4 * 1024,
-        java_mem_gb=3.8 * 1024,
+        java_mem_gb=4 * 1024,
         time_min=get_6h_per_attempt,
         tmpdir=tmp,
     group:
@@ -46,7 +46,7 @@ rule gatk_select_variants_wbc:
     threads: 1
     resources:
         mem_mb=4 * 1024,
-        java_mem_gb=3.8 * 1024,
+        java_mem_gb=4 * 1024,
         time_min=get_6h_per_attempt,
         tmpdir=tmp,
     group:
