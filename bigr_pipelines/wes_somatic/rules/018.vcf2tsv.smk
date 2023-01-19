@@ -130,7 +130,7 @@ rule gatk_variant_filtration:
         "bio/gatk/variantfiltration"
 
 
-rule bcftools_select_variants_preannot:
+rule bcftools_select_variants_postannot:
     input:
         vcf="bcftools/filter/{sample}.post.annot.vcf.gz",
         vcf_tbi="bcftools/filter/{sample}.post.annot.vcf.gz",
