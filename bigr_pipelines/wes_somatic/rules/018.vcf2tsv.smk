@@ -147,7 +147,7 @@ rule gatk_select_variants_postannot:
         time_min=get_90min_per_attempt,
         tmpdir=tmp,
     params:
-        extra="-select 'vc.isNotFiltered()' --create-output-variant-index --create-output-variant-md5"
+        extra="--exclude-filtered --create-output-variant-index --create-output-variant-md5"
     log:
         "logs/gatk/selectvariants/{sample}.pre.annotation.log"
     wrapper:
