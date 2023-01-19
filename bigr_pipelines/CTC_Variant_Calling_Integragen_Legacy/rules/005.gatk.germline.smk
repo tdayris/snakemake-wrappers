@@ -56,7 +56,7 @@ rule gatk_genotype_gvcf:
     resources:
         mem_mb=get_2gb_per_attempt,
         java_mem_gb=get_1p5gb_per_attempt,
-        time_min=get_2h_per_attempt,
+        time_min=get_6h_per_attempt,
         tmpdir=tmp,
     group:
         "baseline_wbc_calling"
@@ -98,7 +98,7 @@ rule gatk_select_variants_snp:
     resources:
         mem_mb=get_2gb_per_attempt,
         java_mem_gb=get_1p5gb_per_attempt,
-        time_min=get_2h_per_attempt,
+        time_min=get_6h_per_attempt,
         tmpdir=tmp,
     group:
         "baseline_wbc_variant_filters"
@@ -139,7 +139,7 @@ rule gatk_variant_filtration:
     resources:
         mem_mb=get_2gb_per_attempt,
         java_mem_gb=get_1p5gb_per_attempt,
-        time_min=get_2h_per_attempt,
+        time_min=get_6h_per_attempt,
         tmpdir=tmp,
     group:
         "baseline_wbc_variant_filters"
