@@ -77,7 +77,7 @@ rule gatk_genotype_gvcf:
         "-T GenotypeGVCFs "
         "{params.extra} "
         "-R {input.fasta} "
-        "-V {input.baseline} "
+        "-V {input.normal} "
         "-V {input.wbc} "
         "-o {output} "
         "> {log} 2>&1"
