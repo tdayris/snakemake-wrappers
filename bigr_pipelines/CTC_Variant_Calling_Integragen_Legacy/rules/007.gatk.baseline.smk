@@ -27,7 +27,7 @@ rule gatk_select_variants_baseline:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "gatk "
-        "-Xmx{resources.java_mem_gb}GB "
+        "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T SelectVariants "
         "{params.extra} "
@@ -61,7 +61,7 @@ rule gatk_select_variants_wbc:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
         "gatk "
-        "-Xmx{resources.java_mem_gb}GB "
+        "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T SelectVariants "
         "{params.extra} "
