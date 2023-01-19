@@ -12,7 +12,7 @@ rule gatk_haplotype_caller:
     threads: 1
     resources:
         mem_mb=4 * 1024,
-        java_mem_gb=3 * 1024,
+        java_mem_gb=3.8 * 1024,
         time_min=get_8h_per_attempt,
         tmpdir=tmp,
     group:
@@ -53,7 +53,7 @@ rule gatk_genotype_gvcf:
     threads: 1
     resources:
         mem_mb=4 * 1024,
-        java_mem_gb=3 * 1024,
+        java_mem_gb=3.8 * 1024,
         time_min=get_6h_per_attempt,
         tmpdir=tmp,
     group:
@@ -93,7 +93,7 @@ rule gatk_select_variants_snp:
     threads: 1
     resources:
         mem_mb=4 * 1024,
-        java_mem_gb=3 * 1024,
+        java_mem_gb=3.8 * 1024,
         time_min=get_6h_per_attempt,
         tmpdir=tmp,
     group:
@@ -132,7 +132,7 @@ rule gatk_variant_filtration:
     threads: 1
     resources:
         mem_mb=4 * 1024,
-        java_mem_gb=3 * 1024,
+        java_mem_gb=3.8 * 1024,
         time_min=get_6h_per_attempt,
         tmpdir=tmp,
     group:
