@@ -132,8 +132,8 @@ rule gatk_variant_filtration:
 
 rule bcftools_select_variants_postannot:
     input:
-        vcf=temp("gatk/variantfiltration/{sample}.post.annot.vcf.gz"),
-        vcf_tbi=temp("gatk/variantfiltration/{sample}.post.annot.vcf.gz.tbi"),
+        vcf="gatk/variantfiltration/{sample}.post.annot.vcf.gz",
+        vcf_tbi="gatk/variantfiltration/{sample}.post.annot.vcf.gz.tbi",
         ref=config["reference"]["fasta"],
         ref_index=config["reference"]["fasta_index"],
         ref_dict=config["reference"]["fasta_dict"],
