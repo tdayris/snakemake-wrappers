@@ -52,7 +52,10 @@ for k, v in igs.items():
     try:
         samples[k] = (samples[k] / v) * 1_000_000
     except KeyError:
-        samples[int(k)] = samples[int(k)] / igs_mb
+        try:
+            samples[int(k)] = samples[int(k)] / igs_mb
+        except:
+            samples[k] = 0
 
 samples["TMB"] = [
     f"{tmb} (TMB High)" if tmb > high_threshold
