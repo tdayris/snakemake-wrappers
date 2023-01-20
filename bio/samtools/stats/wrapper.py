@@ -14,17 +14,13 @@ from snakemake_wrapper_utils.samtools import get_samtools_opts
 extra = snakemake.params.get("extra", "")
 region = snakemake.params.get("region", "")
 bed = snakemake.input.get("bed")
+log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 if bed:
     extra += " -t " + bed
 
 samtools_opts = get_samtools_opts(
     snakemake, parse_write_index=False, parse_output=False, parse_output_format=False
 )
-
-
-extra = snakemake.params.get("extra", "")
-region = snakemake.params.get("region", "")
-log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 reference = snakemake.input.get("ref", "")
 if reference:
