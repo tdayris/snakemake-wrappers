@@ -1,6 +1,6 @@
 rule samtools_stats_raw:
     input:
-        aln="bwa_mem2/sorted/{sample}_{status}.bam",
+        bam="bwa_mem2/sorted/{sample}_{status}.bam",
         bai="bwa_mem2/sorted/{sample}_{status}.bam.bai",
         ref=config["reference"]["fasta"],
         ref_idx=config["reference"]["fasta_index"],
@@ -23,7 +23,7 @@ rule samtools_stats_raw:
 
 rule samtools_stats_cleaned:
     input:
-        aln="sambamba/markdup/{sample}_{status}.bam",
+        bam="sambamba/markdup/{sample}_{status}.bam",
         bai="sambamba/markdup/{sample}_{status}.bam.bai",
         ref=config["reference"]["fasta"],
         ref_idx=config["reference"]["fasta_index"],
