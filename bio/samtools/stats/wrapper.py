@@ -13,7 +13,7 @@ from snakemake_wrapper_utils.samtools import get_samtools_opts
 
 extra = snakemake.params.get("extra", "")
 region = snakemake.params.get("region", "")
-bed = snakemake.input.get("bed", "")
+bed = snakemake.input.get("bed")
 if bed:
     extra += " -t " + bed
 
@@ -31,5 +31,5 @@ if reference:
     extra += f" -r {reference}"
 
 shell(
-    "samtools stats {samtools_opts} {extra} {snakemake.input.bam} {bed} {region} > {snakemake.output} {log}"
+    "samtools stats {samtools_opts} {extra} {snakemake.input.bam} {region} > {snakemake.output} {log}"
 )
