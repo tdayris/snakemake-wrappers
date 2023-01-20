@@ -22,6 +22,14 @@ rule variants_only:
         tmb="data_output/TMB.tsv",
         msi="data_output/MSI.tsv",
         cnv=expand("data_output/CNV/{sample}.tsv", sample=sample_list),
+        full_vcf=expand(
+            "bcftools/filter/{sample}.preannot.vcf.gz",
+            sample=sample_list
+        ),
+        full_vcf_idx=expand(
+            "bcftools/filter/{sample}.preannot.vcf.gz.tbi",
+            sample=sample_list
+        )
 
 
 rule cnv_only:

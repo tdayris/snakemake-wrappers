@@ -2,7 +2,7 @@ rule sambamba_index_bam:
     input:
         "{tool}/{subcommand}/{sample}_{status}.bam",
     output:
-        "{tool}/{subcommand}/{sample}_{status}.bam.bai",
+        temp("{tool}/{subcommand}/{sample}_{status}.bam.bai"),
     threads: min(config.get("max_threads", 8), 8)
     resources:
         mem_mb=get_4gb_per_attempt,

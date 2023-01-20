@@ -76,7 +76,7 @@ rule bcftools_select_variants_preannot:
         ref_index=config["reference"]["fasta_index"],
         ref_dict=config["reference"]["fasta_dict"],
     output:
-        vcf="bcftools/filter/{sample}.preannot.vcf",
+        vcf=temp("bcftools/filter/{sample}.preannot.vcf"),
     threads: 1
     resources:
         mem_mb=get_8gb_per_attempt,

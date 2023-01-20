@@ -48,7 +48,7 @@ rule extractfields:
         call="data_output/VCF/{sample}.vcf.gz",
         call_index="data_output/VCF/{sample}.vcf.gz.tbi",
     output:
-        tsv="snpsift/extractFields/{sample}.tsv",
+        tsv=temp("snpsift/extractFields/{sample}.tsv"),
     threads: 2
     resources:
         mem_mb=get_6gb_per_attempt,
