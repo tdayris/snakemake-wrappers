@@ -1,7 +1,7 @@
 rule snpeff:
     input:
-        calls="bcftools/mutect2/{sample}.vcf.gz",
-        calls_index="bcftools/mutect2/{sample}.vcf.gz.tbi",
+        calls="mutect2/corrected/{sample}.vcf.gz",
+        calls_index="mutect2/corrected/{sample}.vcf.gz.tbi",
         db=config["reference"]["snpeff"],
     output:
         calls=temp("snpeff/calls/{sample}.vcf"),
@@ -68,7 +68,7 @@ rule gatk_hard_filtering:
         "bio/gatk/variantfiltration"
 
 
-rule gatk_select_variants_preannot:
+rule bcftools_select_variants_preannot:
     input:
         vcf="gatk/variantfiltration/{sample}.vcf.gz",
         vcf_tbi="gatk/variantfiltration/{sample}.vcf.gz.tbi",
@@ -76,15 +76,15 @@ rule gatk_select_variants_preannot:
         ref_index=config["reference"]["fasta_index"],
         ref_dict=config["reference"]["fasta_dict"],
     output:
-        vcf=temp("gatk/selectvariant/{sample}.preannot.vcf"),
+        vcf="bcftools/filter/{sample}.preannot.vcf",
     threads: 1
     resources:
         mem_mb=get_8gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir=tmp,
     params:
-        extra="-select 'vc.isNotFiltered()'"
+        extra="--include 'FILTER==\"PASS\" || FILTER==\".\"'",
     log:
-        "logs/gatk/selectvariants/{sample}.pre.annotation.log"
+        "logs/bcftools/filter/{sample}.pre.annotation.log"
     wrapper:
-        "bio/gatk/selectvariants"
+        "bio/bcftools/filter"

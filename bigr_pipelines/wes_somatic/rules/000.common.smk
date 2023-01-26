@@ -38,7 +38,6 @@ ruleorder: gatk_variant_filtration > tabix_index
 ruleorder: gleaves_compatibility > tabix_index
 ruleorder: gleaves_compatibility > pbgzip_compress
 ruleorder: gatk_hard_filtering > tabix_index
-ruleorder: gatk_select_variants_postannot > tabix_index
 
 
 ########################

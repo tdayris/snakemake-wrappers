@@ -1,6 +1,6 @@
 rule splice_ai:
     input:
-        vcf="gatk/selectvariant/{sample}.preannot.vcf",
+        vcf="bcftools/filter/{sample}.preannot.vcf",
         fasta=config["reference"]["fasta"],
         fasta_index=config["reference"]["fasta_index"],
     output:

@@ -130,25 +130,23 @@ rule gatk_variant_filtration:
         "bio/gatk/variantfiltration"
 
 
-rule gatk_select_variants_postannot:
+rule bcftools_select_variants_postannot:
     input:
         vcf="gatk/variantfiltration/{sample}.post.annot.vcf.gz",
-        vcf_tbi="gatk/variantfiltration/{sample}.post.annot.vcf.gz",
+        vcf_tbi="gatk/variantfiltration/{sample}.post.annot.vcf.gz.tbi",
         ref=config["reference"]["fasta"],
         ref_index=config["reference"]["fasta_index"],
         ref_dict=config["reference"]["fasta_dict"],
     output:
         vcf=protected("data_output/VCF/{sample}.vcf.gz"),
-        vcf_tbi=protected("data_output/VCF/{sample}.vcf.gz.tbi"),
-        md5=protected("data_output/VCF/{sample}.vcf.gz.md5"),
     threads: 1
     resources:
         mem_mb=get_8gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir=tmp,
     params:
-        extra="-select 'vc.isNotFiltered()' --create-output-variant-index --create-output-variant-md5"
+        extra="--include 'FILTER==\"PASS\" || FILTER==\".\"'",
     log:
-        "logs/gatk/selectvariants/{sample}.pre.annotation.log"
+        "logs/bcftools/filter/{sample}.post.annotation.log"
     wrapper:
-        "bio/gatk/selectvariants"
+        "bio/bcftools/filter"
