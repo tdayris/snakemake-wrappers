@@ -6,7 +6,7 @@ import sys
 import functools
 from pathlib import Path
 
-workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
+# workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
 common = str(workflow_source_dir / ".." / "common" / "python")
 sys.path.append(common)
 
@@ -161,6 +161,11 @@ def targets(wildcards):
     base = {
         "bam": expand(
             "data_output/BAM/{sample}_{status}.bam",
+            sample=sample_list,
+            status=status_list,
+        ),
+        "bam_md5": expand(
+            "data_output/BAM/{sample}_{status}.bam.md5",
             sample=sample_list,
             status=status_list,
         ),
