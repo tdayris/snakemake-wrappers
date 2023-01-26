@@ -20,7 +20,7 @@ rule correct_mutect2_vcf:
     params:
         fix_as_filterstatus="'s/ID=AS_FilterStatus,Number=A/ID=AS_FilterStatus,Number=1/g'",
     conda:
-        str(workflow_source_dir / "envs" / "bash.yaml")
+        "../envs/bash.yaml"
     shell:
         "sed {params.fix_as_filterstatus} {input} > {output} 2> {log}"
 
@@ -41,7 +41,7 @@ rule gunzip_mutect2_vcf:
     params:
         "-c",
     conda:
-        str(workflow_source_dir / "envs" / "bash.yaml")
+        "../envs/bash.yaml"
     shell:
         "gunzip {params} {input} > {output} 2> {log}"
 
