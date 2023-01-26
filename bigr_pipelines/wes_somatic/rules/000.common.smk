@@ -149,7 +149,6 @@ def get_filter_mutect2_input(wildcards) -> Dict[str, str]:
         "bam": "sambamba/markdup/{sample}_tumor.bam",
         "bam_index": get_bai("sambamba/markdup/{sample}_tumor.bam"),
         "f1r2": "gatk/orientation_model/{sample}/{sample}.artifacts-prior.tar.gz",
-        "contamination": "summary/{sample}_calculate_contamination.table",
     }
 
     if "Upstream_file_normal" in design.columns.tolist():
