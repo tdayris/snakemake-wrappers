@@ -17,7 +17,7 @@ rule estimate_igs:
     log:
         "logs/igs_estimation.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "tmb" / "igs_estimation")
+        "bio/tmb/igs_estimation"
 
 
 """
@@ -45,7 +45,7 @@ rule extract_somatic_mutations:
         min_coverage=config["tmb"].get("min_coverage", 10),
         allele_depth=config["tmb"].get("allele_depth_keyname", "AD"),
     wrapper:
-        str(wrapper_prefix / "bio" / "tmb" / "extract_somatic")
+        "bio/tmb/extract_somatic"
 
 
 """
@@ -70,4 +70,4 @@ rule compute_tmb:
     params:
         high_threshold=config["tmb"].get("tmb_highness_threshold", 20),
     wrapper:
-        str(wrapper_prefix / "bio" / "tmb" / "compute_tmb")
+        "bio/tmb/compute_tmb"

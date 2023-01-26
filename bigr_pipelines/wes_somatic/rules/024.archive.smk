@@ -28,7 +28,7 @@ rule bcftools_archive:
     params:
         extra="--compression-level 9",
     wrapper:
-        str(wrapper_prefix / "bio" / "bcftools" / "view")
+        "bio/bcftools/view"
 
 
 rule gzip_tsv:
@@ -106,4 +106,4 @@ rule cram_mapping:
     params:
         extra="-h",
     wrapper:
-        str(wrapper_prefix / "bio" / "samtools" / "view")
+        "bio/samtools/view"

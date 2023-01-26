@@ -66,7 +66,7 @@ rule split_multiallelic_mutect2:
     log:
         "logs/bcftools/norm/mutect2/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "bcftools" / "norm")
+        "bio/bcftools/norm"
 
 
 ###########################################
@@ -94,7 +94,7 @@ rule gatk_filter_mutect_calls:
     log:
         "logs/mutect2/filter/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "gatk" / "filtermutectcalls")
+        "bio/gatk/filtermutectcalls"
 
 
 """
@@ -122,7 +122,7 @@ rule calculate_tumor_contamination:
     log:
         "logs/gatk/CalculateContamination/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "gatk" / "calculatecontamination")
+        "bio/gatk/calculatecontamination"
 
 
 """
@@ -152,7 +152,7 @@ rule get_pileup_summaries:
     log:
         "logs/gatk/GetPileupSummaries/{sample}.{status}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "gatk" / "getpileupsummaries")
+        "bio/gatk/getpileupsummaries"
 
 
 """
@@ -176,7 +176,7 @@ rule gatk_learn_read_orientation_model:
     log:
         "gatk/orientation_model/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "gatk" / "learnreadorientationmodel")
+        "bio/gatk/learnreadorientationmodel"
 
 
 ######################
@@ -206,4 +206,4 @@ rule mutect2_somatic:
     log:
         "logs/gatk/mutect2/call/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "gatk" / "mutect")
+        "bio/gatk/mutect"

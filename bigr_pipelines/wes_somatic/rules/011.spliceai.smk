@@ -17,4 +17,4 @@ rule splice_ai:
     log:
         "logs/splice_ai/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "spliceai")
+        "bio/spliceai"

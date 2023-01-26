@@ -13,7 +13,7 @@ rule variant_occurence_annotate:
     log:
         "logs/variant_occurence/uncompress/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "variantoccurence" / "annotate")
+        "bio/variantoccurence/annotate"
 
 
 rule concatenate_per_chr_information:
@@ -28,7 +28,7 @@ rule concatenate_per_chr_information:
         tmpdir=tmp,
     retries: 1
     conda:
-        str(workflow_source_dir / "envs" / "bash.yaml")
+        str(workflow_source_dir / "envs"/ "bash.yaml")
     log:
         "logs/variant_occurence/all.log",
     shell:
@@ -49,4 +49,4 @@ rule variant_occurence_per_chr:
     log:
         "logs/variant_occurence/{chr}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "variantoccurence" / "chromosomes")
+        "bio/variantoccurence/chromosomes"

@@ -25,4 +25,4 @@ rule cnv_facets:
     log:
         "logs/facets/cnv/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "facets" / "cnv")
+        "bio/facets/cnv"

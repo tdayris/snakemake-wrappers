@@ -15,4 +15,4 @@ rule sambamba_markduplicates:
     params:
         extra=config["sambamba"].get("markdup_extra", "--remove-duplicates"),
     wrapper:
-        str(wrapper_prefix / "bio" / "sambamba" / "markdup")
+        "bio/sambamba/markdup"

@@ -47,4 +47,4 @@ rule add_census:
     log:
         "logs/annot_sv/census/{sample}.log",
     script:
-        str(workflow_source_dir / "scripts" / "add_census.py")
+        str(workflow_source_dir / "scripts/add_census.py")

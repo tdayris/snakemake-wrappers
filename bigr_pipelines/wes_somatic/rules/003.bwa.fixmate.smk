@@ -148,4 +148,4 @@ rule bwa_mem:
     log:
         "logs/bwa_mem2/mem/{sample}.{status}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "bwa-mem2" / "mem")
+        "bio/bwa-mem2/mem"

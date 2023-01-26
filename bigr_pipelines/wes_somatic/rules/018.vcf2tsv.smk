@@ -41,7 +41,7 @@ rule filter_tsv:
     log:
         "logs/pandas/filter_tsv/{sample}.log"
     wrapper:
-        str(wrapper_prefix / "bio" / "pandas" / "filter_table")
+        "bio/pandas/filter_table"
 
 
 rule extractfields:
@@ -61,7 +61,7 @@ rule extractfields:
     params:
         extra=config["snpsift"].get("extract_all_fields", "-s ';' -e '.'"),
     wrapper:
-        str(wrapper_prefix / "bio" / "snpsift" / "extractAllFields")
+        "bio/snpsift/extractAllFields"
 
 
 rule fix_vcf:
@@ -84,7 +84,7 @@ rule fix_vcf:
             True,
         ),
     wrapper:
-        str(wrapper_prefix / "bio" /" BiGR" / "fix_vcf")
+        "bio/BiGR/fix_vcf"
 
 
 rule gleaves_compatibility:
@@ -102,7 +102,7 @@ rule gleaves_compatibility:
     log:
         "logs/BiGR/gleaves_compatibility/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "BiGR" / "gleaves_compatibility")
+        "bio/BiGR/gleaves_compatibility"
 
 
 rule gatk_variant_filtration:
@@ -127,7 +127,7 @@ rule gatk_variant_filtration:
         filters=config["gatk"].get("filtgatk_filters_annotationers", {"DepthBelow10X": "DP < 10"}),
         extra="--create-output-variant-index --create-output-variant-md5",
     wrapper:
-        str(wrapper_prefix / "bio" / "gatk" / "variantfiltration")
+        "bio/gatk/variantfiltration"
 
 
 rule bcftools_select_variants_postannot:
@@ -149,4 +149,4 @@ rule bcftools_select_variants_postannot:
     log:
         "logs/bcftools/filter/{sample}.post.annotation.log"
     wrapper:
-        str(wrapper_prefix / "bio" / "bcftools" / "filter")
+        "bio/bcftools/filter"

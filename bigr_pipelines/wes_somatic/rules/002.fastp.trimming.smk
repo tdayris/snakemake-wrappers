@@ -27,4 +27,4 @@ rule fastp_clean:
     log:
         "logs/fastp/{sample}.{status}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "fastp")
+        "bio/fastp"

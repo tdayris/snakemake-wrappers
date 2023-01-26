@@ -17,7 +17,7 @@ rule snpsift_gwascat:
     log:
         "logs/snpsift/gwascat/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "snpsift" / "gwascat")
+        "bio/snpsift/gwascat")
 
 
 rule snpsift_dbvar:
@@ -38,7 +38,7 @@ rule snpsift_dbvar:
     log:
         "logs/snpsift/dbvar/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "snpsift" / "annotate")
+        "bio/snpsift/annotate"
 
 
 rule snpsift_exac:
@@ -61,7 +61,7 @@ rule snpsift_exac:
     log:
         "logs/snpsift/exac/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "snpsift" / "annotate")
+        "bio/snpsift/annotate"
 
 
 rule snpsift_gnomad:
@@ -84,7 +84,7 @@ rule snpsift_gnomad:
     log:
         "logs/snpsift/gnomad/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "snpsift" / "annotate")
+        "bio/snpsift/annotate"
 
 
 rule snpsift_clinvar:
@@ -107,7 +107,7 @@ rule snpsift_clinvar:
     log:
         "logs/snpsift/clinvar/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "snpsift" / "annotate")
+        "bio/snpsift/annotate"
 
 
 rule snpsift_dbnsfp:
@@ -129,7 +129,7 @@ rule snpsift_dbnsfp:
     log:
         "logs/snpsift/dbnsfp/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "snpsift" / "dbnsfp")
+        "bio/snpsift/dbnsfp"
 
 
 rule snpsift_cosmic:
@@ -152,7 +152,7 @@ rule snpsift_cosmic:
     log:
         "logs/snpsift/cosmic/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "snpsift" / "annotate")
+        "bio/snpsift/annotate"
 
 
 rule snpsift_kaviar:
@@ -177,7 +177,7 @@ rule snpsift_kaviar:
             "kaviar", "-name 'Kaviar_' -tabix -noDownload -noLog"
         ),
     wrapper:
-        str(wrapper_prefix / "bio" / "snpsift" / "annotate")
+        "bio/snpsift/annotate"
 
 
 rule snpsift_gmt:
@@ -195,7 +195,7 @@ rule snpsift_gmt:
     log:
         "logs/snpsift/gmt/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "snpsift" / "genesets")
+        "bio/snpsift/genesets"
 
 
 rule snpsift_dbsnp:
@@ -216,7 +216,7 @@ rule snpsift_dbsnp:
     params:
         extra=config["snpsift"].get("dbsnp", "-name 'dbSNP_' -tabix -noDownload -noLog"),
     wrapper:
-        str(wrapper_prefix / "bio" / "snpsift" / "annotate")
+        "bio/snpsift/annotate"
 
 
 rule snpsift_vartype:
@@ -234,4 +234,4 @@ rule snpsift_vartype:
     log:
         "logs/snpsift/varType/{sample}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "snpsift" / "varType")
+        "bio/snpsift/varType"

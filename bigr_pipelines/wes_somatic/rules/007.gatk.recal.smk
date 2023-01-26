@@ -20,7 +20,7 @@ rule gatk_apply_baserecalibrator:
     log:
         "logs/gatk/applybqsr/{sample}.{status}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "gatk" / "applybqsr")
+        "bio/gatk/applybqsr"
 
 
 rule gatk_compute_baserecalibration_table:
@@ -45,4 +45,4 @@ rule gatk_compute_baserecalibration_table:
     params:
         extra=config["gatk"].get("base_recalibrator"),
     wrapper:
-        str(wrapper_prefix / "bio" / "gatk" / "baserecalibrator")
+        "bio/gatk/baserecalibrator"

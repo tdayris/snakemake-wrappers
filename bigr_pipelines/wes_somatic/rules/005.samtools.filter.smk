@@ -18,4 +18,4 @@ rule samtools_filter_bed:
     log:
         "logs/samtools/filter/{sample}_{status}.log",
     wrapper:
-        str(wrapper_prefix / "bio" / "samtools" / "view")
+        "bio/samtools/view"

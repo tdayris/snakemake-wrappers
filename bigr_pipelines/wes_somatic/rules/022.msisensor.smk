@@ -27,7 +27,7 @@ rule msisensor_pro_msi:
     params:
         extra=config["msisensor"].get("extra", ""),
     wrapper:
-        str(wrapper_prefix / "bio" / "msisensor_pro" / "msi")
+        "bio/msisensor_pro/msi"
 
 
 rule msi_results:
@@ -46,4 +46,4 @@ rule msi_results:
         stability=config["msisensor"].get("stability_threshold", 20),
         sample_list=sample_list,
     wrapper:
-        str(wrapper_prefix / "bio" / "BiGR" / "msisensor_table")
+        "bio/BiGR/msisensor_table"

@@ -62,7 +62,7 @@ rule vcftools_annotate_mane:
             "INFO/MANE_chr_strand",
         ),
     wrapper:
-        str(wrapper_prefix / "bio" / "vcftools" / "annotate")
+        "bio/vcftools/annotate"
 
 
 ######################
@@ -117,7 +117,7 @@ rule vcftools_annotate_revel:
             else "--columns CHROM,-,POS,REF,ALT,INFO/AAREF,INFO/AAALT,INFO/REVEL,INFO/REVEL_Ensembl_transcriptid",
         ),
     wrapper:
-        str(wrapper_prefix / "bio" / "vcftools" / "annotate")
+        "bio/vcftools/annotate"
 
 
 #######################
@@ -134,7 +134,7 @@ rule additional_headers_mistic:
         time_min=get_15min_per_attempt,
         tmpdir=tmp,
     conda:
-        str(workflow_source_dir / "envs" / "bash.yaml")
+        str(workflow_source_dir / "envs/bash.yaml")
     group:
         "additional_headers"
     log:
@@ -167,4 +167,4 @@ rule vcftools_annotate_mistic:
             "mistic", "--columns CHROM,POS,REF,ALT,INFO/MISTIC_score,INFO/MISTIC_pred"
         ),
     wrapper:
-        str(wrapper_prefix / "bio" / "vcftools" / "annotate")
+        "bio/vcftools/annotate"
