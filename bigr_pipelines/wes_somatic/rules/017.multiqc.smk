@@ -15,13 +15,6 @@ rule multiqc_variant:
             sample=design["Sample_id"],
             status=status_list,
         ),
-        # fastq_screen=expand(
-        #     "fastq_screen/{sample}.{stream}.{status}.fastq_screen.{ext}",
-        #     sample=design["Sample_id"],
-        #     stream=streams,
-        #     ext=["txt", "png"],
-        #     status=status_list,
-        # ),
         samtools_stats=expand(
             "samtools/stats/{sample}_{status}.{cleaning}.stats",
             sample=sample_list,
@@ -29,6 +22,7 @@ rule multiqc_variant:
             cleaning=cleaning_status,
         ),
         csvstats=expand("snpeff/csvstats/{sample}.csv", sample=sample_list),
+        htmlstats=expand("snpeff/report/{sample}.html", sample=sample_list),
     output:
         protected("data_output/MultiQC/Somatic_Variant_Calling.html"),
     threads: 1
@@ -37,6 +31,8 @@ rule multiqc_variant:
         time_min=get_45min_per_attempt,
         tmpdir=tmp,
     retries: 1
+    params:
+        extra="--module fastp --mudule sambamba --module samtools --module snpeff"
     log:
         "logs/multiqc.log",
     wrapper:
@@ -60,13 +56,6 @@ rule multiqc_mapping:
             sample=design["Sample_id"],
             status=status_list,
         ),
-        fastq_screen=expand(
-            "fastq_screen/{sample}.{stream}.{status}.fastq_screen.{ext}",
-            sample=design["Sample_id"],
-            stream=streams,
-            ext=["txt", "png"],
-            status=status_list,
-        ),
         samtools_stats=expand(
             "samtools/stats/{sample}_{status}.{cleaning}.stats",
             sample=sample_list,
@@ -81,6 +70,8 @@ rule multiqc_mapping:
         time_min=get_45min_per_attempt,
         tmpdir=tmp,
     retries: 1
+    params:
+        extra="--module fastp --mudule sambamba --module samtools"
     log:
         "logs/multiqc.log",
     wrapper:
@@ -123,6 +114,8 @@ rule multiqc_fusions:
         time_min=get_45min_per_attempt,
         tmpdir=tmp,
     retries: 1
+    params:
+        extra="--module fastp --mudule sambamba --module samtools --module snpeff --module star"
     log:
         "logs/multiqc.log",
     wrapper:

@@ -55,15 +55,7 @@ rule split_multiallelic_mutect2:
 
 rule gatk_filter_mutect_calls:
     input:
-        vcf="mutect2/call/{sample}.vcf.gz",
-        vcf_tbi=get_tbi("mutect2/call/{sample}.vcf.gz"),
-        ref=config["reference"]["fasta"],
-        ref_index=config["reference"]["fasta_index"],
-        ref_dict=config["reference"]["fasta_dict"],
-        bam="sambamba/markdup/{sample}_tumor.bam",
-        bam_index=get_bai("sambamba/markdup/{sample}_tumor.bam"),
-        f1r2="gatk/orientation_model/{sample}/{sample}.artifacts-prior.tar.gz",
-        contamination="summary/{sample}_calculate_contamination.table",
+        unpack(get_filter_mutect2_input)
     output:
         vcf=temp("mutect2/filter/{sample}.vcf.gz"),
         vcf_index=temp("mutect2/filter/{sample}.vcf.gz.tbi"),
@@ -177,16 +169,7 @@ This rule calls somatic variants with GATK Mutect2
 
 rule mutect2_somatic:
     input:
-        fasta=config["reference"]["fasta"],
-        fasta_idx=config["reference"]["fasta_index"],
-        fasta_dict=config["reference"]["fasta_dict"],
-        map="sambamba/markdup/{sample}_normal.bam",
-        map_idx="sambamba/markdup/{sample}_normal.bam.bai",
-        tumor="sambamba/markdup/{sample}_tumor.bam",
-        tumor_idx="sambamba/markdup/{sample}_tumor.bam.bai",
-        germline=config["reference"]["af_only"],
-        germline_tbi=config["reference"]["af_only_tbi"],
-        intervals=config["reference"]["capture_kit_bed"],
+        unpack(get_mutect2_input),
     output:
         vcf=temp("mutect2/call/{sample}.vcf.gz"),
         vcf_index=temp("mutect2/call/{sample}.vcf.gz.tbi"),
@@ -198,11 +181,7 @@ rule mutect2_somatic:
         tmpdir=tmp,
     retries: 1
     params:
-        extra=lambda wildcards, output: (
-            f"{config['gatk'].get('mutect2', '')} "
-            f"--tumor-sample {wildcards.sample}_tumor "
-            f"--normal-sample {wildcards.sample}_normal "
-        ),
+        extra=lambda wildcards: get_mutect2_args(wildcards),
     log:
         "logs/gatk/mutect2/call/{sample}.log",
     wrapper:

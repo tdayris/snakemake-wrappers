@@ -92,3 +92,128 @@ wildcard_constraints:
     status=r"|".join(status_list),
     content=r"|".join(content),
     cleaning=r"|".join(cleaning_status),
+
+
+#########################
+### Herlper functions ###
+#########################
+
+def get_mutect2_input(wildcards) -> Dict[str, str]:
+    """
+    Given somatic/germline design file, return the correct
+    tumor bam + optional normal bam pairs
+    """
+    base = {
+        "fasta": config["reference"]["fasta"],
+        "fasta_idx": config["reference"]["fasta_index"],
+        "fasta_dict": config["reference"]["fasta_dict"],
+        "tumor": f"sambamba/markdup/{wildcards.sample}_tumor.bam",
+        "tumor_idx": f"sambamba/markdup/{wildcards.sample}_tumor.bam.bai",
+        "germline": config["reference"]["af_only"],
+        "germline_tbi": config["reference"]["af_only_tbi"],
+        "intervals": config["reference"]["capture_kit_bed"],
+    }
+    if "Upstream_file_normal" in design.columns.tolist():
+        base["map"] = f"sambamba/markdup/{wildcards.sample}_normal.bam"
+        base["map_idx"] = f"sambamba/markdup/{wildcards.sample}_normal.bam.bai"
+    
+    return base
+
+
+def get_mutect2_args(wildcards) -> str:
+    """
+    Return Mutect2 optional arguments with sample decoration
+    in case of somatic variant calling
+    """
+    base = config['gatk'].get('mutect2', '')
+    if "Upstream_file_normal" in design.columns.tolist():
+        base += f"--tumor-sample {wildcards.sample}_tumor "
+        base += f"--normal-sample {wildcards.sample}_normal "
+    return base
+
+
+def get_filter_mutect2_input(wildcards) -> Dict[str, str]:
+    """
+    No tumor contamination estimates is possible without
+    normal calls.
+    """
+    base = {
+        "vcf": "mutect2/call/{sample}.vcf.gz",
+        "vcf_tbi": get_tbi("mutect2/call/{sample}.vcf.gz"),
+        "ref": config["reference"]["fasta"],
+        "ref_index": config["reference"]["fasta_index"],
+        "ref_dict": config["reference"]["fasta_dict"],
+        "bam": "sambamba/markdup/{sample}_tumor.bam",
+        "bam_index": get_bai("sambamba/markdup/{sample}_tumor.bam"),
+        "f1r2": "gatk/orientation_model/{sample}/{sample}.artifacts-prior.tar.gz",
+        "contamination": "summary/{sample}_calculate_contamination.table",
+    }
+
+    if "Upstream_file_normal" in design.columns.tolist():
+        base["contamination"] = "summary/{sample}_calculate_contamination.table"
+
+    return base
+
+
+def targets():
+    base = {
+        "bam": expand(
+            "data_output/BAM/{sample}_{status}.bam",
+            sample=sample_list,
+            status=status_list,
+        ),
+        "bai": expand(
+            "data_output/BAM/{sample}_{status}.bam.bai",
+            sample=sample_list,
+            status=status_list,
+        ),
+        "mapping_QC": "data_output/MultiQC/MappingQC.html"
+    }
+
+    if config.get("steps", {}).get("calling", True):
+        base["vcf"] = expand(
+            "data_output/VCF/{sample}.vcf.gz",
+            sample=sample_list,
+        )
+        base["vcf_tbi"] = expand(
+            "data_output/VCF/{sample}.vcf.gz.tbi",
+            sample=sample_list,
+        )
+        base["vcf_md5"] = expand(
+            "data_output/VCF/{sample}.vcf.gz.md5",
+            sample=sample_list,
+        )
+        base["tsv"] = expand(
+            "data_output/TSV/{sample}.tsv",
+            sample=sample_list,
+        )
+        base["xslx"] = expand(
+            "data_output/TSV/{sample}.tsv",
+            sample=sample_list,
+        )
+        base["calling_qc"] = "data_output/MultiQC/Somatic_Variant_Calling.html"
+
+    if config.get("steps", {}).get("cnv", False):
+        if "Upstream_file_normal" in design.columns.tolist():
+            base["cnv"] = expand(
+                "data_output/CNV/{sample}.tsv",
+                sample=sample_list,
+            )
+        else:
+            logging.warning(
+                "CNV are not analyzed without Normal/Tumor somatic calling."
+            )
+    
+    if config.get("steps", {}).get("tmb", False):
+        base["tmb"] = "data_output/TMB.tsv"
+
+    if config.get("steps", {}).get("msi", False):
+        if "Upstream_file_normal" in design.columns.tolist():
+            base["msi"] = "data_output/MSI.tsv"
+            base["calling_qc"] = "data_output/MultiQC/Somatic_Variant_Calling.html"
+        else:
+            logging.warning(
+                "MSI cannot be analyzed without Normal/Tumor somatic calling."
+            )
+
+    return base
