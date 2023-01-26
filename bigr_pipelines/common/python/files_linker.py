@@ -43,8 +43,8 @@ def link_fq(
 
 def link_fq_somatic(
         sample_names: List[str],
-        n1_paths: List[str],
-        t1_paths: List[str],
+        n1_paths: Optional[List[str]] = None,
+        t1_paths: Optional[List[str]] = None,
         n2_paths: Optional[List[str]] = None,
         t2_paths: Optional[List[str]] = None,
         prefix: str = "reads"
@@ -71,8 +71,9 @@ def link_fq_somatic(
         "tumor": {}
     }
     if n2_paths is None:
-        for sample, n1 in zip(sample_names, n1_paths):
-            link_dict["normal"][f"{prefix}/normal/{sample}.fq.gz"] = n1
+        if n1_paths is not None:
+            for sample, n1 in zip(sample_names, n1_paths):
+                link_dict["normal"][f"{prefix}/normal/{sample}.fq.gz"] = n1
     else:
         for sample, n1, n2 in zip(sample_names, n1_paths, n2_paths):
             link_dict["normal"][f"{prefix}/normal/{sample}.1.fq.gz"] = n1

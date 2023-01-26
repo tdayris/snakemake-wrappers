@@ -63,17 +63,21 @@ design.index = design["Sample_id"]
 tmp = os.getenv("BIGR_DEFAULT_TMP", "tmp")
 sample_list = design["Sample_id"].tolist()
 streams = ["1", "2"]
-status_list = ["normal", "tumor"]
+status_list = (
+    ["normal", "tumor"] 
+    if "Upstream_file_normal" in design.columns.tolist() 
+    else ["tumor"]
+)
 content = ["snp", "indel"]
 cleaning_status = ["raw", "cleaned"]
 
 
 fastq_links = link_fq_somatic(
     sample_names=sample_list,
-    n1_paths=design.Upstream_file_normal,
-    t1_paths=design.Upstream_file_tumor,
-    n2_paths=design.Downstream_file_normal,
-    t2_paths=design.Downstream_file_tumor,
+    n1_paths=design.get("Upstream_file_normal"),
+    t1_paths=design.get("Upstream_file_tumor"),
+    n2_paths=design.get("Downstream_file_normal"),
+    t2_paths=design.get("Downstream_file_tumor"),
     prefix="data_input",
 )
 
