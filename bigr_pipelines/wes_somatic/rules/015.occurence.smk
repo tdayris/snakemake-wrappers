@@ -28,7 +28,7 @@ rule concatenate_per_chr_information:
         tmpdir=tmp,
     retries: 1
     conda:
-        str(workflow_source_dir / "envs" / "bash.yaml")
+        "../envs/bash.yaml"
     log:
         "logs/variant_occurence/all.log",
     shell:

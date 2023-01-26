@@ -14,6 +14,6 @@ rule md5_hash:
     params:
         extra="",
     conda:
-        str(workflow_source_dir / "envs" / "bash.yaml")
+        "../envs/bash.yaml"
     shell:
         "md5sum {params.extra} {input} > {output} 2> {log}"

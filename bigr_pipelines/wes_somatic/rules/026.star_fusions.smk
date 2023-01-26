@@ -15,7 +15,7 @@ rule star_fusion:
     params:
         extra=config["star_fusion"].get("extra", "--FusionInspector inspect"),
     conda:
-        str(workflow_source_dir / "envs" / "fusions.yaml")
+        "../envs/fusions.yaml"
     shell:
         "STAR-Fusion "
         "--chimeric_junction {input.junctions} "

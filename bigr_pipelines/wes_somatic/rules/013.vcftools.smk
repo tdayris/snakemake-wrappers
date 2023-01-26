@@ -12,7 +12,7 @@ rule additional_headers_mane:
         time_min=get_15min_per_attempt,
         tmpdir=tmp,
     conda:
-        str(workflow_source_dir / "envs" / "bash.yaml")
+        "../envs/bash.yaml"
     group:
         "additional_headers"
     log:
@@ -79,7 +79,7 @@ rule additional_headers_revel:
         time_min=get_15min_per_attempt,
         tmpdir=tmp,
     conda:
-        str(workflow_source_dir / "envs" / "bash.yaml")
+        "../envs/bash.yaml"
     group:
         "additional_headers"
     log:
@@ -134,7 +134,7 @@ rule additional_headers_mistic:
         time_min=get_15min_per_attempt,
         tmpdir=tmp,
     conda:
-        str(workflow_source_dir / "envs/bash.yaml")
+        "../envs/bash.yaml"
     group:
         "additional_headers"
     log:

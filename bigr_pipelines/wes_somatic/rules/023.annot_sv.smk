@@ -22,7 +22,7 @@ rule annot_sv:
         ),
         genome=f"-genomeBuild {config['reference'].get('ncbi_build', 'GRCh38')}",
     conda:
-        str(workflow_source_dir / "envs" / "annot_sv.yaml")
+        "../envs/annot_sv.yaml"
     shell:
         """
         export ANNOTSV="{params.install_dir}" &&

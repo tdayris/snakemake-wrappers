@@ -42,7 +42,7 @@ rule gzip_tsv:
         time_min=get_5h_per_attempt,
         tmpdir=tmp,
     conda:
-        str(workflow_source_dir / "envs" / "bash.yaml")
+        "../envs/bash.yaml"
     log:
         "logs/archive/tsv/{sample}.log",
     params:
