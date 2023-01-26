@@ -20,7 +20,6 @@ rule filter_tsv:
             ["Reference_Allele", "=", "REF"],
             ["Tumor_Seq_Allele1", "=", "ALT"],
             ["Filter", "=", "FILTER"],
-
         ],
         keep_column=lambda wildcards: config["table_cols"]
         + [
@@ -39,7 +38,7 @@ rule filter_tsv:
             f"{wildcards.sample}_tumor_AF",
         ],
     log:
-        "logs/pandas/filter_tsv/{sample}.log"
+        "logs/pandas/filter_tsv/{sample}.log",
     wrapper:
         "bio/pandas/filter_table"
 
@@ -124,7 +123,9 @@ rule gatk_variant_filtration:
     log:
         "logs/gatk/variant_filtration/{sample}.log",
     params:
-        filters=config["gatk"].get("filtgatk_filters_annotationers", {"DepthBelow10X": "DP < 10"}),
+        filters=config["gatk"].get(
+            "filtgatk_filters_annotationers", {"DepthBelow10X": "DP < 10"}
+        ),
         extra="--create-output-variant-index --create-output-variant-md5",
     wrapper:
         "bio/gatk/variantfiltration"
@@ -145,8 +146,8 @@ rule bcftools_select_variants_postannot:
         time_min=get_90min_per_attempt,
         tmpdir=tmp,
     params:
-        extra="--include 'FILTER==\"PASS\" || FILTER==\".\"'",
+        extra='--include \'FILTER=="PASS" || FILTER=="."\'',
     log:
-        "logs/bcftools/filter/{sample}.post.annotation.log"
+        "logs/bcftools/filter/{sample}.post.annotation.log",
     wrapper:
         "bio/bcftools/filter"

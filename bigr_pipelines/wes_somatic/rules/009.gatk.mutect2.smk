@@ -37,9 +37,9 @@ rule gunzip_mutect2_vcf:
         tmpdir=tmp,
     retries: 1
     log:
-        "logs/mutect2/unzip/{sample}.log"
+        "logs/mutect2/unzip/{sample}.log",
     params:
-        "-c"
+        "-c",
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     shell:
@@ -76,7 +76,7 @@ rule split_multiallelic_mutect2:
 
 rule gatk_filter_mutect_calls:
     input:
-        unpack(get_filter_mutect2_input)
+        unpack(get_filter_mutect2_input),
     output:
         vcf=temp("mutect2/filter/{sample}.vcf.gz"),
         vcf_index=temp("mutect2/filter/{sample}.vcf.gz.tbi"),

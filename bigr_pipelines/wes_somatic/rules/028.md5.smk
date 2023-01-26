@@ -5,12 +5,12 @@ rule md5_hash:
         protected("{file}.md5"),
     threads: 1
     resources:
-        mem_mb = get_1gb_per_attempt,
-        time_min = get_15min_per_attempt,
-        tmpdir = tmp,
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
+        tmpdir=tmp,
     retries: 1
     log:
-        "logs/md5sum/{file}.log"
+        "logs/md5sum/{file}.log",
     params:
         extra="",
     conda:

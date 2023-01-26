@@ -17,7 +17,7 @@ rule snpsift_gwascat:
     log:
         "logs/snpsift/gwascat/{sample}.log",
     wrapper:
-        "bio/snpsift/gwascat")
+        "bio/snpsift/gwascat"
 
 
 rule snpsift_dbvar:

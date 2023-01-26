@@ -25,13 +25,15 @@ logging.basicConfig(
 )
 
 default_container_path = Path(
-    workflow_source_dir / ".." / ".." / ".." / "singularity" / "mambaforge_4.14.0-0.sif")
+    workflow_source_dir / ".." / ".." / ".." / "singularity" / "mambaforge_4.14.0-0.sif"
 )
 container_path = (
     str(default_container_path)
     if default_container_path.exists
     else "docker://continuumio/miniconda3:4.4.10"
 )
+
+
 container: container_path
 
 
@@ -48,6 +50,7 @@ ruleorder: gleaves_compatibility > pbgzip_compress
 ruleorder: gatk_hard_filtering > tabix_index
 ruleorder: gatk_apply_baserecalibrator > sambamba_index_bam
 
+
 ########################
 ### Load environment ###
 ########################
@@ -58,7 +61,7 @@ default_config = read_yaml(workflow_source_dir / "config.hg38.yaml")
 configfile: get_config(default_config)
 
 
-wrapper_prefix = workflow_source_dir / ".. " / "..")
+wrapper_prefix = workflow_source_dir / ".. " / ".."
 
 design = get_design(os.getcwd(), search_fastq_somatic)
 design.dropna(inplace=True)
@@ -72,8 +75,8 @@ tmp = os.getenv("BIGR_DEFAULT_TMP", "tmp")
 sample_list = design["Sample_id"].tolist()
 streams = ["1", "2"]
 status_list = (
-    ["normal", "tumor"] 
-    if "Upstream_file_normal" in design.columns.tolist() 
+    ["normal", "tumor"]
+    if "Upstream_file_normal" in design.columns.tolist()
     else ["tumor"]
 )
 content = ["snp", "indel"]
@@ -109,6 +112,7 @@ wildcard_constraints:
 ### Herlper functions ###
 #########################
 
+
 def get_mutect2_input(wildcards) -> Dict[str, str]:
     """
     Given somatic/germline design file, return the correct
@@ -127,7 +131,7 @@ def get_mutect2_input(wildcards) -> Dict[str, str]:
     if "Upstream_file_normal" in design.columns.tolist():
         base["map"] = f"sambamba/markdup/{wildcards.sample}_normal.bam"
         base["map_idx"] = f"sambamba/markdup/{wildcards.sample}_normal.bam.bai"
-    
+
     return base
 
 
@@ -136,7 +140,7 @@ def get_mutect2_args(wildcards) -> str:
     Return Mutect2 optional arguments with sample decoration
     in case of somatic variant calling
     """
-    base = config['gatk'].get('mutect2', '')
+    base = config["gatk"].get("mutect2", "")
     if "Upstream_file_normal" in design.columns.tolist():
         base += f"--tumor-sample {wildcards.sample}_tumor "
         base += f"--normal-sample {wildcards.sample}_normal "
@@ -182,7 +186,7 @@ def targets(wildcards):
             sample=sample_list,
             status=status_list,
         ),
-        "mapping_QC": "data_output/MultiQC/MappingQC.html"
+        "mapping_QC": "data_output/MultiQC/MappingQC.html",
     }
 
     if config.get("steps", {}).get("calling", True):
@@ -218,7 +222,7 @@ def targets(wildcards):
             logging.warning(
                 "CNV are not analyzed without Normal/Tumor somatic calling."
             )
-    
+
     if config.get("steps", {}).get("tmb", False):
         base["tmb"] = "data_output/TMB.tsv"
 

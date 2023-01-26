@@ -32,7 +32,7 @@ rule multiqc_variant:
         tmpdir=tmp,
     retries: 1
     params:
-        extra="--module fastp --mudule sambamba --module samtools --module snpeff"
+        extra="--module fastp --mudule sambamba --module samtools --module snpeff",
     log:
         "logs/multiqc.log",
     wrapper:
@@ -71,7 +71,7 @@ rule multiqc_mapping:
         tmpdir=tmp,
     retries: 1
     params:
-        extra="--module fastp --mudule sambamba --module samtools"
+        extra="--module fastp --mudule sambamba --module samtools",
     log:
         "logs/multiqc.log",
     wrapper:
@@ -115,7 +115,7 @@ rule multiqc_fusions:
         tmpdir=tmp,
     retries: 1
     params:
-        extra="--module fastp --mudule sambamba --module samtools --module snpeff --module star"
+        extra="--module fastp --mudule sambamba --module samtools --module snpeff --module star",
     log:
         "logs/multiqc.log",
     wrapper:

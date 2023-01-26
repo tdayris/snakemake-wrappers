@@ -49,21 +49,21 @@ rule gatk_hard_filtering:
         tmpdir=tmp,
     params:
         filters=config["gatk"].get(
-            "gatk_filters_quality", 
+            "gatk_filters_quality",
             {
-            "DepthBelow10X": "DP < 10",
-            "BelowQualByDepth": "QD <= 2.0",
-            "BelowBaseQuality": "QUAL < 30.0",
-            "AboveFisherStrandBias": "FS > 60.0",
-            "AboveStrandOddsRatio": "SOR > 3.0",
-            "BelowMappingQuality": "MQ < 35.0",
-            "BelowMQRankSum": "MQRankSum < -12.5",
-            "BelowReadPosRankSum": "ReadPosRankSum < -8.0",
-            }
+                "DepthBelow10X": "DP < 10",
+                "BelowQualByDepth": "QD <= 2.0",
+                "BelowBaseQuality": "QUAL < 30.0",
+                "AboveFisherStrandBias": "FS > 60.0",
+                "AboveStrandOddsRatio": "SOR > 3.0",
+                "BelowMappingQuality": "MQ < 35.0",
+                "BelowMQRankSum": "MQRankSum < -12.5",
+                "BelowReadPosRankSum": "ReadPosRankSum < -8.0",
+            },
         ),
-        extra="--create-output-variant-index"
+        extra="--create-output-variant-index",
     log:
-        "logs/gatk/variantfiltration/{sample}.log"
+        "logs/gatk/variantfiltration/{sample}.log",
     wrapper:
         "bio/gatk/variantfiltration"
 
@@ -83,8 +83,8 @@ rule bcftools_select_variants_preannot:
         time_min=get_90min_per_attempt,
         tmpdir=tmp,
     params:
-        extra="--include 'FILTER==\"PASS\" || FILTER==\".\"'",
+        extra='--include \'FILTER=="PASS" || FILTER=="."\'',
     log:
-        "logs/bcftools/filter/{sample}.pre.annotation.log"
+        "logs/bcftools/filter/{sample}.pre.annotation.log",
     wrapper:
         "bio/bcftools/filter"
