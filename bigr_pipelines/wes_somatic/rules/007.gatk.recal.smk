@@ -26,7 +26,7 @@ rule gatk_apply_baserecalibrator:
 rule gatk_compute_baserecalibration_table:
     input:
         bam="sambamba/markdup/{sample}_{status}.bam",
-        bam_index=get_bai("sambamba/markdup/{sample}_{status}.bam"),
+        bam_index="sambamba/markdup/{sample}_{status}.bam.bai",
         ref=config["reference"]["fasta"],
         ref_idx=config["reference"]["fasta_index"],
         ref_dict=config["reference"]["fasta_dict"],
