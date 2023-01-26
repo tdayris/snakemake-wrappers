@@ -58,7 +58,7 @@ default_config = read_yaml(workflow_source_dir / "config.hg38.yaml")
 configfile: get_config(default_config)
 
 
-wrapper_prefix = workflow_source_dir / ".." / ".."
+wrapper_prefix = "file://" + str(workflow_source_dir / ".." / "..")
 
 design = get_design(os.getcwd(), search_fastq_somatic)
 design.dropna(inplace=True)
