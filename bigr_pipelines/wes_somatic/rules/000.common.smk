@@ -158,7 +158,7 @@ def get_filter_mutect2_input(wildcards) -> Dict[str, str]:
     return base
 
 
-def targets():
+def targets(wildcards):
     base = {
         "bam": expand(
             "data_output/BAM/{sample}_{status}.bam",
