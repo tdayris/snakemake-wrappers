@@ -8,7 +8,6 @@ from pathlib import Path
 
 # workflow_source_dir = Path(snakemake.workflow.srcdir(".."))
 common = str(workflow_source_dir / ".." / "common" / "python")
-print(common)
 sys.path.append(common)
 
 from file_manager import *
