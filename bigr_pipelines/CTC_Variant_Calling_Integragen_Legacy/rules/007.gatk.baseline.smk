@@ -20,17 +20,19 @@ rule gatk_select_variants_baseline:
     log:
         "logs/gatk/select_variants/baseline/{sample}.pass.log",
     params:
-        extra="-sn {sample}.baseline",
+        extra="", #"-sn {sample}.baseline",
         jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar",
         tmp=tmp,
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
+        "SAMPLE_NAME=$(grep -P \"^#CHROM\" {input.vcf} | rev | cut -f 2 | rev)"
         "gatk "
         "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T SelectVariants "
         "{params.extra} "
+        "-sn ${{SAMPLE_NAME}} "
         "-R {input.fasta} "
         "-V {input.vcf} "
         "-o {output} "
@@ -60,11 +62,13 @@ rule gatk_select_variants_wbc:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
+        "SAMPLE_NAME=$(grep -P \"^#CHROM\" {input.vcf} | rev | cut -f 1 | rev)"
         "gatk "
         "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
         "-T SelectVariants "
         "{params.extra} "
+        "-sn ${{SAMPLE_NAME}} "
         "-R {input.fasta} "
         "-V {input.vcf} "
         "-o {output} "
