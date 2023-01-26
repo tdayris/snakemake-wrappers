@@ -26,7 +26,7 @@ rule gatk_select_variants_baseline:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "SAMPLE_NAME=$(grep -P \"^#CHROM\" {input.vcf} | rev | cut -f 2 | rev)"
+        "SAMPLE_NAME=$(grep -P \"^#CHROM\" {input.vcf} | rev | cut -f 2 | rev); "
         "gatk "
         "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
@@ -62,7 +62,7 @@ rule gatk_select_variants_wbc:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "SAMPLE_NAME=$(grep -P \"^#CHROM\" {input.vcf} | rev | cut -f 1 | rev)"
+        "SAMPLE_NAME=$(grep -P \"^#CHROM\" {input.vcf} | rev | cut -f 1 | rev); "
         "gatk "
         "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "
