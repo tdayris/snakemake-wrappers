@@ -1,10 +1,11 @@
 from pathlib import Path
 import os
 
+print(snakemake.workflow.srcdir(".."))
 workflow_source_dir = Path(os.path.relpath(snakemake.workflow.srcdir(".."), ".")).parent
 
 
-include: str(workflow_source_dir / "rules" / "000.common.smk")
+include: "rules/000.common.smk"
 
 
 rule target:
@@ -57,8 +58,8 @@ rule fusions_only:
 #####################
 
 
-include: str(workflow_source_dir / "rules" / "028.md5.smk")
-include: str(workflow_source_dir / "rules" / "024.archive.smk")
+include: "rules/028.md5.smk"
+include: "rules/024.archive.smk"
 
 
 ###############
@@ -66,8 +67,8 @@ include: str(workflow_source_dir / "rules" / "024.archive.smk")
 ###############
 
 
-include: str(workflow_source_dir / "rules"/ "025.star_chimera.smk")
-include: str(workflow_source_dir / "rules"/ "026.star_fusions.smk")
+include: "rules/025.star_chimera.smk"
+include: "rules/026.star_fusions.smk"
 
 
 ###############################
@@ -75,7 +76,7 @@ include: str(workflow_source_dir / "rules"/ "026.star_fusions.smk")
 ###############################
 
 
-include: str(workflow_source_dir / "rules" / "018.vcf2tsv.smk")
+include: "rules/018.vcf2tsv.smk"
 
 
 #################
@@ -83,8 +84,8 @@ include: str(workflow_source_dir / "rules" / "018.vcf2tsv.smk")
 #################
 
 
-include: str(workflow_source_dir / "rules" / "016.mapping_qc.smk")
-include: str(workflow_source_dir / "rules" / "017.multiqc.smk")
+include: "rules/016.mapping_qc.smk"
+include: "rules/017.multiqc.smk"
 
 
 ######################
@@ -92,7 +93,7 @@ include: str(workflow_source_dir / "rules" / "017.multiqc.smk")
 ######################
 
 
-include: str(workflow_source_dir / "rules" / "022.msisensor.smk")
+include: "rules/022.msisensor.smk"
 
 
 ###########
@@ -100,7 +101,7 @@ include: str(workflow_source_dir / "rules" / "022.msisensor.smk")
 ###########
 
 
-include: str(workflow_source_dir / "rules" / "021.tmb.smk")
+include: "rules/021.tmb.smk"
 
 
 ##################
@@ -108,8 +109,8 @@ include: str(workflow_source_dir / "rules" / "021.tmb.smk")
 ##################
 
 
-include: str(workflow_source_dir / "rules" / "020.cnv_facets.smk")
-include: str(workflow_source_dir / "rules" / "023.annot_sv.smk")
+include: "rules/020.cnv_facets.smk"
+include: "rules/023.annot_sv.smk"
 
 
 ###########################
@@ -117,7 +118,7 @@ include: str(workflow_source_dir / "rules" / "023.annot_sv.smk")
 ###########################
 
 
-include: str(workflow_source_dir / "rules" / "019.tabix.smk")
+include: "rules/019.tabix.smk"
 
 
 ######################
@@ -125,12 +126,12 @@ include: str(workflow_source_dir / "rules" / "019.tabix.smk")
 ######################
 
 
-include: str(workflow_source_dir / "rules" / "010.snpeff.smk")
-include: str(workflow_source_dir / "rules" / "012.snpsift.smk")
-include: str(workflow_source_dir / "rules" / "015.occurence.smk")
-include: str(workflow_source_dir / "rules" / "011.spliceai.smk")
-include: str(workflow_source_dir / "rules" / "013.vcftools.smk")
-include: str(workflow_source_dir / "rules" / "014.bigr.annot.smk")
+include: "rules/010.snpeff.smk"
+include: "rules/012.snpsift.smk"
+include: "rules/015.occurence.smk"
+include: "rules/011.spliceai.smk"
+include: "rules/013.vcftools.smk"
+include: "rules/014.bigr.annot.smk"
 
 
 ############################################################################
@@ -143,7 +144,7 @@ include: str(workflow_source_dir / "rules" / "014.bigr.annot.smk")
 ###############################
 
 
-include: str(workflow_source_dir / "rules" / "009.gatk.mutect2.smk")
+include: "rules/009.gatk.mutect2.smk"
 
 
 ##############################
@@ -151,7 +152,7 @@ include: str(workflow_source_dir / "rules" / "009.gatk.mutect2.smk")
 ##############################
 
 
-include: str(workflow_source_dir / "rules" / "007.gatk.recal.smk")
+include: "rules/007.gatk.recal.smk"
 
 
 #####################
@@ -159,13 +160,13 @@ include: str(workflow_source_dir / "rules" / "007.gatk.recal.smk")
 #####################
 
 
-include: str(workflow_source_dir / "rules" / "006.sambamba.markdup.smk")
+include: "rules/006.sambamba.markdup.smk"
 
 
 # Filter a bam over the capturekit bed file
 
 
-include: str(workflow_source_dir / "rules" / "005.samtools.filter.smk")
+include: "rules/005.samtools.filter.smk"
 
 
 ###################
@@ -173,7 +174,7 @@ include: str(workflow_source_dir / "rules" / "005.samtools.filter.smk")
 ###################
 
 
-include: str(workflow_source_dir / "rules" / "003.bwa.fixmate.smk")
+include: "rules/003.bwa.fixmate.smk"
 
 
 ############################
@@ -181,7 +182,7 @@ include: str(workflow_source_dir / "rules" / "003.bwa.fixmate.smk")
 ############################
 
 
-include: str(workflow_source_dir / "rules" / "002.fastp.trimming.smk")
+include: "rules/002.fastp.trimming.smk"
 
 
 #################################################
@@ -189,7 +190,7 @@ include: str(workflow_source_dir / "rules" / "002.fastp.trimming.smk")
 #################################################
 
 
-include: str(workflow_source_dir / "rules" / "001.bigr_copy.smk")
+include: "rules/001.bigr_copy.smk"
 
 
 ###########################
@@ -197,4 +198,4 @@ include: str(workflow_source_dir / "rules" / "001.bigr_copy.smk")
 ###########################
 
 
-include: str(workflow_source_dir / "rules" / "004.sambamba.index.smk")
+include: "rules/004.sambamba.index.smk"
