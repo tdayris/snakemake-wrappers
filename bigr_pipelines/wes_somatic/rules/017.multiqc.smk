@@ -36,7 +36,7 @@ rule multiqc_variant:
     log:
         "logs/multiqc.log",
     wrapper:
-        "bio/multiqc"
+        str(wrapper_prefix / "bio "/ "multiqc")
 
 
 rule multiqc_mapping:
@@ -75,7 +75,7 @@ rule multiqc_mapping:
     log:
         "logs/multiqc.log",
     wrapper:
-        "bio/multiqc"
+        str(wrapper_prefix / "bio" / "multiqc")
 
 
 rule multiqc_fusions:
@@ -119,4 +119,4 @@ rule multiqc_fusions:
     log:
         "logs/multiqc.log",
     wrapper:
-        "bio/multiqc"
+        str(wrapper_prefix / "bio" / "multiqc")

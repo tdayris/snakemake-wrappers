@@ -12,4 +12,4 @@ rule bigr_copy:
     log:
         "logs/bigr_copy/{status}/{sample}.{stream}.log",
     wrapper:
-        "bio/BiGR/copy"
+        str(wrapper_prefix / "bio" / "BiGR" / "copy")

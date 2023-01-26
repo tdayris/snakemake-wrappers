@@ -18,7 +18,7 @@ rule snpeff:
     log:
         "logs/snpeff/annotate/{sample}.log",
     wrapper:
-        "bio/snpeff/annotate"
+        str(wrapper_prefix / "bio" / "snpeff" / "annotate")
 
 
 ###############################################################
@@ -65,7 +65,7 @@ rule gatk_hard_filtering:
     log:
         "logs/gatk/variantfiltration/{sample}.log"
     wrapper:
-        "bio/gatk/variantfiltration"
+        str(wrapper_prefix / "bio" / "gatk" / "variantfiltration")
 
 
 rule bcftools_select_variants_preannot:
@@ -87,4 +87,4 @@ rule bcftools_select_variants_preannot:
     log:
         "logs/bcftools/filter/{sample}.pre.annotation.log"
     wrapper:
-        "bio/bcftools/filter"
+        str(wrapper_prefix / "bio" / "bcftools" / "filter")

@@ -23,8 +23,15 @@ logging.basicConfig(
     filename="snakemake.variant_calling_somatic.log", filemode="w", level=logging.DEBUG
 )
 
-
-container: "docker://continuumio/miniconda3:4.4.10"
+default_container_path = Path(
+    workflow_source_dir / ".." / ".." / ".." / "singularity" / "mambaforge_4.14.0-0.sif"
+)
+container_path = (
+    str(default_container_path)
+    if default_container_path.exists
+    else "docker://continuumio/miniconda3:4.4.10"
+)
+container: container_path
 
 
 localrules:

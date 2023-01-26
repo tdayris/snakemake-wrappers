@@ -18,7 +18,7 @@ rule samtools_stats_raw:
     params:
         extra=config["samtools"].get("stats", ""),
     wrapper:
-        "bio/samtools/stats"
+        str(wrapper_prefix / "bio" / "samtools" / "stats")
 
 
 rule samtools_stats_cleaned:
@@ -41,7 +41,7 @@ rule samtools_stats_cleaned:
     params:
         extra=config["samtools"].get("stats", ""),
     wrapper:
-        "bio/samtools/stats"
+        str(wrapper_prefix / "bio" / "samtools" / "stats")
 
 
 rule samtools_stats_fusions:
@@ -64,7 +64,7 @@ rule samtools_stats_fusions:
     params:
         extra=config["samtools"].get("stats", ""),
     wrapper:
-        "bio/samtools/stats"
+        str(wrapper_prefix / "bio" / "samtools" / "stats")
 
 
 rule fastq_screen:
@@ -86,4 +86,4 @@ rule fastq_screen:
     log:
         "logs/fastqc/{sample}.{stream}.{status}.log",
     wrapper:
-        "bio/fastq_screen"
+        str(wrapper_prefix / "bio" / "fastq_screen")

@@ -6,10 +6,10 @@
 
 rule correct_mutect2_vcf:
     input:
-        "bcftools/mutect2/{sample}.vcf.gz",
+        "bcftools/mutect2/{sample}.vcf",
     output:
         temp("mutect2/corrected/{sample}.vcf"),
-    threads: 2
+    threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
         time_min=get_20min_per_attempt,
@@ -19,10 +19,31 @@ rule correct_mutect2_vcf:
         "logs/mutect2/correct_fields/{sample}.log",
     params:
         fix_as_filterstatus="'s/ID=AS_FilterStatus,Number=A/ID=AS_FilterStatus,Number=1/g'",
+    conda:
+        str(workflow_source_dir / "envs" / "bash.yaml")
     shell:
-        "(gunzip -c {input} | "
-        "sed {params.fix_as_filterstatus}) "
-        "> {output} 2> {log}"
+        "sed {params.fix_as_filterstatus} {input} > {output} 2> {log}"
+
+
+rule gunzip_mutect2_vcf:
+    input:
+        "bcftools/mutect2/{sample}.vcf.gz",
+    output:
+        pipe("bcftools/mutect2/{sample}.vcf"),
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
+        tmpdir=tmp,
+    retries: 1
+    log:
+        "logs/mutect2/unzip/{sample}.log"
+    params:
+        "-c"
+    conda:
+        str(workflow_source_dir / "envs" / "bash.yaml")
+    shell:
+        "gunzip {params} {input} > {output} 2> {log}"
 
 
 rule split_multiallelic_mutect2:
@@ -45,7 +66,7 @@ rule split_multiallelic_mutect2:
     log:
         "logs/bcftools/norm/mutect2/{sample}.log",
     wrapper:
-        "bio/bcftools/norm"
+        str(wrapper_prefix / "bio" / "bcftools" / "norm")
 
 
 ###########################################
@@ -73,7 +94,7 @@ rule gatk_filter_mutect_calls:
     log:
         "logs/mutect2/filter/{sample}.log",
     wrapper:
-        "bio/gatk/filtermutectcalls"
+        str(wrapper_prefix / "bio" / "gatk" / "filtermutectcalls")
 
 
 """
@@ -101,7 +122,7 @@ rule calculate_tumor_contamination:
     log:
         "logs/gatk/CalculateContamination/{sample}.log",
     wrapper:
-        "bio/gatk/calculatecontamination"
+        str(wrapper_prefix / "bio" / "gatk" / "calculatecontamination")
 
 
 """
@@ -131,7 +152,7 @@ rule get_pileup_summaries:
     log:
         "logs/gatk/GetPileupSummaries/{sample}.{status}.log",
     wrapper:
-        "bio/gatk/getpileupsummaries"
+        str(wrapper_prefix / "bio" / "gatk" / "getpileupsummaries")
 
 
 """
@@ -155,7 +176,7 @@ rule gatk_learn_read_orientation_model:
     log:
         "gatk/orientation_model/{sample}.log",
     wrapper:
-        "bio/gatk/learnreadorientationmodel"
+        str(wrapper_prefix / "bio" / "gatk" / "learnreadorientationmodel")
 
 
 ######################
@@ -185,4 +206,4 @@ rule mutect2_somatic:
     log:
         "logs/gatk/mutect2/call/{sample}.log",
     wrapper:
-        "bio/gatk/mutect"
+        str(wrapper_prefix / "bio" / "gatk" / "mutect")

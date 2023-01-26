@@ -14,4 +14,4 @@ rule sambamba_index_bam:
     params:
         extra=config["sambamba"].get("index_extra", ""),
     wrapper:
-        "bio/sambamba/index"
+        str(wrapper_prefix / "bio" / "sambamba" / "index")

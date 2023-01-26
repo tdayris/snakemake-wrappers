@@ -28,7 +28,7 @@ rule bcftools_archive:
     params:
         extra="--compression-level 9",
     wrapper:
-        "bio/bcftools/view"
+        str(wrapper_prefix / "bio" / "bcftools" / "view")
 
 
 rule gzip_tsv:
@@ -41,6 +41,8 @@ rule gzip_tsv:
         mem_mb=get_2gb_per_attempt,
         time_min=get_5h_per_attempt,
         tmpdir=tmp,
+    conda:
+        str(workflow_source_dir / "envs" / "bash.yaml")
     log:
         "logs/archive/tsv/{sample}.log",
     params:
@@ -104,4 +106,4 @@ rule cram_mapping:
     params:
         extra="-h",
     wrapper:
-        "bio/samtools/view"
+        str(wrapper_prefix / "bio" / "samtools" / "view")

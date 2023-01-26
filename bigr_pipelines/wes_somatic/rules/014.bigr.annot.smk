@@ -24,7 +24,7 @@ rule cancer_gene_census_annotate:
     log:
         "logs/bigr/cancer_gene_census_annotate/{sample}.log",
     wrapper:
-        "bio/BiGR/cancer_gene_census_annotate"
+        str(wrapper_prefix / "bio" / "BiGR" / "cancer_gene_census_annotate")
 
 
 rule oncokb_annotate:
@@ -42,7 +42,7 @@ rule oncokb_annotate:
     log:
         "logs/bigr/oncokb/{sample}.log",
     wrapper:
-        "bio/BiGR/oncokb_annotate"
+        str(wrapper_prefix / "bio" / "BiGR" / "oncokb_annotate")
 
 
 ####################
@@ -66,4 +66,4 @@ rule format_to_info:
     params:
         extra=config["bigr_additionals"].get("format_to_info", ""),
     wrapper:
-        "bio/BiGR/vcf_format_to_info"
+        str(wrapper_prefix / "bio" / "BiGR" / "vcf_format_to_info")

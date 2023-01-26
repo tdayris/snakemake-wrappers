@@ -19,7 +19,7 @@ rule tabix_index:
     log:
         "logs/{tool}/{subcommand}/tabix/index/{sample}.log",
     wrapper:
-        "bio/tabix/index"
+        str(wrapper_prefix / "bio" / "tabix" / "index")
 
 
 """ 
@@ -43,4 +43,4 @@ rule pbgzip_compress:
     log:
         "logs/{tool}/{subcommand}/pbgzip/{sample}.log",
     wrapper:
-        "bio/bcftools/view"
+        str(wrapper_prefix / "bio" / "bcftools" / "view")
