@@ -11,7 +11,7 @@ rule gatk_haplotype_caller:
         bam="gatk/haplotypecaller/{sample}.{status}.bam",
     threads: 1
     resources:
-        mem_mb=4 * 1024,
+        mem_mb=5 * 1024,
         java_mem_gb=4 * 1024,
         time_min=get_8h_per_attempt,
         tmpdir=tmp,
