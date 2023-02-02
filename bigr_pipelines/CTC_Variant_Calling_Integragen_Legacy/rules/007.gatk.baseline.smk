@@ -56,7 +56,7 @@ rule gatk_select_variants_wbc:
     log:
         "logs/gatk/select_variants/wbc/{sample}.pass.log",
     params:
-        extra="-sn {sample}.wbc",
+        extra="",
         jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar",
         tmp=tmp,
     conda:
