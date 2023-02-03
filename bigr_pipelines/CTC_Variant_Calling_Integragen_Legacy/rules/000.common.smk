@@ -157,7 +157,7 @@ def get_trio(wildcards):
 
 def get_hc(wildcards):        
     return {
-        "bam": link_sample_baseline[wildcards.sample][wilcards.status],
+        "bam": link_sample_baseline[wildcards.sample][wildcards.status],
         "fasta": config["ref"]["fasta"],
     }
 

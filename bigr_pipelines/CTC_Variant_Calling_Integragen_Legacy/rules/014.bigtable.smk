@@ -84,7 +84,7 @@ rule concat_to_bigtable:
         ),
         expand(
             "vep/hc/{sample}.orig.wbc.tsv",
-            sample=wbc_sample_list,
+            sample=samples_list,
         ),
         expand(
             "vep/hc/{sample}.orig.ctc.tsv",
