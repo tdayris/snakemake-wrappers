@@ -19,9 +19,9 @@ rule add_origin_mutect_ctc:
 
 rule add_origin_brc:
     input:
-        "vep/brc/{sample}.tsv"
+        "vep/bcr/{sample}.tsv"
     output:
-        temp("vep/brc/{sample}.orig.tsv")
+        temp("vep/bcr/{sample}.orig.tsv")
     threads: 1
     resources:
         mem_mb=512,
