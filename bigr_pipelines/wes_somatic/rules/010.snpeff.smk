@@ -75,6 +75,7 @@ rule bcftools_select_variants_preannot:
         ref=config["reference"]["fasta"],
         ref_index=config["reference"]["fasta_index"],
         ref_dict=config["reference"]["fasta_dict"],
+        regions=config["reference"]["capture_kit_bed"],
     output:
         vcf=temp("bcftools/filter/{sample}.preannot.vcf"),
     threads: 1
@@ -83,7 +84,7 @@ rule bcftools_select_variants_preannot:
         time_min=get_90min_per_attempt,
         tmpdir=tmp,
     params:
-        extra='--include \'FILTER=="PASS" || FILTER=="."\'',
+        extra=""# ' --include \'FILTER=="PASS" || FILTER=="."\'',
     log:
         "logs/bcftools/filter/{sample}.pre.annotation.log",
     wrapper:
