@@ -83,11 +83,11 @@ rule concat_to_bigtable:
             sample=samples_list,
         ),
         expand(
-            "vep/hc/{sample}.orig.wbc.tsv",
+            "vep/hc/{sample}.wbc.orig.tsv",
             sample=samples_list,
         ),
         expand(
-            "vep/hc/{sample}.orig.ctc.tsv",
+            "vep/hc/{sample}.ctc.orig.tsv",
             sample=samples_list,
         ),
     output:
