@@ -7,7 +7,7 @@ rule concat_to_bigtable:
         ),
         expand(
             "vep/hc/{sample}.wbc.tsv",
-            sample=wbc_sample_list,
+            sample=samples_list,
         ),
         expand(
             "vep/hc/{sample}.ctc.tsv",
