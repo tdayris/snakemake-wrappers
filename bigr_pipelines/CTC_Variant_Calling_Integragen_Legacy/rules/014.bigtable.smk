@@ -1,16 +1,93 @@
+rule add_origin_mutect_ctc:
+    input:
+        "vep/mutect/{sample}.tsv"
+    output:
+        temp("vep/mutect/{sample}.orig.tsv")
+    threads: 1
+    resources:
+        mem_mb=512,
+        time_min=10,
+        tmpdir=tmp,
+    log:
+        "logs/vep/origin/{sample}.{annot}.log"
+    params:
+        begin='FS=OFS="\\t"',
+        body=['print $0"\\tMutect_CTC"']
+    wrapper:
+        "bio/awk"
+
+
+rule add_origin_brc:
+    input:
+        "vep/brc/{sample}.tsv"
+    output:
+        temp("vep/brc/{sample}.orig.tsv")
+    threads: 1
+    resources:
+        mem_mb=512,
+        time_min=10,
+        tmpdir=tmp,
+    log:
+        "logs/vep/origin/{sample}.{annot}.log"
+    params:
+        begin='FS=OFS="\\t"',
+        body=['print $0"\\tBRC"']
+    wrapper:
+        "bio/awk"
+
+
+
+rule add_origin_wbc_ctc:
+    input:
+        "vep/hc/{sample}.wbc.tsv"
+    output:
+        temp("vep/hc/{sample}.wbc.orig.tsv")
+    threads: 1
+    resources:
+        mem_mb=512,
+        time_min=10,
+        tmpdir=tmp,
+    log:
+        "logs/vep/origin/{sample}.{annot}.log"
+    params:
+        begin='FS=OFS="\\t"',
+        body=['print $0"\\tHC_WBC"']
+    wrapper:
+        "bio/awk"
+
+
+rule add_origin_hc_ctc:
+    input:
+        "vep/hc/{sample}.ctc.tsv"
+    output:
+        temp("vep/hc/{sample}.ctc.orig.tsv")
+    threads: 1
+    resources:
+        mem_mb=512,
+        time_min=10,
+        tmpdir=tmp,
+    log:
+        "logs/vep/origin/{sample}.{annot}.log"
+    params:
+        begin='FS=OFS="\\t"',
+        body=['print $0"\\tHC_WBC"']
+    wrapper:
+        "bio/awk"
+
+
 rule concat_to_bigtable:
     input:
         expand(
-            "vep/{annot}/{sample}.tsv",
+            "vep/{annot}/{sample}.orig.tsv",
             annot=["bcr", "mutect"],
             sample=samples_list,
         ),
         expand(
-            "vep/hc/{sample}.wbc.tsv",
+            "vep/hc/{sample}.orig.wbc.tsv",
             sample=wbc_sample_list,
         ),
         expand(
-            "vep/hc/{sample}.ctc.tsv",
+            "vep/hc/{sample}.orig.ctc.tsv",
             sample=samples_list,
         ),
     output:
