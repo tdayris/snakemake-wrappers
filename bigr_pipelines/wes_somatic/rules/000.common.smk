@@ -128,11 +128,11 @@ def get_mutect2_input(wildcards) -> Dict[str, str]:
     if "Upstream_file_normal" in design.columns.tolist():
         base["map"] = f"sambamba/markdup/{wildcards.sample}_normal.bam"
         base["map_idx"] = f"sambamba/markdup/{wildcards.sample}_normal.bam.bai"
-        base["tumor"]: f"sambamba/markdup/{wildcards.sample}_tumor.bam"
-        base["tumor_idx"]: f"sambamba/markdup/{wildcards.sample}_tumor.bam.bai"
+        base["tumor"] = f"sambamba/markdup/{wildcards.sample}_tumor.bam"
+        base["tumor_idx"] = f"sambamba/markdup/{wildcards.sample}_tumor.bam.bai"
     else:
-        base["map"]: f"sambamba/markdup/{wildcards.sample}_tumor.bam"
-        base["map_idx"]: f"sambamba/markdup/{wildcards.sample}_tumor.bam.bai"
+        base["map"] = f"sambamba/markdup/{wildcards.sample}_tumor.bam"
+        base["map_idx"] = f"sambamba/markdup/{wildcards.sample}_tumor.bam.bai"
 
     return base
 
