@@ -9,7 +9,7 @@ rule add_origin_mutect_ctc:
         time_min=10,
         tmpdir=tmp,
     log:
-        "logs/vep/origin/{sample}.{annot}.log"
+        "logs/vep/origin/{sample}.mutect.log"
     params:
         begin='FS=OFS="\\t"',
         body=['print $0"\\tMutect_CTC"']
@@ -28,7 +28,7 @@ rule add_origin_brc:
         time_min=10,
         tmpdir=tmp,
     log:
-        "logs/vep/origin/{sample}.{annot}.log"
+        "logs/vep/origin/{sample}.brc.log"
     params:
         begin='FS=OFS="\\t"',
         body=['print $0"\\tBRC"']
@@ -48,7 +48,7 @@ rule add_origin_wbc_ctc:
         time_min=10,
         tmpdir=tmp,
     log:
-        "logs/vep/origin/{sample}.{annot}.log"
+        "logs/vep/origin/{sample}.wbc.log"
     params:
         begin='FS=OFS="\\t"',
         body=['print $0"\\tHC_WBC"']
@@ -67,7 +67,7 @@ rule add_origin_hc_ctc:
         time_min=10,
         tmpdir=tmp,
     log:
-        "logs/vep/origin/{sample}.{annot}.log"
+        "logs/vep/origin/{sample}.ctc.log"
     params:
         begin='FS=OFS="\\t"',
         body=['print $0"\\tHC_WBC"']
