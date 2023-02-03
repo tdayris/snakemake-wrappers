@@ -121,8 +121,6 @@ def get_mutect2_input(wildcards) -> Dict[str, str]:
         "fasta": config["reference"]["fasta"],
         "fasta_idx": config["reference"]["fasta_index"],
         "fasta_dict": config["reference"]["fasta_dict"],
-        "tumor": f"sambamba/markdup/{wildcards.sample}_tumor.bam",
-        "tumor_idx": f"sambamba/markdup/{wildcards.sample}_tumor.bam.bai",
         "germline": config["reference"]["af_only"],
         "germline_tbi": config["reference"]["af_only_tbi"],
         "intervals": config["reference"]["capture_kit_bed"],
@@ -130,6 +128,11 @@ def get_mutect2_input(wildcards) -> Dict[str, str]:
     if "Upstream_file_normal" in design.columns.tolist():
         base["map"] = f"sambamba/markdup/{wildcards.sample}_normal.bam"
         base["map_idx"] = f"sambamba/markdup/{wildcards.sample}_normal.bam.bai"
+        base["tumor"]: f"sambamba/markdup/{wildcards.sample}_tumor.bam"
+        base["tumor_idx"]: f"sambamba/markdup/{wildcards.sample}_tumor.bam.bai"
+    else:
+        base["map"]: f"sambamba/markdup/{wildcards.sample}_tumor.bam"
+        base["map_idx"]: f"sambamba/markdup/{wildcards.sample}_tumor.bam.bai"
 
     return base
 
