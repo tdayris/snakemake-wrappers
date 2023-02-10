@@ -156,12 +156,12 @@ def get_filter_mutect2_input(wildcards) -> Dict[str, str]:
     """
     base = {
         "vcf": "mutect2/call/{sample}.vcf.gz",
-        "vcf_tbi": get_tbi("mutect2/call/{sample}.vcf.gz"),
+        "vcf_tbi": "mutect2/call/{sample}.vcf.gz.tbi",
         "ref": config["reference"]["fasta"],
         "ref_index": config["reference"]["fasta_index"],
         "ref_dict": config["reference"]["fasta_dict"],
         "bam": "sambamba/markdup/{sample}_tumor.bam",
-        "bam_index": get_bai("sambamba/markdup/{sample}_tumor.bam"),
+        "bam_index": "sambamba/markdup/{sample}_tumor.bam.bai",
         "f1r2": "gatk/orientation_model/{sample}/{sample}.artifacts-prior.tar.gz",
     }
 
