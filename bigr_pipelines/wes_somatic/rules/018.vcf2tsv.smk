@@ -129,7 +129,7 @@ rule gatk_variant_filtration:
         filters=config["gatk"].get(
             "filtgatk_filters_annotationers", {"DepthBelow10X": "DP < 10"}
         ),
-        extra="--create-output-variant-index --create-output-variant-md5",
+        extra="--create-output-variant-index --seconds-between-progress-updates 30 --missing-values-evaluate-as-failing false",
     wrapper:
         "bio/gatk/variantfiltration"
 
