@@ -53,7 +53,7 @@ rule gatk_hard_filtering:
             {
                 "DepthBelow10X": "DP < 10",
                 "BelowQualByDepth": "QD <= 2.0",
-                "BelowBaseQuality": "QUAL < 30.0",
+                # "BelowBaseQuality": "QUAL < 30.0", # Redundant
                 "AboveFisherStrandBias": "FS > 60.0",
                 "AboveStrandOddsRatio": "SOR > 3.0",
                 "BelowMappingQuality": "MQ < 35.0",
@@ -61,7 +61,7 @@ rule gatk_hard_filtering:
                 "BelowReadPosRankSum": "ReadPosRankSum < -8.0",
             },
         ),
-        extra="--create-output-variant-index",
+        extra="--create-output-variant-index --seconds-between-progress-updates 30 --missing-values-evaluate-as-failing false",
     log:
         "logs/gatk/variantfiltration/{sample}.log",
     wrapper:
@@ -84,7 +84,7 @@ rule bcftools_select_variants_preannot:
         time_min=get_90min_per_attempt,
         tmpdir=tmp,
     params:
-        extra=""# ' --include \'FILTER=="PASS" || FILTER=="."\'',
+        extra=' --include \'FILTER=="PASS" || FILTER=="."\'',
     log:
         "logs/bcftools/filter/{sample}.pre.annotation.log",
     wrapper:
