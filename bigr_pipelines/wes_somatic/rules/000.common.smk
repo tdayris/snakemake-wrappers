@@ -213,6 +213,10 @@ def targets(wildcards):
             sample=sample_list,
         )
         base["calling_qc"] = "data_output/MultiQC/Somatic_Variant_Calling.html"
+        base["vcf_report"] = expand(
+            "data_output/HTML/{sample}_report",
+            sample=sample_list,
+        )
 
     if config.get("steps", {}).get("cnv", False):
         if "Upstream_file_normal" in design.columns.tolist():
@@ -231,7 +235,7 @@ def targets(wildcards):
     if config.get("steps", {}).get("msi", False):
         if "Upstream_file_normal" in design.columns.tolist():
             base["msi"] = "data_output/MSI.tsv"
-            base["calling_qc"] = "data_output/MultiQC/Somatic_Variant_Calling.html"
+            # base["calling_qc"] = "data_output/MultiQC/Somatic_Variant_Calling.html"
         else:
             logging.warning(
                 "MSI cannot be analyzed without Normal/Tumor somatic calling."

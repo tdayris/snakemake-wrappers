@@ -62,7 +62,7 @@ rule vep_annotate:
     log:
         "logs/vep/annotate/{sample}.log"
     params:
-        extra="--vcf_info_field CSQ --hgvs --hgvsg --force_overwrite --offline --cache --format vcf --vcf --stats_text"
+        extra="--vcf_info_field VEP_ANN --hgvs --hgvsg --force_overwrite --offline --cache --format vcf --vcf --stats_text"
         cache_version="99"
         species="GRCh38" if config["reference"].get("ncbi_build", "GRCh38").lower() == "grch38" else "GRCm38"
         build=config["reference"].get("ncbi_build", "GRCh38")
@@ -100,7 +100,7 @@ rule vcf_report:
     log:
         "logs/rbt/vcf_report/{sample}.log"
     params:
-        extra="--annotation-field CSQ "
+        extra="--annotation-field VEP_ANN "
     conda:
         "../envs/rbt.yaml"
     shell:
