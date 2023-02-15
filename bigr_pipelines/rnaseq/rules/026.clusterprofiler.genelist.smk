@@ -10,7 +10,7 @@ by
 
 rule make_rank_list:
     input:
-        tsv="008.deseq2/{comparison}/wald.{comparison}.tsv"
+        tsv="008.deseq2/{comparison}/wald.{comparison}.tsv",
     output:
         tsv=temp("026.clusterprofiler/{comparison}/wald.{comparison}.tsv"),
     threads: 1
@@ -21,7 +21,7 @@ rule make_rank_list:
     log:
         "logs/026.clusterprofiler/make_rank_list.{comparison}.log",
     params:
-        "-f1,3"
+        "-f1,3",
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     script:
@@ -47,16 +47,22 @@ rule expand_rank_list:
         tsv="026.clusterprofiler/{comparison}/wald.{comparison}.tsv",
     output:
         tsv_ensembl=temp("026.clusterprofiler/gene_lists/ENSEMBL/{comparisons}.tsv"),
-        tsv_ensemblprot=temp("026.clusterprofiler/gene_lists/ENSEMBLPROT/{comparisons}.tsv"),
+        tsv_ensemblprot=temp(
+            "026.clusterprofiler/gene_lists/ENSEMBLPROT/{comparisons}.tsv"
+        ),
         tsv_symbol=temp("026.clusterprofiler/gene_lists/SYMBOL/{comparisons}.tsv"),
         tsv_entrez=temp("026.clusterprofiler/gene_lists/ENTREZID/{comparisons}.tsv"),
         rds_ensembl=temp("026.clusterprofiler/gene_lists/ENSEMBL/{comparisons}.RDS"),
-        rds_ensemblprot=temp("026.clusterprofiler/gene_lists/ENSEMBLPROT/{comparisons}.RDS"),
+        rds_ensemblprot=temp(
+            "026.clusterprofiler/gene_lists/ENSEMBLPROT/{comparisons}.RDS"
+        ),
         rds_symbol=temp("026.clusterprofiler/gene_lists/SYMBOL/{comparisons}.RDS"),
         rds_entrez=temp("026.clusterprofiler/gene_lists/ENTREZID/{comparisons}.RDS"),
         universe_entrez=temp("026.clusterprofiler/universe/ENTREZID/{comparison}.tsv"),
         universe_ensembl=temp("026.clusterprofiler/universe/ENSEMBL/{comparison}.tsv"),
-        universe_ensemblprot=temp("026.clusterprofiler/universe/ENSEMBLPROT/{comparison}.tsv"),
+        universe_ensemblprot=temp(
+            "026.clusterprofiler/universe/ENSEMBLPROT/{comparison}.tsv"
+        ),
         universe_symbol=temp("026.clusterprofiler/universe/SYMBOL/{comparison}.tsv"),
     threads: 1
     resources:

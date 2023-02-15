@@ -71,8 +71,10 @@ def expected_targets(steps: Dict[str, Any]) -> Dict[str, Any]:
 # Setup environment #
 #####################
 
+
 # Main container
 container: "docker://continuumio/miniconda3:4.4.10"
+
 
 # Save output stream in a file
 logging.basicConfig(filename="snakemake.rnaseq.log", filemode="w", level=logging.DEBUG)
