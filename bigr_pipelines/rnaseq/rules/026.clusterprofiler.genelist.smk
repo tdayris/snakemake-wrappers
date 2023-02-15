@@ -46,14 +46,14 @@ rule expand_rank_list:
     input:
         tsv="026.clusterprofiler/{comparison}/wald.{comparison}.tsv",
     output:
-        tsv_ensembl=temp("026.clusterprofiler/gene_lists/ENSEMBL/{comparisons}.tsv")
-        tsv_ensemblprot=temp("026.clusterprofiler/gene_lists/ENSEMBLPROT/{comparisons}.tsv")
-        tsv_symbol=temp("026.clusterprofiler/gene_lists/SYMBOL/{comparisons}.tsv")
-        tsv_entrez=temp("026.clusterprofiler/gene_lists/ENTREZID/{comparisons}.tsv")
-        rds_ensembl=temp("026.clusterprofiler/gene_lists/ENSEMBL/{comparisons}.RDS")
-        rds_ensemblprot=temp("026.clusterprofiler/gene_lists/ENSEMBLPROT/{comparisons}.RDS")
-        rds_symbol=temp("026.clusterprofiler/gene_lists/SYMBOL/{comparisons}.RDS")
-        rds_entrez=temp("026.clusterprofiler/gene_lists/ENTREZID/{comparisons}.RDS")
+        tsv_ensembl=temp("026.clusterprofiler/gene_lists/ENSEMBL/{comparisons}.tsv"),
+        tsv_ensemblprot=temp("026.clusterprofiler/gene_lists/ENSEMBLPROT/{comparisons}.tsv"),
+        tsv_symbol=temp("026.clusterprofiler/gene_lists/SYMBOL/{comparisons}.tsv"),
+        tsv_entrez=temp("026.clusterprofiler/gene_lists/ENTREZID/{comparisons}.tsv"),
+        rds_ensembl=temp("026.clusterprofiler/gene_lists/ENSEMBL/{comparisons}.RDS"),
+        rds_ensemblprot=temp("026.clusterprofiler/gene_lists/ENSEMBLPROT/{comparisons}.RDS"),
+        rds_symbol=temp("026.clusterprofiler/gene_lists/SYMBOL/{comparisons}.RDS"),
+        rds_entrez=temp("026.clusterprofiler/gene_lists/ENTREZID/{comparisons}.RDS"),
         universe_entrez=temp("026.clusterprofiler/universe/ENTREZID/{comparison}.tsv"),
         universe_ensembl=temp("026.clusterprofiler/universe/ENSEMBL/{comparison}.tsv"),
         universe_ensemblprot=temp("026.clusterprofiler/universe/ENSEMBLPROT/{comparison}.tsv"),
