@@ -81,4 +81,4 @@ rule expand_rank_list:
     conda:
         str(workflow_source_dir / "envs" / "clusterprofiler.R")
     script:
-        str(workflow_source_dir / "scripts" / "bitr.R")
+        str(workflow_source_dir / "scripts" / "026.bitr.R")
