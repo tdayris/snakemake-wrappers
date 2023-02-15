@@ -25,7 +25,7 @@ rule make_rank_list:
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     script:
-        "cut {params} {input} > {output} 2> {log}"
+        "cut {params} {input.tsv} > {output.tsv} 2> {log}"
 
 
 # Expand and annotate gene rank list
