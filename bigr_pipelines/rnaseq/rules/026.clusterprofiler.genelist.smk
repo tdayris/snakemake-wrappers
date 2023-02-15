@@ -24,7 +24,7 @@ rule make_rank_list:
         "-f1,3",
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
-    script:
+    shell:
         "cut {params} {input.tsv} > {output.tsv} 2> {log}"
 
 
