@@ -72,9 +72,10 @@ tsv <- utils::read.table(
   sep = "\t",
   stringsAsFactors = FALSE
 )
+base::message("Dataset and libraries loaded")
 
 gene_id_type <- get_parameter("gene_id_type", "ENSEMBL")
-base::message("Dataset and libraries loaded")
+base::message("KeyType acquired")
 
 if (! "ENSEMBL" %in% colnames(tsv)) {
   base::message("Adding ENSEMBL keys to the gene table")
