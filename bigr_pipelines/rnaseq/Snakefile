@@ -401,79 +401,79 @@ rule deseq2_results:
 # Used after DESeq2
 
 
-# include: str(workflow_source_dir / "rules" / "027.clusterprofiler.gmt.smk")
-# include: str(workflow_source_dir / "rules" / "029.clusterprofiler.terms.smk")
-# include: str(workflow_source_dir / "rules" / "028.clusterprofiler.others.smk")
-# include: str(workflow_source_dir / "rules" / "026.clusterprofiler.genelist.smk")
-# include: str(workflow_source_dir / "rules" / "030.clusterprofiler.plots.smk")
+include: str(workflow_source_dir / "rules" / "027.clusterprofiler.gmt.smk")
+include: str(workflow_source_dir / "rules" / "029.clusterprofiler.terms.smk")
+include: str(workflow_source_dir / "rules" / "028.clusterprofiler.others.smk")
+include: str(workflow_source_dir / "rules" / "026.clusterprofiler.genelist.smk")
+include: str(workflow_source_dir / "rules" / "030.clusterprofiler.plots.smk")
 
 
-# rule clusterprofiler_results:
-#     input:
-#         salmon_quant=lambda wildcards: expand(
-#             "004.salmon/pseudo_mapping/{sample}/quant.genes.sf",
-#             sample=samples_per_prefixes[wildcards.comparison],
-#         ),
-#         tpm_table=expand(
-#             "data_output/Quantification/TPM.{feature}.tsv",
-#             feature=features,
-#         ),
-#         raw_counts="data_output/Quantification/Raw.genes.tsv",
-#         fastp=lambda wildcards: expand(
-#             "002.fastp/{ext}/{sample}.fastp.{ext}",
-#             sample=samples_per_prefixes[wildcards.comparison],
-#             ext=fastp_ext,
-#         ),
-#         fastq_screen=lambda wildcards: expand(
-#             "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
-#             sample=samples_per_prefixes[wildcards.comparison],
-#             stream=streams,
-#             ext=fastqscreen_ext,
-#         ),
-#         deseq2_results=expand(
-#             "data_output/DEseq2/{comparison}/{content}_{comparison}.tsv",
-#             content=content_list,
-#             allow_missing=True,
-#         ),
-#         config="009.multiqc/{comparison}/multiqc_config.yaml",
-#         gene_plot="data_output/DEseq2/{comparison}/gene_plots/",
-#         plots=[
-#             "009.multiqc/{comparison}/pca_plot_mqc.png",
-#             "009.multiqc/{comparison}/volcanoplot_mqc.png",
-#             "009.multiqc/{comparison}/distro_expr_mqc.png",
-#             "009.multiqc/{comparison}/distro_mu_mqc.png",
-#             "009.multiqc/{comparison}/ma_plot_mqc.png",
-#             "009.multiqc/{comparison}/independent_filter_mqc.png",
-#             "009.multiqc/{comparison}/inde_theta_filter_mqc.png",
-#             "009.multiqc/{comparison}/pvalue_qc_mqc.png",
-#         ],
-#         clustermap_sample="009.figures/{comparison}/clustermap/ClusteredHeatmap.samples.{comparison}.png",
-#         pca_plot=expected_pcas,
-#         volcanoplot="009.figures/{comparison}/volcano/Volcano.{comparison}.png",
-#         distro_expr="009.figures/{comparison}/log_counts/log_dst.{comparison}.png",
-#         ma_plot="009.figures/{comparison}/maplot/maplot.{comparison}.png",
-#         distro_mu="009.figures/{comparison}/log_counts/log_mu.{comparison}.png",
-#         independent_filter="009.figures/{comparison}/deseq2/independent_filter.{comparison}.png",
-#         pvalue_qc="009.figures/{comparison}/deseq2/pval.{comparison}.png",
-#         inde_theta_filter="009.figures/{comparison}/deseq2/theta.{comparison}.png",
-#         clusterprofiler_tsv=tsv_list(db_key=db_key_dict, comparisons=output_prefixes),
-#         clusterprofiler_png=plot_list(
-#             plots=cprof_plots,
-#             methods=gse_method_list,
-#             comparisons=output_prefixes,
-#             db_key=db_key_dict,
-#         ),
-#     output:
-#         "data_output/GSEA/{comparison}/MultiQC.GSEA.html",
-#     threads: 1
-#     resources:
-#         mem_mb=get_1gb_per_attempt,
-#         time_min=get_45min_per_attempt,
-#         tmpdir="tmp",
-#     log:
-#         "logs/snakefile.multiqc/clusterprofiler.{comparison}.log",
-#     wrapper:
-#         "bio/multiqc"
+rule clusterprofiler_results:
+    input:
+        salmon_quant=lambda wildcards: expand(
+            "004.salmon/pseudo_mapping/{sample}/quant.genes.sf",
+            sample=samples_per_prefixes[wildcards.comparison],
+        ),
+        tpm_table=expand(
+            "data_output/Quantification/TPM.{feature}.tsv",
+            feature=features,
+        ),
+        raw_counts="data_output/Quantification/Raw.genes.tsv",
+        fastp=lambda wildcards: expand(
+            "002.fastp/{ext}/{sample}.fastp.{ext}",
+            sample=samples_per_prefixes[wildcards.comparison],
+            ext=fastp_ext,
+        ),
+        fastq_screen=lambda wildcards: expand(
+            "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
+            sample=samples_per_prefixes[wildcards.comparison],
+            stream=streams,
+            ext=fastqscreen_ext,
+        ),
+        deseq2_results=expand(
+            "data_output/DEseq2/{comparison}/{content}_{comparison}.tsv",
+            content=content_list,
+            allow_missing=True,
+        ),
+        config="009.multiqc/{comparison}/multiqc_config.yaml",
+        gene_plot="data_output/DEseq2/{comparison}/gene_plots/",
+        plots=[
+            "009.multiqc/{comparison}/pca_plot_mqc.png",
+            "009.multiqc/{comparison}/volcanoplot_mqc.png",
+            "009.multiqc/{comparison}/distro_expr_mqc.png",
+            "009.multiqc/{comparison}/distro_mu_mqc.png",
+            "009.multiqc/{comparison}/ma_plot_mqc.png",
+            "009.multiqc/{comparison}/independent_filter_mqc.png",
+            "009.multiqc/{comparison}/inde_theta_filter_mqc.png",
+            "009.multiqc/{comparison}/pvalue_qc_mqc.png",
+        ],
+        clustermap_sample="009.figures/{comparison}/clustermap/ClusteredHeatmap.samples.{comparison}.png",
+        pca_plot=expected_pcas,
+        volcanoplot="009.figures/{comparison}/volcano/Volcano.{comparison}.png",
+        distro_expr="009.figures/{comparison}/log_counts/log_dst.{comparison}.png",
+        ma_plot="009.figures/{comparison}/maplot/maplot.{comparison}.png",
+        distro_mu="009.figures/{comparison}/log_counts/log_mu.{comparison}.png",
+        independent_filter="009.figures/{comparison}/deseq2/independent_filter.{comparison}.png",
+        pvalue_qc="009.figures/{comparison}/deseq2/pval.{comparison}.png",
+        inde_theta_filter="009.figures/{comparison}/deseq2/theta.{comparison}.png",
+        clusterprofiler_tsv=tsv_list(db_key=db_key_dict, comparisons=output_prefixes),
+        clusterprofiler_png=plot_list(
+            plots=cprof_plots,
+            methods=gse_method_list,
+            comparisons=output_prefixes,
+            db_key=db_key_dict,
+        ),
+    output:
+        "data_output/GSEA/{comparison}/MultiQC.GSEA.html",
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_45min_per_attempt,
+        tmpdir="tmp",
+    log:
+        "logs/snakefile.multiqc/clusterprofiler.{comparison}.log",
+    wrapper:
+        "bio/multiqc"
 
 
 #######################
