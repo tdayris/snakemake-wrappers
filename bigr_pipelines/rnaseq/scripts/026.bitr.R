@@ -31,7 +31,7 @@ save_tsv <- function(data, keytype, weights, out_key) {
     base::message("Saving TSV to ", out_path)
 
     utils::write.table(
-        x = data[c(keytype, weights), ]
+        x = data[c(keytype, weights), ],
         file = out_path,
         sep = "\t"
     )
