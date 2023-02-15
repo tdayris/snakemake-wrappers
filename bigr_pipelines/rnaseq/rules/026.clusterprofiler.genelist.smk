@@ -79,6 +79,6 @@ rule expand_rank_list:
     log:
         "logs/026.clusterprofiler/expand.{comparison}.log",
     conda:
-        str(workflow_source_dir / "envs" / "clusterprofiler.R")
+        str(workflow_source_dir / "envs" / "clusterprofiler.yaml")
     script:
         str(workflow_source_dir / "scripts" / "026.bitr.R")
