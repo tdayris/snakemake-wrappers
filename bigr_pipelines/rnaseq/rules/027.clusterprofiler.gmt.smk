@@ -43,7 +43,7 @@ rule enricher_GMT:
     input:
         gene="026.clusterprofiler/gene_lists/{keytype}/{comparison}.tsv",
         term2gene=lambda wildcards: config["clusterprofiler"]["gmt"][wildcards.database],
-        term2name="026.clusterprofiler/databases/{database}.{keytype}.term2name.tsv",
+        term2name="026.clusterprofiler/gmt/{database}.{keytype}.term2name.tsv",
     output:
         readable_rds=temp(
             "027.enrich/{database}.{keytype}/{comparison}/enrich.{database}.{keytype}.RDS"
