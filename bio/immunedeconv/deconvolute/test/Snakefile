@@ -1,0 +1,15 @@
+rule test_cibersort_abs:
+    input:
+        quant="quantification.tsv",
+        cibersort_binary="/path/to/cibersort/non/free",
+        cibersort_mat="/path/to/celltypes.mat"
+    output:
+        histogram="celltypes.hist.png",
+        dotplot="celltypes.dotplot.png",
+        plotdir=directory("celltypes.dotplots"),
+        tsv="celltypes.tsv",
+        rds="celltypes.RDS"
+    params:
+        
+    wrapper:
+        "master/bio/immunedeconv/deconvolute"
