@@ -529,9 +529,6 @@ DEseq2/
 
 ### Pipeline
 
-
-### Pipeline
-
 1. iRODS copy 
 1. Fastp
 1. FastqScreen
@@ -621,6 +618,9 @@ data_output/
     ├── TPM.genes.tsv
     └── TPM.transcripts.tsv
 ```
+
+
+## Immune Cell Deconvolution
 
 
 ## Fusions
