@@ -80,10 +80,10 @@ logging.info("Additional utils loaded")
 
 
 # Find and load configfile
-default_config = read_yaml(workflow_source_dir / "config.hg38.yaml")
+if config == dict():
+    default_config = read_yaml(workflow_source_dir / "config" / "config.hg38.yaml")
 
-
-configfile: get_config(default_config=default_config)
+    configfile: get_config(default_config=default_config)
 
 
 logging.info("Config file loaded")
@@ -199,10 +199,6 @@ maptypes = ["variants", "chimera"]
 content_list = ["SortedOnLogFC", "SortedOnPadj", "Complete"]
 
 
-# Immune deconv tool list
-tool_list = ["cibersort", "cibersort_abs", "mcp_counter", "epic", "quantiseq", "xcell"]
-
-
 # VDJ alignment: MIXcr
 # List of possible segment export in mixcr
 segment_export_list = ["vUsage", "jUsage", "isotypeUsage", "vjUsage"]
@@ -225,6 +221,10 @@ db_key_dict = db_keytype(
 )
 database_keytypes_list = [f"{db}.{key}" for db, key in db_key_dict.items()]
 
+# ImmuneDeconv
+# List of tools
+deconv_methods = config["immunedeconv"].get("tool_list", ["cibersort_abs"])
+
 
 logging.info("Constraining wildcards...")
 
@@ -241,7 +241,7 @@ wildcard_constraints:
     feature=r"|".join(features),
     maptype=r"|".join(maptypes),
     content=r"|".join(content_list),
-    tool=r"|".join(tool_list),
+    deconv_method=r"|".join(deconv_methods),
     segment=r"|".join(segment_export_list),
     ppi=r"|".join(ppi_list),
     gmt=r"|".join(gmt_list),
