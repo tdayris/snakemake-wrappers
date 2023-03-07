@@ -185,18 +185,12 @@ rule immunedeconv_results:
             sample=sample_list,
             ext=fastp_ext,
         ),
-        fastq_screen=lambda wildcards: expand(
-            "003.fastq_screen/{sample}.{stream}.fastq_screen.{ext}",
-            sample=sample_list,
-            stream=streams,
-            ext=fastqscreen_ext,
-        ),
         config="005.immunedeconv/multiqc_config_mqc.yaml",
         graphs=expand(
-            "data_output/{tool}/celltypes.{graph}.png",
-            tool=config["immunedeconv"].get(
+            "data_output/{deconv_method}/celltypes.{graph}.png",
+            deconv_method=config["immunedeconv"].get(
                 "tool_list",
-                tool_list,
+                deconv_methods,
             ),
             graph=["hist", "dotplot"],
         ),

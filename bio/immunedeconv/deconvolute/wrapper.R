@@ -38,8 +38,8 @@ tpm[, gene_col] <- NULL
 print(tpm %>% head)
 
 method <- "quantiseq"
-if ("method" %in% base::names(snakemake@wildcards)) {
-  method <- base::as.character(x = snakemake@wildcards[["method"]])
+if ("method" %in% base::names(snakemake@params)) {
+  method <- base::as.character(x = snakemake@params[["method"]])
 }
 
 extra <- "method = method"
