@@ -45,10 +45,10 @@ rule enricher_GMT:
         term2gene=lambda wildcards: config["clusterprofiler"]["gmt"][wildcards.database],
         term2name="026.clusterprofiler/gmt/{database}.{keytype}.term2name.tsv",
     output:
-        readable_rds=temp(
+        rds=temp(
             "027.enrich/{database}.{keytype}/{comparison}/enrich.{database}.{keytype}.RDS"
         ),
-        readable_tsv=protected(
+        tsv=protected(
             "data_output/GSEA/{comparison}/{database}.{keytype}/enrichment.tsv"
         ),
     threads: 1

@@ -7,10 +7,30 @@ by
 -> 026.expand_rank_list
 """
 
+rule reheader_deseq2:
+    input:
+        tsv="008.deseq2/{comparison}/wald.{comparison}.tsv",
+    output:
+        tsv=pipe("008.deseq2/{comparison}/wald.{comparison}.reheaded.tsv"),
+    threads: 1
+    resources:
+        mem_mb=get_768mb_per_attempt,
+        time_min=get_10min_per_attempt,
+        tmpdir="tmp",
+    log:
+        "logs/026.clusterprofiler/header_deseq2.{comparison}.log",
+    params:
+        echo='-ne "ENSEMBL\t"',
+        cat=''
+    conda:
+        str(workflow_source_dir / "envs" / "bash.yaml")
+    shell:
+        "cat {params.cat} <(echo {params.echo}) {input.tsv} > {output.tsv} 2> {log}"
+
 
 rule make_rank_list:
     input:
-        tsv="008.deseq2/{comparison}/wald.{comparison}.tsv",
+        tsv="008.deseq2/{comparison}/wald.{comparison}.reheaded.tsv",
     output:
         tsv=temp("026.clusterprofiler/{comparison}/wald.{comparison}.tsv"),
     threads: 1

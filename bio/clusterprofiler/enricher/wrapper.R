@@ -27,7 +27,7 @@ read_input <- function(data_path) {
         data <- readRDS(file = data_path)
     } else if (base::endsWith(x = data_path, suffix = ".gmt")) {
         # Then the file is a GMT file (e.g. from MSigDB)
-        data <- clusterProfiler::read.gmt(gmtfile = gmt_path)
+        data <- clusterProfiler::read.gmt(gmtfile = data_path)
     } else if (base::endsWith(x = data_path, suffix = ".csv")) {
         # Then the file is a CSV
         data <- utils::read.table(

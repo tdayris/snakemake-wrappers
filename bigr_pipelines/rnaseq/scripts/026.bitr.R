@@ -12,9 +12,11 @@ base::library(package = "AnnotationDbi", character.only = TRUE)
 base::library(package = "org.Hs.eg.db", character.only = TRUE)
 base::library(package = "org.Mm.eg.db", character.only = TRUE)
 
-orgdb <- "org.Hs.eg.db"
+orgdb <- org.Hs.eg.db
 if ("orgdb" %in% base::names(snakemake@params)) {
-  orgdb <- base::as.character(x = snakemake@params[["orgdb"]])
+  if (snakemake@params[["orgdb"]] == "mm10") {
+    orgdb <- org.Mm.eg.db
+  }
 }
 
 get_parameter <- function(param_name, default_value) {
@@ -27,25 +29,25 @@ get_parameter <- function(param_name, default_value) {
 }
 
 save_tsv <- function(data, keytype, weights, out_key) {
-    out_path <- base::as.character(x = snakemake@out_key)
+    out_path <- base::as.character(x = snakemake@output[[out_key]])
     base::message("Saving TSV to ", out_path)
 
     utils::write.table(
-        x = data[c(keytype, weights), ],
+        x = na.omit(data[, c(keytype, weights)]),
         file = out_path,
-        sep = "\t"
+        sep = "\t",
+        row.names = FALSE,
+        col.names = TRUE,
+        quote = FALSE
     )
 }
 
 save_rds <- function(data, keytype, weights, out_key) {
-  out_path <- base::as.character(x = snakemake@out_key)
+  out_path <- base::as.character(x = snakemake@output[[out_key]])
   base::message("Saving RDS to ", out_path)
 
-  geneList <- build_gene_list(
-    gene_frame = data,
-    comparison_name = weights,
-    keyid = keytype
-  )
+  geneList <-data[[weights]]
+  names(geneList) <- data[[keytype]]
 
   base::saveRDS(
     object = geneList,
@@ -55,8 +57,8 @@ save_rds <- function(data, keytype, weights, out_key) {
 
 
 save_universe <- function(data, keytype, out_key) {
-  out_path <- base::as.character(x = snakemake@out_key)
-  base::message("Saving RDS to ", out_path)
+  out_path <- base::as.character(x = snakemake@output[[out_key]])
+  base::message("Saving universe to ", out_path)
 
   base::saveRDS(
     object = data[keytype, ],
@@ -76,12 +78,13 @@ base::message("Dataset and libraries loaded")
 
 gene_id_type <- get_parameter("gene_id_type", "ENSEMBL")
 base::message("KeyType acquired")
+print(head(tsv))
 
 if (! "ENSEMBL" %in% colnames(tsv)) {
   base::message("Adding ENSEMBL keys to the gene table")
   tsv$ENSEMBL <- mapIds(
     orgdb,
-    keys = tsv$SYMBOL,
+    keys = as.character(x = tsv$SYMBOL),
     colum = 'ENSEMBL',
     keytype = "SYMBOL",
     multiVals = 'first'
@@ -92,8 +95,8 @@ if (! "SYMBOL" %in% colnames(tsv)) {
   base::message("Adding SYMBOL keys to the gene table")
   tsv$SYMBOL <- mapIds(
     orgdb,
-    keys = tsv$ENSEMBL,
-    colum = 'SYMBOL',
+    keys = as.character(x = tsv$ENSEMBL),
+    colum = "SYMBOL",
     keytype = "ENSEMBL",
     multiVals = 'first'
   )
@@ -102,7 +105,7 @@ if (! "SYMBOL" %in% colnames(tsv)) {
 base::message("Adding ENTREZID keys to the gene table ", gene_id_type)
 tsv$ENTREZID <- mapIds(
   orgdb,
-  keys = tsv$ENSEMBL,
+  keys = as.character(x = tsv$ENSEMBL),
   column = "ENTREZID",
   keytype = "ENSEMBL",
   multiVals = "first"
@@ -111,7 +114,7 @@ tsv$ENTREZID <- mapIds(
 base::message("Adding ENSEMBLPROT keys to the gene table")
 tsv$ENSEMBLPROT <- mapIds(
   orgdb,
-  keys = tsv$ENSEMBL,
+  keys = as.character(x = tsv$ENSEMBL),
   column = "ENSEMBLPROT",
   keytype = "ENSEMBL",
   multiVals = "first"
@@ -119,54 +122,54 @@ tsv$ENSEMBLPROT <- mapIds(
 base::print(utils::head(tsv))
 
 weights <- base::colnames(tsv)
-weights <- comparison_names[! comparison_names %in% c("SYMBOL", "ENSEMBL", "ENTREZID", "ENSEMBLPROT")]
+weights <- weights[! weights %in% c("SYMBOL", "ENSEMBL", "ENTREZID", "ENSEMBLPROT")]
 
 if ("tsv_ensembl" %in% base::names(snakemake@output)) {
-    save_tsv <- function(tsv, "ENSEMBL", weights, "tsv_ensembl")
+  save_tsv(tsv, "ENSEMBL", weights, "tsv_ensembl")
 }
 
 if ("tsv_entrez" %in% base::names(snakemake@output)) {
-    save_tsv <- function(tsv, "ENTREZID", weights, "tsv_entrez")
+  save_tsv(tsv, "ENTREZID", weights, "tsv_entrez")
 }
 
 if ("tsv_ensemblprot" %in% base::names(snakemake@output)) {
-    save_tsv <- function(tsv, "ENSEMBLPROT", weights, "tsv_ensemblprot")
+  save_tsv(tsv, "ENSEMBLPROT", weights, "tsv_ensemblprot")
 }
 
 if ("tsv_symbol" %in% base::names(snakemake@output)) {
-    save_tsv <- function(tsv, "SYMBOL", weights, "tsv_symbol")
+  save_tsv(tsv, "SYMBOL", weights, "tsv_symbol")
 }
 
 if ("rds_ensembl" %in% base::names(snakemake@output)) {
-    save_rds <- function(tsv, "ENSEMBL", weights, "rds_ensembl")
+  save_rds(tsv, "ENSEMBL", weights, "rds_ensembl")
 }
 
 if ("rds_entrez" %in% base::names(snakemake@output)) {
-    save_rds <- function(tsv, "ENTREZID", weights, "rds_entrez")
+  save_rds(tsv, "ENTREZID", weights, "rds_entrez")
 }
 
 if ("rds_ensemblprot" %in% base::names(snakemake@output)) {
-    save_rds <- function(tsv, "ENSEMBLPROT", weights, "rds_ensemblprot")
+  save_rds(tsv, "ENSEMBLPROT", weights, "rds_ensemblprot")
 }
 
 if ("rds_symbol" %in% base::names(snakemake@output)) {
-    save_rds <- function(tsv, "SYMBOL", weights, "rds_symbol")
+  save_rds(tsv, "SYMBOL", weights, "rds_symbol")
 }
 
 if ("universe_symbol" %in% base::names(snakemake@output)) {
-    save_universe <- function(tsv, "SYMBOL", "universe_symbol")
+  save_universe(tsv, "SYMBOL", "universe_symbol")
 }
 
 if ("universe_ensembl" %in% base::names(snakemake@output)) {
-    save_universe <- function(tsv, "ENSEMBL", "universe_ensembl")
+  save_universe(tsv, "ENSEMBL", "universe_ensembl")
 }
 
 if ("universe_ensemblprot" %in% base::names(snakemake@output)) {
-    save_universe <- function(tsv, "ENSEMBLPROT", "universe_ensemblprot")
+  save_universe(tsv, "ENSEMBLPROT", "universe_ensemblprot")
 }
 
 if ("universe_entrez" %in% base::names(snakemake@output)) {
-    save_universe <- function(tsv, "ENTREZID", "universe_entrez")
+  save_universe(tsv, "ENTREZID", "universe_entrez")
 }
 
 

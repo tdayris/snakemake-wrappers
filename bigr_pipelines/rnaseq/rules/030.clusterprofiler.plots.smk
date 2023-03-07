@@ -23,18 +23,18 @@ rule enrichplot_enricher:
         dotplot=protected(
             "data_output/GSEA/{comparison}/{database}.{keytype}/dotplot.enrich.png"
         ),
-        cnetplot=protected(
-            "data_output/GSEA/{comparison}/{database}.{keytype}/cnetplot.enrich.png"
-        ),
+        # cnetplot=protected(
+        #     "data_output/GSEA/{comparison}/{database}.{keytype}/cnetplot.enrich.png"
+        # ),
         heatplot=protected(
             "data_output/GSEA/{comparison}/{database}.{keytype}/heatplot.enrich.png"
         ),
         upsetplot=protected(
             "data_output/GSEA/{comparison}/{database}.{keytype}/upsetplot.enrich.png"
         ),
-        pmcplot=protected(
-            "data_output/GSEA/{comparison}/{database}.{keytype}/pmcplot.enrich.png"
-        ),
+        # pmcplot=protected(
+        #     "data_output/GSEA/{comparison}/{database}.{keytype}/pmcplot.enrich.png"
+        # ),
     threads: 1
     resources:
         time_min=get_35min_per_attempt,
