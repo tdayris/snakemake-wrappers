@@ -26,11 +26,11 @@ else:
 
 
 index = os.path.commonprefix(snakemake.input.idx).rstrip(".")
-
+threads = snakemake.threads - 1
 
 shell(
     "(bowtie2"
-    " --threads {snakemake.threads}"
+    " --threads {threads}"
     " {reads} "
     " -x {index}"
     " {extra}"
