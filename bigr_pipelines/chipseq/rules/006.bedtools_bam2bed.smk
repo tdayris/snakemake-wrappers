@@ -1,7 +1,7 @@
 rule bedtools_bamtobed:
     input:
-        bam="samtools/view/{sample}.bam",
-        bai="samtools/view/{sample}.bam.bai",
+        bam="data_output/alignment/{sample}.bam",
+        bai="data_output/alignment/{sample}.bam.bai",
     output:
         temp("bedtools/bamtobed/{sample}.bed"),
     threads: 1
@@ -35,6 +35,8 @@ rule keep_pairs_from_same_chr:
         extra="'$1==$4 && $6-$2 < 1000 {print $0}'",
     conda:
         "envs/awk.yaml"
+    group:
+        "clean_bed"
     shell:
         "awk {params.extra} {input} > {output} 2> {log}"
 
@@ -55,6 +57,8 @@ rule extract_fragments:
         extra="-f 1,2,6",
     conda:
         "../envs/bash.yaml"
+    group:
+        "clean_bed"
     shell:
         "cut {params.extra} {input} > {output} 2> {log}"
 
@@ -75,5 +79,7 @@ rule sort_fragments:
         extra="-k1,1 -k2,2n -k3,3n",
     conda:
         "../envs/bash.yaml"
+    group:
+        "clean_bed"
     shell:
         "sort {params.extra} {input} > {output} 2> {log}"
