@@ -21,7 +21,7 @@ rule multiqc_report:
         correlations="deeptools/correlations/SpearmanCorr_readCounts.tab",
         pca="deeptools/pca/PCA.txt",
     output:
-        "multiqc/Chipseq.html",
+        "data_output/Report.html",
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
