@@ -177,7 +177,7 @@ def get_ensembl_vep_hc(wildcards):
         "cache": config["ref"]["vep"],
         "fasta": "resources/GRCh38.fasta",
         "vcf": f"data_output/{subdir}/{wildcards.sample}.vcf.gz",
-        "vcf": f"data_output/{subdir}/{wildcards.sample}.vcf.gz.tbi",
+        "vcf_tbi": f"data_output/{subdir}/{wildcards.sample}.vcf.gz.tbi",
     }
 
 
