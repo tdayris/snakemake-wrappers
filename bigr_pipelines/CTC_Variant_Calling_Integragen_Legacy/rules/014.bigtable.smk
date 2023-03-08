@@ -12,7 +12,10 @@ rule add_origin_mutect_ctc:
         "logs/vep/origin/{sample}.mutect.log"
     params:
         begin='FS=OFS="\\t"',
-        body=['print $0"\\tMutect_CTC"']
+        body=[
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0\\tMutect_CTC\\tMutect\\tCTC']
+            # 'print $0"\\tMutect_CTC"'
+        ]
     wrapper:
         "bio/awk"
 
@@ -31,7 +34,10 @@ rule add_origin_brc:
         "logs/vep/origin/{sample}.brc.log"
     params:
         begin='FS=OFS="\\t"',
-        body=['print $0"\\tBRC_CTC"']
+        body=[
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0\\tBRC_CTC\\tBRC\\tCTC']
+            # 'print $0"\\tBRC_CTC"'
+        ]
     wrapper:
         "bio/awk"
 
@@ -52,7 +58,10 @@ rule add_origin_wbc_ctc:
         "wbc_origin"
     params:
         begin='FS=OFS="\\t"',
-        body=['print $0"\\tHC_WBC"']
+        body=[
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0\\tHC_WBC\\tHaplotypeCaller\\tWBC']
+            # 'print $0"\\tHC_WBC"'
+        ]
     wrapper:
         "bio/awk"
 
@@ -93,7 +102,10 @@ rule add_origin_hc_ctc:
         "logs/vep/origin/{sample}.ctc.log"
     params:
         begin='FS=OFS="\\t"',
-        body=['print $0"\\tHC_CTC"']
+        body=[
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0\\tHC_CTC\\tHaplotypeCaller\\tCTC']
+            # 'print $0"\\tHC_CTC"'
+        ]
     wrapper:
         "bio/awk"
 
@@ -114,7 +126,10 @@ rule add_origin_hc_bseline:
         "baseline_origin"
     params:
         begin='FS=OFS="\\t"',
-        body=['print $0"\\tHC_Germline"']
+        body=[
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0\\tHC_Germline\\tHaplotypeCaller\\tGermline']
+            # 'print $0"\\tHC_Germline"'
+        ]
     wrapper:
         "bio/awk"
 
