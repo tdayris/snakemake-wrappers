@@ -1,7 +1,7 @@
 rule macs2_callpeak_narrow:
     input:
-        treatment="samtools/view/{sample}.bam",
-        treatment_idx="samtools/view/{sample}.bam.bai",
+        treatment="data_output/alignment/{sample}.bam",
+        treatment_idx="data_output/alignment/{sample}.bam.bai",
     output:
         multiext(
             "macs2/callpeak/narrowPeak/{sample}",
@@ -24,8 +24,8 @@ rule macs2_callpeak_narrow:
 
 rule macs2_callpeak_broad:
     input:
-        treatment="samtools/view/{sample}.bam",
-        treatment_idx="samtools/view/{sample}.bam.bai",
+        treatment="data_output/alignment/{sample}.bam",
+        treatment_idx="data_output/alignment/{sample}.bam.bai",
     output:
         multiext(
             "macs2/callpeak/broadPeak/{sample}",

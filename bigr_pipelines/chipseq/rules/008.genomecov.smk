@@ -1,7 +1,7 @@
 rule bedtools_genomecoveragebam:
     input:
-        "samtools/view/{sample}.bam",
-        "samtools/view/{sample}.bam.bai",
+        "data_output/alignment/{sample}.bam",
+        "data_output/alignment/{sample}.bam.bai",
     output:
         temp("bedtools/genomecov/{sample}.bedgraph"),
     threads: 1
