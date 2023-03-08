@@ -191,7 +191,7 @@ def targets(wildcards):
         "mapping_QC": "data_output/MultiQC/MappingQC.html",
     }
 
-    if config.get("steps", {}).get("calling", True):
+    if config.get("steps", {}).get("calling", False):
         base["vcf"] = expand(
             "data_output/VCF/{sample}.vcf.gz",
             sample=sample_list,
