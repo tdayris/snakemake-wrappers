@@ -12,7 +12,7 @@ rule term2gene_TERMS_PPI:
     input:
         lambda wildcards: config["clusterprofiler"]["ppi"][wildcards.database],
     output:
-        temp("026.clusterprofiler/databases/{database}.ENSEMBLPROT.term2gene.tsv"),
+        temp("026.clusterprofiler/ppi/{database}.ENSEMBLPROT.term2gene.tsv"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
@@ -43,7 +43,7 @@ rule terms2name_TERMS_PPI:
     input:
         lambda wildcards: config["clusterprofiler"]["ppi"][wildcards.database],
     output:
-        temp("026.clusterprofiler/databases/{database}.ENSEMBLPROT.term2name.tsv"),
+        temp("026.clusterprofiler/ppi/{database}.ENSEMBLPROT.term2name.tsv"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
@@ -69,8 +69,9 @@ by
 -> End job
 """
 
+
 use rule enricher_GMT as enricher_TSV with:
     input:
         gene="026.clusterprofiler/gene_lists/{keytype}/{comparison}.tsv",
-        term2gene="026.clusterprofiler/databases/{database}.{keytype}.term2gene.tsv",
-        term2name="026.clusterprofiler/databases/{database}.{keytype}.term2name.tsv",
+        term2gene="026.clusterprofiler/ppi/{database}.{keytype}.term2gene.tsv",
+        term2name="026.clusterprofiler/ppi/{database}.{keytype}.term2name.tsv",

@@ -23,32 +23,40 @@ rule enrichplot_enricher:
         dotplot=protected(
             "data_output/GSEA/{comparison}/{database}.{keytype}/dotplot.enrich.png"
         ),
-        cnetplot=protected(
-            "data_output/GSEA/{comparison}/{database}.{keytype}/cnetplot.enrich.png"
-        ),
+        # cnetplot=protected(
+        #     "data_output/GSEA/{comparison}/{database}.{keytype}/cnetplot.enrich.png"
+        # ),
         heatplot=protected(
             "data_output/GSEA/{comparison}/{database}.{keytype}/heatplot.enrich.png"
         ),
         upsetplot=protected(
             "data_output/GSEA/{comparison}/{database}.{keytype}/upsetplot.enrich.png"
         ),
-        pmcplot=protected(
-            "data_output/GSEA/{comparison}/{database}.{keytype}/pmcplot.enrich.png"
-        ),
+        # pmcplot=protected(
+        #     "data_output/GSEA/{comparison}/{database}.{keytype}/pmcplot.enrich.png"
+        # ),
     threads: 1
     resources:
         time_min=get_35min_per_attempt,
         mem_mb=get_4gb_per_attempt,
         tmpdir="tmp",
     params:
-        enricher_extra=config["clusterprofiler"].get("enricher_extra", "pvalueCutoff = 0.1, qvalueCutoff = 0.1"),
+        enricher_extra=config["clusterprofiler"].get(
+            "enricher_extra", "pvalueCutoff = 0.1, qvalueCutoff = 0.1"
+        ),
         barplot_extra=config["clusterprofiler"].get("barplot_extra", "showCategory = 5"),
         dotplot_extra=config["clusterprofiler"].get("dotplot_extra", "showCategory = 5"),
-        cnetplot_extra=config["clusterprofiler"].get("cnetplot_extra", "showCategory = 5"),
-        heatplot_extra=config["clusterprofiler"].get("heatplot_extra", "showCategory = 5"),
+        cnetplot_extra=config["clusterprofiler"].get(
+            "cnetplot_extra", "showCategory = 5"
+        ),
+        heatplot_extra=config["clusterprofiler"].get(
+            "heatplot_extra", "showCategory = 5"
+        ),
         upsetplot_extra=config["clusterprofiler"].get("upsetplot_extra", "n = 5"),
         pmcplot_extra=config["clusterprofiler"].get("pmcplot_extra", "period=2012:2022"),
-        png_extra=config["clusterprofiler"].get("png_extra", "height = 768, width = 1024, units = 'px', type = 'cairo'"),
+        png_extra=config["clusterprofiler"].get(
+            "png_extra", "height = 768, width = 1024, units = 'px', type = 'cairo'"
+        ),
     log:
         "logs/030.clusterprofiler/dotplot/enrich.{database}.{comparison}.{keytype}.log",
     wrapper:

@@ -1,7 +1,7 @@
 rule deeptools_bamcov:
     input:
-        bam="samtools/view/{sample}.bam",
-        bai="samtools/view/{sample}.bam.bai",
+        bam="data_output/alignment/{sample}.bam",
+        bai="data_output/alignment/{sample}.bam.bai",
         blacklist=config["reference"]["blacklist"],
     output:
         protected("deeptools/bamcoverage/{sample}.bw"),
@@ -35,11 +35,11 @@ rule deeptools_bamcov:
 
 rule deeptools_fingerprint:
     input:
-        bam_files=expand("samtools/view/{sample}.bam", sample=sample_list),
-        bam_idx=expand("samtools/view/{sample}.bam.bai", sample=sample_list),
+        bam_files=expand("data_output/alignment/{sample}.bam", sample=sample_list),
+        bam_idx=expand("data_output/alignment/{sample}.bam.bai", sample=sample_list),
         blacklist=config["reference"]["blacklist"],
     output:
-        fingerprint="deeptools/plot_fingerprint/plot_fingerprint.png",
+        fingerprint=protected("data_output/plots/plot_fingerprint.png"),
         counts=temp("deeptools/plot_fingerprint/raw_counts.tab"),
         qc_metrics=temp("deeptools/plot_fingerprint/qc_metrics.txt"),
     threads: 20
@@ -85,7 +85,7 @@ rule deeptools_plot_heatmap:
     input:
         "deeptools/matrix_files/{peaktype}.gz",
     output:
-        heatmap_img="deeptools/plot_heatmap/{peaktype}.heatmap.png",
+        heatmap_img=protected("data_output/plots/{peaktype}.heatmap.png"),
         regions=temp("deeptools/plot_heatmap/{peaktype}.heatmap_regions.bed"),
         heatmap_matrix=temp("deeptools/plot_heatmap/{peaktype}.heatmap_matrix.tab"),
     threads: 20
@@ -132,7 +132,7 @@ rule deeptools_plotcorrelation:
     input:
         cordata="deeptools/multibigwigsummary/results.npz",
     output:
-        png="deeptools/correlations/sample_correlation.png",
+        png=protected("data_output/plots/sample_correlation.png"),
         counts=temp("deeptools/correlations/SpearmanCorr_readCounts.tab"),
     threads: 1
     resources:
@@ -163,7 +163,7 @@ rule deeptools_plotpca:
     input:
         cordata="deeptools/multibigwigsummary/results.npz",
     output:
-        png="deeptools/pca/PCA.png",
+        png=protected("data_output/plots/PCA.png"),
         data="deeptools/pca/PCA.txt",
     threads: 1
     resources:

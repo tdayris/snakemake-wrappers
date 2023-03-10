@@ -52,11 +52,11 @@ def expected_targets(steps: Dict[str, Any]) -> Dict[str, Any]:
             comparison=output_prefixes,
         )
 
-    # if steps.get("gsea", False) is True:
-    #     results["clusterprofiler"] = expand(
-    #         "data_output/GSEA/{comparison}/MultiQC.GSEA.html",
-    #         comparison=output_prefixes,
-    #     )
+    if steps.get("gsea", False) is True:
+        results["clusterprofiler"] = expand(
+            "data_output/GSEA/{comparison}/MultiQC.GSEA.html",
+            comparison=output_prefixes,
+        )
 
     if steps.get("immunedeconv", False) is True:
         results["immunedeconv"] = "data_output/MultiQC/ImmuneDeconv.html"
@@ -71,8 +71,10 @@ def expected_targets(steps: Dict[str, Any]) -> Dict[str, Any]:
 # Setup environment #
 #####################
 
+
 # Main container
 container: "docker://continuumio/miniconda3:4.4.10"
+
 
 # Save output stream in a file
 logging.basicConfig(filename="snakemake.rnaseq.log", filemode="w", level=logging.DEBUG)

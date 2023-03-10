@@ -22,7 +22,7 @@ rule bowtie2_map:
             "--phred33 "
             "-I 10 -X 700"
         ),
-        index=config["bowtie2"]["index_prefix"],
+        index=f'{config["bowtie2"]["index_prefix"]}',
     wrapper:
         "bio/bowtie2/align"
 

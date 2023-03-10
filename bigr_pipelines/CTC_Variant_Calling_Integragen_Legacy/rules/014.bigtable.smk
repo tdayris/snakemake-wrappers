@@ -12,7 +12,10 @@ rule add_origin_mutect_ctc:
         "logs/vep/origin/{sample}.mutect.log"
     params:
         begin='FS=OFS="\\t"',
-        body=['print $0"\\tMutect_CTC"']
+        body=[
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tMutect_CTC\\tMutect\\tCTC"']
+            # 'print $0"\\tMutect_CTC"'
+        ]
     wrapper:
         "bio/awk"
 
@@ -31,15 +34,41 @@ rule add_origin_brc:
         "logs/vep/origin/{sample}.brc.log"
     params:
         begin='FS=OFS="\\t"',
-        body=['print $0"\\tBRC_CTC"']
+        body=[
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tBRC_CTC\\tBRC\\tCTC"']
+            # 'print $0"\\tBRC_CTC"'
+        ]
     wrapper:
         "bio/awk"
-
 
 
 rule add_origin_wbc_ctc:
     input:
         "vep/hc/{sample}.wbc.tsv"
+    output:
+        temp("vep/hc/{sample}.wbc.tmp.tsv")
+    threads: 1
+    resources:
+        mem_mb=512,
+        time_min=10,
+        tmpdir=tmp,
+    log:
+        "logs/vep/origin/{sample}.wbc.log"
+    group:
+        "wbc_origin"
+    params:
+        begin='FS=OFS="\\t"',
+        body=[
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tHC_WBC\\tHaplotypeCaller\\tWBC"']
+            # 'print $0"\\tHC_WBC"'
+        ]
+    wrapper:
+        "bio/awk"
+
+
+rule rename_sample_wbc_hc:
+    input:
+        "vep/hc/{sample}.wbc.tmp.tsv"
     output:
         temp("vep/hc/{sample}.wbc.orig.tsv")
     threads: 1
@@ -48,12 +77,15 @@ rule add_origin_wbc_ctc:
         time_min=10,
         tmpdir=tmp,
     log:
-        "logs/vep/origin/{sample}.wbc.log"
+        "logs/vep/rename/{sample}.wbc.log"
+    group:
+        "wbc_origin"
     params:
-        begin='FS=OFS="\\t"',
-        body=['print $0"\\tHC_WBC"']
-    wrapper:
-        "bio/awk"
+        sample=lambda wildcards: "_".join(str(wildcards.sample).split("_")[:-1]) + "_WBC"
+    conda:
+        "../envs/bash.yaml"
+    shell:
+        "sed 's|{wildcards.sample}|{params.sample}|g' {input} > {output} 2> {log}"
 
 
 rule add_origin_hc_ctc:
@@ -70,9 +102,58 @@ rule add_origin_hc_ctc:
         "logs/vep/origin/{sample}.ctc.log"
     params:
         begin='FS=OFS="\\t"',
-        body=['print $0"\\tHC_CTC"']
+        body=[
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tHC_CTC\\tHaplotypeCaller\\tCTC"']
+            # 'print $0"\\tHC_CTC"'
+        ]
     wrapper:
         "bio/awk"
+
+
+rule add_origin_hc_bseline:
+    input:
+        "vep/hc/{sample}.baseline.tsv"
+    output:
+        temp("vep/hc/{sample}.baseline.tmp.tsv")
+    threads: 1
+    resources:
+        mem_mb=512,
+        time_min=10,
+        tmpdir=tmp,
+    log:
+        "logs/vep/origin/{sample}.baseline.log"
+    group:
+        "baseline_origin"
+    params:
+        begin='FS=OFS="\\t"',
+        body=[
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tHC_Germline\\tHaplotypeCaller\\tGermline"']
+            # 'print $0"\\tHC_Germline"'
+        ]
+    wrapper:
+        "bio/awk"
+
+
+rule rename_sample_germline_hc:
+    input:
+        "vep/hc/{sample}.baseline.tmp.tsv"
+    output:
+        temp("vep/hc/{sample}.baseline.orig.tsv")
+    threads: 1
+    resources:
+        mem_mb=512,
+        time_min=10,
+        tmpdir=tmp,
+    log:
+        "logs/vep/rename/{sample}.baseline.log"
+    group:
+        "baseline_origin"
+    params:
+        sample=lambda wildcards: "_".join(str(wildcards.sample).split("_")[:-1]) + "_Germline_DNA"
+    conda:
+        "../envs/bash.yaml"
+    shell:
+        "sed 's|{wildcards.sample}|{params.sample}|g' {input} > {output} 2> {log}"
 
 
 rule concat_to_bigtable:
@@ -88,6 +169,10 @@ rule concat_to_bigtable:
         ),
         expand(
             "vep/hc/{sample}.ctc.orig.tsv",
+            sample=samples_list,
+        ),
+        expand(
+            "vep/hc/{sample}.baseline.orig.tsv",
             sample=samples_list,
         ),
     output:
@@ -131,7 +216,7 @@ rule bigtable_noheader:
     input:
         "bigtable/raw.tsv",
     output:
-        pipe("bigtable/noheader.tsv"),
+        temp("bigtable/noheader.tsv"),
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
@@ -140,7 +225,7 @@ rule bigtable_noheader:
     log:
         "logs/bigtable/noheader.log",
     params:
-        "'1d;s|.ctc.brc.vcf||g;s|Baseline|Germline|g;'",
+        "'1d;s|.ctc.brc.vcf||g;s|Baseline|Germline|g'",
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     shell:

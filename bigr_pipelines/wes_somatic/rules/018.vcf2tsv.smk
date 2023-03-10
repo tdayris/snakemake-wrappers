@@ -36,15 +36,10 @@ rule filter_tsv:
             f"{wildcards.sample}_tumor_AD_allele1",
             f"{wildcards.sample}_tumor_AD_allele2",
             f"{wildcards.sample}_tumor_AF",
-        ] if "Upstream_file_normal" in design.columns.tolist() else [
-            f"{wildcards.sample}_tumor_Reference_Allele",
-            f"{wildcards.sample}_tumor_Seq_Allele1",
-            f"{wildcards.sample}_tumor_Seq_Allele2",
-            f"{wildcards.sample}_tumor_DP",
-            f"{wildcards.sample}_tumor_AD_allele1",
-            f"{wildcards.sample}_tumor_AD_allele2",
-            f"{wildcards.sample}_tumor_AF",
-        ]),
+        ],
+        contains=[
+            ["Filter", r".|PASS"]
+        ]
     log:
         "logs/pandas/filter_tsv/{sample}.log",
     wrapper:
@@ -146,6 +141,7 @@ rule bcftools_select_variants_postannot:
         ref=config["reference"]["fasta"],
         ref_index=config["reference"]["fasta_index"],
         ref_dict=config["reference"]["fasta_dict"],
+        regions=config["reference"]["capture_kit_bed"],
     output:
         vcf=protected("data_output/VCF/{sample}.vcf.gz"),
     threads: 1
