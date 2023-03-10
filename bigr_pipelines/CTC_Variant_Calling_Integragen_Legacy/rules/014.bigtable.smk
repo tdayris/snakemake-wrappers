@@ -13,7 +13,7 @@ rule add_origin_mutect_ctc:
     params:
         begin='FS=OFS="\\t"',
         body=[
-            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0\\tMutect_CTC\\tMutect\\tCTC']
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tMutect_CTC\\tMutect\\tCTC"']
             # 'print $0"\\tMutect_CTC"'
         ]
     wrapper:
@@ -35,7 +35,7 @@ rule add_origin_brc:
     params:
         begin='FS=OFS="\\t"',
         body=[
-            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0\\tBRC_CTC\\tBRC\\tCTC']
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tBRC_CTC\\tBRC\\tCTC"']
             # 'print $0"\\tBRC_CTC"'
         ]
     wrapper:
@@ -59,7 +59,7 @@ rule add_origin_wbc_ctc:
     params:
         begin='FS=OFS="\\t"',
         body=[
-            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0\\tHC_WBC\\tHaplotypeCaller\\tWBC']
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tHC_WBC\\tHaplotypeCaller\\tWBC"']
             # 'print $0"\\tHC_WBC"'
         ]
     wrapper:
@@ -103,7 +103,7 @@ rule add_origin_hc_ctc:
     params:
         begin='FS=OFS="\\t"',
         body=[
-            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0\\tHC_CTC\\tHaplotypeCaller\\tCTC']
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tHC_CTC\\tHaplotypeCaller\\tCTC"']
             # 'print $0"\\tHC_CTC"'
         ]
     wrapper:
@@ -127,7 +127,7 @@ rule add_origin_hc_bseline:
     params:
         begin='FS=OFS="\\t"',
         body=[
-            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0\\tHC_Germline\\tHaplotypeCaller\\tGermline']
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tHC_Germline\\tHaplotypeCaller\\tGermline"']
             # 'print $0"\\tHC_Germline"'
         ]
     wrapper:
