@@ -12,7 +12,7 @@ rule gatk_apply_baserecalibrator:
     threads: 1
     resources:
         mem_mb=get_8gb_per_attempt,
-        time_min=get_1h_per_attempt,
+        time_min=get_5h_per_attempt,
         tmpdir=tmp,
     retries: 1
     params:
@@ -37,7 +37,7 @@ rule gatk_compute_baserecalibration_table:
     threads: 1
     resources:
         mem_mb=get_8gb_per_attempt,
-        time_min=get_2h_per_attempt,
+        time_min=get_5h_per_attempt,
         tmpdir=tmp,
     retries: 1
     log:
