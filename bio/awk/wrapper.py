@@ -11,18 +11,18 @@ def join_awk_sections(instructions: Optional[List[str]] = None) -> Optional[str]
     """Return the joint awk instruction, of None is no instruction are provided"""
     result = []
     if (instructions == []) or (instructions is None):
-        return None
+        result.append("")
     elif isinstance(instructions, str):
-        result.append([instructions])
+        result.append(instructions)
     else:
         for instruction in instructions:
             if isinstance(instruction, list):
                 if len(instruction) == 2:
-                    result.append([f"{{if {instruction[0]} {{{instruction[1]}}} }}"])
-                elif len(intruction) == 3:
-                    result.append([f"{{if {instruction[0]} {{{instruction[1]}}} else {{{instruction[2]}}} }}"])
+                    result.append(f"{{if ({instruction[0]}) {{{instruction[1]}}} }}")
+                elif len(instruction) == 3:
+                    result.append(f"{{if ({instruction[0]}) {{{instruction[1]}}} else {{{instruction[2]}}} }}")
             
-    return ";".join(instructions)
+    return ";".join(result)
 
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
