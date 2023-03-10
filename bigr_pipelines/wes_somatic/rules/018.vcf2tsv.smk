@@ -22,7 +22,7 @@ rule filter_tsv:
             ["Filter", "=", "FILTER"],
         ],
         keep_column=lambda wildcards: config["table_cols"]
-        + [
+        + ([
             f"{wildcards.sample}_normal_Reference_Allele",
             f"{wildcards.sample}_normal_Seq_Allele1",
             f"{wildcards.sample}_normal_Seq_Allele2",
@@ -36,7 +36,15 @@ rule filter_tsv:
             f"{wildcards.sample}_tumor_AD_allele1",
             f"{wildcards.sample}_tumor_AD_allele2",
             f"{wildcards.sample}_tumor_AF",
-        ],
+        ] if "Upstream_file_normal" in design.columns.tolist() else [
+            f"{wildcards.sample}_tumor_Reference_Allele",
+            f"{wildcards.sample}_tumor_Seq_Allele1",
+            f"{wildcards.sample}_tumor_Seq_Allele2",
+            f"{wildcards.sample}_tumor_DP",
+            f"{wildcards.sample}_tumor_AD_allele1",
+            f"{wildcards.sample}_tumor_AD_allele2",
+            f"{wildcards.sample}_tumor_AF",
+        ]),
     log:
         "logs/pandas/filter_tsv/{sample}.log",
     wrapper:
