@@ -92,9 +92,9 @@ rule expand_rank_list:
     params:
         gene_id_type=config.get("gene_id_type", "ENSEMBL"),
         orgdb=(
-            "org.Hs.eg.db"
+            "hs38"
             if config["clusterprofiler"].get("organism", "Hs") == "Hs"
-            else "org.Mm.eg.db"
+            else "mm10"
         ),
     log:
         "logs/026.clusterprofiler/expand.{comparison}.log",
