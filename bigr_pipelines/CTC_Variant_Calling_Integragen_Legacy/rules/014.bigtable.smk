@@ -31,7 +31,7 @@ rule add_origin_brc:
         "logs/vep/origin/{sample}.brc.log"
     params:
         begin='FS=OFS="\\t"',
-        body=['print $0"\\tBRC"']
+        body=['print $0"\\tBRC_CTC"']
     wrapper:
         "bio/awk"
 
@@ -70,7 +70,7 @@ rule add_origin_hc_ctc:
         "logs/vep/origin/{sample}.ctc.log"
     params:
         begin='FS=OFS="\\t"',
-        body=['print $0"\\tHC_WBC"']
+        body=['print $0"\\tHC_CTC"']
     wrapper:
         "bio/awk"
 
