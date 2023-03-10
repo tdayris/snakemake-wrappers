@@ -54,9 +54,9 @@ while [ "$#" -gt 0 ]; do
     -p|--profile) PROFILE="${2}"; shift 2;;
     --summary) SUMMARY="${2}"; shift 2;;
     --rulegraph|--dag) GRAPH="${2}"; shift 2;;
-    hg19|HG19|GRCh37) CONFIG_PATH="${PIPELINE_PATH}/config/config.hg19.yaml"; message WARNING "Some operations are not available for hg19 genome"; shift;;
-    hg38|HG38|GRCh38) CONFIG_PATH="${PIPELINE_PATH}/config/config.hg38.yaml"; shift;;
-    mm10|MM10|GRCm38) CONFIG_PATH="${PIPELINE_PATH}/config/config.mm10.yaml"; message WARNING "Some operations are not available for mice datasets"; shift;;
+    hg19|HG19|GRCh37) CONFIG_PATH='${PIPELINE_PATH}/config/config.hg19.yaml'; message WARNING "Some operations are not available for hg19 genome"; shift;;
+    hg38|HG38|GRCh38) CONFIG_PATH='${PIPELINE_PATH}/config/config.hg38.yaml'; shift;;
+    mm10|MM10|GRCm38) CONFIG_PATH='${PIPELINE_PATH}/config/config.mm10.yaml'; message WARNING "Some operations are not available for mice datasets"; shift;;
     DESeq2|deseq2|DGE|dge) STEPS+=("dge"); message INFO "DGE is in the expected result list"; shift;;
     salmon|Salmon|quant) STEPS+=("quant"); message INFO "Quantification is in the expected result list"; shift;;
     fusions|fusion) STEPS+=("fusions"); message INFO "Fusions are in the expected result list"; shift;;
@@ -97,7 +97,7 @@ else
 fi
 
 # Default config file path
-
+CONFIG_PATH=$(echo "${CONFIG_PATH}" | sed "s|\${PIPELINE_PATH}|${PIPELINE_PATH}|")
 if [ ! -f "${CONFIG_PATH}" ]; then
   if [ -f "${PIPELINE_PATH}/config/config.yaml" ]; then
     CONFIG_PATH="${PIPELINE_PATH}/config/config.yaml"
