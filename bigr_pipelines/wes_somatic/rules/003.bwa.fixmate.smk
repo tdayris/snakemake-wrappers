@@ -12,7 +12,7 @@ rule sambamba_sort_coordinate:
         mapping=temp("sambamba/sort/{sample}_{status}.bam"),
     threads: min(config.get("max_threads", 20), 10)
     resources:
-        mem_mb=get_4gb_per_attempt,
+        mem_mb=get_6gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir=tmp,
     retries: 1
@@ -33,7 +33,7 @@ rule sambamba_sort_raw:
         mapping=temp("bwa_mem2/sorted/{sample}_{status}.bam"),
     threads: min(config.get("max_threads", 20), 10)
     resources:
-        mem_mb=get_2gb_per_attempt,
+        mem_mb=get_6gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir=tmp,
     retries: 1
@@ -102,7 +102,7 @@ rule sambamba_sort_raw_bwa:
         mapping=temp("bwa_mem2/mem/{sample}_{status}.bam"),
     threads: min(config.get("max_threads", 20), 10)
     resources:
-        mem_mb=get_2gb_per_attempt,
+        mem_mb=get_6gb_per_attempt,
         time_min=get_90min_per_attempt,
         tmpdir=tmp,
     retries: 1
