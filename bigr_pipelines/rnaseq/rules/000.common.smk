@@ -36,6 +36,12 @@ from reservation import *
 from gmt import *
 from messages import message
 
+container_image = config.get(
+    "container_image",
+    "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/singularity/mambaforge_4.14.0-0.sif"
+)
+
+container: container_image
 
 def expected_targets(steps: Dict[str, Any]) -> Dict[str, Any]:
     """Return the list of expected output files"""
