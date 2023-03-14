@@ -225,7 +225,7 @@ rule bigtable_noheader:
     log:
         "logs/bigtable/noheader.log",
     params:
-        "'1d;s|.ctc.brc.vcf||g;s|Baseline|Germline|g'",
+        "'1d;s|.ctc.brc.vcf||g;s|.ctc.bcr.vcf||g;s|Baseline|Germline|g'",
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     shell:
@@ -237,7 +237,7 @@ rule bigtable_sort:
         "bigtable/noheader.tsv",
     output:
         temp("bigtable/sorted.tsv"),
-    threads: 1
+    threads: 2
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_45min_per_attempt,
@@ -245,11 +245,11 @@ rule bigtable_sort:
     log:
         "logs/bigtable/sort.log",
     params:
-        "-k1,1 -k2,2n",
+        "",
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     shell:
-        "sort {params} {input} > {output}"
+        "sort {params} {input} | uniq > {output}"
 
 
 rule bigtable_output:
@@ -271,3 +271,24 @@ rule bigtable_output:
         str(workflow_source_dir / "envs" / "bash.yaml")
     shell:
         "cat {input.header} {input.content} > {output} 2> {log}"
+
+
+rule bigtable_annotated:
+    input:
+        bigtable="data_output/bigtable.tsv",
+        egfr_annot="annot.csv"
+    output:
+        "data_output/bigtable.annot.tsv"
+    threads: 1
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
+        tmpdir=tmp,
+    log:
+        "logs/bigtable/annot.log",
+    params:
+        "",
+    conda:
+        str(workflow_source_dir / "envs" / "bash.yaml")
+    script:
+        "../scripts/merge_tables.py"
