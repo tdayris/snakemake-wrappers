@@ -161,12 +161,16 @@ def read_labels(path: str) -> pd.DataFrame:
     ]
 
     df = df[[
+        "Patient",
+        "Time-Point",
         "Treatment",
         "FullComment",
         "Targeted NGS SampleName",
         "Number of cells",
+        "Type of sample",
         "Normal / Tumor",
         "WGA QC (/4)",
+        "CTC_nb",
         "KEY"
     ]]
 
@@ -181,10 +185,30 @@ print(labels.shape)
 
 merged = pd.merge(
     left=df,
-    right=labels,
+    right=labels[[
+        "Treatment",
+        "FullComment",
+        "Targeted NGS SampleName",
+        "Number of cells",
+        "Normal / Tumor",
+        "WGA QC (/4)",
+        "KEY"
+    ]],
     how="left",
     on="KEY"
 )
 
 print(merged.shape)
 merged.to_csv(snakemake.output["bigtable"], sep="\t", header=True, index=False)
+
+merged = pd.merge(
+    left=df,
+    right=labels,
+    how="outer",
+    on="KEY",
+    suffixes=["_bigtable", "_annotations"]
+)
+merged.fillna(value="NO_DATA", inplace=True)
+
+print(merged.shape)
+merged.to_csv(snakemake.output["fulltable"], sep="\t", header=True, index=False)
