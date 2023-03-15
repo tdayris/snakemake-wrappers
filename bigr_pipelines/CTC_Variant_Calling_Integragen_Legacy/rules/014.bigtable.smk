@@ -320,4 +320,4 @@ rule bigtable_annotated:
     conda:
         str(workflow_source_dir / "envs" / "bash.yaml")
     script:
-        "../scripts/merge_tables.py"
+        "../scripts/annotate_bigtable.py"
