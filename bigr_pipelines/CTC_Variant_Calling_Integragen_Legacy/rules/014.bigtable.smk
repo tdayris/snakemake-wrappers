@@ -305,7 +305,7 @@ rule remove_duplicates:
 rule bigtable_annotated:
     input:
         bigtable="bigtable/bigtable.uniq.csv",
-        lebel="Labels.csv"
+        label="Labels.csv"
     output:
         bittable="data_output/bigtable.annot.tsv"
     threads: 1
