@@ -161,16 +161,12 @@ def read_labels(path: str) -> pd.DataFrame:
     ]
 
     df = df[[
-        "Patient",
-        "Time-Point",
         "Treatment",
         "FullComment",
         "Targeted NGS SampleName",
         "Number of cells",
-        "Type of sample",
         "Normal / Tumor",
         "WGA QC (/4)",
-        "CTC_nb",
         "KEY"
     ]]
 
