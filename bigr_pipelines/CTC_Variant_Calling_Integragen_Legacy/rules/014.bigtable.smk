@@ -81,7 +81,10 @@ rule rename_sample_wbc_hc:
     group:
         "wbc_origin"
     params:
-        sample=lambda wildcards: "_".join(str(wildcards.sample).split("_")[:-1]) + "_WBC"
+        sample=lambda wildcards: (
+            "_".join(str(wildcards.sample).split("_")[:-1]) + "_WBC" 
+            if re.search("_\d+$", str(wildcards.sample)) else str(wildcards.sample) + "_WBC"
+        )
     conda:
         "../envs/bash.yaml"
     shell:
@@ -149,7 +152,10 @@ rule rename_sample_germline_hc:
     group:
         "baseline_origin"
     params:
-        sample=lambda wildcards: "_".join(str(wildcards.sample).split("_")[:-1]) + "_Germline_DNA"
+        sample=lambda wildcards: (
+            "_".join(str(wildcards.sample).split("_")[:-1]) + "_Germline_DNA" 
+            if re.search("_\d+$", str(wildcards.sample)) else str(wildcards.sample) + "_Germline_DNA"
+        )
     conda:
         "../envs/bash.yaml"
     shell:
@@ -273,12 +279,35 @@ rule bigtable_output:
         "cat {input.header} {input.content} > {output} 2> {log}"
 
 
+
+rule remove_duplicates:
+    input:
+        "data_output/bigtable.tsv"
+    output:
+        temp("bigtable/bigtable.uniq.csv")
+    threads: 3
+    resources:
+        mem_mb=get_1gb_per_attempt,
+        time_min=get_15min_per_attempt,
+        tmpdir=tmp,
+    log:
+        "logs/xsv/preset/bigtable.log"
+    params:
+        s="",
+        u="",
+        e="'s|,|;|g;s|\t|,|g'",
+    conda:
+        str(workflow_source_dir / "envs" / "bash.yaml")
+    shell:
+        "sed {params.e} {input} | xsv sort {params.s} | uniq {params.u} > {output} 2> {log}"
+
+
 rule bigtable_annotated:
     input:
-        bigtable="data_output/bigtable.tsv",
-        egfr_annot="annot.csv"
+        bigtable="bigtable/bigtable.uniq.csv",
+        lebel="Labels.csv"
     output:
-        "data_output/bigtable.annot.tsv"
+        bittable="data_output/bigtable.annot.tsv"
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
