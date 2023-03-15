@@ -307,7 +307,7 @@ rule bigtable_annotated:
         bigtable="bigtable/bigtable.uniq.csv",
         label="Labels.csv"
     output:
-        bittable="data_output/bigtable.annot.tsv"
+        bigtable="data_output/bigtable.annot.tsv"
     threads: 1
     resources:
         mem_mb=get_1gb_per_attempt,
