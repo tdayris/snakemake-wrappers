@@ -214,3 +214,4 @@ merged.fillna(value="NO_DATA", inplace=True)
 
 print(merged.shape)
 merged.to_csv(snakemake.output["fulltable"], sep="\t", header=True, index=False)
+merged.to_excel(snakemake.output["excel"], sep="\t", header=True, index=False)
