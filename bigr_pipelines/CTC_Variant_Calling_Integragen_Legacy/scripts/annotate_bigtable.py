@@ -35,7 +35,7 @@ def get_tp_treatment(tp: str, ttm: bool = False) -> str:
 
 
 def get_nb(uid: str, tos: str, target: bool = False) -> str:
-    if tos.strip().lower() != germline_text.lower():
+    if (tos.strip().lower() != germline_text.lower()) or (tos.strip().lower() == germline_text.lower().split()[0]):
         if target:
             try:
                 return float(uid.strip().split(" ")[-1])
@@ -50,6 +50,8 @@ def get_nb(uid: str, tos: str, target: bool = False) -> str:
 
 
 def get_key(p: str, tp: float, tos: str, nb: float) -> str:
+    if tos == "Germline":
+        tos = germline_text
     return str(p) + "_V" + str(tp) + "_" + str(tos) + " " + str(nb)
 
 
