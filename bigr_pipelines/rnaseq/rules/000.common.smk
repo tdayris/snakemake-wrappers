@@ -126,10 +126,12 @@ comparison_levels = list(
 
 # An iterator that holds all samples involved in the comparisons
 # listed above
-samples_iterator = yield_samples(
-    complete_design=design.copy(),
-    aggregate=config["deseq2"]["design"].get("aggregate_col"),
-    remove=config["deseq2"]["design"].get("remove_col"),
+samples_iterator = list(
+    yield_samples(
+        complete_design=design.copy(),
+        aggregate=config["deseq2"]["design"].get("aggregate_col"),
+        remove=config["deseq2"]["design"].get("remove_col"),
+    )
 )
 
 # A list containing all expected PCA at the end of DESeq2.
@@ -149,16 +151,6 @@ condition_dict = {
     for factor, test, ref in comparison_levels
 }
 
-# A list containing all DESeq2 comparison names
-# Stored as a list for futrther re-use
-output_prefixes = [
-    f"DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}"
-    for factor, test, ref in comparison_levels
-]
-if config.get("write_comparisons", True):
-    with open("list_of_possible_comparisons.txt", "w") as outcomplist:
-        outcomplist.write("\n".join(output_prefixes) + "\n")
-
 # A dict containing comparison names and factors/levels
 contrasts = dict(zip(output_prefixes, comparison_levels))
 
@@ -170,6 +162,31 @@ samples_per_prefixes = {
 
 # Boolean: is there any batch effect to consider in DEseq2 ?
 batch_effect = any(level[0] == "BatchEffect" for level in comparison_levels)
+
+
+# A list containing all DESeq2 comparison names
+# Stored as a list for futrther re-use
+output_prefixes = [
+    f"DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}"
+    for factor, test, ref in comparison_levels
+]
+if config.get("write_comparisons", True):
+    _outcomp_data = []
+    for _prefix, _comparison in contrasts.items():
+        _levels = _comparison[1:-1]
+        _factor = _comparison[0]
+        _ref_level = _comparison[-1]
+        _formula = (
+            f"~{_factor}"
+            if (batch_effect is False) or (_factor == "BatchEffect")
+            else f"~BatchEffect+{_factor}"
+        )
+        outcomp_data.append(
+            "\t".join([_prefix, _levels, _ref_level, _factor, _formula])
+        )
+    with open("list_of_possible_comparisons.txt", "w") as outcomplist:
+        outcomplist.write("ResultName\tTestedLevels\tReferenceLevel\tFactor\tFormula")
+        outcomplist.write("\n".join(_outcomp_data) + "\n")
 
 
 # Globals used in wildcards
