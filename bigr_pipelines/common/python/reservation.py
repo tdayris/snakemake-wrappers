@@ -166,6 +166,9 @@ get_45min_per_gb_input_per_attempt = functools.partial(
 get_4gb_per_gb_input_per_attempt = functools.partial(
     get_resources_per_gb_per_attempt, multiplier=4 * 1024, base=4 * 1024
 )
+get_2gb_per_gb_input_per_attempt = functools.partial(
+    get_resources_per_gb_per_attempt, multiplier=2 * 1024, base=2 * 1024
+)
 
 
 # Some special cases
