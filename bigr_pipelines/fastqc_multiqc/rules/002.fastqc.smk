@@ -17,9 +17,10 @@ rule fastqc:
         zip=temp("fastqc/{sample}_fastqc.zip"),
     threads: 1
     resources:
-        mem_mb=get_2gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        mem_mb=get_2gb_per_gb_input_per_attempt,
+        time_min=get_45min_per_gb_input_per_attempt,
         tmpdir="tmp",
+    retries: 3
     params:
         "",
     log:
