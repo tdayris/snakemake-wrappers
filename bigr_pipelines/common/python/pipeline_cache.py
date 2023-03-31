@@ -20,6 +20,7 @@ import yaml
 from pathlib import Path
 from snakemake.utils import makedirs
 
+
 def parser() -> argparse.ArgumentParser:
     """
     Build the command line parser object
@@ -27,7 +28,7 @@ def parser() -> argparse.ArgumentParser:
     main_parser = argparse.ArgumentParser(
         description=sys.modules[__name__].__doc__,
         formatter_class=CustomFormatter,
-        epilog="This script does any magic, please check results."
+        epilog="This script does any magic, please check results.",
     )
 
     # Positional arguments
@@ -46,7 +47,8 @@ def parser() -> argparse.ArgumentParser:
         choices=["GRCh38", "GRCm38"],
     )
 
-source_path = Path(os.path.realpath(__file__))  / ".." / ".." / ".."
+
+source_path = Path(os.path.realpath(__file__)) / ".." / ".." / ".."
 exec_path = Path(".").absolute()
 makedirs(".bigr_pipelines", mode=755, exist_ok=True)
 
@@ -85,7 +87,9 @@ cache_data = {
             "dbsnp": "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.all.vcf.gz",
             "dbsnp_tbi": "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCm38.99/GRCm38.99.mus_musculus.all.vcf.gz.tbi",
         },
-        "chromosomes": list(range(1, 23)) + list(map(str, range(1, 23))) + ["MT", "X", "Y"],
+        "chromosomes": list(range(1, 23))
+        + list(map(str, range(1, 23)))
+        + ["MT", "X", "Y"],
         "db": {
             "CTAT_resource_lib": "/mnt/beegfs/database/bioinfo/Index_DB/CTAT_Resource_Lib/GRCh38_gencode_v37/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play/ctat_genome_lib_build_dir/",
             "cibersort_mat": "/mnt/beegfs/software/cibersort/1.0.6/LM22.txt",
@@ -152,7 +156,7 @@ cache_data = {
             "mistic": None,
             "cancer_census": None,
             "oncokb": None,
-        }
+        },
     },
     "hg38": {
         "name": "GRCh38.99",
@@ -174,18 +178,20 @@ cache_data = {
         "fasta": {
             "genome": "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta",
             "genome_index": "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.fasta.fai",
-            "genome_dict": "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.dict"
+            "genome_dict": "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.dna.main_chr.dict",
         },
         "annotations": {
             "gtf": "/mnt/beegfs/database/bioinfo/Index_DB/Fasta/Ensembl/GRCh38.99/GRCh38.99.homo_sapiens.gtf",
             "reflat": "/mnt/beegfs/database/bioinfo/Index_DB/refFlat/GRCh38/refFlat.txt.gz",
             "refgene_model": "/mnt/beegfs/database/bioinfo/Index_DB/refgene/bed12/GRCh38/GRCh38.nochr.bed12",
-            "af_only":"/mnt/beegfs/database/bioinfo/Index_DB/GATK/mutect2_gnomad_af_only/hg38/somatic-hg38_af-only-gnomad.hg38.nochr.vcf.gz",
+            "af_only": "/mnt/beegfs/database/bioinfo/Index_DB/GATK/mutect2_gnomad_af_only/hg38/somatic-hg38_af-only-gnomad.hg38.nochr.vcf.gz",
             "af_only_tbi": "/mnt/beegfs/database/bioinfo/Index_DB/GATK/mutect2_gnomad_af_only/hg38/somatic-hg38_af-only-gnomad.hg38.nochr.vcf.gz.tbi",
             "dbsnp": "/mnt/beegfs/database/bioinfo/Index_DB/dbSNP/GRCh38p7/All_20180418.nochr.vcf.gz",
             "dbsnp_tbi": "/mnt/beegfs/database/bioinfo/Index_DB/dbSNP/GRCh38p7/All_20180418.nochr.vcf.gz.tbi",
         },
-        "chromosomes": list(range(1, 23)) + list(map(str, range(1, 23))) + ["MT", "X", "Y"],
+        "chromosomes": list(range(1, 23))
+        + list(map(str, range(1, 23)))
+        + ["MT", "X", "Y"],
         "db": {
             "CTAT_resource_lib": "/mnt/beegfs/database/bioinfo/Index_DB/CTAT_Resource_Lib/GRCh38_gencode_v37/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play/ctat_genome_lib_build_dir/",
             "cibersort_mat": "/mnt/beegfs/software/cibersort/1.0.6/LM22.txt",
@@ -252,6 +258,6 @@ cache_data = {
             "mistic": "/mnt/beegfs/database/bioinfo/Index_DB/MISTIC/MISTIC_GRCh38.tsv.gz",
             "cancer_census": "/mnt/beegfs/database/bioinfo/Index_DB/CancerGeneCensus/Census_allTue_Aug_31_15_11_39_2021.csv",
             "oncokb": "/mnt/beegfs/database/bioinfo/Index_DB/OncoKB/OncoKB.csv",
-        }
-    }
+        },
+    },
 }

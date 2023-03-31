@@ -26,7 +26,7 @@ rule salmon_quant:
         logs=temp(directory("004.salmon/pseudo_mapping/{sample}/logs")),
     threads: config.get("max_threads", 20)
     resources:
-        time_min=get_90min_per_attempt,
+        time_min=get_salmon_time_per_attempt,
         mem_mb=get_15gb_per_attempt,
         tmpdir="tmp",
     retries: 1
@@ -65,8 +65,8 @@ rule tx_to_gene:
         gene2gene_large=temp("004.salmon/gene2gene_with_chr.tsv"),
     threads: 1
     resources:
-        mem_mb=get_4gb_per_attempt,
-        time_min=get_15min_per_attempt,
+        mem_mb=get_4gb_per_gb_input_per_attempt,
+        time_min=get_15min_per_gb_input_per_attempt,
         tmpdir="tmp",
     retries: 1
     log:
@@ -98,8 +98,8 @@ rule aggregate_raw_counts:
         tsv=protected("data_output/Quantification/Raw.genes.tsv"),
     threads: 1
     resources:
-        mem_mb=get_4gb_per_attempt,
-        time_min=get_15min_per_attempt,
+        mem_mb=get_4gb_per_gb_input_per_attempt,
+        time_min=get_15min_per_gb_input_per_attempt,
         tmpdir="tmp",
     retries: 1
     params:
@@ -139,8 +139,8 @@ rule aggregate_gene_counts:
         tsv=protected("data_output/Quantification/TPM.genes.tsv"),
     threads: 1
     resources:
-        mem_mb=get_4gb_per_attempt,
-        time_min=get_15min_per_attempt,
+        mem_mb=get_4gb_per_gb_input_per_attempt,
+        time_min=get_15min_per_gb_input_per_attempt,
         tmpdir="tmp",
     retries: 1
     params:
@@ -178,8 +178,8 @@ rule aggregate_transcript_counts:
         tsv=protected("data_output/Quantification/TPM.transcripts.tsv"),
     threads: 1
     resources:
-        mem_mb=get_4gb_per_attempt,
-        time_min=get_15min_per_attempt,
+        mem_mb=get_4gb_per_gb_input_per_attempt,
+        time_min=get_15min_per_gb_input_per_attempt,
         tmpdir="tmp",
     retries: 1
     params:

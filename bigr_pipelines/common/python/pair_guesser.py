@@ -18,14 +18,16 @@ class CustomFormatter(logging.Formatter):
     red = "\x1b[31;20m"
     green = "\x1b[31;1m"
     reset = "\x1b[0m"
-    format = "%(levelname)s - %(asctime)s - %(name)s - %(message)s (%(filename)s:%(lineno)d)"
+    format = (
+        "%(levelname)s - %(asctime)s - %(name)s - %(message)s (%(filename)s:%(lineno)d)"
+    )
 
     FORMATS = {
         logging.DEBUG: green + format + reset,
         logging.INFO: cyan + format + reset,
         logging.WARNING: orange + format + reset,
         logging.ERROR: red + format + reset,
-        logging.CRITICAL: red + format + reset
+        logging.CRITICAL: red + format + reset,
     }
 
     def format(self, record):
@@ -34,34 +36,35 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-
 def cmd_parser(args: Any) -> argparse.Namespace:
     """Parse command line arguments"""
     logging.info("Parsing command line...")
     parser = argparse.ArgumentParser(
-        description="",
-        epilog="This script does not perform any magic. Check results."
+        description="", epilog="This script does not perform any magic. Check results."
     )
 
     parser.add_argument(
-        "-i", "--input",
+        "-i",
+        "--input",
         help="Path to input TSV file",
         default="paired_dataset_paths.txt",
-        type=str
+        type=str,
     )
 
     parser.add_argument(
-        "-d", "--design",
+        "-d",
+        "--design",
         help="Path to the output design file with merged fastq files",
         default="design.tsv",
-        type=str
+        type=str,
     )
 
     parser.add_argument(
-        "-e", "--extension",
+        "-e",
+        "--extension",
         help="Space separated list of suffixes to remove to guess sample name",
         default=[".gz", ".fq", ".fastq", "_001", "_R1"],
-        nargs="+"
+        nargs="+",
     )
 
     return parser.parse_args(args)
@@ -83,7 +86,9 @@ def try_remove_ext(filename: str, possible_exts: Optional[List[str]] = None) -> 
     return filename
 
 
-def index_paired_dataset(path: str, possible_exts: Optional[List[str]]) -> Dict[str, Dict[str, List[str]]]:
+def index_paired_dataset(
+    path: str, possible_exts: Optional[List[str]]
+) -> Dict[str, Dict[str, List[str]]]:
     logging.info("Indexing input file...")
     result = {}
     with open(path, "r") as paired_dataset:
@@ -105,12 +110,21 @@ def create_design_file(path: str, index: Dict[str, Dict[str, List[str]]]) -> Non
         design.write("Sample_id\tUpstream_file\tDownstream_file\n")
         for sample in index.keys():
             if len(index[sample]["R1"]) > 1:
-                logging.info("{} seems to be divided in {} files".format(sample, len(index[sample]["R1"])))
-            line = "\t".join([
-                sample,
-                ",".join(index[sample]["R1"]),
-                ",".join(index[sample]["R2"]),
-            ]) + "\n"
+                logging.info(
+                    "{} seems to be divided in {} files".format(
+                        sample, len(index[sample]["R1"])
+                    )
+                )
+            line = (
+                "\t".join(
+                    [
+                        sample,
+                        ",".join(index[sample]["R1"]),
+                        ",".join(index[sample]["R2"]),
+                    ]
+                )
+                + "\n"
+            )
             design.write(line)
 
 

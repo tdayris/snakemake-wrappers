@@ -3,6 +3,7 @@
 
 from typing import Dict, List
 
+
 def get_t2n_extra(database: str) -> str:
     """Get the correct awk print command to extract human readable term 2 name"""
     two_cols = [
@@ -50,7 +51,7 @@ def get_t2n_extra(database: str) -> str:
 
     if database in two_cols:
         return '{print $1"\t"$2}'
-    
+
     if database in first_col_readable:
         return '{print $1"\t"$1}'
 
@@ -76,10 +77,9 @@ def db_keytype(gmts: Dict[str, str], ppis: Dict[str, str]) -> Dict[str, str]:
     return result
 
 
-def plot_list(plots: List[str], 
-              methods: List[str],
-              comparisons: List[str], 
-              db_key: Dict[str, str]) -> List[str]:
+def plot_list(
+    plots: List[str], methods: List[str], comparisons: List[str], db_key: Dict[str, str]
+) -> List[str]:
     """Return list of plots with correct key type and database"""
     result = [
         f"data_output/GSEA/{comparison}/{db_name}.{keytype}/{plot}.{method}.png"
