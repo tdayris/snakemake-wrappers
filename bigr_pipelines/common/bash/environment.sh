@@ -8,7 +8,7 @@
 # This script is used to export variables to a running environment
 
 function conda_activate () {
-  CMD="source \"$(conda info --base)/etc/profile.d/conda.sh\" || source \"/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_conda/anaconda3/etc/profile.d/conda.sh\""
+  CMD="which conda > /dev/null 2>&1 || source \"/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_conda/anaconda3/etc/profile.d/conda.sh\""
   message CMD "${CMD}"
   eval ${CMD}
   CMD="conda activate"
