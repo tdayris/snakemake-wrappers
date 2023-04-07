@@ -11,18 +11,18 @@ extra = snakemake.params.get("extra", "")
 
 
 blacklist = snakemake.input.get("blacklist", "")
-if blacklist != "":
+if blacklist:
     blacklist = " --blackListFileName " + blacklist
 
 
 raw_counts = snakemake.output.get("raw_counts")
-if raw_counts != "":
+if raw_counts:
     raw_counts = " --outRawCounts " + raw_counts
 
 
 subcommand = " bins "
 bed = snakemake.input.get("bed", "")
-if bed != "":
+if bed:
     bed = " --BED " + bed
     subcommand = " BED-file "
 
