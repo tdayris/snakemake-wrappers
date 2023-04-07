@@ -2184,6 +2184,21 @@ def test_deeptools_plotheatmap():
 
 
 @skip_if_not_modified
+def test_deeptools_multibigwigsummary():
+    run(
+        "bio/deeptools/multibigwigsummary",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "multibigwig.npz",
+            "--use-conda",
+            "-F",
+        ],
+    )
+
+
+@skip_if_not_modified
 def test_deeptools_plotfingerprint():
     run(
         "bio/deeptools/plotfingerprint",
