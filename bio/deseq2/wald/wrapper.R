@@ -61,7 +61,11 @@ base::message(deseq2_cmd)
 wald <- base::eval(base::parse(text = deseq2_cmd))
 
 
-# Save results RDS on user request
+# The rest of the script is here to save part or complete
+# list of results in RDS or plain text (TSV) formats.
+
+
+# Save main result on user request (RDS)
 if ("wald_rds" %in% base::names(x = snakemake@output)) {
   output_rds <- base::as.character(x = snakemake@output[["wald_rds"]])
   base::saveRDS(obj = wald, file = output_rds)
@@ -70,20 +74,20 @@ if ("wald_rds" %in% base::names(x = snakemake@output)) {
 
 # Saving normalized counts on demand
 table <- counts(wald)
+
+# TSV
 if ("normalized_counts_table" %in% base::names(snakemake@output)) {
   output_table <- base::as.character(x=snakemake@output[["normalized_counts_table"]])
   utils::write.table(x = table, file = output_table, sep = "\t", quote = FALSE)
   base::message("Normalized counts saved as TSV")
 }
 
+# RDS
 if ("normalized_counts_rds" %in% base::names(snakemake@output)) {
   output_rds <- base::as.character(
     x = snakemake@output[["normalized_counts_rds"]]
   )
-  base::saveRDS(
-    obj = table,
-    file = output_rds
-  )
+  base::saveRDS(obj = table, file = output_rds)
 }
 
 # On user request: saving all results as TSV in a directory.
@@ -117,13 +121,14 @@ if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
   if ("extra_schrink" %in% base::names(x = snakemake@params)) {
     extra_schrink <- base::paste(
       ", ",
-      base::as.characterx = snakemake@params[["extra_schrink"]]
+      base::as.characters = snakemake@params[["extra_schrink"]]
     )
   }
   schrink_cmd <- base::paste0("DESeq2::lfcSchrink(", extra_schrink, ")")
   base::message("Command line used for log(FC) schrinkage:")
   base::message(schrink_cmd)
 
+  # For each available comparison in the wald-dds object
   for (resultname in wald_results_names) {
     # Building table
     base::message(base::paste("Saving results for", resultname))
@@ -133,7 +138,7 @@ if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
 
     results_path <- base::file.path(
       output_prefix,
-      base::paste0("Deseq2_", resultname, ".tsv")
+      base::paste0(resultname, ".tsv")
     )
 
     # Saving table
