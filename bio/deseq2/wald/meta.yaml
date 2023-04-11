@@ -1,0 +1,22 @@
+name: deseq2
+description: |
+  Call differentially expressed genes with DESeq2
+url: https://bioconductor.org/packages/3.16/bioc/html/DESeq2.html
+authors:
+  - Thibault Dayris
+input:
+  - dds: Path to RDS-formatted DESeq2-object
+  - count_matrix: Path to TSV-formatted count matrix **OR**
+output:
+  - normalized_counts: Optional path to normalized counts, either TSV formatted text file, or RDS formatted object, or both. Format is acquired from output file extension.
+  - wald_test: Optional path to wald test results, either TSV formatted text file, or RDS formatted object, or both.  Format is acquired from output file extension.
+  - wald_test_dir: Path to a directory containing all DESeq2 wald results available in `resultsNames()`.
+parameters:
+  - formula: Statistical formula used to build linear model.
+  - reference_level: (Optional) Exact name of the reference level. Default will be the last level name in alpha-numerical order.
+  - tested_level: (Optional) Exact name of the tested level. Default will be the first level in alpha-numerical order.
+  - result_name: (Optional) Result name. Default result is the one using provided reference and tested level. This can be a string, a list of two elements, or a list of three elements, according to the DESeq2 documentation on `results(contrast=...)`
+  - deseq_extra: Optional parameters provided to the function `DESeq()`
+  - schrink_extra: Optional parameters provided to the function `lfSchrink()`
+note: |
+  * If both reference_level, and tested_level are provided, the dds object will be releveled.
