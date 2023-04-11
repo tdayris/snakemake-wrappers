@@ -12,7 +12,6 @@ log.file <- base::file(description = snakemake@log[[1]], open = "wt")
 base::sink(file = log.file)
 base::sink(file = log.file, type = "message")
 
-# Differential Gene expression
 base::library(package = "BiocParallel", character.only = TRUE)
 base::library(package = "SummarizedExperiment", character.only = TRUE)
 base::library(package = "DESeq2", character.only = TRUE)
@@ -43,7 +42,7 @@ if ("factor" %in% base::names(x = snakemake@params)) {
 }
 
 # Build extra parameters for DESeq2
-extra_deseq2 <- "object = dds"
+extra_deseq2 <- "object = dds, test = 'Wald', parallel = parallel"
 if ("extra" %in% snakemake@params) {
   extra <- base::paste0(
     ", ",
@@ -95,7 +94,7 @@ if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
 
   # Recovreing extra parameters for TSV tables
   # The variable `result_name` is built below in `for` loop.
-  extra_results <- "object = wald, name = result_name"
+  extra_results <- "object = wald, name = result_name, parallel = parallel"
   if ("extra_results" %in% base::names(snakemake@params)) {
     extra_results <- base::paste(
       ", ",
@@ -114,7 +113,7 @@ if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
   base::message("Command line used for TSV results creation:")
   base::message(results_cmd)
 
-  extra_schrink <- "object = wald, res = results_frame, contrast = contrast"
+  extra_schrink <- "object = wald, res = results_frame, contrast = contrast, parallel = parallel"
   if ("extra_schrink" %in% base::names(x = snakemake@params)) {
     extra_schrink <- base::paste(
       ", ",
@@ -151,153 +150,76 @@ if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
 
 # If user provides contrasts, then a precise result
 # can be extracted from DESeq2 object.
-if ("contrast" %in% base::names(snakemake@params)) {
-  contrast_length <- base::length(snakemake@params[["contrast"]])
-  message(snakemake@params[["contrast"]], contrast_length)
+if ("wald_tsv" %in% base::names(x = snakemake@output)) {
+  if ("contrast" %in% base::names(x = snakemake@params)) {
+    contrast_length <- base::length(x = snakemake@params[["contrast"]])
 
-  extra_results <- "object=wald"
-  contrast <- NULL
+    extra_results <- "object=wald, parallel = parallel"
+    contrast <- NULL
 
-  if (contrast_length == 1) {
-    # Case user provided a result name in the `contrast` parameter
-    contrast <- base::as.character(x=snakemake@params[["contrast"]])
-    contrast <- base::paste0("name='", contrast[1], "'")
+    if (contrast_length == 1) {
+      # Case user provided a result name in the `contrast` parameter
+      contrast <- base::as.character(x=snakemake@params[["contrast"]])
+      contrast <- base::paste0("name='", contrast[1], "'")
 
-  } else if (contrast_length == 2) {
-    # Case user provided both tested and reference level
-    # In that order! Order matters.
-    contrast <- sapply(
-      snakemake@params[["contrast"]],
-      function(extra) base::as.character(x=extra)
-    )
-    contrast <- base::paste0(
-      "contrast=list('", contrast[1], "', '", contrast[2], "')"
-    )
+    } else if (contrast_length == 2) {
+      # Case user provided both tested and reference level
+      # In that order! Order matters.
+      contrast <- sapply(
+        snakemake@params[["contrast"]],
+        function(extra) base::as.character(x=extra)
+      )
+      contrast <- base::paste0(
+        "contrast=list('", contrast[1], "', '", contrast[2], "')"
+      )
 
-  } else if (contrast_length == 3) {
-    # Case user provided both tested and reference level,
-    # and studied factor.
-    contrast <- sapply(
-      snakemake@params[["contrast"]],
-      function(extra) base::as.character(x=extra)
-    )
-    contrast <- base::paste0(
-      "contrast=c('",
-      contrast[1],
-      "', '",
-      contrast[2],
-      "', '",
-      contrast[3],
-      "')"
-    )
+    } else if (contrast_length == 3) {
+      # Case user provided both tested and reference level,
+      # and studied factor.
+      contrast <- sapply(
+        snakemake@params[["contrast"]],
+        function(extra) base::as.character(x=extra)
+      )
+      contrast <- base::paste0(
+        "contrast=c('",
+        contrast[1],
+        "', '",
+        contrast[2],
+        "', '",
+        contrast[3],
+        "')"
+      )
 
-    # Finally saving results as contrast has been
-    # built from user input.
-    extra_results <- base::paste(extra_results, contrast, sep=", ")
-    results_cmd <- base::paste0("DESeq2::results(", extra_results, ")")
-    base::message("Result extraction command: ", results_cmd)
-    results_frame <- base::eval(base::parse(text = results_cmd))
+      # Finally saving results as contrast has been
+      # built from user input.
+      extra_results <- base::paste(extra_results, contrast, sep=", ")
+      results_cmd <- base::paste0("DESeq2::results(", extra_results, ")")
+      base::message("Result extraction command: ", results_cmd)
+
+      extra_schrink <- "object = wald, res = results_frame, contrast = contrast, parallel = parallel"
+      if ("extra_schrink" %in% base::names(x = snakemake@params)) {
+        extra_schrink <- base::paste(
+          ", ",
+          base::as.characterx = snakemake@params[["extra_schrink"]]
+        )
+      }
+      schrink_cmd <- base::paste0("DESeq2::lfcSchrink(", extra_schrink, ")")
+      base::message("Command line used for log(FC) schrinkage:")
+      base::message(schrink_cmd)
 
 
+      results_frame <- base::eval(base::parse(text = results_cmd))
+      schrink_frame <- base::eval(base::parse(text = schrink_cmd))
+      results_frame$log2FoldChange <- schrink_frame$log2FoldChange
+
+      # Saving table
+      utils::write.table(
+        x = results_frame,
+        file = results_path,
+        quote = FALSE,
+        sep = "\t",
+        row.names = TRUE
+      )
+    }
   }
-
-
-  if ("filter_theta" %in% base::names(snakemake@output)) {
-    base::message("Saving ThetaFilter information: ")
-    theta <- metadata(results_frame)$filterNumRej
-    # Saving theta filter table on demand
-    utils::write.table(
-      x = theta,
-      file = base::as.character(x = snakemake@output[["filter_theta"]]),
-      quote = FALSE,
-      sep = "\t",
-      row.names = TRUE
-    )
-  }
-
-  if ("metadata" %in% base::names(snakemake@output)) {
-    base::message("Saving Metadata information")
-    metadata_table <- data.frame(metadata(results_frame)$filterThreshold)
-    metadata_table$filterTheta <- metadata(results_frame)$filterTheta
-    metadata_table$alpha <- metadata(results_frame)$alpha
-    metadata_table$lfcThreshold <- metadata(results_frame)$lfcThreshold
-
-    # Saving theta filter table on demand
-    utils::write.table(
-      x = metadata_table,
-      file = base::as.character(x = snakemake@output[["metadata"]]),
-      quote = FALSE,
-      sep = "\t",
-      row.names = TRUE
-    )
-  }
-
-  results_frame$filterThreshold <- results_frame$baseMean > metadata(results_frame)$filterThreshold
-
-  # Saving table
-  utils::write.table(
-    x = results_frame,
-    file = base::as.character(x = snakemake@output[["deseq2_tsv"]]),
-    quote = FALSE,
-    sep = "\t",
-    row.names = TRUE
-  )
 }
-
-
-
-if ("shrinked_wald" %in% base::names(snakemake@output)) {
-  contrast_length <- base::length(snakemake@params[["contrast"]])
-  message(snakemake@params[["contrast"]], contrast_length)
-
-  extra_results <- 'object=wald, type="apeglm"'
-  contrast <- NULL
-
-  if (contrast_length == 1) {
-    contrast <- base::as.character(x=snakemake@params[["contrast"]])
-    contrast <- base::paste0("coef='", contrast[1], "'")
-
-  } else if (contrast_length == 2) {
-    contrast <- sapply(
-      snakemake@params[["contrast"]],
-      function(extra) base::as.character(x=extra)
-    )
-    contrast <- base::paste0(
-      "contrast=list('", contrast[1], "', '", contrast[2], "')"
-    )
-
-  } else if (contrast_length == 3) {
-    contrast <- sapply(
-      snakemake@params[["contrast"]],
-      function(extra) base::as.character(x=extra)
-    )
-    contrast <- base::paste0(
-      "contrast=c('",
-      contrast[1],
-      "', '",
-      contrast[2],
-      "', '",
-      contrast[3],
-      "')"
-    )
-  }
-  extra_results <- base::paste(extra_results, contrast, sep=", ")
-  results_cmd <- base::paste0("DESeq2::lfcShrink(", extra_results, ")")
-  base::message("Shrunken results extraction command: ", results_cmd)
-  results_frame <- base::eval(base::parse(text = results_cmd))
-  results_frame$filterThreshold <- results_frame$baseMean > metadata(results_frame)$filterThreshold
-
-  # Saving table
-  utils::write.table(
-    x = results_frame,
-    file = base::as.character(x = snakemake@output[["shrinked_wald"]]),
-    quote = FALSE,
-    sep = "\t",
-    row.names = TRUE
-  )
-}
-
-# Proper syntax to close the connection for the log file
-# but could be optional for Snakemake wrapper
-base::sink(type="message")
-base::sink()
