@@ -4739,6 +4739,15 @@ def test_tximport():
     run("bio/tximport", ["snakemake", "--cores", "1", "txi.RDS", "--use-conda", "-F"])
 
 
+
+@skip_if_not_modified
+def test_tximeta_make_linked_txome():
+    run(
+        "bio/tximeta/makelinkedtxome", 
+        ["snakemake", "--cores", "1", "linkedtxome.json", "--use-conda", "-F"]
+    )
+
+
 @skip_if_not_modified
 def test_fasterq_dump_se():
     run(
