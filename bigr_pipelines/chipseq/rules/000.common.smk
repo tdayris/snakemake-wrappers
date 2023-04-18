@@ -32,6 +32,7 @@ from file_manager import *
 from files_linker import *
 from graphics import *
 from write_yaml import *
+from reservation import *
 from messages import message
 
 #####################
