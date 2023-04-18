@@ -67,6 +67,9 @@ while [ "$#" -gt 0 ]; do
     msi|MSI) STEPS+=("msi"); message INFO "MSI are in the expected result list"; shift;;
     cnv|CNV|facets) STEPS+=("cnv"); message INFO "CNV are in the expected result list"; shift;;
     map|mapping) STEPS+=("aln"); message INFO "Alignments are in the expected result list"; shift;;
+    chip|chipseq) STEPS+=("chipseq"); message INFO "ChIPseq Peaks are in the expected result list"; shift;;
+    cutntag|cut) STEPS+=("cutntag"); message INFO "Cut&Tag Peaks are in the expected result list"; shift;;
+    atac|ataq|atacseq) STEP+=("atacseq"); message INFO "AtacSeq peaks are in the expected result list"; shift;;
     vc|variant|variants|calling) STEPS+=("variant_calling"); message INFO "Variant callings are in the expected result list"; shift;;
     --name) NAME="${2}"; shift 2;;
     -h|--help) message INFO "Please see official documentation at: https://github.com/tdayris/snakemake-wrappers"; exit 0; shift;;
