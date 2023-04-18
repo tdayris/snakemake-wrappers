@@ -99,7 +99,7 @@ def targets() -> Dict[str, Any]:
     }
     
     
-    if config.get("analysis", {}).get("chipseq", False):
+    if config.get("steps", {}).get("chipseq", False):
         results["macs2_peaks"] = expand(
             "macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed",
             peaktype=peak_types,
@@ -108,7 +108,7 @@ def targets() -> Dict[str, Any]:
         results["coverage"] = expand("deeptools/bamcoverage/{sample}.bw", sample=sample_list)
         results["multiqc"] = "data_output/Report.html"
 
-    if config.get("analysis", {}).get("cutntag", False):
+    if config.get("steps", {}).get("cutntag", False):
         results["macs2_peaks"] = expand(
             "macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed",
             peaktype=peak_types,
@@ -118,7 +118,7 @@ def targets() -> Dict[str, Any]:
         results["seacr"] = expand("seacr/{sample}.{mode}.bed", sample=sample_list, mode=mode_list)
         results["multiqc"] = "data_output/Report.html"
 
-    if config.get("analysis", {}).get("atacseq", False):
+    if config.get("steps", {}).get("atacseq", False):
         results["macs2_peaks"] = expand(
             "macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed",
             peaktype=peak_types,
