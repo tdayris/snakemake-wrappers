@@ -15,7 +15,7 @@ base::library(package = "tximeta", character.only = TRUE)
 # or multiple paths to salmon index files in a common
 # directory.
 salmon_index <- snakemake@input[["salmon_index"]]
-if (base::inherits(x = salmon_index, what = character)) {
+if (base::inherits(x = salmon_index, what = "character")) {
     # Then user input points to a single file or directory.
     if (base::file.exists(salmon_index) && ! base::dir.exists(salmon_index)) {
         # Then user input points to a file. We need the index *directory*
