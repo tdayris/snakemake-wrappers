@@ -187,6 +187,20 @@ def test_loglog():
     )
 
 @skip_if_not_modified
+def test_deseq2_wald():
+    run(
+        "bio/deseq2/wald",
+        [
+            "snakemake",
+            "--cores",
+            "2",
+            "--use-conda",
+            "-F",
+            "wald.RDS",
+        ],
+    )
+
+@skip_if_not_modified
 def test_tadpole():
     run(
         "bio/bbtools/tadpole",
