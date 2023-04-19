@@ -18,11 +18,36 @@ base::library(package = "SummarizedExperiment", character.only = TRUE)
 base::library(package = "DESeq2", character.only = TRUE)
 base::library(package = "ashr", character.only = TRUE)
 
+# Function to handle optional user-defined parameters
+# and still follow R syntax
+add_extra <- function(wrapper_extra, snakemake_param_name) {
+  if (snakemake_param_name %in% base::names(snakemake@params)) {
+    # Case user did used parameters name in snakemake rule
+    user_param <- snakemake@params[[snakemake_param_name]]
+
+    param_is_empty <- user_param == ""
+    param_is_character <- inherits(x = user_param, what = "charcter")
+    if ((! param_is_empty) && (param_is_character)) {
+      # Case user did not provide an empty string, as
+      # R does not like trailing commas at the end
+      # of a function call.
+      wrapper_extra <- base::paste(
+        wrapper_extra,
+        user_param,
+        sep = ", "
+      )
+    }
+  }
+
+  # In any case, required parameters shall be returned
+  base::return(wrapper_extra)
+}
+
 # Setting up multithreading if required
 parallel <- FALSE
 if (snakemake@threads > 1) {
     BiocParallel::register(
-      BPPARAM=BiocParallel::MulticoreParam(snakemake@threads)
+      BPPARAM = BiocParallel::MulticoreParam(snakemake@threads)
     )
     parallel <- TRUE
 }
@@ -33,14 +58,10 @@ dds <- base::readRDS(file = dds_path)
 base::message("Libraries and dataset loaded")
 
 # Build extra parameters for DESeq2
-extra_deseq2 <- "object = dds, test = 'Wald', parallel = parallel"
-if ("deseq_extra" %in% snakemake@params) {
-  extra_deseq2 <- base::paste(
-    extra_deseq2,
-    base::as.character(x = snakemake@params[["deseq_extra"]]),
-    sep = ", "
-  )
-}
+extra_deseq2 <- add_extra(
+  "object = dds, test = 'Wald', parallel = parallel",
+  "deseq_extra"
+)
 
 deseq2_cmd <- base::paste0(
   "DESeq2::DESeq(", extra_deseq2, ")"
@@ -92,14 +113,10 @@ if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
 
   # Recovering extra parameters for TSV tables
   # The variable `result_name` is built below in `for` loop.
-  results_extra <- "object = wald, name = result_name, parallel = parallel"
-  if ("results_extra" %in% base::names(snakemake@params)) {
-    results_extra <- base::paste(
-      results_extra,
-      base::as.character(x = snakemake@params[["results_extra"]]),
-      sep = ", "
-    )
-  }
+  results_extra <- add_extra(
+    "object = wald, name = result_name, parallel = parallel",
+    "results_extra"
+  )
 
   # DESeq2 result dir will contain all results available in the Wald object
   output_prefix <- snakemake@output[["deseq2_result_dir"]]
@@ -112,14 +129,10 @@ if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
   base::message("Command line used for TSV results creation:")
   base::message(results_cmd)
 
-  shrink_extra <- "dds = wald, res = results_frame, contrast = contrast, parallel = parallel, type = 'ashr'"
-  if ("shrink_extra" %in% base::names(x = snakemake@params)) {
-    shrink_extra <- base::paste(
-      shrink_extra,
-      base::as.character(x = snakemake@params[["shrink_extra"]]),
-      sep = ", "
-    )
-  }
+  shrink_extra <- add_extra(
+    "dds = wald, res = results_frame, contrast = contrast, parallel = parallel, type = 'ashr'",
+    "shrink_extra"
+  )
   shrink_cmd <- base::paste0("DESeq2::lfcShrink(", shrink_extra, ")")
   base::message("Command line used for log(FC) shrinkage:")
   base::message(shrink_cmd)
@@ -197,14 +210,10 @@ if ("wald_tsv" %in% base::names(x = snakemake@output)) {
       results_cmd <- base::paste0("DESeq2::results(", results_extra, ")")
       base::message("Result extraction command: ", results_cmd)
 
-      shrink_extra <- "dds = wald, res = results_frame, contrast = contrast[1], parallel = parallel, type = 'ashr'"
-      if ("shrink_extra" %in% base::names(x = snakemake@params)) {
-        shrink_extra <- base::paste(
-          shrink_extra,
-          base::as.character(x = snakemake@params[["shrink_extra"]]),
-          sep = ", "
-        )
-      }
+      shrink_extra <- add_extra(
+        "dds = wald, res = results_frame, contrast = contrast[1], parallel = parallel, type = 'ashr'",
+        "shrink_extra"
+      )
       shrink_cmd <- base::paste0("DESeq2::lfcShrink(", shrink_extra, ")")
       base::message("Command line used for log(FC) shrinkage:")
       base::message(shrink_cmd)
@@ -224,13 +233,11 @@ if ("wald_tsv" %in% base::names(x = snakemake@output)) {
       )
     }
   } else {
-    message <- base::paste(
-      "No contrast provided.",
-      "In absence of contrast, it is not possible",
+    base::stop(
+      "No contrast provided. ",
+      "In absence of contrast, it is not possible ",
       "to guess the expected result name.",
-      sep = " "
     )
-    base::stop(message)
   }
 }
 
