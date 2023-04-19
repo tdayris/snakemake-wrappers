@@ -9,7 +9,26 @@ log.file <- base::file(snakemake@log[[1]], open = "wt")
 base::sink(log.file)
 base::sink(log.file, type = "message")
 
+base::library(package = "BiocFileCache", character.only = TRUE)
 base::library(package = "tximeta", character.only = TRUE)
+
+# Overload BiocFileCache directory in order to control
+# the produced results. This is done is and only if
+# user provides "cache" as an output directory.
+if ("cache" %in% base::names(snakemake@output)) {
+    origin_path <- BiocFileCache::getBFCOption("CACHE")
+    new_cache <- base::as.character(x = snakemake@output[["cache"]])
+
+    if (! base::dir.exists(new_cache)) {
+        base::dir.create(new_cache)
+    }
+
+    BiocFileCache::setBFCOption(arg = "CACHE", value = new_cache)
+    base::message(
+        "BiocFileCache directory has been set from `",
+        origin_path, "` to `", new_cache, "`."
+    )
+}
 
 # Salmon index can be either a path to a directory
 # or multiple paths to salmon index files in a common
