@@ -124,6 +124,10 @@ comparison_levels = list(
     )
 )
 
+output_prefixes = [
+    f"DGE_considering_factor_{factor}_comparing_{test}_vs_{ref}"
+    for factor, test, ref in comparison_levels
+]
 # An iterator that holds all samples involved in the comparisons
 # listed above
 samples_iterator = list(
@@ -173,7 +177,7 @@ output_prefixes = [
 if config.get("write_comparisons", True):
     _outcomp_data = []
     for _prefix, _comparison in contrasts.items():
-        _levels = _comparison[1:-1]
+        _levels = ",".join(_comparison[1:-1])
         _factor = _comparison[0]
         _ref_level = _comparison[-1]
         _formula = (
@@ -181,13 +185,13 @@ if config.get("write_comparisons", True):
             if (batch_effect is False) or (_factor == "BatchEffect")
             else f"~BatchEffect+{_factor}"
         )
-        outcomp_data.append(
+        _outcomp_data.append(
             "\t".join([_prefix, _levels, _ref_level, _factor, _formula])
         )
     with open("list_of_possible_comparisons.txt", "w") as outcomplist:
         outcomplist.write("ResultName\tTestedLevels\tReferenceLevel\tFactor\tFormula")
         outcomplist.write("\n".join(_outcomp_data) + "\n")
-
+logging.info("List of possible comparisons established")
 
 # Globals used in wildcards
 # List of samples
