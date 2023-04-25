@@ -6,13 +6,13 @@ rule sambamba_markdup:
         temp("sambamba/markdup/{sample}.bam"),
     threads: 8
     resources:
-        mem_mb=get_2gb_per_attempt,
+        mem_mb=get_6gb_per_attempt,
         time_min=get_45min_per_attempt,
         tmpdir="tmp",
     log:
         "logs/sambamba/{sample}.bwa.log",
     params:
-        extra="--remove-duplicates",
+        extra="--remove-duplicates --overflow-list-size 400000",
     wrapper:
         "bio/sambamba/markdup"
 
