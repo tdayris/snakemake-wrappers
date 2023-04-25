@@ -1194,6 +1194,14 @@ def test_bcftools_filter_sample():
 
 
 @skip_if_not_modified
+def test_test_simpleaf_add_chemistry():
+    run(
+        "bio/simpleaf/addchemistry",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "custom_chemistries.json"]
+    )
+
+
+@skip_if_not_modified
 def test_bcftools_filter_vcf():
     run(
         "bio/bcftools/filter",
