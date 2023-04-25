@@ -22,7 +22,7 @@ rule filter_tsv:
             ["Filter", "=", "FILTER"],
         ],
         keep_column=lambda wildcards: config["table_cols"]
-        + ([
+        + [
             f"{wildcards.sample}_normal_Reference_Allele",
             f"{wildcards.sample}_normal_Seq_Allele1",
             f"{wildcards.sample}_normal_Seq_Allele2",
