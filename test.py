@@ -1186,6 +1186,14 @@ def test_art_profiler_illumina():
 
 
 @skip_if_not_modified
+def test_simpleaf_setpaths():
+    run(
+        "bio/simpleaf/setpaths",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "simpleaf_info.json"]
+    )
+
+
+@skip_if_not_modified
 def test_bcftools_filter_sample():
     run(
         "bio/bcftools/filter",
