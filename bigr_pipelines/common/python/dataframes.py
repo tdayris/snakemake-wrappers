@@ -82,6 +82,7 @@ def yield_samples(
     complete_design: pandas.DataFrame,
     aggregate: Optional[List[str]] = None,
     remove: Optional[List[str]] = None,
+    contains: Optional[List[str]] = None,
 ) -> List[Union[pandas.DataFrame, List[str]]]:
     """
     Split a large design into simple ones and provide comparison information

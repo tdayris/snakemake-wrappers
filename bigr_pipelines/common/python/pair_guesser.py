@@ -83,7 +83,7 @@ def try_remove_ext(filename: str, possible_exts: Optional[List[str]] = None) -> 
 
     for ext in possible_exts:
         filename = re.sub(ext, "", filename)
-    return filename
+    return filename.upper()
 
 
 def index_paired_dataset(
