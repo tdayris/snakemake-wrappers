@@ -12,6 +12,7 @@ import os
 import os.path as op
 import logging
 
+from random import randint
 from snakemake.shell import shell
 from tempfile import TemporaryDirectory
 
@@ -117,7 +118,7 @@ def copy_then_concat(dest: str, *src: str) -> None:
     with TemporaryDirectory() as tmpdir:
         outfiles = []
         for path in src:
-            tmp_dest = f"{tmpdir}/{os.path.basename(path)}.{os.urandom(8)}"
+            tmp_dest = f"{tmpdir}/{os.path.basename(path)}.{randint(0, 100_000_000)}"
             copy(path, tmp_dest)
             outfiles.append(tmp_dest)
         cat_files(dest, *outfiles)
