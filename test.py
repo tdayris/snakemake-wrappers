@@ -2450,8 +2450,6 @@ def test_freebayes_bcf():
                 "calls/a.bcf",
                 "--use-conda",
                 "-F",
-                "-s",
-                "Snakefile_bcf",
             ],
         )
 
@@ -2465,11 +2463,9 @@ def test_freebayes_bed():
                 "snakemake",
                 "--cores",
                 str(c),
-                "calls/a.bcf",
+                "calls/a.vcf.gz",
                 "--use-conda",
                 "-F",
-                "-s",
-                "Snakefile_bed",
             ],
         )
 
