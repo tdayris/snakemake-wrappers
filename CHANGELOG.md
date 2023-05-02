@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.29.0](https://www.github.com/tdayris/snakemake-wrappers/compare/v1.28.0...v1.29.0) (2023-05-02)
+
+
+### Features
+
+* Add seqkit subseq ([#1318](https://www.github.com/tdayris/snakemake-wrappers/issues/1318)) ([262d9bb](https://www.github.com/tdayris/snakemake-wrappers/commit/262d9bb50cf8d03edca00916bc29fe5f1009209a))
+* Pyroe make-spliced+unspliced ([#1290](https://www.github.com/tdayris/snakemake-wrappers/issues/1290)) ([96a2cbb](https://www.github.com/tdayris/snakemake-wrappers/commit/96a2cbbf667fb45676087c2002fa875a76982e6b))
+
 ## [1.28.0](https://www.github.com/snakemake/snakemake-wrappers/compare/v1.27.0...v1.28.0) (2023-04-28)
 
 
