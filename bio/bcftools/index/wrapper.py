@@ -34,4 +34,12 @@ else:
     raise ValueError("invalid index file format ('.tbi', '.csi').")
 
 
+if len(snakemake.input) > 1:
+    raise Exception("Only one input file expected, got: " + str(len(snakemake.input)))
+
+
+if len(snakemake.output) > 1:
+    raise Exception("Only one output file expected, got: " + str(len(snakemake.output)))
+
+
 shell("bcftools index {bcftools_opts} {extra} {snakemake.input[0]} {log}")
