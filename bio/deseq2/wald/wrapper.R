@@ -1,8 +1,8 @@
-# This script takes a deseq dataset object and performs
-# a default DESeq2 wald test
+# This script takes a deseq2 dataset object, performs
+# a DESeq2 wald test, and saves results as requested by user
 
 # __author__ = "Thibault Dayris"
-# __copyright__ = "Copyright 2020, Thibault Dayris"
+# __copyright__ = "Copyright 2023, Thibault Dayris"
 # __email__ = "thibault.dayris@gustaveroussy.fr"
 # __license__ = "MIT"
 
@@ -39,7 +39,7 @@ add_extra <- function(wrapper_extra, snakemake_param_name) {
     }
   }
 
-  # In any case, required parameters shall be returned
+  # In any case, required parameters must be returned
   base::return(wrapper_extra)
 }
 
@@ -59,8 +59,8 @@ base::message("Libraries and dataset loaded")
 
 # Build extra parameters for DESeq2
 extra_deseq2 <- add_extra(
-  "object = dds, test = 'Wald', parallel = parallel",
-  "deseq_extra"
+  wrapper_extra="object = dds, test = 'Wald', parallel = parallel",
+  snakemake_param_name="deseq_extra"
 )
 
 deseq2_cmd <- base::paste0(
@@ -109,13 +109,14 @@ if ("normalized_counts_rds" %in% base::names(snakemake@output)) {
 # User can later access the directory content with
 # a checkpoint rule.
 if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
+  # Acquire list of available results in DESeqDataSet
   wald_results_names <- DESeq2::resultsNames(object = wald)
 
   # Recovering extra parameters for TSV tables
   # The variable `result_name` is built below in `for` loop.
   results_extra <- add_extra(
-    "object = wald, name = result_name, parallel = parallel",
-    "results_extra"
+    wrapper_extra="object = wald, name = result_name, parallel = parallel",
+    snakemake_param_name="results_extra"
   )
 
   # DESeq2 result dir will contain all results available in the Wald object
