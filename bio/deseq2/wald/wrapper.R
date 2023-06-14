@@ -90,7 +90,7 @@ table <- counts(wald)
 # TSV
 if ("normalized_counts_table" %in% base::names(snakemake@output)) {
   output_table <- base::as.character(
-    x=snakemake@output[["normalized_counts_table"]]
+    x = snakemake@output[["normalized_counts_table"]]
   )
   utils::write.table(x = table, file = output_table, sep = "\t", quote = FALSE)
   base::message("Normalized counts saved as TSV")
@@ -115,8 +115,8 @@ if ("deseq2_result_dir" %in% base::names(snakemake@output)) {
   # Recovering extra parameters for TSV tables
   # The variable `result_name` is built below in `for` loop.
   results_extra <- add_extra(
-    wrapper_extra="object = wald, name = result_name, parallel = parallel",
-    snakemake_param_name="results_extra"
+    wrapper_extra = "object = wald, name = result_name, parallel = parallel",
+    snakemake_param_name = "results_extra"
   )
 
   # DESeq2 result dir will contain all results available in the Wald object
