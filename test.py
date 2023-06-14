@@ -140,6 +140,40 @@ def run(wrapper, cmd, check_log=None):
 
 
 @skip_if_not_modified
+def test_nonpareil():
+    run(
+        "bio/nonpareil/infer",
+        [
+            "snakemake",
+            "--cores",
+            "2",
+            "--use-conda",
+            "-F",
+            "results/a.fa.npo",
+            "results/a.fas.bz2.npo",
+            "results/a.fasta.gz.npo",
+            "results/a.fq.npo",
+            "results/a.fq.bz2.npo",
+            "results/a.fastq.gz.npo",
+        ],
+    )
+
+
+@skip_if_not_modified
+def test_nonpareil_plot():
+    run(
+        "bio/nonpareil/plot",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "results/a.pdf",
+        ]
+    )
+
+@skip_if_not_modified
 def test_indelqual():
     run(
         "bio/lofreq/indelqual",
@@ -191,20 +225,6 @@ def test_loglog():
 
 
 @skip_if_not_modified
-def test_deseq2_wald():
-    run(
-        "bio/deseq2/wald",
-        [
-            "snakemake",
-            "--cores",
-            "2",
-            "--use-conda",
-            "-F",
-            "wald.RDS",
-        ],
-    )
-
-@skip_if_not_modified
 def test_tadpole():
     run(
         "bio/bbtools/tadpole",
@@ -231,7 +251,7 @@ def test_tadpole():
 @skip_if_not_modified
 def test_seqkit_stats():
     run(
-        "bio/seqkit/stats",
+        "bio/seqkit",
         [
             "snakemake",
             "--cores",
@@ -246,33 +266,41 @@ def test_seqkit_stats():
 @skip_if_not_modified
 def test_seqkit_rmdup():
     run(
-        "bio/seqkit/rmdup",
+        "bio/seqkit",
         [
             "snakemake",
             "--cores",
             "2",
             "--use-conda",
             "-F",
-            "out/rmdup_name/a.fastq.gz",
+            "out/rmdup/name/a.fastq.gz",
         ],
     )
     run(
-        "bio/seqkit/rmdup",
+        "bio/seqkit",
         [
             "snakemake",
             "--cores",
             "2",
             "--use-conda",
             "-F",
-            "out/rmdup_seq/a.fastq.gz",
+            "out/rmdup/seq/a.fastq.gz",
         ],
+    )
+
+
+@skip_if_not_modified
+def test_gffread():
+    run(
+        "bio/gffread",
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "transcripts.fa"],
     )
 
 
 @skip_if_not_modified
 def test_seqkit_fx2tab():
     run(
-        "bio/seqkit/fx2tab",
+        "bio/seqkit",
         [
             "snakemake",
             "--cores",
@@ -287,25 +315,25 @@ def test_seqkit_fx2tab():
 @skip_if_not_modified
 def test_seqkit_grep():
     run(
-        "bio/seqkit/grep",
+        "bio/seqkit",
         [
             "snakemake",
             "--cores",
             "2",
             "--use-conda",
             "-F",
-            "out/grep_name/a.fastq.gz",
+            "out/grep/name/a.fastq.gz",
         ],
     )
     run(
-        "bio/seqkit/grep",
+        "bio/seqkit",
         [
             "snakemake",
             "--cores",
             "2",
             "--use-conda",
             "-F",
-            "out/grep_seq/a.fastq.gz",
+            "out/grep/seq/a.fastq.gz",
         ],
     )
 
@@ -313,36 +341,51 @@ def test_seqkit_grep():
 @skip_if_not_modified
 def test_seqkit_subseq():
     run(
-        "bio/seqkit/subseq",
+        "bio/seqkit",
         [
             "snakemake",
             "--cores",
             "2",
             "--use-conda",
             "-F",
-            "out/subseq_bed/t_bed.fa.gz",
+            "out/subseq/bed/a.fa.gz",
         ],
     )
     run(
-        "bio/seqkit/subseq",
+        "bio/seqkit",
         [
             "snakemake",
             "--cores",
             "2",
             "--use-conda",
             "-F",
-            "out/subseq_gtf/t_gtf.fa.gz",
+            "out/subseq/gtf/a.fa.gz",
         ],
     )
     run(
-        "bio/seqkit/subseq",
+        "bio/seqkit",
         [
             "snakemake",
             "--cores",
             "2",
             "--use-conda",
             "-F",
-            "out/subseq_region/t_region.fa.gz",
+            "out/subseq/region/a.fa.gz",
+        ],
+    )
+
+
+@skip_if_not_modified
+def test_seqkit_seq():
+    run(
+        "bio/seqkit",
+        [
+            "snakemake",
+            "--cores",
+            "2",
+            "--use-conda",
+            "-F",
+            "out/seq/a.fa.gz",
         ],
     )
 
@@ -723,6 +766,20 @@ def test_open_cravat_module():
 
 
 @skip_if_not_modified
+def test_salmon_tximport_meta():
+    run(
+        "meta/bio/salmon_tximport",
+        [
+            "snakemake",
+            "--cores",
+            "2",
+            "--use-conda",
+            "tximport/SummarizedExperimentObject.RDS",
+        ],
+    )
+
+
+@skip_if_not_modified
 def test_dada2_se_meta():
     run(
         "meta/bio/dada2_se",
@@ -976,6 +1033,45 @@ def test_dada2_add_species():
     run(
         "bio/dada2/add-species",
         ["snakemake", "--cores", "1", "--use-conda", "results/dada2/taxa-sp.RDS"],
+    )
+
+
+@skip_if_not_modified
+def test_deseq2_deseqdataset():
+    # from HTSeqcount / Featurecount
+    run(
+        "bio/deseq2/deseqdataset",
+        ["snakemake", "--cores", "1", "--use-conda", "dds_htseq.RDS"],
+    )
+
+    # DDS import
+    run(
+        "bio/deseq2/deseqdataset",
+        ["snakemake", "--cores", "1", "--use-conda", "dds_minimal.RDS"],
+    )
+
+    # txi import
+    run(
+        "bio/deseq2/deseqdataset",
+        ["snakemake", "--cores", "1", "--use-conda", "dds_txi.RDS"],
+    )
+
+    # SE import
+    run(
+        "bio/deseq2/deseqdataset",
+        ["snakemake", "--cores", "1", "--use-conda", "dds_se.RDS"],
+    )
+
+    # R matrix import
+    run(
+        "bio/deseq2/deseqdataset",
+        ["snakemake", "--cores", "1", "--use-conda", "dds_rmatrix.RDS"],
+    )
+
+    # text matrix import
+    run(
+        "bio/deseq2/deseqdataset",
+        ["snakemake", "--cores", "1", "--use-conda", "dds_matrix.RDS"],
     )
 
 
@@ -1575,16 +1671,6 @@ def test_bowtie2_align():
     run(
         "bio/bowtie2/align",
         ["snakemake", "--cores", "2", "mapped_idx/a.cram", "--use-conda", "-F"],
-    )
-
-    run(
-        "bio/bowtie2/align",
-        ["snakemake", "--cores", "2", "mapped_idx/a.bam", "--use-conda", "-F"],
-    )
-
-    run(
-        "bio/bowtie2/align",
-        ["snakemake", "--cores", "2", "mapped/a.bam", "--use-conda", "-F"],
     )
 
 
@@ -2257,6 +2343,21 @@ def test_deeptools_computematrix():
 
 
 @skip_if_not_modified
+def test_deeptools_bamcoverage():
+    run(
+        "bio/deeptools/bamcoverage",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "a.coverage.bw",
+            "--use-conda",
+            "-F",
+        ],
+    )
+
+
+@skip_if_not_modified
 def test_deeptools_alignmentsieve():
     run(
         "bio/deeptools/alignmentsieve",
@@ -2316,6 +2417,21 @@ def test_deeptools_plotprofile():
             "plot_profile/plot.png",
             "plot_profile/regions.bed",
             "plot_profile/data.tab",
+            "--use-conda",
+            "-F",
+        ],
+    )
+
+
+@skip_if_not_modified
+def test_deeptools_plotcoverage():
+    run(
+        "bio/deeptools/plotcoverage",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "coverage.png",
             "--use-conda",
             "-F",
         ],
@@ -2593,7 +2709,7 @@ def test_happy_prepy():
 def test_happy_prepy():
     run(
         "bio/hap.py/pre.py",
-        ["snakemake", "--cores", "1", "normalized/variants.vcf", "--use-conda", "-F"],
+        ["snakemake", "--cores", "1", "normalized/variants.vcf.gz", "--use-conda", "-F"],
     )
 
 
@@ -3568,7 +3684,7 @@ def test_snpeff_download():
 def test_strelka_germline():
     run(
         "bio/strelka/germline",
-        ["snakemake", "--cores", "1", "strelka/a", "--use-conda", "-F"],
+        ["snakemake", "--cores", "1", "strelka/a.vcf.gz", "--use-conda", "-F"],
     )
 
 
@@ -5465,12 +5581,5 @@ def test_bazam_interleaved():
 def test_bazam_separated():
     run(
         "bio/bazam",
-        [
-            "snakemake",
-            "--cores",
-            "1",
-            "--use-conda",
-            "-F",
-            "results/reads/a.r1.fastq.gz",
-        ],
+        ["snakemake", "--cores", "1", "--use-conda", "-F", "results/reads/a.r1.fastq.gz"],
     )
