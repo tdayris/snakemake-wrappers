@@ -421,7 +421,7 @@ if "log_counts" in snakemake.output.keys():
             colors=sample_colors,
             png_out=snakemake.output["log_counts"]
         )
-    except Error as e:
+    except Exception as e:
         logging.error(e)
         raise
 
@@ -434,7 +434,7 @@ if "log_mu" in snakemake.output.keys():
             png_out=snakemake.output["log_mu"],
             is_mu=True
         )
-    except Error as e:
+    except Exception as e:
         logging.error(e)
         raise
 
@@ -467,7 +467,7 @@ if "gene_plots" in snakemake.output.keys():
             png_prefix=snakemake.params["gene_plots_prefix"],
             comparison=snakemake.params["comparison"]
         )
-    except Error as e:
+    except Exception as e:
         logging.error(e)
         raise
 
@@ -480,7 +480,7 @@ if "pval" in snakemake.output.keys():
             png_out=snakemake.output["pval"],
             chromosomes=snakemake.params.get("chromosomes", None)
         )
-    except Error as e:
+    except Exception as e:
         logging.error(e)
         raise
 
@@ -492,7 +492,7 @@ if "independent_filtering" in snakemake.output.keys():
             comparison=snakemake.params["comparison"],
             png_out=snakemake.output["independent_filtering"]
         )
-    except Error as e:
+    except Exception as e:
         logging.error(e)
         raise
 
@@ -504,7 +504,7 @@ if "filter_theta" in snakemake.output.keys():
             metadata=metadata,
             png_out=snakemake.output["filter_theta"]
         )
-    except Error as e:
+    except Exception as e:
         logging.error(e)
         raise
 
