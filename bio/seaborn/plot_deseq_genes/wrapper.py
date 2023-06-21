@@ -164,11 +164,17 @@ def plot_single_gene(dst: pandas.DataFrame,
     mubox["Condition"] = [condition_dict[s] for s in mubox['Sample ID']]
 
     for gene in genes:
-        logging.info("Plotting gene information on %s", gene)
+        logging.info("Gathering gene information on %s", gene)
         gene_count = dstbox[dstbox.index == gene]
         gene_mu = mubox[mubox.index == gene]
         gene_dge = deseq[deseq.index == gene]
         status = gene_dge["Status"][0]
+        if any(l == 0 for l in [len(gene_count), len(gene_mu), len(gene_dge)]):
+            logging.error(f"Could not find information about: {gene}")
+            logging.debug(gene_count.head())
+            logging.debug(gene_mu.head())
+            logging.debug(gene_dge.head())
+            continue
 
         padj = round(gene_dge["padj"][0], 4)
 
