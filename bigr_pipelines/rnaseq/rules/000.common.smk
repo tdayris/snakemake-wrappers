@@ -51,6 +51,10 @@ def expected_targets(steps: Dict[str, Any]) -> Dict[str, Any]:
             "data_output/DEseq2/{comparison}/MultiQC.DEseq2.html",
             comparison=output_prefixes,
         )
+        results["gene_plots"] = expand(
+            "data_output/DEseq2/{comparison}/gene_plots/",
+            comparison=output_prefixes,
+        )
 
     if steps.get("gsea", False) is True:
         results["clusterprofiler"] = expand(
