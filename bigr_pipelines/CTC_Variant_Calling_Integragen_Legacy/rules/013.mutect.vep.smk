@@ -31,7 +31,7 @@ rule grep_pass:
     params:
         '-P "^#|\tPASS\t"'
     log:    
-        "logs/013.grep_PASS/{sample}.log"
+        "logs/013.grep_PASS/{sample}.{mutect_dir}.log"
     shell:
         "grep {params} {input} > {output} 2> {log}"
 
