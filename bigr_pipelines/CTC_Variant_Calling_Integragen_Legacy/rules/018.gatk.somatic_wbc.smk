@@ -3,7 +3,7 @@ mutect 2.0 : java -Xmx8g -jar GenomeAnalysisTK.jar -T MuTect2 -I:tumor {sample_t
 """
 
 
-rule mutect2:
+rule mutect2_wbc_call:
     input:
         unpack(get_trio_wbc),
     output:
@@ -39,7 +39,7 @@ rule mutect2:
         "> {log} 2>&1 "
 
 
-rule tabix_mutect2:
+rule tabix_mutect2_wbc_call:
     input:
         "gatk/mutect2_wbc/{sample}.vcf.gz",
     output:
@@ -57,7 +57,7 @@ rule tabix_mutect2:
         "bio/tabix/index"
 
 
-rule unzip_mutect2:
+rule unzip_mutect2_wbc_call:
     input:
         "gatk/mutect2_wbc/{sample}.vcf.gz",
     output:

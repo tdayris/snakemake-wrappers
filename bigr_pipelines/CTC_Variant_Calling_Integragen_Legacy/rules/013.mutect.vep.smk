@@ -113,7 +113,7 @@ ensembl VEP 87.0 refseq (on each normal VCF/TSV) : singularity run -B /mnt/beegf
 """
 
 
-rule ensembl_vep_mutect:
+rule ensembl_vep_mutect_wbc:
     input:
         vcf="gatk/mutect2_wbc/{sample}.filtered.vcf",
         cache=config["ref"]["vep"],
@@ -148,7 +148,7 @@ rule ensembl_vep_mutect:
         "> {log} 2>&1 "
 
 
-rule ensemblvep_mutect:
+rule ensemblvep_mutect_wbc:
     input:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
         vcfs=["vep/annotate/{sample}.mutect2_wbc.vcf"],
