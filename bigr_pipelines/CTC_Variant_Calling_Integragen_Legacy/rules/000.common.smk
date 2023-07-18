@@ -154,7 +154,7 @@ def get_trio(wildcards):
         "fasta": config["ref"]["fasta"],
     }
 
-def get_trio_wbc(wilcards):
+def get_trio_wbc(wildcards):
     return {
         "ctc": link_sample_baseline[wildcards.sample]["ctc"],
         "tumor": link_sample_baseline[wildcards.sample]["wbc"],
