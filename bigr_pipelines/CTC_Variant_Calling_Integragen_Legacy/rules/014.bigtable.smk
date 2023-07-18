@@ -204,7 +204,7 @@ rule concat_to_bigtable:
         ),
         expand(
             "vep/mutect2_wbc/{sample}.tsv",
-            sample=sample_list,
+            sample=samples_list,
         )
     output:
         temp("bigtable/raw.tsv"),
