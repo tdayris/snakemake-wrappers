@@ -154,6 +154,14 @@ def get_trio(wildcards):
         "fasta": config["ref"]["fasta"],
     }
 
+def get_trio_wbc(wilcards):
+    return {
+        "ctc": link_sample_baseline[wildcards.sample]["ctc"],
+        "tumor": link_sample_baseline[wildcards.sample]["wbc"],
+        "normal": link_sample_baseline[wildcards.sample]["baseline"],
+        "fasta": config["ref"]["fasta"],
+    }
+
 
 def get_hc(wildcards):        
     return {
@@ -194,8 +202,10 @@ version_list = list(set(design["Version"]))
 manip_list = list(set(design["Manip"]))
 status_list = list(set(design["Status"]))
 tmp = os.environ.get("BIGR_DEFAULT_TMP", "tmp")
+mutect_dir_list=["mutect2", "mutect2_wbc"]
 
 
 wildcard_constraints:
     sample=r"|".join(samples_list + baseline_sample_list + wbc_sample_list),
     status=r"|".join(status_list),
+    mutect_dir=r"|".join(mutect_dir_list),

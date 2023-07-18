@@ -20,6 +20,27 @@ rule add_origin_mutect_ctc:
         "bio/awk"
 
 
+rule add_origin_mutect_ctc:
+    input:
+        "vep/mutect2_wbc/{sample}.tsv"
+    output:
+        temp("vep/mutect2_wbc/{sample}.orig.tsv")
+    threads: 1
+    resources:
+        mem_mb=512,
+        time_min=10,
+        tmpdir=tmp,
+    log:
+        "logs/vep/origin/{sample}.mutect2_wbc.log"
+    params:
+        begin='FS=OFS="\\t"',
+        body=[
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tMutect_WBC\\tMutect\\tWBC"']
+        ]
+    wrapper:
+        "bio/awk"
+
+
 rule add_origin_brc:
     input:
         "vep/bcr/{sample}.tsv"
@@ -181,6 +202,10 @@ rule concat_to_bigtable:
             "vep/hc/{sample}.baseline.orig.tsv",
             sample=samples_list,
         ),
+        expand(
+            "vep/mutect2_wbc/{sample}.tsv",
+            sample=sample_list,
+        )
     output:
         temp("bigtable/raw.tsv"),
     threads: 1
