@@ -20,7 +20,7 @@ rule add_origin_mutect_ctc:
         "bio/awk"
 
 
-rule add_origin_mutect_ctc:
+rule add_origin_mutect_wbc:
     input:
         "vep/mutect2_wbc/{sample}.tsv"
     output:
