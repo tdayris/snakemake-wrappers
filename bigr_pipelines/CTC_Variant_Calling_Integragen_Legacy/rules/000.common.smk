@@ -12,6 +12,7 @@ Skip if you're looking for rules
 # Official libraries
 import os
 import functools
+import itertools
 
 from snakemake.utils import min_version
 from pathlib import Path
@@ -204,8 +205,8 @@ status_list = list(set(design["Status"]))
 tmp = os.environ.get("BIGR_DEFAULT_TMP", "tmp")
 mutect_dir_list=["mutect2", "mutect2_wbc"]
 
-
 wildcard_constraints:
     sample=r"|".join(samples_list + baseline_sample_list + wbc_sample_list),
     status=r"|".join(status_list),
     mutect_dir=r"|".join(mutect_dir_list),
+    sample_wbc=r"|".join(wbc_sample_list),

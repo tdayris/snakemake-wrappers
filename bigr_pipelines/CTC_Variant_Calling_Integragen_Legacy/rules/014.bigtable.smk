@@ -210,13 +210,26 @@ rule concat_to_bigtable:
     input:
         expand(
             "vep/{annot}/{sample}.orig.tsv",
-            annot=["bcr", "mutect", "bcr_wbc", "mutect2_wbc"],
+            annot=["bcr", "mutect"],
             sample=samples_list,
         ),
         expand(
-            "vep/hc/{sample}.{content}.orig.tsv",
-            sample=samples_list,
+            "vep/{annot}/{sample_wbc}.orig.tsv",
+            sample_wbc=wbc_sample_list,
+            annot=["mutect2_wbc", "bcr_wbc"],
+        ),
+        expand(
+            "vep/hc/{sample}.wbc.orig.tsv",
+            sample=wbc_sample_list,
             content=["wbc", "ctc", "baseline"]
+        ),
+        expand(
+            "vep/hc/{sample}.baseline.orig.tsv",
+            sample=baseline_sample_list,
+        ),
+        expand(
+            "vep/hc/{sample}.ctc.orig.tsv",
+            sample=samples_list,
         ),
     output:
         temp("bigtable/raw.tsv"),
