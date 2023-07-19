@@ -210,13 +210,13 @@ rule concat_to_bigtable:
     input:
         expand(
             "vep/{annot}/{sample}.orig.tsv",
-            annot=["bcr", "mutect"],
+            annot=["bcr", "mutect", "mutect2_wbc"],
             sample=samples_list,
         ),
         expand(
             "vep/{annot}/{sample_wbc}.orig.tsv",
             sample_wbc=wbc_sample_list,
-            annot=["mutect2_wbc", "bcr_wbc"],
+            annot=["bcr_wbc"],
         ),
         expand(
             "vep/hc/{sample}.wbc.orig.tsv",
