@@ -203,7 +203,7 @@ rule concat_to_bigtable:
             sample=samples_list,
         ),
         expand(
-            "vep/mutect2_wbc/{sample}.tsv",
+            "vep/mutect2_wbc/{sample}.orig.tsv",
             sample=samples_list,
         )
     output:
