@@ -38,12 +38,42 @@ rule ensembl_vep_brc:
         "> {log} 2>&1 "
 
 
-rule ensemblvep_bcr:
+rule ensembl_vep_bcr_ctc:
     input:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
         vcfs=["vep/annotate/{sample}.ctc.brc.vcf"],
     output:
         tsv=temp("vep/bcr/{sample}.tsv"),
+    threads: 1
+    resources:
+        mem_mb=get_20gb_per_attempt,
+        time_min=get_3h_per_attempt,
+        tmpdir=tmp,
+    log:
+        "logs/vep/bcr/{sample}.log",
+    params:
+        organism=config.get("vep_db", "hg38"),
+    container:
+        str(
+            workflow_source_dir
+            / ".."
+            / ".."
+            / ".."
+            / "singularity"
+            / "mambaforge_4.14.0-0.sif"
+        )
+    conda:
+        str(workflow_source_dir / "envs" / "r.yaml")
+    script:
+        str(workflow_source_dir / "scripts" / "ensemblVEP_bcr.R")
+
+
+rule ensembl_vep_bcr_wbc:
+    input:
+        cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
+        vcfs=["vep/annotate/{sample}.wbc.brc.vcf"],
+    output:
+        tsv=temp("vep/bcr_wbc/{sample}.tsv"),
     threads: 1
     resources:
         mem_mb=get_20gb_per_attempt,

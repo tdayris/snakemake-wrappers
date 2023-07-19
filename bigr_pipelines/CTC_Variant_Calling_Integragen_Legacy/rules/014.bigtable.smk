@@ -41,7 +41,7 @@ rule add_origin_mutect_wbc:
         "bio/awk"
 
 
-rule add_origin_brc:
+rule add_origin_brc_ctc:
     input:
         "vep/bcr/{sample}.tsv"
     output:
@@ -57,6 +57,29 @@ rule add_origin_brc:
         begin='FS=OFS="\\t"',
         body=[
             ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tBRC_CTC\\tBRC\\tCTC"']
+            # 'print $0"\\tBRC_CTC"'
+        ]
+    wrapper:
+        "bio/awk"
+
+
+
+rule add_origin_brc_wbc:
+    input:
+        "vep/bcr_wbc/{sample}.tsv"
+    output:
+        temp("vep/bcr_wbc/{sample}.orig.tsv")
+    threads: 1
+    resources:
+        mem_mb=512,
+        time_min=10,
+        tmpdir=tmp,
+    log:
+        "logs/vep/origin/{sample}.brc.wbc.log"
+    params:
+        begin='FS=OFS="\\t"',
+        body=[
+            ['NR == 1', 'print $0"\\tSample_Type\\tTool\\tCondition"', 'print $0"\\tBRC_WBC\\tBRC\\tWBC"']
             # 'print $0"\\tBRC_CTC"'
         ]
     wrapper:
@@ -187,25 +210,14 @@ rule concat_to_bigtable:
     input:
         expand(
             "vep/{annot}/{sample}.orig.tsv",
-            annot=["bcr", "mutect"],
+            annot=["bcr", "mutect", "bcr_wbc", "mutect2_wbc"],
             sample=samples_list,
         ),
         expand(
-            "vep/hc/{sample}.wbc.orig.tsv",
+            "vep/hc/{sample}.{content}.orig.tsv",
             sample=samples_list,
+            content=["wbc", "ctc", "baseline"]
         ),
-        expand(
-            "vep/hc/{sample}.ctc.orig.tsv",
-            sample=samples_list,
-        ),
-        expand(
-            "vep/hc/{sample}.baseline.orig.tsv",
-            sample=samples_list,
-        ),
-        expand(
-            "vep/mutect2_wbc/{sample}.orig.tsv",
-            sample=samples_list,
-        )
     output:
         temp("bigtable/raw.tsv"),
     threads: 1
