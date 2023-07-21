@@ -1,0 +1,39 @@
+rule test_DESeqDataSet_from_tximport:
+    input:
+        txi="dataset/txi.RDS",
+        colData="coldata.tsv",
+    output:
+        "dds_txi.RDS",
+    threads: 1
+    log:
+        "logs/DESeqDataSet/txi.log",
+    params:
+        formula="~condition",  # Required R statistical formula
+        # factor="condition", # Optionally used for relevel
+        # reference_level="A", # Optionally used for relevel
+        # tested_level="B", # Optionally used for relevel
+        # min_counts=0, # Optionally used to filter low counts
+        # extra="", # Optional parameters provided to import function
+    wrapper:
+        "v2.2.1/bio/deseq2/deseqdataset"
+
+
+rule test_deseq2_wald:
+    input:
+        dds="dds_txi.RDS",
+    output:
+        wald_rds="wald.RDS",
+        wald_tsv="dge.tsv",
+        deseq2_result_dir=directory("deseq_results"),
+        normalized_counts_table="counts.tsv",
+        normalized_counts_rds="counts.RDS",
+    params:
+        deseq_extra="",
+        shrink_extra="",
+        results_extra="",
+        contrast=["condition", "A", "B"],
+    threads: 1
+    log:
+        "logs/deseq2.log",
+    wrapper:
+        "v2.2.1/bio/deseq2/wald"
