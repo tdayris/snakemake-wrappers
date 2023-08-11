@@ -1,5 +1,21 @@
 # Changelog
 
+### [2.3.3](https://www.github.com/tdayris/snakemake-wrappers/compare/v2.3.2...v2.3.3) (2023-08-11)
+
+
+### Performance Improvements
+
+* autobump bio/busco ([#1739](https://www.github.com/tdayris/snakemake-wrappers/issues/1739)) ([d04d8d7](https://www.github.com/tdayris/snakemake-wrappers/commit/d04d8d73927354e8e43f222dc6d1d0de4dc1c4ce))
+* autobump bio/delly ([#1735](https://www.github.com/tdayris/snakemake-wrappers/issues/1735)) ([479ac84](https://www.github.com/tdayris/snakemake-wrappers/commit/479ac84e866f61b0d905e7c9e7048f2bdb0ec772))
+* autobump bio/gatk/estimatelibrarycomplexity ([#1736](https://www.github.com/tdayris/snakemake-wrappers/issues/1736)) ([b318de6](https://www.github.com/tdayris/snakemake-wrappers/commit/b318de6011e7dbab95465bb3d8961668f7ec8a39))
+* autobump bio/gatk3/printreads ([#1731](https://www.github.com/tdayris/snakemake-wrappers/issues/1731)) ([b6fff95](https://www.github.com/tdayris/snakemake-wrappers/commit/b6fff95d6c25b3536d0999ed63b9e7aecc4bc586))
+* autobump bio/mashmap ([#1737](https://www.github.com/tdayris/snakemake-wrappers/issues/1737)) ([ae721ec](https://www.github.com/tdayris/snakemake-wrappers/commit/ae721ec4f0bbede932b54cb53046307506a7c659))
+* autobump bio/picard/bedtointervallist ([#1734](https://www.github.com/tdayris/snakemake-wrappers/issues/1734)) ([13e5cad](https://www.github.com/tdayris/snakemake-wrappers/commit/13e5cad53b86a84291b7420b37950cc111a7a7a2))
+* autobump bio/samtools/depth ([#1738](https://www.github.com/tdayris/snakemake-wrappers/issues/1738)) ([5d0f676](https://www.github.com/tdayris/snakemake-wrappers/commit/5d0f6761d8b2b11afeafe017d0566ae74fc0b0f9))
+* autobump bio/sra-tools/fasterq-dump ([#1732](https://www.github.com/tdayris/snakemake-wrappers/issues/1732)) ([06e7b87](https://www.github.com/tdayris/snakemake-wrappers/commit/06e7b872c6de379a2c0452836b4f0c17e7f33fda))
+* autobump utils/cairosvg ([#1733](https://www.github.com/tdayris/snakemake-wrappers/issues/1733)) ([3a48cd7](https://www.github.com/tdayris/snakemake-wrappers/commit/3a48cd719e6798b0b4041b929d8e6b7a92f83f0c))
+* bump datavzrd to 2.23.2 ([#1729](https://www.github.com/tdayris/snakemake-wrappers/issues/1729)) ([55a7066](https://www.github.com/tdayris/snakemake-wrappers/commit/55a70669a000900cfd23c9bd4092f92b3eda208b))
+
 ### [2.3.2](https://www.github.com/snakemake/snakemake-wrappers/compare/v2.3.1...v2.3.2) (2023-08-07)
 
 
