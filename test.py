@@ -158,6 +158,117 @@ def test_galah():
 
 
 @skip_if_not_modified
+def test_agat_convert():
+    run(
+        "bio/agat/convert",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "bed.gff",
+        ]
+    )
+
+    run(
+        "bio/agat/convert",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "embl.gff",
+        ]
+    )
+
+    run(
+        "bio/agat/convert",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "genscan.gff",
+        ]
+    )
+
+    run(
+        "bio/agat/convert",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "mfannot.gff",
+        ]
+    )
+
+    run(
+        "bio/agat/convert",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "bam.gff",
+        ]
+    )
+
+    run(
+        "bio/agat/convert",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "sam.gff",
+        ]
+    )
+
+    run(
+        "bio/agat/convert",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "gff.gtf",
+        ]
+    )
+
+    run(
+        "bio/agat/convert",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "gtf.gff",
+        ]
+    )
+
+    run(
+        "bio/agat/convert",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "gff.tsv",
+        ]
+    )
+
+
+@skip_if_not_modified
 def test_nonpareil():
     run(
         "bio/nonpareil/infer",
