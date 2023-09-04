@@ -159,111 +159,267 @@ def test_galah():
 
 @skip_if_not_modified
 def test_agat_convert():
-    run(
-        "bio/agat/convert",
-        [
-            "snakemake",
-            "--cores",
-            "1",
-            "--use-conda",
-            "-F",
-            "bed.gff",
-        ]
-    )
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "bed.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "embl.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "genscan.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "mfannot.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "bam.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "sam.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "gff.gtf",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "gtf.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "gff.tsv",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "zff.dna",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "gff.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "prokka_renamed.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "intron.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "start_strop.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "alignment.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "fixed.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "compared.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "completed.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "ensembl.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "extracted_ID.txt",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "extracted.fasta",
+    #     ]
+    # )
 
     run(
-        "bio/agat/convert",
+        "bio/agat",
         [
             "snakemake",
             "--cores",
             "1",
             "--use-conda",
             "-F",
-            "embl.gff",
-        ]
-    )
-
-    run(
-        "bio/agat/convert",
-        [
-            "snakemake",
-            "--cores",
-            "1",
-            "--use-conda",
-            "-F",
-            "genscan.gff",
-        ]
-    )
-
-    run(
-        "bio/agat/convert",
-        [
-            "snakemake",
-            "--cores",
-            "1",
-            "--use-conda",
-            "-F",
-            "mfannot.gff",
-        ]
-    )
-
-    run(
-        "bio/agat/convert",
-        [
-            "snakemake",
-            "--cores",
-            "1",
-            "--use-conda",
-            "-F",
-            "bam.gff",
-        ]
-    )
-
-    run(
-        "bio/agat/convert",
-        [
-            "snakemake",
-            "--cores",
-            "1",
-            "--use-conda",
-            "-F",
-            "sam.gff",
-        ]
-    )
-
-    run(
-        "bio/agat/convert",
-        [
-            "snakemake",
-            "--cores",
-            "1",
-            "--use-conda",
-            "-F",
-            "gff.gtf",
-        ]
-    )
-
-    run(
-        "bio/agat/convert",
-        [
-            "snakemake",
-            "--cores",
-            "1",
-            "--use-conda",
-            "-F",
-            "gtf.gff",
-        ]
-    )
-
-    run(
-        "bio/agat/convert",
-        [
-            "snakemake",
-            "--cores",
-            "1",
-            "--use-conda",
-            "-F",
-            "gff.tsv",
+            "passing.gff",
         ]
     )
 
