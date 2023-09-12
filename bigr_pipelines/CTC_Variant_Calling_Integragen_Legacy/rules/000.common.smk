@@ -164,11 +164,15 @@ def get_trio_wbc(wildcards):
     }
 
 
-def get_hc(wildcards):        
+def get_hc(wildcards):   
     return {
-        "bam": link_sample_baseline[wildcards.sample][wildcards.status],
+        "bam": f"sambamba/sort/{wildcards.sample}.{wildcards.status}.bam",
         "fasta": config["ref"]["fasta"],
     }
+    # return {
+    #     "bam": link_sample_baseline[wildcards.sample][wildcards.status],
+    #     "fasta": config["ref"]["fasta"],
+    # }
 
 
 def get_ensembl_vep_hc(wildcards):
