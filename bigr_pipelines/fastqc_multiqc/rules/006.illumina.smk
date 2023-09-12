@@ -7,7 +7,7 @@ by
 """
 
 
-use rule unzip_stats as uzip_interop with:
+use rule unzip_stats as unzip_interop with:
     input:
         interop,
     output:
