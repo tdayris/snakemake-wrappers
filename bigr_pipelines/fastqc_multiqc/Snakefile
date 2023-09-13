@@ -45,9 +45,18 @@ include: "rules/001.copy.smk"
 
 if stats != default_existing_path:
     include: "rules/004.unzip.smk"
+else:
+    warn("No Stats.json.zip found. This file is required for DemuxQC")
 
 if all(zipfile != default_existing_path for zipfile in [interop, runinfo, runparams]):
     include: "rules/006.illumina.smk"
+else:
+    warn(
+        "No InterOp.zip found, and/or "
+        "no RunInfo.xml.zip found, "
+        "and/or no RunParameters.xml.zip found. "
+        "These files are required for DemuxQC."
+    )
 
 
 prefix = (
