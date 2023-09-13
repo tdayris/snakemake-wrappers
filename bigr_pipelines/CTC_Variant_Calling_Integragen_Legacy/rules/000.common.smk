@@ -236,15 +236,20 @@ def get_ctc(wildcards):
 
 
 def get_trio(wildcards):
+    sample = wildcards.sample
+    version = wildcards.version
+    manip = wildcards.manip
+
     if "nb" in wildcards.keys():
+        nb = wildcards.nb
         return {
-            "tumor": get_ctc(wildcards),
-            "normal": get_baseline(wildcards),
+            "tumor": f"sambamba/markdup/{sample}_{version}_{manip}_{nb}.bam",
+            "normal": f"sambamba/markdup/{sample}.baseline.bam",
             "fasta": config["ref"]["fasta"],
         }
     return {
-        "tumor": get_wbc(wildcards),
-        "normal": get_baseline(wildcards),
+        "tumor": f"sambamba/sort/{sample}_{version}_{manip}.bam",
+        "normal": f"sambamba/markdup/{sample}.baseline.bam",
         "fasta": config["ref"]["fasta"],
     }
     
@@ -266,18 +271,25 @@ def get_trio(wildcards):
 #     }
 
 def get_hc(wildcards):
+    sample = wildcards.sample
     if "nb" in wildcards.keys():
+        version = wildcards.version
+        manip = wildcards.manip
+    
         return {
-            "bam": get_ctc(wildcards),
+            "bam": f"sambamba/markdup/{sample}_{version}_{manip}_{nb}.bam",
             "fasta": config["ref"]["fasta"],
         }
     if "manip" in wildcards.keys():
+        version = wildcards.version
+        manip = wildcards.manip
+    
         return {
-            "bam": get_wbc(wildcards),
+            "bam": f"sambamba/markdup/{sample}_{version}_{manip}.bam",
             "fasta": config["ref"]["fasta"],
         }
     return {
-        "bam": get_baseline(wildcards),
+        "bam": f"sambamba/markdup/{sample}.baseline.bam",
         "fasta": config["ref"]["fasta"],
     }
 
