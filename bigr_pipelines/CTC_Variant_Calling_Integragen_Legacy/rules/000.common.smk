@@ -144,10 +144,10 @@ def get_baseline(wildcards):
             if "version" in wildcards.keys():
                 if "sample" in wildcards.keys():
                     return design[
-                        (df["Sample_id"] == str(wildcards.sample)) & 
-                        (df["Version"] == str(wildcards.version)) &
-                        (df["Manip"] == str(wildcards.manip)) &
-                        (df["NB"] == int(wildcards.nb))
+                        (design["Sample_id"] == str(wildcards.sample)) & 
+                        (design["Version"] == str(wildcards.version)) &
+                        (design["Manip"] == str(wildcards.manip)) &
+                        (design["NB"] == int(wildcards.nb))
                     ].Baseline.to_list()[0]
 
     # There is only one baseline per sample, so
@@ -156,23 +156,23 @@ def get_baseline(wildcards):
         if "version" in wildcards.keys():
             if "sample" in wildcards.keys():
                 return design[
-                    (df["Sample_id"] == str(wildcards.sample)) & 
-                    (df["Version"] == str(wildcards.version)) &
-                    (df["Manip"] == str(wildcards.manip))
+                    (design["Sample_id"] == str(wildcards.sample)) & 
+                    (design["Version"] == str(wildcards.version)) &
+                    (design["Manip"] == str(wildcards.manip))
                 ].Baseline.to_list()[0]
     
     # Same remark with manip.
     if "version" in wildcards.keys():
         if "sample" in wildcards.keys():
             return design[
-                (df["Sample_id"] == str(wildcards.sample)) & 
-                (df["Version"] == str(wildcards.version))
+                (design["Sample_id"] == str(wildcards.sample)) & 
+                (design["Version"] == str(wildcards.version))
             ].Baseline.to_list()[0]
 
     # Same remark with panel version.
     if "sample" in wildcards.keys():
         return design[
-            (df["Sample_id"] == str(wildcards.sample))
+            (design["Sample_id"] == str(wildcards.sample))
         ].Baseline.to_list()[0]
 
     raise ValueError("Missing wildcards values.")
@@ -188,10 +188,10 @@ def get_wbc(wildcards):
             if "version" in wildcards.keys():
                 if "sample" in wildcards.keys():
                     return design[
-                        (df["Sample_id"] == str(wildcards.sample)) & 
-                        (df["Version"] == str(wildcards.version)) &
-                        (df["Manip"] == str(wildcards.manip)) &
-                        (df["NB"] == int(wildcards.nb))
+                        (design["Sample_id"] == str(wildcards.sample)) & 
+                        (design["Version"] == str(wildcards.version)) &
+                        (design["Manip"] == str(wildcards.manip)) &
+                        (design["NB"] == int(wildcards.nb))
                     ].WBC.to_list()[0]
 
     # There is only one baseline per replicate, so
@@ -200,9 +200,9 @@ def get_wbc(wildcards):
         if "version" in wildcards.keys():
             if "sample" in wildcards.keys():
                 return design[
-                    (df["Sample_id"] == str(wildcards.sample)) & 
-                    (df["Version"] == str(wildcards.version)) &
-                    (df["Manip"] == str(wildcards.manip))
+                    (design["Sample_id"] == str(wildcards.sample)) & 
+                    (design["Version"] == str(wildcards.version)) &
+                    (design["Manip"] == str(wildcards.manip))
                 ].WBC.to_list()[0]
 
     raise ValueError("Missing wildcards values: get_wbc requires 'manip'.")
@@ -217,10 +217,10 @@ def get_ctc(wildcards):
             if "version" in wildcards.keys():
                 if "sample" in wildcards.keys():
                     return design[
-                        (df["Sample_id"] == str(wildcards.sample)) & 
-                        (df["Version"] == str(wildcards.version)) &
-                        (df["Manip"] == str(wildcards.manip)) &
-                        (df["NB"] == int(wildcards.nb))
+                        (design["Sample_id"] == str(wildcards.sample)) & 
+                        (design["Version"] == str(wildcards.version)) &
+                        (design["Manip"] == str(wildcards.manip)) &
+                        (design["NB"] == int(wildcards.nb))
                     ].WBC.to_list()[0]
     
     raise ValueError("Missing wildcards values: get_ctc requires 'nb', 'manip', 'version', and 'sample'.")
