@@ -4,9 +4,9 @@ No command line provided
 
 rule awk_add_origin_brc_ctc:
     input:
-        "vep/bcr/{sample}_{version}_{manip}_{nb}.tsv"
+        "vep/brc/{sample}_{version}_{manip}_{nb}.tsv"
     output:
-        temp("vep/bcr/{sample}_{version}_{manip}_{nb}.orig.tsv")
+        temp("vep/brc/{sample}_{version}_{manip}_{nb}.orig.tsv")
     threads: 1
     resources:
         mem_mb=512,
@@ -25,9 +25,9 @@ rule awk_add_origin_brc_ctc:
 
 rule awk_add_origin_brc_wbc:
     input:
-        "vep/bcr/{sample}_{version}_{manip}.tsv"
+        "vep/brc/{sample}_{version}_{manip}.tsv"
     output:
-        temp("vep/bcr/{sample}_{version}_{manip}.orig.tsv")
+        temp("vep/brc/{sample}_{version}_{manip}.orig.tsv")
     threads: 1
     resources:
         mem_mb=512,
@@ -46,9 +46,9 @@ rule awk_add_origin_brc_wbc:
 
 rule awk_add_origin_brc_baseline:
     input:
-        "vep/bcr/{sample}.baseline.tsv"
+        "vep/brc/{sample}.baseline.tsv"
     output:
-        temp("vep/bcr/{sample}.baseline.orig.tsv")
+        temp("vep/brc/{sample}.baseline.orig.tsv")
     threads: 1
     resources:
         mem_mb=512,

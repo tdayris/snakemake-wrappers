@@ -7,7 +7,7 @@ rule ensembl_vep_bcr_ctc_postprocess:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
         vcfs=["vep/annotate/{sample}_{version}_{manip}_{nb}.brc.vcf"],
     output:
-        tsv=temp("vep/bcr/{sample}_{version}_{manip}_{nb}.tsv"),
+        tsv=temp("vep/brc/{sample}_{version}_{manip}_{nb}.tsv"),
     threads: 1
     resources:
         mem_mb=get_20gb_per_attempt,
@@ -38,7 +38,7 @@ rule ensembl_vep_bcr_wbc_postprocess:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
         vcfs=["vep/annotate/{sample}_{version}_{manip}.brc.vcf"],
     output:
-        tsv=temp("vep/bcr/{sample}_{version}_{manip}.tsv"),
+        tsv=temp("vep/brc/{sample}_{version}_{manip}.tsv"),
     threads: 1
     resources:
         mem_mb=get_20gb_per_attempt,
@@ -68,7 +68,7 @@ rule ensembl_vep_bcr_baseline_postprocess:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
         vcfs=["vep/annotate/{sample}.baseline.brc.vcf"],
     output:
-        tsv=temp("vep/bcr/{sample}.baseline.tsv"),
+        tsv=temp("vep/brc/{sample}.baseline.tsv"),
     threads: 1
     resources:
         mem_mb=get_20gb_per_attempt,

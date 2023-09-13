@@ -5,7 +5,7 @@ ensembl VEP 87.0 refseq (on each normal VCF/TSV) : singularity run -B /mnt/beegf
 
 rule ensembl_vep_bam_readcount_ctc:
     input:
-        vcf="bcr2vep/filtered/{sample}_{version}_{manip}_{nb}.tsv",
+        vcf="brc2vep/filtered/{sample}_{version}_{manip}_{nb}.tsv",
         cache=config["ref"]["vep"],
         fasta="resources/GRCh38.fasta",
     output:
@@ -40,7 +40,7 @@ rule ensembl_vep_bam_readcount_ctc:
 
 rule ensembl_vep_bam_readcount_wbc:
     input:
-        vcf="bcr2vep/filtered/{sample}_{version}_{manip}.tsv",
+        vcf="brc2vep/filtered/{sample}_{version}_{manip}.tsv",
         cache=config["ref"]["vep"],
         fasta="resources/GRCh38.fasta",
     output:
@@ -75,7 +75,7 @@ rule ensembl_vep_bam_readcount_wbc:
 
 rule ensembl_vep_bam_readcount_baseline:
     input:
-        vcf="bcr2vep/filtered/{sample}.baseline.tsv",
+        vcf="brc2vep/filtered/{sample}.baseline.tsv",
         cache=config["ref"]["vep"],
         fasta="resources/GRCh38.fasta",
     output:
