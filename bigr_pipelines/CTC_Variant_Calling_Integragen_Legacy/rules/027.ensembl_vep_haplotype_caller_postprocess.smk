@@ -67,14 +67,14 @@ rule ensembl_vep_haplotype_caller_baseline_postprocess:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
         vcfs=["vep/annotate/{sample}.vcf"],
     output:
-        tsv=temp("vep/hc/{sample}.tsv"),
+        tsv=temp("vep/hc/{sample}.baseline.tsv"),
     threads: 1
     resources:
         mem_mb=get_10gb_per_attempt,
         time_min=get_2h_per_attempt,
         tmpdir=tmp,
     log:
-        "logs/vep/hc/{sample}.log",
+        "logs/vep/hc/{sample}.baseline.log",
     params:
         organism=config.get("vep_db", "hg38"),
     container:
