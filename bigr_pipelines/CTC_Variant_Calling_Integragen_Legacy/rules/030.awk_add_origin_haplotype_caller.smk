@@ -40,7 +40,7 @@ rule awk_add_origin_hc_wbc:
         "bio/awk"
 
 
-rule awk_add_origin_hc_ctc:
+rule awk_add_origin_hc_baseline:
     input:
         "vep/hc/{sample}.baseline.tsv"
     output:
