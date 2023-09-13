@@ -147,7 +147,7 @@ def get_baseline(wildcards):
                         (design["Sample_id"] == str(wildcards.sample)) & 
                         (design["Version"] == str(wildcards.version)) &
                         (design["Manip"] == str(wildcards.manip)) &
-                        (design["NB"] == int(wildcards.nb))
+                        (design["NB"] == str(wildcards.nb))
                     ].Baseline.to_list()[0]
 
     # There is only one baseline per sample, so
@@ -191,7 +191,7 @@ def get_wbc(wildcards):
                         (design["Sample_id"] == str(wildcards.sample)) & 
                         (design["Version"] == str(wildcards.version)) &
                         (design["Manip"] == str(wildcards.manip)) &
-                        (design["NB"] == int(wildcards.nb))
+                        (design["NB"] == str(wildcards.nb))
                     ].WBC.to_list()[0]
 
     # There is only one baseline per replicate, so
@@ -220,7 +220,7 @@ def get_ctc(wildcards):
                         (design["Sample_id"] == str(wildcards.sample)) & 
                         (design["Version"] == str(wildcards.version)) &
                         (design["Manip"] == str(wildcards.manip)) &
-                        (design["NB"] == int(wildcards.nb))
+                        (design["NB"] == str(wildcards.nb))
                     ].WBC.to_list()[0]
     
     raise ValueError("Missing wildcards values: get_ctc requires 'nb', 'manip', 'version', and 'sample'.")
