@@ -34,7 +34,7 @@ rule awk_add_origin_mutect_wbc:
         time_min=10,
         tmpdir=tmp,
     log:
-        "logs/vep/origin/{sample}.mutect2_wbc.log"
+        "logs/vep/origin/{sample}_{version}_{manip}.mutect2_wbc.log"
     params:
         begin='FS=OFS="\\t"',
         body=[
