@@ -47,7 +47,7 @@ rule bigtable_output:
 
 rule remove_duplicates:
     input:
-        "data_output/bigtable.tsv"
+        "bigtable/duplicated.tsv"
     output:
         temp("bigtable/uniq.csv")
     threads: 3
