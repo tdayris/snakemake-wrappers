@@ -33,7 +33,7 @@ rule ensembl_vep_bcr_ctc_postprocess:
 
 
 
-rule ensembl_vep_bcr_ctc_postprocess:
+rule ensembl_vep_bcr_wbc_postprocess:
     input:
         cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
         vcfs=["vep/annotate/{sample}_{version}_{manip}.brc.vcf"],
