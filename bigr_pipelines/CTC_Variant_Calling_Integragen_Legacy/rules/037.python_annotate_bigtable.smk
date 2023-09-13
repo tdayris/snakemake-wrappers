@@ -4,7 +4,7 @@ No command line provided
 
 rule bigtable_annotated:
     input:
-        bigtable="bigtable/bigtable.uniq.csv",
+        bigtable="bigtable/uniq.csv",
         label="Labels.csv"
     output:
         bigtable="data_output/BigTable.tsv",
