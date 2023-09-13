@@ -59,7 +59,7 @@ logging.info("Config file loaded")
 design = get_design(dirpath=os.getcwd(), search_func=search_mapping)
 design.set_index("Sample_id", inplace=True)
 design["Sample_id"] = design.index.tolist()
-design = design.astype({"NB", "str"})
+design = design.astype("str")
 logging.info("Design file loaded")
 
 ##################################
