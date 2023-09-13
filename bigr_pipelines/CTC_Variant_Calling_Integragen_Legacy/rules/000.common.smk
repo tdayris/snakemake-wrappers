@@ -305,8 +305,8 @@ def get_ensembl_vep_hc(wildcards):
        return {
             "cache": config["ref"]["vep"],
             "fasta": "resources/GRCh38.fasta",
-            "vcf": f"data_output/HC_CTC/{wildcards.sample}_{wildcards.version}_{wildcards.manip}_{wildcard.nb}.vcf.gz",
-            "vcf_tbi": f"data_output/HC_CTC/{wildcards.sample}_{wildcards.version}_{wildcards.manip}_{wildcard.nb}.vcf.gz.tbi",
+            "vcf": f"data_output/HC_CTC/{wildcards.sample}_{wildcards.version}_{wildcards.manip}_{wildcards.nb}.vcf.gz",
+            "vcf_tbi": f"data_output/HC_CTC/{wildcards.sample}_{wildcards.version}_{wildcards.manip}_{wildcards.nb}.vcf.gz.tbi",
         }
     if "manip" in wildcards.keys():
         return {
