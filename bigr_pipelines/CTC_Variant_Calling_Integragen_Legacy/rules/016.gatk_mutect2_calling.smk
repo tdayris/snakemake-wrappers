@@ -3,11 +3,11 @@ mutect 2.0 : java -Xmx8g -jar GenomeAnalysisTK.jar -T MuTect2 -I:tumor {sample_t
 """
 
 
-rule mutect2:
+rule gatk_mutect2_ctc:
     input:
         unpack(get_trio),
     output:
-        "gatk/mutect2/{sample}.vcf.gz",
+        "gatk/mutect2/{sample}_{version}_{manip}_{nb}.vcf.gz",
     threads: 1
     resources:
         mem_mb=4 * 1024,
@@ -15,7 +15,7 @@ rule mutect2:
         time_min=get_6h_per_attempt,
         tmpdir=tmp,
     log:
-        "logs/gatk/mutect2/{sample}.log",
+        "logs/gatk/mutect2/{sample}_{version}_{manip}_{nb}.log",
     params:
         extra=(
             "--max_alt_alleles_in_normal_count 2 "
@@ -39,39 +39,38 @@ rule mutect2:
         "> {log} 2>&1 "
 
 
-rule tabix_mutect2:
+
+rule gatk_mutect2_wbc:
     input:
-        "gatk/mutect2/{sample}.vcf.gz",
+        unpack(get_trio),
     output:
-        "gatk/mutect2/{sample}.vcf.gz.tbi",
+        "gatk/mutect2/{sample}_{version}_{manip}.vcf.gz",
     threads: 1
     resources:
-        mem_mb=get_4gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        mem_mb=4 * 1024,
+        java_mem_gb=4 * 1024,
+        time_min=get_6h_per_attempt,
         tmpdir=tmp,
     log:
-        "logs/tabix/{sample}.mutect2.log",
+        "logs/gatk/mutect2/{sample}_{version}_{manip}.log",
     params:
-        "-p vcf",
-    wrapper:
-        "bio/tabix/index"
-
-
-rule unzip_mutect2:
-    input:
-        "gatk/mutect2/{sample}.vcf.gz",
-    output:
-        temp("gatk/mutect2/{sample}.vcf"),
-    threads: 1
-    resources:
-        mem_mb=get_1gb_per_attempt,
-        time_min=get_35min_per_attempt,
-        tmpdir=tmp,
+        extra=(
+            "--max_alt_alleles_in_normal_count 2 "
+            "--max_alt_allele_in_normal_fraction 0.04 "
+            "--maxReadsInRegionPerSample 100000 "
+            "--output_mode EMIT_VARIANTS_ONLY "
+        ),
+        tmp=tmp,
     conda:
-        str(workflow_source_dir / "envs" / "bash.yaml")
-    log:
-        "logs/gatk/mutect2/unzip/{sample}.log",
-    params:
-        "--decompress --force --verbose --stdout",
+        str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "gzip {params} {input} > {output} 2> {log}"
+        "gatk "
+        "-Xmx{resources.java_mem_gb}M "
+        "-Djava.io.tmpdir=\"{params.tmp}\" "
+        "{params.extra} "
+        "-T MuTect2 "
+        "-I:tumor {input.tumor} "
+        "-I:normal {input.normal} "
+        "-o {output} "
+        "-R {input.fasta} "
+        "> {log} 2>&1 "

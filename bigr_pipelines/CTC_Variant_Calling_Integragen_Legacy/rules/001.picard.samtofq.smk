@@ -3,11 +3,11 @@ picard (v2.23.8) (optional depending on the provided filetype) : picard SamToFas
 """
 
 
-rule picard_sam_to_fastq:
+rule picard_sam_to_fastq_ctc:
     input:
-        "data_input/{sample}.{status}.bam",
+        "data_input/{sample}_{version}_{manip}_{nb}.ctc.bam",
     output:
-        temp("fastq/{sample}.{status}.fastq"),
+        temp("fastq/{sample}_{version}_{manip}_{nb}.fastq"),
     threads: 1
     resources:
         mem_mb=get_2gb_per_attempt,
@@ -16,7 +16,47 @@ rule picard_sam_to_fastq:
     group:
         "clean_input"
     log:
-        "logs/picard/samtofq/{sample}.{status}.log",
+        "logs/picard/samtofq/{sample}_{version}_{manip}_{nb}.log",
+    conda:
+        str(workflow_source_dir / "envs" / "picard.yaml")
+    shell:
+        "picard SamToFastq --INPUT {input} --FASTQ {output} > {log} 2>&1"
+
+
+rule picard_sam_to_fastq_wbc:
+    input:
+        "data_input/{sample}_{version}_{manip}.wbc.bam",
+    output:
+        temp("fastq/{sample}_{version}_{manip}.fastq"),
+    threads: 1
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_15min_per_attempt,
+        tmpdir=tmp,
+    group:
+        "clean_input"
+    log:
+        "logs/picard/samtofq/{sample}_{version}_{manip}.log",
+    conda:
+        str(workflow_source_dir / "envs" / "picard.yaml")
+    shell:
+        "picard SamToFastq --INPUT {input} --FASTQ {output} > {log} 2>&1"
+
+
+rule picard_sam_to_fastq_baseline:
+    input:
+        "data_input/{sample}.baseline.bam",
+    output:
+        temp("fastq/{sample}.baseline.fastq"),
+    threads: 1
+    resources:
+        mem_mb=get_2gb_per_attempt,
+        time_min=get_15min_per_attempt,
+        tmpdir=tmp,
+    group:
+        "clean_input"
+    log:
+        "logs/picard/samtofq/{sample}.baseline.log",
     conda:
         str(workflow_source_dir / "envs" / "picard.yaml")
     shell:
