@@ -63,7 +63,7 @@ design = design.astype("str")
 logging.info("Design file loaded")
 
 ##################################
-# Setup globals and fix wilcards #
+# Setup globals and fix wildcards #
 ##################################
 
 # Links fastq paths provided by users and fastq paths used in this pipeline
@@ -139,15 +139,15 @@ logging.info("Building globals...")
 
 def get_baseline(wildcards):
     # Optimal case.
-    if "nb" in wilcards.keys():
+    if "nb" in wildcards.keys():
         if "manip" in wildcards.keys():
             if "version" in wildcards.keys():
                 if "sample" in wildcards.keys():
                     return design[
-                        (df["Sample_id"] == str(wilcards.sample)) & 
-                        (df["Version"] == str(wilcards.version)) &
-                        (df["Manip"] == str(wilcards.manip)) &
-                        (df["NB"] == int(wilcards.nb))
+                        (df["Sample_id"] == str(wildcards.sample)) & 
+                        (df["Version"] == str(wildcards.version)) &
+                        (df["Manip"] == str(wildcards.manip)) &
+                        (df["NB"] == int(wildcards.nb))
                     ].Baseline.to_list()[0]
 
     # There is only one baseline per sample, so
@@ -156,23 +156,23 @@ def get_baseline(wildcards):
         if "version" in wildcards.keys():
             if "sample" in wildcards.keys():
                 return design[
-                    (df["Sample_id"] == str(wilcards.sample)) & 
-                    (df["Version"] == str(wilcards.version)) &
-                    (df["Manip"] == str(wilcards.manip))
+                    (df["Sample_id"] == str(wildcards.sample)) & 
+                    (df["Version"] == str(wildcards.version)) &
+                    (df["Manip"] == str(wildcards.manip))
                 ].Baseline.to_list()[0]
     
     # Same remark with manip.
     if "version" in wildcards.keys():
         if "sample" in wildcards.keys():
             return design[
-                (df["Sample_id"] == str(wilcards.sample)) & 
-                (df["Version"] == str(wilcards.version))
+                (df["Sample_id"] == str(wildcards.sample)) & 
+                (df["Version"] == str(wildcards.version))
             ].Baseline.to_list()[0]
 
     # Same remark with panel version.
     if "sample" in wildcards.keys():
         return design[
-            (df["Sample_id"] == str(wilcards.sample))
+            (df["Sample_id"] == str(wildcards.sample))
         ].Baseline.to_list()[0]
 
     raise ValueError("Missing wildcards values.")
@@ -183,15 +183,15 @@ def get_baseline(wildcards):
 
 def get_wbc(wildcards):
     # Optimal case.
-    if "nb" in wilcards.keys():
+    if "nb" in wildcards.keys():
         if "manip" in wildcards.keys():
             if "version" in wildcards.keys():
                 if "sample" in wildcards.keys():
                     return design[
-                        (df["Sample_id"] == str(wilcards.sample)) & 
-                        (df["Version"] == str(wilcards.version)) &
-                        (df["Manip"] == str(wilcards.manip)) &
-                        (df["NB"] == int(wilcards.nb))
+                        (df["Sample_id"] == str(wildcards.sample)) & 
+                        (df["Version"] == str(wildcards.version)) &
+                        (df["Manip"] == str(wildcards.manip)) &
+                        (df["NB"] == int(wildcards.nb))
                     ].WBC.to_list()[0]
 
     # There is only one baseline per replicate, so
@@ -200,9 +200,9 @@ def get_wbc(wildcards):
         if "version" in wildcards.keys():
             if "sample" in wildcards.keys():
                 return design[
-                    (df["Sample_id"] == str(wilcards.sample)) & 
-                    (df["Version"] == str(wilcards.version)) &
-                    (df["Manip"] == str(wilcards.manip))
+                    (df["Sample_id"] == str(wildcards.sample)) & 
+                    (df["Version"] == str(wildcards.version)) &
+                    (df["Manip"] == str(wildcards.manip))
                 ].WBC.to_list()[0]
 
     raise ValueError("Missing wildcards values: get_wbc requires 'manip'.")
@@ -211,16 +211,16 @@ def get_wbc(wildcards):
 # def get_ctc(wildcards):
 #     return link_sample_baseline[wildcards.sample]["ctc"]
 
-def get_ctc(wilcards):
-    if "nb" in wilcards.keys():
+def get_ctc(wildcards):
+    if "nb" in wildcards.keys():
         if "manip" in wildcards.keys():
             if "version" in wildcards.keys():
                 if "sample" in wildcards.keys():
                     return design[
-                        (df["Sample_id"] == str(wilcards.sample)) & 
-                        (df["Version"] == str(wilcards.version)) &
-                        (df["Manip"] == str(wilcards.manip)) &
-                        (df["NB"] == int(wilcards.nb))
+                        (df["Sample_id"] == str(wildcards.sample)) & 
+                        (df["Version"] == str(wildcards.version)) &
+                        (df["Manip"] == str(wildcards.manip)) &
+                        (df["NB"] == int(wildcards.nb))
                     ].WBC.to_list()[0]
     
     raise ValueError("Missing wildcards values: get_ctc requires 'nb', 'manip', 'version', and 'sample'.")
@@ -235,16 +235,16 @@ def get_ctc(wilcards):
 #     }
 
 
-def get_trio(wilcards):
-    if "nb" in wilcards.keys():
+def get_trio(wildcards):
+    if "nb" in wildcards.keys():
         return {
-            "tumor": get_ctc(wilcards),
-            "normal": get_baseline(wilcards),
+            "tumor": get_ctc(wildcards),
+            "normal": get_baseline(wildcards),
             "fasta": config["ref"]["fasta"],
         }
     return {
-        "tumor": get_wbc(wilcards),
-        "normal": get_baseline(wilcards),
+        "tumor": get_wbc(wildcards),
+        "normal": get_baseline(wildcards),
         "fasta": config["ref"]["fasta"],
     }
     
@@ -266,18 +266,18 @@ def get_trio(wilcards):
 #     }
 
 def get_hc(wildcards):
-    if "nb" in wilcards.keys():
+    if "nb" in wildcards.keys():
         return {
-            "bam": get_ctc(wilcards),
+            "bam": get_ctc(wildcards),
             "fasta": config["ref"]["fasta"],
         }
-    if "manip" in wilcards.keys():
+    if "manip" in wildcards.keys():
         return {
-            "bam": get_wbc(wilcards),
+            "bam": get_wbc(wildcards),
             "fasta": config["ref"]["fasta"],
         }
     return {
-        "bam": get_baseline(wilcards),
+        "bam": get_baseline(wildcards),
         "fasta": config["ref"]["fasta"],
     }
 
@@ -301,14 +301,14 @@ def get_hc(wildcards):
 #     }
 
 def get_ensembl_vep_hc(wildcards):
-    if "nb" in wilcards.keys():
+    if "nb" in wildcards.keys():
        return {
             "cache": config["ref"]["vep"],
             "fasta": "resources/GRCh38.fasta",
             "vcf": f"data_output/HC_CTC/{wildcards.sample}_{wildcards.version}_{wildcards.manip}_{wildcard.nb}.vcf.gz",
             "vcf_tbi": f"data_output/HC_CTC/{wildcards.sample}_{wildcards.version}_{wildcards.manip}_{wildcard.nb}.vcf.gz.tbi",
         }
-    if "manip" in wilcards.keys():
+    if "manip" in wildcards.keys():
         return {
             "cache": config["ref"]["vep"],
             "fasta": "resources/GRCh38.fasta",
