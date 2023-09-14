@@ -7,7 +7,7 @@ rule gatk_mutect2_ctc:
     input:
         tumor="sambamba/markdup/{sample}_{version}_{manip}_{nb}.bam",
         normal="sambamba/markdup/{sample}.baseline.bam",
-        fastaconfig["ref"]["fasta"],
+        fasta=config["ref"]["fasta"],
     output:
         "gatk/mutect2/{sample}_{version}_{manip}_{nb}.vcf.gz",
     threads: 1
@@ -46,7 +46,7 @@ rule gatk_mutect2_wbc:
     input:
         tumor="sambamba/markdup/{sample}_{version}_{manip}.bam",
         normal="sambamba/markdup/{sample}.baseline.bam",
-        fastaconfig["ref"]["fasta"],
+        fasta=config["ref"]["fasta"],
     output:
         "gatk/mutect2/{sample}_{version}_{manip}.vcf.gz",
     threads: 1
