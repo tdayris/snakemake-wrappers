@@ -233,25 +233,6 @@ def get_ctc(wildcards):
 #         "normal": link_sample_baseline[wildcards.sample]["baseline"],
 #         "fasta": config["ref"]["fasta"],
 #     }
-
-
-def get_trio(wildcards):
-    sample = wildcards.sample
-    version = wildcards.version
-    manip = wildcards.manip
-
-    if "nb" in wildcards.keys():
-        nb = wildcards.nb
-        return {
-            "tumor": f"sambamba/markdup/{sample}_{version}_{manip}_{nb}.bam",
-            "normal": f"sambamba/markdup/{sample}.baseline.bam",
-            "fasta": config["ref"]["fasta"],
-        }
-    return {
-        "tumor": f"sambamba/sort/{sample}_{version}_{manip}.bam",
-        "normal": f"sambamba/markdup/{sample}.baseline.bam",
-        "fasta": config["ref"]["fasta"],
-    }
     
 
 
@@ -269,29 +250,6 @@ def get_trio(wildcards):
 #         "bam": link_sample_baseline[wildcards.sample][wildcards.status],
 #         "fasta": config["ref"]["fasta"],
 #     }
-
-def get_hc(wildcards):
-    sample = wildcards.sample
-    if "nb" in wildcards.keys():
-        version = wildcards.version
-        manip = wildcards.manip
-    
-        return {
-            "bam": f"sambamba/markdup/{sample}_{version}_{manip}_{nb}.bam",
-            "fasta": config["ref"]["fasta"],
-        }
-    if "manip" in wildcards.keys():
-        version = wildcards.version
-        manip = wildcards.manip
-    
-        return {
-            "bam": f"sambamba/markdup/{sample}_{version}_{manip}.bam",
-            "fasta": config["ref"]["fasta"],
-        }
-    return {
-        "bam": f"sambamba/markdup/{sample}.baseline.bam",
-        "fasta": config["ref"]["fasta"],
-    }
 
 
 # def get_ensembl_vep_hc(wildcards):
@@ -311,28 +269,6 @@ def get_hc(wildcards):
 #         "vcf": f"data_output/{subdir}/{wildcards.sample}.vcf.gz",
 #         "vcf_tbi": f"data_output/{subdir}/{wildcards.sample}.vcf.gz.tbi",
 #     }
-
-def get_ensembl_vep_hc(wildcards):
-    if "nb" in wildcards.keys():
-       return {
-            "cache": config["ref"]["vep"],
-            "fasta": "resources/GRCh38.fasta",
-            "vcf": f"data_output/HC_CTC/{wildcards.sample}_{wildcards.version}_{wildcards.manip}_{wildcards.nb}.vcf.gz",
-            "vcf_tbi": f"data_output/HC_CTC/{wildcards.sample}_{wildcards.version}_{wildcards.manip}_{wildcards.nb}.vcf.gz.tbi",
-        }
-    if "manip" in wildcards.keys():
-        return {
-            "cache": config["ref"]["vep"],
-            "fasta": "resources/GRCh38.fasta",
-            "vcf": f"data_output/HC_WBC/{wildcards.sample}_{wildcards.version}_{wildcards.manip}.vcf.gz",
-            "vcf_tbi": f"data_output/HC_WBC/{wildcards.sample}_{wildcards.version}_{wildcards.manip}.vcf.gz.tbi",
-        }
-    return {
-        "cache": config["ref"]["vep"],
-        "fasta": "resources/GRCh38.fasta",
-        "vcf": f"data_output/HC_Baseline/{wildcards.sample}.vcf.gz",
-        "vcf_tbi": f"data_output/HC_Baseline/{wildcards.sample}.vcf.gz.tbi",
-    }
 
 
 # link_bams, samples_list, link_sample_baseline, baseline_sample_list, wbc_sample_list = parse_design(design.copy())

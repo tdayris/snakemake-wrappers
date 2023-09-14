@@ -5,7 +5,8 @@ gatk 3.7 haplotypecaller (on each normal sample) : java -Xmx8g -jar GenomeAnalys
 
 rule gatk_haplotype_caller_ctc:
     input:
-        unpack(get_hc)
+        bam="sambamba/markdup/{sample}_{version}_{manip}_{nb}.bam",
+        fasta=config["ref"]["fasta"],
     output:
         vcf=temp("gatk/haplotypecaller/{sample}_{version}_{manip}_{nb}.g.vcf.gz"),
         bam="gatk/haplotypecaller/{sample}_{version}_{manip}_{nb}.bam",
@@ -38,7 +39,8 @@ rule gatk_haplotype_caller_ctc:
 
 rule gatk_haplotype_caller_wbc:
     input:
-        unpack(get_hc)
+        bam="sambamba/markdup/{sample}_{version}_{manip}.bam",
+        fasta=config["ref"]["fasta"],
     output:
         vcf=temp("gatk/haplotypecaller/{sample}_{version}_{manip}.g.vcf.gz"),
         bam="gatk/haplotypecaller/{sample}_{version}_{manip}.bam",
@@ -71,7 +73,8 @@ rule gatk_haplotype_caller_wbc:
 
 rule gatk_haplotype_caller_baseline:
     input:
-        unpack(get_hc)
+        bam="sambamba/markdup/{sample}.baseline.bam",
+        fasta=config["ref"]["fasta"],
     output:
         vcf=temp("gatk/haplotypecaller/{sample}.baseline.g.vcf.gz"),
         bam="gatk/haplotypecaller/{sample}.baseline.bam",

@@ -4,7 +4,10 @@ ensembl VEP 87.0 refseq (on each normal VCF/TSV) : singularity run -B /mnt/beegf
 
 rule ensembl_vep_haplotype_caller_ctc:
     input:
-        unpack(get_ensembl_vep_hc)
+        cache=config["ref"]["vep"],
+        fasta="resources/GRCh38.fasta",
+        vcf="data_output/HC_CTC/{sample}_{version}_{manip}_{nb}.vcf.gz",
+        vcf_tbi="data_output/HC_CTC/{sample}_{version}_{manip}_{nb}.vcf.gz.tbi",
     output:
         vcf=temp("vep/annotate/{sample}_{version}_{manip}_{nb}.vcf"),
     threads: 1
@@ -37,7 +40,10 @@ rule ensembl_vep_haplotype_caller_ctc:
 
 rule ensembl_vep_haplotype_caller_wbc:
     input:
-        unpack(get_ensembl_vep_hc)
+        cache=config["ref"]["vep"],
+        fasta="resources/GRCh38.fasta",
+        vcf="data_output/HC_WBC/{sample}_{version}_{manip}.vcf.gz",
+        vcf_tbi="data_output/HC_WBC/{sample}_{version}_{manip}.vcf.gz.tbi",
     output:
         vcf=temp("vep/annotate/{sample}_{version}_{manip}.vcf"),
     threads: 1
@@ -70,7 +76,10 @@ rule ensembl_vep_haplotype_caller_wbc:
 
 rule ensembl_vep_haplotype_caller_baseline:
     input:
-        unpack(get_ensembl_vep_hc)
+        cache=config["ref"]["vep"],
+        fasta="resources/GRCh38.fasta",
+        vcf="data_output/HC_Baseline/{sample}.vcf.gz",
+        vcf_tbi="data_output/HC_Baseline/{sample}.vcf.gz.tbi",
     output:
         vcf=temp("vep/annotate/{sample}.vcf"),
     threads: 1
