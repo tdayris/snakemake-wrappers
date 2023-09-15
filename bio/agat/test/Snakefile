@@ -266,7 +266,7 @@ rule test_agat_sp_clipN_seqExtremities_and_fixCoordinates:
 # compare two annotation of the same assembly
 rule test_agat_sp_compare_two_annotations:
     input:
-        gff1=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/0.gff"),
+        gff1=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
         gff2=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
     output:
         out="compared.gff",
@@ -358,7 +358,8 @@ rule test_agat_sp_filter_by_ORF_size:
     input:
         gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
     output:
-        out="passing.gff",
+        passing="passing.gff",
+        not_passing="not_passing.gff"
     threads: 1
     params:
         script="agat_sp_filter_by_ORF_size.pl",
