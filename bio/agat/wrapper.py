@@ -36,43 +36,48 @@ for argname, file_path in snakemake.input.items():
         input_cmd += f" {dash}{argname} {file_path} "
 
 # Acquire output file(s)
-output_cmd = ""
-if script == "agat_convert_sp_gff2zff.pl":
-    output_cmd += f""
-    prefix = os.path.commonprefix(list(map(str, snakemake.output)))
-    output_cmd += f" --output {prefix} "
-elif script == "agat_sp_extract_attributes.pl":
-    ext = os.path.splitext(snakemake.output[0])[-1]
-    prefix = os.path.commonprefix(list(map(str , snakemake.output)))[:-1]
-    output_cmd += f" --output {prefix}{ext} "
+# output_cmd = ""
+# if script == "agat_convert_sp_gff2zff.pl":
+#     output_cmd += f""
+#     prefix = os.path.commonprefix(list(map(str, snakemake.output)))[:-1]
+#     output_cmd += f" --output {prefix} "
+# elif script == "agat_sp_extract_attributes.pl":
+#     ext = os.path.splitext(snakemake.output[0])[-1]
+#     prefix = os.path.commonprefix(list(map(str , snakemake.output)))[:-1]
+#     output_cmd += f" --output {prefix}{ext} "
 
+# else:
 
-for argname, file_path in snakemake.output.items():
-    # Deal with long/short options, since some agat scripts
-    # only accepts 'output' as long option and output.output is
-    # a protected name in Snakemake.
-    dash = "-" if len(str(argname)) == 1 else "--"
-    output_cmd += f" {dash}{argname} {file_path} "
 
 
 with TemporaryDirectory() as tempdir:
+    output_cmd = ""
     # The following script do not let user choose output file names
     if script in ["agat_convert_sp_gff2zff.pl", "agat_sp_extract_attributes.pl"]:
         output_cmd += f" --output {tempdir}/outfile "
+    else:
+        for argname, file_path in snakemake.output.items():
+            # Deal with long/short options, since some agat scripts
+            # only accepts 'output' as long option and output.output is
+            # a protected name in Snakemake.
+            dash = "-" if len(str(argname)) == 1 else "--"
+            output_cmd += f" {dash}{argname} {file_path} "
 
     shell("{script} {extra} {input_cmd} {output_cmd} {log}")
     shell("ls -lrth {tempdir} {log}")
+    shell("ls -lrth {log}")
+    shell("pwd {log}")
 
     # Forwarding output files for script that do not
     # let user choose output file name(s)
     if script == "agat_convert_sp_gff2zff.pl":
-        annot = snakemake.output.get("gff")
+        annot = snakemake.output.get("annotation")
         if annot:
-            shell(f"mv --verbose {tempdir}/outfile.gff {annot} {log}")
+            shell(f"mv --verbose {tempdir}/outfile.ann {annot} {log}")
         
         fasta = snakemake.output.get("fasta")
         if fasta:
-            shell(f"mv --verbose {tempdir}.outfile.fasta {annot} {log}")
+            shell(f"mv --verbose {tempdir}/outfile.dna {fasta} {log}")
 
     elif script == "agat_sp_extract_attributes.pl":
         extra_args = iter(extra.split(" "))

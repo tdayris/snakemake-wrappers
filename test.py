@@ -158,18 +158,39 @@ def test_galah():
 
 
 @skip_if_not_modified
-def test_agat_convert():
-    # run(
-    #     "bio/agat",
-    #     [
-    #         "snakemake",
-    #         "--cores",
-    #         "1",
-    #         "--use-conda",
-    #         "-F",
-    #         "bed.gff",
-    #     ]
-    # )
+def test_agat():
+    run(
+        "bio/agat",
+        [
+            "snakemake",
+            "--cores",
+            "4",
+            "--use-conda",
+            "-F",
+            # "bed.gff",
+            # "embl.gff",
+            # "genscan.gff",
+            # "mfannot.gff",
+            # "bam.gff",
+            # "sam.gff",
+            # "gff.gtf",
+            # "gtf.gff",
+            # "gff.tsv",
+            "zff.dna",
+            # "gff.gff",
+            # "prokka_renamed.gff",
+            # "intron.gff",
+            # "start_strop.gff",
+            # "alignment.gff",
+            # "fixed.gff",
+            # "compared.gff",
+            # "completed.gff",
+            # "ensembl.gff",
+            # "extracted_ID.txt",
+            # "extracted.fasta",
+            # "passing.gff",
+        ]
+    )
 
     # run(
     #     "bio/agat",
@@ -411,17 +432,17 @@ def test_agat_convert():
     #     ]
     # )
 
-    run(
-        "bio/agat",
-        [
-            "snakemake",
-            "--cores",
-            "1",
-            "--use-conda",
-            "-F",
-            "passing.gff",
-        ]
-    )
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "passing.gff",
+    #     ]
+    # )
 
 
 @skip_if_not_modified
