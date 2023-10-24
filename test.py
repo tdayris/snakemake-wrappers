@@ -159,38 +159,49 @@ def test_galah():
 
 @skip_if_not_modified
 def test_agat():
-    # run(
-    #     "bio/agat",
-    #     [
-    #         "snakemake",
-    #         "--cores",
-    #         "4",
-    #         "--use-conda",
-    #         "-F",
-    #         # "bed.gff",
-    #         # "embl.gff",
-    #         # "genscan.gff",
-    #         # "mfannot.gff",
-    #         # "bam.gff",
-    #         # "sam.gff",
-    #         # "gff.gtf",
-    #         # "gtf.gff",
-    #         # "gff.tsv",
-    #         # "zff.dna",
-    #         # "gff.gff",
-    #         # "prokka_renamed.gff",
-    #         # "intron.gff",
-    #         "start_strop.gff",
-    #         "alignment.gff",
-    #         "fixed.gff",
-    #         "compared.gff",
-    #         "completed.gff",
-    #         "ensembl.gff",
-    #         "extracted_ID.txt",
-    #         "extracted.fasta",
-    #         "passing.gff",
-    #     ]
-    # )
+    run(
+        "bio/agat",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            # "bed.gff",
+            # "embl.gff",
+            # "genscan.gff",
+            # "mfannot.gff",
+            # "bam.gff",
+            # "sam.gff",
+            # "gff.gtf",
+            # "gtf.gff",
+            # "gff.tsv",
+            # "zff.dna",
+            # "gff.gff",
+            # "prokka_renamed.gff",
+            # "intron.gff",
+            # "start_strop.gff",
+            # "alignment.gff",
+            # "fixed.gff",
+            # "compared.gff",
+            # "completed.gff",
+            # "ensembl.gff",
+            # "extracted_ID.txt",
+            # "extracted.fasta",
+            # "passing.gff",
+            # "flagged_short_locus_distance.gff",
+            # "fitlered_by_tag.gff",
+            # "selected_by_attr_value.gff",
+            # "filter_feature_from_keep_list.gff",
+            # "filter_feature_from_kill_list.gff",
+            # "filter_feature_from_intron_nb.gff",
+            # "filter_feature_from_gene_len.gff",
+            # "filter_feature_from_incomplete_gene_model.gff",
+            # "filter_record_by_coordinates.gff",
+            # "cds_frame_fixed.gff",
+            "features_deduplicated.gff",
+        ]
+    )
 
     # run(
     #     "bio/agat",
@@ -432,17 +443,150 @@ def test_agat():
     #     ]
     # )
 
-    run(
-        "bio/agat",
-        [
-            "snakemake",
-            "--cores",
-            "1",
-            "--use-conda",
-            "-F",
-            "passing.gff",
-        ]
-    )
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "passing.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "flagged_short_locus_distance.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "fitlered_by_tag.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "selected_by_attr_value.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "filter_feature_from_keep_list.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "filter_feature_from_kill_list.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "filter_feature_from_intron_nb.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "filter_feature_from_gene_len.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "filter_record_by_coordinates.gff",
+    #     ]
+    # )
+    
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "filter_record_by_coordinates.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "cds_frame_fixed.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "features_deduplicated.gff",
+    #     ]
+    # )
+
 
 
 @skip_if_not_modified

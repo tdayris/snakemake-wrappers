@@ -368,3 +368,181 @@ rule test_agat_sp_filter_by_ORF_size:
         "logs/test_agat_sp_filter_by_ORF_size.log"
     wrapper:
         "master/bio/agat"
+
+
+# filter features according to attribute presence (9th column)
+rule test_agat_sp_filter_by_locus_distance:
+    input:
+        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+    output:
+        output="flagged_short_locus_distance.gff",
+    threads: 1
+    params:
+        script="agat_sp_filter_by_locus_distance.pl",
+        extra="--add_flag --dist 200",
+    log:
+        "logs/test_agat_sp_filter_by_locus_distance.log"
+    wrapper:
+        "master/bio/agat"
+
+# filter features according to attribute presence (9th column)
+rule test_agat_sp_select_feature_by_attribute_presence:
+    input:
+        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+    output:
+        output="fitlered_by_tag.gff",
+    threads: 1
+    params:
+        script="agat_sp_filter_feature_by_attribute_presence.pl",
+        extra="--attribute transcript_id",
+    log:
+        "logs/test_agat_sp_select_feature_by_attribute_presence.log"
+    wrapper:
+        "master/bio/agat"
+
+
+# filter features according to attribute value (9th column)
+rule test_agat_sp_select_feature_by_attribute_value:
+    input:
+        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+    output:
+        output="selected_by_attr_value.gff",
+    threads: 1
+    params:
+        script="agat_sp_filter_feature_by_attribute_value.pl",
+        extra="--attribute transcript_id --value 'Os01t0100100-01' --test '='",
+    log:
+        "logs/test_agat_sp_select_feature_by_attribute_value.log"
+    wrapper:
+        "master/bio/agat"
+
+
+# keep records based on a keeplist
+rule test_agat_sp_filter_feature_from_keep_list:
+    input:
+        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        keep_list=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/keep_list.txt"),
+    output:
+        output="filter_feature_from_keep_list.gff",
+    threads: 1
+    params:
+        script="agat_sp_filter_feature_from_keep_list.pl",
+        extra="",
+    log:
+        "logs/test_agat_sp_filter_feature_from_keep_list.log"
+    wrapper:
+        "master/bio/agat"
+
+
+# remove features based on a kill list
+rule test_agat_sp_filter_feature_from_kill_list:
+    input:
+        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        kill_list=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/kill_list.txt"),
+    output:
+        output="filter_feature_from_kill_list.gff",
+    threads: 1
+    params:
+        script="agat_sp_filter_feature_from_kill_list.pl",
+        extra="",
+    log:
+        "logs/test_agat_sp_filter_feature_from_kill_list.log"
+    wrapper:
+        "master/bio/agat"
+
+
+# filter genes by intron numbers
+rule test_agat_sp_filter_gene_by_intron_numbers:
+    input:
+        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+    output:
+        output="filter_feature_from_intron_nb.gff",
+    threads: 1
+    params:
+        script="agat_sp_filter_gene_by_intron_numbers.pl",
+        extra="--number 5 --test '<='",
+    log:
+        "logs/test_agat_sp_filter_gene_by_intron_numbers.log"
+    wrapper:
+        "master/bio/agat"
+
+
+# filter level1 feature (e.g. gene, match, etc) by length
+rule test_agat_sp_filter_gene_by_length:
+    input:
+        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+    output:
+        output="filter_feature_from_gene_len.gff",
+    threads: 1
+    params:
+        script="agat_sp_filter_gene_by_length.pl",
+        extra="--size 100 --test '<='",
+    log:
+        "logs/test_agat_sp_filter_gene_by_length.log"
+    wrapper:
+        "master/bio/agat"
+
+
+# remove gene with start and/or stop codon missing in its cds
+rule test_agat_sp_filter_incomplete_gene_coding_models:
+    input:
+        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        fasta=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"),
+    output:
+        output="filter_feature_from_incomplete_gene_model.gff",
+    threads: 1
+    params:
+        script="agat_sp_filter_incomplete_gene_coding_models.pl",
+        extra="--add_flag",
+    log:
+        "logs/test_agat_sp_filter_incomplete_gene_coding_models.log"
+    wrapper:
+        "master/bio/agat"
+
+
+# filter the records to keep only those contained within coordinates defined in an input bed/tsv file
+rule test_agat_sp_filter_record_by_coordinates:
+    input:
+        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        tsv=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/coordinates.tsv"),
+    output:
+        output=directory("filter_record_by_coordinates.gff"),
+    threads: 1
+    params:
+        script="agat_sp_filter_record_by_coordinates.pl",
+        extra="",
+    log:
+        "logs/test_agat_sp_filter_record_by_coordinates.log"
+    wrapper:
+        "master/bio/agat"
+
+# fix the cds phases
+rule test_agat_sp_fix_cds_phases:
+    input:
+        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        fasta=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"),
+    output:
+        output="cds_frame_fixed.gff",
+    threads: 1
+    params:
+        script="agat_sp_fix_cds_phases.pl",
+        extra="",
+    log:
+        "logs/agat_sp_fix_cds_phases.log"
+    wrapper:
+        "master/bio/agat"
+
+# modify/remove feature with duplicated locations
+rule test_agat_sp_fix_features_locations_duplicated:
+    input:
+        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+    output:
+        output="features_deduplicated.gff",
+    threads: 1
+    params:
+        script="agat_sp_fix_features_locations_duplicated.pl",
+        extra="--model 1",
+    log:
+        "logs/test_agat_sp_fix_features_locations_duplicated.log"
+    wrapper:
+        "master/bio/agat"

@@ -38,7 +38,7 @@ for argname, file_path in snakemake.input.items():
 
 with TemporaryDirectory() as tempdir:
     output_cmd = ""
-    # The following script do not let user choose output file names
+    # The following scripts do not let user choose output file names
     if script in ["agat_sp_extract_attributes.pl"]:
         output_cmd += f" --output {tempdir}/outfile "
     elif script in ["agat_sp_filter_by_ORF_size.pl"]:
@@ -53,8 +53,13 @@ with TemporaryDirectory() as tempdir:
             output_cmd += f" {dash}{argname} {file_path} "
 
     shell("{script} {extra} {input_cmd} {output_cmd} {log}")
+    shell("echo 'ls {tempdir}...'")
     shell("ls -lrth {tempdir} {log}")
+    shell("echo 'ls local...'")
     shell("ls -lrth {log}")
+    shell("echo 'tree {tempdir}...'")
+    shell("tree {tempdir} {log}")
+    shell("echo 'we are at...'")
     shell("pwd {log}")
 
     # Forwarding output files for script that do not
@@ -101,10 +106,10 @@ with TemporaryDirectory() as tempdir:
         # Move expected output files as uses intends
         passing = snakemake.output.get("passing")
         if passing:
-            shell("mv --verbose {tempdir}/outfile_{fiters[0]}{prot_length}.gff {passing} {log}")
+            shell("mv --verbose {tempdir}/outfile_{filters[0]}{prot_length}.gff {passing} {log}")
         
         not_passing = snakemake.output.get("not_passing")
         if not_passing:
-            shell("mv --verbose {tempdir}/outfile.{fiters[1]}{prot_length}.gff {not_passing} {log}")
+            shell("mv --verbose {tempdir}/outfile_{filters[1]}{prot_length}.gff {not_passing} {log}")
             
         
