@@ -6,7 +6,9 @@ https = HTTP.RemoteProvider(allow_redirects=True)
 # Translate from bed to gff
 rule test_agat_convert_bed2gff:
     input:
-        bed=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/test.bed"),
+        bed=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/test.bed"
+        ),
     output:
         gff="bed.gff",
     threads: 1
@@ -14,7 +16,7 @@ rule test_agat_convert_bed2gff:
         script="agat_convert_bed2gff.pl",
         extra="",
     log:
-        "logs/test_agat_convert_bed2gff.log"
+        "logs/agat_convert_bed2gff.log",
     wrapper:
         "master/bio/agat"
 
@@ -22,7 +24,9 @@ rule test_agat_convert_bed2gff:
 # Translate from embl to gff
 rule test_agat_convert_embl2gff:
     input:
-        embl=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/agat_convert_embl2gff_1.embl"),
+        embl=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/agat_convert_embl2gff_1.embl"
+        ),
     output:
         outfile="embl.gff",
     threads: 1
@@ -30,7 +34,7 @@ rule test_agat_convert_embl2gff:
         script="agat_convert_embl2gff",
         extra="",
     log:
-        "logs/test_agat_convert_embl2gff.log"
+        "logs/agat_convert_embl2gff.log",
     wrapper:
         "master/bio/agat"
 
@@ -38,7 +42,9 @@ rule test_agat_convert_embl2gff:
 # Translate from genscan to gff
 rule test_agat_convert_genscan2gff:
     input:
-        genscan=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/test.genscan"),
+        genscan=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/test.genscan"
+        ),
     output:
         out="genscan.gff",
     threads: 1
@@ -46,7 +52,7 @@ rule test_agat_convert_genscan2gff:
         script="agat_convert_genscan2gff.pl",
         extra="",
     log:
-        "logs/test_agat_convert_genscan2gff.log"
+        "logs/agat_convert_genscan2gff.log",
     wrapper:
         "master/bio/agat"
 
@@ -54,7 +60,9 @@ rule test_agat_convert_genscan2gff:
 # Translate from mf annot to gff
 rule test_agat_convert_mfannot2gff:
     input:
-        m=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/test.mfannot"),
+        m=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/test.mfannot"
+        ),
     output:
         g="mfannot.gff",
     threads: 1
@@ -62,7 +70,7 @@ rule test_agat_convert_mfannot2gff:
         script="agat_convert_mfannot2gff.pl",
         extra="",
     log:
-        "logs/test_agat_convert_mfannot2gff.log"
+        "logs/agat_convert_mfannot2gff.log",
     wrapper:
         "master/bio/agat"
 
@@ -70,7 +78,9 @@ rule test_agat_convert_mfannot2gff:
 # Translate from bam to gff
 rule test_agat_convert_bam2gff:
     input:
-        i=https.remote("https://github.com/NBISweden/AGAT/raw/master/t/scripts_output/in/test_minimap2.bam"),
+        i=https.remote(
+            "https://github.com/NBISweden/AGAT/raw/master/t/scripts_output/in/test_minimap2.bam"
+        ),
     output:
         out="bam.gff",
     threads: 1
@@ -78,7 +88,7 @@ rule test_agat_convert_bam2gff:
         script="agat_convert_minimap2_bam2gff.pl",
         extra="--bam",
     log:
-        "logs/test_agat_convert_bam2gff.log"
+        "logs/agat_convert_bam2gff.log",
     wrapper:
         "master/bio/agat"
 
@@ -86,7 +96,9 @@ rule test_agat_convert_bam2gff:
 # Translate from sam to gff
 rule test_agat_convert_sam2gff:
     input:
-        i=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/test_minimap2.sam"),
+        i=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/test_minimap2.sam"
+        ),
     output:
         out="sam.gff",
     threads: 1
@@ -94,7 +106,7 @@ rule test_agat_convert_sam2gff:
         script="agat_convert_minimap2_bam2gff.pl",
         extra="--sam",
     log:
-        "logs/test_agat_convert_sam2gff.log"
+        "logs/agat_convert_sam2gff.log",
     wrapper:
         "master/bio/agat"
 
@@ -102,7 +114,9 @@ rule test_agat_convert_sam2gff:
 # Translate between gff and gtf formats
 rule test_agat_convert_gff2gtf:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/0.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/0.gff"
+        ),
     output:
         outfile="gff.gtf",
     threads: 1
@@ -110,7 +124,7 @@ rule test_agat_convert_gff2gtf:
         script="agat_convert_sp_gff2gtf.pl",
         extra="",
     log:
-        "logs/test_agat_convert_gff2gtf.log"
+        "logs/agat_convert_gff2gtf.log",
     wrapper:
         "master/bio/agat"
 
@@ -118,7 +132,9 @@ rule test_agat_convert_gff2gtf:
 # Translate between gff and gtf formats
 rule test_agat_convert_gtf2gff:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/test_kraken.gtf"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/test_kraken.gtf"
+        ),
     output:
         outfile="gtf.gff",
     threads: 1
@@ -126,14 +142,17 @@ rule test_agat_convert_gtf2gff:
         script="agat_convert_sp_gff2gtf.pl",
         extra="",
     log:
-        "logs/test_agat_convert_gtf2gff.log"
+        "logs/agat_convert_gtf2gff.log",
     wrapper:
         "master/bio/agat"
+
 
 # Translate from gff to tsv
 rule test_agat_convert_gff2tsv:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/0.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/0.gff"
+        ),
     output:
         outfile="gff.tsv",
     threads: 1
@@ -141,7 +160,7 @@ rule test_agat_convert_gff2tsv:
         script="agat_convert_sp_gff2tsv.pl",
         extra="",
     log:
-        "logs/test_agat_convert_gff2tsv.log"
+        "logs/agat_convert_gff2tsv.log",
     wrapper:
         "master/bio/agat"
 
@@ -149,8 +168,12 @@ rule test_agat_convert_gff2tsv:
 # Translate from gff to zff
 rule test_agat_convert_sp_gff2zff:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
-        fasta=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+        fasta=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"
+        ),
     output:
         annotation="zff.ann",
         fasta="zff.dna",
@@ -159,7 +182,7 @@ rule test_agat_convert_sp_gff2zff:
         script="agat_convert_sp_gff2zff.pl",
         extra="",
     log:
-        "logs/test_agat_convert_sp_gff2zff.log"
+        "logs/agat_convert_sp_gff2zff.log",
     wrapper:
         "master/bio/agat"
 
@@ -167,7 +190,9 @@ rule test_agat_convert_sp_gff2zff:
 # Translate between gff and gtf formats
 rule test_agat_convert_sp_gxf2gxf:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
     output:
         o="gff.gff",
     threads: 1
@@ -175,7 +200,7 @@ rule test_agat_convert_sp_gxf2gxf:
         script="agat_convert_sp_gxf2gxf.pl",
         extra="",
     log:
-        "logs/test_agat_convert_sp_gxf2gxf.log"
+        "logs/agat_convert_sp_gxf2gxf.log",
     wrapper:
         "master/bio/agat"
 
@@ -183,7 +208,9 @@ rule test_agat_convert_sp_gxf2gxf:
 # Fill a Name attribute based on <gene> attribute in a prokka gff annotation file.
 rule test_agat_sp_Prokka_inferNameFromAttributes:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/prokka_cav_10DC88.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/prokka_cav_10DC88.gff"
+        ),
     output:
         outfile="prokka_renamed.gff",
     threads: 1
@@ -191,7 +218,7 @@ rule test_agat_sp_Prokka_inferNameFromAttributes:
         script="agat_sp_Prokka_inferNameFromAttributes.pl",
         extra="",
     log:
-        "logs/test_agat_sp_Prokka_inferNameFromAttributes.log"
+        "logs/agat_sp_Prokka_inferNameFromAttributes.log",
     wrapper:
         "master/bio/agat"
 
@@ -199,7 +226,9 @@ rule test_agat_sp_Prokka_inferNameFromAttributes:
 # Add intron features to gtf/gff file without intron features.
 rule test_agat_sp_add_introns:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/prokka_cav_10DC88.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
     output:
         out="intron.gff",
     threads: 1
@@ -207,7 +236,7 @@ rule test_agat_sp_add_introns:
         script="agat_sp_add_introns.pl",
         extra="",
     log:
-        "logs/test_agat_sp_add_introns.log"
+        "logs/agat_sp_add_introns.log",
     wrapper:
         "master/bio/agat"
 
@@ -215,8 +244,12 @@ rule test_agat_sp_add_introns:
 # Add start/stop features to gtf/gff file without start/stop features.
 rule test_agat_sp_add_start_and_stop:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
-        fasta=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+        fasta=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"
+        ),
     output:
         out="start_strop.gff",
     threads: 1
@@ -224,7 +257,7 @@ rule test_agat_sp_add_start_and_stop:
         script="agat_sp_add_start_and_stop.pl",
         extra="",
     log:
-        "logs/test_agat_sp_add_start_and_stop.log"
+        "logs/agat_sp_add_start_and_stop.log",
     wrapper:
         "master/bio/agat"
 
@@ -232,7 +265,9 @@ rule test_agat_sp_add_start_and_stop:
 # convert gtf/gff into gff3 alignment format
 rule test_agat_sp_alignment_output_style:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/prokka_cav_10DC88.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/prokka_cav_10DC88.gff"
+        ),
     output:
         out="alignment.gff",
     threads: 1
@@ -240,7 +275,7 @@ rule test_agat_sp_alignment_output_style:
         script="agat_sp_alignment_output_style.pl",
         extra="",
     log:
-        "logs/test_agat_sp_alignment_output_style.log"
+        "logs/agat_sp_alignment_output_style.log",
     wrapper:
         "master/bio/agat"
 
@@ -248,8 +283,12 @@ rule test_agat_sp_alignment_output_style:
 # clip the N's extremities of the sequences
 rule test_agat_sp_clipN_seqExtremities_and_fixCoordinates:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
-        fasta=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+        fasta=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"
+        ),
     output:
         og="fixed.gff",
         of="fixed.fasta",
@@ -258,7 +297,7 @@ rule test_agat_sp_clipN_seqExtremities_and_fixCoordinates:
         script="agat_sp_clipN_seqExtremities_and_fixCoordinates.pl",
         extra="",
     log:
-        "logs/test_agat_sp_clipN_seqExtremities_and_fixCoordinates.log"
+        "logs/agat_sp_clipN_seqExtremities_and_fixCoordinates.log",
     wrapper:
         "master/bio/agat"
 
@@ -266,16 +305,20 @@ rule test_agat_sp_clipN_seqExtremities_and_fixCoordinates:
 # compare two annotation of the same assembly
 rule test_agat_sp_compare_two_annotations:
     input:
-        gff1=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
-        gff2=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        gff1=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+        gff2=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
     output:
-        out="compared.gff",
+        out="compared.txt",
     threads: 1
     params:
         script="agat_sp_compare_two_annotations.pl",
         extra="",
     log:
-        "logs/test_agat_sp_compare_two_annotations.log"
+        "logs/agat_sp_compare_two_annotations.log",
     wrapper:
         "master/bio/agat"
 
@@ -283,11 +326,17 @@ rule test_agat_sp_compare_two_annotations:
 # complement a reference annotation with other annotations
 rule test_agat_sp_complement_annotations:
     input:
-        ref=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/0.gff"),
+        ref=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/0.gff"
+        ),
         add=[
-            https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
-            https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/agat_sq_add_attributes_from_tsv.gff"),
-        ]
+            https.remote(
+                "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+            ),
+            https.remote(
+                "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/agat_sq_add_attributes_from_tsv.gff"
+            ),
+        ],
     output:
         out="completed.gff",
     threads: 1
@@ -295,7 +344,7 @@ rule test_agat_sp_complement_annotations:
         script="agat_sp_complement_annotations.pl",
         extra="",
     log:
-        "logs/test_agat_sp_complement_annotations.log"
+        "logs/agat_sp_complement_annotations.log",
     wrapper:
         "master/bio/agat"
 
@@ -303,7 +352,9 @@ rule test_agat_sp_complement_annotations:
 # convert from normal gff3 annotation format file to gff3 like ensembl format
 rule test_agat_sp_ensembl_output_style:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/0.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/0.gff"
+        ),
     output:
         out="ensembl.gff",
     threads: 1
@@ -311,27 +362,25 @@ rule test_agat_sp_ensembl_output_style:
         script="agat_sp_ensembl_output_style.pl",
         extra="",
     log:
-        "logs/test_agat_sp_ensembl_output_style.log"
+        "logs/agat_sp_ensembl_output_style.log",
     wrapper:
         "master/bio/agat"
-
 
 
 # convert from normal gff3 annotation format file to gff3 like ensembl format
 rule test_agat_sp_extract_attributes:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/0.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/0.gff"
+        ),
     output:
-        out=expand(
-            "extracted_{attribute}.txt",
-            attribute=["ID", "Parent"]
-        )
+        out=expand("extracted_{attribute}.txt", attribute=["ID", "Parent"]),
     threads: 1
     params:
         script="agat_sp_extract_attributes.pl",
         extra="--att ID,Parent -p exon",
     log:
-        "logs/test_agat_sp_extract_attributes.log"
+        "logs/agat_sp_extract_attributes.log",
     wrapper:
         "master/bio/agat"
 
@@ -339,8 +388,12 @@ rule test_agat_sp_extract_attributes:
 # extract sequences in fasta format according to features described in a gff file.
 rule test_agat_sp_extract_sequences:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
-        fasta=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+        fasta=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"
+        ),
     output:
         out="extracted.fasta",
     threads: 1
@@ -348,7 +401,7 @@ rule test_agat_sp_extract_sequences:
         script="agat_sp_extract_sequences.pl",
         extra="--cdna",
     log:
-        "logs/test_agat_sp_extract_sequences.log"
+        "logs/agat_sp_extract_sequences.log",
     wrapper:
         "master/bio/agat"
 
@@ -356,16 +409,18 @@ rule test_agat_sp_extract_sequences:
 # extract sequences in fasta format according to features described in a gff file.
 rule test_agat_sp_filter_by_ORF_size:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
     output:
         passing="passing.gff",
-        not_passing="not_passing.gff"
+        not_passing="not_passing.gff",
     threads: 1
     params:
         script="agat_sp_filter_by_ORF_size.pl",
         extra="--size 6",
     log:
-        "logs/test_agat_sp_filter_by_ORF_size.log"
+        "logs/agat_sp_filter_by_ORF_size.log",
     wrapper:
         "master/bio/agat"
 
@@ -373,7 +428,9 @@ rule test_agat_sp_filter_by_ORF_size:
 # filter features according to attribute presence (9th column)
 rule test_agat_sp_filter_by_locus_distance:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
     output:
         output="flagged_short_locus_distance.gff",
     threads: 1
@@ -381,14 +438,17 @@ rule test_agat_sp_filter_by_locus_distance:
         script="agat_sp_filter_by_locus_distance.pl",
         extra="--add_flag --dist 200",
     log:
-        "logs/test_agat_sp_filter_by_locus_distance.log"
+        "logs/agat_sp_filter_by_locus_distance.log",
     wrapper:
         "master/bio/agat"
+
 
 # filter features according to attribute presence (9th column)
 rule test_agat_sp_select_feature_by_attribute_presence:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
     output:
         output="fitlered_by_tag.gff",
     threads: 1
@@ -396,7 +456,7 @@ rule test_agat_sp_select_feature_by_attribute_presence:
         script="agat_sp_filter_feature_by_attribute_presence.pl",
         extra="--attribute transcript_id",
     log:
-        "logs/test_agat_sp_select_feature_by_attribute_presence.log"
+        "logs/agat_sp_select_feature_by_attribute_presence.log",
     wrapper:
         "master/bio/agat"
 
@@ -404,7 +464,9 @@ rule test_agat_sp_select_feature_by_attribute_presence:
 # filter features according to attribute value (9th column)
 rule test_agat_sp_select_feature_by_attribute_value:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
     output:
         output="selected_by_attr_value.gff",
     threads: 1
@@ -412,7 +474,7 @@ rule test_agat_sp_select_feature_by_attribute_value:
         script="agat_sp_filter_feature_by_attribute_value.pl",
         extra="--attribute transcript_id --value 'Os01t0100100-01' --test '='",
     log:
-        "logs/test_agat_sp_select_feature_by_attribute_value.log"
+        "logs/agat_sp_select_feature_by_attribute_value.log",
     wrapper:
         "master/bio/agat"
 
@@ -420,8 +482,12 @@ rule test_agat_sp_select_feature_by_attribute_value:
 # keep records based on a keeplist
 rule test_agat_sp_filter_feature_from_keep_list:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
-        keep_list=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/keep_list.txt"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+        keep_list=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/keep_list.txt"
+        ),
     output:
         output="filter_feature_from_keep_list.gff",
     threads: 1
@@ -429,7 +495,7 @@ rule test_agat_sp_filter_feature_from_keep_list:
         script="agat_sp_filter_feature_from_keep_list.pl",
         extra="",
     log:
-        "logs/test_agat_sp_filter_feature_from_keep_list.log"
+        "logs/agat_sp_filter_feature_from_keep_list.log",
     wrapper:
         "master/bio/agat"
 
@@ -437,8 +503,12 @@ rule test_agat_sp_filter_feature_from_keep_list:
 # remove features based on a kill list
 rule test_agat_sp_filter_feature_from_kill_list:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
-        kill_list=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/kill_list.txt"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+        kill_list=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/kill_list.txt"
+        ),
     output:
         output="filter_feature_from_kill_list.gff",
     threads: 1
@@ -446,7 +516,7 @@ rule test_agat_sp_filter_feature_from_kill_list:
         script="agat_sp_filter_feature_from_kill_list.pl",
         extra="",
     log:
-        "logs/test_agat_sp_filter_feature_from_kill_list.log"
+        "logs/agat_sp_filter_feature_from_kill_list.log",
     wrapper:
         "master/bio/agat"
 
@@ -454,7 +524,9 @@ rule test_agat_sp_filter_feature_from_kill_list:
 # filter genes by intron numbers
 rule test_agat_sp_filter_gene_by_intron_numbers:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
     output:
         output="filter_feature_from_intron_nb.gff",
     threads: 1
@@ -462,7 +534,7 @@ rule test_agat_sp_filter_gene_by_intron_numbers:
         script="agat_sp_filter_gene_by_intron_numbers.pl",
         extra="--number 5 --test '<='",
     log:
-        "logs/test_agat_sp_filter_gene_by_intron_numbers.log"
+        "logs/agat_sp_filter_gene_by_intron_numbers.log",
     wrapper:
         "master/bio/agat"
 
@@ -470,7 +542,9 @@ rule test_agat_sp_filter_gene_by_intron_numbers:
 # filter level1 feature (e.g. gene, match, etc) by length
 rule test_agat_sp_filter_gene_by_length:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
     output:
         output="filter_feature_from_gene_len.gff",
     threads: 1
@@ -478,7 +552,7 @@ rule test_agat_sp_filter_gene_by_length:
         script="agat_sp_filter_gene_by_length.pl",
         extra="--size 100 --test '<='",
     log:
-        "logs/test_agat_sp_filter_gene_by_length.log"
+        "logs/agat_sp_filter_gene_by_length.log",
     wrapper:
         "master/bio/agat"
 
@@ -486,8 +560,12 @@ rule test_agat_sp_filter_gene_by_length:
 # remove gene with start and/or stop codon missing in its cds
 rule test_agat_sp_filter_incomplete_gene_coding_models:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
-        fasta=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+        fasta=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"
+        ),
     output:
         output="filter_feature_from_incomplete_gene_model.gff",
     threads: 1
@@ -495,7 +573,7 @@ rule test_agat_sp_filter_incomplete_gene_coding_models:
         script="agat_sp_filter_incomplete_gene_coding_models.pl",
         extra="--add_flag",
     log:
-        "logs/test_agat_sp_filter_incomplete_gene_coding_models.log"
+        "logs/agat_sp_filter_incomplete_gene_coding_models.log",
     wrapper:
         "master/bio/agat"
 
@@ -503,8 +581,12 @@ rule test_agat_sp_filter_incomplete_gene_coding_models:
 # filter the records to keep only those contained within coordinates defined in an input bed/tsv file
 rule test_agat_sp_filter_record_by_coordinates:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
-        tsv=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/coordinates.tsv"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+        tsv=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/coordinates.tsv"
+        ),
     output:
         output=directory("filter_record_by_coordinates.gff"),
     threads: 1
@@ -512,15 +594,20 @@ rule test_agat_sp_filter_record_by_coordinates:
         script="agat_sp_filter_record_by_coordinates.pl",
         extra="",
     log:
-        "logs/test_agat_sp_filter_record_by_coordinates.log"
+        "logs/agat_sp_filter_record_by_coordinates.log",
     wrapper:
         "master/bio/agat"
+
 
 # fix the cds phases
 rule test_agat_sp_fix_cds_phases:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
-        fasta=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+        fasta=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"
+        ),
     output:
         output="cds_frame_fixed.gff",
     threads: 1
@@ -528,14 +615,17 @@ rule test_agat_sp_fix_cds_phases:
         script="agat_sp_fix_cds_phases.pl",
         extra="",
     log:
-        "logs/agat_sp_fix_cds_phases.log"
+        "logs/agat_sp_fix_cds_phases.log",
     wrapper:
         "master/bio/agat"
+
 
 # modify/remove feature with duplicated locations
 rule test_agat_sp_fix_features_locations_duplicated:
     input:
-        gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
     output:
         output="features_deduplicated.gff",
     threads: 1
@@ -543,6 +633,327 @@ rule test_agat_sp_fix_features_locations_duplicated:
         script="agat_sp_fix_features_locations_duplicated.pl",
         extra="--model 1",
     log:
-        "logs/test_agat_sp_fix_features_locations_duplicated.log"
+        "logs/agat_sp_fix_features_locations_duplicated.log",
+    wrapper:
+        "master/bio/agat"
+
+
+# look for other ORF in UTRs (UTR3 and UTR5) of each gene model described in the gff file
+# FAILING
+# rule test_agat_sp_fix_fusion:
+#     input:
+#         gff=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"),
+#         fasta=https.remote("https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"),
+#     output:
+#         o="fixed_fusion.gff",
+#         # unchanged="unfixed_fusion.gff",
+#     threads: 1
+#     params:
+#         script="agat_sp_fix_fusion.pl",
+#         extra="--threshold 20",
+#     log:
+#         "logs/agat_sp_fix_fusion.log"
+#     wrapper:
+#         "master/bio/agat"
+
+
+# fix the ORFs of gene models described in the gff file
+rule test_agat_sp_fix_longest_ORF:
+    input:
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+        fasta=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"
+        ),
+    output:
+        modified="fixed_longest_ORF.gff",
+        intact="unfixed_longest_ORF.gff",
+        both="fixed_and_unfixed_fusion.gff",
+        report="fixed_and_unfixed_report.txt",
+    threads: 1
+    params:
+        script="agat_sp_fix_longest_ORF.pl",
+        extra="--model 1",
+    log:
+        "logs/agat_sp_fix_longest_ORF.log",
+    wrapper:
+        "master/bio/agat"
+
+
+# Merge features with the same CDS
+rule test_agat_sp_fix_overlaping_genes:
+    input:
+        f=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+    output:
+        o="fixed_overlaping_genes.gff",
+    threads: 1
+    params:
+        script="agat_sp_fix_overlaping_genes.pl",
+        extra="-m",
+    log:
+        "logs/agat_sp_fix_overlaping_genes.log",
+    wrapper:
+        "master/bio/agat"
+
+
+# Flag the mRNAs containing premature stop codons
+rule test_agat_sp_flag_premature_stop_codons:
+    input:
+        reffile=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+        fasta=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.fa"
+        ),
+    output:
+        out="flaged_premature_stop_codons.gff",
+    threads: 1
+    params:
+        script="agat_sp_flag_premature_stop_codons.pl",
+        extra="",
+    log:
+        "logs/agat_sp_flag_premature_stop_codons.log",
+    wrapper:
+        "master/bio/agat"
+
+
+# Summerize functional information stored in the file.
+rule test_agat_sp_functional_statistics:
+    input:
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+    output:
+        o=directory("functional_statistics"),
+    threads: 1
+    params:
+        script="agat_sp_functional_statistics.pl",
+        extra="",
+    log:
+        "logs/agat_sp_functional_statistics.log",
+    wrapper:
+        "master/bio/agat"
+
+
+# Summerize functional information stored in the file.
+rule test_agat_sp_keep_longest_isoform:
+    input:
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+    output:
+        o="longest_isoform.gff",
+    threads: 1
+    params:
+        script="agat_sp_keep_longest_isoform.pl",
+        extra="",
+    log:
+        "logs/agat_sp_keep_longest_isoform.log",
+    wrapper:
+        "master/bio/agat"
+
+
+# Summerize functional information stored in the file.
+# Warning: official documentation contains a wrong script name.
+rule test_agat_sp_kraken_assess_liftover:
+    input:
+        gtf=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/ecef08928aa9a35951abae6421603daafaae000d/t/scripts_output/in/test_kraken.gtf"
+        ),
+    output:
+        o="kraken_assess_lift_coverage.gff",
+    threads: 1
+    params:
+        script="agat_sp_kraken_assess_liftover.pl",
+        extra="",
+    log:
+        "logs/agat_sp_kraken_assess_liftover.log",
+    wrapper:
+        "master/bio/agat"
+
+
+# List all the introns inferior to a certain size.
+rule test_agat_sp_list_short_introns:
+    input:
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+    output:
+        o="list_short_introns.gff",
+    threads: 1
+    params:
+        script="agat_sp_list_short_introns.pl",
+        extra="",
+    log:
+        "logs/agat_sp_list_short_introns.log",
+    wrapper:
+        "master/bio/agat"
+
+
+# Overwrite the value of the ID attribute
+rule test_agat_sp_manage_IDs:
+    input:
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+    output:
+        outfile="managed_IDs.gff",
+    threads: 1
+    params:
+        script="agat_sp_manage_IDs.pl",
+        extra="",
+    log:
+        "logs/agat_sp_manage_IDs.log",
+    wrapper:
+        "master/bio/agat"
+
+
+# Detect the genes containing too much UTR's exon according to a choosen threshold
+rule test_agat_sp_manage_UTRs:
+    input:
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+    output:
+        over_or_equals="longer_or_equals_UTR_size.gff",
+        under="under_UTR_size.gff",
+        report="report_UTR_size.txt",
+    threads: 1
+    params:
+        script="agat_sp_manage_UTRs.pl",
+        extra="--five --three",
+    log:
+        "logs/agat_sp_manage_UTRs.log",
+    wrapper:
+        "master/bio/agat"
+
+
+# Remove choosen attributes of selected features
+rule test_agat_sp_manage_attributes:
+    input:
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+    output:
+        o="manage_attributes.gff",
+    threads: 1
+    params:
+        script="agat_sp_manage_attributes.pl",
+        extra="--att protein_id",
+    log:
+        "logs/agat_sp_manage_attributes.log",
+    wrapper:
+        "master/bio/agat"
+
+
+# Attach functional annotation to corresponding features within the gff file.
+rule test_agat_sp_manage_functional_annotation:
+    input:
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/ecef08928aa9a35951abae6421603daafaae000d/t/scripts_output/in/agat_sp_manage_functional_annotation/02413F.gff"
+        ),
+        blast=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/ecef08928aa9a35951abae6421603daafaae000d/t/scripts_output/in/agat_sp_manage_functional_annotation/02413F_blast.out"
+        ),
+        db=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/ecef08928aa9a35951abae6421603daafaae000d/t/scripts_output/in/agat_sp_manage_functional_annotation/uniprot_sprot_test.fasta"
+        ),
+        interpro=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/ecef08928aa9a35951abae6421603daafaae000d/t/scripts_output/in/agat_sp_manage_functional_annotation/02413F_interpro.tsv"
+        ),
+    output:
+        gff="functional_annotation.gff",
+        cdd="functional_annotation.cdd.txt",
+        duplicates="functional_annotation.duplicates.blast.txt",
+        error="error.txt",
+        go="GO.txt",
+        interpro="InterPro.txt",
+        mobi="MobiDBLite.txt",
+        panther="PANTHER.txt",
+        report="report.txt",
+        family="SUPERFAMILY.txt",
+    threads: 1
+    params:
+        script="agat_sp_manage_functional_annotation.pl",
+        extra="",
+    log:
+        "logs/agat_sp_manage_functional_annotation.log",
+    wrapper:
+        "master/bio/agat"
+
+
+# Provide information about introns (longest, shortest size mean ...)
+rule test_agat_sp_manage_introns:
+    input:
+        ref=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+        ),
+    output:
+        report="manage_introns.txt",
+        # `--plot` automatically set in extra parameters if and only if pdf files are requested
+        cds="intronPlot_cds.pdf",
+        exon="intronPlot_exon.pdf",
+        five_prime_utr="intronPlot_five_prime_utr.pdf",
+        three_prime_utr="intronPlot_three_prime_utr.pdf",
+    threads: 1
+    params:
+        script="agat_sp_manage_introns.pl",
+        extra="",
+    log:
+        "logs/agat_sp_manage_introns.log",
+    wrapper:
+        "master/bio/agat"
+
+# Merge different gff annotation files in one
+rule test_agat_sp_merge_annotations:
+    input:
+        gff=[
+            https.remote(
+                "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/1.gff"
+            ),
+            https.remote(
+                "https://raw.githubusercontent.com/NBISweden/AGAT/master/t/scripts_output/in/0.gff"
+            ),
+
+        ]
+    output:
+        out="merged_annotations.gff",
+    threads: 1
+    params:
+        script="agat_sp_merge_annotations.pl",
+        extra="",
+    log:
+        "logs/agat_sp_merge_annotations.log",
+    wrapper:
+        "master/bio/agat"
+
+# Analyse fragmented gene annotations (FRAGS) within prokka annotations
+# Warning: official documentation contains a wrong script name.
+rule test_agat_sp_prokka_fix_fragmented_gene_annotations:
+    input:
+        gff=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/ecef08928aa9a35951abae6421603daafaae000d/t/scripts_output/in/prokka_cav_10DC88.gff"
+        ),
+        fasta=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/ecef08928aa9a35951abae6421603daafaae000d/t/scripts_output/in/prokka_cav_10DC88.fa"
+        ),
+        db=https.remote(
+            "https://raw.githubusercontent.com/NBISweden/AGAT/ecef08928aa9a35951abae6421603daafaae000d/t/scripts_output/in/prokka_bacteria_sprot.fa"
+        ),
+    output:
+        report="prokka_fragmented_gene_annotations.report.txt",
+        # Automatically add `--pseudo` to command line if `gff` is mentionned:
+        gff="prokka_fragmented_gene_annotations.gff",
+        # Automatically add `--fracs` to command line if `fasta` is mentionned:
+        fasta="prokka_fragmented_gene_annotations.fa",
+    threads: 1
+    params:
+        script="agat_sp_prokka_fix_fragmented_gene_annotations.pl",
+        extra="",
+    log:
+        "logs/agat_sp_prokka_fix_fragmented_gene_annotations.log",
     wrapper:
         "master/bio/agat"

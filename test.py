@@ -183,7 +183,7 @@ def test_agat():
             # "start_strop.gff",
             # "alignment.gff",
             # "fixed.gff",
-            # "compared.gff",
+            # "compared.txt",
             # "completed.gff",
             # "ensembl.gff",
             # "extracted_ID.txt",
@@ -199,7 +199,23 @@ def test_agat():
             # "filter_feature_from_incomplete_gene_model.gff",
             # "filter_record_by_coordinates.gff",
             # "cds_frame_fixed.gff",
-            "features_deduplicated.gff",
+            # "features_deduplicated.gff",
+            # "fixed_fusion.gff", # Failing
+            # "fixed_longest_ORF.gff",
+            # "fixed_overlaping_genes.gff",
+            # "fix_small_exon_from_extremities.gff",
+            # "flaged_premature_stop_codons.gff",
+            # "functional_statistics",
+            # "longest_isoform.gff",
+            # "kraken_assess_lift_coverage.gff",
+            # "list_short_introns.gff",
+            # "managed_IDs.gff",
+            # "longer_or_equals_UTR_size.gff",
+            # "manage_attributes.gff",
+            # "functional_annotation.gff",
+            # "manage_introns.txt",
+            # "merged_annotations.gff",
+            "prokka_fragmented_gene_annotations.report.txt",
         ]
     )
 
@@ -586,6 +602,187 @@ def test_agat():
     #         "features_deduplicated.gff",
     #     ]
     # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "fixed_fusion.gff",",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "fixed_longest_ORF.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "fixed_overlaping_genes.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "fix_small_exon_from_extremities.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "flaged_premature_stop_codons.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "longest_isoform.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "kraken_assess_lift_coverage.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "list_short_introns.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "managed_IDs.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "longer_or_equals_UTR_size.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "manage_attributes.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "functional_annotation.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "manage_introns.txt",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "merged_annotations.gff",
+    #     ]
+    # )
+
+    # run(
+    #     "bio/agat",
+    #     [
+    #         "snakemake",
+    #         "--cores",
+    #         "1",
+    #         "--use-conda",
+    #         "-F",
+    #         "prokka_fragmented_gene_annotations.report.txt",
+    #     ]
+    # )
+
 
 
 
