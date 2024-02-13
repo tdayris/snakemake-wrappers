@@ -1,0 +1,98 @@
+---
+name: Global_QC
+description: Simply run FastQC, FastQ-Screen, CellRanger if needed, and MultiQC on available Fastq files.
+authors:
+  - Thibault Dayris
+  - Gérôme Jules-Clément
+  - Marie Martelat
+  - Marine Aglave
+input:
+  - Fastq files
+  - FastQ-Screen databases (already provided for IGR Flamingo users)
+  - CellRanger references (already provided for IGR Flamingo users) if sample is 10X data.
+output:
+  - HTML report for each single fastq files with FastQC and Fastq-Screen
+  - HTML report for each sample with CellRanger (if sample is 10X data)
+  - Complete HTML report for all fastq files with MultiQC
+usage:
+  - \# Go to the directory containing your fastq files (they may be in sub-directories)
+  - cd /path/to/my/fastq.gz
+  - \# Copy paste the following line
+  - bash /mnt/beegfs/pipelines/snakemake-wrappers/bigr_pipelines/global_qc/run.sh
+notes: |
+  This simple pipeline is here to assess the quality after automatic sequencing process. Keep in mind that FastQC is built for DNASeq, and may raise non-critical warnings.
+
+  This pipeline requires either (1) a two columned design file called 'design.tsv', or (2) available fastq files in the current directory.
+
+  .. list-table:: Desgin file format
+      :widths: 33 33
+      :header-rows: 1
+
+      * - Sample_id
+        - Upstream_fastq
+      * - Name of the Sample1
+        - Path to upstream fastq file
+      * - Name of the Sample2
+        - Path to upstream fastq file
+      * - ...
+        - ...
+        
+This pipeline requires a 3 columned design file called 'supplementary_design.tsv'.
+
+  .. list-table:: Supplementary_Desgin file format
+      :widths: 33 33 33
+      :header-rows: 1
+
+      * - Sample_id
+        - ApplicationType
+        - Species
+      * - Name of the Sample1
+        - Type of single-cell data (could be SingleCell_RNAseq or singleCell_ATACseq)
+        - Species of teh sample (could be human or mouse)
+      * - Name of the Sample2
+        - Type of single-cell data (could be SingleCell_RNAseq or singleCell_ATACseq)
+        - Species of teh sample (could be human or mouse)
+      * - ...
+        - ...
+        - ...
+
+  How does it work ?
+
+  1. Gathering Fastq files
+
+  This pipeline copies files from iRODS, or symlinks them. In your design file,
+  the `Sample_id` is used to rename your fastq file and make them all easily
+  recognisable. In case of iRODS copy, the checksum is automatically computed
+  and verified. In cas of a copy from cold to hot storage, then a checksum is
+  automatically computed and verified. Elsewise, a simple sylmink is done and
+  no control needs to be performed.
+
+  The column Upstream_file/Downstream_file identifies reads' streams.
+  If the sequencing was not oriented, then order does not matter.
+  Otherwise, make sure R1 reads are under Upstream_file, and R2 reads under
+  Downstream_file.
+
+  You may need to concatenate several fastq files into one single fastq file
+  for a given sample: in case of lane splitting, run splitting, and/or
+  resequencing. This may be done automatically! Under the corresponding column,
+  separate the multiple files by a comma (`,`).
+
+  2. Carrying out quality control
+
+  Fastq files are analyzed by FastQC, in order to get the quality of each read 
+  for each fastq file.
+  
+  FastQ-Screen is used in order to identify the original species of each fastq 
+  file. Many genomes are tested.
+  
+  If there is single-cell RNAseq or single-cell ATAC-seq (10X data), fastq files 
+  are analyzed by CellRanger (10X Genomics), in order to generate one quality 
+  control file (web_summary.html) per sample. In the supplementary_design.tsv 
+  file, the column ApplicationType identifies the type of single-cell data and 
+  the column Species identifies the species of these data. Those allow to use 
+  right parameters for CellRanger.
+
+  3. Gathering quality reports
+
+  MultiQC aggregates all quality reports so you can compare all your samples
+  easily.
