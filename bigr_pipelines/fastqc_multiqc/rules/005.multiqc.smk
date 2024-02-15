@@ -33,7 +33,7 @@ rule multiqc:
     threads: 1
     resources:
         mem_mb=get_2gb_and_6gb_per_attempt,
-        time_min=get_1h_per_attempt,
+        time_min=get_4h_per_attempt,
         tmpdir="tmp",
     params:
         "--flat --force --module fastp --module fastq_screen",
@@ -68,7 +68,7 @@ rule multiqc_stats:
     threads: 1
     resources:
         mem_mb=get_2gb_and_6gb_per_attempt,
-        time_min=get_1h_per_attempt,
+        time_min=get_4h_per_attempt,
         tmpdir="tmp",
     params:
         "--flat --force --module fastp --module fastq_screen",
