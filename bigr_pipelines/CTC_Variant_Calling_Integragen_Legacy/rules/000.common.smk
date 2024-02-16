@@ -221,7 +221,7 @@ def get_ctc(wildcards):
                         (design["Version"] == str(wildcards.version)) &
                         (design["Manip"] == str(wildcards.manip)) &
                         (design["NB"] == str(wildcards.nb))
-                    ].WBC.to_list()[0]
+                    ].CTC.to_list()[0]
     
     raise ValueError("Missing wildcards values: get_ctc requires 'nb', 'manip', 'version', and 'sample'.")
 
