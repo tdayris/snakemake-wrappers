@@ -5,7 +5,7 @@ picard (v2.23.8) (optional depending on the provided filetype) : picard SamToFas
 
 rule picard_sam_to_fastq_ctc:
     input:
-        "data_input/{sample}_{version}_{manip}_{nb}.ctc.bam",
+        lambda wildcards: get_ctc(wildcards),
     output:
         temp("fastq/{sample}_{version}_{manip}_{nb}.fastq"),
     threads: 1
@@ -25,7 +25,7 @@ rule picard_sam_to_fastq_ctc:
 
 rule picard_sam_to_fastq_wbc:
     input:
-        "data_input/{sample}_{version}_{manip}.wbc.bam",
+        lambda wildcards: get_wbc(wildcards),
     output:
         temp("fastq/{sample}_{version}_{manip}.fastq"),
     threads: 1
@@ -45,7 +45,7 @@ rule picard_sam_to_fastq_wbc:
 
 rule picard_sam_to_fastq_baseline:
     input:
-        "data_input/{sample}.baseline.bam",
+        lambda wildcards: get_baseline(wildcards),
     output:
         temp("fastq/{sample}.baseline.fastq"),
     threads: 1
