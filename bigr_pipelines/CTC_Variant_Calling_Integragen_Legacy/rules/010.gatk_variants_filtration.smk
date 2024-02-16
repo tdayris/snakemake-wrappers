@@ -5,7 +5,7 @@ gatk 3.7 variantfiltration : java -Xmx8g -jar GenomeAnalysisTK.jar -T VariantFil
 
 rule gatk_variant_filtration_wbc_baseline:
     input:
-        gvcf="gatk/genotype_gvcf/{sample}_{version}_{manip}.g.vcf",
+        gvcf="gatk/genotype_gvcf/{sample}_{version}_{manip}.g.vcf.gz",
         fasta=config["ref"]["fasta"],
     output:
         temp("gatk/variant_filtration/{sample}_{version}_{manip}.g.vcf"),
@@ -41,7 +41,7 @@ rule gatk_variant_filtration_wbc_baseline:
 
 rule gatk_variant_filtration_ctc_baseline:
     input:
-        gvcf="gatk/genotype_gvcf/{sample}_{version}_{manip}_{nb}.g.vcf",
+        gvcf="gatk/genotype_gvcf/{sample}_{version}_{manip}_{nb}.g.vcf.gz",
         fasta=config["ref"]["fasta"],
     output:
         temp("gatk/variant_filtration/{sample}_{version}_{manip}_{nb}.g.vcf"),
@@ -76,7 +76,7 @@ rule gatk_variant_filtration_ctc_baseline:
 
 rule gatk_variant_filtration_baseline:
     input:
-        gvcf="gatk/genotype_gvcf/{sample}.baseline.g.vcf",
+        gvcf="gatk/genotype_gvcf/{sample}.baseline.g.vcf.gz",
         fasta=config["ref"]["fasta"],
     output:
         temp("gatk/variant_filtration/{sample}.baseline.g.vcf"),
