@@ -23,6 +23,8 @@ rule gatk_mutect2_ctc:
             "--max_alt_alleles_in_normal_count 2 "
             "--max_alt_allele_in_normal_fraction 0.04 "
             "--maxReadsInRegionPerSample 100000 "
+            "--downsampling_type NONE "
+            "--downsampling_type LENIENT "
             "--output_mode EMIT_VARIANTS_ONLY "
         ),
         tmp=tmp,
@@ -62,6 +64,8 @@ rule gatk_mutect2_wbc:
             "--max_alt_alleles_in_normal_count 2 "
             "--max_alt_allele_in_normal_fraction 0.04 "
             "--maxReadsInRegionPerSample 100000 "
+            "--downsampling_type NONE "
+            "--downsampling_type LENIENT "
             "--output_mode EMIT_VARIANTS_ONLY "
         ),
         tmp=tmp,
