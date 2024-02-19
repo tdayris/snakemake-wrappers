@@ -1,6 +1,6 @@
 # Make csv config file for CellRanger
 """
-007.cellranger_csv
+007.csv_cellranger_arc_RNA_ATAC
 from
 -> Entry job
 by

@@ -26,7 +26,7 @@ rule concat_cellranger_multi:
     output:
         concat_multi=temp("cellranger/csv_concat/CellRanger_RNA_summary_mqc.csv")
     message:
-        "Computing concatenation of CelleRanger multi metrics_summary.csv files"
+        "Computing concatenation of CellRanger multi metrics_summary.csv files"
     threads: 1
     resources:
         mem_mb=lambda wildcard, attempt: attempt * 1000,
@@ -77,7 +77,7 @@ rule concat_cellranger_multi:
         final_df.columns = [w.replace('"', '') for w in final_df.columns]
         
         #sauvegarder le df en format csv
-        final_df.to_csv(output.concat_multi, sep=',',header=True, index=False, na_rep='0', decimal='.')
+        final_df.to_csv(output.concat_multi, sep=',',header=True, index=False, na_rep='NA', decimal='.')
         
 
         

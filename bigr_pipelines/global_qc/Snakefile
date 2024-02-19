@@ -13,7 +13,7 @@ onstart:
 
 ############################
 ### Get data information ###
-############################
+############################da
 
 
 include: "rules/000.common.smk"
@@ -116,12 +116,20 @@ if os.path.isfile(supplementary_design):
                         dic_DATA[i][j][k]['Library_Name']=sub_sub_sub_data.Library_Name.values.tolist()
                         dic_DATA[i][j][k]['Species']=''.join(set(sub_sub_sub_data.Species)) #''.join() allow to convert set() type in string.
                         #get path of fastq files for this sample
-                        dic_DATA[i][j][k]['Fastq_Files'] = [ os.path.abspath(l) for l in sum([ glob.glob('./data_input/**/' + l +'_S[0-9]*_R[1-3]_*.f*q.gz',  recursive=True) for l in dic_DATA[i][j][k]['Library_Name']], [])]
+                        dic_DATA[i][j][k]['Fastq_Files'] = [ os.path.abspath(l) for l in sum([ glob.glob('./*input/**/' + l +'_S[0-9]*_R[1-3]_*.f*q.gz',  recursive=True) for l in dic_DATA[i][j][k]['Library_Name']], [])]
                         #print("Library : " + k)
                         #print("Library Name : " + ",".join(dic_DATA[i][j][k]['Library_Name']))
                         #print("Species : " + dic_DATA[i][j][k]['Species'])
                         #print("Fastq Files : " + ",".join(dic_DATA[i][j][k]['Fastq_Files']) + "\n")
 
+
+################################
+### Get pipeline information ###
+################################
+
+
+PIPELINE_FOLDER = workflow.snakefile
+PIPELINE_FOLDER = PIPELINE_FOLDER.replace("/Snakefile", "")
 
 
 ##################################
@@ -172,7 +180,7 @@ else:
 
 
 if isScRNAData:
-    include: "rules/007.cellranger_csv_RNA.smk"
+    include: "rules/007.csv_cellranger_multi_RNA.smk"
     include: "rules/008.cellranger_multi_RNA.smk"
     include: "rules/009.concat_cellranger_multi_RNA.smk"
 
@@ -183,7 +191,7 @@ if isScATACData:
 
 
 if isScRNAATACData:
-    include: "rules/007.cellranger_csv_RNA_ATAC.smk"
+    include: "rules/007.csv_cellranger_arc_RNA_ATAC.smk"
     include: "rules/008.cellranger_arc_RNA_ATAC.smk"
     include: "rules/009.concat_cellranger_arc_RNA_ATAC.smk"
 

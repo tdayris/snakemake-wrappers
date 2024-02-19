@@ -1,6 +1,6 @@
 # Run CellRanger
 """
-008.cellranger_atac
+008.cellranger_atac_ATAC
 from
 -> Entry job
 by
@@ -53,4 +53,4 @@ rule cellranger_atac:
     log:
         "logs/cellranger/{CR_sample}_cellranger_atac.log"
     shell:
-        "module load singularity/3.6.3 && singularity exec --no-home {params.sing_arg} ../envs/cellranger_atac_v2.1.0.simg ../scripts/script_cellranger_atac_ATAC.sh {threads} {resources.mem_mb} {wildcards.CR_sample} {params.library_names} {params.reference} {params.path_fastqs} $(pwd)"
+        "module load singularity/3.6.3 && singularity exec --no-home {params.sing_arg} -B {PIPELINE_FOLDER}/scripts/:{PIPELINE_FOLDER}/scripts/ {PIPELINE_FOLDER}/envs/cellranger_atac_v2.1.0.simg {PIPELINE_FOLDER}/scripts/script_cellranger_atac_ATAC.sh {threads} {resources.mem_mb} {wildcards.CR_sample} {params.library_names} {params.reference} {params.path_fastqs} $(pwd)"

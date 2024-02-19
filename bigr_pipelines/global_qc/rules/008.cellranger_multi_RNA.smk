@@ -1,8 +1,8 @@
 # Run CellRanger
 """
-008.cellranger_multi
+008.cellranger_multi_RNA
 from
--> 007.cellranger_csv_RNA
+-> 007.csv_cellranger_multi_RNA
 by
 -> 003.multiqc
 -> 003.irods_complient
@@ -37,4 +37,4 @@ rule cellranger_multi:
     log:
         "logs/cellranger/{CR_sample}_cellranger_multi.log"
     shell:
-        "module load singularity/3.6.3 && singularity exec --no-home {params.sing_arg} ../envs/cellranger_v7.2.0.simg ../scripts/script_cellranger_multi_RNA_TCR_BCR.sh {threads} {resources.mem_mb} {wildcards.CR_sample} {params.csv_config} $(pwd)"
+        "module load singularity/3.6.3 && singularity exec --no-home {params.sing_arg} -B {PIPELINE_FOLDER}/scripts/:{PIPELINE_FOLDER}/scripts/  {PIPELINE_FOLDER}/envs/cellranger_v7.2.0.simg {PIPELINE_FOLDER}/scripts/script_cellranger_multi_RNA_TCR_BCR.sh {threads} {resources.mem_mb} {wildcards.CR_sample} {params.csv_config} $(pwd)"
