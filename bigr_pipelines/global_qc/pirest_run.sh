@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+#SBATCH --cpus-per-task 2
+#SBATCH --mem 1024
+#SBATCH --partition longq
+
 script_dir=$(dirname $0)
 script_dir=$(readlink -e "${script_dir}")
 
