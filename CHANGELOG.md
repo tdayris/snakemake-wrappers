@@ -1,5 +1,12 @@
 # Changelog
 
+### [3.4.1](https://www.github.com/tdayris/snakemake-wrappers/compare/v3.4.0...v3.4.1) (2024-02-28)
+
+
+### Performance Improvements
+
+* Update datavzrd to 2.36.2 ([#2694](https://www.github.com/tdayris/snakemake-wrappers/issues/2694)) ([b1ea355](https://www.github.com/tdayris/snakemake-wrappers/commit/b1ea355d3bd25db056e4a96b794769754dc61e3b))
+
 ## [3.4.0](https://www.github.com/snakemake/snakemake-wrappers/compare/v3.3.7...v3.4.0) (2024-02-27)
 
 
