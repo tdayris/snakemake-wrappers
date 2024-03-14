@@ -20,7 +20,7 @@ rule term2gene_TERMS_PPI:
         tmpdir="tmp",
     params:
         begin='FS=OFS="\t"',
-        body=["print $3 FS $1"],
+        body=["{print $3 FS $1}"],
     group:
         "prepare_terms_ppi"
     log:
@@ -51,7 +51,7 @@ rule terms2name_TERMS_PPI:
         tmpdir="tmp",
     params:
         begin='FS=OFS="\t"',
-        body=["print $3 FS $4"],
+        body=["{print $3 FS $4}"],
     group:
         "prepare_terms_ppi"
     log:
