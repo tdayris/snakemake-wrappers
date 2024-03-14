@@ -16,6 +16,7 @@ base::sink(log.file,type="message");
 
 base::library(package="DESeq2", quietly=TRUE);
 
+#read counts table file
 counts <- utils::read.table(
   file=snakemake@input[["counts"]],
   header = TRUE,
@@ -23,26 +24,28 @@ counts <- utils::read.table(
   stringsAsFactors = FALSE
 );
 
+#formatting counts table with genes in row names
 gene_names_col <- "genes";
 if ("count_gene_col" %in% base::names(snakemake@params)) {
   gene_names_col <- base::as.character(x=snakemake@params[["count_gene_col"]]);
 }
 rownames(counts) <- counts[, gene_names_col];
-
-numerical_columns <- base::unlist(base::lapply(x, base::is.numeric));
+numerical_columns <- base::unlist(base::lapply(counts[1,], base::is.numeric));
 counts <- counts[, numerical_columns];
 
+#filtering low counts
 count_filter <- 0;
 if ("count_filter" %in% names(snakemake@params)) {
   count_filter <- base::as.numeric(
     x = snakemake@params[["count_filter"]]
   );
 }
-
-keep <- rowSums(counts(counts)) > count_filter;
+keep <- rowSums(head(counts)) > count_filter;
 counts <- counts[keep, ];
+
 base::message("Counts loaded");
 
+#read coldata file
 coldata <- utils::read.table(
   file=snakemake@input[["coldata"]],
   header = TRUE,
@@ -51,11 +54,14 @@ coldata <- utils::read.table(
 );
 base::message("Coldata loaded");
 
+#filtering count table to keep only samples from coldata file
+counts <- counts[, colnames(counts) %in% coldata[,1]];
+
 extra <- "countData=counts, colData=coldata"
 if ("extra" %in% base::names(snakemake@params)) {
   extra <- base::paste(
     extra,
-    base::as.character(x=snakemake@params[["extra"]])
+    base::as.character(x=snakemake@params[["extra"]]),
     sep=","
   );
 }
