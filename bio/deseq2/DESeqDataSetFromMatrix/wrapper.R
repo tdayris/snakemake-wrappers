@@ -40,7 +40,7 @@ if ("count_filter" %in% names(snakemake@params)) {
     x = snakemake@params[["count_filter"]]
   );
 }
-keep <- rowSums(head(counts)) > count_filter;
+keep <- rowSums(counts) > count_filter;
 counts <- counts[keep, ];
 
 base::message("Counts loaded");
