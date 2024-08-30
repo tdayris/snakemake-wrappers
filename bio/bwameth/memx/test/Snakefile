@@ -1,0 +1,23 @@
+rule test_bwameth_mem:
+    input:
+        ref="genome.fasta",
+        idx=multiext(
+            "genome.fasta.bwameth",
+            ".c2t",
+            ".c2t.amb",
+            ".c2t.ann",
+            ".c2t.bwt",
+            ".c2t.pac",
+            ".c2t.sa",
+        ),
+        fq=["A.fastq"],
+    output:
+        "A.bam",
+    threads: 2
+    params:
+        extra="", # Optional parameters for bwameth.py, besides IO and threading
+        sort="sambamba", # Either `sambamba`, `samtools`, `picard`, or `none`.
+        sort_order="corrdinate", # Either `corrdinate` or `queryname`
+        sort_extra="", # Optional parameters for sambamba/samtools/picard. Ignored if `sort` is equal to `none`.
+    wrapper:
+        "master/bio/bwameth/memx"
