@@ -460,6 +460,54 @@ def test_sickle_se():
 
 
 @skip_if_not_modified
+def test_bwameth_memx():
+    #run(
+    #    "bio/bwameth/memx",
+    #    [
+    #        "snakemake",
+    #        "--cores",
+    #        "1",
+    #        "--use-conda",
+    #        "-F",
+    #        "A.mem.bam",
+    #    ],
+    #)
+    run(
+        "bio/bwameth/memx",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "A.mem2.bam",
+        ],
+    )
+    run(
+        "bio/bwameth/memx",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "A.picard_sort.bam",
+        ],
+    )
+    run(
+        "bio/bwameth/memx",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "A.samtools_sort.bam",
+        ],
+    )
+
+
+@skip_if_not_modified
 def test_bwa_memx_index():
     run(
         "bio/bwa-memx/index",
@@ -494,7 +542,6 @@ def test_bwa_memx_index():
             "genome.fasta.pos_packed",
         ],
     )
-
 
 @skip_if_not_modified
 def test_bwa_memx_mem():
