@@ -1,0 +1,15 @@
+rule test_make_dataset:
+    output:
+        directory("blob.zarr"),
+    threads: 1
+    params:
+        # Use SpatialData blob dataset, or create one.
+        use_blob=True,
+        # Extra parameters for dataset creation
+        extra={"length": 512},
+        # Optional parameters, besides "file_path" and "overwrite"
+        write={"consolidate_metadata": True},
+    log:
+        "logs/blob.log"
+    wrapper:
+        "master/bio/sopa/make_test_dataset"

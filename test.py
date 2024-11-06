@@ -2173,6 +2173,20 @@ def test_bwa_mem():
 
 
 @skip_if_not_modified
+def test_sopa_make_test_dataset():
+    run(
+        "bio/sopa/make_test_dataset",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "blob.zarr",
+            "--use-conda",
+            "-F",
+        ],
+    )
+
+@skip_if_not_modified
 def test_bwa_mem_sort_samtools():
     run(
         "bio/bwa/mem",
