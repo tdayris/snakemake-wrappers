@@ -16,6 +16,7 @@ import functools
 from snakemake.utils import min_version
 from pathlib import Path
 from yaml import dump
+from typing import Any, Dict
 
 min_version("7.5")
 
@@ -31,6 +32,7 @@ from file_manager import *
 from files_linker import *
 from graphics import *
 from write_yaml import *
+from reservation import *
 from messages import message
 
 #####################
@@ -82,6 +84,50 @@ wildcard_constraints:
     sample=r"|".join(sample_list),
     stream=r"|".join(streams),
     peaktype=r"|".join(peak_types),
+
+
+###############
+### Targets ###
+###############
+
+def targets() -> Dict[str, Any]:
+    """
+    Return expected list of targets
+    """
+    results = {
+        "mapping": expand("data_output/alignment/{sample}.bam", sample=sample_list),
+        "mapping_indexes": expand("data_output/alignment/{sample}.bam.bai", sample=sample_list),
+    }
+    
+    
+    if config.get("steps", {}).get("chipseq", False):
+        results["macs2_peaks"] = expand(
+            "macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed",
+            peaktype=peak_types,
+            sample=sample_list,
+        )
+        results["coverage"] = expand("deeptools/bamcoverage/{sample}.bw", sample=sample_list)
+        results["multiqc"] = "data_output/Report.html"
+
+    if config.get("steps", {}).get("cutntag", False):
+        results["macs2_peaks"] = expand(
+            "macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed",
+            peaktype=peak_types,
+            sample=sample_list,
+        )
+        results["coverage"] = expand("deeptools/bamcoverage/{sample}.bw", sample=sample_list)
+        results["seacr"] = expand("seacr/{sample}.{mode}.bed", sample=sample_list, mode=mode_list)
+        results["multiqc"] = "data_output/Report.html"
+
+    if config.get("steps", {}).get("atacseq", False):
+        results["macs2_peaks"] = expand(
+            "macs2/callpeak/{peaktype}/{sample}_peaks.{peaktype}.bed",
+            peaktype=peak_types,
+            sample=sample_list,
+        )
+        results["coverage"] = expand("deeptools/bamcoverage/{sample}.bw", sample=sample_list)
+
+    return results
 
 
 ############################

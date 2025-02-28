@@ -12,12 +12,13 @@ import functools
 
 from typing import Dict, List, Optional
 
+
 def link_fq(
-        sample_names: List[str],
-        r1_paths: List[str],
-        r2_paths: Optional[List[str]] = None,
-        prefix: str = "reads"
-    ) -> Dict[str, str]:
+    sample_names: List[str],
+    r1_paths: List[str],
+    r2_paths: Optional[List[str]] = None,
+    prefix: str = "reads",
+) -> Dict[str, str]:
     """
     Case r2 are provided:
     Build a dictionary containing the following pairs:
@@ -30,8 +31,7 @@ def link_fq(
     """
     if r2_paths is None:
         return {
-            f"reads/{sample}.fq.gz": r1
-            for sample, r1 in zip(sample_names, r1_paths)
+            f"reads/{sample}.fq.gz": r1 for sample, r1 in zip(sample_names, r1_paths)
         }
 
     link_dict = {}
@@ -42,13 +42,13 @@ def link_fq(
 
 
 def link_fq_somatic(
-        sample_names: List[str],
-        n1_paths: Optional[List[str]] = None,
-        t1_paths: Optional[List[str]] = None,
-        n2_paths: Optional[List[str]] = None,
-        t2_paths: Optional[List[str]] = None,
-        prefix: str = "reads"
-    ) -> Dict[str, Dict[str, str]]:
+    sample_names: List[str],
+    n1_paths: Optional[List[str]] = None,
+    t1_paths: Optional[List[str]] = None,
+    n2_paths: Optional[List[str]] = None,
+    t2_paths: Optional[List[str]] = None,
+    prefix: str = "reads",
+) -> Dict[str, Dict[str, str]]:
     """
     Case r2 are provided:
     Build a dictionary containing the following pairs:
@@ -66,10 +66,7 @@ def link_fq_somatic(
     normal:
         original_name: {prefix}/normal/{sample}.fq.gz
     """
-    link_dict = {
-        "normal": {},
-        "tumor": {}
-    }
+    link_dict = {"normal": {}, "tumor": {}}
     if n2_paths is None:
         if n1_paths is not None:
             for sample, n1 in zip(sample_names, n1_paths):
@@ -106,23 +103,24 @@ def link_bed(design: pandas.DataFrame, bed: Optional[str] = None):
     if "datasetIdBED" in design.columns:
         for sample, sample_bed in zip(design["Sample_id", "datasetIdBED"]):
             bed_to_sample_link[sample] = dataset_to_bed_path.get(
-                sample_bed,
-                sample_bed if sample_bed is not None else bed
+                sample_bed, sample_bed if sample_bed is not None else bed
             )
     else:
-        bed_to_sample_link = {
-            sample: bed for sample in design["Sample_id"]
-        }
+        bed_to_sample_link = {sample: bed for sample in design["Sample_id"]}
     return bed_to_sample_link
 
 
-def link_mapping(sample_names: List[str], files: List[str], ext: str, prefix: str = "data_input/calls") -> Dict[str, str]:
+def link_mapping(
+    sample_names: List[str],
+    files: List[str],
+    ext: str,
+    prefix: str = "data_input/calls",
+) -> Dict[str, str]:
     """
     Build a dictionary linking a file path to its expected path
     """
     return {
-        f"{prefix}/{sample}.{ext}": file
-        for file, sample in zip(files, sample_names)
+        f"{prefix}/{sample}.{ext}": file for file, sample in zip(files, sample_names)
     }
 
 

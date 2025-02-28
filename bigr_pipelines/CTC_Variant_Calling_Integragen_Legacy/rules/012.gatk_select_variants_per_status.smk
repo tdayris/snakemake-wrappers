@@ -5,7 +5,7 @@ gatk 3.7 selectvariants (to separate each "normal" on independent VCFs) : java -
 
 rule gatk_select_variants_baseline:
     input:
-        vcf="grep/baseline_wbc/{sample}.vcf",
+        vcf="grep/{sample}.baseline.vcf",
         fasta=config["ref"]["fasta"],
     output:
         temp("gatk/select_variants/baseline/{sample}.tmp.vcf"),
@@ -15,12 +15,44 @@ rule gatk_select_variants_baseline:
         java_mem_gb=4 * 1024,
         time_min=get_6h_per_attempt,
         tmpdir=tmp,
-    group:
-        "retrieve_baseline"
     log:
         "logs/gatk/select_variants/baseline/{sample}.pass.log",
     params:
         extra="", #"-sn {sample}.baseline",
+        jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar",
+        tmp=tmp,
+    conda:
+        str(workflow_source_dir / "envs" / "gatk.yaml")
+    shell:
+        "SAMPLE_NAME=$(grep -P \"^#CHROM\" {input.vcf} | rev | cut -f 1 | rev); "
+        "gatk "
+        "-Xmx{resources.java_mem_gb}M "
+        "-Djava.io.tmpdir=\"{params.tmp}\" "
+        "-T SelectVariants "
+        "{params.extra} "
+        "-sn ${{SAMPLE_NAME}} "
+        "-R {input.fasta} "
+        "-V {input.vcf} "
+        "-o {output} "
+        "> {log} 2>&1"
+
+
+rule gatk_select_variants_wbc:
+    input:
+        vcf="grep/{sample}_{version}_{manip}.vcf",
+        fasta=config["ref"]["fasta"],
+    output:
+        temp("gatk/select_variants/wbc/{sample}_{version}_{manip}.tmp.vcf"),
+    threads: 1
+    resources:
+        mem_mb=4 * 1024,
+        java_mem_gb=4 * 1024,
+        time_min=get_6h_per_attempt,
+        tmpdir=tmp,
+    log:
+        "logs/gatk/select_variants/wbc/{sample}_{version}_{manip}.pass.log",
+    params:
+        extra="",
         jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar",
         tmp=tmp,
     conda:
@@ -39,22 +71,21 @@ rule gatk_select_variants_baseline:
         "> {log} 2>&1"
 
 
-rule gatk_select_variants_wbc:
+
+rule gatk_select_variants_ctc:
     input:
-        vcf="grep/baseline_wbc/{sample}.vcf",
+        vcf="grep/{sample}_{version}_{manip}_{nb}.vcf",
         fasta=config["ref"]["fasta"],
     output:
-        temp("gatk/select_variants/wbc/{sample}.tmp.vcf"),
+        temp("gatk/select_variants/ctc/{sample}_{version}_{manip}_{nb}.tmp.vcf"),
     threads: 1
     resources:
         mem_mb=4 * 1024,
         java_mem_gb=4 * 1024,
         time_min=get_6h_per_attempt,
         tmpdir=tmp,
-    group:
-        "retrieve_wbc"
     log:
-        "logs/gatk/select_variants/wbc/{sample}.pass.log",
+        "logs/gatk/select_variants/ctc/{sample}_{version}_{manip}_{nb}.pass.log",
     params:
         extra="",
         jar="/mnt/beegfs/userdata/t_dayris/GATK3.7/devs/GATK/GenomeAnalysisTK.jar",
@@ -62,7 +93,7 @@ rule gatk_select_variants_wbc:
     conda:
         str(workflow_source_dir / "envs" / "gatk.yaml")
     shell:
-        "SAMPLE_NAME=$(grep -P \"^#CHROM\" {input.vcf} | rev | cut -f 1 | rev); "
+        "SAMPLE_NAME=$(grep -P \"^#CHROM\" {input.vcf} | rev | cut -f 2 | rev); "
         "gatk "
         "-Xmx{resources.java_mem_gb}M "
         "-Djava.io.tmpdir=\"{params.tmp}\" "

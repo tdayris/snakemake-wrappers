@@ -13,4 +13,9 @@ samtools_opts = get_samtools_opts(snakemake)
 extra = snakemake.params.get("extra", "")
 log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
 
-shell("samtools view {samtools_opts} {extra} {snakemake.input[0]} {log}")
+if "aln" in snakemake.input.keys():
+    input_file = snakemake.input["aln"]
+else:
+    input_file = snakemake.input[0]
+
+shell("samtools view {samtools_opts} {extra} {input_file} {log}")

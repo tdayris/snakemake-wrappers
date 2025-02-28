@@ -16,8 +16,8 @@ rule multiqc_report:
         ],
         html=expand("fastp/html/{sample}.fastp.html", sample=sample_list),
         json=expand("fastp/json/{sample}.fastp.json", sample=sample_list),
-        fingerprint_counts="deeptools/plot_fingerprint/raw_counts.tab",
-        fingerprint_qc_metrics="deeptools/plot_fingerprint/qc_metrics.txt",
+        #fingerprint_counts="deeptools/plot_fingerprint/raw_counts.tab",
+        #fingerprint_qc_metrics="deeptools/plot_fingerprint/qc_metrics.txt",
         correlations="deeptools/correlations/SpearmanCorr_readCounts.tab",
         pca="deeptools/pca/PCA.txt",
     output:

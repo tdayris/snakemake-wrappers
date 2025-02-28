@@ -30,7 +30,7 @@ def remove_suffixes(word: str, suffixes: List[str]) -> str:
     """
     for suffix in suffixes:
         if word.endswith(suffix):
-            return word[:-len(suffix)]
+            return word[: -len(suffix)]
     return word
 
 
@@ -46,6 +46,7 @@ def get_fai(genome_path: str) -> str:
     From a fasta path, return it's fai without checking for existence (faster)
     """
     return get_fasta_index_from_genome_path(genome_path)
+
 
 def get_fasta_dict_from_genome_path(genome_path: str) -> str:
     """
@@ -172,8 +173,9 @@ def search_fastq_somatic(dirpath: FilePathType) -> Dict[str, str]:
             "Upstream_file_tumor": t1,
             "Downstream_file_tumor": t2,
             "Upstream_file_normal": n1,
-            "Downstream_file_normal": n2
-        } for n1, n2, t1, t2 in zip(*[iter(search_fastq_files(dirpath).values())]*4)
+            "Downstream_file_normal": n2,
+        }
+        for n1, n2, t1, t2 in zip(*[iter(search_fastq_files(dirpath).values())] * 4)
     }
 
 
@@ -185,7 +187,7 @@ def search_fastq_trio(dirpath: FilePathType) -> Dict[str, str]:
     It returns fastq files six by six, according to alphanumerical order.
     """
     suffixes = ("fastq", "fq", "fastq.gz", "fq.gz")
-    fqiter = zip(*[iter(search_fastq_files(dirpath))]*6)
+    fqiter = zip(*[iter(search_fastq_files(dirpath))] * 6)
     return {
         remove_suffixes(basename(n1), suffixes): {
             "Tumor_upstream_file": n1,
@@ -194,7 +196,8 @@ def search_fastq_trio(dirpath: FilePathType) -> Dict[str, str]:
             "Father_downstream_file": f2,
             "Mother_upstream_file": m1,
             "Mother_downstream_file": m2,
-        } for n1, n2, f1, f2, m1, m2 in fqiter
+        }
+        for n1, n2, f1, f2, m1, m2 in fqiter
     }
 
 
@@ -208,8 +211,10 @@ def search_fastq_pairs(dirpath: FilePathType) -> Dict[str, Dict[str, str]]:
     suffixes = (".fastq", ".fq", ".fastq.gz", ".fq.gz")
     return {
         remove_suffixes(basename(r1), suffixes): {
-            "Upstream_file": r1, "Downstream_file": r2
-        } for r1, r2 in zip(*[iter(sorted(search_fastq_files(dirpath).values()))]*2)
+            "Upstream_file": r1,
+            "Downstream_file": r2,
+        }
+        for r1, r2 in zip(*[iter(sorted(search_fastq_files(dirpath).values()))] * 2)
     }
 
 
@@ -257,25 +262,27 @@ def read_design(design_path: FilePathType) -> pandas.DataFrame:
 
 
 def build_design(
-        dirpath: FilePathType,
-        search_func: Callable[FilePathType, Dict[str, Dict[str, str]]]) \
-        -> pandas.DataFrame:
+    dirpath: FilePathType,
+    search_func: Callable[FilePathType, Dict[str, Dict[str, str]]],
+) -> pandas.DataFrame:
     """
     Search for files with the provided function within the given directory,
     then return a design as a pandas DataFrame.
     """
-    design = (pandas.DataFrame.from_dict(search_func(dirpath), orient="index")
-                              .reset_index()
-                              .rename(columns={"index": "Sample_id"}))
+    design = (
+        pandas.DataFrame.from_dict(search_func(dirpath), orient="index")
+        .reset_index()
+        .rename(columns={"index": "Sample_id"})
+    )
     design["Sample_id"] = [x.strip(".") for x in design["Sample_id"]]
     design.to_csv("design.tsv", sep="\t", header=True, index=False)
     return design
 
 
 def get_design(
-        dirpath: FilePathType,
-        search_func: Callable[FilePathType, Dict[str, Dict[str, str]]]) \
-        -> pandas.DataFrame:
+    dirpath: FilePathType,
+    search_func: Callable[FilePathType, Dict[str, Dict[str, str]]],
+) -> pandas.DataFrame:
     """
     From a given path, search for a file named 'design.tsv'. If this file is
     missing, then this function searches for files with the given extension
@@ -283,7 +290,8 @@ def get_design(
     DataFrame corresponding to that design.
     """
     design = None
-    if (design_path := Path("design.tsv")).exists():
+    design_path = Path("design.tsv")
+    if design_path.exists():
         logging.info("Design file available: %s", str(design_path.absolute()))
         design = read_design(design_path)
     else:
@@ -297,12 +305,11 @@ def get_config(default_config: Dict[str, Any]) -> str:
     From a given path, seach for a function named "config.yaml". If this file
     is missing, this function saves a copy of the default configuration.
     """
-    if (config_path := Path("config.yaml")).exists():
+    config_path = Path("config.yaml")
+    if config_path.exists():
         logging.info("Config file available: %s", str(config_path.absolute()))
     else:
-        logging.info(
-            "Generic config file not found, falling back to default arguments"
-        )
+        logging.info("Generic config file not found, falling back to default arguments")
         if isinstance(default_config, str):
             write_yaml(output_yaml=config_path, data=read_yaml(default_config))
         else:
@@ -311,10 +318,10 @@ def get_config(default_config: Dict[str, Any]) -> str:
 
 
 def design_config(
-        default_config: Dict[str, Any],
-        dirpath: FilePathType,
-        search_func: Callable[FilePathType, Dict[str, Dict[str, str]]]) \
-        -> List[Union[pandas.DataFrame, str]]:
+    default_config: Dict[str, Any],
+    dirpath: FilePathType,
+    search_func: Callable[FilePathType, Dict[str, Dict[str, str]]],
+) -> List[Union[pandas.DataFrame, str]]:
     """
     Shortcut to build/load both design and config at once.
     """

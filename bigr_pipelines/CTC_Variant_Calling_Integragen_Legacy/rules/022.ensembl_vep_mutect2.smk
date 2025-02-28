@@ -3,20 +3,20 @@ ensembl VEP 87.0 refseq (on each normal VCF/TSV) : singularity run -B /mnt/beegf
 """
 
 
-rule ensembl_vep_brc:
+rule ensembl_vep_mutect_ctc:
     input:
-        vcf="bcr2vep/filtered/{sample}.{status}.tsv",
+        vcf="gatk/mutect2/{sample}_{version}_{manip}_{nb}.filtered.vcf",
         cache=config["ref"]["vep"],
         fasta="resources/GRCh38.fasta",
     output:
-        vcf=temp("vep/annotate/{sample}.{status}.brc.vcf"),
+        vcf=temp("vep/annotate/{sample}_{version}_{manip}_{nb}.mutect.vcf"),
     threads: 1
     resources:
-        mem_mb=get_10gb_per_attempt,
-        time_min=get_45min_per_attempt,
+        mem_mb=get_20gb_per_attempt,
+        time_min=get_3h_per_attempt,
         tmpdir=tmp,
     log:
-        "logs/vep/{sample}.{status}.log",
+        "logs/vep/{sample}_{version}_{manip}_{nb}.log",
     params:
         "--species homo_sapiens "
         "--assembly GRCh38 "
@@ -24,8 +24,8 @@ rule ensembl_vep_brc:
         "--everything "
         "--offline "
         "--vcf "
+        "--format vcf "
         "--force_overwrite "
-        "--format ensembl "
         "--refseq ",
     container:
         "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
@@ -38,31 +38,36 @@ rule ensembl_vep_brc:
         "> {log} 2>&1 "
 
 
-rule ensemblvep_bcr:
+rule ensembl_vep_mutect_wbc:
     input:
-        cancer_genes=config.get("cancer_genes", "Cancer.genes.cleaned.txt"),
-        vcfs=["vep/annotate/{sample}.ctc.brc.vcf"],
+        vcf="gatk/mutect2/{sample}_{version}_{manip}.filtered.vcf",
+        cache=config["ref"]["vep"],
+        fasta="resources/GRCh38.fasta",
     output:
-        tsv=temp("vep/bcr/{sample}.tsv"),
+        vcf=temp("vep/annotate/{sample}_{version}_{manip}.mutect.vcf"),
     threads: 1
     resources:
         mem_mb=get_20gb_per_attempt,
         time_min=get_3h_per_attempt,
         tmpdir=tmp,
     log:
-        "logs/vep/bcr/{sample}.log",
+        "logs/vep/{sample}_{version}_{manip}.log",
     params:
-        organism=config.get("vep_db", "hg38"),
+        "--species homo_sapiens "
+        "--assembly GRCh38 "
+        "--cache "
+        "--everything "
+        "--offline "
+        "--vcf "
+        "--format vcf "
+        "--force_overwrite "
+        "--refseq ",
     container:
-        str(
-            workflow_source_dir
-            / ".."
-            / ".."
-            / ".."
-            / "singularity"
-            / "mambaforge_4.14.0-0.sif"
-        )
-    conda:
-        str(workflow_source_dir / "envs" / "r.yaml")
-    script:
-        str(workflow_source_dir / "scripts" / "ensemblVEP_bcr.R")
+        "/mnt/beegfs/software/vep/87/ensembl-vep_release_87.0.sif"
+    shell:
+        "vep {params} "
+        "--input_file {input.vcf} "
+        "--output_file {output.vcf} "
+        "--dir_cache {input.cache} "
+        "--fasta {input.fasta} "
+        "> {log} 2>&1 "

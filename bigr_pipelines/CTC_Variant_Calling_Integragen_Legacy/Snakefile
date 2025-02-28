@@ -1,25 +1,41 @@
-include: "rules/000.common.smk"
-include: "rules/001.picard.samtofq.smk"
-include: "rules/002.cutadapt.smk"
-include: "rules/003.bwa.mem.smk"
-include: "rules/004.sambamba.smk"
-include: "rules/005.gatk.germline.smk"
-include: "rules/006.grep.smk"
-include: "rules/007.gatk.baseline.smk"
-include: "rules/008.grep.baseline.smk"
-include: "rules/009.gatk.somatic.smk"
-include: "rules/010.filter.vcf.smk"
-include: "rules/011.bam_readcount.smk"
-include: "rules/012.bcr2vep.smk"
-include: "rules/013.mutect.vep.smk"
-include: "rules/014.bigtable.smk"
-include: "rules/015.brc.vep.smk"
-include: "rules/016.hc.vep.smk"
-include: "rules/017.bigr_copy.smk"
-
+include: 'rules/000.common.smk'
+include: 'rules/001.picard.samtofq.smk'
+include: 'rules/002.cutadapt.smk'
+include: 'rules/003.bwa.mem.smk'
+include: 'rules/004.sambamba_view.smk'
+include: 'rules/005.sambamba_sort.smk'
+include: 'rules/006.sambamba_markdup.smk'
+include: 'rules/007.gatk_haplotype_caller.smk'
+include: 'rules/008.gatk_genotype_gvcf.smk'
+include: 'rules/009.gatk_select_variants_snp.smk'
+include: 'rules/010.gatk_variants_filtration.smk'
+include: 'rules/011.grep_pass_haplitype_caller.smk'
+include: 'rules/012.gatk_select_variants_per_status.smk'
+include: 'rules/014.grep_out_homozygote.smk'
+include: 'rules/015.bcftools_zip_index_haplotype_caller.smk'
+include: 'rules/016.gatk_mutect2_calling.smk'
+include: 'rules/017.tabix_index_mutect2.smk'
+include: 'rules/018.grep_gatk_mutect2_pass.smk'
+include: 'rules/019.bam_readcount.smk'
+include: 'rules/020.link_fasta_ensembl_vep.smk'
+include: 'rules/021.brc2vep.smk'
+include: 'rules/022.ensembl_vep_mutect2.smk'
+include: 'rules/023.ensembl_vep_mutect2_postprocess.smk'
+include: 'rules/024.ensembl_vep_bamreadcount.smk'
+include: 'rules/025.ensembl_vep_bamreadcount_postprocess.smk'
+include: 'rules/026.ensembl_vep_haplotype_caller.smk'
+include: 'rules/027.ensembl_vep_haplotype_caller_postprocess.smk'
+include: 'rules/028.awk_add_origin_mutect2.smk'
+include: 'rules/029.awk_add_origin_bam_readcount.smk'
+include: 'rules/030.awk_add_origin_haplotype_caller.smk'
+include: 'rules/031.sed_rename_samples_haplotype_caller.smk'
+include: 'rules/032.sed_rename_amples_bam_readcount.smk'
+include: 'rules/033.sed_rename_samples_mutect2.smk'
+include: 'rules/034.awk_concat_to_bigtable.smk'
+include: 'rules/035.head_sed_header.smk'
+include: 'rules/036.sort_uniq_bigtable.smk'
+include: 'rules/037.python_annotate_bigtable.smk'
 
 rule target:
     input:
-        raw=expand("gatk/mutect2/{sample}.vcf.gz", sample=samples_list),
-        raw_indexes=expand("gatk/mutect2/{sample}.vcf.gz.tbi", sample=samples_list),
-        annotated="data_output/bigtable.tsv",
+        "data_output/BigTable.tsv"

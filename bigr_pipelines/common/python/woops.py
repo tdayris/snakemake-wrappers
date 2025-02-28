@@ -129,8 +129,11 @@ if not os.path.exists(parsed_logs_path):
         err = parse_error_log(log["path"], log["start"], log["end"])
         jobs_dict[f"{err['name']}.{err['jobid']}"] = err
 
-    jobs = pandas.DataFrame.from_dict(data=jobs_dict,orient="index",)
-    
+    jobs = pandas.DataFrame.from_dict(
+        data=jobs_dict,
+        orient="index",
+    )
+
     jobs.index.name = "Job_name"
     jobs.to_csv(parsed_logs_path, sep="\t", header=True, index=True)
 else:
@@ -145,22 +148,18 @@ if barplot is True:
     matplotlib.pyplot.xticks(rotation=90)
 
     logging.info("barplot saved to %s", png_out)
-    matplotlib.pyplot.savefig(
-        png_out,
-        bbox_inches="tight"
-    )
+    matplotlib.pyplot.savefig(png_out, bbox_inches="tight")
 
 
 if kde is True:
     png_out = "MemoryAndTimeConsumption.kdeplot.png"
     seaborn.jointplot(
         data=jobs,
-        x="Memory_Usage", y="CPU_Usage", hue="name",
+        x="Memory_Usage",
+        y="CPU_Usage",
+        hue="name",
         kind="kde",
     )
 
     logging.info("kdrplot saved to %s", png_out)
-    matplotlib.pyplot.savefig(
-        png_out,
-        bbox_inches="tight"
-    )
+    matplotlib.pyplot.savefig(png_out, bbox_inches="tight")
