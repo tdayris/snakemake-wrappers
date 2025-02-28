@@ -110,7 +110,7 @@ if "resources" in job_properties:
             arg_dict["gres"] = resources["gres"]
             arg_dict["ntasks"] = 1
             arg_dict["nodes"] = 1
-            arg_dict["partition"] = "visuq"
+            arg_dict["partition"] = resources.get("partition", "visuq")
 
     if resources.get("chdir", None) is not None:
         arg_dict["chdir"] = resources["chrdir"]

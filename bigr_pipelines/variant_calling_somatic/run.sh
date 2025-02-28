@@ -1,1 +1,0 @@
-../wes_somatic/run.sh

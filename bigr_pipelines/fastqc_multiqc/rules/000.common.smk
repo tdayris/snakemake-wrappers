@@ -46,7 +46,7 @@ fastq_links = link_fq(
 )
 
 configfile: config_path
-container: config.get("miniconda", "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/singularity/mambaforge_4.14.0-0.sif")
+container: config.get("miniconda", "/mnt/beegfs02/pipelines/unofficial-snakemake-wrappers/singularity/mambaforge_4.14.0-0.sif")
 
 
 def get_archives(file: str, prefix: str = ".") -> List[str]:

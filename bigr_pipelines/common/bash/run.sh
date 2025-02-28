@@ -34,7 +34,7 @@ iodirectories "${CWD}" "data_input"
 iodirectories "${CWD}" "data_output"
 
 # Flamingo databases path
-FLAMINGO_DB="/mnt/beegfs/database/bioinfo/"
+FLAMINGO_DB="/mnt/beegfs02/database/bioinfo/"
 
 # Default snakemake arguments
 SNAKE_ARGS=(

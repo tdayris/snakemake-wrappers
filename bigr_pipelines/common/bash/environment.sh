@@ -8,7 +8,7 @@
 # This script is used to export variables to a running environment
 
 function conda_activate () {
-  CMD="source \"$(conda info --base)/etc/profile.d/conda.sh\" || source \"/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_conda/anaconda3/etc/profile.d/conda.sh\""
+  CMD="source \"$(conda info --base)/etc/profile.d/conda.sh\" || source \"/home/t_dayris/conda_envs/miniconda3/etc/profile.d/conda.sh\""
   message CMD "${CMD}"
   eval ${CMD}
   CMD="conda activate"
@@ -62,16 +62,16 @@ function iodirectories() {
 }
 
 # Add shortcut to conda environment, the main environment with resources to execute all pipelines
-declare -x CONDA_ENV_PATH="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/bigr_snakemake"
+declare -x CONDA_ENV_PATH="/home/t_dayris/modules/bigr_snakemake/env"
 
 # Declare snakemake cache directory. Used to avoid indexation steps and redundant operations
-declare -x SNAKEMAKE_OUTPUT_CACHE="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/snakemake_cache"
+declare -x SNAKEMAKE_OUTPUT_CACHE="/home/t_dayris/modules/bigr_snakemake/snakemake_cache"
 
 # Declare conda cache directory. Used to avoid conda reinstallations
-declare -x CONDA_CACHE_PATH="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/conda_cache"
+declare -x CONDA_CACHE_PATH="/home/t_dayris/modules/bigr_snakemake/conda_cache"
 
-declare -x SHARED_SINGULARITY_PATH="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/singularity/"
-declare -x SHARED_CONDA_INDSTALL="/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_install/"
+declare -x SHARED_SINGULARITY_PATH="/home/t_dayris/modules/bigr_snakemake/singularity"
+declare -x SHARED_CONDA_INDSTALL="/home/t_dayris/modules/bigr_snakemake/shared_install"
 
 # Export previously defined variables to current environment
 export SNAKEMAKE_OUTPUT_CACHE CONDA_ENV_PATH CONDA_CACHE_PATH
@@ -84,10 +84,10 @@ eval ${CMD}
 # Our main temporary directory.
 if [ -z "${BIGR_DEFAULT_TMP:-}" ]; then
   declare -x BIGR_DEFAULT_TMP
-  BIGR_DEFAULT_TMP="/mnt/beegfs/userdata/${USER}/tmp"
+  BIGR_DEFAULT_TMP="/mnt/home/${USER}/tmp"
   export BIGR_DEFAULT_TMP
 elif [ "${BIGR_DEFAULT_TMP:-}" == "/tmp" ]; then
-  BIGR_DEFAULT_TMP="/mnt/beegfs/userdata/${USER}/tmp"
+  BIGR_DEFAULT_TMP="/mnt/home/${USER}/tmp"
   export BIGR_DEFAULT_TMP
 fi
 
@@ -202,7 +202,7 @@ fi
 if [ ! -f "${HOME}/.condarc" ]; then
   message WARNING "${HOME}/.condarc does not exists. This can lead to OS errors in conda due to lack of space in /tmp"
   message WARNING "${HOME}/.condarc was created with: env_dir, pkgs_dir, and conda-build:root_dir overloaded"
-  echo -e "envs_dir:\n\t- /mnt/beegfs/userdata/${USER}/anaconda/envs\npkgs_dir:\n\t- /mnt/beegfs/userdata/${USER}/anaconda/pkgs\nconda-build:\n\troot_dir: /mnt/beegfs/userdata/${USER}/conda-builds" > "${HOME}/.condarc"
+  echo -e "envs_dir:\n\t- /mnt/home/${USER}/anaconda/envs\npkgs_dir:\n\t- /mnt/home/${USER}/anaconda/pkgs\nconda-build:\n\troot_dir: /mnt/home/${USER}/conda-builds" > "${HOME}/.condarc"
 fi
 
 
