@@ -36,7 +36,7 @@ rule multiqc:
         time_min=get_4h_per_attempt,
         tmpdir="tmp",
     params:
-        "--flat --force --module fastp --module fastq_screen",
+        "--flat --force --module fastqc --module fastp --module fastq_screen --no-megaqc-upload ",
     log:
         "logs/003.multiqc.log",
     wrapper:
@@ -71,7 +71,7 @@ rule multiqc_stats:
         time_min=get_4h_per_attempt,
         tmpdir="tmp",
     params:
-        "--flat --force --module fastp --module fastq_screen",
+        "--flat --force --module fastqc --module fastp --module fastq_screen --no-megaqc-upload ",
     log:
         "logs/003.multiqc.log",
     wrapper:
