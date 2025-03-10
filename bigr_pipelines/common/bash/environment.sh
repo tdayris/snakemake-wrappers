@@ -84,10 +84,10 @@ eval ${CMD}
 # Our main temporary directory.
 if [ -z "${BIGR_DEFAULT_TMP:-}" ]; then
   declare -x BIGR_DEFAULT_TMP
-  BIGR_DEFAULT_TMP="/mnt/home/${USER}/tmp"
+  BIGR_DEFAULT_TMP="/home/${USER}/tmp"
   export BIGR_DEFAULT_TMP
 elif [ "${BIGR_DEFAULT_TMP:-}" == "/tmp" ]; then
-  BIGR_DEFAULT_TMP="/mnt/home/${USER}/tmp"
+  BIGR_DEFAULT_TMP="/home/${USER}/tmp"
   export BIGR_DEFAULT_TMP
 fi
 
