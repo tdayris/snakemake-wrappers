@@ -1,0 +1,17 @@
+rule test_simpleaf_index:
+    input:
+        fasta="genome.fasta",
+        gtf="annotation.gtf",
+        spliced="extra_spliced.fasta",
+        unspliced="extra_unspliced.fasta",
+    output:
+        directory("sequences_index"),
+    threads: 2
+    log:
+        "test_simpleaf_index.log",
+    params:
+        # Optional parameters besides IO, `--threads`, 
+        # `--work-dir`, and `--gff3-format`
+        extra="--overwrite -k 13 --minimizer-length 7",
+    wrapper:
+        "master/bio/simpleaf/index"

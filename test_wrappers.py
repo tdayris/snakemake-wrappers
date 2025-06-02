@@ -4755,6 +4755,13 @@ def test_trinity(run):
     )
 
 
+def test_simpleaf_index(run):
+    run(
+        "bio/simpleaf/index",
+        ["snakemake", "--cores", "2", "--use-conda", "-F", "sequences_index"],
+    )
+
+
 def test_salmon_decoys(run):
     run(
         "bio/salmon/decoys",
