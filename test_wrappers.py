@@ -1102,6 +1102,20 @@ def test_vcf2maf_vcf2vcf(run):
     )
 
 
+def test_ensembl_reference_meta(run):
+    run(
+        "meta/bio/ensembl_reference",
+        [
+            "snakemake",
+            "--cores",
+            "1",
+            "--use-conda",
+            "-F",
+            "resources/sequence/saccharomyces_cerevisiae.R64-1-1.98.cdna.fa",
+        ],
+    )
+
+
 def test_varscan2_snpeff_meta(run):
     run(
         "meta/bio/varscan2_snpeff",
