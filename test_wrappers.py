@@ -6206,6 +6206,10 @@ def test_snpsift_vartype(run):
         "bio/snpsift/varType",
         ["snakemake", "--cores", "1", "annotated/out.vcf", "--use-conda", "-F"],
     )
+    run(
+        "bio/snpsift/varType",
+        ["snakemake", "--cores", "3", "annotated/a.bcf", "--use-conda", "-F"],
+    )
 
 
 def test_snpsift_gwascat(run):

@@ -11,8 +11,9 @@ from snakemake_wrapper_utils.bcftools import get_bcftools_opts
 
 java_opts = get_java_opts(snakemake)
 bcftools_opts = get_bcftools_opts(snakemake, parse_ref=False, parse_memory=False)
-log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 extra = snakemake.params.get("extra", "")
+min_threads = 1
 
 
 # Uncompression shall be done according to user-defined input
@@ -38,8 +39,8 @@ if snakemake.threads < min_threads:
     )
 
 shell(
-    "(SnpSift varType"  # Tool and its subcommand
+    "( SnpSift varType"  # Tool and its subcommand
     " {java_opts} {extra}"  # Extra parameters
-    " {incall} {outcall})"  # Path to input/output vcf files
+    " {incall} {outcall} )"  # Path to input/output vcf files
     " {log}"  # Logging behaviour
 )
