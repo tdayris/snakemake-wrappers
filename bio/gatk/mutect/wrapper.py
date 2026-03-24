@@ -52,7 +52,13 @@ if isinstance(aln, list):
 
 
 extra = snakemake.params.get("extra", "")
-java_opts = get_java_opts(snakemake)
+java_opts = get_java_opts(
+    snakemake,
+    parse_bam_index=True,
+    parse_bam_md5=True,
+    parse_vcf_index=True,
+    parse_vcf_md5=True,
+)
 
 # In case Java execution environment suits GC parallel
 # calls, these must be given as optional java parameters
