@@ -40,6 +40,7 @@ rule mutect2_complete:
         intervals="genome/intervals.bed",
     output:
         vcf="variant_complete/{sample}.vcf.gz",
+        # Optional output files
         vcf_idx="variant_complete/{sample}.vcf.gz.tbi",
         vcf_md5="variant_complete/{sample}.vcf.gz.md5",
         bam="variant_complete/{sample}.bam",
@@ -55,6 +56,7 @@ rule mutect2_complete:
         "logs/mutect_{sample}.log",
     wrapper:
         "master/bio/gatk/mutect"
+
 
 rule mutect2_list:
     input:
