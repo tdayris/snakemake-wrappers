@@ -4825,6 +4825,14 @@ def test_verifybamid2(run):
     )
 
 
+def test_rbt_vcf_fix_iupac_alleles(run):
+    run(
+        "bio/rbt/vcf_fix_iupac_alleles",
+        ["snakemake", "fixed.bcf", "fixed.vcf.gz"],
+        cores=2,
+    )
+
+
 def test_rbt_csvreport(run):
     run(
         "bio/rbt/csvreport",
@@ -4847,6 +4855,16 @@ def test_meta_gatk_mutect2_calling(run):
             "results/variant/Sample1.filtered.vcf.gz.tbi",
         ],
         cores=2,
+    )
+
+
+def test_meta_agat_genome_statistics(run):
+    run(
+        "meta/bio/agat_genome_statistics",
+        [
+            "snakemake",
+            "results/saccharomyces_cerevisiae.R64-1-1.105/agat_genome_statistics.yaml",
+        ],
     )
 
 
