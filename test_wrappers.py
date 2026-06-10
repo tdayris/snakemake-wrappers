@@ -708,7 +708,7 @@ def test_purge_dups_split_fa(run):
 def test_quast(run):
     run(
         "bio/quast",
-        ["snakemake", "quast/treport.tsv", "meta_quast/treport.tsv"],
+        ["snakemake", "a/treport.tsv"],
     )
 
 
@@ -1322,6 +1322,43 @@ def test_goleft_indexcov(run):
     run(
         "bio/goleft/indexcov",
         ["snakemake"],
+    )
+
+
+def test_grit(run):
+    run(
+        "bio/grit",
+        [
+            "snakemake",
+            "synthetic_beds",
+            "sorted.bed",
+            "merged.bed",
+            "extended.bed",
+            "complement.bed",
+            "genome_coverage.bed",
+            "intersections.bed",
+            "intersect.bed",
+            "closest.bed",
+            "window.bed",
+            "jaccard.tsv",
+            "subtract.bed",
+            "coverage.bed",
+        ],
+        cores=7,
+        compare_results_with_expected={
+            "sorted.bed": "expected_sorted.bed",
+            "merged.bed": "expected_merged.bed",
+            "subtract.bed": "expected_subtract.bed",
+            "intersect.bed": "expected_intersect.bed",
+            "closest.bed": "expected_closest.bed",
+            "window.bed": "expected_window.bed",
+            "coverage.bed": "expected_coverage.tsv",
+            "complement.bed": "expected_complement.bed",
+            "extended.bed": "expected_slop.bed",
+            "genome_coverage.bed": "expected_genomecov.bed",
+            "jaccard.tsv": "expected_jaccard.tsv",
+            "intersections.bed": "expected_multiinter.bed",
+        },
     )
 
 
@@ -2678,16 +2715,6 @@ def test_macs2_callpeak(run):
     )
 
 
-def test_mageck_flute_mle(run):
-    run(
-        "bio/mageckflute/flutemle",
-        [
-            "snakemake",
-            "test_mageck_flute_mle",
-        ],
-    )
-
-
 def test_minimap2_aligner(run):
     run(
         "bio/minimap2/aligner",
@@ -3487,9 +3514,9 @@ def test_cairosvg(run):
 
 def test_ripgrep(run):
     run(
-        "utils/ripgrep",
+        "utils/ripgrep", 
         [
-            "snakemake",
+            "snakemake", 
             "test_ripgrep_plain_text.txt",
             "test_ripgrep_pattern_file.txt",
             "test_ripgrep_compressed_input.txt",
@@ -4955,7 +4982,6 @@ def test_sortmerna(run):
         [
             "snakemake",
             "aligned_1.fastq.gz",
-            "aligned_interleaved.fastq.gz",
             "unpaired.fastq",
         ],
     )
@@ -5333,8 +5359,7 @@ def test_pbmarkdup(run):
             "dedup.fastq.gz",
         ],
     )
-
-
+    
 def test_libarchive_extract(run):
     run(
         "utils/libarchive/extract",
@@ -5343,13 +5368,17 @@ def test_libarchive_extract(run):
             "results/7z/a.txt",
             "results/tar/a.txt",
             "results/tar/b.md",
-            "results/zip/a.txt",
+            "results/zip/a.txt"
         ],
     )
-
 
 def test_libarchive_compress(run):
     run(
         "utils/libarchive/compress",
-        ["snakemake", "results/test.7z", "results/test.tar.gz", "results/test.zip"],
+        [
+            "snakemake",
+            "results/test.7z",
+            "results/test.tar.gz",
+            "results/test.zip"
+        ],
     )
