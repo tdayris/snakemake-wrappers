@@ -1,0 +1,25 @@
+name: Access fastq files pair
+url: https://www.ensembl.org/info/data/ftp/index.html?redirect=no
+description: >
+  This meta-wrapper makes paired fastq files available, and trimms them.
+
+  This meta-wrapper includes the following steps:
+
+    +----------+------------+-----------------------------------+
+    | Step     | Tool       | Reason                            |
+    +==========+============+===================================+
+    | Download | plugins    | Get raw fastq file(s)             |
+    +----------+------------+-----------------------------------+
+    | Concat   | fastcat    | Concatenate fastq files if needed |
+    +----------+------------+-----------------------------------+
+    | QC       | xsv        | Aggregate fastcat QC table        |
+    +----------+------------+-----------------------------------+
+    | QC       | xsv        | Build frequency table over QC     |
+    +----------+------------+-----------------------------------+
+authors:
+  - Thibault Dayris
+pathvars:
+  default:
+    - results
+    - logs
+    - tmp
