@@ -1,0 +1,29 @@
+name: Download genome annotation
+url: https://www.ensembl.org/info/data/ftp/index.html?redirect=no
+description: >
+  This meta-wrapper downloads, filters and formats a GFF/GTF from Ensembl.
+
+  This meta-wrapper includes the following steps:
+
+    +----------+-------------+--------------------------------------------------+
+    | Step     | Tool        | Reason                                           |
+    +==========+=============+==================================================+
+    | Download | curl        | Get raw genome annotations                       |
+    +----------+-------------+--------------------------------------------------+
+    | Format   | agat        | Fix common issues in GFF format                  |
+    +----------+-------------+--------------------------------------------------+
+    | Filter   | agat        | Ensure fasta and GTF/GFF have same contigs       |
+    +----------+-------------+--------------------------------------------------+
+    | Filter   | agat        | Remove TSL NA genic objects                      |
+    +----------+-------------+--------------------------------------------------+
+    | Format   | pyroe       | Create transcript_id / gene_id / gene_name table |
+    +----------+-------------+--------------------------------------------------+
+    | Format   | xsv / runiq | Create gene_id / gene_name table                 |
+    +----------+-------------+--------------------------------------------------+
+authors:
+  - Thibault Dayris
+pathvars:
+  default:
+    - results
+    - logs
+    - tmp

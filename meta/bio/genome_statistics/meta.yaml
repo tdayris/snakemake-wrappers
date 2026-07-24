@@ -1,0 +1,25 @@
+name: Agat genome statistics
+url: https://www.ensembl.org/info/data/ftp/index.html?redirect=no
+description: >
+  This meta-wrapper produces genome statistics based on GTF and Fasta.
+
+  This meta-wrapper includes the following steps:
+
+    +------------+----------------+--------------------------------------------------+
+    | Step       | Tool           | Reason                                           |
+    +============+================+==================================================+
+    | Statistics | agat           | Get raw genome annotations                       |
+    +------------+----------------+--------------------------------------------------+
+    | Statistics | assembly-stats | Fix common issues in GFF format                  |
+    +------------+----------------+--------------------------------------------------+
+    | Format     | go-yq          | Ensure fasta and GTF/GFF have same contigs       |
+    +------------+----------------+--------------------------------------------------+
+    | Format     | go-yq          | Remove TSL NA genic objects                      |
+    +------------+----------------+--------------------------------------------------+
+authors:
+  - Thibault Dayris
+pathvars:
+  default:
+    - results
+    - logs
+    - tmp

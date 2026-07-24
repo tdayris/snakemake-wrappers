@@ -1,0 +1,22 @@
+from snakemake.utils import min_version
+
+min_version("9.13.1")
+
+
+configfile: "config.yaml"
+
+
+wildcard_constraints:
+    species=r"saccharomyces_cerevisiae",
+    build=r"R64-1-1",
+    release=r"105",
+
+
+module genome_statistics:
+    config:
+        config
+    meta_wrapper:
+        "file:.."
+
+
+use rule * from genome_statistics

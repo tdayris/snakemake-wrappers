@@ -942,6 +942,29 @@ def test_meta_salmon_tximport(run):
     )
 
 
+def test_meta_download_genome_annotation(run):
+    run(
+        "meta/bio/download_genome_annotation",
+        [
+            "snakemake",
+            "reference/saccharomyces_cerevisiae.R64-1-1.105/annotations/saccharomyces_cerevisiae.R64-1-1.105.gff3",
+            "reference/saccharomyces_cerevisiae.R64-1-1.105/annotations/saccharomyces_cerevisiae.R64-1-1.105.gtf",
+        ],
+    )
+
+def test_meta_download_genome_sequences(run):
+    run(
+        "meta/bio/download_genome_sequences",
+        [
+            "snakemake",
+            "reference/saccharomyces_cerevisiae.R64-1-1.105/sequences/saccharomyces_cerevisiae.R64-1-1.105.dna.fasta",
+            "reference/saccharomyces_cerevisiae.R64-1-1.105/sequences/saccharomyces_cerevisiae.R64-1-1.105.dna.fasta.fai",
+            "reference/saccharomyces_cerevisiae.R64-1-1.105/sequences/saccharomyces_cerevisiae.R64-1-1.105.dna.fasta.dict",
+            "reference/saccharomyces_cerevisiae.R64-1-1.105/sequences/saccharomyces_cerevisiae.R64-1-1.105.dna.fasta.2bit",
+            "reference/saccharomyces_cerevisiae.R64-1-1.105/sequences/saccharomyces_cerevisiae.R64-1-1.105.dna.chrom_sizes.tsv"
+        ],
+    )
+
 def test_meta_dada2_se(run):
     run(
         "meta/bio/dada2_se",

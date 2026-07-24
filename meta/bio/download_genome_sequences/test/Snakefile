@@ -1,0 +1,23 @@
+from snakemake.utils import min_version
+
+min_version("9.13.1")
+
+
+configfile: "config.yaml"
+
+
+wildcard_constraints:
+    species=r"saccharomyces_cerevisiae",
+    build=r"R64-1-1",
+    release=r"105",
+    datatype=r"dna",
+
+
+module download_genome_sequences:
+    config:
+        config
+    meta_wrapper:
+        "file:.."
+
+
+use rule * from download_genome_sequences

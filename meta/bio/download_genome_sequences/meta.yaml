@@ -1,0 +1,29 @@
+name: Download genome sequence
+url: https://www.ensembl.org/info/data/ftp/index.html?redirect=no
+description: >
+  This meta-wrapper downloads, filters and indexes ensembl reference genome.
+
+  This meta-wrapper includes the following steps:
+
+    +----------+------------+-----------------------------------+
+    | Step     | Tool       | Reason                            |
+    +==========+============+===================================+
+    | Download | curl       | Get raw genome sequence           |
+    +----------+------------+-----------------------------------+
+    | Filter   | pyfaidx    | Remove non-cannonical chromosomes |
+    +----------+------------+-----------------------------------+
+    | Index    | samtools   | Get sequence index                |
+    +----------+------------+-----------------------------------+
+    | Index    | picard     | Get sequence dictionary           |
+    +----------+------------+-----------------------------------+
+    | Format   | faToTwoBit | Get sequence 2bit                 |
+    +----------+------------+-----------------------------------+
+    | Format   | xsv        | Get contigs and their size        |
+    +----------+------------+-----------------------------------+
+authors:
+  - Thibault Dayris
+pathvars:
+  default:
+    - results
+    - logs
+    - tmp
