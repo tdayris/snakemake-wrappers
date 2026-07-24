@@ -37,9 +37,9 @@ samples_table.set_index("sample_id", inplace=True)
 # Building possible storage access methods with plugins
 default_irods_env: str = os.path.expanduser("~/.irods/irods_environment.json")
 
-#storage irods_files:
-#    provider="irods",
-#    storage_irods_host=config.get("irods_host", default_irods_env),
+storage irods_files:
+    provider="irods",
+    storage_irods_host=config.get("irods_host", default_irods_env),
 
 storage local_files:
     provider="fs",
