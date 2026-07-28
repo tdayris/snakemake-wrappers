@@ -31,7 +31,7 @@ rule pyfaidx_filter:
     threads: 1
     params:
         extra="",
-        regions=config["contigs"],
+        regions=lambda wildcards: config[str(wildcards.species)]["cannonical_chromosomes"],
     wrapper:
         "v9.4.2/bio/pyfaidx"
 
@@ -95,7 +95,7 @@ rule xsv_select_chrom_sizes:
     log:
         "<log>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmark>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
         subcommand="select",

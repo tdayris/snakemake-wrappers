@@ -1,0 +1,35 @@
+name: Mapping star autoparams
+url: https://physiology.med.cornell.edu/faculty/skrabanek/lab/angsd/lecture_notes/STARmanual.pdf
+description: >
+  Align reads with STAR with automatically set parameters
+
+  This meta-wrapper includes the following steps:
+
+    +-------------+------------+-----------------------------------+
+    | Step        | Tool       | Reason                            |
+    +=============+============+===================================+
+    | Index       | STAR       | Index genome sequences            |
+    +-------------+------------+-----------------------------------+
+    | Mapping     | STAR       | Align reads on the genome index   |
+    +-------------+------------+-----------------------------------+
+    | Sorting     | Sambamba   | Sort aligned reads                |
+    +-------------+------------+-----------------------------------+
+    | Duplicates  | Sambamba   | Mark/Drop duplicated reads        |
+    +-------------+------------+-----------------------------------+
+    | Compression | Samtools   | Save disk space                   |
+    +-------------+------------+-----------------------------------+
+    | Formatting  | xsv        | Format star read count to CSV     |
+    +-------------+------------+-----------------------------------+
+    | Formatting  | xsv        | Add header                        |
+    +-------------+------------+-----------------------------------+
+    | Aggregation | xsv        | Aggregate all counts together     |
+    +-------------+------------+-----------------------------------+
+    | Formatting  | Bioconvert | Save in excel format for victims  |
+    +-------------+------------+-----------------------------------+
+authors:
+  - Thibault Dayris
+pathvars:
+  default:
+    - results
+    - logs
+    - tmp

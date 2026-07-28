@@ -95,7 +95,7 @@ rule agat_convert_sp_gxf2gxf:
 rule agat_sq_filter_feature_from_fasta:
     """ensure fasta and gff have the same contigs"""
     input:
-        gff=temp("<tmp>/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}"),
+        gff="<tmp>/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}",
         config="<reference>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_{gxf}_config.yaml",
         fasta="<genome_sequence>",
     output:
