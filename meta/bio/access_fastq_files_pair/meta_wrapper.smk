@@ -32,20 +32,24 @@ missing_cols: set[str] = required_tables - set(samples_table.columns)
 if len(missing_cols) > 0:
     raise KeyError(f"Could not find {missing_cols=} in {samples_table.columns=}")
 samples_table.set_index("sample_id", inplace=True)
-    
+
 
 # Building possible storage access methods with plugins
 default_irods_env: str = os.path.expanduser("~/.irods/irods_environment.json")
+
 
 storage irods_files:
     provider="irods",
     storage_irods_host=config.get("irods_host", default_irods_env),
 
+
 storage local_files:
     provider="fs",
 
+
 storage http_files:
     provider="http",
+
 
 def get_provider(path: str) -> StorageProviderType:
     """This function select the correct storage provider"""
@@ -81,11 +85,11 @@ def get_fastq_rule_inteface(
     """
     stream = str(wildcards.stream)
     return get_fastq_from_pandas(
-        index = str(wildcards.sample),
-        column = str(
+        index=str(wildcards.sample),
+        column=str(
             "upstream_file" if int(wildcards.stream) == 1 else "downstream_file"
         ),
-        samples_table = samples_table,
+        samples_table=samples_table,
     )
 
 
@@ -99,12 +103,8 @@ rule fastcat_fastq:
         basecallers=temp(
             "<tmp>/fastcat_fastq/fastcat_{sample}.{stream}/basecallers.tsv"
         ),
-        per_file=temp(
-            "<tmp>/fastcat_fastq/fastcat_{sample}.{stream}/per_file.tsv"
-        ),
-        runids=temp(
-            "<tmp>/fastcat_fastq/fastcat_{sample}.{stream}/runids.tsv"
-        ),
+        per_file=temp("<tmp>/fastcat_fastq/fastcat_{sample}.{stream}/per_file.tsv"),
+        runids=temp("<tmp>/fastcat_fastq/fastcat_{sample}.{stream}/runids.tsv"),
         quality=temp(
             "<tmp>/fastcat_fastq/fastcat_{sample}.{stream}/histograms/quality.hist"
         ),
@@ -115,9 +115,9 @@ rule fastcat_fastq:
         "<log>/fastcat_fastq/{sample}.{stream}.log",
     benchmark:
         "<benchmark>/fastcat_fastq/{sample}.{stream}.tsv"
-    threads: 2
     conda:
-        workflow.source_path("resources/fastcat.yaml"),
+        workflow.source_path("resources/fastcat.yaml")
+    threads: 2
     params:
         extra=lambda wildcards: str(
             "--input-fmt 'fastq' --dust "
@@ -136,7 +136,6 @@ rule fastcat_fastq:
         " ) > {log} 2>&1"
 
 
-
 rule xsv_cat_fastcat_per_file:
     """aggregate fastcat per sample qc table"""
     input:
@@ -146,7 +145,7 @@ rule xsv_cat_fastcat_per_file:
             stream={1, 2},
         ),
     output:
-        "<results>/fastq_qc/fastcat_per_fastq_file_qc.csv",
+        temp("<results>/fastq_qc/fastcat_per_fastq_file_qc.csv"),
     log:
         "<log>/xsv_cat_fastcat_per_file.log",
     benchmark:
@@ -168,10 +167,26 @@ rule xsv_frequency_fastcat_per_file:
     log:
         "<log>/xsv_frequency_fastcat_per_file.log",
     benchmark:
-        "<benchmark>/xsv_frequency_fastcat_per_file.tsv",
+        "<benchmark>/xsv/frequency_fastcat_per_file.tsv"
     threads: 1
     params:
         subcommand="stats",
         extra="--select 'n_seqs,n_bases,min_length,max_length,mean_quality,f_file_ok,f_stream_error,f_qual_missing,f_qual_truncated,f_unknown_error,r_record_seen,r_record_ok,r_too_long,r_too_short,r_low_quality,r_dust_masked'",
     wrapper:
         "v3.4.0/utils/xsv"
+
+
+rule crabz_compress_fastq_qc:
+    input:
+        "<results>/fastq_qc/fastcat_per_fastq_file_qc.csv",
+    output:
+        "<results>/fastq_qc/fastcat_per_fastq_file_qc.csv.gz",
+    log:
+        "<log>/crabz/compress_fastq_qc.log",
+    benchmark:
+        "<benchmark>/crabz/compress_fastq_qc.tsv"
+    threads: 1
+    params:
+        extra="--compression-level 9",
+    wrapper:
+        "v9.15.0/utils/crabz"
