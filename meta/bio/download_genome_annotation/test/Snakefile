@@ -3,9 +3,6 @@ from snakemake.utils import min_version
 min_version("9.13.1")
 
 
-configfile: "config.yaml"
-
-
 wildcard_constraints:
     species=r"saccharomyces_cerevisiae",
     build=r"R64-1-1",
@@ -13,9 +10,28 @@ wildcard_constraints:
     gfx=f"gtf|gff",
 
 
+rule target:
+    input:
+        expand(
+            "reference/{species}.{build}.{release}/annotations/{species}.{build}.{release}.{gxf}",
+            species=["saccharomyces_cerevisiae"],
+            build=["R64-1-1"],
+            release=[105],
+            gxf={"gtf", "gff"},
+        ),
+
+
 module download_genome_annotation:
     config:
-        config
+        {
+            "pathvars": {
+                "tmp": "tmp",
+                "benchmark": "benchmark",
+                "log": "log",
+                "reference": "reference",
+                "genome_sequence": "genome.fasta",
+            }
+        }
     meta_wrapper:
         "file:.."
 

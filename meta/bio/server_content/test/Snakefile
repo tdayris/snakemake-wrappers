@@ -1,0 +1,35 @@
+from snakemake.utils import min_version
+
+min_version("9.13.1")
+
+
+web_address: list[str] = ["https://sg-nex-data.s3.amazonaws.com"]
+wildcard_constraints:
+    web_address=r"|".join(web_address),
+
+
+rule target:
+    input:
+        expand(
+            "results/available_data/{web_address}.{ext}",
+            web_address=web_address,
+            ext={"csv", "xls"},
+        ),
+
+
+module server_content:
+    config:
+        {
+            "pathvars": {
+                "tmp": "tmp",
+                "benchmark": "benchmark",
+                "log": "log",
+                "reference": "reference",
+            },
+            "web_address": web_address,
+        }
+    meta_wrapper:
+        "file:.."
+
+
+use rule * from server_content
