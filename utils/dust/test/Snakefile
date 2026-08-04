@@ -1,0 +1,15 @@
+rule test_dust:
+    input:
+        # Optional path to a directory (defaults to '.')
+        path="../",
+        # Optional path to a configuration file 
+        config="config.toml",
+    output:
+        "disk_usage.json",
+    threads: 1
+    log:
+        "test_dust.log",
+    params:
+        extra="--depth 2",
+    wrapper:
+        "master/utils/dust"
