@@ -4929,6 +4929,15 @@ def test_rbt_collapse_reads_to_fragments(run):
     )
 
 
+def test_rbt_vcf_fix_iupac_alleles(run):
+    run(
+        "bio/rbt/vcf_fix_iupac_alleles",
+        ["snakemake", "fixed.vcf.gz"],
+        cores=2,
+    )
+
+
+
 def test_meta_gatk_mutect2_calling(run):
     run(
         "meta/bio/gatk_mutect2_calling",
@@ -5369,6 +5378,53 @@ def test_go_yq(run):
             "data.yaml": "expected/expected_data.yaml",
         },
     )
+
+
+def test_dust(run):
+    run(
+        "utils/dust",
+        ["snakemake"],
+    )
+
+
+def test_dysk(run):
+    run(
+        "utils/dysk",
+        [
+            "snakemake",
+            "dysk.txt",
+            "dysk.json",
+            "dysk.csv",
+            "dysk.tsv",
+        ],
+    )
+
+
+def test_minibwa_index(run):
+    run(
+        "bio/minibwa/index",
+        [
+            "snakemake",
+            "index.l2b",
+            "meth_index.l2b",
+        ],
+    )
+
+
+def test_minibwa_map(run):
+    run(
+        "bio/minibwa/map",
+        [
+            "snakemake",
+            "mapped_single.sam",
+            "mapped_pairs.bam",
+            "mapped_meth.bam",
+            "mapped_samtools.cram",
+            "mapped_picard.cram",
+            "mapped_sambamba.cram",
+        ],
+    )
+
 
 
 def test_pytrf(run):
