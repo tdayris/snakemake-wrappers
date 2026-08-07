@@ -1,3 +1,7 @@
+wildcard_constraints:
+    datatype=r"dna|cdna|cds",
+
+
 rule reference_ensembl_sequence_download:
     """download genome sequence"""
     output:
@@ -7,7 +11,7 @@ rule reference_ensembl_sequence_download:
     log:
         "<log>/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark>/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmark>/curl/reference_ensembl_sequence_download_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
         species="{species}",
@@ -27,11 +31,13 @@ rule pyfaidx_filter:
     log:
         "<log>/pyfaidx_filter/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark>/pyfaidx_filter/{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmark>/pyfaidx/filter_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
         extra="",
-        regions=lambda wildcards: config[str(wildcards.species)]["cannonical_chromosomes"],
+        regions=lambda wildcards: config[str(wildcards.species)][
+            "cannonical_chromosomes"
+        ],
     wrapper:
         "v9.4.2/bio/pyfaidx"
 
@@ -64,6 +70,8 @@ rule picard_create_sequence_dictionary:
     benchmark:
         "<benchmark>/picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
+    resources:
+        mem_mb=2_000,
     params:
         extra="",
     wrapper:
@@ -79,7 +87,7 @@ rule fasta_to_twobit_convert:
     log:
         "<log>/fasta_to_twobit_convert/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark>/fasta_to_twobit_convert/{species}.{build}.{release}.{datatype}.tsv",
+        "<benchmark>/fasta_to_twobit/convert_{species}.{build}.{release}.{datatype}.tsv"
     params:
         "",
     wrapper:
@@ -95,7 +103,7 @@ rule xsv_select_chrom_sizes:
     log:
         "<log>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmark>/xsv/select_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
         subcommand="select",
@@ -104,18 +112,16 @@ rule xsv_select_chrom_sizes:
         "v3.4.0/utils/xsv"
 
 
-rule xsv_format_chrom_sizes:
+use rule xsv_select_chrom_sizes as xsv_format_chrom_sizes with:
     """format chromosome sizes from csv to tsv"""
     input:
         table="<tmp>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.csv",
     output:
         "<reference>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.chrom_sizes.tsv",
     log:
-        "<log>/xsv_format_chrom_sizes/{species}.{build}.{release}.{datatype}.log"
+        "<log>/xsv_format_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark>/xsv_format_chrom_sizes/{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmark>/xsv/format_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
     params:
         subcommand="fmt",
         extra="--out-delimiter $'\\t'",
-    wrapper:
-        "v3.4.0/utils/xsv"

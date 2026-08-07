@@ -948,6 +948,9 @@ def test_meta_download_genome_annotation(run):
 def test_meta_download_genome_sequences(run):
     run("meta/bio/download_genome_sequences", ["snakemake"])
 
+def test_meta_genome_statistics(run):
+    run("meta/bio/genome_statistics", ["snakemake"])
+
 def test_meta_server_content(run):
     run("meta/bio/server_content", ["snakemake"])
 
@@ -5274,6 +5277,23 @@ def test_trf(run):
             "run_trf_basic_uppercase",
         ],
     )
+
+
+def test_zstd(run):
+    run(
+        "utils/zstd",
+        [
+            "snakemake",
+            "data.decompress.txt",
+            "data2.txt.zst",
+            "data.uncompress_gz.txt",
+        ],
+        compare_results_with_expected={
+            "data.decompress.txt": "data.txt",
+            "data.uncompress_gz.txt": "data.txt",
+        },
+    )
+            
 
 
 def test_mehari_download_transcript_db(run):
