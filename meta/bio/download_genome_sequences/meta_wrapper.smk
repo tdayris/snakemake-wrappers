@@ -6,12 +6,12 @@ rule reference_ensembl_sequence_download:
     """download genome sequence"""
     output:
         temp(
-            "<tmp>/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.fasta"
+            "<temp>/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.fasta"
         ),
     log:
-        "<log>/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.log",
+        "<logs>/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark>/curl/reference_ensembl_sequence_download_{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmarks>/curl/reference_ensembl_sequence_download_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
         species="{species}",
@@ -25,13 +25,13 @@ rule reference_ensembl_sequence_download:
 rule pyfaidx_filter:
     """filter out non-cannonical chromosomes"""
     input:
-        fasta="<tmp>/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.fasta",
+        fasta="<temp>/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.fasta",
     output:
-        "<reference>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
     log:
-        "<log>/pyfaidx_filter/{species}.{build}.{release}.{datatype}.log",
+        "<logs>/pyfaidx_filter/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark>/pyfaidx/filter_{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmarks>/pyfaidx/filter_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
         extra="",
@@ -45,13 +45,13 @@ rule pyfaidx_filter:
 rule samtools_faidx:
     """index fasta sequence with samtools"""
     input:
-        "<reference>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
     output:
-        "<reference>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
+        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
     log:
-        "<log>/samtools_faidx/{species}.{build}.{release}.{datatype}.log",
+        "<logs>/samtools_faidx/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark>/samtools_faidx/{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmarks>/samtools_faidx/{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
         extra="",
@@ -62,13 +62,13 @@ rule samtools_faidx:
 rule picard_create_sequence_dictionary:
     """create a genome sequence dictionary with Picard"""
     input:
-        "<reference>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
     output:
-        "<reference>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.dict",
+        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.dict",
     log:
-        "<log>/picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.log",
+        "<logs>/picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark>/picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmarks>/picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     resources:
         mem_mb=2_000,
@@ -81,13 +81,13 @@ rule picard_create_sequence_dictionary:
 rule fasta_to_twobit_convert:
     """convert genome sequence from fasta to twobit"""
     input:
-        "<reference>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
     output:
-        "<reference>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.2bit",
+        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.2bit",
     log:
-        "<log>/fasta_to_twobit_convert/{species}.{build}.{release}.{datatype}.log",
+        "<logs>/fasta_to_twobit_convert/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark>/fasta_to_twobit/convert_{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmarks>/fasta_to_twobit/convert_{species}.{build}.{release}.{datatype}.tsv"
     params:
         "",
     wrapper:
@@ -97,13 +97,13 @@ rule fasta_to_twobit_convert:
 rule xsv_select_chrom_sizes:
     """extract chromosome sizes from fasta index"""
     input:
-        table="<reference>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
+        table="<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
     output:
-        temp("<tmp>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.csv"),
+        temp("<temp>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.csv"),
     log:
-        "<log>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
+        "<logs>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark>/xsv/select_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmarks>/xsv/select_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
         subcommand="select",
@@ -115,13 +115,13 @@ rule xsv_select_chrom_sizes:
 use rule xsv_select_chrom_sizes as xsv_format_chrom_sizes with:
     """format chromosome sizes from csv to tsv"""
     input:
-        table="<tmp>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.csv",
+        table="<temp>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.csv",
     output:
-        "<reference>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.chrom_sizes.tsv",
+        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.chrom_sizes.tsv",
     log:
-        "<log>/xsv_format_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
+        "<logs>/xsv_format_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmark>/xsv/format_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmarks>/xsv/format_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
     params:
         subcommand="fmt",
         extra="--out-delimiter $'\\t'",

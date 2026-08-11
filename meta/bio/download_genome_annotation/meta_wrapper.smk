@@ -6,12 +6,12 @@ rule reference_ensembl_annotation_download:
     """download genome gff"""
     output:
         temp(
-            "<tmp>/reference_ensembl_annotation_download/{species}.{build}.{release}.{gxf}"
+            "<temp>/reference_ensembl_annotation_download/{species}.{build}.{release}.{gxf}"
         ),
     log:
-        "<log>/reference_ensembl_annotation_download/{species}.{build}.{release}.{gxf}.log",
+        "<logs>/reference_ensembl_annotation_download/{species}.{build}.{release}.{gxf}.log",
     benchmark:
-        "<benchmark>/curl/reference_ensembl_annotation_download_{species}.{build}.{release}.{gxf}.tsv"
+        "<benchmarks>/curl/reference_ensembl_annotation_download_{species}.{build}.{release}.{gxf}.tsv"
     threads: 1
     params:
         species="{species}",
@@ -24,11 +24,11 @@ rule reference_ensembl_annotation_download:
 rule agat_default_config:
     """define agat configuration for gff"""
     output:
-        temp("<tmp>/default_agat_config.yaml"),
+        temp("<temp>/default_agat_config.yaml"),
     log:
-        "<log>/agat_default_config.log",
+        "<logs>/agat_default_config.log",
     benchmark:
-        "<benchmark>/agat/default_config.tsv"
+        "<benchmarks>/agat/default_config.tsv"
     threads: 1
     shadow:
         "minimal"
@@ -42,13 +42,13 @@ rule agat_default_config:
 rule go_yq_update_gff_config:
     """define agat configuration for gff"""
     input:
-        "<tmp>/default_agat_config.yaml",
+        "<temp>/default_agat_config.yaml",
     output:
-        "<reference>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml",
+        "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml",
     log:
-        "<log>/go_yq_update_config/{species}.{build}.{release}.gff3.log",
+        "<logs>/go_yq_update_config/{species}.{build}.{release}.gff3.log",
     benchmark:
-        "<benchmark>/go_yq/update_config_{species}.{build}.{release}.gff3.tsv"
+        "<benchmarks>/go_yq/update_config_{species}.{build}.{release}.gff3.tsv"
     threads: 1
     params:
         extra="--verbose",
@@ -61,13 +61,13 @@ rule go_yq_update_gff_config:
 use rule go_yq_update_gff_config as go_yq_update_gtf_config with:
     """define agat configuration for gtf"""
     input:
-        "<reference>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml",
+        "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml",
     output:
-        "<reference>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gtf_config.yaml",
+        "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gtf_config.yaml",
     log:
-        "<log>/go_yq_update_config/{species}.{build}.{release}.gtf.log",
+        "<logs>/go_yq_update_config/{species}.{build}.{release}.gtf.log",
     benchmark:
-        "<benchmark>/go_yq/update_config_{species}.{build}.{release}.gtf.tsv"
+        "<benchmarks>/go_yq/update_config_{species}.{build}.{release}.gtf.tsv"
     threads: 1
     params:
         extra="--verbose",
@@ -78,14 +78,14 @@ use rule go_yq_update_gff_config as go_yq_update_gtf_config with:
 use rule agat_default_config as agat_convert_sp_gxf2gxf with:
     """fix common ensembl format issues"""
     input:
-        gff="<tmp>/reference_ensembl_annotation_download/{species}.{build}.{release}.{gxf}",
-        config="<reference>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_{gxf}_config.yaml",
+        gff="<temp>/reference_ensembl_annotation_download/{species}.{build}.{release}.{gxf}",
+        config="<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_{gxf}_config.yaml",
     output:
-        out=temp("<tmp>/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}"),
+        out=temp("<temp>/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}"),
     log:
-        "<log>/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}.log",
+        "<logs>/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}.log",
     benchmark:
-        "<benchmark>/agat/convert_sp_gxf2gxf_{species}.{build}.{release}.{gxf}.tsv"
+        "<benchmarks>/agat/convert_sp_gxf2gxf_{species}.{build}.{release}.{gxf}.tsv"
     threads: 6
     shadow:
         "minimal"
@@ -97,17 +97,17 @@ use rule agat_default_config as agat_convert_sp_gxf2gxf with:
 use rule agat_default_config as agat_sq_filter_feature_from_fasta with:
     """ensure fasta and gff have the same contigs"""
     input:
-        gff="<tmp>/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}",
-        config="<reference>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_{gxf}_config.yaml",
+        gff="<temp>/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}",
+        config="<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_{gxf}_config.yaml",
         fasta="<genome_sequence>",
     output:
         o=temp(
-            "<tmp>/agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}"
+            "<temp>/agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}"
         ),
     log:
-        "<log>/agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}.log",
+        "<logs>/agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}.log",
     benchmark:
-        "<benchmark>/agat/sq_filter_feature_from_fasta_{species}.{build}.{release}.{gxf}.tsv"
+        "<benchmarks>/agat/sq_filter_feature_from_fasta_{species}.{build}.{release}.{gxf}.tsv"
     threads: 6
     shadow:
         "minimal"
@@ -119,14 +119,14 @@ use rule agat_default_config as agat_sq_filter_feature_from_fasta with:
 use rule agat_default_config as agat_sp_filter_feature_by_attribute_value with:
     """filter out tsl na from genome annotation"""
     input:
-        gff="<tmp>/agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}",
-        config="<reference>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_{gxf}_config.yaml",
+        gff="<temp>/agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}",
+        config="<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_{gxf}_config.yaml",
     output:
-        o="<reference>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.{gxf}",
+        o="<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.{gxf}",
     log:
-        "<log>/agat_sp_filter_feature_by_attribute_value/{species}.{build}.{release}.{gxf}.log",
+        "<logs>/agat_sp_filter_feature_by_attribute_value/{species}.{build}.{release}.{gxf}.log",
     benchmark:
-        "<benchmark>/agat/sp_filter_feature_by_attribute_value_{species}.{build}.{release}.{gxf}.tsv"
+        "<benchmarks>/agat/sp_filter_feature_by_attribute_value_{species}.{build}.{release}.{gxf}.tsv"
     threads: 6
     shadow:
         "minimal"

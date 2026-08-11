@@ -5,13 +5,13 @@ rule agat_sp_statistics:
         gs="<genome_sequence>",
         config="<agat_config>",
     output:
-        report="<reference>/<species>.<build>.<release>/statistics/statistics.txt",
-        yaml=temp("<tmp>/agat_sp_statistics/<species>.<build>.<release>.yaml"),
-        plot=directory("<reference>/<species>.<build>.<release>/statistics/graphs"),
+        report="<resources>/<species>.<build>.<release>/statistics/statistics.txt",
+        yaml=temp("<temp>/agat_sp_statistics/<species>.<build>.<release>.yaml"),
+        plot=directory("<resources>/<species>.<build>.<release>/statistics/graphs"),
     log:
-        "<log>/agat_sp_statistics/<species>.<build>.<release>.log",
+        "<logs>/agat_sp_statistics/<species>.<build>.<release>.log",
     benchmark:
-        "<benchmark>/agat/sp_statistics_<species>.<build>.<release>.tsv"
+        "<benchmarks>/agat/sp_statistics_<species>.<build>.<release>.tsv"
     threads: 6
     params:
         command="agat_sp_statistics.pl",
@@ -24,11 +24,11 @@ rule assembly_stats:
     input:
         assembly="<genome_sequence>",
     output:
-        assembly_stats=temp("<tmp>/assembly_stats/<species>.<build>.<release>.tsv"),
+        assembly_stats=temp("<temp>/assembly_stats/<species>.<build>.<release>.tsv"),
     log:
-        "<log>/assembly_stats/<species>.<build>.<release>.log",
+        "<logs>/assembly_stats/<species>.<build>.<release>.log",
     benchmark:
-        "<benchmark>/assembly_stats/<species>.<build>.<release>.tsv"
+        "<benchmarks>/assembly_stats/<species>.<build>.<release>.tsv"
     threads: 1
     params:
         extra="-t",
@@ -39,13 +39,13 @@ rule assembly_stats:
 rule go_yq_format_tsv_to_yaml:
     """in order to include assembly stats in agat ones"""
     input:
-        "<tmp>/assembly_stats/<species>.<build>.<release>.tsv",
+        "<temp>/assembly_stats/<species>.<build>.<release>.tsv",
     output:
-        temp("<tmp>/go_yq_format_tsv/<species>.<build>.<release>.yaml"),
+        temp("<temp>/go_yq_format_tsv/<species>.<build>.<release>.yaml"),
     log:
-        "<log>/go_yq_format_tsv/<species>.<build>.<release>.log",
+        "<logs>/go_yq_format_tsv/<species>.<build>.<release>.log",
     benchmark:
-        "<benchmark>/go_yq/format_tsv_<species>.<build>.<release>.tsv"
+        "<benchmarks>/go_yq/format_tsv_<species>.<build>.<release>.tsv"
     threads: 1
     params:
         extra="",
@@ -58,14 +58,14 @@ rule go_yq_format_tsv_to_yaml:
 use rule go_yq_format_tsv_to_yaml as go_yq_include_assembly_into_agat with:
     """in order to have a single entry genome statistics"""
     input:
-        "<tmp>/agat_sp_statistics/<species>.<build>.<release>.yaml",
-        "<tmp>/go_yq_format_tsv/<species>.<build>.<release>.yaml",
+        "<temp>/agat_sp_statistics/<species>.<build>.<release>.yaml",
+        "<temp>/go_yq_format_tsv/<species>.<build>.<release>.yaml",
     output:
-        "<reference>/<species>.<build>.<release>/statistics/statistics.yaml",
+        "<resources>/<species>.<build>.<release>/statistics/statistics.yaml",
     log:
-        "<log>/go_yq_include_assembly_into_agat/<species>.<build>.<release>.log",
+        "<logs>/go_yq_include_assembly_into_agat/<species>.<build>.<release>.log",
     benchmark:
-        "<benchmark>/go_yq/include_assembly_into_agat_<species>.<build>.<release>.tsv"
+        "<benchmarks>/go_yq/include_assembly_into_agat_<species>.<build>.<release>.tsv"
     params:
         extra="--no-doc",
         subcommand="eval-all",
