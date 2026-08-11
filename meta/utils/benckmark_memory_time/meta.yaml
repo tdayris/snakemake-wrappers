@@ -1,0 +1,29 @@
+name: benchmark memory and time
+url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#benchmark-rules
+description: >
+  This meta-wrapper produces statistics over rules' extended benchmark.
+
+  This meta-wrapper includes the following steps:
+
+    +-------------+----------+---------------------------------------+
+    | Step        | Tool     | Reason                                |
+    +=============+==========+=======================================+
+    | Format      | xsv      | TSV to CSV for easier parsing         |
+    +-------------+----------+---------------------------------------+
+    | Filter      | xsv      | Keep only columns of interet          |
+    +-------------+----------+---------------------------------------+
+    | Format      | go-yq    | Sum input file size and add tool info |
+    +-------------+----------+---------------------------------------+
+    | Aggregation | xsv      | Per-tool requirement aggregation      |
+    +-------------+----------+---------------------------------------+
+    | Summary     | xsv      | Per-tool resources summary            |
+    +-------------+----------+---------------------------------------+
+authors:
+  - Thibault Dayris
+pathvars:
+  default:
+    - results
+    - resources
+    - benchmarks
+    - logs
+    - temp

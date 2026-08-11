@@ -1,0 +1,28 @@
+from snakemake.utils import min_version
+
+min_version("9.13.1")
+
+configfile: "config.yaml"
+
+tools: tuple[str] = ("agat", "assembly_stats", "curl", "go_yq")
+
+wildcard_constraints:
+    tool=r"|".join(tools)
+
+rule target:
+    input:
+        expand(
+            "<results>/benchmark/{tool}/summary.csv",
+            tool=tools,
+        ),
+        "<results>/benchmark/benchmarks.csv",
+
+
+module benckmark_memory_time:
+    config:
+        config
+    meta_wrapper:
+        "file:.."
+
+
+use rule * from benckmark_memory_time
