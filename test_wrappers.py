@@ -388,6 +388,20 @@ def test_jq(run):
     )
 
 
+def test_crabz(run):
+    run(
+        "utils/crabz",
+        [
+            "snakemake",
+            "hello.txt.gz",
+            "hello.decompressed.txt",
+        ],
+        compare_results_with_expected={
+            "hello.decompressed.txt": "hello.txt",
+        },
+    )
+
+
 def test_taxonkit(run):
     run(
         "bio/taxonkit",
@@ -859,6 +873,14 @@ def test_liftoff(run):
     )
 
 
+def test_bioconvert(run):
+    run(
+        "bio/bioconvert",
+        ["snakemake", "intervals.csv", "intervals.xls", "a.cram"],
+        cores=2,
+    )
+
+
 def test_biobambam2_bamsormadup(run):
     run(
         "bio/biobambam2/bamsormadup",
@@ -983,16 +1005,15 @@ def test_adapterremoval(run):
         "bio/adapterremoval",
         [
             "snakemake",
-            "trimmed/pe/a_R1.fastq.gz",
-            "trimmed/pe/a_R2.fastq.gz",
-            "trimmed/pe/a.singleton.fastq.gz",
-            "trimmed/pe/a.collapsed.fastq.gz",
-            "trimmed/pe/a.collapsed_trunc.fastq.gz",
-            "trimmed/pe/a.discarded.fastq.gz",
-            "stats/pe/a.settings",
             "trimmed/se/a.fastq.gz",
             "trimmed/se/a.discarded.fastq.gz",
-            "stats/se/a.settings",
+            "stats/se/a.json",
+            "trimmed/pe/a_R1.fastq.gz",
+            "trimmed/pe/a_R2.fastq.gz",
+            "trimmed/pe/a.merged.fastq.gz",
+            "trimmed/pe/a.singleton.fastq.gz",
+            "trimmed/pe/a.discarded.fastq.gz",
+            "stats/pe/a.html",
         ],
     )
 
@@ -2469,6 +2490,19 @@ def test_falco(run):
     )
 
 
+def test_fastaguard(run):
+    run(
+        "bio/fastaguard",
+        [
+            "snakemake",
+            "pass/fastaguard.json",
+            "warn/fastaguard.json",
+            "fail/fastaguard.json",
+            "invalid/fastaguard.json",
+        ],
+    )
+
+
 def test_fastp(run):
     run(
         "bio/fastp",
@@ -2754,6 +2788,15 @@ def test_macs2_callpeak(run):
         ],
     )
 
+
+def test_mageck_mle(run):
+    run(
+        "bio/mageck/mle",
+        [
+            "snakemake",
+            "test_mageck_mle.genes.tsv",
+        ],
+    )
 
 def test_mageck_test(run):
     run(
@@ -5377,6 +5420,14 @@ def test_mofa2_plotting(run):
     run("bio/mofa2/plotting", ["snakemake"])
 
 
+def test_mofaflex_training(run):
+    run("bio/mofaflex/training", ["snakemake", "shrunk_data.h5"])
+
+
+def test_mofaflex_plotting(run):
+    run("bio/mofaflex/plotting", ["snakemake", "results/shrunk_data_weights.pdf"])
+
+
 def test_go_yq(run):
     run(
         "utils/go-yq",
@@ -5538,6 +5589,19 @@ def test_sniffles(run):
             "calls/a.vcf",
             "calls/a.snf",
             "calls/multisample.vcf",
+        ],
+        cores=4,
+    )
+
+
+def test_nanovar(run):
+    run(
+        "bio/nanovar",
+        [
+            "snakemake",
+            "calls/a.vcf",
+            "calls/a.report.html",
+            "calls/b.vcf",
         ],
         cores=4,
     )
