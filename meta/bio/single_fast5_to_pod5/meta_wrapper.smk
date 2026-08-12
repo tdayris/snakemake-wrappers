@@ -60,7 +60,8 @@ rule untar_single_read_archive:
             "--verbose --no-same-owner --no-same-permissions --force-local"
         ),
     shell:
-        "tar {params.extra} --file {input:q} --directory {output:q} > {log:q} 2>&1"
+        "mkdir --parents --verbose {output:q} > {log} 2>&1 && "
+        "tar {params.extra} --file {input:q} --directory {output:q} >> {log:q} 2>&1"
 
 
 rule fast5_aggregation_with_ont_api:
