@@ -32,11 +32,11 @@ samples_table.set_index("sample_id", inplace=True, drop=False)
 rule aria_download_single_read_archive:
     """let fast5 data be available for later use"""
     output:
-       temp("<tmp>/access_fast5_archive/<sample>.tar.gz"),
+       temp("<temp>/access_fast5_archive/<sample>.tar.gz"),
     log:
-        "<log>/access_fast5_archive/<sample>.log",
+        "<logs>/access_fast5_archive/<sample>.log",
     benchmark:
-        "<benchmark>/aria2/access_fast5_archive_<sample>.tsv"
+        "<benchmarks>/aria2/access_fast5_archive_<sample>.tsv"
     params:
         url=lambda wildcards: samples_table.at[wildcards.sample, "fast5_archive"],
         extra="--retry-wait 5",
@@ -47,13 +47,13 @@ rule aria_download_single_read_archive:
 rule untar_single_read_archive:
     """decompress all single-read fast5 samples"""
     input:
-        "<tmp>/access_fast5_archive/<sample>.tar.gz",
+        "<temp>/access_fast5_archive/<sample>.tar.gz",
     output:
-        temp(directory("<tmp>/untar_single_read_archive/<sample>")),
+        temp(directory("<temp>/untar_single_read_archive/<sample>")),
     log:
         "log/untar_single_read_archive/<sample>.log"
     benchmark:
-        "<benchmark>/untar_single_read_archive/<sample>.tsv"
+        "<benchmarks>/untar_single_read_archive/<sample>.tsv"
     params:
         extra="--extract --verbose --gunzip",
     shell:
@@ -63,13 +63,13 @@ rule untar_single_read_archive:
 rule fast5_aggregation_with_ont_api:
     """reformat single-read fast5 into multi-read fast5"""
     input:
-        indir="<tmp>/untar_single_read_archive/<sample>",
+        indir="<temp>/untar_single_read_archive/<sample>",
     output:
-        outdir=temp(directory("<tmp>/fast5_aggregation_with_ont_api/<sample>")),
+        outdir=temp(directory("<temp>/fast5_aggregation_with_ont_api/<sample>")),
     log:
-        "<log>/fast5_aggregation_with_ont_api/<sample>.log",
+        "<logs>/fast5_aggregation_with_ont_api/<sample>.log",
     benchmark:
-        "<benchmark>/fast5_aggregation_with_ont_api/<sample>.tsv"
+        "<benchmarks>/fast5_aggregation_with_ont_api/<sample>.tsv"
     container:
         "docker://nanozoo/ont-fast5-api:3.1.6--a980386"
     threads: 15
@@ -86,13 +86,13 @@ rule fast5_aggregation_with_ont_api:
 rule fast5_to_pod5_conversion:
     """reformat mutl-read fast5 into pod5"""
     input:
-        indir="<tmp>/fast5_aggregation_with_ont_api/<sample>",
+        indir="<temp>/fast5_aggregation_with_ont_api/<sample>",
     output:
-        pod=temp("<tmp>/fast5_to_pod5_conversion/<sample>.pod5"),
+        pod=temp("<temp>/fast5_to_pod5_conversion/<sample>.pod5"),
     log:
-        "<log>/fast5_to_pod5_conversion/<sample>.log",
+        "<logs>/fast5_to_pod5_conversion/<sample>.log",
     benchmark:
-        "<benchmark>/fast5_to_pod5_conversion/<sample>.tsv"
+        "<benchmarks>/fast5_to_pod5_conversion/<sample>.tsv"
     container:
         "docker://staphb/pod5:0.3.36"
     threads: 15
