@@ -55,9 +55,12 @@ rule untar_single_read_archive:
     benchmark:
         "<benchmarks>/untar_single_read_archive/<sample>.tsv"
     params:
-        extra="--extract --verbose --gunzip",
+        extra=str(
+            "--no-auto-compress --extract --overwrite --gzip "
+            "--verbose --no-same-owner --no-same-permissions --force-local"
+        ),
     shell:
-        "tar --file={input:q} {params.extra} {output:q} > {log:q} 2>&1"
+        "tar {params.extra} --file {input:q} --directory {output:q} > {log:q} 2>&1"
 
 
 rule fast5_aggregation_with_ont_api:
