@@ -1,5 +1,7 @@
-import yaml
+import io
 import typing
+import yaml
+
 
 def get_xsv_columns(stranding: str) -> str:
     """provide xsv select arguments to extract read counts from star output"""
@@ -8,34 +10,57 @@ def get_xsv_columns(stranding: str) -> str:
         return f"{extra} 1,2"
     if stranding == "foreward":
         return f"{extra} 1,3"
-    if stranding == "reverse"
+    if stranding == "reverse":
         return f"{extra} 1,4"
     raise ValueError(
         f"Unexepcted {stranding=}, "
-        "expected one of ['unstranded', 'foreward', 'reverse']"
+        "expected one of {'unstranded', 'foreward', 'reverse'}"
     )
 
 
-def get_star_params(genome_statistics: str) -> str:
+def get_star_params(
+    genome_statistics: io.TextIOWrapper, 
+    chimeric: bool = False,
+) -> str:
     """provide star align arguments to align reads with given genome"""
     extra: str = str(
-        "--outFilterType 'BySJout' "
-        "--outFilterMultimapNmax 20 "
-        "--alignSJoverhangMin 8 "
-        "--alignSJDBoverhangMin 1 "
-        "--outFilterMismatchNmax 999 "
-        "--outFilterMismatchNoverReadLmax 0.04 "
-        "--alignMatesGapMax 1000000 "
-        "--outSAMattributes 'All' "
-        "--twopassMode 'Basic' "
-        "--outSAMtype 'BAM' 'Unsorted' "
+        " --outFilterType 'BySJout'"
+        " --outFilterMultimapNmax 20"
+        " --alignSJoverhangMin 8"
+        " --alignSJDBoverhangMin 1"
+        " --outFilterMismatchNmax 999"
+        " --outFilterMismatchNoverReadLmax 0.04"
+        " --twopassMode 'Basic'"
+        " --outSAMtype BAM Unsorted"
     )
-    with open(genome_statistics, "r") as yaml_genome_stream:
-        genome_data: list[typing.Any] = yaml.safe_load(yaml_genome_stream)
-        intron_min: int = genome_data[0]
-    #    --alignIntronMin 20 minimum intron length
-    # --alignIntronMax 1000000 maximum intron length
+    genome_data: list[typing.Any] = yaml.safe_load(genome_statistics)
+    try:
+        intron_min: int = genome_data[0]["transcript"]["without_isoforms"][
+            "Shortest intron into exon part (bp)"
+        ]
+    except KeyError:
+        intron_min = 21
+    try:
+        intron_max: int = genome_data[0]["transcript"]["without_isoforms"][
+            "Longest intron into exon part (bp)"
+        ]
+        matex_gap_max: int = intron_max + 300
+    except KeyError:
+        intron_max = 1000000
+        matex_gap_max = 1000000
 
+    extra += str(
+        f" --alignIntronMin {intron_min}"
+        f" --alignIntronMax {intron_max}"
+        f" --alignMatesGapMax {matex_gap_max}"
+    )
+
+    if chimeric is True:
+        raise NotImplementedError("Not chimeric alignment implemented. Sorry.")
+    else:
+        extra += " --outSAMattributes 'All'"
+
+    print(extra)
     return extra
 
 
@@ -44,41 +69,45 @@ rule star_index:
     input:
         fasta="<genome_sequence>",
         fasta_index="<genome_index>",
+        gtf="<genome_annotation>",
     output:
-        directory("<reference>/<species>.<build>.<release>/star_index"),
+        directory("<resources>/<species>.<build>.<release>/star_index"),
     log:
-        "<log>/star_index/<species>.<build>.<release>.log",
+        "<logs>/star_index/<species>.<build>.<release>.log",
     benchmark:
-        "<benchmark>/star_index/<species>.<build>.<release>.tsv"
+        "<benchmarks>/star_index/<species>.<build>.<release>.tsv"
     threads: 20
     params:
         extra="",
         sjdbOverhang=100,
     wrapper:
         "v3.3.7/bio/star/index"
-    
+
 
 rule star_align:
     """align reads over indexed genome with star"""
     input:
         fq1=["<upstream_reads>"],
         fq2=["<downstream_reads>"],
-        idx="<reference>/<species>.<build>.<release>/star_index",
-        statistics="<genome_agat_statistics>"
+        idx="<resources>/<species>.<build>.<release>/star_index",
+        statistics="<genome_agat_statistics>",
     output:
-        aln=temp("<tmp>/star_align/<species>.<build>.<release>.{sample}/{sample}.bam"),
-        log=temp("<tmp>/star_align/<species>.<build>.<release>.{sample}/Log.out"),
-        log_progress=temp("<tmp>/star_align/<species>.<build>.<release>.{sample}/Log.progress.out"),
-        log_final=temp("<tmp>/star_align/<species>.<build>.<release>.{sample}/Log.final.out"),
-        reads_per_gene=temp("<tmp>/star_align/<species>.<build>.<release>.{sample}/ReadsPerGene.out.tab"),
-        sj=temp("<tmp>/star_align/<species>.<build>.<release>.{sample}/SJ.out.tab"),
+        aln=temp("<temp>/star_align/<species>.<build>.<release>.{sample}/{sample}.bam"),
+        log=temp("<temp>/star_align/<species>.<build>.<release>.{sample}/Log.out"),
+        log_progress=temp(
+            "<temp>/star_align/<species>.<build>.<release>.{sample}/Log.progress.out"
+        ),
+        log_final=temp(
+            "<temp>/star_align/<species>.<build>.<release>.{sample}/Log.final.out"
+        ),
+        sj=temp("<temp>/star_align/<species>.<build>.<release>.{sample}/SJ.out.tab"),
     log:
-        "<log>/star_align/{sample}.<species>.<build>.<release>.log",
+        "<logs>/star_align/{sample}.<species>.<build>.<release>.log",
     benchmark:
-        "<benchmark>/star_align/{sample}.<species>.<build>.<release>.tsv"
+        "<benchmarks>/star_align/{sample}.<species>.<build>.<release>.tsv"
     threads: 20
     params:
-        extra="",
+        extra=parse_input(input.statistics, parser=get_star_params),
     wrapper:
         "v9.4.2/bio/star/align"
 
@@ -86,13 +115,13 @@ rule star_align:
 rule sambamba_sort_reads:
     """sort star mapped reads to gain disk space and work faster"""
     input:
-        "<tmp>/star_align/<species>.<build>.<release>.{sample}/{sample}.bam",
+        "<temp>/star_align/<species>.<build>.<release>.{sample}/{sample}.bam",
     output:
-        temp("<tmp>/sambamba_sort_reads/<species>.<build>.<release>.{sample}.bam"),
+        temp("<temp>/sambamba_sort_reads/<species>.<build>.<release>.{sample}.bam"),
     log:
-        "<log>/sambamba_sort_reads/{sample}.<species>.<build>.<release>.log",
+        "<logs>/sambamba_sort_reads/{sample}.<species>.<build>.<release>.log",
     benchmark:
-        "<benchmark>/sambamba_sort_reads/{sample}.<species>.<build>.<release>.tsv",
+        "<benchmarks>/sambamba_sort/{sample}.<species>.<build>.<release>.star_reads.tsv"
     threads: 20
     params:
         extra="",
@@ -103,13 +132,13 @@ rule sambamba_sort_reads:
 rule sambamba_index_sorted_reads:
     """access faster to sorted reads chunks"""
     input:
-        "<tmp>/sambamba_sort_reads/<species>.<build>.<release>.{sample}.bam",
+        "<temp>/sambamba_sort_reads/<species>.<build>.<release>.{sample}.bam",
     output:
-        temp("<tmp>/sambamba_sort_reads/<species>.<build>.<release>.{sample}.bam.bai"),
+        temp("<temp>/sambamba_sort_reads/<species>.<build>.<release>.{sample}.bam.bai"),
     log:
-        "<log>/sambamba_index_sorted_reads/{sample}.<species>.<build>.<release>.log",
+        "<logs>/sambamba_index_sorted_reads/{sample}.<species>.<build>.<release>.log",
     benchmark:
-        "<benchmark>/sambamba_index_sorted_reads/{sample}.<species>.<build>.<release>.tsv",
+        "<benchmarks>/sambamba_index/{sample}.<species>.<build>.<release>.sorted_star_reads.tsv"
     threads: 3
     params:
         extra="",
@@ -120,13 +149,13 @@ rule sambamba_index_sorted_reads:
 rule sambamba_mark_duplicates:
     """mark or remove artefactual duplicates in mapping"""
     input:
-        "<tmp>/sambamba_sort_reads/<species>.<build>.<release>.{sample}.bam",
+        "<temp>/sambamba_sort_reads/<species>.<build>.<release>.{sample}.bam",
     output:
-        temp("<tmp>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.bam"),
+        temp("<temp>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.bam"),
     log:
-        "<log>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.log",
+        "<logs>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.log",
     benchmark:
-        "<benchmark>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.tsv",
+        "<benchmarks>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.tsv"
     threads: 20
     params:
         extra="--remove-duplicates",
@@ -134,16 +163,30 @@ rule sambamba_mark_duplicates:
         "v6.1.0/bio/sambamba/markdup"
 
 
-rule samtools_cram_aligned_reads:
-     """compress mapped reads to save disk space"""
+use rule sambamba_index_sorted_reads as sambamba_index_deduplicated_reads with:
     input:
-        "<tmp>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.bam",
+        "<temp>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.bam",
+    output:
+        temp("<temp>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.bam.bai"),
+    log:
+        "<logs>/sambamba_index_deduplicated_reads/<species>.<build>.<release>.{sample}.log",
+    benchmark:
+        "<benchmarks>/sambamba_index/<species>.<build>.<release>.{sample}.deduplicated_reads.tsv"
+
+
+rule samtools_cram_aligned_reads:
+    """compress mapped reads to save disk space"""
+    input:
+        "<temp>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.bam",
+        "<temp>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.bam.bai",
+        ref="<genome_sequence>",
+        ref_idx="<genome_index>",
     output:
         "<results>/<species>.<build>.<release>/mapping_star/{sample}.cram",
     log:
-        "<log>/samtools_cram_aligned_reads/{sample}.star.<species>.<build>.<release>.log",
+        "<logs>/samtools_cram_aligned_reads/{sample}.star.<species>.<build>.<release>.log",
     benchmark:
-        "<benchmark>/samtools_cram_aligned_reads/{sample}.star.<species>.<build>.<release>.tsv",
+        "<benchmarks>/samtools_view/{sample}.star.<species>.<build>.<release>.cram_deduplicated_reads.tsv"
     threads: 8
     params:
         extra="",
@@ -160,7 +203,7 @@ rule samtools_index_cram_reads:
     log:
         "<logs>/samtools_index_cram_reads/{sample}.<species>.<build>.<release>.log",
     benchmark:
-        "<benchmark>/samtools_index_cram_reads/{sample}.<species>.<build>.<release>.tsv",
+        "<benchmarks>/samtools_index_cram_reads/{sample}.<species>.<build>.<release>.tsv"
     threads: 3
     params:
         extra="",
@@ -168,90 +211,3 @@ rule samtools_index_cram_reads:
         "v9.14.0/bio/samtools/index"
 
 
-rule xsv_extract_read_counts:
-    """extracts unstranded read counts over genes"""
-    input:
-        table="<tmp>/star_align/<species>.<build>.<release>/{sample}/ReadsPerGene.out.tab",
-    output:
-        temp("<tmp>/xsv_extract_read_counts/<species>.<build>.<release>.{sample}.csv"),
-    log:
-        "<log>/xsv_extract_read_counts/{sample}.{stranding}.<species>.<build>.<release>.log",
-    benchmark:
-        "<benchmark>/xsv_extract_read_counts/{sample}.{stranding}.<species>.<build>.<release>.tsv",
-    threads: 1
-    params:
-        subcommand="select",
-        extra=lambda wildcards: get_xsv_columns(str(wildcards.stranding)),
-    wrapper:
-        "v3.4.0/utils/xsv"
-
-
-use rule xsv_extract_read_counts as xsv_add_header with:
-    """provide sample name to count table"""
-    input:
-        "<tmp>/xsv_extract_read_counts/<species>.<build>.<release>.{sample}.csv",
-    output:
-        temp("<results>/<species>.<build>.<release>/mapping_star/{sample}.{stranding}.read_counts.csv"),
-    log:
-        "<log>/xsv_add_header/<species>.<build>.<release>.{sample}.log",
-    benchmark:
-        "<benchmark>/xsv_add_header/<species>.<build>.<release>.{sample}.tsv"
-    threads: 1
-    params:
-        subcommand="cat row",
-        extra=lambda wildcards: f'<( echo "gene_name,{wildcards.sample}" )',
-
-
-use rule xsv_extract_read_counts as xsv_aggregate_counts with:
-    """provide a single table for all read counts"""
-    input:
-        expand(
-            "<results>/<species>.<build>.<release>/mapping_star/{sample}.{stranding}.read_counts.csv",
-            stranding={"foreward", "reverse", "unstranded"},
-            sample=config["samples"],
-        ),
-    output:
-        temp("<results>/<species>.<build>.<release>/mapping_star/aggregated_{stranding}_read_counts.csv"),
-    log:
-        "<log>/xsv_aggregate_counts/<species>.<build>.<release>.log",
-    benchmark:
-        "<benchmark>/xsv_aggregate_counts/<species>.<build>.<release>.tsv"
-    threads: 1
-    params:
-        subcommand="cat columns",
-        extra="",
-    
-
-rule bioconvert_star_csv_counts_to_xls:
-    """let coworkers access raw counts with ease"""
-    input:
-        "<results>/<species>.<build>.<release>/mapping_star/aggregated_{stranding}_read_counts.csv",
-    output:
-        "<results>/<species>.<build>.<release>/mapping_star/{sample}.{stranding}.read_counts.xls",
-    log:
-        "<log>/bioconvert_star_csv_counts_to_xls/{stranding}.<species>.<build>.<release>.log",
-    benchmark:
-        "<benchmark>/bioconvert_star_csv_counts_to_xls/stranding}.<species>.<build>.<release>.tsv",
-    threads: 1
-    params:
-        converter="csv2xls",
-        extra="",
-    wrapper:
-        "v9.15.0/bio/bioconvert"
-
-
-rule compress_read_counts:
-    """save disk space"""
-    input:
-        "<results>/<species>.<build>.<release>/mapping_star/aggregated_{stranding}_read_counts.csv",
-    output:
-        "<results>/<species>.<build>.<release>/mapping_star/aggregated_{stranding}_read_counts.csv.gz",
-    log:
-        "<log>/compress_read_counts/<species>.<build>.<release>.{stranding}.log",
-    benchmark:
-        "<benchmark>/compress_read_counts/<species>.<build>.<release>.{stranding}.tsv"
-    threads: 7
-    params:
-        extra="--compression-level 9",
-    wrapper:
-        "v9.15.0/utils/crabz"

@@ -1,0 +1,83 @@
+from snakemake.utils import min_version
+
+min_version("9.13.1")
+
+configfile: "config.yaml"
+
+wildcard_constraints:
+    species=r"saccharomyces_cerevisiae",
+    build=r"R64-1-1",
+    release=r"105",
+    datatype=r"dna",
+
+
+storage:
+    provider="http",
+
+
+rule target:
+    input:
+        expand(
+            "results/{species}.{build}.{release}/mapping_star/{sample}.cram.crai",
+            species={"saccharomyces_cerevisiae"},
+            build={"R64-1-1"},
+            release={105},
+            stranding={"foreward", "reverse", "unstranded"},
+            sample={"a", "b"}
+        ),
+
+
+samples: dict[str, str] = {
+    "a.1": storage.http(
+        "https://raw.githubusercontent.com/snakemake-workflows/ngs-test-data/refs/heads/master/reads/a.chr21.1.fq"
+    ),
+    "a.2": storage.http(
+        "https://raw.githubusercontent.com/snakemake-workflows/ngs-test-data/refs/heads/master/reads/a.chr21.2.fq"
+    ),
+    "b.1": storage.http(
+        "https://raw.githubusercontent.com/snakemake-workflows/ngs-test-data/refs/heads/master/reads/b.chr21.1.fq"
+    ),
+    "b.2": storage.http(
+        "https://raw.githubusercontent.com/snakemake-workflows/ngs-test-data/refs/heads/master/reads/b.chr21.2.fq"
+    ),
+}
+
+
+rule make_reads_available:
+    input:
+        lambda wildcards: samples[f"{wildcards.sample}.{wildcards.stream}"],
+    output:
+        temp("tmp/make_reads_available/{sample}.{stream}.fastq.gz"),
+    log:
+        "log/make_reads_available/{sample}.{stream}.log",
+    benchmark:
+        "benchmark/make_reads_available/{sample}.{stream}.tsv"
+    params:
+        extra="--compression-level 9",
+    wrapper:
+        "v9.15.0/utils/crabz"
+
+
+rule make_ref_available:
+    output:
+        "ref/{data}",
+    log:
+        "log/aria2/make_ref_available_{data}.log",
+    benchmark:
+        "benchmark/aria2/make_ref_available_{data}.tsv"
+    threads: 1
+    params:
+        url="https://raw.githubusercontent.com/snakemake-workflows/ngs-test-data/refs/heads/master/ref/{data}",
+        extra="",
+    wrapper:
+        "v6.2.0/utils/aria2c"
+
+
+module mapping_star_autoparams:
+    config:
+        config
+    meta_wrapper:
+        "file:.."
+
+
+use rule * from mapping_star_autoparams
