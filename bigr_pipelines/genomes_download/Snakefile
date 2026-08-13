@@ -5,6 +5,9 @@ wildcard_constraints:
   gxf=r"gtf|gff|gff3",
   seqtype=r"dna|cdna|cds",
 
+config["genome_sequence"] = "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta"
+config["genome_annotation"] = "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.gtf"
+config["agat_config"] = "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml"
 
 rule target:
     input:
@@ -28,11 +31,7 @@ module download_genome_sequences:
     meta_wrapper:
         f"{config['git_repo']}/download_genome_annotation"
     config:
-        {
-            "homo_sapiens": config["homo_sapiens"],
-            "saccharomyces_cerevisiae": config["saccharomyces_cerevisiae"],
-            "mus_musculus": config["mus_musculus"],
-        }
+        config
 
 use rule * from download_genome_sequences
 
@@ -41,8 +40,7 @@ module download_genome_annotation:
     meta_wrapper:
         f"{config['git_repo']}/download_genome_sequences"
     config:
-        {"genome_sequence": "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta"}
-
+        config
 
 use rule * from download_genome_annotation
 
@@ -51,11 +49,6 @@ module genome_statistics:
     meta_wrapper:
         f"{config['git_repo']}/genome_statistics"
     config:
-        {
-            "genome_sequence": "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta",
-            "genome_annotation": "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.gtf",
-            "agat_config": "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml",
-        }
-
+        config
 
 use rule * from genome_statistics
