@@ -1,19 +1,19 @@
 rule jannovar:
     input:
         vcf="{sample}.vcf",
-        pedigree="pedigree_ar.ped" # optional, contains familial relationships
+        pedigree="pedigree_ar.ped",  # optional, contains familial relationships
     output:
-        "jannovar/{sample}.vcf.gz"
+        "jannovar/{sample}.vcf.gz",
     log:
-        "logs/jannovar/{sample}.log"
+        "logs/jannovar/{sample}.log",
     # optional specification of memory usage of the JVM that snakemake will respect with global
     # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
     # and which can be used to request RAM during cluster job submission as `{resources.mem_mg}`:
     # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
     resources:
-        mem_mb = 1024,
+        mem_mb=1024,
     params:
-        database="hg19_small.ser", # path to jannovar reference dataset
-        extra="--show-all"         # optional parameters
+        database="hg19_small.ser",  # path to jannovar reference dataset
+        extra="--show-all",  # optional parameters
     wrapper:
         "master/bio/jannovar"

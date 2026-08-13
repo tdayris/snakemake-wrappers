@@ -5,9 +5,9 @@ rule muscle_fasta:
         alignment="{sample}.fas",  # Output alignment file
     log:
         "logs/muscle/{sample}.log",
+    threads: 2
     params:
         extra="-refineiters 50",  # Additional arguments
-    threads: 2
     wrapper:
         "master/bio/muscle"
 
@@ -19,9 +19,9 @@ rule muscle_super5:
         alignment="{sample}.super5.fas",
     log:
         "logs/muscle/{sample}.super5.log",
-    params:
-        super5 = True,
-        extra="-refineiters 50",
     threads: 2
+    params:
+        super5=True,
+        extra="-refineiters 50",
     wrapper:
         "master/bio/muscle"

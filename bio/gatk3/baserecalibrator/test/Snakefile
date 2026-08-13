@@ -11,10 +11,10 @@ rule baserecalibrator:
         recal_table="{sample}.recal_data_table",
     log:
         "logs/gatk3/bqsr/{sample}.log",
-    params:
-        extra="--defaultBaseQualities 20 --filter_reads_with_N_cigar",  # optional
+    threads: 16
     resources:
         mem_mb=1024,
-    threads: 16
+    params:
+        extra="--defaultBaseQualities 20 --filter_reads_with_N_cigar",  # optional
     wrapper:
         "master/bio/gatk3/baserecalibrator"

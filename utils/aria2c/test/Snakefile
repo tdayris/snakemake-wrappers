@@ -4,13 +4,13 @@ rule test_aria2:
         "results/file.fas.gz",
     log:
         "logs/aria2.log",
-    params:
-        url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/869/925/GCF_000869925.1_ViralProj17181/GCF_000869925.1_ViralProj17181_genomic.fna.gz",
-        extra="--file-allocation none --retry-wait 5 --console-log-level warn --log-level notice",
     threads: 2
     resources:
         mem_mb=1024,
         runtime=30,
+    params:
+        url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/869/925/GCF_000869925.1_ViralProj17181/GCF_000869925.1_ViralProj17181_genomic.fna.gz",
+        extra="--file-allocation none --retry-wait 5 --console-log-level warn --log-level notice",
     wrapper:
         "master/utils/aria2c"
 
@@ -20,14 +20,14 @@ rule test_aria2_md5:
         "results/file.md5.fas.gz",
     log:
         "logs/aria2.md5.log",
-    params:
-        url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/869/925/GCF_000869925.1_ViralProj17181/GCF_000869925.1_ViralProj17181_genomic.fna.gz",
-        md5="42aa93c5bfdba6ac09a4822a4407b572",
-        extra="--file-allocation none --retry-wait 5 --console-log-level warn --log-level notice",
     threads: 2
     resources:
         mem_mb=1024,
         runtime=30,
+    params:
+        url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/869/925/GCF_000869925.1_ViralProj17181/GCF_000869925.1_ViralProj17181_genomic.fna.gz",
+        md5="42aa93c5bfdba6ac09a4822a4407b572",
+        extra="--file-allocation none --retry-wait 5 --console-log-level warn --log-level notice",
     wrapper:
         "master/utils/aria2c"
 
@@ -41,6 +41,10 @@ rule test_aria2_md5fileH:
         "results/file.md5fileH.fas.gz",
     log:
         "logs/aria2.md5fileH.log",
+    threads: 2
+    resources:
+        mem_mb=1024,
+        runtime=30,
     params:
         url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/869/925/GCF_000869925.1_ViralProj17181/GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         md5=parse_input(
@@ -49,10 +53,6 @@ rule test_aria2_md5fileH:
             file="GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         ),
         extra="--file-allocation none --retry-wait 5 --console-log-level warn --log-level notice",
-    threads: 2
-    resources:
-        mem_mb=1024,
-        runtime=30,
     wrapper:
         "master/utils/aria2c"
 
@@ -64,6 +64,10 @@ rule test_aria2_md5file:
         "results/file.md5file.fas.gz",
     log:
         "logs/aria2.md5file.log",
+    threads: 2
+    resources:
+        mem_mb=1024,
+        runtime=30,
     params:
         url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/869/925/GCF_000869925.1_ViralProj17181/GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         extra="--file-allocation none --retry-wait 5 --console-log-level warn --log-level notice",
@@ -72,10 +76,6 @@ rule test_aria2_md5file:
             parser=extract_checksum,
             file="GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         ),
-    threads: 2
-    resources:
-        mem_mb=1024,
-        runtime=30,
     wrapper:
         "master/utils/aria2c"
 
@@ -87,6 +87,10 @@ rule test_aria2_sha1file:
         "results/file.sha1file.fas.gz",
     log:
         "logs/aria2.sha1file.log",
+    threads: 2
+    resources:
+        mem_mb=1024,
+        runtime=30,
     params:
         url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/869/925/GCF_000869925.1_ViralProj17181/GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         extra="--file-allocation none --retry-wait 5 --console-log-level warn --log-level notice",
@@ -95,10 +99,6 @@ rule test_aria2_sha1file:
             parser=extract_checksum,
             file="GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         ),
-    threads: 2
-    resources:
-        mem_mb=1024,
-        runtime=30,
     wrapper:
         "master/utils/aria2c"
 
@@ -110,6 +110,10 @@ rule test_aria2_sha224file:
         "results/file.sha224file.fas.gz",
     log:
         "logs/aria2.sha224file.log",
+    threads: 2
+    resources:
+        mem_mb=1024,
+        runtime=30,
     params:
         url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/869/925/GCF_000869925.1_ViralProj17181/GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         extra="--file-allocation none --retry-wait 5 --console-log-level warn --log-level notice",
@@ -118,10 +122,6 @@ rule test_aria2_sha224file:
             parser=extract_checksum,
             file="GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         ),
-    threads: 2
-    resources:
-        mem_mb=1024,
-        runtime=30,
     wrapper:
         "master/utils/aria2c"
 
@@ -133,6 +133,10 @@ rule test_aria2_sha256file:
         "results/file.sha256file.fas.gz",
     log:
         "logs/aria2.sha256file.log",
+    threads: 2
+    resources:
+        mem_mb=1024,
+        runtime=30,
     params:
         url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/869/925/GCF_000869925.1_ViralProj17181/GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         extra="--file-allocation none --retry-wait 5 --console-log-level warn --log-level notice",
@@ -141,10 +145,6 @@ rule test_aria2_sha256file:
             parser=extract_checksum,
             file="GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         ),
-    threads: 2
-    resources:
-        mem_mb=1024,
-        runtime=30,
     wrapper:
         "master/utils/aria2c"
 
@@ -156,6 +156,10 @@ rule test_aria2_sha384file:
         "results/file.sha384file.fas.gz",
     log:
         "logs/aria2.sha384file.log",
+    threads: 2
+    resources:
+        mem_mb=1024,
+        runtime=30,
     params:
         url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/869/925/GCF_000869925.1_ViralProj17181/GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         extra="--file-allocation none --retry-wait 5 --console-log-level warn --log-level notice",
@@ -164,10 +168,6 @@ rule test_aria2_sha384file:
             parser=extract_checksum,
             file="GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         ),
-    threads: 2
-    resources:
-        mem_mb=1024,
-        runtime=30,
     wrapper:
         "master/utils/aria2c"
 
@@ -179,6 +179,10 @@ rule test_aria2_sha512file:
         "results/file.sha512file.fas.gz",
     log:
         "logs/aria2.sha512file.log",
+    threads: 2
+    resources:
+        mem_mb=1024,
+        runtime=30,
     params:
         url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/869/925/GCF_000869925.1_ViralProj17181/GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         extra="--file-allocation none --retry-wait 5 --console-log-level warn --log-level notice",
@@ -187,9 +191,5 @@ rule test_aria2_sha512file:
             parser=extract_checksum,
             file="GCF_000869925.1_ViralProj17181_genomic.fna.gz",
         ),
-    threads: 2
-    resources:
-        mem_mb=1024,
-        runtime=30,
     wrapper:
         "master/utils/aria2c"

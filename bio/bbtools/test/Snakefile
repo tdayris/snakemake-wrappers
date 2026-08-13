@@ -23,12 +23,12 @@ rule index_genome:
         # The index is actually stored in subfolders of the path {path}/ref/genome/{build} and {path}/ref/index/{build}
         # Where build is by default 1
         path=temp(directory("path/to/indexes/genome/")),
-    params:
-        command="bbmap.sh",
     log:
         "logs/index_genome.log",
     resources:
         mem_mb=1000,
+    params:
+        command="bbmap.sh",
     wrapper:
         "master/bio/bbtools"
 
@@ -42,6 +42,10 @@ rule create_reads:
             fraction=get_fractions(),
             allow_missing=True,
         ),
+    log:
+        "logs/create_reads/{sample}.log",
+    resources:
+        mem_mb=1000,
     params:
         command="randomreads.sh",  # Define which bbmap command to use
         # All parameters are passed to the command
@@ -50,10 +54,6 @@ rule create_reads:
         paired=True,
         overwrite=True,
         pigz=True,
-    resources:
-        mem_mb=1000,
-    log:
-        "logs/create_reads/{sample}.log",
     wrapper:
         "master/bio/bbtools"
 
@@ -63,13 +63,13 @@ rule loglog:
         rules.create_reads.output.out,
     log:
         "logs/loglog/{sample}.log",  # Captures the error output of the command and the log of the wrapper
+    threads: 2
+    resources:
+        mem_mb=1024,
     params:
         command="loglog.sh",
         buckets=2048,
         seed=1234,
-    threads: 2
-    resources:
-        mem_mb=1024,
     wrapper:
         "master/bio/bbtools"
 
@@ -96,8 +96,10 @@ rule bbduk:
         #outsingle="reads/discarded/{sample}_singletons.fastq.gz", # only for paired reads
         stats="stats/trimming_stats/{sample}.txt",
     log:
-        "logs/bbduk/{sample}.log",
+        "logs/trim/{sample}.log",
     threads: 7
+    resources:
+        mem_mb=4000,
     params:
         command="bbduk.sh",
         extra="tpe tbo ",
@@ -112,10 +114,6 @@ rule bbduk:
         entropy=0.5,
         entropywindow=50,
         entropyk=5,
-    resources:
-        mem_mb=4000,
-    log:
-        "logs/trim/{sample}.log",
     wrapper:
         "master/bio/bbtools"
 
@@ -132,12 +130,12 @@ rule tadpole_correct:
         outd="reads/discarded/{sample}.fastq.gz",
     log:
         "logs/correct/{sample}.log",
-    params:
-        command="tadpole.sh",
-        mode="correct",
     threads: 2
     resources:
         mem_mb=1024,
+    params:
+        command="tadpole.sh",
+        mode="correct",
     wrapper:
         "master/bio/bbtools"
 
@@ -150,12 +148,12 @@ rule tadpole_assemble:
         "assembly/{sample}.fasta.gz",
     log:
         "logs/assemble/{sample}.log",
-    params:
-        command="tadpole.sh",
-        mode="contig",
     threads: 2
     resources:
         mem_mb=1024,
+    params:
+        command="tadpole.sh",
+        mode="contig",
     wrapper:
         "master/bio/bbtools"
 
@@ -171,15 +169,15 @@ rule bbmap:
         out="mapped/{sample}.bam",
     log:
         "logs/bbmap/{sample}.log",
+    threads: 12
+    resources:
+        mem_mb=1000,  # optional: bbmap normaly needs a lot of memory, e.g. 60GB
     params:
         command="bbmap.sh",
         machineout=True,
         overwrite=True,  # recommended
         unpigz=True,
         nodisk=True,  # Don't write a index
-    threads: 12
-    resources:
-        mem_mb=1000,  # optional: bbmap normaly needs a lot of memory, e.g. 60GB
     wrapper:
         "master/bio/bbtools"
 
@@ -193,12 +191,12 @@ rule pileup:
         basecov="basecov/{sample}.tsv",
     log:
         "logs/pileup/{sample}.log",
+    threads: 4
+    resources:
+        mem_mb=1000,
     params:
         command="pileup.sh",
         nzo=True,
         overwrite=True,
-    threads: 4
-    resources:
-        mem_mb=1000,
     wrapper:
         "master/bio/bbtools"

@@ -24,8 +24,10 @@ rule download_nanosim_genome_model:
             "_strandness_rate",
             "_unaligned_length.pkl",
         ),
-    conda: "envs/download.yaml"
-    log: "logs/human_giab_hg002_sub1M_kitv14_dorado_v3.2.1/training_download.log",
+    log:
+        "logs/human_giab_hg002_sub1M_kitv14_dorado_v3.2.1/training_download.log",
+    conda:
+        "envs/download.yaml"
     shell:
         "cd resources/; "
         "wget https://github.com/bcgsc/NanoSim/raw/refs/heads/master/pre-trained_models/human_giab_hg002_sub1M_kitv14_dorado_v3.2.1.tar.gz; "
@@ -64,8 +66,10 @@ rule download_nanosim_transcriptome_model:
             "_transcriptome_primary.out",
             "_unaligned_length.pkl",
         ),
-    conda: "envs/download.yaml"
-    log: "logs/human_NA12878_cDNA-rel2_guppy_v3.2.2/training_download.log",
+    log:
+        "logs/human_NA12878_cDNA-rel2_guppy_v3.2.2/training_download.log",
+    conda:
+        "envs/download.yaml"
     shell:
         "cd resources/; "
         "wget https://zenodo.org/records/14042983/files/human_NA12878_cDNA-rel2_guppy_v3.2.2.tar.gz; "
@@ -97,8 +101,10 @@ rule download_nanosim_metagenome_model:
             "_strandness_rate",
             "_unaligned_length.pkl",
         ),
-    conda: "envs/download.yaml"
-    log: "logs/metagenome_ERR3152366_Log_v3.2.2/training_download.log",
+    log:
+        "logs/metagenome_ERR3152366_Log_v3.2.2/training_download.log",
+    conda:
+        "envs/download.yaml"
     shell:
         "cd resources/; "
         "wget https://github.com/bcgsc/NanoSim/raw/refs/heads/master/pre-trained_models/metagenome_ERR3152366_Log_v3.2.2.tar.gz; "

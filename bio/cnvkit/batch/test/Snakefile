@@ -9,13 +9,14 @@ rule cnvkit_batch_build_reference:
         reference="cnvkit/reference.cnn",
     log:
         "cnvkit/a.reference.cnn.log",
-    params:
-        method='hybrid',  # optional
-        extra="--target-avg-size 10",  # optional
     resources:
         mem_mb=1024,
+    params:
+        method="hybrid",  # optional
+        extra="--target-avg-size 10",  # optional
     wrapper:
         "master/bio/cnvkit/batch"
+
 
 rule cnvkit_batch:
     input:
@@ -31,10 +32,10 @@ rule cnvkit_batch:
         target_coverage="cnvkit/a.targetcoverage.cnn",
     log:
         "cnvkit/a.antitargetcoverage.cnn.log",
-    params:
-        method='hybrid',  # optional
-        extra="",  # optional
     resources:
         mem_mb=1024,
+    params:
+        method="hybrid",  # optional
+        extra="",  # optional
     wrapper:
         "master/bio/cnvkit/batch"

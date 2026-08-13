@@ -4,12 +4,12 @@ rule test_deeptools_plot_correlation:
     output:
         plot="bins.svg",
         counts="counts.tsv",  # Optional output file
+    log:
+        "corr.log",
     threads: 1
     params:
         extra="--skipZeros",  # Any optional parameters besides IO and --plotFileFormat
         correlation="spearman",  # either spearman or pearson
         plot="heatmap",  # either heatmap or scatterplot
-    log:
-        "corr.log",
     wrapper:
         "master/bio/deeptools/plotcorrelation"

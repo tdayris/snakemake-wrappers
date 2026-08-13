@@ -9,9 +9,9 @@ rule abundance:
         unmapped="{sample}_unmapped.fas",
     log:
         "logs/emu/{sample}_abundance.log",
+    threads: 3  # optional, defaults to 1
     params:
         extra="--type map-ont --keep-counts",
-    threads: 3  # optional, defaults to 1
     wrapper:
         "master/bio/emu/abundance"
 
@@ -27,8 +27,8 @@ rule abundance_paired:
         unmapped="{sample}_unmapped_paired.fq",
     log:
         "logs/emu/{sample}_abundance_paired.log",
+    threads: 3  # optional, defaults to 1
     params:
         extra="--type sr --keep-counts",
-    threads: 3  # optional, defaults to 1
     wrapper:
         "master/bio/emu/abundance"

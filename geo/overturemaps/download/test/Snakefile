@@ -2,6 +2,9 @@ rule download:
     output:
         # Overture maps datafile
         path="results/division_boundary.parquet",
+    log:
+        "logs/overturemaps/download.log",
+    threads: 1
     params:
         # file format to request
         format="geoparquet",
@@ -9,8 +12,5 @@ rule download:
         type="division_boundary",
         # bounding box in "west,south,east,north" format
         bbox=[15.87, -19.02, 28.88, -9.66],  # optional
-    threads: 1
-    log:
-        "logs/overturemaps/download.log"
     wrapper:
         "master/geo/overturemaps/download"

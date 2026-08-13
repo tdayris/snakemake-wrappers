@@ -5,6 +5,7 @@ rule gdc_download:
         "raw/{sample}.maf.gz",
     log:
         "logs/gdc-client/download/{sample}.log",
+    threads: 4
     params:
         # to use this rule flexibly, make uuid a function that maps your
         # sample names of choice to the UUIDs they correspond to (they are
@@ -17,7 +18,6 @@ rule gdc_download:
         # for valid extra command line arguments, check command line help or:
         # https://docs.gdc.cancer.gov/Data_Transfer_Tool/Users_Guide/Data_Download_and_Upload/
         extra="",
-    threads: 4
     wrapper:
         "master/bio/gdc-client/download"
 
@@ -33,6 +33,7 @@ rule gdc_download_bam:
         directory("raw/{sample}/logs"),
     log:
         "logs/gdc-client/download/{sample}.log",
+    threads: 4
     params:
         # to use this rule flexibly, make uuid a function that maps your
         # sample names of choice to the UUIDs they correspond to (they are
@@ -45,6 +46,5 @@ rule gdc_download_bam:
         # for valid extra command line arguments, check command line help or:
         # https://docs.gdc.cancer.gov/Data_Transfer_Tool/Users_Guide/Data_Download_and_Upload/
         extra="",
-    threads: 4
     wrapper:
         "master/bio/gdc-client/download"

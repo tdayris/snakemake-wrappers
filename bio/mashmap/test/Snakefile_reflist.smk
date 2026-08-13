@@ -4,9 +4,9 @@ rule test_mashmap_reflist:
         query="read.fasta.gz",
     output:
         "mashmap.out",
-    params:
-        extra="-s 500 --pi 99",
     log:
         "logs/mashmap.log",
+    params:
+        extra="-s 500 --pi 99",
     wrapper:
         "master/bio/mashmap"

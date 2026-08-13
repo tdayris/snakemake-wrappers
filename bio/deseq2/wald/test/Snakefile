@@ -7,15 +7,15 @@ rule test_deseq2_wald_apeglm:
         deseq2_result_dir=directory("deseq_results_apeglm"),
         normalized_counts_table="counts_apeglm.tsv",
         normalized_counts_rds="counts_apeglm.RDS",
+    log:
+        "logs/deseq2_apeglm.log",
+    threads: 1
     params:
         deseq_extra="",
         # Optional parameters for `lfcShrink` besides dds, parallel, contrast, and coef
         shrink_extra="type='apeglm'",
         results_extra="",
         contrast=["condition", "A", "B"],
-    threads: 1
-    log:
-        "logs/deseq2_apeglm.log",
     wrapper:
         "master/bio/deseq2/wald"
 
@@ -29,15 +29,15 @@ rule test_deseq2_wald_ashr:
         deseq2_result_dir=directory("deseq_results_ashr"),
         normalized_counts_table="counts_ashr.tsv",
         normalized_counts_rds="counts_ashr.RDS",
+    log:
+        "logs/deseq2_ashr.log",
+    threads: 1
     params:
         deseq_extra="",
         # Optional parameters for `lfcShrink` besides dds, parallel, contrast, and coef
         shrink_extra="type='ashr'",
         results_extra="",
         contrast=["condition", "A", "B"],
-    threads: 1
-    log:
-        "logs/deseq2_ashr.log",
     wrapper:
         "master/bio/deseq2/wald"
 
@@ -51,17 +51,18 @@ rule test_deseq2_wald_normal:
         deseq2_result_dir=directory("deseq_results_normal"),
         normalized_counts_table="counts_normal.tsv",
         normalized_counts_rds="counts_normal.RDS",
+    log:
+        "logs/deseq2_normal.log",
+    threads: 1
     params:
         deseq_extra="",
         # Optional parameters for `lfcShrink` besides dds, parallel, contrast, and coef
         shrink_extra="type='normal'",
         results_extra="",
         contrast=["condition", "A", "B"],
-    threads: 1
-    log:
-        "logs/deseq2_normal.log",
     wrapper:
         "master/bio/deseq2/wald"
+
 
 rule test_deseq2_wald_contrast_2_factors:
     input:
@@ -72,15 +73,15 @@ rule test_deseq2_wald_contrast_2_factors:
         deseq2_result_dir=directory("deseq_results_2f"),
         normalized_counts_table="counts_2f.tsv",
         normalized_counts_rds="counts_2f.RDS",
+    log:
+        "logs/deseq2_2f.log",
+    threads: 1
     params:
         deseq_extra="",
         # Optional parameters for `lfcShrink` besides dds, parallel, contrast, and coef
         shrink_extra="type='apeglm'",
         results_extra="",
         contrast=["A", "B"],
-    threads: 1
-    log:
-        "logs/deseq2_2f.log",
     wrapper:
         "master/bio/deseq2/wald"
 
@@ -94,14 +95,14 @@ rule test_deseq2_wald_contrast_1_string:
         deseq2_result_dir=directory("deseq_results_1s"),
         normalized_counts_table="counts_1s.tsv",
         normalized_counts_rds="counts_1s.RDS",
+    log:
+        "logs/deseq2_1s.log",
+    threads: 1
     params:
         deseq_extra="",
         # Optional parameters for `lfcShrink` besides dds, parallel, contrast, and coef
         shrink_extra="type='apeglm'",
         results_extra="",
         contrast=["condition_B_vs_A"],
-    threads: 1
-    log:
-        "logs/deseq2_1s.log",
     wrapper:
         "master/bio/deseq2/wald"

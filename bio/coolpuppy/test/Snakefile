@@ -6,12 +6,12 @@ rule coolpuppy:
         view="CN.mm9.toy_regions.bed",  ## File with the region names and coordinates
     output:
         "CN_{resolution,[0-9]+}.clpy",
+    log:
+        "logs/CN_{resolution}_coolpuppy.log",
+    threads: 2
     params:
         ## Add optional parameters
         features_format="bed",  ## Format of the features file
         extra="--local",  ## Add extra parameters
-    threads: 2
-    log:
-        "logs/CN_{resolution}_coolpuppy.log",
     wrapper:
         "master/bio/coolpuppy"

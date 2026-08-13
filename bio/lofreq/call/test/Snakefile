@@ -1,14 +1,14 @@
 rule lofreq:
     input:
         bam="data/{sample}.bam",
-        bai="data/{sample}.bai"
+        bai="data/{sample}.bai",
     output:
-        "calls/{sample}.vcf"
+        "calls/{sample}.vcf",
     log:
-        "logs/lofreq_call/{sample}.log"
+        "logs/lofreq_call/{sample}.log",
+    threads: 8
     params:
         ref="data/genome.fasta",
-        extra=""
-    threads: 8
+        extra="",
     wrapper:
         "master/bio/lofreq/call"

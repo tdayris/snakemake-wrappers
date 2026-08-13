@@ -2,10 +2,19 @@ rule gridss_setupreference:
     input:
         reference="reference/genome.fasta",
     output:
-        idx=multiext("reference/genome.fasta", ".amb", ".ann", ".bwt", ".dict", ".fai", ".pac", ".sa")
-    params:
-        extra="--jvmheap 1g"
+        idx=multiext(
+            "reference/genome.fasta",
+            ".amb",
+            ".ann",
+            ".bwt",
+            ".dict",
+            ".fai",
+            ".pac",
+            ".sa",
+        ),
     log:
-        "log/gridss/setupreference.log"
+        "log/gridss/setupreference.log",
+    params:
+        extra="--jvmheap 1g",
     wrapper:
         "master/bio/gridss/setupreference"

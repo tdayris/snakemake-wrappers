@@ -1,13 +1,21 @@
 wildcard_constraints:
-  species=r"saccharomyces_cerevisiae|homo_sapiens|mus_musculus",
-  build=r"R64-1-1|GRCh38|GRCh37|GRCm38|GRCm39",
-  release=r"116|75|102|115",
-  gxf=r"gtf|gff|gff3",
-  seqtype=r"dna|cdna|cds",
+    species=r"saccharomyces_cerevisiae|homo_sapiens|mus_musculus",
+    build=r"R64-1-1|GRCh38|GRCh37|GRCm38|GRCm39",
+    release=r"116|75|102|115",
+    gxf=r"gtf|gff|gff3",
+    seqtype=r"dna|cdna|cds",
 
-config["genome_sequence"] = "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta"
-config["genome_annotation"] = "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.gtf"
-config["agat_config"] = "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml"
+
+config["genome_sequence"] = (
+    "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta"
+)
+config["genome_annotation"] = (
+    "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.gtf"
+)
+config["agat_config"] = (
+    "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml"
+)
+
 
 rule target:
     input:
@@ -28,27 +36,30 @@ rule target:
 
 
 module download_genome_sequences:
-    meta_wrapper:
-        f"{config['git_repo']}/download_genome_annotation"
     config:
         config
+    meta_wrapper:
+        f"{config['git_repo']}/download_genome_annotation"
+
 
 use rule * from download_genome_sequences
 
 
 module download_genome_annotation:
-    meta_wrapper:
-        f"{config['git_repo']}/download_genome_sequences"
     config:
         config
+    meta_wrapper:
+        f"{config['git_repo']}/download_genome_sequences"
+
 
 use rule * from download_genome_annotation
 
 
 module genome_statistics:
-    meta_wrapper:
-        f"{config['git_repo']}/genome_statistics"
     config:
         config
+    meta_wrapper:
+        f"{config['git_repo']}/genome_statistics"
+
 
 use rule * from genome_statistics

@@ -4,14 +4,14 @@ rule freebayes:
         idxs="mapped/{sample}.bam.bai",
         ref="genome.fasta",
     output:
-        vcf = "calls/{sample}.vcf",
+        vcf="calls/{sample}.vcf",
     log:
         "logs/freebayes/{sample}.log",
-    params:
-        normalize="-a",
     threads: 2
     resources:
         mem_mb=1024,
+    params:
+        normalize="-a",
     wrapper:
         "master/bio/freebayes"
 
@@ -40,10 +40,10 @@ rule freebayes_bed:
         vcf="calls/{sample}.vcf.gz",
     log:
         "logs/freebayes/{sample}.bed.log",
-    params:
-        chunksize=50000,
     threads: 2
     resources:
         mem_mb=1024,
+    params:
+        chunksize=50000,
     wrapper:
         "master/bio/freebayes"

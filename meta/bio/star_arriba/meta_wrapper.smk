@@ -4,13 +4,13 @@ rule star_index:
         gtf="<genome_annotation>",
     output:
         directory("<resources>/star_genome"),
+    log:
+        "<logs>/star_index_genome.log",
+    cache: True  # mark as eligible for between workflow caching
     threads: 4
     params:
         sjdbOverhang=100,
         extra="",
-    log:
-        "<logs>/star_index_genome.log",
-    cache: True  # mark as eligible for between workflow caching
     wrapper:
         "v3.3.7/bio/star/index"
 
@@ -29,6 +29,7 @@ rule star_align:
         reads_per_gene="<results>/star/<per>/ReadsPerGene.out.tab",
     log:
         "<logs>/star/<per>.log",
+    threads: 12
     params:
         # specific parameters to work well with arriba
         extra=lambda wc, input: (
@@ -37,7 +38,6 @@ rule star_align:
             " --chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0"
             " --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"
         ),
-    threads: 12
     wrapper:
         "v9.4.2/bio/star/align"
 
@@ -54,14 +54,14 @@ rule arriba:
     output:
         fusions="<results>/arriba/<per>.fusions.tsv",
         discarded="<results>/arriba/<per>.fusions.discarded.tsv",
+    log:
+        "<logs>/arriba/<per>.log",
+    threads: 1
     params:
         # required if blacklist or known_fusions is set
         genome_build="GRCh38",
         default_blacklist=False,
         default_known_fusions=True,
         extra="",
-    log:
-        "<logs>/arriba/<per>.log",
-    threads: 1
     wrapper:
         "v9.0.1/bio/arriba"

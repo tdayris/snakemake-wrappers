@@ -11,11 +11,11 @@ rule mapdamage2_plot:
         plot_misinc="results/plot/{sample}.Fragmisincorporation_plot.pdf",
         plot_len="results/plot/{sample}.Length_plot.pdf",
         log="results/plot/{sample}.log",
-    params:
-        extra="-m 20",
     log:
         "logs/plot/{sample}.log",
     threads: 1
+    params:
+        extra="-m 20",
     wrapper:
         "master/bio/mapdamage2"
 
@@ -35,11 +35,11 @@ rule mapdamage2_stats:
         stats_plot_freq="results/stats/{sample}.Stats_out_MCMC_post_pred.pdf",
         stats_plot_trace="results/stats/{sample}.Stats_out_MCMC_trace.pdf",
         log="results/stats/{sample}.log",
-    params:
-        extra="--burn 10 --iter 10",
     log:
         "logs/stats/{sample}.log",
     threads: 1
+    params:
+        extra="--burn 10 --iter 10",
     wrapper:
         "master/bio/mapdamage2"
 
@@ -52,11 +52,11 @@ rule mapdamage2_rescale:
     output:
         bam="results/rescale/{sample}.bam",
         log="results/rescale/{sample}.log",
-    params:
-        extra="",
     log:
         "logs/rescale/{sample}.log",
     threads: 1
+    params:
+        extra="",
     wrapper:
         "master/bio/mapdamage2"
 
@@ -82,10 +82,10 @@ rule mapdamage2_all:
         stats_plot_trace="results/all/{sample}.Stats_out_MCMC_trace.pdf",
         bam="results/all/{sample}.bam",
         log="results/all/{sample}.log",
-    params:
-        extra="--burn 10 --iter 10",
     log:
         "logs/all/{sample}.log",
     threads: 1
+    params:
+        extra="--burn 10 --iter 10",
     wrapper:
         "master/bio/mapdamage2"

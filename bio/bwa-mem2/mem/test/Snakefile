@@ -7,12 +7,12 @@ rule bwa_mem2_mem:
         "mapped/{sample}.bam",
     log:
         "logs/bwa_mem2/{sample}.log",
+    threads: 8
     params:
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
         sort="none",  # Can be 'none', 'samtools', or 'picard'.
         sort_order="coordinate",  # Can be 'coordinate' (default) or 'queryname'.
         sort_extra="",  # Extra args for samtools/picard sorts.
-    threads: 8
     wrapper:
         "master/bio/bwa-mem2/mem"
 
@@ -26,11 +26,11 @@ rule bwa_mem2_mem_sam:
         "mapped/{sample}.sam",
     log:
         "logs/bwa_mem2/{sample}.log",
+    threads: 8
     params:
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
         sort="none",  # Can be 'none', 'samtools', or 'picard'.
         sort_order="coordinate",  # Can be 'coordinate' (default) or 'queryname'.
         sort_extra="",  # Extra args for samtools/picard sorts.
-    threads: 8
     wrapper:
         "master/bio/bwa-mem2/mem"

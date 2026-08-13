@@ -17,6 +17,7 @@ rule bwa_memx_mem:
         "mapped/mem/{sample}.cram",  # Output can be .cram, .bam, or .sam
     log:
         "logs/bwa_memx/{sample}.log",
+    threads: 8
     params:
         bwa="bwa-mem",  # Can be 'bwa-mem, bwa-mem2 or bwa-meme.
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}' -M",
@@ -27,7 +28,6 @@ rule bwa_memx_mem:
         dedup_extra="-M",  # Extra args for samblaster.
         exceed_thread_limit=True,  # Set threads als for samtools sort / view (total used CPU may exceed threads!)
         embed_ref=True,  # Embed reference when writing cram.
-    threads: 8
     wrapper:
         "master/bio/bwa-memx/mem"
 
@@ -48,6 +48,7 @@ rule bwa_memx_mem2:
         "mapped/mem2/{sample}.cram",
     log:
         "logs/bwa_memx/{sample}.log",
+    threads: 8
     params:
         bwa="bwa-mem2",
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}' -M",
@@ -58,7 +59,6 @@ rule bwa_memx_mem2:
         dedup_extra="-M",
         exceed_thread_limit=True,
         embed_ref=True,
-    threads: 8
     wrapper:
         "master/bio/bwa-memx/mem"
 
@@ -83,6 +83,7 @@ rule bwa_memx_meme:
         "mapped/meme/{sample}.cram",
     log:
         "logs/bwa_memx/{sample}.log",
+    threads: 8
     params:
         bwa="bwa-meme",
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}' -M",
@@ -93,6 +94,5 @@ rule bwa_memx_meme:
         dedup_extra="-M",
         exceed_thread_limit=False,
         embed_ref=False,
-    threads: 8
     wrapper:
         "master/bio/bwa-memx/mem"

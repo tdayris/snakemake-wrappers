@@ -10,9 +10,9 @@ rule L2_PARAMETERS_extract:
         "genome.fasta.suffixarray_uint64_L2_PARAMETERS.gz",
     output:
         temp("genome.fasta.suffixarray_uint64_L2_PARAMETERS"),
-    conda:
-        "gzip.yaml"
     log:
         "log/extract.l2.log",
+    conda:
+        "gzip.yaml"
     shell:
         "zcat {input} > {output} 2> {log}"

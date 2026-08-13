@@ -3,12 +3,12 @@ rule star_index:
         fasta="{genome}.fasta",
     output:
         directory("{genome}"),
-    message:
-        "Testing STAR index"
+    log:
+        "logs/star_index_{genome}.log",
     threads: 1
     params:
         extra="",
-    log:
-        "logs/star_index_{genome}.log",
+    message:
+        "Testing STAR index"
     wrapper:
         "master/bio/star/index"

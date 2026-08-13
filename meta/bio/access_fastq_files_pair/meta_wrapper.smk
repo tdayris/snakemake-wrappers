@@ -11,27 +11,29 @@ PandasColumnValueType = collections.abc.Hashable
 StorageProviderType = StorageProviderBase
 
 
+# If no samples are provided in name space, then
 # Load samples table with column separator auto-detection
-samples_table_path: str = config.get("samples_table", "config/samples.csv")
-with open(samples_table_path, "r") as table_stream:
-    dialect: csv.Dialect = csv.Sniffer().sniff(table_stream.readline())
-    table_stream.seek(0)
+if not (("samples" in locals()) or ("samples" in globals())):
+    samples_table_path: str = config.get("samples_table", "config/samples.csv")
+    with open(samples_table_path, "r") as table_stream:
+        dialect: csv.Dialect = csv.Sniffer().sniff(table_stream.readline())
+        table_stream.seek(0)
 
-samples_table: pandas.DataFrame = pandas.read_csv(
-    samples_table_path,
-    header=0,
-    index_col=None,
-    sep=dialect.delimiter,
-    comment="#",
-    dtype=str,
-)
+    samples_table: pandas.DataFrame = pandas.read_csv(
+        samples_table_path,
+        header=0,
+        index_col=None,
+        sep=dialect.delimiter,
+        comment="#",
+        dtype=str,
+    )
 
 # If there are any, list **all** required columns missing from samples table
 required_tables: set[str] = {"sample_id", "upstream_file", "downstream_file"}
 missing_cols: set[str] = required_tables - set(samples_table.columns)
 if len(missing_cols) > 0:
     raise KeyError(f"Could not find {missing_cols=} in {samples_table.columns=}")
-samples_table.set_index("sample_id", inplace=True)
+samples_table.set_index("sample_id", inplace=True, drop=False)
 
 
 # Building possible storage access methods with plugins

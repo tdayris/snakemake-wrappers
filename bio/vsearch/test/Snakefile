@@ -6,9 +6,9 @@ rule vsearch_cluster_fast:
     log:
         "logs/vsearch/cluster_fast/{sample}.log",
         vsearch="out/maskfasta/{sample}.log",
+    threads: 1
     params:
         extra="--id 0.2 --sizeout --minseqlength 5",
-    threads: 1
     wrapper:
         "master/bio/vsearch"
 
@@ -21,9 +21,9 @@ rule vsearch_maskfasta:
     log:
         "logs/vsearch/maskfasta/{sample}.log",
         vsearch="out/maskfasta/{sample}.log",
+    threads: 1
     params:
         extra="--hardmask",
-    threads: 1
     wrapper:
         "master/bio/vsearch"
 
@@ -36,9 +36,9 @@ rule vsearch_fastx_uniques:
     log:
         "logs/vsearch/fastx_uniques/{sample}.log",
         vsearch="out/fastx_uniques/{sample}.log",
+    threads: 1
     params:
         extra="--strand both --minseqlength 5",
-    threads: 1
     wrapper:
         "master/bio/vsearch"
 
@@ -51,9 +51,9 @@ rule vsearch_fastx_uniques_gzip:
     log:
         "logs/vsearch/fastx_uniques/{sample}.log",
         vsearch="out/fastx_uniques/{sample}.log",
+    threads: 2
     params:
         extra="--strand both --minseqlength 5",
-    threads: 2
     wrapper:
         "master/bio/vsearch"
 
@@ -66,9 +66,9 @@ rule vsearch_fastx_uniques_bzip2:
     log:
         "logs/vsearch/fastx_uniques/{sample}.log",
         vsearch="out/fastx_uniques/{sample}.log",
+    threads: 2
     params:
         extra="--strand both --minseqlength 5",
-    threads: 2
     wrapper:
         "master/bio/vsearch"
 
@@ -81,11 +81,12 @@ rule vsearch_fastq_convert:
     log:
         "logs/vsearch/fastq_convert/{sample}.log",
         vsearch="out/fastq_convert/{sample}.log",
+    threads: 2
     params:
         extra="--fastq_ascii 33 --fastq_asciiout 64",
-    threads: 2
     wrapper:
         "master/bio/vsearch"
+
 
 rule vsearch_derep_fulllength:
     input:
@@ -95,11 +96,12 @@ rule vsearch_derep_fulllength:
     log:
         "logs/vsearch/derep_fulllength/{sample}.log",
         vsearch="out/derep_fulllength/{sample}.log",
+    threads: 2
     params:
         extra="--sizeout --relabel_sha1 --fasta_width 0 --minseqlength 30",
-    threads: 2
     wrapper:
         "master/bio/vsearch"
+
 
 rule vsearch_derep_prefix:
     input:
@@ -109,8 +111,8 @@ rule vsearch_derep_prefix:
     log:
         "logs/vsearch/derep_prefix/{sample}.log",
         vsearch="out/derep_prefix/{sample}.log",
+    threads: 2
     params:
         extra="--sizeout --relabel_sha1 --fasta_width 0 --minseqlength 30",
-    threads: 2
     wrapper:
         "master/bio/vsearch"

@@ -16,10 +16,10 @@ rule mmseqs2_databases:
         ),
     log:
         "logs/databases/{sample}.log",
+    threads: 1
     params:
         module="databases SILVA",
         extra="-v 3",
-    threads: 1
     wrapper:
         "master/bio/mmseqs2/db"
 
@@ -41,10 +41,10 @@ rule mmseqs2_createdb:
         ),
     log:
         "logs/createdb/{sample}.log",
+    threads: 1
     params:
         module="createdb",
         extra="-v 3 --dbtype 2",
-    threads: 1
     wrapper:
         "master/bio/mmseqs2/db"
 
@@ -60,9 +60,9 @@ rule mmseqs2_createtaxdb:
         touch("out/createtaxdb/{sample}.done"),
     log:
         "logs/createtaxdb/{sample}.log",
+    threads: 1
     params:
         module="createtaxdb",
         extra="-v 3",
-    threads: 1
     wrapper:
         "master/bio/mmseqs2/db"

@@ -11,11 +11,11 @@ rule strelka:
     output:
         # Strelka output - can be directory or full file path
         directory("{tumor}_vcf"),
+    log:
+        "logs/strelka_{tumor}.log",
     threads: 1
     params:
         run_extra="",
         config_extra="",
-    log:
-        "logs/strelka_{tumor}.log",
     wrapper:
         "master/bio/strelka/somatic"

@@ -4,12 +4,18 @@ rule vg_autoindex_giraffe:
         # Optional vcf file containing haplotypes for graph creation
         #vcf="",
     output:
-        multiext("resources/{genome}", ".dist", ".shortread.zipcodes", ".shortread.withzip.min", ".giraffe.gbz"),
+        multiext(
+            "resources/{genome}",
+            ".dist",
+            ".shortread.zipcodes",
+            ".shortread.withzip.min",
+            ".giraffe.gbz",
+        ),
     log:
         "logs/autoindex/{genome}.log",
+    threads: 8
     params:
         extra="",
-    threads: 8
     wrapper:
         "master/bio/vg/autoindex"
 
@@ -23,8 +29,8 @@ rule vg_autoindex_map:
         multiext("resources/{genome}", ".xg", ".gcsa", ".gcsa.lcp"),
     log:
         "logs/autoindex/{genome}.log",
+    threads: 8
     params:
         extra="",
-    threads: 8
     wrapper:
         "master/bio/vg/autoindex"

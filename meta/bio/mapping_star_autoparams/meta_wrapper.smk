@@ -19,7 +19,7 @@ def get_xsv_columns(stranding: str) -> str:
 
 
 def get_star_params(
-    genome_statistics: io.TextIOWrapper, 
+    genome_statistics: io.TextIOWrapper,
     chimeric: bool = False,
 ) -> str:
     """provide star align arguments to align reads with given genome"""
@@ -167,7 +167,9 @@ use rule sambamba_index_sorted_reads as sambamba_index_deduplicated_reads with:
     input:
         "<temp>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.bam",
     output:
-        temp("<temp>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.bam.bai"),
+        temp(
+            "<temp>/sambamba_mark_duplicates/<species>.<build>.<release>.{sample}.bam.bai"
+        ),
     log:
         "<logs>/sambamba_index_deduplicated_reads/<species>.<build>.<release>.{sample}.log",
     benchmark:
@@ -209,5 +211,3 @@ rule samtools_index_cram_reads:
         extra="",
     wrapper:
         "v9.14.0/bio/samtools/index"
-
-

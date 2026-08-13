@@ -9,12 +9,12 @@ rule run_busco:
         dataset_dir=directory("resources/busco_downloads"),
     log:
         "logs/proteins_busco.log",
+    threads: 8
     params:
         mode="proteins",
         lineage="stramenopiles_odb10",
         # optional parameters
         extra="",
-    threads: 8
     wrapper:
         "master/bio/busco"
 
@@ -27,11 +27,11 @@ rule run_busco_euk:
         dataset_dir=directory("resources/busco_downloads"),
     log:
         "logs/proteins_busco_euk.log",
+    threads: 8
     params:
         mode="proteins",
         # optional parameters
         extra="--auto-lineage-euk",
-    threads: 8
     wrapper:
         "master/bio/busco"
 
@@ -44,10 +44,10 @@ rule run_busco_prok:
         dataset_dir=directory("resources/busco_downloads"),
     log:
         "logs/proteins_busco_prok.log",
+    threads: 8
     params:
         mode="proteins",
         # optional parameters
         extra="--auto-lineage-prok",
-    threads: 8
     wrapper:
         "master/bio/busco"

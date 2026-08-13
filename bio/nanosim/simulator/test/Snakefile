@@ -2,10 +2,12 @@
 # simulator.py subcommands, as these are needed for testing #[hide]
 include: "download_models.smk"  #[hide]
 
+
 wildcard_constraints:
     model="[^/]+",
     refs_prefix="[^/]+",
     sample="[^/]+",
+
 
 rule nanosim_genome:
     input:
@@ -40,9 +42,9 @@ rule nanosim_genome:
         unaligned_reads="results/nanosim/genome/{sample}/{model}.simulated_reads.unaligned.fq",  # asking for unaligned_reads implicitly turns off --perfect
     log:
         "logs/nanosim/genome/{sample}.{model}.log",
+    threads: 4
     params:
         extra="--number 5 -dna_type circular",
-    threads: 4
     wrapper:
         "master/bio/nanosim/simulator"
 
@@ -81,7 +83,6 @@ rule nanosim_transcriptome:
             "_transcriptome_gap_length.pkl",
             "_transcriptome_primary.out",
             "_unaligned_length.pkl",
-
         ),
     output:
         reads="results/nanosim/transcriptome/{sample}/{model}.simulated.fq",  # fastq output requires specification of a --basecaller
@@ -89,9 +90,9 @@ rule nanosim_transcriptome:
         unaligned_reads="results/nanosim/transcriptome/{sample}/{model}.simulated_reads.unaligned.fq",
     log:
         "logs/nanosim/transcriptome/{sample}.{model}.log",
+    threads: 4
     params:
         extra="--number 5 --basecaller guppy",
-    threads: 4
     wrapper:
         "master/bio/nanosim/simulator"
 
@@ -136,6 +137,7 @@ rule nanosim_metagenome:
         #unaligned_reads="results/nanosim/metagenome/{refs_prefix}.{model}/simulated/{sample}.simulated_reads_unaligned.fq",  # not asking for unaligned reads sets the flag --perfect
     log:
         "logs/nanosim/metagenome/{refs_prefix}.{model}/{sample}.log",
+    threads: 4
     params:
         extra="",
         species={
@@ -150,6 +152,5 @@ rule nanosim_metagenome:
                 "ref_suffix": "genome2.fa",
             },
         },
-    threads: 4
     wrapper:
         "master/bio/nanosim/simulator"

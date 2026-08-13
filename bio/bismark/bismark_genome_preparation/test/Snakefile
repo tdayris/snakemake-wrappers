@@ -6,9 +6,9 @@ rule bismark_genome_preparation_fa:
         bismark_genome_dir=directory("resources/{genome}/bismark/"),
     log:
         "logs/resources/{genome}/bismark_genome_preparation.log",
+    threads: 2  # bismark_genome_preparation requires least 2 threads and at least --cores 2 from workflow run
     params:
         extra="",  # optional params string
-    threads: 2  # bismark_genome_preparation requires least 2 threads and at least --cores 2 from workflow run
     wrapper:
         "master/bio/bismark/bismark_genome_preparation"
 
@@ -21,8 +21,8 @@ rule bismark_genome_preparation_fa_gz:
         bismark_genome_dir=directory("resources/{genome}/bismark/"),
     log:
         "logs/resources/{genome}/bismark_genome_preparation.log",
+    threads: 2  # bismark_genome_preparation requires least 2 threads and at least --cores 2 from workflow run
     params:
         extra="",  # optional params string
-    threads: 2  # bismark_genome_preparation requires least 2 threads and at least --cores 2 from workflow run
     wrapper:
         "master/bio/bismark/bismark_genome_preparation"

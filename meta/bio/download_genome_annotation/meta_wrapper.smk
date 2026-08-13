@@ -29,9 +29,9 @@ rule agat_default_config:
         "<logs>/agat_default_config.log",
     benchmark:
         "<benchmarks>/agat/default_config.tsv"
-    threads: 1
     shadow:
         "minimal"
+    threads: 1
     params:
         command="config",
         extra="",
@@ -86,9 +86,9 @@ use rule agat_default_config as agat_convert_sp_gxf2gxf with:
         "<logs>/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}.log",
     benchmark:
         "<benchmarks>/agat/convert_sp_gxf2gxf_{species}.{build}.{release}.{gxf}.tsv"
-    threads: 6
     shadow:
         "minimal"
+    threads: 6
     params:
         command="agat_convert_sp_gxf2gxf.pl",
         extra="",
@@ -108,9 +108,9 @@ use rule agat_default_config as agat_sq_filter_feature_from_fasta with:
         "<logs>/agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}.log",
     benchmark:
         "<benchmarks>/agat/sq_filter_feature_from_fasta_{species}.{build}.{release}.{gxf}.tsv"
-    threads: 6
     shadow:
         "minimal"
+    threads: 6
     params:
         extra="",
         command="agat_sq_filter_feature_from_fasta.pl",
@@ -127,9 +127,9 @@ use rule agat_default_config as agat_sp_filter_feature_by_attribute_value with:
         "<logs>/agat_sp_filter_feature_by_attribute_value/{species}.{build}.{release}.{gxf}.log",
     benchmark:
         "<benchmarks>/agat/sp_filter_feature_by_attribute_value_{species}.{build}.{release}.{gxf}.tsv"
-    threads: 6
     shadow:
         "minimal"
+    threads: 6
     params:
         extra="--attribute 'transcript_support_level' --value 'NA' --test '='",
         command="agat_sp_filter_feature_by_attribute_value.pl",

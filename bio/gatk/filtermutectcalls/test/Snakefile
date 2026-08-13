@@ -6,11 +6,11 @@ rule gatk_filtermutectcalls:
         vcf="calls/snvs.mutect.filtered.vcf",
     log:
         "logs/gatk/filter/snvs.log",
+    resources:
+        mem_mb=1024,
     params:
         extra="--max-alt-allele-count 3",  # optional arguments, see GATK docs
         java_opts="",  # optional
-    resources:
-        mem_mb=1024,
     wrapper:
         "master/bio/gatk/filtermutectcalls"
 
@@ -28,10 +28,10 @@ rule gatk_filtermutectcalls_complete:
         vcf="calls/snvs.mutect.filtered.b.vcf",
     log:
         "logs/gatk/filter/snvs.log",
+    resources:
+        mem_mb=1024,
     params:
         extra="--max-alt-allele-count 3",  # optional arguments, see GATK docs
         java_opts="",  # optional
-    resources:
-        mem_mb=1024,
     wrapper:
         "master/bio/gatk/filtermutectcalls"

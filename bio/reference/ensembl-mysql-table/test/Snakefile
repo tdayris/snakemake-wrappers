@@ -1,6 +1,9 @@
 rule create_repeat_annotations:
     output:
         table="resources/ensembl_repeat_annotations.tsv.gz",  # .gz extension is optional, but recommended
+    log:
+        "logs/create_repeat_annotations.log",
+    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     params:
         species="homo_sapiens",
         build="GRCh37",
@@ -9,7 +12,8 @@ rule create_repeat_annotations:
             "repeat_feature": {
                 "database": "core",
             },
-        },  # choose the main table to retrieve, specifying { table : database }
+        },
+        # choose the main table to retrieve, specifying { table : database }
         join_tables={
             "seq_region": {
                 "database": "core",
@@ -21,9 +25,6 @@ rule create_repeat_annotations:
             },
         },
         # optional: add tables to join in for further annotations, specifying { table : { "database": database, "join_column": join-column } }
-    log:
-        "logs/create_repeat_annotations.log",
-    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     wrapper:
         "master/bio/reference/ensembl-mysql-table"
 
@@ -31,6 +32,9 @@ rule create_repeat_annotations:
 rule create_regulatory_annotations_parquet:
     output:
         table="resources/ensembl_regulatory_annotations.parquet.gz",  # .gz extension is optional, but recommended
+    log:
+        "logs/create_regulatory_annotations_parquet.log",
+    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     params:
         species="mus_musculus",
         build="GRCm39",
@@ -45,18 +49,9 @@ rule create_regulatory_annotations_parquet:
         },
         # choose the main table to retrieve, specifying { table : database }
         join_tables={
-            "seq_region": {
-                "database": "core",
-                "join_column": "seq_region_id"
-            },
-            "feature_type": {
-                "database": "funcgen",
-                "join_column": "feature_type_id"
-            },
+            "seq_region": {"database": "core", "join_column": "seq_region_id"},
+            "feature_type": {"database": "funcgen", "join_column": "feature_type_id"},
         },
         # optional: add tables to join in for further annotations, specifying { table : { "database": database, "join_column": join-column } }
-    log:
-        "logs/create_regulatory_annotations_parquet.log",
-    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     wrapper:
         "master/bio/reference/ensembl-mysql-table"

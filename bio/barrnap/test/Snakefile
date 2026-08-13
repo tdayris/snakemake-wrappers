@@ -4,11 +4,11 @@ rule barrnap:
     output:
         gff="{sample}.gff",
         fasta="{sample}_hits.fasta",
+    log:
+        "logs/barrnap/{sample}.log",
+    threads: 1
     params:
         kingdom="bac",
         extra="",
-    threads: 1
-    log:
-        "logs/barrnap/{sample}.log",
     wrapper:
         "master/bio/barrnap"

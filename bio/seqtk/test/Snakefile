@@ -49,10 +49,10 @@ rule seqtk_mergepe:
         merged="results/mergepe/{sample}.fastq.gz",
     log:
         "logs/mergepe/{sample}.log",
+    threads: 2
     params:
         command="mergepe",
         compress_lvl=9,
-    threads: 2
     wrapper:
         "master/bio/seqtk"
 
@@ -64,11 +64,11 @@ rule seqtk_sample_se:
         "results/sample_se/{sample}.fastq.gz",
     log:
         "logs/sample_se/{sample}.log",
+    threads: 1
     params:
         command="sample",
         n=3,
         extra="-s 12345",
-    threads: 1
     wrapper:
         "master/bio/seqtk"
 
@@ -82,10 +82,10 @@ rule seqtk_sample_pe:
         f2="results/sample_pe/{sample}.2.fastq.gz",
     log:
         "logs/sample_pe/{sample}.log",
+    threads: 1
     params:
         command="sample",
         n=3,
         extra="-s 12345",
-    threads: 1
     wrapper:
         "master/bio/seqtk"

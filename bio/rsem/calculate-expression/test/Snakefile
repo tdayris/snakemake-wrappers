@@ -4,7 +4,15 @@ rule calculate_expression:
         # an aligned to transcriptome BAM
         bam="mapped/a.bam",
         # Index files created by rsem-prepare-reference
-        reference=multiext("index/reference", ".grp", ".ti", ".transcripts.fa", ".seq", ".idx.fa", ".n2g.idx.fa"),
+        reference=multiext(
+            "index/reference",
+            ".grp",
+            ".ti",
+            ".transcripts.fa",
+            ".seq",
+            ".idx.fa",
+            ".n2g.idx.fa",
+        ),
         # reference_bowtie: Additionally needed for FASTQ input; Index files created (by bowtie-build) from the reference transcriptome
         # reference_bowtie=multiext("index/reference", ".1.ebwt", ".2.ebwt", ".3.ebwt", ".4.ebwt", ".rev.1.ebwt", ".rev.2.ebwt"),
     output:
@@ -14,13 +22,13 @@ rule calculate_expression:
         # isoforms_results must end in .isoforms.results and otherwise have the same prefix as genes_results
         # this file contains per-transcript quantification data for the sample
         isoforms_results="output/a.isoforms.results",
+    log:
+        "logs/rsem/calculate_expression/a.log",
+    threads: 2
     params:
         # optional, specify if sequencing is paired-end
         paired_end=True,
         # additional optional parameters to pass to rsem, for example,
         extra="--seed 42",
-    log:
-        "logs/rsem/calculate_expression/a.log",
-    threads: 2
     wrapper:
         "master/bio/rsem/calculate-expression"

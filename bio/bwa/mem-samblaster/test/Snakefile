@@ -7,9 +7,9 @@ rule bwa_mem:
         bai="mapped/{sample}.bam.bai",
     log:
         "logs/bwa_mem_sambamba/{sample}.log",
+    threads: 8
     params:
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
         sort_extra="",  # Extra args for sambamba.
-    threads: 8
     wrapper:
         "master/bio/bwa/mem-samblaster"

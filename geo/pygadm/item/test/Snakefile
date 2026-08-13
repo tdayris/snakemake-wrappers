@@ -2,13 +2,13 @@ rule download:
     output:
         # GADM data file
         path="results/mexico.parquet",
+    log:
+        "logs/pygadm/item.log",
+    threads: 1
     params:
         # administration iso-3 code
         admin="MEX",
         # layer to get (0: country, 1: regions, 2: subregions)
-        content_level=1
-    threads: 1
-    log:
-        "logs/pygadm/item.log"
+        content_level=1,
     wrapper:
         "master/geo/pygadm/item"

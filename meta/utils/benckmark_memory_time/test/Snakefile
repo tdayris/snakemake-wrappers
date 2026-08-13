@@ -2,12 +2,16 @@ from snakemake.utils import min_version
 
 min_version("9.13.1")
 
+
 configfile: "config.yaml"
+
 
 tools: tuple[str] = ("agat", "assembly_stats", "curl", "go_yq")
 
+
 wildcard_constraints:
-    tool=r"|".join(tools)
+    tool=r"|".join(tools),
+
 
 rule target:
     input:
@@ -15,7 +19,7 @@ rule target:
             "<results>/benchmark/{tool}/summary.csv",
             tool=tools,
         ),
-        "<results>/benchmark/benchmarks.csv",
+        "<results>/benchmark/report.txt",
 
 
 module benckmark_memory_time:

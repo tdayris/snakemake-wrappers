@@ -5,10 +5,10 @@ rule homer_annotatepeaks:
         # optional input files
         # gtf="", # implicitly sets the -gtf flag
         # gene="", # implicitly sets the -gene flag for gene data file to add gene expression or other data types
-        motif_files="peaks_refs/motives.txt", # implicitly sets the -m flag
+        motif_files="peaks_refs/motives.txt",  # implicitly sets the -m flag
         # filter_motiv="", # implicitly sets the -fm flag
         # center="",  # implicitly sets the -center flag
-        nearest_peak="peaks_refs/b.peaks", # implicitly sets the -p flag
+        nearest_peak="peaks_refs/b.peaks",  # implicitly sets the -p flag
         # tag="",  # implicitly sets the -d flag for tagDirectories
         # vcf="", # implicitly sets the -vcf flag
         # bed_graph="", # implicitly sets the -bedGraph flag
@@ -20,24 +20,24 @@ rule homer_annotatepeaks:
     output:
         annotations="{sample}_annot.txt",
         # optional output, implicitly sets the -matrix flag, requires motif_files as input
-        matrix=multiext("{sample}",
-                        ".count.matrix.txt",
-                        ".ratio.matrix.txt",
-                        ".logPvalue.matrix.txt",
-                        ".stats.txt"
-                        ),
+        matrix=multiext(
+            "{sample}",
+            ".count.matrix.txt",
+            ".ratio.matrix.txt",
+            ".logPvalue.matrix.txt",
+            ".stats.txt",
+        ),
         # optional output, implicitly sets the -mfasta flag, requires motif_files as input
         mfasta="{sample}_motif.fasta",
         # # optional output, implicitly sets the -mbed flag, requires motif_files as input
         mbed="{sample}_motif.bed",
         # # optional output, implicitly sets the -mlogic flag, requires motif_files as input
-        mlogic="{sample}_motif.logic"
-    threads:
-        2
-    params:
-        mode="", # add tss, tts or rna mode and options here, i.e. "tss mm8"
-        extra="-gid"  # optional params, see http://homer.ucsd.edu/homer/ngs/annotation.html
+        mlogic="{sample}_motif.logic",
     log:
-        "logs/annotatePeaks/{sample}.log"
+        "logs/annotatePeaks/{sample}.log",
+    threads: 2
+    params:
+        mode="",  # add tss, tts or rna mode and options here, i.e. "tss mm8"
+        extra="-gid",  # optional params, see http://homer.ucsd.edu/homer/ngs/annotation.html
     wrapper:
         "master/bio/homer/annotatePeaks"

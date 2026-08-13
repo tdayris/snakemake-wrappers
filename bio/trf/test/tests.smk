@@ -5,6 +5,8 @@ rule run_trf_with_missing_param_value:
         sample="demo_data/{sample}.fasta",
     output:
         directory("trf_output/{sample}"),
+    log:
+        "logs/{sample}.log",
     params:
         match=2,
         mismatch=7,
@@ -12,8 +14,6 @@ rule run_trf_with_missing_param_value:
         pm=80,
         maxperiod=500,
         extra="-f -d -m",
-    log:
-        "logs/{sample}.log",
     wrapper:
         "master/bio/trf"
 
@@ -25,6 +25,8 @@ rule run_trf_permissible_flags:
         sample="demo_data/{sample}.fasta",
     output:
         directory("trf_output/{sample}"),
+    log:
+        "logs/{sample}.log",
     params:
         match=2,
         mismatch=7,
@@ -34,8 +36,6 @@ rule run_trf_permissible_flags:
         minscore=50,
         maxperiod=500,
         extra="-H -L29",
-    log:
-        "logs/{sample}.log",
     wrapper:
         "master/bio/trf"
 
@@ -48,6 +48,8 @@ rule run_trf_basic_uppercase:
         sample="demo_data/{sample}.fasta",
     output:
         directory("trf_output/{sample}"),
+    log:
+        "logs/{sample}.log",
     params:
         MATCH=2,
         mismatch=7,
@@ -57,7 +59,5 @@ rule run_trf_basic_uppercase:
         minscore=50,
         maxperiod=500,
         eXtra="-f -d -m",
-    log:
-        "logs/{sample}.log",
     wrapper:
         "master/bio/trf"

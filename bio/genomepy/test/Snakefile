@@ -11,8 +11,8 @@ rule genomepy:
         ),
     log:
         "logs/genomepy_{assembly}.log",
+    cache: "omit-software"  # mark as eligible for between workflow caching
     params:
         provider="ucsc",  # optional, defaults to ucsc. Choose from ucsc, ensembl, and ncbi
-    cache: "omit-software"  # mark as eligible for between workflow caching
     wrapper:
         "master/bio/genomepy"

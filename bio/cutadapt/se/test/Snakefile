@@ -4,11 +4,11 @@ rule cutadapt:
     output:
         fastq="trimmed/{sample}.fastq",
         qc="trimmed/{sample}.qc.txt",
-    params:
-        adapters="-a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC",
-        extra="-q 20",
     log:
         "logs/cutadapt/{sample}.log",
     threads: 4  # set desired number of threads here
+    params:
+        adapters="-a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC",
+        extra="-q 20",
     wrapper:
         "master/bio/cutadapt/se"

@@ -5,9 +5,9 @@ rule salmon_decoy_sequences:
     output:
         gentrome=temp("resources/gentrome.fasta"),
         decoys=temp("resources/decoys.txt"),
-    threads: 1
     log:
         "decoys.log",
+    threads: 1
     wrapper:
         "v6.0.0/bio/salmon/decoys"
 
@@ -31,9 +31,9 @@ rule salmon_index_gentrome:
             "index.tct",
             "index.tdct",
         ),
-    cache: True
     log:
         "logs/salmon/transcriptome_index.log",
+    cache: True
     threads: 2
     params:
         # optional parameters
@@ -57,11 +57,11 @@ rule salmon_quant_reads:
         logs=temp(directory("pseudo_mapping/{sample}/logs")),
     log:
         "logs/salmon/{sample}.log",
+    threads: 2
     params:
         # optional parameters
         libtype="A",
         extra="--numBootstraps 32",
-    threads: 2
     wrapper:
         "v9.15.0/bio/salmon/quant"
 
@@ -88,9 +88,9 @@ rule tximport:
         tx_to_gene="resources/tx2gene.tsv",
     output:
         txi="tximport/SummarizedExperimentObject.RDS",
+    log:
+        "logs/tximport.log",
     params:
         extra="type='salmon'",
-    log:
-        "logs/tximport.log"
     wrapper:
         "v9.3.0/bio/tximport"

@@ -12,8 +12,6 @@ rule datavzrd:
         config="resources/{sample}.datavzrd.yaml",
         # optional files required for rendering the given config
         table="data/{sample}.tsv",
-    params:
-        extra="",
     output:
         report(
             directory("results/datavzrd-report/{sample}"),
@@ -22,8 +20,10 @@ rule datavzrd:
             # for additional options like caption, categories and labels
         ),
         # optionally output the rendered config
-        config = "resources/datavzrd/{sample}.rendered_config.yaml"
+        config="resources/datavzrd/{sample}.rendered_config.yaml",
     log:
         "logs/datavzrd_report/{sample}.log",
+    params:
+        extra="",
     wrapper:
         "master/utils/datavzrd"

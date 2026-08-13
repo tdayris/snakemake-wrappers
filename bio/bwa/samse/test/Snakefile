@@ -5,12 +5,12 @@ rule bwa_samse:
         idx=multiext("genome", ".amb", ".ann", ".bwt", ".pac", ".sa"),
     output:
         "mapped/{sample}.bam",
+    log:
+        "logs/bwa_samse/{sample}.log",
     params:
         extra=r"-r '@RG\tID:{sample}\tSM:{sample}'",  # optional: Extra parameters for bwa.
         sort="none",  # optional: Enable sorting. Possible values: 'none', 'samtools' or 'picard'`
         sort_order="queryname",  # optional: Sort by 'queryname' or 'coordinate'
         sort_extra="",  # optional: extra arguments for samtools/picard
-    log:
-        "logs/bwa_samse/{sample}.log",
     wrapper:
         "master/bio/bwa/samse"

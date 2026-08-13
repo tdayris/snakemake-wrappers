@@ -8,9 +8,9 @@ rule mosdepth:
         summary="mosdepth/{dataset}.mosdepth.summary.txt",
     log:
         "logs/mosdepth/{dataset}.log",
+    threads: 4
     params:
         extra="--fast-mode",
-    threads: 4
     wrapper:
         "master/bio/mosdepth"
 
@@ -27,9 +27,9 @@ rule mosdepth_bed:
         summary="mosdepth_bed/{dataset}.mosdepth.summary.txt",
     log:
         "logs/mosdepth_bed/{dataset}.log",
+    threads: 4
     params:
         extra="--use-median",
-    threads: 4
     wrapper:
         "master/bio/mosdepth"
 
@@ -46,10 +46,10 @@ rule mosdepth_by_threshold:
         summary="mosdepth_by_threshold/{dataset}.mosdepth.summary.txt",
     log:
         "logs/mosdepth_by/{dataset}.log",
+    threads: 4
     params:
         by="500",  # needed for mosdepth.region.dist.txt and regions.bed.gz
         thresholds="1,5,10,30",  # needed for thresholds.bed.gz
-    threads: 4
     wrapper:
         "master/bio/mosdepth"
 
@@ -64,10 +64,10 @@ rule mosdepth_quantize_precision:
         summary="mosdepth_quantize_precision/{dataset}.mosdepth.summary.txt",
     log:
         "logs/mosdepth_quantize_precision/{dataset}.log",
+    threads: 4
     params:
         quantize="0:1:5:150",  # needed for quantized.bed.gz
         precision="5",  # optional, set decimals of precision
-    threads: 4
     wrapper:
         "master/bio/mosdepth"
 
@@ -85,8 +85,8 @@ rule mosdepth_cram:
         summary="mosdepth_cram/{dataset}.mosdepth.summary.txt",
     log:
         "logs/mosdepth_cram/{dataset}.log",
+    threads: 4
     params:
         extra="--use-median",
-    threads: 4
     wrapper:
         "master/bio/mosdepth"

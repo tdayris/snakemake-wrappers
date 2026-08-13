@@ -8,14 +8,14 @@ rule gatk_baserecalibratorspark:
         recal_table="recal/{sample}.grp",
     log:
         "logs/gatk/baserecalibrator/{sample}.log",
+    threads: 8
+    resources:
+        mem_mb=1024,
     params:
         extra="",  # optional
         java_opts="",  # optional
         #spark_runner="",  # optional, local by default
         #spark_master="",  # optional
         #spark_extra="", # optional
-    resources:
-        mem_mb=1024,
-    threads: 8
     wrapper:
         "master/bio/gatk/baserecalibratorspark"

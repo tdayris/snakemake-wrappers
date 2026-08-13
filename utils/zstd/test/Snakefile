@@ -1,0 +1,70 @@
+rule test_zstd_compress:
+    input:
+        "data.txt",
+    output:
+        "data.compressed.txt.zst",
+    log:
+        "zstd_compress.log",
+    threads: 1
+    params:
+        extra="-9",
+    wrapper:
+        "master/utils/zstd"
+
+
+rule test_zstd_decompress:
+    input:
+        "data.compressed.txt.zst",
+    output:
+        "data.decompress.txt",
+    log:
+        "zstd_decompress.log",
+    threads: 1
+    params:
+        extra="-9",
+    wrapper:
+        "master/utils/zstd"
+
+
+rule test_zstd_compress_multiple_files:
+    input:
+        "data.txt",
+        "data2.txt",
+    output:
+        "data.txt.zst",
+        "data2.txt.zst",
+    log:
+        "zstd_compress_multiple_files.log",
+    threads: 2
+    params:
+        extra="-9",
+    wrapper:
+        "master/utils/zstd"
+
+
+rule test_zstd_compress_gzip:
+    input:
+        "data.txt",
+    output:
+        "data.txt.gz",
+    log:
+        "zstd_compress_gzip.log",
+    threads: 1
+    params:
+        extra="-9",
+    wrapper:
+        "master/utils/zstd"
+
+
+rule test_zstd_uncompress_gzip:
+    input:
+        "data.txt.gz",
+    output:
+        "data.uncompress_gz.txt",
+    log:
+        "zstd_uncompress_gzip.log",
+    threads: 1
+    params:
+        extra="-9",
+    wrapper:
+        "master/utils/zstd"

@@ -22,6 +22,7 @@ rule bwa_meme_mem:
         "mapped/{sample}.cram",  # Output can be .cram, .bam, or .sam
     log:
         "logs/bwa_meme/{sample}.log",
+    threads: 8
     params:
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}' -M",
         sort="samtools",  # Can be 'none' or 'samtools or picard'.
@@ -31,6 +32,5 @@ rule bwa_meme_mem:
         dedup_extra="-M",  # Extra args for samblaster.
         exceed_thread_limit=True,  # Set threads als for samtools sort / view (total used CPU may exceed threads!)
         embed_ref=True,  # Embed reference when writing cram.
-    threads: 8
     wrapper:
         "master/bio/bwa-meme/mem"

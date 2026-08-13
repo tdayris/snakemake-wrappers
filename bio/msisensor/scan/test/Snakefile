@@ -1,15 +1,14 @@
 rule test_msisensor_scan:
     input:
-        "genome.fasta"
+        "genome.fasta",
     output:
-        "microsat.list"
+        "microsat.list",
+    log:
+        "logs/msisensor_scan.log",
+    threads: 1
+    params:
+        extra="",
     message:
         "Testing MSISensor scan"
-    threads:
-        1
-    params:
-        extra = ""
-    log:
-        "logs/msisensor_scan.log"
     wrapper:
         "master/bio/msisensor/scan"

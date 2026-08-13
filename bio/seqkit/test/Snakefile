@@ -5,10 +5,10 @@ rule seqkit_seq:
         fasta="out/seq/{sample}.fa.gz",
     log:
         "logs/seq/{sample}.log",
+    threads: 2
     params:
         command="seq",
         extra="--min-len 10",
-    threads: 2
     wrapper:
         "master/bio/seqkit"
 
@@ -21,9 +21,9 @@ rule seqkit_subseq_bed:
         fasta="out/subseq/bed/{sample}.fa.gz",
     log:
         "logs/subseq/bed/{sample}.log",
+    threads: 2
     params:
         command="subseq",
-    threads: 2
     wrapper:
         "master/bio/seqkit"
 
@@ -36,10 +36,10 @@ rule seqkit_subseq_gtf:
         fasta="out/subseq/gtf/{sample}.fa.gz",
     log:
         "logs/subseq/gtf/{sample}.log",
+    threads: 2
     params:
         command="subseq",
         extra="--feature CDS",
-    threads: 2
     wrapper:
         "master/bio/seqkit"
 
@@ -51,10 +51,10 @@ rule seqkit_subseq_region:
         fasta="out/subseq/region/{sample}.fa.gz",
     log:
         "logs/subseq/region/{sample}.log",
+    threads: 2
     params:
         command="subseq",
         extra="--region 1:12",
-    threads: 2
     wrapper:
         "master/bio/seqkit"
 
@@ -66,10 +66,10 @@ rule seqkit_fx2tab:
         tsv="out/fx2tab/{sample}.tsv",
     log:
         "logs/fx2tab/{sample}.log",
+    threads: 2
     params:
         command="fx2tab",
         extra="--name",
-    threads: 2
     wrapper:
         "master/bio/seqkit"
 
@@ -82,10 +82,10 @@ rule seqkit_grep_name:
         fastx="out/grep/name/{sample}.fastq.gz",
     log:
         "logs/grep/name/{sample}.log",
+    threads: 2
     params:
         command="grep",
         extra="--by-name",
-    threads: 2
     wrapper:
         "master/bio/seqkit"
 
@@ -98,10 +98,10 @@ rule seqkit_grep_seq:
         fastx="out/grep/seq/{sample}.fastq.gz",
     log:
         "logs/grep/seq/{sample}.log",
+    threads: 2
     params:
         command="grep",
         extra="--by-seq",
-    threads: 2
     wrapper:
         "master/bio/seqkit"
 
@@ -115,10 +115,10 @@ rule seqkit_rmdup_name:
         dup_seqs="out/rmdup/name/{sample}.seq.txt",
     log:
         "logs/rmdup/name/{sample}.log",
+    threads: 2
     params:
         command="rmdup",
         extra="--by-name",
-    threads: 2
     wrapper:
         "master/bio/seqkit"
 
@@ -132,10 +132,10 @@ rule seqkit_rmdup_seq:
         dup_seqs="out/rmdup/seq/{sample}.seq.txt",
     log:
         "logs/rmdup/seq/{sample}.log",
+    threads: 2
     params:
         command="rmdup",
         extra="--by-seq",
-    threads: 2
     wrapper:
         "master/bio/seqkit"
 
@@ -147,10 +147,10 @@ rule seqkit_stats:
         stats="out/stats/{sample}.tsv",
     log:
         "logs/stats/{sample}.log",
+    threads: 2
     params:
         command="stats",
         extra="--all --tabular",
-    threads: 2
     wrapper:
         "master/bio/seqkit"
 
@@ -165,10 +165,10 @@ rule seqkit_common:
         fasta="out/common/{sample1}_{sample2}.fa.gz",
     log:
         "logs/common/{sample1}_{sample2}.log",
+    threads: 2
     params:
         command="common",
         extra="",
-    threads: 2
     wrapper:
         "master/bio/seqkit"
 
@@ -183,11 +183,11 @@ rule seqkit_concat:
         fasta="out/concat/{sample1}_{sample2}.fa.gz",
     log:
         "logs/concat/{sample1}_{sample2}.log",
+    threads: 2
     params:
         command="concat",
         extra="",
         out_bgzip=True,
-    threads: 2
     wrapper:
         "master/bio/seqkit"
 
@@ -202,9 +202,9 @@ rule seqkit_split2_part:
         ],
     log:
         "logs/split/part/{sample}.log",
+    threads: 2
     params:
         command="split2",
         extra="--by-part 2",
-    threads: 2
     wrapper:
         "master/bio/seqkit"

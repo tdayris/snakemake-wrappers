@@ -1,5 +1,6 @@
 import os.path
 
+
 rule calc_consensus_reads:
     input:
         # sorted bam file
@@ -12,10 +13,10 @@ rule calc_consensus_reads:
         consensus_se=temp("<results>/consensus_reads/{sample}.se.fq"),
         # skipped reads (soft-clipped or unpropper mapped reads) will be skipped and unmarked
         skipped=temp("<results>/consensus_reads/{sample}.skipped.bam"),
-    params:
-        extra="",
     log:
         "<logs>/consensus/{sample}.log",
+    params:
+        extra="",
     wrapper:
         "v3.9.0/bio/rbt/collapse_reads_to_fragments-bam"
 
@@ -24,7 +25,9 @@ rule bwa_index:
     input:
         "<genome_sequence>",
     output:
-        idx=multiext("<resources>/bwa_index/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"),
+        idx=multiext(
+            "<resources>/bwa_index/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"
+        ),
     log:
         "<logs>/bwa_index.log",
     wrapper:
@@ -38,19 +41,21 @@ rule map_consensus_reads:
             sample=wc.sample,
             read="se" if wc.read_type == "se" else (1, 2),
         ),
-        idx=multiext("<resources>/bwa_index/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"),
+        idx=multiext(
+            "<resources>/bwa_index/genome", ".amb", ".ann", ".bwt", ".pac", ".sa"
+        ),
     output:
         temp("<results>/consensus_mapped/{sample}.{read_type}.bam"),
+    log:
+        "<logs>/bwa_mem/{sample}.{read_type}.consensus.log",
+    wildcard_constraints:
+        read_type="pe|se",
+    threads: 8
     params:
         extra=r"-C -R '@RG\tID:{sample}\tSM:{sample}'",
         index=lambda w, input: os.path.splitext(input.idx[0])[0],
         sort="samtools",
         sort_order="coordinate",
-    wildcard_constraints:
-        read_type="pe|se",
-    log:
-        "<logs>/bwa_mem/{sample}.{read_type}.consensus.log",
-    threads: 8
     wrapper:
         "v9.15.0/bio/bwa/mem"
 
@@ -60,13 +65,13 @@ rule sort_skipped_reads:
         "<results>/consensus_reads/{sample}.skipped.bam",
     output:
         temp("<results>/consensus_reads/{sample}.skipped.sorted.bam"),
-    params:
-        extra="-m 4G",
-        tmp_dir="/tmp/",
     log:
         "<logs>/sort_consensus/{sample}.log",
     # Samtools takes additional threads through its option -@
     threads: 8  # This value - 1 will be sent to -@.
+    params:
+        extra="-m 4G",
+        tmp_dir="/tmp/",
     wrapper:
         "v9.15.0/bio/samtools/sort"
 
@@ -79,14 +84,14 @@ rule mark_duplicates_skipped:
         metrics="<results>/consensus_dupmarked/{sample}.skipped.metrics.txt",
     log:
         "<logs>/picard/marked/{sample}.log",
-    params:
-        extra="--VALIDATION_STRINGENCY LENIENT --TAG_DUPLICATE_SET_MEMBERS true",
     # optional specification of memory usage of the JVM that snakemake will respect with global
     # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
     # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
     # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
     resources:
         mem_mb=1024,
+    params:
+        extra="--VALIDATION_STRINGENCY LENIENT --TAG_DUPLICATE_SET_MEMBERS true",
     wrapper:
         "v9.15.0/bio/picard/markduplicates"
 

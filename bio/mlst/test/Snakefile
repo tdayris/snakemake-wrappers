@@ -5,8 +5,11 @@ rule run_mlst:
     output:
         #Tab delimited mlst designation
         mlst="{sample}_mlst.txt",
+    log:
+        "logs/{sample}.mlst.log",
+    threads: 1
     params:
-    #extra parameters should be space delimited
+        #extra parameters should be space delimited
         # SYNOPSIS
         #   Automatic MLST calling from assembled contigs
         # USAGE
@@ -42,8 +45,5 @@ rule run_mlst:
         # HOMEPAGE
         #   https://github.com/tseemann/mlst - Torsten Seemann
         extra="--nopath",
-    log:
-        "logs/{sample}.mlst.log",
-    threads: 1
     wrapper:
         "master/bio/mlst"

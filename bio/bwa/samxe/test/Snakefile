@@ -5,11 +5,11 @@ rule bwa_sam_pe:
         idx=multiext("genome", ".amb", ".ann", ".bwt", ".pac", ".sa"),
     output:
         "mapped/{sample}.pe.sam",
+    log:
+        "logs/bwa_sam_pe/{sample}.log",
     params:
         extra=r"-r '@RG\tID:{sample}\tSM:{sample}'",  # optional: Extra parameters for bwa.
         sort="none",
-    log:
-        "logs/bwa_sam_pe/{sample}.log",
     wrapper:
         "master/bio/bwa/samxe"
 
@@ -21,11 +21,11 @@ rule bwa_sam_se:
         idx=multiext("genome", ".amb", ".ann", ".bwt", ".pac", ".sa"),
     output:
         "mapped/{sample}.se.sam",
+    log:
+        "logs/bwa_sam_se/{sample}.log",
     params:
         extra=r"-r '@RG\tID:{sample}\tSM:{sample}'",  # optional: Extra parameters for bwa.
         sort="none",
-    log:
-        "logs/bwa_sam_se/{sample}.log",
     wrapper:
         "master/bio/bwa/samxe"
 
@@ -37,11 +37,11 @@ rule bwa_bam_pe:
         idx=multiext("genome", ".amb", ".ann", ".bwt", ".pac", ".sa"),
     output:
         "mapped/{sample}.pe.bam",
+    log:
+        "logs/bwa_bam_pe/{sample}.log",
     params:
         extra=r"-r '@RG\tID:{sample}\tSM:{sample}'",  # optional: Extra parameters for bwa.
         sort="none",
-    log:
-        "logs/bwa_bam_pe/{sample}.log",
     wrapper:
         "master/bio/bwa/samxe"
 
@@ -53,10 +53,10 @@ rule bwa_bam_se:
         idx=multiext("genome", ".amb", ".ann", ".bwt", ".pac", ".sa"),
     output:
         "mapped/{sample}.se.bam",
+    log:
+        "logs/bwa_bam_se/{sample}.log",
     params:
         extra=r"-r '@RG\tID:{sample}\tSM:{sample}'",  # optional: Extra parameters for bwa.
         sort="none",
-    log:
-        "logs/bwa_bam_se/{sample}.log",
     wrapper:
         "master/bio/bwa/samxe"

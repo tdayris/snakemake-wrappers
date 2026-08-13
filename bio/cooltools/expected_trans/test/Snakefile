@@ -4,11 +4,11 @@ rule cooltools_expected_trans:
         view="mm9_view.txt",  ## File with the region names and coordinates
     output:
         "{sample}_{resolution,[0-9]+}.trans.expected.tsv",
+    log:
+        "logs/{sample}_{resolution}_trans_expected.log",
+    threads: 4
     params:
         ## Add optional parameters
         extra="",
-    threads: 4
-    log:
-        "logs/{sample}_{resolution}_trans_expected.log",
     wrapper:
         "master/bio/cooltools/expected_trans"

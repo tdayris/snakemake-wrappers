@@ -2,7 +2,7 @@ rule gdc_api_bam_slice_download:
     output:
         bam="raw/{sample}.bam",
     log:
-        "logs/gdc-api/bam-slicing/{sample}.log"
+        "logs/gdc-api/bam-slicing/{sample}.log",
     params:
         # to use this rule flexibly, make uuid a function that maps your
         # sample names of choice to the UUIDs they correspond to (they are
@@ -15,6 +15,6 @@ rule gdc_api_bam_slice_download:
         # provide wanted `region=` or `gencode=` slices joined with `&`
         slices="region=chr22&region=chr5:1000-2000&region=unmapped&gencode=BRCA2",
         # extra command line arguments passed to curl
-        extra=""
+        extra="",
     wrapper:
         "master/bio/gdc-api/bam-slicing"

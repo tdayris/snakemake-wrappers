@@ -17,6 +17,7 @@ rule arriba:
         discarded="fusions/{sample}.discarded.tsv",  # optional
     log:
         "logs/arriba/{sample}.log",
+    threads: 1
     params:
         # strongly recommended, see https://github.com/suhrig/arriba/wiki/04-Input-files#blacklist
         # only set blacklist input-file or blacklist-param
@@ -24,7 +25,6 @@ rule arriba:
         default_known_fusions=False,  # optional
         # optional parameters
         extra="-i 1,2",
-    threads: 1
     wrapper:
         "master/bio/arriba"
 
@@ -40,7 +40,7 @@ rule arriba_with_sv:
         # optional arriba blacklist file
         custom_blacklist="blacklist.tsv",
         # optional file with known structural variants
-        sv_file="sv_list_from_wgs.vcf"
+        sv_file="sv_list_from_wgs.vcf",
     output:
         # approved gene fusions
         fusions="fusions/{sample}.with_sv.tsv",
@@ -48,6 +48,7 @@ rule arriba_with_sv:
         discarded="fusions/{sample}.with_sv.discarded.tsv",  # optional
     log:
         "logs/arriba/{sample}.with_sv.log",
+    threads: 1
     params:
         # required when any of blacklist or known_fusions is set to True
         genome_build="GRCh38",
@@ -55,6 +56,5 @@ rule arriba_with_sv:
         # only set blacklist input-file or blacklist-param
         default_blacklist=False,  # optional
         default_known_fusions=True,  # optional
-    threads: 1
     wrapper:
         "master/bio/arriba"

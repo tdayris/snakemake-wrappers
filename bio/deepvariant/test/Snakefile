@@ -1,16 +1,16 @@
 rule deepvariant:
     input:
         bam="mapped/{sample}.bam",
-        ref="genome/genome.fasta"
+        ref="genome/genome.fasta",
     output:
-        vcf="calls/{sample}.vcf.gz"
-    params:
-        model="wgs",   # {wgs, wes, pacbio, hybrid}
-        sample_name=lambda w: w.sample, # optional
-        extra=""
-    threads: 2
+        vcf="calls/{sample}.vcf.gz",
     log:
-        "logs/deepvariant/{sample}/stdout.log"
+        "logs/deepvariant/{sample}/stdout.log",
+    threads: 2
+    params:
+        model="wgs",  # {wgs, wes, pacbio, hybrid}
+        sample_name=lambda w: w.sample,  # optional
+        extra="",
     wrapper:
         "master/bio/deepvariant"
 
@@ -18,15 +18,15 @@ rule deepvariant:
 rule deepvariant_gvcf:
     input:
         bam="mapped/{sample}.bam",
-        ref="genome/genome.fasta"
+        ref="genome/genome.fasta",
     output:
         vcf="gvcf_calls/{sample}.vcf.gz",
-        gvcf="gvcf_calls/{sample}.g.vcf.gz"
-    params:
-        model="wgs",   # {wgs, wes, pacbio, hybrid}
-        extra=""
-    threads: 2
+        gvcf="gvcf_calls/{sample}.g.vcf.gz",
     log:
-        "logs/deepvariant/{sample}/stdout.log"
+        "logs/deepvariant/{sample}/stdout.log",
+    threads: 2
+    params:
+        model="wgs",  # {wgs, wes, pacbio, hybrid}
+        extra="",
     wrapper:
         "master/bio/deepvariant"

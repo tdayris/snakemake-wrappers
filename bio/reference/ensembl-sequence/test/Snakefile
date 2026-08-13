@@ -1,14 +1,14 @@
 rule get_genome:
     output:
         "refs/genome.fasta",
+    log:
+        "logs/get_genome.log",
+    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     params:
         species="saccharomyces_cerevisiae",
         datatype="dna",
         build="R64-1-1",
         release="98",
-    log:
-        "logs/get_genome.log",
-    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     wrapper:
         "master/bio/reference/ensembl-sequence"
 
@@ -16,14 +16,14 @@ rule get_genome:
 rule get_genome_gzipped:
     output:
         "refs/genome.fa.gz",
+    log:
+        "logs/get_genome.log",
+    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     params:
         species="saccharomyces_cerevisiae",
         datatype="dna",
         build="R64-1-1",
         release="98",
-    log:
-        "logs/get_genome.log",
-    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     wrapper:
         "master/bio/reference/ensembl-sequence"
 
@@ -31,24 +31,21 @@ rule get_genome_gzipped:
 rule get_single_chromosome:
     output:
         "refs/chr2.fasta",
-    params:
-        species="saccharomyces_cerevisiae",
-        datatype="dna",
-        build="R64-1-1",
-        release="101",
-        chromosome=["II"],  # optional: restrict to one or multiple chromosomes, for multiple see below
-        # branch="plants",  # optional: specify branch
     log:
         "logs/get_genome.log",
+    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     params:
         url="http://ftp.ensembl.org/pub",
-    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     wrapper:
         "master/bio/reference/ensembl-sequence"
+
 
 rule get_multiple_chromosome:
     output:
         "refs/chr6_and_chr1.fasta",
+    log:
+        "logs/get_genome.log",
+    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     params:
         species="saccharomyces_cerevisiae",
         datatype="dna",
@@ -56,9 +53,6 @@ rule get_multiple_chromosome:
         release="113",
         chromosome=["VI", "I"],  # optional: restrict to one or multiple chromosomes
         # branch="plants",  # optional: specify branch
-    log:
-        "logs/get_genome.log",
-    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     wrapper:
         "master/bio/reference/ensembl-sequence"
 
@@ -66,6 +60,9 @@ rule get_multiple_chromosome:
 rule get_multiple_chromosomes_gzipped:
     output:
         "refs/chr6_and_chr1.fa.gz",
+    log:
+        "logs/get_genome.log",
+    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     params:
         species="saccharomyces_cerevisiae",
         datatype="dna",
@@ -73,8 +70,5 @@ rule get_multiple_chromosomes_gzipped:
         release="113",
         chromosome=["VI", "I"],  # optional: restrict to one or multiple chromosomes
         # branch="plants",  # optional: specify branch
-    log:
-        "logs/get_genome.log",
-    cache: "omit-software"  # save space and time with between workflow caching (see docs)
     wrapper:
         "master/bio/reference/ensembl-sequence"

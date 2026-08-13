@@ -5,6 +5,9 @@ rule run_assembly_stats:
     output:
         #Assembly statistics
         assembly_stats="{sample}_stats.txt",
+    log:
+        "logs/{sample}.assembly-stats.log",
+    threads: 1
     params:
         # Tab delimited output, with a header, is set as the default. Other options are available:
         #   -l <int>
@@ -20,8 +23,5 @@ rule run_assembly_stats:
         # Note that you can only pick one output format
         # Check https://github.com/sanger-pathogens/assembly-stats for more details
         extra="-t",
-    log:
-        "logs/{sample}.assembly-stats.log",
-    threads: 1
     wrapper:
         "master/bio/assembly-stats"

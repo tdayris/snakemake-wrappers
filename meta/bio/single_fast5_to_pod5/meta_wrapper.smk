@@ -32,7 +32,7 @@ samples_table.set_index("sample_id", inplace=True, drop=False)
 rule aria_download_single_read_archive:
     """let fast5 data be available for later use"""
     output:
-       temp("<temp>/access_fast5_archive/<sample>.tar.gz"),
+        temp("<temp>/access_fast5_archive/<sample>.tar.gz"),
     log:
         "<logs>/access_fast5_archive/<sample>.log",
     benchmark:
@@ -51,7 +51,7 @@ rule untar_single_read_archive:
     output:
         temp(directory("<temp>/untar_single_read_archive/<sample>")),
     log:
-        "log/untar_single_read_archive/<sample>.log"
+        "log/untar_single_read_archive/<sample>.log",
     benchmark:
         "<benchmarks>/untar_single_read_archive/<sample>.tsv"
     params:

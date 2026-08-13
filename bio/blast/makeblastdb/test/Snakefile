@@ -1,39 +1,42 @@
 rule blast_makedatabase_nucleotide:
     input:
-        fasta="genome/{genome}.fasta"
+        fasta="genome/{genome}.fasta",
     output:
-        multiext("results/{genome}.fasta",
+        multiext(
+            "results/{genome}.fasta",
             ".ndb",
             ".nhr",
             ".nin",
             ".not",
             ".nsq",
             ".ntf",
-            ".nto"
-        )
+            ".nto",
+        ),
     log:
-        "logs/{genome}.log"
+        "logs/{genome}.log",
     params:
-        "-input_type fasta -blastdb_version 5 -parse_seqids"
+        "-input_type fasta -blastdb_version 5 -parse_seqids",
     wrapper:
         "master/bio/blast/makeblastdb"
 
+
 rule blast_makedatabase_protein:
     input:
-        fasta="protein/{protein}.fasta"
+        fasta="protein/{protein}.fasta",
     output:
-        multiext("results/{protein}.fasta",
+        multiext(
+            "results/{protein}.fasta",
             ".pdb",
             ".phr",
             ".pin",
             ".pot",
             ".psq",
             ".ptf",
-            ".pto"
-        )
+            ".pto",
+        ),
     log:
-        "logs/{protein}.log"
+        "logs/{protein}.log",
     params:
-        "-input_type fasta -blastdb_version 5"
+        "-input_type fasta -blastdb_version 5",
     wrapper:
         "master/bio/blast/makeblastdb"

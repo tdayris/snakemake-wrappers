@@ -6,11 +6,11 @@ rule dragmap_align:
         "mapped/{sample}.bam",
     log:
         "logs/dragmap/{sample}.align.log",
+    threads: 8
     params:
         extra="",
         sorting="none",  # Can be 'none', 'samtools' or 'picard'.
         sort_order="queryname",  # Can be 'queryname' or 'coordinate'.
         sort_extra="",  # Extra args for samtools/picard.
-    threads: 8
     wrapper:
         "master/bio/dragmap/align"

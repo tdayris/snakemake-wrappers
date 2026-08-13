@@ -9,10 +9,10 @@ rule L2_PARAMETERS_extract:
         "genome.fasta.suffixarray_uint64_L2_PARAMETERS.gz",
     output:
         temp("genome.fasta.suffixarray_uint64_L2_PARAMETERS"),
-    conda:
-        "gzip.yaml"
     log:
         "log/extract.l2.log",
+    conda:
+        "gzip.yaml"
     shell:
         "zcat {input} > {output} 2> {log}"
 
@@ -37,6 +37,7 @@ rule bwa_meme_mem_picard:
         "mapped/{sample}.picard.cram",
     log:
         "logs/bwa_meme/{sample}.log",
+    threads: 8
     params:
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}' -M",
         sort="picard",
@@ -46,6 +47,5 @@ rule bwa_meme_mem_picard:
         dedup_extra="-M",
         exceed_thread_limit=True,
         embed_ref=True,
-    threads: 8
     wrapper:
         "master/bio/bwa-meme/mem"

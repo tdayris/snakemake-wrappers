@@ -8,6 +8,8 @@ rule gatk_applybqsr_spark:
         bam="recal/{sample}.bam",
     log:
         "logs/gatk/applybqsr_spark/{sample}.log",
+    resources:
+        mem_mb=1024,
     params:
         extra="",  # optional
         java_opts="",  # optional
@@ -16,8 +18,6 @@ rule gatk_applybqsr_spark:
         #spark_extra="", # optional
         embed_ref=True,  # embed reference in cram output
         exceed_thread_limit=True,  # samtools is also parallized and thread limit is not guaranteed anymore
-    resources:
-        mem_mb=1024,
     wrapper:
         "master/bio/gatk/applybqsrspark"
 
@@ -32,6 +32,8 @@ rule gatk_applybqsr_spark_cram:
         bam="recal/{sample}.cram",
     log:
         "logs/gatk/applybqsr_spark/{sample}.cram.log",
+    resources:
+        mem_mb=1024,
     params:
         extra="",  # optional
         java_opts="",  # optional
@@ -40,7 +42,5 @@ rule gatk_applybqsr_spark_cram:
         #spark_extra="", # optional
         embed_ref=True,  # embed reference in cram output
         exceed_thread_limit=True,  # samtools is also parallized
-    resources:
-        mem_mb=1024,
     wrapper:
         "master/bio/gatk/applybqsrspark"

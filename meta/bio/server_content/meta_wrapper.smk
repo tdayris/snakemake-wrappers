@@ -5,13 +5,13 @@ rule curl_list_available_resources:
     log:
         "<log>/curl_list_available_resources/{web_address}.log",
     benchmark:
-        "<benchmark>/curl_list_available_resources/{web_address}.tsv",
+        "<benchmark>/curl_list_available_resources/{web_address}.tsv"
+    conda:
+        workflow.source_path("resources/curl.yaml")
     threads: 1
     params:
         url="{web_address}",
         extra="--silent",
-    conda:
-        workflow.source_path("resources/curl.yaml"),
     shell:
         "curl {params.extra} {params.url:q} > {output:q} 2> {log:q}"
 
@@ -25,16 +25,16 @@ rule go_yq_format_to_csv:
     log:
         "<log>/go_yq_format_to_csv/{web_address}.log",
     benchmark:
-        "<benchmark>/go_yq_format_to_csv/{web_address}.tsv",
+        "<benchmark>/go_yq_format_to_csv/{web_address}.tsv"
     threads: 1
     params:
         subcommand="eval",
         extra="",
         expression=str(
-            '.ListBucketResult.Contents[] | '
+            ".ListBucketResult.Contents[] | "
             '[ .Key, .LastModified, .Size, (.Owner.ID? // ""), '
             '(.ChecksumAlgorithm? // ""), (.ChecksumType? // "")] | '
-            '@csv'
+            "@csv"
         ),
     wrapper:
         "v9.15.0/utils/go-yq"
@@ -48,7 +48,7 @@ rule add_header_to_csv:
     log:
         "<log>/available_data/{web_address}.log",
     benchmark:
-        "<benchmark>/available_data/{web_address}.tsv",
+        "<benchmark>/available_data/{web_address}.tsv"
     threads: 1
     params:
         subcommand="cat rows",

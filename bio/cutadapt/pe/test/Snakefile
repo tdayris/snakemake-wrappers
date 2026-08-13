@@ -5,13 +5,13 @@ rule cutadapt:
         fastq1="trimmed/{sample}.1.fastq",
         fastq2="trimmed/{sample}.2.fastq",
         qc="trimmed/{sample}.qc.txt",
+    log:
+        "logs/cutadapt/{sample}.log",
+    threads: 4  # set desired number of threads here
     params:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
         adapters="-a AGAGCACACGTCTGAACTCCAGTCAC -g AGATCGGAAGAGCACACGT -A AGAGCACACGTCTGAACTCCAGTCAC -G AGATCGGAAGAGCACACGT",
         # https://cutadapt.readthedocs.io/en/stable/guide.html#
         extra="--minimum-length 1 -q 20",
-    log:
-        "logs/cutadapt/{sample}.log",
-    threads: 4  # set desired number of threads here
     wrapper:
         "master/bio/cutadapt/pe"

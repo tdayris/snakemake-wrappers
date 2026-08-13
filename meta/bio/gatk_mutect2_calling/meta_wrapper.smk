@@ -3,11 +3,11 @@ rule create_dict:
         "<genome_sequence>",
     output:
         "<genome_dict>",
+    log:
+        "<logs>/picard/create_dict.log",
     threads: 1
     resources:
         mem_mb=1024,
-    log:
-        "<logs>/picard/create_dict.log",
     params:
         extra="",
     wrapper:
@@ -32,11 +32,11 @@ rule picard_replace_read_groups:
         "<bam_file>",
     output:
         "<results>/picard/<per>.bam",
+    log:
+        "<logs>/picard/replace_rg/<per>.log",
     threads: 1
     resources:
         mem_mb=1024,
-    log:
-        "<logs>/picard/replace_rg/<per>.log",
     params:
         # Required for GATK
         extra="--RGLB lib1 --RGPL illumina --RGPU {sample} --RGSM {sample}",
@@ -49,9 +49,9 @@ rule sambamba_index_picard_bam:
         "<results>/picard/<per>.bam",
     output:
         "<results>/picard/<per>.bam.bai",
-    threads: 1
     log:
         "<logs>/sambamba/index/<per>.log",
+    threads: 1
     params:
         extra="",
     wrapper:
@@ -70,13 +70,13 @@ rule mutect2_call:
         vcf="<results>/variant/<per>.vcf",
         bam="<results>/variant/<per>.bam",
         f1r2="<results>/counts/<per>.f1r2.tar.gz",
+    log:
+        "<logs>/mutect/<per>.log",
     threads: 1
     resources:
         mem_mb=1024,
     params:
         extra=" --tumor-sample {sample} ",
-    log:
-        "<logs>/mutect/<per>.log",
     wrapper:
         "v9.15.0/bio/gatk/mutect"
 
@@ -90,13 +90,13 @@ rule gatk_get_pileup_summaries:
         intervals="<bed_intervals>",
     output:
         temp("<results>/summaries/<per>.table"),
+    log:
+        "<logs>/summary/<per>.log",
     threads: 1
     resources:
         mem_mb=1024,
     params:
         extra="",
-    log:
-        "<logs>/summary/<per>.log",
     wrapper:
         "v9.15.0/bio/gatk/getpileupsummaries"
 
@@ -106,11 +106,11 @@ rule gatk_calculate_contamination:
         tumor="<results>/summaries/<per>.table",
     output:
         temp("<results>/contamination/<per>.pileups.table"),
+    log:
+        "<logs>/contamination/<per>.log",
     threads: 1
     resources:
         mem_mb=1024,
-    log:
-        "<logs>/contamination/<per>.log",
     params:
         extra="",
     wrapper:
@@ -122,13 +122,13 @@ rule gatk_learn_read_orientation_model:
         f1r2="<results>/counts/<per>.f1r2.tar.gz",
     output:
         temp("<results>/artifacts_prior/<per>.tar.gz"),
+    log:
+        "<logs>/learnreadorientationbias/<per>.log",
     threads: 1
     resources:
         mem_mb=1024,
     params:
         extra="",
-    log:
-        "<logs>/learnreadorientationbias/<per>.log",
     wrapper:
         "v9.15.0/bio/gatk/learnreadorientationmodel"
 
@@ -146,11 +146,11 @@ rule filter_mutect_calls:
     output:
         vcf="<results>/variant/<per>.filtered.vcf.gz",
         vcf_idx="<results>/variant/<per>.filtered.vcf.gz.tbi",
+    log:
+        "<logs>/gatk/filter/<per>.log",
     threads: 1
     resources:
         mem_mb=1024,
-    log:
-        "<logs>/gatk/filter/<per>.log",
     params:
         extra="--create-output-variant-index --min-median-mapping-quality 35 --max-alt-allele-count 3",
         java_opts="",
