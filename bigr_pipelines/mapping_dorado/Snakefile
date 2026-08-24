@@ -1,0 +1,25 @@
+wildcard_constraints:
+  species=r"saccharomyces_cerevisiae|homo_sapiens|mus_musculus",
+  build=r"R64-1-1|GRCh38|GRCh37|GRCm38|GRCm39",
+  release=r"116|75|102|115",
+  gxf=r"gtf|gff|gff3",
+  seqtype=r"dna|cdna|cds",
+
+configfile: "config/config.yaml"
+
+module single_fast5_to_pod5:
+    config:
+        config
+    meta_wrapper:
+        f"{config['git_repo']}/meta/bio/single_fast5_to_pod5"
+
+
+use rule * from single_fast5_to_pod5         
+
+rule target:
+    input:
+         expand(
+            "temp/fast5_to_pod5_conversion/{sample}.pod5",
+            sample=tuple(single_fast5_to_pod5.samples_table.index)
+        ),
+    default_target: True
