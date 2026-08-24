@@ -1,0 +1,40 @@
+rule test_bwa_mem3_index:
+    input:
+       fasta="genome.fasta",
+    output:
+        multiext("test", ".amb", ".ann", ".pac", ".bwt.2bit.64"),
+    log:
+        "test_bwa_mem3_index.log",
+    threads: 1
+    params:
+        extra="",
+    wrapper:
+        "master/bio/bwa-mem3/index"
+
+
+rule test_bwa_mem3_index_meth:
+    input:
+        fasta="genome.fasta",
+    output:
+        multiext("test_meth.fasta", ".meth.amb", ".meth.ann", ".meth.bwt.2bit.64", ".meth.fa", ".meth.pac"),
+    log:
+        "test_bwa_mem3_index_meth.log"
+    threads: 1
+    params:
+        extra="",
+    wrapper:
+        "master/bio/bwa-mem3/index"
+
+
+rule test_bwa_mem3_index_unpacked:
+    input:
+       fasta="genome.fasta",
+    output:
+        multiext("unpacked", ".amb", ".ann", ".pac", ".bwt.2bit.64", ".0123"),
+    log:
+        "test_bwa_mem3_index_unpacked.log",
+    threads: 1
+    params:
+        extra="",
+    wrapper:
+        "master/bio/bwa-mem3/index"

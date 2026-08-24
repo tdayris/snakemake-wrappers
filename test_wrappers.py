@@ -2102,6 +2102,29 @@ def test_bwa_meme(run):
     )
 
 
+def test_bwa_mem3_index(run):
+    run(
+        "bio/bwa-mem3/index",
+        ["snakemake", "test.amb", "test_meth.fasta.meth.ann", "unpacked.0123"]
+    )
+
+
+def test_bwa_mem3_mem(run):
+    run(
+        "bio/bwa-mem3/mem",
+        [
+            "snakemake",
+            "mapped_single.sam",
+            "mapped_pairs.bam",
+            "mapped_meth.bam",
+            "mapped_samtools.cram",
+            "mapped_picard.cram",
+            "mapped_sambamba.cram",
+        ],
+    )
+
+
+
 def test_bwa_mem2_mem(run):
     run(
         "bio/bwa-mem2/mem",

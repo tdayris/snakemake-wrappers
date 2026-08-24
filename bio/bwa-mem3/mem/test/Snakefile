@@ -1,0 +1,133 @@
+rule test_bwa_mem3_mem_single_ended:
+    input:
+        index=multiext("index/genome", ".amb", ".ann", ".bwt.2bit.64", ".pac"),
+        # Optional path to genome fasta file for CRAM compression
+        # fasta="index/genome.fasta"
+        reads=["reads/a.1.fastq.gz"],
+    output:
+        "mapped_single.sam",
+    log:
+        "test_bwa_mem3_mem_single_ended.log",
+    threads: 1
+    params:
+        sort=None,
+        # sort_extra="",
+        # sort_order="",
+        extra="",
+    wrapper:
+        "master/bio/bwa-mem3/mem"
+
+
+rule test_bwa_mem3_mem_pair_ended:
+    input:
+        index=multiext("index/genome", ".amb", ".ann", ".bwt.2bit.64", ".pac"),
+        # Optional path to genome fasta file for CRAM compression
+        # fasta="index/genome.fasta"
+        reads=expand("reads/a.{stream}.fastq", stream=[1, 2]),
+    output:
+        "mapped_pairs.bam",
+        idx="mapped_pairs.bai",
+    log:
+        "test_bwa_mem3_mem_pair_ended.log",
+    threads: 1
+    params:
+        # sort=None,
+        # sort_extra="",
+        # sort_order="",
+        extra="",
+    wrapper:
+        "master/bio/bwa-mem3/mem"
+
+
+rule test_bwa_mem3_mem_meth:
+    input:
+        index=multiext(
+            "meth_index/genome.fasta", 
+            ".amb", 
+            ".ann", 
+            ".bwt.2bit.64", 
+            ".meth.ann", 
+            ".meth.bwt.2bit.64", 
+            ".meth.fa", 
+            ".meth.pac", 
+            ".pac",
+        ),
+        reads=expand("reads/a.{stream}.fastq", stream=[1, 2]),
+        # Optional path to genome fasta file for CRAM compression
+        fasta="meth_index/genome.fasta",
+    output:
+        "mapped_meth.bam",
+        idx="mapped_meth.bam.bai",
+    log:
+        "test_bwa_mem3_mem_meth.log",
+    threads: 1
+    params:
+        # sort=None,
+        # sort_extra="",
+        # sort_order="",
+        extra="",
+    wrapper:
+        "master/bio/bwa-mem3/mem"
+
+
+rule test_bwa_mem3_mem_sort_samtools:
+    input:
+        index=multiext("index/genome", ".amb", ".ann", ".bwt.2bit.64", ".pac"),
+        reads=expand("reads/a.{stream}.fastq", stream=[1, 2]),
+        # Optional path to genome fasta file for CRAM compression
+        fasta="index/genome.fasta",
+    output:
+        "mapped_samtools.cram",
+    log:
+        "test_bwa_mem3_mem_sort_samtools.log",
+    threads: 1
+    params:
+        extra="",
+        sort="samtools",
+        sort_extra="",
+        # Optional sort order, default is coordinate
+        sort_order="coordinate",
+    wrapper:
+        "master/bio/bwa-mem3/mem"
+
+
+rule test_bwa_mem3_mem_sort_picard:
+    input:
+        index=multiext("index/genome", ".amb", ".ann", ".bwt.2bit.64", ".pac"),
+        reads=expand("reads/a.{stream}.fastq", stream=[1, 2]),
+        # Optional path to genome fasta file for CRAM compression
+        fasta="index/genome.fasta",
+    output:
+        "mapped_picard.cram",
+    log:
+        "test_bwa_mem3_mem_sort_picard.log",
+    threads: 1
+    params:
+        extra="",
+        sort="picard",
+        sort_extra="",
+        # Optional sort order, default is coordinate
+        sort_order="queryname",
+    wrapper:
+        "master/bio/bwa-mem3/mem"
+
+
+rule test_bwa_mem3_mem_sort_sambamba:
+    input:
+        index=multiext("index/genome", ".amb", ".ann", ".bwt.2bit.64", ".pac"),
+        reads=expand("reads/a.{stream}.fastq", stream=[1, 2]),
+        # Optional path to genome fasta file for CRAM compression
+        fasta="index/genome.fasta",
+    output:
+        "mapped_sambamba.cram",
+    log:
+        "test_bwa_mem3_mem_sort_sambamba.log",
+    threads: 1
+    params:
+        extra="",
+        sort="sambamba",
+        sort_extra="",
+        # Optional sort order, default is coordinate
+        sort_order="coordinate",
+    wrapper:
+        "master/bio/bwa-mem3/mem"
