@@ -2625,6 +2625,14 @@ def test_fgbio_callmolecularconsensusreads(run):
     )
 
 
+def test_fq_lint(run):
+    run("bio/fq/lint", ["snakemake"])
+
+
+def test_fq_subsample(run):
+    run("bio/fq/subsample", ["snakemake"])
+
+
 def test_filtlong(run):
     run(
         "bio/filtlong",

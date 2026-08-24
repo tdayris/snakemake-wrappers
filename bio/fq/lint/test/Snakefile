@@ -1,0 +1,13 @@
+rule test_fq_lint:
+    input:
+        "a.1.fq.gz",
+        "a.2.fq.gz",
+    output:
+        "validation.txt",
+    log:
+        "test_fq_lint.log"
+    threads: 1
+    params:
+        extra="--disable-validator P001",
+    wrapper:
+        "master/bio/fq/lint"

@@ -1,0 +1,12 @@
+rule test_fq_subsample:
+    input:
+        expand("a.{i}.fq.gz", i=(1, 2)),
+    output:
+        expand("subsample.{i}.fq.gz", i=(1, 2)),
+    log:
+        "test_fq_subsample.log",
+    threads: 1
+    params:
+        extra="--seed 42 --record-count 1",
+    wrapper:
+        "master/bio/fq/subsample"
