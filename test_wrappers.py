@@ -388,6 +388,13 @@ def test_jq(run):
     )
 
 
+def test_tar(run):
+    run(
+        "utils/tar",
+        ["snakemake"],
+    )
+
+
 def test_crabz(run):
     run(
         "utils/crabz",

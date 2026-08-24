@@ -1,0 +1,13 @@
+rule test_tar:
+    input:
+        files_list="files_list.txt",
+    output:
+        archive="tests.tar.bz2",
+    log:
+        "test_tar.log",
+    params:
+        extra="--create",
+        explicit_owner=True,
+        explicit_group=True,
+    wrapper:
+        "master/utils/tar"

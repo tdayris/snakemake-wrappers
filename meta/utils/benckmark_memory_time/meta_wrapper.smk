@@ -17,167 +17,134 @@ def get_generator_of_benchmarks(
         elif str(child.name).endswith(".tsv"):
             yield str(child.stem) if stem else str(child)
 
-
-def get_benchmarks_per_tool(
-    wildcards: snakemake.iocontainers.Wildcards, 
-    input_dir: str = input_benchmark,
-) -> dict[str, list[str]]:
-    """get the bechnmark files for a given tool"""
-    return {
-        "table": list(get_generator_of_benchmarks(f"{input_dir}/{wildcards.tool}")),
-    }
+data: list[str] = list(get_generator_of_benchmarks(input_benchmark))
+print(data)
 
 
-
-
-def get_rule_report_per_tool(
-    wildcards: snakemake.iocontainers.Wildcards,
-    input_dir: str = input_benchmark, 
-) -> dict[str, tuple[str]]:
-    """get list of rule report per tool"""
-    tool: str = str(wildcards.tool)
-    return {
-        tool: tuple(
-            f"<temp>/go_yq_sum_input_file_size/{tool}.{rule_report}.csv"
-            for rule_report in get_generator_of_benchmarks(
-                benchmark_dir=f"{input_dir}/{tool}", 
-                stem=True,
-            )
-        )
-    }
-
-tools_tpl: tuple[str] = tuple(str(child.stem) for child in pathlib.Path(input_benchmark).iterdir())
-rule_reports_tpl: tuple[str] = tuple(get_generator_of_benchmarks(input_benchmark, stem=True))
-print(tools_tpl)
-print(rule_reports_tpl)
-
-wildcard_constraints:
-    tool=r"|".join(tools_tpl),
-    rule_report=r"|".join(rule_reports_tpl),
-
-rule xsv_format_benchmarks_to_csv:
-    """format from tsv to csv"""
+rule fd_search_tsv:
     input:
-        table="<input_benchmark>/{tool}/{rule_report}.tsv",
+        input_benchmark,
     output:
-        temp("<temp>/xsv_format_benchmarks_to_csv/{tool}.{rule_report}.csv"),
+        temp("<temp>/fd_search_tsv.txt"),
     log:
-        "<logs>/xsv_format_benchmarks_to_csv/{tool}_{rule_report}.log",
+        "<logs>/fd_search_tsv.log",
     benchmark:
-        "<benchmarks>/xsv/format_benchmarks_to_csv_{tool}_{rule_report}.tsv",
-    threads: 1
+        "<benchmarks>/fd/search_tsv.tsv",
+    threads: 7
     params:
-        subcommand="fmt",
         extra="",
     wrapper:
-        "v3.4.0/utils/xsv"
+        "file:../../../../utils/fd"
+        
 
-
-use rule xsv_format_benchmarks_to_csv as xsv_extract_size_time_memory with:
-    """keep only columns of interest"""
+rule xan_format_benchmarks_to_csv:
     input:
-        table="<temp>/xsv_format_benchmarks_to_csv/{tool}.{rule_report}.csv",
+        data=data,
     output:
-        temp("<temp>/xsv_extract_size_time_memory/{tool}.{rule_report}.csv"),
+        temp("<temp>/xan_format_benchmarks_to_csv/benchmarks.csv"),
     log:
-        "<logs>/xsv_extract_size_time_memory/{tool}.{rule_report}.log",
+        "<logs>/xan_format_benchmarks_to_csv.log",
     benchmark:
-        "<benchmarks>/xsv/extract_size_time_memory_{tool}.{rule_report}.tsv"
+        "<benchmarks>/xan/format_benchmarks_to_csv.tsv",
+    threads: 7
     params:
-        extra="rule_name,s,'h:m:s',max_rss,input_size_mb",
-        subcommand="select",
-
+        extra="--tee",
+        expression=lambda wildcards, threads: str(
+            f"cat rows --delimiter '\\t' --raw "
+        ),
+    wrapper:
+        "file:../../../../utils/xan/run"
+    
 
 rule go_yq_sum_input_file_size:
     """parse json formatted input_file_size column"""
     input:
-        "<temp>/xsv_extract_size_time_memory/{tool}.{rule_report}.csv"
+        "<temp>/xan_format_benchmarks_to_csv/benchmarks.csv",
     output:
-        temp("<temp>/go_yq_sum_input_file_size/{tool}.{rule_report}.csv"),
+        temp("<temp>/go_yq_sum_input_file_size/benchmarks.csv"),
     log:
-        "<logs>/go_yq_sum_input_file_size/{tool}.{rule_report}.log",
+        "<logs>/go_yq_sum_input_file_size/benchmarks.log",
     benchmark:
-        "<benchmarks>/go_yq/sum_input_file_size_{tool}.{rule_report}.tsv"
+        "<benchmarks>/go_yq/sum_input_file_size_benchmarks.tsv"
     threads: 1
     params:
         extra="",
         subcommand="eval",
-        expression=".[].input_size_mb = ( to_entries | .[].input_size_mb as $entry ireduce (0; . + ($entry.value | tonumber))) | .[].tool = \"{tool}\" ",
+        expression='.[].input_size_mb = ( to_entries | .[].input_size_mb as $entry ireduce (0; . + ($entry.value | tonumber)))',
     wrapper:
         "v9.15.0/utils/go-yq"
 
-use rule xsv_format_benchmarks_to_csv as xsv_cat_rules with:
-    """aggregate requirements per tool"""
+use rule xan_format_benchmarks_to_csv as xan_compute_job_statistics with:
+    """build max rss per io and max minutes per io"""
     input:
-        unpack(get_rule_report_per_tool),
+        data="<temp>/go_yq_sum_input_file_size/benchmarks.csv",
     output:
-        "<results>/benchmark/{tool}/rules.csv",
+        "<results>/benchmarks/resources.csv",
     log:
-        "<logs>/xsv_cat_rules/{tool}.log"
+        "<logs>/xan_compute_job_statistics.log",
     benchmark:
-        "<benchmarks>/xsv/cat_rules_{tool}.tsv"
+        "<benchmarks>/xan/compute_job_statistics.tsv",
+    threads: 4
+    params:
+        extra="--tee",
+        expression=str(
+            "progress --title 'compute job statistics' | "
+            "select --evaluate 'rule_name,max(0.5, s / 60) as minutes,max(0.5, input_size_mb) as input_size_mb,max(0.5, max_rss) as max_rss,s as seconds' | "
+            "groupby rule_name 'max(minutes) as minutes,max(max_rss) as max_rss,max(input_size_mb) as input_size_mb' | "
+            "select --evaluate 'rule_name,max_rss / input_size_mb as max_rss_per_mb,minutes / input_size_mb as minutes_per_mb,max_rss,minutes,input_size_mb' "
+        ),
+
+
+use rule xan_format_benchmarks_to_csv as xan_hist_rule with:
+    """display statistics over max_rss and max_time"""
+    input:
+        data="<results>/benchmarks/resources.csv",
+    output:
+        temp("<temp>/xan_hist_rule/{rss_time}.txt"),
+    log:
+        "<logs>/xan_hist_rule/{rss_time}.log",
+    benchmark:
+        "<benchmarks>/xan_hist_rule/{rss_time}.tsv",
+    wildcard_constraints:
+        rss_time="max_rss|minutes",
+    threads: 1
     params:
         extra="",
-        subcommand="cat rows", 
+        expression="hist -v '{rss_time}' -l rule_name --name '{rss_time} per rule' --bar-size small --cols 120 --color 'always'",
 
 
-use rule xsv_format_benchmarks_to_csv as xsv_summarize_benchmarks with:
-    """produce desciptive statistics over benchmarks"""
+use rule xan_format_benchmarks_to_csv as xan_display_table with:
+    """print human readable table"""
     input:
-        "<results>/benchmark/{tool}/rules.csv",
+        data="<results>/benchmarks/resources.csv",
     output:
-        "<results>/benchmark/{tool}/summary.csv",
+        temp("<temp>/xan_display_table.csv"),
     log:
-        "<logs>/xsv_summarize_benchmarks/{tool}.log",
+        "<logs>/xan_display_table.log",
     benchmark:
-        "<benchmarks>/xsv/summarize_benchmarks_{tool}.tsv"
+        "<benchmarks>/xan_display_table.tsv",
+    threads: 1
     params:
-        extra="--select s,max_rss,input_size_mb",
-        subcommand="stats",
-        
+        extra="",
+        expression='view --all --name "Resource per MB of input" --select "rule_name,max_rss_per_mb,minutes_per_mb" --hide-index --color "always" --cols 120',
 
-use rule xsv_cat_rules as xsv_complete_benchmark with:
-    """aggregate all tools into a single table"""
+rule cat_xan_reports:
     input:
-        table=expand(
-            "<results>/benchmark/{tool}/rules.csv",
-            tool=tools_tpl,
+        expand(
+            "<temp>/xan_hist_rule/{rss_time}.txt",
+            rss_time=("max_rss", "minutes"),
         ),
+        "<temp>/xan_display_table.csv",
     output:
-        "<results>/benchmark/benchmarks.csv",
+        "<results>/benchmarks/resources.txt",
     log:
-        "<logs>/xsv_complete_benchmark.log",
+        "<logs>/cat_xan_reports.log",
     benchmark:
-        "<benchmarks>/xsv/complete_benchmark.tsv"
- 
-
-rule xan_hist_time_per_tool:
-    input:
-        "<results>/benchmark/benchmarks.csv",
-    output:
-        temp("<temp>/xan_hist_time_per_tool.txt"),
-    log:
-        "<logs>/xan_hist_time_per_tool.log",
-    benchmark:
-        "<benchmarks>/xan_hist/time_per_tool.tsv",
+        "<benchmarks>/cat_xan_reports.tsv"
+    threads: 1
     params:
-        groupby="tool 'sum(s) as time'",
-        hist="-v time -l tool --name 'Time used by tools' --unit ' seconds'",
-    conda:
-        "resources/xan.yaml"
+        extra="",
     shell:
-        "( xan groupby {params.groupby} {input:q} | "
-        "  xan hist {params.hist} ) > {output:q} 2> {log:q}"
-
-
-use rule xan_hist_time_per_tool as xan_hist_mb_per_tool with:
-    log:
-        "<logs>/xan_hist_time_per_tool.log",
-    benchmark:
-        "<benchmarks>/xan_hist/time_per_tool.tsv",
-    params:
-        groupby="tool 'sum(max_rss) as memory'",
-        hist="-v memory -l tool --name 'RAM used by tools' --unit ' mb'",
+        "cat {params.extra} {input} > {output:q} 2> {log:q}"
     
-
-
+        
