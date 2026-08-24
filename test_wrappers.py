@@ -5447,6 +5447,8 @@ def test_mofaflex_training(run):
 def test_mofaflex_plotting(run):
     run("bio/mofaflex/plotting", ["snakemake", "results/shrunk_data_weights.pdf"])
 
+def test_grex(run):
+    run("utils/grex", ["snakemake"])
 
 def test_go_yq(run):
     run(
