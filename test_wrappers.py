@@ -5480,6 +5480,10 @@ def test_dust(run):
     )
 
 
+def test_fd_find(run):
+    run("utils/fd-find", ["snakemake"])
+
+
 def test_fclones_group(run):
     run(
         "utils/fclones/group",
