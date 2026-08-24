@@ -5478,6 +5478,13 @@ def test_dust(run):
     )
 
 
+def test_fclones_group(run):
+    run(
+        "utils/fclones/group",
+        ["snakemake"],
+    )
+
+
 def test_dysk(run):
     run(
         "utils/dysk",
