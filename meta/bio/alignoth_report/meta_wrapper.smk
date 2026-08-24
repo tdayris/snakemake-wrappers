@@ -45,7 +45,7 @@ rule alignoth:
     params:
         extra=lambda wc, input: f"--around-vcf-record {wc.index} -f tsv",
     wrapper:
-        "v9.4.1/bio/alignoth"
+        "v9.16.0/bio/alignoth"
 
 
 rule datavzrd:
@@ -64,4 +64,4 @@ rule datavzrd:
     params:
         max_index=lambda wc: count_variants(wc),
     wrapper:
-        "v9.12.0/utils/datavzrd"
+        "v9.16.0/utils/datavzrd"

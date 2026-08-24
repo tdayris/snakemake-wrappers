@@ -39,7 +39,7 @@ rule salmon_index_gentrome:
         # optional parameters
         extra="",
     wrapper:
-        "v9.15.0/bio/salmon/index"
+        "v9.16.0/bio/salmon/index"
 
 
 rule salmon_quant_reads:
@@ -63,7 +63,7 @@ rule salmon_quant_reads:
         libtype="A",
         extra="--numBootstraps 32",
     wrapper:
-        "v9.15.0/bio/salmon/quant"
+        "v9.16.0/bio/salmon/quant"
 
 
 rule tximport:

@@ -28,7 +28,7 @@ rule bwa_mem:
         sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
         sort_extra="",  # Extra args for samtools/picard.
     wrapper:
-        "v9.15.0/bio/bwa/mem"
+        "v9.16.0/bio/bwa/mem"
 
 
 rule samtools_index:

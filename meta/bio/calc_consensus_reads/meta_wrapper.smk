@@ -57,7 +57,7 @@ rule map_consensus_reads:
         sort="samtools",
         sort_order="coordinate",
     wrapper:
-        "v9.15.0/bio/bwa/mem"
+        "v9.16.0/bio/bwa/mem"
 
 
 rule sort_skipped_reads:
@@ -93,7 +93,7 @@ rule mark_duplicates_skipped:
     params:
         extra="--VALIDATION_STRINGENCY LENIENT --TAG_DUPLICATE_SET_MEMBERS true",
     wrapper:
-        "v9.15.0/bio/picard/markduplicates"
+        "v9.16.0/bio/picard/markduplicates"
 
 
 rule merge_consensus_reads:
