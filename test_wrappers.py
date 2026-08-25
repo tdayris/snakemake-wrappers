@@ -2480,6 +2480,8 @@ def test_epic_peaks(run):
         ["snakemake", "epic/enriched_regions.bed"],
     )
 
+def test_fq_lint(run):
+    run("bio/fq/lint", ["snakemake"])
 
 def test_falco(run):
     run(
