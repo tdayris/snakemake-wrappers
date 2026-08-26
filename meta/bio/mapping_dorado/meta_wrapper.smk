@@ -6,7 +6,7 @@ rule download_basecalling_model_for_dorado:
     benchmark:
         "<benchmarks>/download_basecalling_model_for_dorado/{model}.tsv"
     container:
-        "quay.io/sangerpathogens/cuda_dorado@sha256:f2a15f1caa4c1ded33c0774f0771a3930139e340ef3c4ade3c36f2bd002f1b18"
+        "docker://quay.io/sangerpathogens/cuda_dorado@sha256:f2a15f1caa4c1ded33c0774f0771a3930139e340ef3c4ade3c36f2bd002f1b18"
     threads: 1
     params:
         model="{model}",
@@ -30,7 +30,7 @@ rule basecalling_with_dorado:
     benchmark:
         "<benchmarks>/basecalling_with_dorado/<sample>.tsv"
     container:
-        "quay.io/sangerpathogens/cuda_dorado@sha256:f2a15f1caa4c1ded33c0774f0771a3930139e340ef3c4ade3c36f2bd002f1b18"
+        "docker://quay.io/sangerpathogens/cuda_dorado@sha256:f2a15f1caa4c1ded33c0774f0771a3930139e340ef3c4ade3c36f2bd002f1b18"
     threads: 20
     params:
         model_dir=lambda wildcards, input: subpath(input.model, parent=True),
