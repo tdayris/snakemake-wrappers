@@ -10,11 +10,12 @@ from getpass import getuser
 from grp import getgrgid
 from os import getuid, getgid
 from snakemake.shell import shell
+from snakemake.ioutils import subpath
 from snakemake_wrapper_utils.snakemake import get_format
 from shlex import quote
 
 extra = snakemake.params.get("extra", "")
-log = snakemake.log_fmt_shell(stdout=True, stderr=True)
+log = snakemake.log_fmt_shell(stdout=True, stderr=True, append=True)
 
 if snakemake.params.get("explicit_owner"):
     user_i = getuid()
@@ -52,4 +53,12 @@ if exclude_from:
 
 infiles = snakemake.input.get("data", "")
 outfiles = snakemake.output.get("data", "")
+if isinstance(outfiles, list):
+    for o in outfiles:
+        parent = subpath(str(o), parents=True)
+        shell("mkdir --parent --verbose {parent:q} {log}")
+else:
+    parent = subpath(str(outfiles), parents=True)
+    shell("mkdir --parent --verbose {parent:q} {log}")
+
 shell("tar {extra} {infiles} {outfiles} {log}")
