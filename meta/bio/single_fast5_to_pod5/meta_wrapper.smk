@@ -47,21 +47,19 @@ rule aria_download_single_read_archive:
 rule untar_single_read_archive:
     """decompress all single-read fast5 samples"""
     input:
-        "<temp>/access_fast5_archive/<sample>.tar.gz",
+        data="<temp>/access_fast5_archive/<sample>.tar.gz",
     output:
-        temp(directory("<temp>/untar_single_read_archive/<sample>")),
+        data=temp(directory("<temp>/untar_single_read_archive/<sample>")),
     log:
         "log/untar_single_read_archive/<sample>.log",
     benchmark:
         "<benchmarks>/untar_single_read_archive/<sample>.tsv"
     params:
-        extra=str(
-            "--no-auto-compress --extract --overwrite --gzip "
-            "--verbose --no-same-owner --no-same-permissions --force-local"
-        ),
-    shell:
-        "mkdir --parents --verbose {output:q} > {log} 2>&1 && "
-        "tar {params.extra} --file {input:q} --directory {output:q} >> {log:q} 2>&1"
+        extra="--extract --overwrite --verbose --force-local",
+        explicit_owner=True,
+        explicit_group=True,
+    wrapper:
+        f"{config['repo']}/utils/tar"
 
 
 rule fast5_aggregation_with_ont_api:
@@ -75,7 +73,7 @@ rule fast5_aggregation_with_ont_api:
     benchmark:
         "<benchmarks>/fast5_aggregation_with_ont_api/<sample>.tsv"
     container:
-        "docker://nanozoo/ont-fast5-api:3.1.6--a980386"
+        "docker://quay.io/biocontainers/ont-fast5-api:0.4.1--py35_0"
     threads: 15
     params:
         extra="--recursive --batch_size 1000000",
@@ -98,7 +96,7 @@ rule fast5_to_pod5_conversion:
     benchmark:
         "<benchmarks>/fast5_to_pod5_conversion/<sample>.tsv"
     container:
-        "docker://staphb/pod5:0.3.36"
+        "docker://quay.io/biocontainers/pod5:0.3.44--pyhdfd78af_0"
     threads: 15
     params:
         extra="--recursive --force-overwrite ",
