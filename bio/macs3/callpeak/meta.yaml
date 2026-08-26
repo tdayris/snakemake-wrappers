@@ -1,0 +1,19 @@
+name: macs3 callpeak
+url: https://github.com/macs3-project/MACS
+description: call peaks with MACS3 -- Model-based Analysis of ChIP-Seq version3
+author:
+  - Thibault Dayris
+input:
+  - treatment:  Path to treatment BAM
+  - control: Optional path to control BAM
+  - barcodes: Optional path to a plain text file containing the barcodes for the fragment
+output:
+  - xls: Path to xls formatted peaks
+  - summits: Path to summits coordinates (BED formatted). Requires `output.narrow_peaks`. Mutually exclusive with `output.broad_peaks` and `output.gapped_peaks`.
+  - narrow_peaks: Path to MACS3 narrow peaks. Requires `output.summits`. Mutually exclusive with `output.broad_peaks` and `output.gapped_peaks`
+  - broad_peaks: Path to MACS3 broad peaks. Implies `--broad`. Requires `output.gapped_peaks`. Mutually exclusive with `output.narrow_peaks`
+  - gapped_peaks: Path to MACS3 broad peaks. Implies `--broad`. Requires `output.broad_peaks`. Mutually exclusive with `output.narrow_peaks`
+  - treatment_bdg: Path to extended fragment pileup for treatment. Implies `-B|--bdg`. If control is provided, this requires `output.control_bdg`
+  - control_bdg: Path to extended fragment pileup for control. Implies `-B|--bgd`. Requires `output.treatment_bdg`
+params:
+  - extra: Optional parameters besides IO, `-B|--bgd` and `--broad`

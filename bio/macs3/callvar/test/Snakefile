@@ -1,0 +1,39 @@
+rule test_macs3_callvar:
+    input:
+        peak="samples/narrow.peak",
+        treatment="samples/a.sorted.bam",
+        treatment_idx="samples/a.sorted.bam.bai",
+        # Optional control input
+        control="samples/b.sorted.bam",
+        control_idx="samples/b.sorted.bam.bai",
+    output:
+        call="a.vcf",
+    log:
+        "test_macs3_callvar.log",
+    threads: 1
+    params:
+        extra="",
+    wrapper:
+        "master/bio/macs3/callvar"
+
+
+rule test_macs3_callvar_gzipped:
+    input:
+        peak="samples/narrow.peak",
+        treatment="samples/a.sorted.bam",
+        treatment_idx="samples/a.sorted.bam.bai",
+        # Optional control input
+        control="samples/b.sorted.bam",
+        control_idx="samples/b.sorted.bam.bai",
+    output:
+        call="a.vcf.gz",
+        call_idx="a.vcf.gz.tbi",
+    log:
+        "test_macs3_callvar.log",
+    threads: 1
+    params:
+        extra="",
+    wrapper:
+        "master/bio/macs3/callvar"
+
+   

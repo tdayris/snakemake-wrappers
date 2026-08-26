@@ -1,0 +1,40 @@
+rule test_macs3_callpeak:
+    input:
+        # Optional path to a barcodes file
+        # barcodes="",
+        treatment="samples/a.bam",
+        control="samples/b.bam",
+    output:
+        xls="narrow_peaks.xls",
+        summits="narrow_summits.bed",
+        narrow_peaks="narrow.peaks",
+        # Optional background tracks
+        treatment_bdg="a_narrow.bgd",
+        control_bdg="b_narrow.bgd",
+    log:
+        "test_macs3_callpeak.log",
+    params:
+        extra="-f BAMPE --name 'snake_test'",
+    wrapper:
+        "master/bio/macs3/callpeak"
+
+
+rule test_macs3_callpeak_broad:
+    input:
+        # Optional path to a barcodes file
+        # barcodes="",
+        treatment="samples/a.bam",
+        control="samples/b.bam",
+    output:
+        # Optional background tracks
+        # treatment_bdg="a.bgd",
+        # control_bdg="b.bgd",
+        xls="broad_peaks.xls",
+        broad_peaks="broad.peaks",
+        gapped_peaks="gapped.peaks",
+    log:
+        "test_macs3_callpeak_broad.log",
+    params:
+        extra="-f BAMPE",
+    wrapper:
+        "master/bio/macs3/callpeak"

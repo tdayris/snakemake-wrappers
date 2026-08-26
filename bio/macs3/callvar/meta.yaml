@@ -1,0 +1,21 @@
+name: macs3 callvar
+url: https://github.com/macs3-project/MACS
+description: call variants in MACS3 peaks -- Model-based Analysis of ChIP-Seq version3
+author:
+  - Thibault Dayris
+input:
+  - peak: Path to MACS3 peak file (BED formatted)
+  - treatment: Path to aligned reads (BAM formatted) for treatment condition
+  - treatment_idx: Path to bam index for `input.treatment`
+  - control: Optional path to aligned reads (BAM formatted) for control condition
+  - condition_idx: Path to bam index for `input.control`
+  - ref: Optional path to reference genome sequence (fasta) for vcf compression. See BCFTools view.
+  - regions: Optional path to bed regions for vcf compression. See BCFTools view.
+  - samples: Optional path to samples file for compression. See BCFTools view.
+  - targets: Optional path to targets file for compression. See BCFTools view.
+output:
+  - call: Path to called variants (vcf/vcf.gz/bcf formatted). Keep it on first position for BCFTools compression.
+  - call_idx: Optional path to variants index
+params:
+  - extra: Optional parameters besides IO and `-m|--multiple-processing`.
+notes: All BCFTools options are automatically handles for compression.
