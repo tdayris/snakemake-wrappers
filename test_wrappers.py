@@ -2830,6 +2830,13 @@ def test_macs3_callpeak(run):
     )
 
 
+def test_macs3_callvar(run):
+    run(
+        "bio/macs3/callvar",
+        ["snakemake", "a.vcf", "a.vcf.gz"],
+    )
+
+
 def test_macs2_callpeak(run):
     run(
         "bio/macs2/callpeak",
