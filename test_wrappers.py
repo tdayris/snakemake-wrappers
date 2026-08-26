@@ -3694,6 +3694,10 @@ def test_runiq(run):
     )
 
 
+def test_rsync(run):
+    run("utils/rsync", ["snakemake"])
+
+
 def test_ripgrep(run):
     run(
         "utils/ripgrep",

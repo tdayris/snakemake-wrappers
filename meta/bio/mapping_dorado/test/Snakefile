@@ -1,0 +1,20 @@
+from snakemake.utils import min_version
+
+min_version("9.13.1")
+
+configfile: "config.yaml"
+
+rule target:
+    input:
+        model="<temp>/download_basecalling_model_for_dorado/rna004_130bps_fast@v5.2.0",
+        mmi="<resources>/<species>.<build>.<release>/minimap2/<species>.<build>.<release>.<seqtype>.mmi",
+        bai="<results>/<species>.<build>.<release>/Dorado.<seqtype>/sample.bam.bai",
+
+module mapping_dorado:
+    config:
+        config
+    meta_wrapper:
+        "file:.."
+
+
+use rule * from mapping_dorado
