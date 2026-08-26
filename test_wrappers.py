@@ -2823,6 +2823,13 @@ def test_kallisto_quant(run):
     )
 
 
+def test_macs3_callpeak(run):
+    run(
+        "bio/macs3/callpeak",
+        ["snakemake", "narrow.peaks", "gapped.peaks"],
+    )
+
+
 def test_macs2_callpeak(run):
     run(
         "bio/macs2/callpeak",
