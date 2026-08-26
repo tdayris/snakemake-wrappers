@@ -55,10 +55,10 @@ infiles = snakemake.input.get("data", "")
 outfiles = snakemake.output.get("data", "")
 if isinstance(outfiles, list):
     for o in outfiles:
-        parent = subpath(str(o), parents=True)
+        parent = subpath(str(o), parent=True)
         shell("mkdir --parent --verbose {parent:q} {log}")
 else:
-    parent = subpath(str(outfiles), parents=True)
+    parent = subpath(str(outfiles), parent=True)
     shell("mkdir --parent --verbose {parent:q} {log}")
 
 shell("tar {extra} {infiles} {outfiles} {log}")
