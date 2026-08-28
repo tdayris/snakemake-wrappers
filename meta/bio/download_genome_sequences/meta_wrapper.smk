@@ -19,7 +19,7 @@ rule reference_ensembl_sequence_download:
         build="{build}",
         release="{release}",
     wrapper:
-        "v9.12.0/bio/reference/ensembl-sequence"
+        f"{config['repo']}/bio/reference/ensembl-sequence"
 
 
 rule pyfaidx_filter:
@@ -39,7 +39,7 @@ rule pyfaidx_filter:
             "cannonical_chromosomes"
         ],
     wrapper:
-        "v9.4.2/bio/pyfaidx"
+        f"{config['repo']}/bio/pyfaidx"
 
 
 rule samtools_faidx:
@@ -56,7 +56,7 @@ rule samtools_faidx:
     params:
         extra="",
     wrapper:
-        "v9.14.0/bio/samtools/faidx"
+        f"{config['repo']}/bio/samtools/faidx"
 
 
 rule picard_create_sequence_dictionary:
@@ -75,7 +75,7 @@ rule picard_create_sequence_dictionary:
     params:
         extra="",
     wrapper:
-        "v9.4.2/bio/picard/createsequencedictionary"
+        f"{config['repo']}/bio/picard/createsequencedictionary"
 
 
 rule fasta_to_twobit_convert:
@@ -91,37 +91,31 @@ rule fasta_to_twobit_convert:
     params:
         "",
     wrapper:
-        "v7.1.0/bio/ucsc/faToTwoBit"
+        f"{config['repo']}/bio/ucsc/faToTwoBit"
 
 
-rule xsv_select_chrom_sizes:
+rule xan_extract_chrom_sizes:
     """extract chromosome sizes from fasta index"""
     input:
         table="<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
     output:
-        temp("<temp>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.csv"),
+        report(
+            "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.chrom_sizes.tsv",
+            caption="resources/genome_statistics.rst",
+            category="Genome Index",
+            labels={
+                "species": "{species}",
+                "build": "{build}",
+                "release": "{release}",
+            },
+        ),
     log:
-        "<logs>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
+        "<logs>/xan_extract_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmarks>/xsv/select_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
+        "<benchmarks>/xan/select_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
-        subcommand="select",
-        extra="--no-headers --delimiter $'\\t' 1,2",
+        expression="select 1,2 | fmt --tabs",
+        extra="--tee",
     wrapper:
-        "v3.4.0/utils/xsv"
-
-
-use rule xsv_select_chrom_sizes as xsv_format_chrom_sizes with:
-    """format chromosome sizes from csv to tsv"""
-    input:
-        table="<temp>/xsv_select_chrom_sizes/{species}.{build}.{release}.{datatype}.csv",
-    output:
-        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.chrom_sizes.tsv",
-    log:
-        "<logs>/xsv_format_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
-    benchmark:
-        "<benchmarks>/xsv/format_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
-    params:
-        subcommand="fmt",
-        extra="--out-delimiter $'\\t'",
+        f"{config['repo']}/utils/xan/run"

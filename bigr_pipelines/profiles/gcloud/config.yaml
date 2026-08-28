@@ -1,0 +1,28 @@
+storage-gcs-project: "canceropole-infra"
+storage-gcs-retries: 1
+default-storage-provider: "gcs"
+default-storage-prefix: "gs://canceropole-infra-snakemake-results"
+
+googlebatch-project: "canceropole-infra"
+googlebatch-region: "europe-west9"
+googlebatch-service-account: "batch-vm-sa-cpole-infra@canceropole-infra.iam.gserviceaccount.com"
+googlebatch-image-project: "batch-custom-image"
+googlebatch-image-family: "batch-cos-stable-official"
+googlebatch-boot-disk-type: "pd-standard"
+googlebatch-retry-count: 5
+googlebatch-container: "snakemake/snakemake:v9.26.0"
+executor: "googlebatch"
+googlebatch-mount-path: "/tmp/workdir"
+
+jobs: 7
+local-cores: 7
+keep-going: true
+rerun-triggers: "mtime"
+rerun-incomplete: true
+shadow-prefix: "tmp/shadow"
+printshellcmds: true
+show-failed-logs: true
+benchmark-extended: true
+software-deployment-method:
+  - apptainer
+  - conda
