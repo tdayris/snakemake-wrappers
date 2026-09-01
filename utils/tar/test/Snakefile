@@ -11,3 +11,15 @@ rule test_tar:
         explicit_group=True,
     wrapper:
         "master/utils/tar"
+
+rule test_untar:
+    input:
+        archive="tests.tar.bz2",
+    output:
+        outdir=directory("uncompressed_tests"),
+    log:
+        "test_untar.log"
+    params:
+        extra="--extract",
+    wrapper:
+        "master/utils/tar"        

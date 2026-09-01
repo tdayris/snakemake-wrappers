@@ -391,7 +391,7 @@ def test_jq(run):
 def test_tar(run):
     run(
         "utils/tar",
-        ["snakemake", "tests.tar.bz2", "Snakefile"],
+        ["snakemake", "tests.tar.bz2", "uncompressed_tests"],
     )
 
 

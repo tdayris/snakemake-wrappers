@@ -9,7 +9,9 @@ __license__ = "MIT"
 from getpass import getuser
 from grp import getgrgid
 from os import getuid, getgid
+from os.path import splitext
 from snakemake.shell import shell
+from snakemake.io import AnnotatedString
 from snakemake.ioutils import subpath
 from snakemake_wrapper_utils.snakemake import get_format
 from shlex import quote
@@ -27,17 +29,20 @@ if snakemake.params.get("explicit_group"):
     grp_n = getgrgid(grp_i).gr_name
     extra += f" --group='{grp_n}:{grp_i}'"
 
-archive = str(snakemake.output.get("archive"))
+archive = snakemake.output.get("archive") or snakemake.input.get("archive")
 if archive:
-    extra += f" --file={quote(archive)}"
+    extra += f" --file={quote(str(archive))}"
 
-    out_format = get_format(
-        path=archive,
-        ignore_compression=False,
-    )
-    compress_fmt = ("bzip2", "gzip", "lzma", "zstd", "lzop")
-    if out_format in compress_fmt:
-        extra += f" --{out_format} --no-auto-compress"
+    try:
+        out_format = get_format(
+            path=archive,
+            ignore_compression=False,
+        )
+        compress_fmt = ("bzip2", "gzip", "lzma", "zstd", "lzop")
+        if out_format in compress_fmt:
+            extra += f" --{out_format} --no-auto-compress"
+    except ValueError:
+        pass
 
 incremental_backup = snakemake.input.get("incremental_backup")
 if incremental_backup:
@@ -53,12 +58,19 @@ if exclude_from:
 
 infiles = snakemake.input.get("data", "")
 outfiles = snakemake.output.get("data", "")
+outdir = snakemake.output.get("outdir", "")
 if isinstance(outfiles, list):
     for o in outfiles:
         parent = subpath(str(o), parent=True)
         shell("mkdir --parent --verbose {parent:q} {log}")
+elif outdir:
+    shell("mkdir --parent --verbose {outdir:q} {log}")
+    outfiles = f" --directory={quote(outdir)}"
 else:
     parent = subpath(str(outfiles), parent=True)
     shell("mkdir --parent --verbose {parent:q} {log}")
+
+
+
 
 shell("tar {extra} {infiles} {outfiles} {log}")
