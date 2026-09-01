@@ -391,7 +391,7 @@ def test_jq(run):
 def test_tar(run):
     run(
         "utils/tar",
-        ["snakemake"],
+        ["snakemake", "tests.tar.bz2", "Snakefile"],
     )
 
 
@@ -1245,6 +1245,16 @@ def test_csvtk(run):
             "csvtk/uniq.txt": "expected/uniq.txt",
         },
     )
+
+
+def test_docutils_rst2html(run):
+    run("utils/docutils/rst2html", ["snakemake"])
+
+def test_b3sum(run):
+    run("utils/b3sum", ["snakemake"])
+
+def test_coreutils_sha256sum(run):
+    run("utils/coreutils/sha256sum", ["snakemake"])
 
 def test_xan(run):
     run(
