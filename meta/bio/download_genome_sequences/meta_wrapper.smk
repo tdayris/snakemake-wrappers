@@ -117,7 +117,7 @@ rule material_and_methods_genome_sequences:
     input:
         rst=workflow.source_path("resources/reports/material_and_methods.rst"),
     output:
-        html="<resources>/{species}.{build}.{release}/sequence/Genome_sequences_material_and_methods.html",
+        html="<resources>/{species}.{build}.{release}/sequences/Genome_sequences_material_and_methods.html",
     log:
         "<logs>/material_and_methods_genome_sequences/{species}.{build}.{release}.log",
     benchmark:

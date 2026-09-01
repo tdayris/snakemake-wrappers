@@ -1,10 +1,10 @@
 Download genome annotation
 ==========================
 
-Ensembl [ensembl]_ raw genome sequence is was downloaded using Snakemake [snakemake]_ 
-wrapper's [snakemake_wrappers]_ curl [core_uutils]_ for {{ wildcards.species }}, 
-build {{ wildcards.build }}, release {{ wildcards.release }}. Agat [agat]_ 
-configuration was build and tweaked using both Agat and go-yq [go_yq]_. Agat was used 
+Ensembl [#ensembl]_ raw genome sequence is was downloaded using Snakemake [#snakemake]_ 
+wrapper's [#snakemake_wrappers]_ curl [#core_uutils]_ for {{ wildcards.species }}, 
+build {{ wildcards.build }}, release {{ wildcards.release }}. Agat [#agat]_ 
+configuration was build and tweaked using both Agat and go-yq [#go_yq]_. Agat was used 
 to remove genic object with a TSL below 5, fix common ensembl GTF/GFF format issue, and
 ensure all contigs present in the genome sequence match this genome annotation.
 
