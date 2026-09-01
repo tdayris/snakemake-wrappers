@@ -97,7 +97,7 @@ rule fasta_to_twobit_convert:
 rule xan_extract_chrom_sizes:
     """extract chromosome sizes from fasta index"""
     input:
-        table="<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
+        data="<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
     output:
         "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.chrom_sizes.tsv",
     log:
