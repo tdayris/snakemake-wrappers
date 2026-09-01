@@ -99,16 +99,7 @@ rule xan_extract_chrom_sizes:
     input:
         table="<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
     output:
-        report(
-            "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.chrom_sizes.tsv",
-            caption="resources/genome_statistics.rst",
-            category="Genome Index",
-            labels={
-                "species": "{species}",
-                "build": "{build}",
-                "release": "{release}",
-            },
-        ),
+        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.chrom_sizes.tsv",
     log:
         "<logs>/xan_extract_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
     benchmark:
