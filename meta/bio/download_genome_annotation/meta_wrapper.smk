@@ -133,3 +133,20 @@ use rule agat_default_config as agat_sp_filter_feature_by_attribute_value with:
     params:
         extra="--attribute 'transcript_support_level' --value 'NA' --test '='",
         command="agat_sp_filter_feature_by_attribute_value.pl",
+
+
+rule material_and_methods_genome_annotation:
+    """provide comprehensible material and methods"""
+    input:
+        rst=workflow.source_path("resources/reports/material_and_methods.rst")
+    output:
+        html="<resources>/{species}.{build}.{release}/annotations/Genome_annotation_material_and_methods.html",
+    log:
+        "<logs>/material_and_methods_genome_annotation/{species}.{build}.{release}.log",
+    benchmark:
+        "<benchmarks>/rst2html/material_and_methods_genome_annotation_{species}.{build}.{release}.tsv"
+    threads: 1
+    params:
+        extra="--embed-stylesheet --title='Material and methods for genome annotation'",
+    wrapper:
+        f"{config['repo']}/utils/docutils/rst2html"

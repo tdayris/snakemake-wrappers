@@ -119,3 +119,20 @@ rule xan_extract_chrom_sizes:
         extra="--tee",
     wrapper:
         f"{config['repo']}/utils/xan/run"
+
+
+rule material_and_methods_genome_sequences:
+    """provide information on genome sequence preparation methods"""
+    input:
+        rst=workflow.source_path("resources/reports/material_and_methods.rst"),
+    output:
+        html="<resources>/{species}.{build}.{release}/sequence/Genome_sequences_material_and_methods.html",
+    log:
+        "<logs>/material_and_methods_genome_sequences/{species}.{build}.{release}.log",
+    benchmark:
+        "<benchmarks>/rst2html/material_and_methods_genome_sequences_{species}.{build}.{release}.tsv"
+    threads: 1
+    params:
+        extra="--title='Material and methods for genome sequence preparation' --embed-stylesheet",
+    wrapper:
+        f"{config['repo']}/utils/docutils/rst2html"
