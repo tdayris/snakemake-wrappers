@@ -12,4 +12,4 @@ from shlex import quote
 extra = snakemake.params.get("extra", "")
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
-shell("sha256sum {snakemake.input} {snakemake.output:q} {log}")
+shell("sha256sum {snakemake.input} > {snakemake.output:q} {log}")
