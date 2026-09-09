@@ -1,0 +1,20 @@
+rule test_librarian_local:
+    input:
+        reads="a.fastq.gz",
+        librarian_directory="librarian",
+    output:
+        composition_map_png="results/composition_map.png",
+        composition_map_svg="results/composition_map.svg",
+        probability_maps_png="results/probability_maps.png",
+        probability_maps_svg="results/probability_maps.svg",
+        prediction_plot_png="results/prediction_plot.png",
+        prediction_plot_svg="results/prediction_plot.svg",
+        heatmap_txt="results/heatmap.txt",
+        report="results/report.html",
+    log:
+        "test_librarian_local.log",
+    threads: 1
+    params:
+        extra="",
+    wrapper:
+        "master/bio/librarian/local"
