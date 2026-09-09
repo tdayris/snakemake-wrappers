@@ -1859,6 +1859,14 @@ def test_bgzip(run):
     run("bio/bgzip", ["snakemake", "test.vcf.gz"])
 
 
+def test_librarian_install(run):
+    run("bio/librarian/install", ["snakemake"])
+
+
+def test_librarian_local(run):
+    run("bio/librarian/local", ["snakemake"])
+
+
 def test_blast_makeblastdb(run):
     run(
         "bio/blast/makeblastdb",
@@ -3517,6 +3525,26 @@ def test_snpmutator(run):
             "test_mutated_2.fasta",
         ],
     )
+
+
+def test_librarian_install(run):
+    run("bio/librarian/install", ["snakemake"])
+
+def test_librarian_local(run):
+    os.makedirs("bio/librarian/local", exist_ok=True)
+    try:
+        subprocess.check_call(
+            str(
+                "mkdir -pv 'bio/librarian/local/test/librarian' && "
+                "wget --quiet https://github.com/DesmondWillowbrook/Librarian/releases/latest/download/librarian.tar.gz && "
+                "tar -xzvf librarian.tar.gz -C 'bio/librarian/local/test/librarian'"
+            ),
+            shell=True
+        )
+    finally:
+        shutil.rmtree("librarian.tar.gz", ignore_errors=True)
+
+    run("bio/librarian/local", ["snakemake"])
 
 
 def test_star_align(run):

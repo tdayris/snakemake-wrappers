@@ -2,8 +2,8 @@ Download genome sequence
 ========================
 
 Ensembl [#ensembl]_ raw genome sequence was downloaded using Snakemake [#snakemake]_ 
-wrapper's [#snakemake_wrappers]_ curl [#core_uutils]_, for {{ wildcards.species }},
-build {{ wildcards.build }}, release {{ wildcards.release }}. Pyfaidx [#pyfaidx]_ 
+wrapper's [#snakemake_wrappers]_ curl [#core_uutils]_, for {{ params.species }},
+build {{ params.build }}, release {{ params.release }}. Pyfaidx [#pyfaidx]_ 
 was used to extract cannonical chromosomes. Samtools [#sambools]_, picard [#picard]_, 
 and UCSC [#ucsc]_ were used to index and format genome sequence in commonly used 
 formats accross bioinformatics. Xan [#xan]_ was used to extract chromosome sizes from 

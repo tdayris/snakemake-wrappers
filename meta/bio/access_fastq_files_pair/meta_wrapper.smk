@@ -39,10 +39,11 @@ samples_table.set_index("sample_id", inplace=True, drop=False)
 # Building possible storage access methods with plugins
 default_irods_env: str = os.path.expanduser("~/.irods/irods_environment.json")
 
-
-storage irods_files:
-    provider="irods",
-    storage_irods_host=config.get("irods_host", default_irods_env),
+irods_host = config.get("irods_host", default_irods_env)
+if os.path.exists(irods_host):
+    storage irods_files:
+        provider="irods",
+        storage_irods_host=config.get("irods_host", default_irods_env),
 
 
 storage local_files:
@@ -101,24 +102,24 @@ rule fastcat_fastq:
     input:
         unpack(get_fastq_rule_inteface),
     output:
-        fastq=temp("<tmp>/fastcat_fastq/{sample}.{stream}.fastq.gz"),
+        fastq=temp("<temp>/fastcat_fastq/{sample}.{stream}.fastq.gz"),
         basecallers=temp(
-            "<tmp>/fastcat_fastq/fastcat_{sample}.{stream}/basecallers.tsv"
+            "<temp>/fastcat_fastq/fastcat_{sample}.{stream}/basecallers.tsv"
         ),
-        per_file=temp("<tmp>/fastcat_fastq/fastcat_{sample}.{stream}/per_file.tsv"),
-        runids=temp("<tmp>/fastcat_fastq/fastcat_{sample}.{stream}/runids.tsv"),
+        per_file=temp("<temp>/fastcat_fastq/fastcat_{sample}.{stream}/per_file.tsv"),
+        runids=temp("<temp>/fastcat_fastq/fastcat_{sample}.{stream}/runids.tsv"),
         quality=temp(
-            "<tmp>/fastcat_fastq/fastcat_{sample}.{stream}/histograms/quality.hist"
+            "<temp>/fastcat_fastq/fastcat_{sample}.{stream}/histograms/quality.hist"
         ),
         length=temp(
-            "<tmp>/fastcat_fastq/fastcat_{sample}.{stream}/histograms/length.hist"
+            "<temp>/fastcat_fastq/fastcat_{sample}.{stream}/histograms/length.hist"
         ),
     log:
-        "<log>/fastcat_fastq/{sample}.{stream}.log",
+        "<logs>/fastcat_fastq/{sample}.{stream}.log",
     benchmark:
-        "<benchmark>/fastcat_fastq/{sample}.{stream}.tsv"
+        "<benchmarks>/fastcat_fastq/{sample}.{stream}.tsv"
     conda:
-        workflow.source_path("resources/fastcat.yaml")
+        workflow.source_path("resources/envs/fastcat.yaml")
     threads: 2
     params:
         extra=lambda wildcards: str(
@@ -142,22 +143,22 @@ rule xsv_cat_fastcat_per_file:
     """aggregate fastcat per sample qc table"""
     input:
         table=expand(
-            "<tmp>/fastcat_fastq/fastcat_{sample}.{stream}/per_file.tsv",
+            "<temp>/fastcat_fastq/fastcat_{sample}.{stream}/per_file.tsv",
             sample=samples_table.index,
             stream={1, 2},
         ),
     output:
         temp("<results>/fastq_qc/fastcat_per_fastq_file_qc.csv"),
     log:
-        "<log>/xsv_cat_fastcat_per_file.log",
+        "<logs>/xsv_cat_fastcat_per_file.log",
     benchmark:
-        "<benchmark>/xsv_cat_fastcat_per_file.tsv"
+        "<benchmarks>/xsv_cat_fastcat_per_file.tsv"
     threads: 1
     params:
         subcommand="cat rows",
         extra="",
     wrapper:
-        "v3.4.0/utils/xsv"
+        f"{config['repo']}/utils/xsv"
 
 
 rule xsv_frequency_fastcat_per_file:
@@ -167,15 +168,15 @@ rule xsv_frequency_fastcat_per_file:
     output:
         "<results>/fastq_qc/fastcat_per_fastq_file_qc_stats.csv",
     log:
-        "<log>/xsv_frequency_fastcat_per_file.log",
+        "<logs>/xsv_frequency_fastcat_per_file.log",
     benchmark:
-        "<benchmark>/xsv/frequency_fastcat_per_file.tsv"
+        "<benchmarks>/xsv/frequency_fastcat_per_file.tsv"
     threads: 1
     params:
         subcommand="stats",
         extra="--select 'n_seqs,n_bases,min_length,max_length,mean_quality,f_file_ok,f_stream_error,f_qual_missing,f_qual_truncated,f_unknown_error,r_record_seen,r_record_ok,r_too_long,r_too_short,r_low_quality,r_dust_masked'",
     wrapper:
-        "v3.4.0/utils/xsv"
+        f"{config['repo']}/utils/xsv"
 
 
 rule crabz_compress_fastq_qc:
@@ -184,11 +185,28 @@ rule crabz_compress_fastq_qc:
     output:
         "<results>/fastq_qc/fastcat_per_fastq_file_qc.csv.gz",
     log:
-        "<log>/crabz/compress_fastq_qc.log",
+        "<logs>/crabz/compress_fastq_qc.log",
     benchmark:
-        "<benchmark>/crabz/compress_fastq_qc.tsv"
+        "<benchmarks>/crabz/compress_fastq_qc.tsv"
     threads: 1
     params:
         extra="--compression-level 9",
     wrapper:
-        "v9.15.0/utils/crabz"
+        f"{config['repo']}/utils/crabz"
+
+
+rule material_and_methods_access_fastq_pairs:
+    """explain access_fastq_files_pair meta wrapper methods"""
+    input:
+        rst=workflow.source_path("resources/reports/material_and_methods.rst"),
+    output:
+        html="<results>/fastq_qc/Material_and_methods_access_fastq_file_pairs.html",
+    log:
+        "<logs>/material_and_methods_access_fastq_pairs.log",
+    benchmark:
+        "<benchmarks>/rst2html/material_and_methods_access_fastq_pairs.tsv",
+    threads: 1
+    params:
+        extra="--embed-stylesheet --title='Material and methods for genome annotation'",
+    wrapper:
+        f"{config['repo']}/utils/docutils/rst2html"

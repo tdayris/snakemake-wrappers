@@ -4,17 +4,7 @@ min_version("9.13.1")
 
 container: "docker://quay.io/condaforge/miniforge3:26.5.3-0"
 
-configfile = "config.yaml"
-
-rule target:
-    input:
-        expand(
-            "tmp/fastcat_fastq/{sample}.{stream}.fastq.gz",
-            sample=config["samples"],
-            stream={1, 2},
-        ),
-        "results/fastq_qc/fastcat_per_fastq_file_qc.csv.gz",
-
+configfile: "config.yaml"
 
 module access_fastq_files_pair:
     config:
@@ -22,5 +12,17 @@ module access_fastq_files_pair:
     meta_wrapper:
         "file:.."
 
-
 use rule * from access_fastq_files_pair
+
+rule target:
+    input:
+        expand(
+            "<temp>/fastcat_fastq/{sample}.{stream}.fastq.gz",
+            sample=access_fastq_files_pair.samples_table.sample_id,
+            stream={1, 2},
+        ),
+        "<results>/fastq_qc/fastcat_per_fastq_file_qc.csv.gz",
+        "<results>/fastq_qc/Material_and_methods_access_fastq_file_pairs.html",
+    default_target: True
+
+

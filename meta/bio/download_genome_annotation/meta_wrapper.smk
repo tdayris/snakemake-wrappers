@@ -18,7 +18,7 @@ rule reference_ensembl_annotation_download:
         build="{build}",
         release="{release}",
     wrapper:
-        "v9.4.2/bio/reference/ensembl-annotation"
+        f"{config['repo']}/bio/reference/ensembl-annotation"
 
 
 rule agat_default_config:
@@ -36,7 +36,7 @@ rule agat_default_config:
         command="config",
         extra="",
     wrapper:
-        "v9.6.0/bio/agat"
+        f"{config['repo']}/bio/agat"
 
 
 rule go_yq_update_gff_config:
@@ -55,7 +55,7 @@ rule go_yq_update_gff_config:
         command="eval",
         expression=".cpu=6 | .log=false | .progress_bar=false | .minimum_chunk_size=1000",
     wrapper:
-        "v9.14.0/utils/go-yq"
+        f"{config['repo']}/utils/go-yq"
 
 
 use rule go_yq_update_gff_config as go_yq_update_gtf_config with:
