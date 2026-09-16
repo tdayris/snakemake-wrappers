@@ -47,9 +47,9 @@ rule aria_download_single_read_archive:
 rule untar_single_read_archive:
     """decompress all single-read fast5 samples"""
     input:
-        data="<temp>/access_fast5_archive/<sample>.tar.gz",
+        archive="<temp>/access_fast5_archive/<sample>.tar.gz",
     output:
-        data=temp(directory("<temp>/untar_single_read_archive/<sample>")),
+        outdir=temp(directory("<temp>/untar_single_read_archive/<sample>")),
     log:
         "log/untar_single_read_archive/<sample>.log",
     benchmark:
