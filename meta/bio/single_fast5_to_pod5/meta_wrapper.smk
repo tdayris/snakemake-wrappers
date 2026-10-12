@@ -41,7 +41,7 @@ rule aria_download_single_read_archive:
         url=lambda wildcards: samples_table.at[wildcards.sample, "fast5_archive"],
         extra="--retry-wait 5",
     wrapper:
-        "v6.2.0/utils/aria2c"
+        f"{config['repo']}/utils/aria2c"
 
 
 rule untar_single_read_archive:

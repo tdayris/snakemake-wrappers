@@ -1771,6 +1771,10 @@ def test_bedtools_bamtobed(run):
     )
 
 
+def test_bedtools_makewindows(run):
+    run("bio/bedtools/makewindow", ["snakemake"])
+
+
 def test_bedtools_genomecov(run):
     run(
         "bio/bedtools/genomecov",

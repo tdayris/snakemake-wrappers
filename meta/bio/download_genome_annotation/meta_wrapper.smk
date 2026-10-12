@@ -24,7 +24,7 @@ rule reference_ensembl_annotation_download:
 rule agat_default_config:
     """define agat configuration for gff"""
     output:
-        temp("<temp>/default_agat_config.yaml"),
+        pipe("<temp>/default_agat_config.yaml"),
     log:
         "<logs>/agat_default_config.log",
     benchmark:

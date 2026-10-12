@@ -1,0 +1,76 @@
+Bootstrap: docker
+From: python:3.13-slim
+
+%labels
+    Author thibault.dayris@gustaveroussy.fr
+    Version v0.9
+
+%help
+    This is a python image with Snakemake and additional plugins installed.
+
+# Let conda dependencies and environment be available
+%files
+    .condarc    /etc/conda/condarc
+    environment.yaml    /opt/environment.yaml
+    environment.linux-64.pin.txt    /opt/environment.linux-64.pin.txt
+
+
+%post
+    set -euo 'pipefail'
+    # Install apptainer and ensure everything is right
+    apt update
+    apt upgrade -y
+    apt install -y build-essential wget 
+    wget "https://github.com/apptainer/apptainer/releases/download/v1.5.4/apptainer_1.5.4-trixie+_amd64.deb"
+    wget "https://github.com/apptainer/apptainer/releases/download/v1.5.4/apptainer-suid_1.5.4-trixie+_amd64.deb"
+    apt install -y "./apptainer_1.5.4-trixie+_amd64.deb" "./apptainer-suid_1.5.4-trixie+_amd64.deb"
+    apt install --fix-broken
+    # Install conda
+    wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh"
+    bash "Miniforge3-Linux-x86_64.sh" -bfc
+    eval "$(/root/miniforge3/bin/conda 'shell.bash' 'hook')"
+    export CONDARC="/etc/conda/condarc"
+    # Install snakemake in '.snakemake/pip-deployments' for persistance
+    python3 -m pip install --root-user-action 'ignore' \
+        --target '.snakemake/pip-deployments' \
+        'snakemake' 'pandas==2.3.3' \
+        'snakemake-storage-plugin-gcs==1.1.4' \
+        'snakemake-storage-plugin-http==0.3.1' \
+        'snakemake-storage-plugin-fs==1.1.3' \
+        'snakemake-software-deployment-plugin-conda==0.8.4' \
+        'snakemake-software-deployment-plugin-container==0.7.5' \
+        'snakemake-executor-plugin-slurm==2.8.0' \
+        'snakemake-executor-plugin-googlebatch==0.5.1'
+
+# Ensure all commands will stop on any error
+# Ensure conda/snakemake are available in PATH
+%runscript
+    set -euo 'pipefail'
+    echo "snakemake-conda-apptainer container: $NOW"
+    eval "$(/root/miniforge3/bin/conda 'shell.bash' 'hook')"
+    export PATH=".snakemake/pip-deployments/bin:${PATH}"
+    export PYTHONPATH="${PYTHONPATH:-}:${PWD}/.snakemake/pip-deployments"
+    export CONDARC="/etc/conda/condarc"
+    exec "$@"
+
+
+# Ensure all commands will stop on any error
+# Ensure conda/snakemake are available in PATH
+# Test conda/apptainer/snakemake availability
+%test
+    set -euo 'pipefail'
+    eval "$(/root/miniforge3/bin/conda 'shell.bash' 'hook')"
+    export PATH="${PATH}:${PWD}/.snakemake/pip-deployments/bin"
+    export PYTHONPATH="${PYTHONPATH:-}:${PWD}/.snakemake/pip-deployments"
+    export CONDARC="/etc/conda/condarc"
+    echo "${CONDARC}"
+    conda config --show-sources
+    snakemake --help
+    snakemake --version
+    conda --version
+    apptainer --version
+    pip list
+    conda list
+    which conda
+    which apptainer
+    which snakemake

@@ -71,6 +71,4 @@ else:
     shell("mkdir --parent --verbose {parent:q} {log}")
 
 
-
-
 shell("tar {extra} {infiles} {outfiles} {log}")
