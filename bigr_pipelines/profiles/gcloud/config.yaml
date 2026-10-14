@@ -2,18 +2,20 @@ storage-gcs-project: "canceropole-infra"
 storage-gcs-retries: 1
 default-storage-provider: "gcs"
 default-storage-prefix: "gs://canceropole-infra-snakemake-results"
+# storage-gcs-stay-on-remote: True
 
 googlebatch-project: "canceropole-infra"
 googlebatch-region: "europe-west9"
 googlebatch-service-account: "batch-vm-sa-cpole-infra@canceropole-infra.iam.gserviceaccount.com"
 # gcloud compute images list --project=batch-custom-image --no-standard-images
 googlebatch-image-project: "batch-custom-image"
-googlebatch-image-family: "batch-debian-12-official"
+#googlebatch-image-family: "batch-debian-12-official"
+googlebatch-image-family: "batch-cos"
 googlebatch-boot-disk-type: "hyperdisk-balanced"
-#googlebatch-container: "oras://ghcr.io/tdayris/snakemake-conda-apptainer:0.8"
+googlebatch-container: "ghcr.io/tdayris/snakemake-conda-apptainer:0.14"
 executor: "googlebatch"
-googlebatch-mount-path: "/tmp/workdir"
-apptainer-args: ""
+googlebatch-mount-path: "/mnt/share"
+
 
 jobs: 7
 local-cores: 7
@@ -27,3 +29,8 @@ benchmark-extended: true
 software-deployment-method:
   - apptainer
   - conda
+
+shared-fs-usage:
+  - persistence
+  - source-cache
+  - sources

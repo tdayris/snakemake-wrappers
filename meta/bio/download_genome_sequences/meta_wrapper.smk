@@ -6,12 +6,12 @@ rule reference_ensembl_sequence_download:
     """download genome sequence"""
     output:
         temp(
-            "<temp>/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.fasta"
+            "temp/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.fasta"
         ),
     log:
-        "<logs>/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.log",
+        "logs/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmarks>/curl/reference_ensembl_sequence_download_{species}.{build}.{release}.{datatype}.tsv"
+        "benchmarks/curl/reference_ensembl_sequence_download_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
         species="{species}",
@@ -25,13 +25,13 @@ rule reference_ensembl_sequence_download:
 rule pyfaidx_filter:
     """filter out non-cannonical chromosomes"""
     input:
-        fasta="<temp>/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.fasta",
+        fasta="temp/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.fasta",
     output:
-        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+        "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
     log:
-        "<logs>/pyfaidx_filter/{species}.{build}.{release}.{datatype}.log",
+        "logs/pyfaidx_filter/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmarks>/pyfaidx/filter_{species}.{build}.{release}.{datatype}.tsv"
+        "benchmarks/pyfaidx/filter_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
         extra="",
@@ -45,13 +45,13 @@ rule pyfaidx_filter:
 rule samtools_faidx:
     """index fasta sequence with samtools"""
     input:
-        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+        "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
     output:
-        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
+        "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
     log:
-        "<logs>/samtools_faidx/{species}.{build}.{release}.{datatype}.log",
+        "logs/samtools_faidx/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmarks>/samtools_faidx/{species}.{build}.{release}.{datatype}.tsv"
+        "benchmarks/samtools_faidx/{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
         extra="",
@@ -62,13 +62,13 @@ rule samtools_faidx:
 rule picard_create_sequence_dictionary:
     """create a genome sequence dictionary with Picard"""
     input:
-        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+        "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
     output:
-        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.dict",
+        "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.dict",
     log:
-        "<logs>/picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.log",
+        "logs/picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmarks>/picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.tsv"
+        "benchmarks/picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     resources:
         mem_mb=2_000,
@@ -81,13 +81,13 @@ rule picard_create_sequence_dictionary:
 rule fasta_to_twobit_convert:
     """convert genome sequence from fasta to twobit"""
     input:
-        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+        "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
     output:
-        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.2bit",
+        "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.2bit",
     log:
-        "<logs>/fasta_to_twobit_convert/{species}.{build}.{release}.{datatype}.log",
+        "logs/fasta_to_twobit_convert/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmarks>/fasta_to_twobit/convert_{species}.{build}.{release}.{datatype}.tsv"
+        "benchmarks/fasta_to_twobit/convert_{species}.{build}.{release}.{datatype}.tsv"
     params:
         "",
     wrapper:
@@ -97,13 +97,13 @@ rule fasta_to_twobit_convert:
 rule xan_extract_chrom_sizes:
     """extract chromosome sizes from fasta index"""
     input:
-        data="<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
+        data="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
     output:
-        "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.chrom_sizes.tsv",
+        "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.chrom_sizes.tsv",
     log:
-        "<logs>/xan_extract_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
+        "logs/xan_extract_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "<benchmarks>/xan/select_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
+        "benchmarks/xan/select_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     params:
         expression="select 1,2 | fmt --tabs",
@@ -117,11 +117,11 @@ rule material_and_methods_genome_sequences:
     input:
         rst=workflow.source_path("resources/reports/material_and_methods.rst"),
     output:
-        html="<resources>/{species}.{build}.{release}/sequences/Genome_sequences_material_and_methods.html",
+        html="resources/{species}.{build}.{release}/sequences/Genome_sequences_material_and_methods.html",
     log:
-        "<logs>/material_and_methods_genome_sequences/{species}.{build}.{release}.log",
+        "logs/material_and_methods_genome_sequences/{species}.{build}.{release}.log",
     benchmark:
-        "<benchmarks>/rst2html/material_and_methods_genome_sequences_{species}.{build}.{release}.tsv"
+        "benchmarks/rst2html/material_and_methods_genome_sequences_{species}.{build}.{release}.tsv"
     threads: 1
     params:
         extra="--title='Material and methods for genome sequence preparation' --embed-stylesheet",
