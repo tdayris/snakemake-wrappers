@@ -13,6 +13,8 @@ rule reference_ensembl_sequence_download:
     benchmark:
         "benchmarks/curl/reference_ensembl_sequence_download_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
+    group:
+        "download_and_filter_genome_sequence"
     params:
         species="{species}",
         datatype="{datatype}",
@@ -33,6 +35,8 @@ rule pyfaidx_filter:
     benchmark:
         "benchmarks/pyfaidx/filter_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
+    group:
+        "download_and_filter_genome_sequence"
     params:
         extra="",
         regions=lambda wildcards: config[str(wildcards.species)][
@@ -53,6 +57,8 @@ rule samtools_faidx:
     benchmark:
         "benchmarks/samtools_faidx/{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
+    group:
+        "index_genome_sequence"
     params:
         extra="",
     wrapper:
@@ -105,17 +111,38 @@ rule xan_extract_chrom_sizes:
     benchmark:
         "benchmarks/xan/select_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
+    group:
+        "index_genome_sequence"
     params:
         expression="select 1,2 | fmt --tabs",
         extra="--tee",
     wrapper:
         f"{config['repo']}/utils/xan/run"
 
+rule sed_replace_genomes_data_in_report:
+    """replace snakemake patterns for generic report"""
+    input:
+        workflow.source_path("resources/reports/material_and_methods.rst"),
+    output:
+        temp("temp/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.rst"),
+    log:
+        "logs/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.log",
+    benchmark:
+        "benchmarks/sed/replace_genomes_data_in_report_material_and_methods_{species}_{build}_{release}.tsv"
+    threads: 1
+    group:
+        "genome_sequence_material_and_methods"
+    params:
+        extra="",
+        expr="s|{{ params.species }}|{species}|g;s|{{ params.build }}|{build}|g;s|{{ params.release }}|{release}|g",
+    wrapper:
+        f"{config['repo']}/utils/sed"
+
 
 rule material_and_methods_genome_sequences:
     """provide information on genome sequence preparation methods"""
     input:
-        rst=workflow.source_path("resources/reports/material_and_methods.rst"),
+        rst="temp/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.rst",
     output:
         html="resources/{species}.{build}.{release}/sequences/Genome_sequences_material_and_methods.html",
     log:
@@ -123,7 +150,11 @@ rule material_and_methods_genome_sequences:
     benchmark:
         "benchmarks/rst2html/material_and_methods_genome_sequences_{species}.{build}.{release}.tsv"
     threads: 1
+    group:
+        "genome_sequence_material_and_methods"
     params:
         extra="--title='Material and methods for genome sequence preparation' --embed-stylesheet",
     wrapper:
         f"{config['repo']}/utils/docutils/rst2html"
+
+

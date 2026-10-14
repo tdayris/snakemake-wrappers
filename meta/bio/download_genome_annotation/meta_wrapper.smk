@@ -24,7 +24,7 @@ rule reference_ensembl_annotation_download:
 rule agat_default_config:
     """define agat configuration for gff"""
     output:
-        pipe("temp/default_agat_config.yaml"),
+        temp("temp/default_agat_config.yaml"),
     log:
         "logs/agat_default_config.log",
     benchmark:
@@ -32,6 +32,8 @@ rule agat_default_config:
     shadow:
         "minimal"
     threads: 1
+    group:
+        "build_agat_config"
     params:
         command="config",
         extra="",
@@ -50,6 +52,8 @@ rule go_yq_update_gff_config:
     benchmark:
         "benchmarks/go_yq/update_config_{species}.{build}.{release}.gff3.tsv"
     threads: 1
+    group:
+        "build_agat_config"
     params:
         extra="--verbose",
         command="eval",
@@ -69,6 +73,8 @@ use rule go_yq_update_gff_config as go_yq_update_gtf_config with:
     benchmark:
         "benchmarks/go_yq/update_config_{species}.{build}.{release}.gtf.tsv"
     threads: 1
+    group:
+        "build_agat_config"
     params:
         extra="--verbose",
         command="eval",
