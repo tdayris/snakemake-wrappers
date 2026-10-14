@@ -102,7 +102,7 @@ use rule agat_default_config as agat_sq_filter_feature_from_fasta with:
         fasta=lookup(
             dpath="pathvars/genome_sequence",
             within=config,
-            default="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+            default="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta",
         ),
     output:
         o=temp(
