@@ -134,7 +134,7 @@ rule sed_replace_genomes_data_in_report:
         "genome_sequence_material_and_methods"
     params:
         extra="",
-        expr="s|{{ params.species }}|{species}|g;s|{{ params.build }}|{build}|g;s|{{ params.release }}|{release}|g",
+        expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g",
     wrapper:
         f"{config['repo']}/utils/sed"
 
