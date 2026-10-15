@@ -102,7 +102,12 @@ rule fastaguard_on_genome_sequence:
             default="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
         ),
     output:
-        html="resources/{species}.{build}.{release}/statistics/fastaguard_report.html",
+        html=report(
+            "resources/{species}.{build}.{release}/statistics/fastaguard_report.html",
+            caption=workflow.source_path("resources/reports/fastaguard_report.rst"),
+            category="Genome information",
+            subcategory="{species}.{build}.{release}",
+        ),
         json="resources/{species}.{build}.{release}/statistics/fastaguard_report.json",
         tsv=temp("temp/fastaguard_on_genome_sequence/{species}.{build}.{release}.tsv"),
         multiqc=temp("temp/fastaguard_on_genome_sequence/{species}.{build}.{release}._mqc.json"),
@@ -110,6 +115,9 @@ rule fastaguard_on_genome_sequence:
         "logs/fastaguard_on_genome_sequence/{species}.{build}.{release}.log",
     benchmark:
         "benchmarks/fastaguard/genome_sequence.{species}.{build}.{release}.tsv",
+    threads: 1
+    group:
+        "fastaguard_qc"
     params:
         extra="--profile assembly --gate pipeline",
     wrapper:
@@ -124,7 +132,12 @@ use rule go_yq_format_tsv_to_yaml as go_yq_include_assembly_into_agat with:
         "temp/go_yq_format_tsv/{species}.{build}.{release}.seqkit_stats_on_genome_sequence.yaml",
         "temp/go_yq_format_tsv/{species}.{build}.{release}.fastaguard_on_genome_sequence.yaml",
     output:
-        "resources/{species}.{build}.{release}/statistics/statistics.yaml",
+        report(
+            "resources/{species}.{build}.{release}/statistics/statistics.yaml",
+            caption=workflow.source_path("resources/report/genome_statistics.rst"),
+            category="Genome information",
+            subcategory="{species}.{build}.{release}",
+        ),
     log:
         "logs/go_yq_include_assembly_into_agat/{species}.{build}.{release}.log",
     benchmark:
@@ -133,3 +146,29 @@ use rule go_yq_format_tsv_to_yaml as go_yq_include_assembly_into_agat with:
         extra="--no-doc",
         subcommand="eval-all",
         expression="[.]",
+
+
+rule multiqc_genome_qualities:
+    """report genome qualities from fastaguard with multiqc"""
+    input:
+        "resources/{species}.{build}.{release}/statistics/fastaguard_report.html",
+    output:
+        report(
+            "resources/{species}.{build}.{release}/statistics/Multiqc.html",
+            caption=workflow.source_path("resources/reports/multiqc_genome_annotation.rst",
+            category="Genome information",
+            subcategory="{species}.{build}.{release}",
+        ),
+        "resources/{species}.{build}.{release}/statistics/Multiqc_data.zip",
+    log:
+        "logs/multiqc_genome_qualities/{species}.{build}.{release}.log",
+    benchmark:
+        "benchmarks/multiqc/genome_qualities_{species}.{build}.{release}.tsv"
+    threads: 1
+    group:
+        "fastaguard_qc"
+    params:
+        extra="--verbose",
+        use_input_files_only=True,
+    wrapper:
+        f"{config['repo']}/bio/multiqc"

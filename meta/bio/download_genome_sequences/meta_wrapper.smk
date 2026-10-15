@@ -119,10 +119,10 @@ rule xan_extract_chrom_sizes:
     wrapper:
         f"{config['repo']}/utils/xan/run"
 
-rule sed_replace_genomes_data_in_report:
+rule sed_replace_genomes_data_in_genome_sequence_report:
     """replace snakemake patterns for generic report"""
     input:
-        workflow.source_path("resources/reports/material_and_methods.rst"),
+        workflow.source_path("resources/reports/material_and_methods_genome_sequence.rst"),
     output:
         temp("temp/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.rst"),
     log:
@@ -134,7 +134,7 @@ rule sed_replace_genomes_data_in_report:
         "genome_sequence_material_and_methods"
     params:
         extra="",
-        expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g",
+        expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g;s|\{\{||g;s|\}\}||g",
     wrapper:
         f"{config['repo']}/utils/sed"
 
@@ -156,5 +156,3 @@ rule material_and_methods_genome_sequences:
         extra="--title='Material and methods for genome sequence preparation' --embed-stylesheet",
     wrapper:
         f"{config['repo']}/utils/docutils/rst2html"
-
-

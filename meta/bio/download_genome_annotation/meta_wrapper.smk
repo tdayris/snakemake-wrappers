@@ -92,6 +92,8 @@ use rule agat_default_config as agat_convert_sp_gxf2gxf with:
         "logs/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}.log",
     benchmark:
         "benchmarks/agat/convert_sp_gxf2gxf_{species}.{build}.{release}.{gxf}.tsv"
+    group:
+        "agat_genome_annotation_processing"
     shadow:
         "minimal"
     threads: 6
@@ -118,6 +120,8 @@ use rule agat_default_config as agat_sq_filter_feature_from_fasta with:
         "logs/agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}.log",
     benchmark:
         "benchmarks/agat/sq_filter_feature_from_fasta_{species}.{build}.{release}.{gxf}.tsv"
+    group:
+        "agat_genome_annotation_processing"
     shadow:
         "minimal"
     threads: 6
@@ -139,10 +143,32 @@ use rule agat_default_config as agat_sp_filter_feature_by_attribute_value with:
         "benchmarks/agat/sp_filter_feature_by_attribute_value_{species}.{build}.{release}.{gxf}.tsv"
     shadow:
         "minimal"
+    group:
+        "agat_genome_annotation_processing"
     threads: 6
     params:
         extra="--attribute 'transcript_support_level' --value 'NA' --test '='",
         command="agat_sp_filter_feature_by_attribute_value.pl",
+
+
+rule sed_replace_genomes_data_in_genome_annotation_report:
+    """replace snakemake patterns for generic report"""
+    input:
+        workflow.source_path("resources/reports/material_and_methods_genome_annotation.rst"),
+    output:
+        temp("temp/sed_replace_genomes_data_in_genome_annotation_report/material_and_methods_{species}_{build}_{release}.rst"),
+    log:
+        "logs/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.log",
+    benchmark:
+        "benchmarks/sed/replace_genomes_data_in_report_material_and_methods_{species}_{build}_{release}.tsv"
+    threads: 1
+    group:
+        "genome_annotation_material_and_methods"
+    params:
+        extra="",
+        expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g;s|\{\{||g;s|\}\}||g",
+    wrapper:
+        f"{config['repo']}/utils/sed"
 
 
 rule material_and_methods_genome_annotation:
@@ -156,6 +182,8 @@ rule material_and_methods_genome_annotation:
     benchmark:
         "benchmarks/rst2html/material_and_methods_genome_annotation_{species}.{build}.{release}.tsv"
     threads: 1
+    group:
+        "genome_annotation_material_and_methods"
     params:
         extra="--embed-stylesheet --title='Material and methods for genome annotation'",
     wrapper:
