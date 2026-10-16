@@ -1,0 +1,24 @@
+set-resources:
+  basecalling_with_dorado:
+    googlebatch_memory: min(attempt * 20000, 25000)
+    googlebatch_max_run_duration: str(min(attempt * 24 * 60 * 60, 86400)) + "s"
+    googlebatch_boot_disk_gb: max(30, 25 * attempt)
+    googlebatch_machine_type: "c4-standard-2"
+
+  align_reads_with_dorado:
+    googlebatch_memory: min(attempt * 20000, 25000)
+    googlebatch_max_run_duration: str(min(attempt * 6 * 60 * 60, 86400)) + "s"
+    googlebatch_boot_disk_gb: max(30, 25 * attempt)
+    googlebatch_machine_type: "c4-standard-2"
+   
+  sort_aligned_reads_with_sambamba:
+    googlebatch_memory: min(attempt * 2500, 3000)
+    googlebatch_max_run_duration: str(min(attempt * 60 * 60, 86400)) + "s"
+    googlebatch_boot_disk_gb: max(30, 25 * attempt)
+    googlebatch_machine_type: "c4-standard-2"
+
+  index_sorted_reads_with_sambamba:
+    googlebatch_memory: min(attempt * 700, 3000)
+    googlebatch_max_run_duration: str(min(attempt * 60 * 60, 86400)) + "s"
+    googlebatch_boot_disk_gb: max(30, 25 * attempt)
+    googlebatch_machine_type: "c4-standard-2"

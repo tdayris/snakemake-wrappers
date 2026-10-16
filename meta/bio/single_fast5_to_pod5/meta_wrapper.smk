@@ -32,11 +32,11 @@ samples_table.set_index("sample_id", inplace=True, drop=False)
 rule aria_download_single_read_archive:
     """let fast5 data be available for later use"""
     output:
-        temp("<temp>/access_fast5_archive/<sample>.tar.gz"),
+        temp("temp/access_fast5_archive/{sample}.tar.gz"),
     log:
-        "<logs>/access_fast5_archive/<sample>.log",
+        "logs/access_fast5_archive/{sample}.log",
     benchmark:
-        "<benchmarks>/aria2/access_fast5_archive_<sample>.tsv"
+        "benchmarks/aria2/access_fast5_archive_{sample}.tsv"
     params:
         url=lambda wildcards: samples_table.at[wildcards.sample, "fast5_archive"],
         extra="--retry-wait 5",
@@ -47,13 +47,13 @@ rule aria_download_single_read_archive:
 rule untar_single_read_archive:
     """decompress all single-read fast5 samples"""
     input:
-        archive="<temp>/access_fast5_archive/<sample>.tar.gz",
+        archive="temp/access_fast5_archive/{sample}.tar.gz",
     output:
-        outdir=temp(directory("<temp>/untar_single_read_archive/<sample>")),
+        outdir=temp(directory("temp/untar_single_read_archive/{sample}")),
     log:
-        "log/untar_single_read_archive/<sample>.log",
+        "log/untar_single_read_archive/{sample}.log",
     benchmark:
-        "<benchmarks>/untar_single_read_archive/<sample>.tsv"
+        "benchmarks/untar_single_read_archive/{sample}.tsv"
     params:
         extra="--extract --overwrite --verbose --force-local",
         explicit_owner=True,
@@ -65,13 +65,13 @@ rule untar_single_read_archive:
 rule fast5_aggregation_with_ont_api:
     """reformat single-read fast5 into multi-read fast5"""
     input:
-        indir="<temp>/untar_single_read_archive/<sample>",
+        indir="temp/untar_single_read_archive/{sample}",
     output:
-        outdir=temp(directory("<temp>/fast5_aggregation_with_ont_api/<sample>")),
+        outdir=temp(directory("temp/fast5_aggregation_with_ont_api/{sample}")),
     log:
-        "<logs>/fast5_aggregation_with_ont_api/<sample>.log",
+        "logs/fast5_aggregation_with_ont_api/{sample}.log",
     benchmark:
-        "<benchmarks>/fast5_aggregation_with_ont_api/<sample>.tsv"
+        "benchmarks/fast5_aggregation_with_ont_api/{sample}.tsv"
     container:
         "docker://quay.io/biocontainers/ont-fast5-api:0.4.1--py35_0"
     threads: 15
@@ -88,13 +88,13 @@ rule fast5_aggregation_with_ont_api:
 rule fast5_to_pod5_conversion:
     """reformat mutl-read fast5 into pod5"""
     input:
-        indir="<temp>/fast5_aggregation_with_ont_api/<sample>",
+        indir="temp/fast5_aggregation_with_ont_api/{sample}",
     output:
-        pod=temp("<temp>/fast5_to_pod5_conversion/<sample>.pod5"),
+        pod=temp("temp/fast5_to_pod5_conversion/{sample}.pod5"),
     log:
-        "<logs>/fast5_to_pod5_conversion/<sample>.log",
+        "logs/fast5_to_pod5_conversion/{sample}.log",
     benchmark:
-        "<benchmarks>/fast5_to_pod5_conversion/<sample>.tsv"
+        "benchmarks/fast5_to_pod5_conversion/{sample}.tsv"
     container:
         "docker://quay.io/biocontainers/pod5:0.3.44--pyhdfd78af_0"
     threads: 15
@@ -106,3 +106,22 @@ rule fast5_to_pod5_conversion:
         "mkdir {params.mk} {params.outdir:q} > {log:q} 2>&1 && "
         "pod5 convert from_fast5 {params.extra} --threads {threads} "
         "--output {output.pod:q} {input.indir:q} >> {log:q} 2>&1 "
+
+
+rule material_and_methods_single_fast5_to_pod5:
+    """provide information on single_fast5_to_pod5 conversion methods"""
+    input:
+        rst="resources/reports/material_and_methods_single_fast5_to_pod5.rst",
+    output:
+        html="resources/{species}.{build}.{release}/sequences/Single_fast5_to_pod5_material_and_methods.html",
+    log:
+        "logs/material_and_methods_genome_sequences/material_and_methods_single_fast5_to_pod5_{species}.{build}.{release}.log",
+    benchmark:
+        "benchmarks/rst2html/material_and_methods_genome_sequences_material_and_methods_single_fast5_to_pod5_{species}.{build}.{release}.tsv"
+    group:
+        "mapping_dorado_material_and_methods"
+    threads: 1
+    params:
+        extra="--title='Material and methods for dorado mapping' --embed-stylesheet",
+    wrapper:
+        f"{config['repo']}/utils/docutils/rst2html"

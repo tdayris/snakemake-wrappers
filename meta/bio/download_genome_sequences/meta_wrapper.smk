@@ -12,9 +12,9 @@ rule reference_ensembl_sequence_download:
         "logs/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.log",
     benchmark:
         "benchmarks/curl/reference_ensembl_sequence_download_{species}.{build}.{release}.{datatype}.tsv"
-    threads: 1
     group:
         "download_and_filter_genome_sequence"
+    threads: 1
     params:
         species="{species}",
         datatype="{datatype}",
@@ -34,9 +34,9 @@ rule pyfaidx_filter:
         "logs/pyfaidx_filter/{species}.{build}.{release}.{datatype}.log",
     benchmark:
         "benchmarks/pyfaidx/filter_{species}.{build}.{release}.{datatype}.tsv"
-    threads: 1
     group:
         "download_and_filter_genome_sequence"
+    threads: 1
     params:
         extra="",
         regions=lambda wildcards: config[str(wildcards.species)][
@@ -56,9 +56,9 @@ rule samtools_faidx:
         "logs/samtools_faidx/{species}.{build}.{release}.{datatype}.log",
     benchmark:
         "benchmarks/samtools_faidx/{species}.{build}.{release}.{datatype}.tsv"
-    threads: 1
     group:
         "index_genome_sequence"
+    threads: 1
     params:
         extra="",
     wrapper:
@@ -110,28 +110,33 @@ rule xan_extract_chrom_sizes:
         "logs/xan_extract_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
     benchmark:
         "benchmarks/xan/select_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
-    threads: 1
     group:
         "index_genome_sequence"
+    threads: 1
     params:
         expression="select 1,2 | fmt --tabs",
         extra="--tee",
     wrapper:
         f"{config['repo']}/utils/xan/run"
 
+
 rule sed_replace_genomes_data_in_genome_sequence_report:
     """replace snakemake patterns for generic report"""
     input:
-        workflow.source_path("resources/reports/material_and_methods_genome_sequence.rst"),
+        workflow.source_path(
+            "resources/reports/material_and_methods_genome_sequence.rst"
+        ),
     output:
-        temp("temp/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.rst"),
+        temp(
+            "temp/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.rst"
+        ),
     log:
         "logs/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.log",
     benchmark:
         "benchmarks/sed/replace_genomes_data_in_report_material_and_methods_{species}_{build}_{release}.tsv"
-    threads: 1
     group:
         "genome_sequence_material_and_methods"
+    threads: 1
     params:
         extra="",
         expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g;s|\{\{||g;s|\}\}||g",
@@ -149,9 +154,9 @@ rule material_and_methods_genome_sequences:
         "logs/material_and_methods_genome_sequences/{species}.{build}.{release}.log",
     benchmark:
         "benchmarks/rst2html/material_and_methods_genome_sequences_{species}.{build}.{release}.tsv"
-    threads: 1
     group:
         "genome_sequence_material_and_methods"
+    threads: 1
     params:
         extra="--title='Material and methods for genome sequence preparation' --embed-stylesheet",
     wrapper:

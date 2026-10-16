@@ -2,6 +2,14 @@ wildcard_constraints:
     gxf=r"gff3|gtf",
 
 
+def local_lookup(dpath, within, default):
+    """Return local(path) if path is within config"""
+    tmp = lookup(dpath=dpath, within=within, default=None)
+    if tmp is None:
+        return default
+    return local(tmp)
+
+
 rule reference_ensembl_annotation_download:
     """download genome gff"""
     output:
@@ -29,11 +37,11 @@ rule agat_default_config:
         "logs/agat_default_config.log",
     benchmark:
         "benchmarks/agat/default_config.tsv"
+    group:
+        "build_agat_config"
     shadow:
         "minimal"
     threads: 1
-    group:
-        "build_agat_config"
     params:
         command="config",
         extra="",
@@ -51,9 +59,9 @@ rule go_yq_update_gff_config:
         "logs/go_yq_update_config/{species}.{build}.{release}.gff3.log",
     benchmark:
         "benchmarks/go_yq/update_config_{species}.{build}.{release}.gff3.tsv"
-    threads: 1
     group:
         "build_agat_config"
+    threads: 1
     params:
         extra="--verbose",
         command="eval",
@@ -72,9 +80,9 @@ use rule go_yq_update_gff_config as go_yq_update_gtf_config with:
         "logs/go_yq_update_config/{species}.{build}.{release}.gtf.log",
     benchmark:
         "benchmarks/go_yq/update_config_{species}.{build}.{release}.gtf.tsv"
-    threads: 1
     group:
         "build_agat_config"
+    threads: 1
     params:
         extra="--verbose",
         command="eval",
@@ -107,7 +115,7 @@ use rule agat_default_config as agat_sq_filter_feature_from_fasta with:
     input:
         gff="temp/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}",
         config="resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_{gxf}_config.yaml",
-        fasta=lookup(
+        fasta=local_lookup(
             dpath="pathvars/genome_sequence",
             within=config,
             default="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta",
@@ -141,10 +149,10 @@ use rule agat_default_config as agat_sp_filter_feature_by_attribute_value with:
         "logs/agat_sp_filter_feature_by_attribute_value/{species}.{build}.{release}.{gxf}.log",
     benchmark:
         "benchmarks/agat/sp_filter_feature_by_attribute_value_{species}.{build}.{release}.{gxf}.tsv"
-    shadow:
-        "minimal"
     group:
         "agat_genome_annotation_processing"
+    shadow:
+        "minimal"
     threads: 6
     params:
         extra="--attribute 'transcript_support_level' --value 'NA' --test '='",
@@ -154,16 +162,20 @@ use rule agat_default_config as agat_sp_filter_feature_by_attribute_value with:
 rule sed_replace_genomes_data_in_genome_annotation_report:
     """replace snakemake patterns for generic report"""
     input:
-        workflow.source_path("resources/reports/material_and_methods_genome_annotation.rst"),
+        workflow.source_path(
+            "resources/reports/material_and_methods_genome_annotation.rst"
+        ),
     output:
-        temp("temp/sed_replace_genomes_data_in_genome_annotation_report/material_and_methods_{species}_{build}_{release}.rst"),
+        temp(
+            "temp/sed_replace_genomes_data_in_genome_annotation_report/material_and_methods_{species}_{build}_{release}.rst"
+        ),
     log:
         "logs/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.log",
     benchmark:
         "benchmarks/sed/replace_genomes_data_in_report_material_and_methods_{species}_{build}_{release}.tsv"
-    threads: 1
     group:
         "genome_annotation_material_and_methods"
+    threads: 1
     params:
         extra="",
         expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g;s|\{\{||g;s|\}\}||g",
@@ -174,16 +186,16 @@ rule sed_replace_genomes_data_in_genome_annotation_report:
 rule material_and_methods_genome_annotation:
     """provide comprehensible material and methods"""
     input:
-        rst=workflow.source_path("resources/reports/material_and_methods.rst")
+        rst=workflow.source_path("resources/reports/material_and_methods.rst"),
     output:
         html="resources/{species}.{build}.{release}/annotations/Genome_annotation_material_and_methods.html",
     log:
         "logs/material_and_methods_genome_annotation/{species}.{build}.{release}.log",
     benchmark:
         "benchmarks/rst2html/material_and_methods_genome_annotation_{species}.{build}.{release}.tsv"
-    threads: 1
     group:
         "genome_annotation_material_and_methods"
+    threads: 1
     params:
         extra="--embed-stylesheet --title='Material and methods for genome annotation'",
     wrapper:
