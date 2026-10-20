@@ -86,7 +86,7 @@ def main() -> None:
         raise FileNotFoundError(f"Could not find {snakefile=}")
 
     profile: pathlib.Path = launcher_path.parent / "profiles" / args.profile
-    workflow_profile: pathlib.Path = snakefile.parent / "workflow-profile" / args.profile
+    workflow_profile: pathlib.Path = snakefile.parent / "workflow-profiles" / args.profile
     if profile.exists():
         extra += f" --profile '{profile.resolve()}'"
     else:
