@@ -160,7 +160,7 @@ rule multiqc_genome_qualities:
         report(
             "resources/{species}.{build}.{release}/statistics/Multiqc.html",
             caption=workflow.source_path(
-                "resources/reports/multiqc_genome_annotation.rst"
+                "resources/reports/multiqc_genome_statistics.rst"
             ),
             category="Genome information",
             subcategory="{species}.{build}.{release}",
