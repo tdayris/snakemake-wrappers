@@ -138,7 +138,7 @@ use rule go_yq_format_tsv_to_yaml as go_yq_include_assembly_into_agat with:
     output:
         report(
             "resources/{species}.{build}.{release}/statistics/statistics.yaml",
-            caption=workflow.source_path("resources/report/genome_statistics.rst"),
+            caption=workflow.source_path("resources/reports/genome_statistics.rst"),
             category="Genome information",
             subcategory="{species}.{build}.{release}",
         ),
