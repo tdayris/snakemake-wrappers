@@ -179,7 +179,7 @@ rule sed_replace_genomes_data_in_mapping_dorado_report:
     threads: 1
     params:
         extra="",
-        expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g;s|\{\{||g;s|\}\}||g",
+        expr=r"s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g;s|\{\{||g;s|\}\}||g",
     wrapper:
         f"{config['repo']}/utils/sed"
 

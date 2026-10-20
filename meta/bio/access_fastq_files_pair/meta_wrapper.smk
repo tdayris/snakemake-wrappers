@@ -41,6 +41,7 @@ default_irods_env: str = os.path.expanduser("~/.irods/irods_environment.json")
 
 irods_host = config.get("irods_host", default_irods_env)
 if os.path.exists(irods_host):
+
     storage irods_files:
         provider="irods",
         storage_irods_host=config.get("irods_host", default_irods_env),
@@ -204,7 +205,7 @@ rule material_and_methods_access_fastq_pairs:
     log:
         "<logs>/material_and_methods_access_fastq_pairs.log",
     benchmark:
-        "<benchmarks>/rst2html/material_and_methods_access_fastq_pairs.tsv",
+        "<benchmarks>/rst2html/material_and_methods_access_fastq_pairs.tsv"
     threads: 1
     params:
         extra="--embed-stylesheet --title='Material and methods for genome annotation'",
