@@ -28,7 +28,7 @@ rule agat_sp_statistics:
     params:
         command="agat_sp_statistics.pl",
     wrapper:
-        f"{config['repo']}/bio/agat"
+        f"{config['git_repo']}/bio/agat"
 
 
 rule assembly_stats:
@@ -49,7 +49,7 @@ rule assembly_stats:
     params:
         extra="-t",
     wrapper:
-        f"{config['repo']}/bio/assembly-stats"
+        f"{config['git_repo']}/bio/assembly-stats"
 
 
 rule go_yq_format_tsv_to_yaml:
@@ -68,7 +68,7 @@ rule go_yq_format_tsv_to_yaml:
         subcommand="",
         expression="",
     wrapper:
-        f"{config['repo']}/utils/go-yq"
+        f"{config['git_repo']}/utils/go-yq"
 
 
 rule seqkit_stats_on_genome_sequence:
@@ -92,7 +92,7 @@ rule seqkit_stats_on_genome_sequence:
         command="stats",
         extra="--all --tabular",
     wrapper:
-        f"{config['repo']}/bio/seqkit"
+        f"{config['git_repo']}/bio/seqkit"
 
 
 rule fastaguard_on_genome_sequence:
@@ -125,7 +125,7 @@ rule fastaguard_on_genome_sequence:
     params:
         extra="--profile assembly --gate pipeline",
     wrapper:
-        f"{config['repo']}/bio/fastaguard"
+        f"{config['git_repo']}/bio/fastaguard"
 
 
 use rule go_yq_format_tsv_to_yaml as go_yq_include_assembly_into_agat with:
@@ -177,4 +177,4 @@ rule multiqc_genome_qualities:
         extra="--verbose",
         use_input_files_only=True,
     wrapper:
-        f"{config['repo']}/bio/multiqc"
+        f"{config['git_repo']}/bio/multiqc"

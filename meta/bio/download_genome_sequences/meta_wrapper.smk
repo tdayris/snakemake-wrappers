@@ -21,7 +21,7 @@ rule reference_ensembl_sequence_download:
         build="{build}",
         release="{release}",
     wrapper:
-        f"{config['repo']}/bio/reference/ensembl-sequence"
+        f"{config['git_repo']}/bio/reference/ensembl-sequence"
 
 
 rule pyfaidx_filter:
@@ -43,7 +43,7 @@ rule pyfaidx_filter:
             "cannonical_chromosomes"
         ],
     wrapper:
-        f"{config['repo']}/bio/pyfaidx"
+        f"{config['git_repo']}/bio/pyfaidx"
 
 
 rule samtools_faidx:
@@ -62,7 +62,7 @@ rule samtools_faidx:
     params:
         extra="",
     wrapper:
-        f"{config['repo']}/bio/samtools/faidx"
+        f"{config['git_repo']}/bio/samtools/faidx"
 
 
 rule picard_create_sequence_dictionary:
@@ -81,7 +81,7 @@ rule picard_create_sequence_dictionary:
     params:
         extra="",
     wrapper:
-        f"{config['repo']}/bio/picard/createsequencedictionary"
+        f"{config['git_repo']}/bio/picard/createsequencedictionary"
 
 
 rule fasta_to_twobit_convert:
@@ -97,7 +97,7 @@ rule fasta_to_twobit_convert:
     params:
         "",
     wrapper:
-        f"{config['repo']}/bio/ucsc/faToTwoBit"
+        f"{config['git_repo']}/bio/ucsc/faToTwoBit"
 
 
 rule xan_extract_chrom_sizes:
@@ -117,7 +117,7 @@ rule xan_extract_chrom_sizes:
         expression="select 1,2 | fmt --tabs",
         extra="--tee",
     wrapper:
-        f"{config['repo']}/utils/xan/run"
+        f"{config['git_repo']}/utils/xan/run"
 
 
 rule sed_replace_genomes_data_in_genome_sequence_report:
@@ -141,7 +141,7 @@ rule sed_replace_genomes_data_in_genome_sequence_report:
         extra="",
         expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g;s|\{\{||g;s|\}\}||g",
     wrapper:
-        f"{config['repo']}/utils/sed"
+        f"{config['git_repo']}/utils/sed"
 
 
 rule material_and_methods_genome_sequences:
@@ -160,4 +160,4 @@ rule material_and_methods_genome_sequences:
     params:
         extra="--title='Material and methods for genome sequence preparation' --embed-stylesheet",
     wrapper:
-        f"{config['repo']}/utils/docutils/rst2html"
+        f"{config['git_repo']}/utils/docutils/rst2html"

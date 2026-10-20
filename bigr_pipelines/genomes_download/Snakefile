@@ -6,17 +6,14 @@ wildcard_constraints:
     seqtype=r"dna|cdna|cds",
 
 
-container: "docker://quay.io/condaforge/miniforge3:26.5.3-0"
-
-
 config["genome_sequence"] = (
-    "<resources>/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta"
+    "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta"
 )
 config["genome_annotation"] = (
-    "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.gtf"
+    "resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.gtf"
 )
 config["agat_config"] = (
-    "<resources>/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml"
+    "resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml"
 )
 
 
@@ -42,7 +39,7 @@ module download_genome_sequences:
     config:
         config
     meta_wrapper:
-        f"{config['git_repo']}/download_genome_annotation"
+        f"{config['git_repo']}/meta/bio/download_genome_annotation"
 
 
 use rule * from download_genome_sequences
@@ -52,7 +49,7 @@ module download_genome_annotation:
     config:
         config
     meta_wrapper:
-        f"{config['git_repo']}/download_genome_sequences"
+        f"{config['git_repo']}/meta/bio/download_genome_sequences"
 
 
 use rule * from download_genome_annotation
@@ -62,7 +59,7 @@ module genome_statistics:
     config:
         config
     meta_wrapper:
-        f"{config['git_repo']}/genome_statistics"
+        f"{config['git_repo']}/meta/bio/genome_statistics"
 
 
 use rule * from genome_statistics

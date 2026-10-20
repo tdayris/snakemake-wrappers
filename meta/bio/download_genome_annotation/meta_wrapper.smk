@@ -26,7 +26,7 @@ rule reference_ensembl_annotation_download:
         build="{build}",
         release="{release}",
     wrapper:
-        f"{config['repo']}/bio/reference/ensembl-annotation"
+        f"{config['git_repo']}/bio/reference/ensembl-annotation"
 
 
 rule agat_default_config:
@@ -46,7 +46,7 @@ rule agat_default_config:
         command="config",
         extra="",
     wrapper:
-        f"{config['repo']}/bio/agat"
+        f"{config['git_repo']}/bio/agat"
 
 
 rule go_yq_update_gff_config:
@@ -67,7 +67,7 @@ rule go_yq_update_gff_config:
         command="eval",
         expression=".cpu=6 | .log=false | .progress_bar=false | .minimum_chunk_size=1000",
     wrapper:
-        f"{config['repo']}/utils/go-yq"
+        f"{config['git_repo']}/utils/go-yq"
 
 
 use rule go_yq_update_gff_config as go_yq_update_gtf_config with:
@@ -180,7 +180,7 @@ rule sed_replace_genomes_data_in_genome_annotation_report:
         extra="",
         expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g;s|\{\{||g;s|\}\}||g",
     wrapper:
-        f"{config['repo']}/utils/sed"
+        f"{config['git_repo']}/utils/sed"
 
 
 rule material_and_methods_genome_annotation:
@@ -199,4 +199,4 @@ rule material_and_methods_genome_annotation:
     params:
         extra="--embed-stylesheet --title='Material and methods for genome annotation'",
     wrapper:
-        f"{config['repo']}/utils/docutils/rst2html"
+        f"{config['git_repo']}/utils/docutils/rst2html"
