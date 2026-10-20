@@ -8,6 +8,7 @@ import pathlib
 import rich.console
 import rich.syntax
 import rich_argparse
+import shlex
 import sys
 import typing
 
@@ -76,28 +77,38 @@ def main() -> None:
     logger.remove()
     logger.add(sys.stderr, level=args.verbosity.upper())
     logger.debug("Command line arguments parsed")
+    extra: str = ""
 
     snakefile: pathlib.Path = launcher_path.parent / args.pipeline_name / "Snakefile"
-    if not snakefile.exists():
+    if snakefile.exists():
+        extra += f" --snakefile '{snakefile.resolve()}'"
+    else:
         raise FileNotFoundError(f"Could not find {snakefile=}")
 
     profile: pathlib.Path = launcher_path.parent / "profiles" / args.profile
-    if not profile.exists():
+    workflow_profile: pathlib.Path = snakefile.parent / "workflow-profile" / args.profile
+    if profile.exists():
+        extra += f" --profile '{profile.resolve()}'"
+    else:
         raise FileNotFoundError(f"Could not find {profile=}")
 
+    if workflow_profile.exists():
+        extra += f" --workflow-profile '{workflow_profile.resolve()}'"
+    else:
+        logger.warning(
+            f"Could not find workflow profile {workflow_profile=}. This could "
+            "be normal and expected."
+        )
+
+
     config: pathlib.PosixPath = pathlib.Path(args.config_file)
-    if not config.exists():
+    if config.exists():
+        extra += f" --configfile '{config.resolve()}'"
+    else:
         raise FileNotFoundError(f"Could not find {config=}")
     logger.info("All required files found")
     
-    cmd: str = str(
-        f"snakemake -s '{snakefile.resolve()}' "
-        f"--profile '{profile.resolve()}' "
-        f"--configfile '{config.resolve()}' "
-    )
-    workflow_profile: pathlib.PosixPath = pathlib.Path(f"{profile.resolve()}-workflow")
-    if workflow_profile.exists():
-        cmd += f" --workflow-profile {workflow_profile.resolve()}"
+    cmd: str = str(f"snakemake {extra} ")
     logger.debug("Command line built, running Snakemake:")
     rich.console.Console().print(rich.syntax.Syntax(cmd.replace("--", "\\\n  --"), "bash", line_numbers=False, word_wrap=True,))
     if not args.dry_run:
