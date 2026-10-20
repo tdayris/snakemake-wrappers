@@ -186,7 +186,7 @@ rule sed_replace_genomes_data_in_genome_annotation_report:
 rule material_and_methods_genome_annotation:
     """provide comprehensible material and methods"""
     input:
-        rst=workflow.source_path("resources/reports/material_and_methods.rst"),
+        rst="temp/sed_replace_genomes_data_in_genome_annotation_report/material_and_methods_{species}_{build}_{release}.rst"
     output:
         html="resources/{species}.{build}.{release}/annotations/Genome_annotation_material_and_methods.html",
     log:
