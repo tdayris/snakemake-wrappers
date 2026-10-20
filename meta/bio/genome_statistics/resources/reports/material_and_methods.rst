@@ -15,4 +15,4 @@ MultiQC [#multiqc]_.
 .. [#seqkit] Shen, Wei, et al. "SeqKit: a cross-platform and ultrafast toolkit for FASTA/Q file manipulation." PloS one 11.10 (2016): e0163962.
 .. [#fastaguard] ESTAJI, E. FastaGuard [Computer software]. https://github.com/ehsanestaji/FastaGuard
 .. [#go_yq] Farah, M. YQ [Computer software]. https://github.com/mikefarah/yq
-
+.. [#multiqc] Ewels, Philip, et al. "MultiQC: summarize analysis results for multiple tools and samples in a single report." Bioinformatics 32.19 (2016): 3047-3048.

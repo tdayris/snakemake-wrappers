@@ -1,6 +1,3 @@
-Genome statistics
-=================
-
 This yaml file contains descriptive statistics over contigs and genic objects
 distribution. It concerns Ensembl's {{ wildcards.species}}, {{ wildcards.build }},
 release number {{ wildcards.release}}.
