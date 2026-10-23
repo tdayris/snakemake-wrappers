@@ -1,17 +1,25 @@
+def local_lookup(dpath, within, default):
+    """Return local(path) if path is within config"""
+    tmp = lookup(dpath=dpath, within=within, default=None)
+    if tmp is None:
+        return default
+    return local(tmp)
+
+
 rule agat_sp_statistics:
     """gather genome-wide statistics"""
     input:
-        gff=lookup(
+        gff=local_lookup(
             dpath="pathvars/genome_annotation",
             within=config,
             default="resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.gff3",
         ),
-        gs=lookup(
+        gs=local_lookup(
             dpath="pathvars/genome_sequence",
             within=config,
-            default="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+            default="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta",
         ),
-        config=lookup(
+        config=local_lookup(
             dpath="pathvars/agat_config",
             within=config,
             default="resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml",
@@ -34,10 +42,10 @@ rule agat_sp_statistics:
 rule assembly_stats:
     """gather contigs-wide statistics"""
     input:
-        assembly=lookup(
+        assembly=local_lookup(
             dpath="pathvars/genome_sequence",
             within=config,
-            default="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+            default="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta",
         ),
     output:
         assembly_stats=temp("temp/assembly_stats/{species}.{build}.{release}.tsv"),
@@ -74,10 +82,10 @@ rule go_yq_format_tsv_to_yaml:
 rule seqkit_stats_on_genome_sequence:
     """get detailed information on the genome sequence with seqkit"""
     input:
-        fastx=lookup(
+        fastx=local_lookup(
             dpath="pathvars/genome_sequence",
             within=config,
-            default="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+            default="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta",
         ),
     output:
         stats=temp(
@@ -98,10 +106,10 @@ rule seqkit_stats_on_genome_sequence:
 rule fastaguard_on_genome_sequence:
     """get detailed information on the genome sequence with fastaguard"""
     input:
-        fasta=lookup(
+        fasta=local_lookup(
             dpath="pathvars/genome_sequence",
             within=config,
-            default="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
+            default="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.dna.fasta",
         ),
     output:
         html=report(
