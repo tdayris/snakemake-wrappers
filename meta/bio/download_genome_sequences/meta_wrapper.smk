@@ -139,7 +139,7 @@ rule sed_replace_genomes_data_in_genome_sequence_report:
     threads: 1
     params:
         extra="",
-        expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g;s|\{\{||g;s|\}\}||g",
+        expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g;s|\\{\\{||g;s|\\}\\}||g",
     wrapper:
         f"{config['git_repo']}/utils/sed"
 
