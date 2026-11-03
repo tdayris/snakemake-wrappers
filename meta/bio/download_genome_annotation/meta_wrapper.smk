@@ -10,33 +10,33 @@ def local_lookup(dpath, within, default):
     return local(tmp)
 
 
-rule reference_ensembl_annotation_download:
+rule download_genome_annotation_reference_ensembl:
     """download genome gff"""
     output:
         temp(
-            "temp/reference_ensembl_annotation_download/{species}.{build}.{release}.{gxf}"
+            "temp/download_genome_annotation_reference_ensembl/{species}.{build}.{release}.{gxf}"
         ),
     log:
-        "logs/reference_ensembl_annotation_download/{species}.{build}.{release}.{gxf}.log",
+        "logs/download_genome_annotation_reference_ensembl/{species}.{build}.{release}.{gxf}.log",
     benchmark:
-        "benchmarks/curl/reference_ensembl_annotation_download_{species}.{build}.{release}.{gxf}.tsv"
+        "benchmarks/curl/download_genome_annotation_reference_ensembl_{species}.{build}.{release}.{gxf}.tsv"
     threads: 1
     params:
         species="{species}",
         build="{build}",
         release="{release}",
     wrapper:
-        f"{config['git_repo']}/bio/reference/ensembl-annotation"
+        f"{config['repo']}/bio/reference/ensembl-annotation"
 
 
-rule agat_default_config:
+rule download_genome_annotation_agat_default_config:
     """define agat configuration for gff"""
     output:
         temp("temp/default_agat_config.yaml"),
     log:
-        "logs/agat_default_config.log",
+        "logs/download_genome_annotation_agat_default_config.log",
     benchmark:
-        "benchmarks/agat/default_config.tsv"
+        "benchmarks/agat/download_genome_annotation_agat_default_config.tsv"
     group:
         "build_agat_config"
     shadow:
@@ -46,19 +46,19 @@ rule agat_default_config:
         command="config",
         extra="",
     wrapper:
-        f"{config['git_repo']}/bio/agat"
+        f"{config['repo']}/bio/agat"
 
 
-rule go_yq_update_gff_config:
+rule download_genome_annotation_go_yq_update_gff_config:
     """define agat configuration for gff"""
     input:
         "temp/default_agat_config.yaml",
     output:
         "resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml",
     log:
-        "logs/go_yq_update_config/{species}.{build}.{release}.gff3.log",
+        "logs/download_genome_annotation_go_yq_update_gff_config/{species}.{build}.{release}.gff3.log",
     benchmark:
-        "benchmarks/go_yq/update_config_{species}.{build}.{release}.gff3.tsv"
+        "benchmarks/go_yq/download_genome_annotation_go_yq_update_gff_config_{species}.{build}.{release}.gff3.tsv"
     group:
         "build_agat_config"
     threads: 1
@@ -67,19 +67,19 @@ rule go_yq_update_gff_config:
         command="eval",
         expression=".cpu=6 | .log=false | .progress_bar=false | .minimum_chunk_size=1000",
     wrapper:
-        f"{config['git_repo']}/utils/go-yq"
+        f"{config['repo']}/utils/go-yq"
 
 
-use rule go_yq_update_gff_config as go_yq_update_gtf_config with:
+use rule download_genome_annotation_go_yq_update_gff_config as download_genome_annotation_go_yq_update_gtf_config with:
     """define agat configuration for gtf"""
     input:
         "resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml",
     output:
         "resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gtf_config.yaml",
     log:
-        "logs/go_yq_update_config/{species}.{build}.{release}.gtf.log",
+        "logs/download_genome_annotation_go_yq_update_gtf_config/{species}.{build}.{release}.gtf.log",
     benchmark:
-        "benchmarks/go_yq/update_config_{species}.{build}.{release}.gtf.tsv"
+        "benchmarks/go_yq/download_genome_annotation_go_yq_update_gtf_config_{species}.{build}.{release}.gtf.tsv"
     group:
         "build_agat_config"
     threads: 1
@@ -89,17 +89,17 @@ use rule go_yq_update_gff_config as go_yq_update_gtf_config with:
         expression='.output_format = "GTF"',
 
 
-use rule agat_default_config as agat_convert_sp_gxf2gxf with:
+use rule download_genome_annotation_agat_default_config as download_genome_annotation_agat_convert_sp_gxf2gxf with:
     """fix common ensembl format issues"""
     input:
-        gff="temp/reference_ensembl_annotation_download/{species}.{build}.{release}.{gxf}",
+        gff="temp/download_genome_annotation_reference_ensembl/{species}.{build}.{release}.{gxf}",
         config="resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_{gxf}_config.yaml",
     output:
-        out=temp("temp/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}"),
+        out=temp("temp/download_genome_annotation_agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}"),
     log:
-        "logs/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}.log",
+        "logs/download_genome_annotation_agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}.log",
     benchmark:
-        "benchmarks/agat/convert_sp_gxf2gxf_{species}.{build}.{release}.{gxf}.tsv"
+        "benchmarks/agat/download_genome_annotation_agat_convert_sp_gxf2gxf_{species}.{build}.{release}.{gxf}.tsv"
     group:
         "agat_genome_annotation_processing"
     shadow:
@@ -110,10 +110,10 @@ use rule agat_default_config as agat_convert_sp_gxf2gxf with:
         extra="",
 
 
-use rule agat_default_config as agat_sq_filter_feature_from_fasta with:
+use rule download_genome_annotation_agat_default_config as download_genome_annotation_agat_sq_filter_feature_from_fasta with:
     """ensure fasta and gff have the same contigs"""
     input:
-        gff="temp/agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}",
+        gff="temp/download_genome_annotation_agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}",
         config="resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_{gxf}_config.yaml",
         fasta=local_lookup(
             dpath="pathvars/genome_sequence",
@@ -122,12 +122,12 @@ use rule agat_default_config as agat_sq_filter_feature_from_fasta with:
         ),
     output:
         o=temp(
-            "temp/agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}"
+            "temp/download_genome_annotation_agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}"
         ),
     log:
-        "logs/agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}.log",
+        "logs/download_genome_annotation_agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}.log",
     benchmark:
-        "benchmarks/agat/sq_filter_feature_from_fasta_{species}.{build}.{release}.{gxf}.tsv"
+        "benchmarks/agat/download_genome_annotation_agat_sq_filter_feature_from_fasta_{species}.{build}.{release}.{gxf}.tsv"
     group:
         "agat_genome_annotation_processing"
     shadow:
@@ -138,17 +138,17 @@ use rule agat_default_config as agat_sq_filter_feature_from_fasta with:
         command="agat_sq_filter_feature_from_fasta.pl",
 
 
-use rule agat_default_config as agat_sp_filter_feature_by_attribute_value with:
+use rule download_genome_annotation_agat_default_config as download_genome_annotation_agat_sp_filter_feature_by_attribute_value with:
     """filter out tsl na from genome annotation"""
     input:
-        gff="temp/agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}",
+        gff="temp/download_genome_annotation_agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}",
         config="resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_{gxf}_config.yaml",
     output:
         o="resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.{gxf}",
     log:
-        "logs/agat_sp_filter_feature_by_attribute_value/{species}.{build}.{release}.{gxf}.log",
+        "logs/download_genome_annotation_agat_sp_filter_feature_by_attribute_value/{species}.{build}.{release}.{gxf}.log",
     benchmark:
-        "benchmarks/agat/sp_filter_feature_by_attribute_value_{species}.{build}.{release}.{gxf}.tsv"
+        "benchmarks/agat/download_genome_annotation_agat_sp_filter_feature_by_attribute_value_{species}.{build}.{release}.{gxf}.tsv"
     group:
         "agat_genome_annotation_processing"
     shadow:
@@ -159,20 +159,20 @@ use rule agat_default_config as agat_sp_filter_feature_by_attribute_value with:
         command="agat_sp_filter_feature_by_attribute_value.pl",
 
 
-rule sed_replace_genomes_data_in_genome_annotation_report:
+rule download_genome_annotation_sed_replace_genomes_data_in_report:
     """replace snakemake patterns for generic report"""
     input:
         workflow.source_path(
-            "resources/reports/material_and_methods_genome_annotation.rst"
+            "resources/reports/download_genome_annotation_material_and_methods.rst"
         ),
     output:
         temp(
-            "temp/sed_replace_genomes_data_in_genome_annotation_report/material_and_methods_{species}_{build}_{release}.rst"
+            "temp/download_genome_annotation_sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.rst"
         ),
     log:
-        "logs/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.log",
+        "logs/download_genome_annotation_sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.log",
     benchmark:
-        "benchmarks/sed/replace_genomes_data_in_report_material_and_methods_{species}_{build}_{release}.tsv"
+        "benchmarks/sed/download_genome_annotation_sed_replace_genomes_data_in_report_{species}_{build}_{release}.tsv"
     group:
         "genome_annotation_material_and_methods"
     threads: 1
@@ -180,23 +180,23 @@ rule sed_replace_genomes_data_in_genome_annotation_report:
         extra="",
         expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g;s|\\{\\{||g;s|\\}\\}||g",
     wrapper:
-        f"{config['git_repo']}/utils/sed"
+        f"{config['repo']}/utils/sed"
 
 
-rule material_and_methods_genome_annotation:
+rule download_genome_annotation_material_and_methods:
     """provide comprehensible material and methods"""
     input:
-        rst="temp/sed_replace_genomes_data_in_genome_annotation_report/material_and_methods_{species}_{build}_{release}.rst"
+        rst="temp/download_genome_annotation_sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.rst"
     output:
         html="resources/{species}.{build}.{release}/annotations/Genome_annotation_material_and_methods.html",
     log:
-        "logs/material_and_methods_genome_annotation/{species}.{build}.{release}.log",
+        "logs/download_genome_annotation_material_and_methods/{species}.{build}.{release}.log",
     benchmark:
-        "benchmarks/rst2html/material_and_methods_genome_annotation_{species}.{build}.{release}.tsv"
+        "benchmarks/rst2html/download_genome_annotation_material_and_methods_{species}.{build}.{release}.tsv"
     group:
         "genome_annotation_material_and_methods"
     threads: 1
     params:
         extra="--embed-stylesheet --title='Material and methods for genome annotation'",
     wrapper:
-        f"{config['git_repo']}/utils/docutils/rst2html"
+        f"{config['repo']}/utils/docutils/rst2html"

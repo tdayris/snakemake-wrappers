@@ -2,16 +2,16 @@ wildcard_constraints:
     datatype=r"dna|cdna|cds",
 
 
-rule reference_ensembl_sequence_download:
+rule download_genome_sequences_reference_ensembl:
     """download genome sequence"""
     output:
         temp(
-            "temp/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.fasta"
+            "temp/download_genome_sequences_reference_ensembl/{species}.{build}.{release}.{datatype}.fasta"
         ),
     log:
-        "logs/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.log",
+        "logs/download_genome_sequences_reference_ensembl/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "benchmarks/curl/reference_ensembl_sequence_download_{species}.{build}.{release}.{datatype}.tsv"
+        "benchmarks/curl/download_genome_sequences_reference_ensembl_{species}.{build}.{release}.{datatype}.tsv"
     group:
         "download_and_filter_genome_sequence"
     threads: 1
@@ -21,19 +21,19 @@ rule reference_ensembl_sequence_download:
         build="{build}",
         release="{release}",
     wrapper:
-        f"{config['git_repo']}/bio/reference/ensembl-sequence"
+        f"{config['repo']}/bio/reference/ensembl-sequence"
 
 
-rule pyfaidx_filter:
+rule download_genome_sequences_pyfaidx_filter:
     """filter out non-cannonical chromosomes"""
     input:
-        fasta="temp/reference_ensembl_sequence_download/{species}.{build}.{release}.{datatype}.fasta",
+        fasta="temp/download_genome_sequences_reference_ensembl/{species}.{build}.{release}.{datatype}.fasta",
     output:
         "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
     log:
-        "logs/pyfaidx_filter/{species}.{build}.{release}.{datatype}.log",
+        "logs/download_genome_sequences_pyfaidx_filter/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "benchmarks/pyfaidx/filter_{species}.{build}.{release}.{datatype}.tsv"
+        "benchmarks/pyfaidx/download_genome_sequences_pyfaidx_filter_{species}.{build}.{release}.{datatype}.tsv"
     group:
         "download_and_filter_genome_sequence"
     threads: 1
@@ -43,73 +43,73 @@ rule pyfaidx_filter:
             "cannonical_chromosomes"
         ],
     wrapper:
-        f"{config['git_repo']}/bio/pyfaidx"
+        f"{config['repo']}/bio/pyfaidx"
 
 
-rule samtools_faidx:
+rule download_genome_sequences_samtools_faidx:
     """index fasta sequence with samtools"""
     input:
         "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
     output:
         "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
     log:
-        "logs/samtools_faidx/{species}.{build}.{release}.{datatype}.log",
+        "logs/download_genome_sequences_samtools_faidx/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "benchmarks/samtools_faidx/{species}.{build}.{release}.{datatype}.tsv"
+        "benchmarks/download_genome_sequences_samtools_faidx/{species}.{build}.{release}.{datatype}.tsv"
     group:
         "index_genome_sequence"
     threads: 1
     params:
         extra="",
     wrapper:
-        f"{config['git_repo']}/bio/samtools/faidx"
+        f"{config['repo']}/bio/samtools/faidx"
 
 
-rule picard_create_sequence_dictionary:
+rule download_genome_sequences_picard_create_sequence_dictionary:
     """create a genome sequence dictionary with Picard"""
     input:
         "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
     output:
         "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.dict",
     log:
-        "logs/picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.log",
+        "logs/download_genome_sequences_picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "benchmarks/picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.tsv"
+        "benchmarks/download_genome_sequences_picard_create_sequence_dictionary/{species}.{build}.{release}.{datatype}.tsv"
     threads: 1
     resources:
         mem_mb=2_000,
     params:
         extra="",
     wrapper:
-        f"{config['git_repo']}/bio/picard/createsequencedictionary"
+        f"{config['repo']}/bio/picard/createsequencedictionary"
 
 
-rule fasta_to_twobit_convert:
+rule download_genome_sequences_fasta_to_twobit_convert:
     """convert genome sequence from fasta to twobit"""
     input:
         "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta",
     output:
         "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.2bit",
     log:
-        "logs/fasta_to_twobit_convert/{species}.{build}.{release}.{datatype}.log",
+        "logs/download_genome_sequences_fasta_to_twobit_convert/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "benchmarks/fasta_to_twobit/convert_{species}.{build}.{release}.{datatype}.tsv"
+        "benchmarks/fasta_to_twobit/download_genome_sequences_fasta_to_twobit_convert_{species}.{build}.{release}.{datatype}.tsv"
     params:
         "",
     wrapper:
-        f"{config['git_repo']}/bio/ucsc/faToTwoBit"
+        f"{config['repo']}/bio/ucsc/faToTwoBit"
 
 
-rule xan_extract_chrom_sizes:
+rule download_genome_sequences_xan_extract_chrom_sizes:
     """extract chromosome sizes from fasta index"""
     input:
         data="resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.fasta.fai",
     output:
         "resources/{species}.{build}.{release}/sequences/{species}.{build}.{release}.{datatype}.chrom_sizes.tsv",
     log:
-        "logs/xan_extract_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
+        "logs/download_genome_sequences_xan_extract_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
     benchmark:
-        "benchmarks/xan/select_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
+        "benchmarks/xan/download_genome_sequences_xan_extract_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
     group:
         "index_genome_sequence"
     threads: 1
@@ -117,10 +117,10 @@ rule xan_extract_chrom_sizes:
         expression="select 1,2 | fmt --tabs",
         extra="--tee",
     wrapper:
-        f"{config['git_repo']}/utils/xan/run"
+        f"{config['repo']}/utils/xan/run"
 
 
-rule sed_replace_genomes_data_in_genome_sequence_report:
+rule download_genome_sequences_sed_replace_genomes_data_in_report:
     """replace snakemake patterns for generic report"""
     input:
         workflow.source_path(
@@ -128,12 +128,12 @@ rule sed_replace_genomes_data_in_genome_sequence_report:
         ),
     output:
         temp(
-            "temp/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.rst"
+            "temp/download_genome_sequences_sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.rst"
         ),
     log:
-        "logs/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.log",
+        "logs/download_genome_sequences_sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.log",
     benchmark:
-        "benchmarks/sed/replace_genomes_data_in_report_material_and_methods_{species}_{build}_{release}.tsv"
+        "benchmarks/sed/download_genome_sequences_sed_replace_genomes_data_in_report_{species}_{build}_{release}.tsv"
     group:
         "genome_sequence_material_and_methods"
     threads: 1
@@ -141,23 +141,23 @@ rule sed_replace_genomes_data_in_genome_sequence_report:
         extra="",
         expr="s| params.species |{species}|g;s| params.build |{build}|g;s| params.release |{release}|g;s|\\{\\{||g;s|\\}\\}||g",
     wrapper:
-        f"{config['git_repo']}/utils/sed"
+        f"{config['repo']}/utils/sed"
 
 
-rule material_and_methods_genome_sequences:
+rule download_genome_sequences_material_and_methods:
     """provide information on genome sequence preparation methods"""
     input:
-        rst="temp/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.rst",
+        rst="temp/download_genome_sequences_sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.rst",
     output:
         html="resources/{species}.{build}.{release}/sequences/Genome_sequences_material_and_methods.html",
     log:
-        "logs/material_and_methods_genome_sequences/{species}.{build}.{release}.log",
+        "logs/download_genome_sequences_material_and_methods/{species}.{build}.{release}.log",
     benchmark:
-        "benchmarks/rst2html/material_and_methods_genome_sequences_{species}.{build}.{release}.tsv"
+        "benchmarks/rst2html/download_genome_sequences_material_and_methods_{species}.{build}.{release}.tsv"
     group:
         "genome_sequence_material_and_methods"
     threads: 1
     params:
         extra="--title='Material and methods for genome sequence preparation' --embed-stylesheet",
     wrapper:
-        f"{config['git_repo']}/utils/docutils/rst2html"
+        f"{config['repo']}/utils/docutils/rst2html"

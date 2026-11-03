@@ -1,28 +1,123 @@
 set-resources:
   reference_ensembl_annotation_download:
-    mem: min(attempt * 400, 1500)
-    runtime: min(attempt * 30, 240)
-    disk_mb: min(6 * attempt, 30)
+    # Max time seen for this rule: 1 minute and 15.53 seconds
+    # Mean time seen for this rule: 29.83 seconds ± 24.4 seconds
+    # Time reservation for 1st attempt: 10 minutes
+    # Time reservation for 2nd attempt: 10 minutes
+    # Time reservation for 13th attempt: 14 minutes
+    runtime: round(min(43800, max(10, attempt * 1 + 1.2222222222222223)))
+    # Max ram seen for this rule 54.37 MB
+    # Mean RAM seen for this rule: 51.2 MB ± 3.06 MB
+    # RAM reservation for 1st attempt: 750 MB
+    # RAM reservation for 2nd attempt: 750 MB
+    # RAM reservation for 13th attempt: 750 MB
+    mem: round(min(150000, max(750, attempt * 3.167777777777779 + 51.20222222222222)))
+    # Max IO seen for this rule 2.64 KB
+    # Mean disk used for this rule: 844.1888888888889 bytes ± 1.04 KB
+    # Disk reservation for 1st attempt: 2 MB
+    # Disk reservation for 2nd attempt: 2 MB
+    # Disk reservation for 13th attempt: 13 MB
+    disk_mb: round(min(10364791554048, max(2, attempt * 1 + 0.0008441888888888889)))
+    # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
+    slurm_account: 'igr_hpc'
+    # Cluster name: scontrol show config | grep ClusterName
+    cluster: 'flamingo'
 
-    agat_default_config:
-      mem: min(attempt * 200, 1000)
-      runtime: min(attempt * 5, 10)
-      disk_mb: min(5 * attempt, 10)
+  agat_default_config:
+    # Max time seen for this rule: 1 minute and 9.59 seconds
+    # Mean time seen for this rule: 1 minute and 9.59 seconds ± 0 seconds
+    # Time reservation for 1st attempt: 10 minutes
+    # Time reservation for 2nd attempt: 10 minutes
+    # Time reservation for 13th attempt: 15 minutes
+    runtime: round(min(43800, max(10, attempt * 1 + 2.0)))
+    # Max ram seen for this rule 37.5 MB
+    # Mean RAM seen for this rule: 37.5 MB ± 0 bytes
+    # RAM reservation for 1st attempt: 750 MB
+    # RAM reservation for 2nd attempt: 750 MB
+    # RAM reservation for 13th attempt: 750 MB
+    mem: round(min(150000, max(750, attempt * 1 + 37.5)))
+    # Max IO seen for this rule 1.0 byte
+    # Mean disk used for this rule: 30.26 bytes ± 0 bytes
+    # Disk reservation for 1st attempt: 2 MB
+    # Disk reservation for 2nd attempt: 2 MB
+    # Disk reservation for 13th attempt: 13 MB
+    disk_mb: round(min(10364791554048, max(2, attempt * 1 + 3.026e-05)))
+    # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
+    slurm_account: 'igr_hpc'
+    # Cluster name: scontrol show config | grep ClusterName
+    cluster: 'flamingo'
 
-    go_yq_update_gff_config:
-      mem: min(attempt * 400, 900)
-      runtime: min(attempt * 5, 10)
-      disk_mb: min(attempt * 5, 10)
+  go_yq_update_gff_config:
+    # Max time seen for this rule: 19.93 seconds
+    # Mean time seen for this rule: 18.56 seconds ± 0.78 seconds
+    # Time reservation for 1st attempt: 10 minutes
+    # Time reservation for 2nd attempt: 10 minutes
+    # Time reservation for 13th attempt: 14 minutes
+    runtime: round(min(43800, max(10, attempt * 1 + 1.0)))
+    # Max ram seen for this rule 21.9 MB
+    # Mean RAM seen for this rule: 21.38 MB ± 669.6 KB
+    # RAM reservation for 1st attempt: 750 MB
+    # RAM reservation for 2nd attempt: 750 MB
+    # RAM reservation for 13th attempt: 750 MB
+    mem: round(min(150000, max(750, attempt * 1 + 21.381999999999998)))
+    # Max IO seen for this rule 1.0 byte
+    # Mean disk used for this rule: 4.304 bytes ± 0.008944271909999366 bytes
+    # Disk reservation for 1st attempt: 2 MB
+    # Disk reservation for 2nd attempt: 2 MB
+    # Disk reservation for 13th attempt: 13 MB
+    disk_mb: round(min(10364791554048, max(2, attempt * 1 + 4.304e-06)))
+    # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
+    slurm_account: 'igr_hpc'
+    # Cluster name: scontrol show config | grep ClusterName
+    cluster: 'flamingo'
 
-    go_yq_update_gtf_config:
-      mem: min(attempt * 400, 900)
-      runtime: min(attempt * 5, 10)
-      disk_mb: min(attempt * 5, 10)
+  go_yq_update_gtf_config:
+    # Max time seen for this rule: 2.8 seconds
+    # Mean time seen for this rule: 1.97 seconds ± 0.76 seconds
+    # Time reservation for 1st attempt: 10 minutes
+    # Time reservation for 2nd attempt: 10 minutes
+    # Time reservation for 13th attempt: 14 minutes
+    runtime: round(min(43800, max(10, attempt * 1 + 1.0)))
+    # Max ram seen for this rule 39.7 MB
+    # Mean RAM seen for this rule: 33.35 MB ± 6.74 MB
+    # RAM reservation for 1st attempt: 750 MB
+    # RAM reservation for 2nd attempt: 750 MB
+    # RAM reservation for 13th attempt: 750 MB
+    mem: round(min(150000, max(750, attempt * 6.346000000000004 + 33.354)))
+    # Max IO seen for this rule 1.0 byte
+    # Mean disk used for this rule: 4.986 bytes ± 0.005477225575051544 bytes
+    # Disk reservation for 1st attempt: 2 MB
+    # Disk reservation for 2nd attempt: 2 MB
+    # Disk reservation for 13th attempt: 13 MB
+    disk_mb: round(min(10364791554048, max(2, attempt * 1 + 4.986000000000001e-06)))
+    # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
+    slurm_account: 'igr_hpc'
+    # Cluster name: scontrol show config | grep ClusterName
+    cluster: 'flamingo'
 
-    agat_convert_sp_gxf2gxf:
-      mem: min(attempt * 9000, 30000)
-      runtime: min(attempt * 30, 240)
-      disk_mb: min(attempt * 6000, 15000)
+  agat_convert_sp_gxf2gxf:
+    # Max time seen for this rule: 39 minutes and 59.72 seconds
+    # Mean time seen for this rule: 10 minutes and 18.09 seconds ± 13 minutes and 4.29 seconds
+    # Time reservation for 1st attempt: 40 minutes
+    # Time reservation for 2nd attempt: 1 hour and 9 minutes
+    # Time reservation for 13th attempt: 6 hours and 31 minutes
+    runtime: round(min(43800, max(10, attempt * 29.25 + 10.75)))
+    # Max ram seen for this rule 1.09 GB
+    # Mean RAM seen for this rule: 845.86 MB ± 202.75 MB
+    # RAM reservation for 1st attempt: 1.34 GB
+    # RAM reservation for 2nd attempt: 1.34 GB
+    # RAM reservation for 13th attempt: 4.06 GB
+    mem: round(min(150000, max(750, attempt * 247.50125000000003 + 845.8587499999999)))
+    # Max IO seen for this rule 4.46 KB
+    # Mean disk used for this rule: 5.25 KB ± 4.89 KB
+    # Disk reservation for 1st attempt: 2 MB
+    # Disk reservation for 2nd attempt: 2 MB
+    # Disk reservation for 13th attempt: 13 MB
+    disk_mb: round(min(10364791554048, max(2, attempt * 1 + 0.0052486187500000005)))
+    # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
+    slurm_account: 'igr_hpc'
+    # Cluster name: scontrol show config | grep ClusterName
+    cluster: 'flamingo'
 
     agat_sq_filter_feature_from_fasta:
       mem: min(attempt * 9000, 30000)
