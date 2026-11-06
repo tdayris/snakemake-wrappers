@@ -1,0 +1,27 @@
+name: fastvep annotate
+description: Annotate VCF with High-performance Variant Effect Predictor in Rust
+url: https://github.com/Huang-lab/fastVEP
+authors:
+  - Thibault Dayris
+input:
+  - vcf: Required path to the vcf/vcf.gz file to annotate.
+  - gff: Optional GFF3 annotation file(s) for transcript models.
+  - fasta: Optional path to FASTA reference file
+  - cache: Optional path to VEP cache directory for known variant annotation.
+  - transcript_cache: Optional path to binary transcript cache file
+  - sa_dir: Optional directory containing supplementary annotation files (.osa, .osi, .oga)
+  - acmg_config: Optional path to ACMG configuration file (TOML) for custom thresholds. Implies `--acmg` argument.
+  - functional_evidence: Optional path to a curated functional-evidence TSV supplying PS3/BS3
+  - panel: Optional path to a gene-panel file
+  - qc_rules: Optional path to a QC rules TOML file
+output:
+  - vcf: Path to annotated variants.
+params:
+  - extra: Optional parameters
+notes: |
+  Gene panel format: one gene symbol or Ensembl gene ID per line; `#` comments and 
+  blank lines ignored
+
+  Functional evidence table format: Columns: chrom, pos, ref, alt, criterion (PS3|BS3),
+  strength, pmid, note. An entry also suppresses PP3/BP4/BP7 for that variant, since 
+  ClinGen SVI ranks experimental evidence above computational prediction.

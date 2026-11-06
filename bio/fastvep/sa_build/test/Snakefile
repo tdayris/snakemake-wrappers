@@ -1,0 +1,16 @@
+rule test_fastvep_sabuild:
+    input:
+        "database.vcf.gz",
+    output:
+        multiext(
+            "fastvep_database",
+            database=".osa2",
+            database_index=".osa2.idx",
+        ),
+    log:
+        "test_fastvep_sabuild.log",
+    threads: 1
+    params:
+        extra="--source 'custom_vcf' --name 'snakemake_test'",
+    wrapper:
+        "master/bio/fastvep/sa_build"

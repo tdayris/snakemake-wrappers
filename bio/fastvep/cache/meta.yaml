@@ -1,0 +1,23 @@
+name: fastvep cache
+description: Build a binary transcript cache for fast startup
+url: https://github.com/Huang-lab/fastVEP
+authors:
+  - Thibault Dayris
+input:
+  - gff: GFF3 annotation file(s) for transcript models.
+  - fasta: Path to FASTA reference file
+  - synonyms: Path to TSV synonyms.
+output:
+  - vcf: Path to annotated variants.
+params:
+  - extra: Optional parameters
+notes: |
+  Gene panel format: one gene symbol or Ensembl gene ID per line; `#` comments and 
+  blank lines ignored
+
+  Functional evidence table format: Columns: chrom, pos, ref, alt, criterion (PS3|BS3),
+  strength, pmid, note. An entry also suppresses PP3/BP4/BP7 for that variant, since 
+  ClinGen SVI ranks experimental evidence above computational prediction.
+
+  Synonyms TSV follows VEP-style chromosome synonyms file (e.g. Ensembl 
+  `chr_synonyms.txt`): one line per contig, whitespace-separated equivalent names.

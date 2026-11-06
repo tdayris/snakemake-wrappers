@@ -1,0 +1,13 @@
+rule test_fastvep_filter:
+    input:
+        vcf="annotated_calls.vcf.gz",
+        vcf_idx="annotated_calls.vcf.gz.tbi",
+    output:
+        vcf="filtered_calls.vcf.gz",
+    log:
+        "test_fastvep_filter.log",
+    threads: 1
+    params:
+        extra="AF < 0.01 or not AF",
+    wrapper:
+        "master/bio/fastvep/filter"

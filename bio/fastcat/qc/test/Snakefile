@@ -1,0 +1,92 @@
+rule test_fastcat_fastq:
+    input:
+        # Optional path to regions to operate on. Only for bam input
+        # bed="",
+        # Optional path to regions on which to compute coverage. Only for bam input
+        # coverage_bed="", 
+        reads=expand(
+            "fastq_files/bc{n}.fastq.gz",
+            n=(1, 2),
+        ),
+    output:
+        # Optional path to concatenated reads. Only for fastq input.
+        reads="test_fastcat_fastq.fastq.gz",
+        # Optional path to machine-readable progress. Only for BAM coverage.
+        # jsonl_progress="",
+        # Optional coverage directory. Only for BAM coverage options.
+        # coverage="",
+        # Optional demultiplexing directory. It contains one directory per barcode.
+        # demux="",
+        # Optional HTML report
+        html="test_fastcat_fastq.report.html",
+        # Optional per-read VERY LARGE table
+        per_read="test_fastcat_fastq.per_reads.tsv",
+    threads: 2
+    log:
+        "test_fastcat_fastq.log",
+    params:
+        extra="",
+        crabz_extra="--compression-level 9",
+    wrapper:
+        "master/bio/fastcat/qc"
+
+
+rule test_fastcat_demux:
+    input:
+        # Optional path to regions to operate on. Only for bam input
+        # bed="",
+        # Optional path to regions on which to compute coverage. Only for bam input
+        # coverage_bed="", 
+        reads="barcoded.fastq",
+    output:
+        # Optional path to concatenated reads. Only for fastq input.
+        # reads="",
+        # Optional path to machine-readable progress. Only for BAM coverage.
+        # jsonl_progress="",
+        # Optional coverage directory. Only for BAM coverage options.
+        # coverage="",
+        # Optional demultiplexing directory. It contains one directory per barcode.
+        demux=directory("barcodes"),
+        # Optional HTML report
+        html="test_fastcat_fastq.report.html",
+        # Optional per-read VERY LARGE table
+        # per_read="",
+    threads: 2
+    log:
+        "test_fastcat_demux.log",
+    params:
+        extra="",
+        # Optional parameters to compress `output.reads`
+        # crabz_extra="",
+    wrapper:
+        "master/bio/fastcat/qc"
+
+
+rule test_fastcat_bam:
+    input:
+        # Optional path to regions to operate on. Only for bam input
+        bed="400.regions.bed",
+        # Optional path to regions on which to compute coverage. Only for bam input
+        coverage_bed="400.coverage.bed", 
+        reads="400.sorted.bam",
+    output:
+        # Optional path to concatenated reads. Only for fastq input.
+        # reads="",
+        # Optional path to machine-readable progress. Only for BAM coverage.
+        jsonl_progress="progression.jsonl",
+        # Optional coverage directory. Only for BAM coverage options.
+        coverage=directory("400_coverage"),
+        # Optional demultiplexing directory. It contains one directory per barcode.
+        # demux="",
+        # Optional HTML report
+        html="test_fastcat_fastq.report.html",
+        # Optional per-read VERY LARGE table
+        per_read="test_fastcat_fastq.per_reads.tsv",
+    threads: 2
+    log:
+        "test_fastcat_fastq.log",
+    params:
+        extra="",
+        crabz_extra="--compression-level 9",
+    wrapper:
+        "master/bio/fastcat/qc"

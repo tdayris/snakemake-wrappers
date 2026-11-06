@@ -1,0 +1,22 @@
+rule test_fastvep_annotate:
+    input:
+        # gff3="", # Optional GFF3 annotation file(s) for transcript models.
+        # fasta="", # Optional path to FASTA reference file
+        # cache="", # Optional path to VEP cache directory
+        # transcript_cache="", # Optional path to binary transcript cache file
+        # sa_dir="", # Optional directory containing supplementary annotation files
+        # acmg_config="", # Optional path to ACMG configuration file
+        # functional_evidence="", # Optional path to a curated functional-evidence TSV
+        # panel="", # Optional path to a gene-panel file
+        # qc_rules="", # Optional path to a QC rules TOML file
+        vcf="calls.vcf.gz",
+        vcf_idx="calls.vcf.gz.tbi",
+    output:
+        vcf="annotated.vcf.gz",
+    log:
+        "test_fastvep_annotate.log",
+    threads: 1
+    params:
+        extra="",
+    wrapper:
+        "master/bio/fastvep/annotate"

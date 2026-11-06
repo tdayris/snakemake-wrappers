@@ -1,0 +1,15 @@
+rule test_fastvep_cache:
+    input:
+        gff="annotation.gff3",
+        fasta="sequence.fasta",
+        # Optional synonyms in case GFF3 and Fasta have different contig names
+        synonyms="synonyms.tsv",
+    output:
+        directory("cache"),
+    log:
+        "test_fastvep_cache.log",
+    threads: 1
+    params:
+        extra="",
+    wrapper:
+        "master/bio/fastvep/cache"

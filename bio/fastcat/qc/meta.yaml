@@ -1,0 +1,26 @@
+name: fastcat qc
+description: fastcat quality-control FASTQ or BAM input
+url: https://github.com/epi2me-labs/fastcat#fastcat-qc
+authors:
+  - Thibault Dayris
+input:
+  - reads: Path to (list of) fastq, or (list of) bam, or (list of) file listing input files.
+  - bed: Optional path to the bed regions to process in bam input.
+  - coverage_bed: Optional path to (list of) bed files to compute coverage. Requires `coverage` in output.
+output:
+  - summary: Path to `summary.json` metrics.
+  - html: Optional path to quality report.
+  - per_reads: Optional path to (very large) per-read TSV.
+  - coverage: Optional path to BED.gz coverage.
+  - demux: Optional path to samples separated by barcodes. Implies `--demultiplex`. Mutually exclusive with `reads_dir`.
+  - reads_dir: Optional path to reads file(s). Requires `--reads-per-file` in params. Mutually exclusive with `demux`. Available for fastq input only.
+  - coverage: Optional path to directory holding coverage beds and indexes. Required bam input.
+  - json_progress: Optional path to machine-readable lifecycle and progress and events
+params:
+  - extra: Optional parameters besides `--recurse`, `--input-fmt` when bam or fastq are namely provided in input, `--bed`, `--per-read` `--html-report`, `--threads`, `--output`
+  - crabz_extra: Optional parameters in case you want to compress output fastq files
+notes: |
+  Content of coverage directory depends on the `input.coverage_bed` content, if any,
+  and the reads filtering, if any.
+
+  Content of the demux directory depends on the barcodes available in input file.
