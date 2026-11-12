@@ -2592,6 +2592,12 @@ def test_fastqc(run):
         ["snakemake", "qc/fastqc/a.html"],
     )
 
+def test_fastcat(run):
+    run(
+        "bio/fastcat/lint",
+        ["snakemake", "linted.fq"],
+        compare_results_with_expected={"reads.fq": "linted.fq"},
+    )
 
 def test_fastq_screen(run):
     run(
