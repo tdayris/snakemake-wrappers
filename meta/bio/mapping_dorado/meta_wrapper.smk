@@ -6,13 +6,13 @@ def local_lookup(dpath, within, default):
     return local(tmp)
 
 
-rule download_basecalling_model_for_dorado:
+rule mapping_dorado_download_basecalling_model_for_dorado:
     output:
-        model=temp(directory("temp/download_basecalling_model_for_dorado/{model}")),
+        model=temp(directory("temp/mapping_dorado_download_basecalling_model_for_dorado/{model}")),
     log:
-        "logs/download_basecalling_model_for_dorado/{model}",
+        "logs/mapping_dorado_download_basecalling_model_for_dorado/{model}",
     benchmark:
-        "benchmarks/download_basecalling_model_for_dorado/{model}.tsv"
+        "benchmarks/dorado_download/mapping_dorado_download_basecalling_model_for_dorado/{model}.tsv"
     container:
         "docker://quay.io/sangerpathogens/cuda_dorado:2.0.1"
     threads: 1
@@ -26,21 +26,21 @@ rule download_basecalling_model_for_dorado:
         "> {log:q} 2>&1"
 
 
-rule basecalling_with_dorado:
+rule mapping_dorado_basecalling_with_dorado:
     """call bases with dorado"""
     input:
         pod5=local_lookup(
             dpath="pathvars/pod5",
             within=config,
-            default="temp/fast5_to_pod5_conversion/{sample}.pod5",
+            default="temp/single_fast5_to_pod5_fast5_to_pod5_conversion/{sample}.pod5",
         ),
-        model="temp/download_basecalling_model_for_dorado/rna004_130bps_fast@v5.2.0",
+        model="temp/mapping_dorado_download_basecalling_model_for_dorado/rna004_130bps_fast@v5.2.0",
     output:
-        ubam=temp("temp/basecalling_with_dorado/{sample}.ubam"),
+        ubam=temp("temp/mapping_dorado_basecalling_with_dorado/{sample}.ubam"),
     log:
-        "logs/basecalling_with_dorado/{sample}.log",
+        "logs/mapping_dorado_basecalling_with_dorado/{sample}.log",
     benchmark:
-        "benchmarks/basecalling_with_dorado/{sample}.tsv"
+        "benchmarks/dorado_basecaller/mapping_dorado_basecalling_with_dorado_{sample}.tsv"
     group:
         "dorado_mapping"
     container:
@@ -57,7 +57,7 @@ rule basecalling_with_dorado:
         "> {output.ubam:q} 2> {log}"
 
 
-rule index_genome_fasta_sequence_with_minimap2:
+rule mapping_dorado_index_genome_fasta_sequence_with_minimap2:
     """in order to align reads through dorado"""
     input:
         target=local_lookup(
@@ -83,22 +83,22 @@ rule index_genome_fasta_sequence_with_minimap2:
         "v9.9.0/bio/minimap2/index"
 
 
-rule align_reads_with_dorado:
+rule mapping_dorado_align_reads_with_dorado:
     """using minimap2 in the background"""
     input:
-        ubam="temp/basecalling_with_dorado/{sample}.ubam",
+        ubam="temp/mapping_dorado_basecalling_with_dorado/{sample}.ubam",
         index="resources/{species}.{build}.{release}/minimap2/{species}.{build}.{release}.{seqtype}.mmi",
     output:
         bam=temp(
-            "temp/align_reads_with_dorado/{sample}.{seqtype}.{species}.{build}.{release}.bam"
+            "temp/mapping_dorado_align_reads_with_dorado/{sample}.{seqtype}.{species}.{build}.{release}.bam"
         ),
         summary=temp(
-            "temp/align_reads_with_dorado/{sample}.{seqtype}.{species}.{build}.{release}.summary"
+            "temp/mapping_dorado_align_reads_with_dorado/{sample}.{seqtype}.{species}.{build}.{release}.summary"
         ),
     log:
-        "logs/align_reads_with_dorado/{sample}.{seqtype}.{species}.{build}.{release}.log",
+        "logs/mapping_dorado_align_reads_with_dorado/{sample}.{seqtype}.{species}.{build}.{release}.log",
     benchmark:
-        "benchmarks/align_reads_with_dorado/{sample}.{seqtype}.{species}.{build}.{release}.tsv"
+        "benchmarks/dorado_align/mapping_dorado_align_reads_with_dorado_{sample}.{seqtype}.{species}.{build}.{release}.tsv"
     group:
         "dorado_mapping"
     container:
@@ -122,16 +122,16 @@ rule align_reads_with_dorado:
         "mv --verbose ${{summary}} {output.summary:q} >> {log:q} 2>&1 "
 
 
-rule sort_aligned_reads_with_sambamba:
+rule mapping_dorado_sort_aligned_reads_with_sambamba:
     """gain space and processing speed"""
     input:
-        "temp/align_reads_with_dorado/{sample}.dna.{species}.{build}.{release}.bam",
+        "temp/mapping_dorado_align_reads_with_dorado/{sample}.dna.{species}.{build}.{release}.bam",
     output:
         "results/{species}.{build}.{release}/Dorado.dna/{sample}.bam",
     log:
-        "logs/sort_aligned_reads_with_sambamba/{sample}.dna.{species}.{build}.{release}.log",
+        "logs/mapping_dorado_sort_aligned_reads_with_sambamba/{sample}.dna.{species}.{build}.{release}.log",
     benchmark:
-        "benchmarks/sambamba_sort/sort_aligned_reads_from_dorado_{sample}.dna.{species}.{build}.{release}.tsv"
+        "benchmarks/sambamba_sort/mapping_dorado_sort_aligned_reads_from_dorado_{sample}.dna.{species}.{build}.{release}.tsv"
     group:
         "sambamba_post_process_bam"
     threads: 15
@@ -141,16 +141,16 @@ rule sort_aligned_reads_with_sambamba:
         "v3.11.0/bio/sambamba/sort"
 
 
-rule index_sorted_reads_with_sambamba:
+rule mapping_dorado_index_sorted_reads_with_sambamba:
     """gain processing speed"""
     input:
         "results/{species}.{build}.{release}/Dorado.dna/{sample}.bam",
     output:
         "results/{species}.{build}.{release}/Dorado.dna/{sample}.bam.bai",
     log:
-        "logs/index_sorted_reads_with_sambamba/{sample}.dna.{species}.{build}.{release}.log",
+        "logs/mapping_dorado_index_sorted_reads_with_sambamba/{sample}.dna.{species}.{build}.{release}.log",
     benchmark:
-        "benchmarks/sambamba_index/index_sorted_reads_from_dorado.{sample}.dna.{species}.{build}.{release}.tsv"
+        "benchmarks/sambamba_index/mapping_dorado_index_sorted_reads_from_dorado.{sample}.dna.{species}.{build}.{release}.tsv"
     group:
         "sambamba_post_process_bam"
     threads: 3
@@ -160,7 +160,7 @@ rule index_sorted_reads_with_sambamba:
         "v6.1.0/bio/sambamba/index"
 
 
-rule sed_replace_genomes_data_in_mapping_dorado_report:
+rule mapping_dorado_sed_replace_genomes_data_in_mapping_dorado_report:
     """replace snakemake patterns for generic report"""
     input:
         workflow.source_path(
@@ -168,12 +168,12 @@ rule sed_replace_genomes_data_in_mapping_dorado_report:
         ),
     output:
         temp(
-            "temp/sed_replace_genomes_data_in_report/material_and_methods_mapping_dorado_{species}_{build}_{release}.rst"
+            "temp/mapping_dorado_sed_replace_genomes_data_in_report/material_and_methods_mapping_dorado_{species}_{build}_{release}.rst"
         ),
     log:
-        "logs/sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.log",
+        "logs/mapping_dorado_sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.log",
     benchmark:
-        "benchmarks/sed/replace_genomes_data_in_report_material_and_methods_{species}_{build}_{release}.tsv"
+        "benchmarks/sed/mapping_dorado_sed_replace_genomes_data_in_report_material_and_methods_{species}_{build}_{release}.tsv"
     group:
         "mapping_dorado_material_and_methods"
     threads: 1
@@ -184,16 +184,16 @@ rule sed_replace_genomes_data_in_mapping_dorado_report:
         f"{config['repo']}/utils/sed"
 
 
-rule material_and_methods_mapping_dorado:
+rule mapping_dorado_mapping_dorado_material_and_methods:
     """provide information on dorado mapping methods"""
     input:
-        rst="temp/sed_replace_genomes_data_in_report/material_and_methods_mapping_dorado_{species}_{build}_{release}.rst",
+        rst="temp/mapping_dorado_sed_replace_genomes_data_in_report/material_and_methods_mapping_dorado_{species}_{build}_{release}.rst",
     output:
         html="resources/{species}.{build}.{release}/sequences/Mapping_Dorado_material_and_methods.html",
     log:
-        "logs/material_and_methods_genome_sequences/material_and_methods_mapping_dorado_{species}.{build}.{release}.log",
+        "logs/mapping_dorado_material_and_methods/material_and_methods_mapping_dorado_{species}.{build}.{release}.log",
     benchmark:
-        "benchmarks/rst2html/material_and_methods_genome_sequences_material_and_methods_mapping_dorado_{species}.{build}.{release}.tsv"
+        "benchmarks/rst2html/mapping_dorado_material_and_methods_{species}.{build}.{release}.tsv"
     group:
         "mapping_dorado_material_and_methods"
     threads: 1

@@ -37,8 +37,6 @@ rule download_genome_annotation_agat_default_config:
         "logs/download_genome_annotation_agat_default_config.log",
     benchmark:
         "benchmarks/agat/download_genome_annotation_agat_default_config.tsv"
-    group:
-        "build_agat_config"
     shadow:
         "minimal"
     threads: 1
@@ -59,8 +57,6 @@ rule download_genome_annotation_go_yq_update_gff_config:
         "logs/download_genome_annotation_go_yq_update_gff_config/{species}.{build}.{release}.gff3.log",
     benchmark:
         "benchmarks/go_yq/download_genome_annotation_go_yq_update_gff_config_{species}.{build}.{release}.gff3.tsv"
-    group:
-        "build_agat_config"
     threads: 1
     params:
         extra="--verbose",
@@ -80,8 +76,6 @@ use rule download_genome_annotation_go_yq_update_gff_config as download_genome_a
         "logs/download_genome_annotation_go_yq_update_gtf_config/{species}.{build}.{release}.gtf.log",
     benchmark:
         "benchmarks/go_yq/download_genome_annotation_go_yq_update_gtf_config_{species}.{build}.{release}.gtf.tsv"
-    group:
-        "build_agat_config"
     threads: 1
     params:
         extra="--verbose",
@@ -100,8 +94,6 @@ use rule download_genome_annotation_agat_default_config as download_genome_annot
         "logs/download_genome_annotation_agat_convert_sp_gxf2gxf/{species}.{build}.{release}.{gxf}.log",
     benchmark:
         "benchmarks/agat/download_genome_annotation_agat_convert_sp_gxf2gxf_{species}.{build}.{release}.{gxf}.tsv"
-    group:
-        "agat_genome_annotation_processing"
     shadow:
         "minimal"
     threads: 6
@@ -128,8 +120,6 @@ use rule download_genome_annotation_agat_default_config as download_genome_annot
         "logs/download_genome_annotation_agat_sq_filter_feature_from_fasta/{species}.{build}.{release}.{gxf}.log",
     benchmark:
         "benchmarks/agat/download_genome_annotation_agat_sq_filter_feature_from_fasta_{species}.{build}.{release}.{gxf}.tsv"
-    group:
-        "agat_genome_annotation_processing"
     shadow:
         "minimal"
     threads: 6
@@ -149,8 +139,6 @@ use rule download_genome_annotation_agat_default_config as download_genome_annot
         "logs/download_genome_annotation_agat_sp_filter_feature_by_attribute_value/{species}.{build}.{release}.{gxf}.log",
     benchmark:
         "benchmarks/agat/download_genome_annotation_agat_sp_filter_feature_by_attribute_value_{species}.{build}.{release}.{gxf}.tsv"
-    group:
-        "agat_genome_annotation_processing"
     shadow:
         "minimal"
     threads: 6
@@ -173,8 +161,6 @@ rule download_genome_annotation_sed_replace_genomes_data_in_report:
         "logs/download_genome_annotation_sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.log",
     benchmark:
         "benchmarks/sed/download_genome_annotation_sed_replace_genomes_data_in_report_{species}_{build}_{release}.tsv"
-    group:
-        "genome_annotation_material_and_methods"
     threads: 1
     params:
         extra="",
@@ -193,8 +179,6 @@ rule download_genome_annotation_material_and_methods:
         "logs/download_genome_annotation_material_and_methods/{species}.{build}.{release}.log",
     benchmark:
         "benchmarks/rst2html/download_genome_annotation_material_and_methods_{species}.{build}.{release}.tsv"
-    group:
-        "genome_annotation_material_and_methods"
     threads: 1
     params:
         extra="--embed-stylesheet --title='Material and methods for genome annotation'",

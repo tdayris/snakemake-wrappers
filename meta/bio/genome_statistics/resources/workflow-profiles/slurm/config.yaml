@@ -1,150 +1,140 @@
 set-resources:
-    agat_sp_statistics:
-    # Max time seen for this rule: 1 minute and 5.93 seconds
-    # Mean time seen for this rule: 1 minute and 5.93 seconds ± 0 seconds
+  genome_statistics_agat_sp_statistics:
+    # Max time seen for this rule: 50.84 seconds
+    # Mean time seen for this rule: 50.84 seconds ± 0 seconds
+    # Time reservation for 1st attempt: 10 minutes
+    # Time reservation for 2nd attempt: 10 minutes
+    # Time reservation for 13th attempt: 13 minutes
+    runtime: round(min(43800, max(10, attempt )))
+    # Max ram seen for this rule 253.96 MB
+    # Mean RAM seen for this rule: 253.96 MB ± 0 bytes
+    # RAM reservation for 1st attempt: 750 MB
+    # RAM reservation for 2nd attempt: 750 MB
+    # RAM reservation for 13th attempt: 3.3 GB
+    mem: round(min(150000, max(750, (attempt  - 1) * 253.96  + 253.96)))
+    # Max IO seen for this rule 192.37 bytes
+    # Mean disk used for this rule: 192.37 bytes ± 0 bytes
+    # Disk reservation for 1st attempt: 2 MB
+    # Disk reservation for 2nd attempt: 2 MB
+    # Disk reservation for 13th attempt: 13 MB
+    disk_mb: round(min(5190881116160, max(2, attempt )))
+    # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
+    slurm_account: 'igr_hpc'
+    # Cluster name: scontrol show config | grep ClusterName
+    cluster: 'flamingo'
+  genome_statistics_assembly_stats:
+    # Max time seen for this rule: 1 minute and 7.34 seconds
+    # Mean time seen for this rule: 34.29 seconds ± 28.77 seconds
     # Time reservation for 1st attempt: 10 minutes
     # Time reservation for 2nd attempt: 10 minutes
     # Time reservation for 13th attempt: 15 minutes
-    runtime: round(min(43800, max(10, attempt * 1 + 2.0)))
-    # Max ram seen for this rule 261.78 MB
-    # Mean RAM seen for this rule: 261.78 MB ± 0 bytes
+    runtime: round(min(43800, max(10, attempt  + 2.0)))
+    # Max ram seen for this rule 510.75 MB
+    # Mean RAM seen for this rule: 377.55 MB ± 188.51 MB
+    # RAM reservation for 1st attempt: 750 MB
+    # RAM reservation for 2nd attempt: 887 MB
+    # RAM reservation for 13th attempt: 5.04 GB
+    mem: round(min(150000, max(750, (attempt  - 1) * 377.548  + 509.71)))
+    # Max IO seen for this rule 2.21 KB
+    # Mean disk used for this rule: 1.66 KB ± 931.9703113189819 bytes
+    # Disk reservation for 1st attempt: 2 MB
+    # Disk reservation for 2nd attempt: 2 MB
+    # Disk reservation for 13th attempt: 13 MB
+    disk_mb: round(min(5190881116160, max(2, attempt )))
+    # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
+    slurm_account: 'igr_hpc'
+    # Cluster name: scontrol show config | grep ClusterName
+    cluster: 'flamingo'
+  genome_statistics_fastaguard_on_genome_sequence:
+    # Max time seen for this rule: 3 minutes and 59.67 seconds
+    # Mean time seen for this rule: 2 minutes and 7.42 seconds ± 1 minute and 41.95 seconds
+    # Time reservation for 1st attempt: 10 minutes
+    # Time reservation for 2nd attempt: 10 minutes
+    # Time reservation for 13th attempt: 43 minutes
+    runtime: round(min(43800, max(10, attempt * 3  + 4.0)))
+    # Max ram seen for this rule 52.57 MB
+    # Mean RAM seen for this rule: 47.44 MB ± 8.04 MB
     # RAM reservation for 1st attempt: 750 MB
     # RAM reservation for 2nd attempt: 750 MB
     # RAM reservation for 13th attempt: 750 MB
-    mem: round(min(150000, max(750, attempt * 1 + 261.78)))
-    # Max IO seen for this rule 18.93 bytes
-    # Mean disk used for this rule: 141.87 bytes ± 0 bytes
+    mem: round(min(150000, max(750, (attempt  - 1) * 47.440000000000005  + 51.88)))
+    # Max IO seen for this rule 5.89 KB
+    # Mean disk used for this rule: 4.28 KB ± 2.45 KB
     # Disk reservation for 1st attempt: 2 MB
     # Disk reservation for 2nd attempt: 2 MB
     # Disk reservation for 13th attempt: 13 MB
-    disk_mb: round(min(10364791554048, max(2, attempt * 1 + 0.00014187)))
+    disk_mb: round(min(5190881116160, max(2, attempt )))
     # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
     slurm_account: 'igr_hpc'
     # Cluster name: scontrol show config | grep ClusterName
     cluster: 'flamingo'
-
-  assembly_stats:
-    # Max time seen for this rule: 1 minute and 56.59 seconds
-    # Mean time seen for this rule: 52.82 seconds ± 41.96 seconds
+  genome_statistics_go_yq_format_tsv_to_yaml:
+    # Max time seen for this rule: 14.39 seconds
+    # Mean time seen for this rule: 4.73 seconds ± 4.27 seconds
     # Time reservation for 1st attempt: 10 minutes
     # Time reservation for 2nd attempt: 10 minutes
-    # Time reservation for 13th attempt: 14 minutes
-    runtime: round(min(43800, max(10, attempt * 1 + 1.4)))
-    # Max ram seen for this rule 509.74 MB
-    # Mean RAM seen for this rule: 372.69 MB ± 197.68 MB
-    # RAM reservation for 1st attempt: 750 MB
-    # RAM reservation for 2nd attempt: 750 MB
-    # RAM reservation for 13th attempt: 2.15 GB
-    mem: round(min(150000, max(750, attempt * 137.048 + 372.692)))
-    # Max IO seen for this rule 1.0 byte
-    # Mean disk used for this rule: 1.52 KB ± 1.13 KB
-    # Disk reservation for 1st attempt: 2 MB
-    # Disk reservation for 2nd attempt: 2 MB
-    # Disk reservation for 13th attempt: 13 MB
-    disk_mb: round(min(10364791554048, max(2, attempt * 1 + 0.0015190480000000003)))
-    # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
-    slurm_account: 'igr_hpc'
-    # Cluster name: scontrol show config | grep ClusterName
-    cluster: 'flamingo'
-
-  go_yq_format_tsv_to_yaml:
-    # Max time seen for this rule: 8.22 seconds
-    # Mean time seen for this rule: 2.86 seconds ± 2.12 seconds
-    # Time reservation for 1st attempt: 10 minutes
-    # Time reservation for 2nd attempt: 10 minutes
-    # Time reservation for 13th attempt: 14 minutes
-    runtime: round(min(43800, max(10, attempt * 1 + 1.0)))
-    # Max ram seen for this rule 47.86 MB
-    # Mean RAM seen for this rule: 31.8 MB ± 12.22 MB
+    # Time reservation for 13th attempt: 13 minutes
+    runtime: round(min(43800, max(10, attempt )))
+    # Max ram seen for this rule 46 MB
+    # Mean RAM seen for this rule: 24.8 MB ± 13.88 MB
     # RAM reservation for 1st attempt: 750 MB
     # RAM reservation for 2nd attempt: 750 MB
     # RAM reservation for 13th attempt: 750 MB
-    mem: round(min(150000, max(750, attempt * 16.05818181818181 + 31.801818181818188)))
-    # Max IO seen for this rule 1.0 byte
-    # Mean disk used for this rule: 4.668181818181819 bytes ± 0.8989974213735897 bytes
+    mem: round(min(150000, max(750, (attempt  - 1) * 24.803333333333335  + 32.94)))
+    # Max IO seen for this rule 4.99 bytes
+    # Mean disk used for this rule: 3.802000000000001 bytes ± 1.450941566215342 bytes
     # Disk reservation for 1st attempt: 2 MB
     # Disk reservation for 2nd attempt: 2 MB
     # Disk reservation for 13th attempt: 13 MB
-    disk_mb: round(min(10364791554048, max(2, attempt * 1 + 4.6681818181818185e-06)))
+    disk_mb: round(min(5190881116160, max(2, attempt )))
     # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
     slurm_account: 'igr_hpc'
     # Cluster name: scontrol show config | grep ClusterName
     cluster: 'flamingo'
-
-  seqkit_stats_on_genome_sequence:
-    # Max time seen for this rule: 17.34 seconds
-    # Mean time seen for this rule: 17.34 seconds ± 0 seconds
+  genome_statistics_go_yq_include_assembly_into_agat:
+    # Max time seen for this rule: 0.99 seconds
+    # Mean time seen for this rule: 0.99 seconds ± 0 seconds
     # Time reservation for 1st attempt: 10 minutes
     # Time reservation for 2nd attempt: 10 minutes
-    # Time reservation for 13th attempt: 14 minutes
-    runtime: round(min(43800, max(10, attempt * 1 + 1.0)))
-    # Max ram seen for this rule 46.69 MB
-    # Mean RAM seen for this rule: 46.69 MB ± 0 bytes
+    # Time reservation for 13th attempt: 13 minutes
+    runtime: round(min(43800, max(10, attempt )))
+    # Max ram seen for this rule 10.5 MB
+    # Mean RAM seen for this rule: 10.5 MB ± 0 bytes
     # RAM reservation for 1st attempt: 750 MB
     # RAM reservation for 2nd attempt: 750 MB
     # RAM reservation for 13th attempt: 750 MB
-    mem: round(min(150000, max(750, attempt * 1 + 46.69)))
-    # Max IO seen for this rule 1.0 byte
-    # Mean disk used for this rule: 4.98 bytes ± 0 bytes
+    mem: round(min(150000, max(750, (attempt  - 1) * 10.5  + 10.5)))
+    # Max IO seen for this rule 2.04 bytes
+    # Mean disk used for this rule: 2.04 bytes ± 0 bytes
     # Disk reservation for 1st attempt: 2 MB
     # Disk reservation for 2nd attempt: 2 MB
     # Disk reservation for 13th attempt: 13 MB
-    disk_mb: round(min(10364791554048, max(2, attempt * 1 + 4.980000000000001e-06)))
+    disk_mb: round(min(5190881116160, max(2, attempt )))
     # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
     slurm_account: 'igr_hpc'
     # Cluster name: scontrol show config | grep ClusterName
     cluster: 'flamingo'
-
-  fastaguard_on_genome_sequence:
-    # Max time seen for this rule: 4 minutes and 2.7 seconds
-    # Mean time seen for this rule: 2 minutes and 5.42 seconds ± 1 minute and 25.78 seconds
+  genome_statistics_seqkit_stats_on_genome_sequence:
+    # Max time seen for this rule: 1 minute and 48 seconds
+    # Mean time seen for this rule: 55.86 seconds ± 36.73 seconds
     # Time reservation for 1st attempt: 10 minutes
     # Time reservation for 2nd attempt: 10 minutes
-    # Time reservation for 13th attempt: 31 minutes
-    runtime: round(min(43800, max(10, attempt * 2.2 + 2.8)))
-    # Max ram seen for this rule 54.4 MB
-    # Mean RAM seen for this rule: 45.18 MB ± 10.67 MB
-    # RAM reservation for 1st attempt: 750 MB
-    # RAM reservation for 2nd attempt: 750 MB
-    # RAM reservation for 13th attempt: 750 MB
-    mem: round(min(150000, max(750, attempt * 9.215999999999994 + 45.184000000000005)))
-    # Max IO seen for this rule 1.0 byte
-    # Mean disk used for this rule: 4.2 KB ± 2.35 KB
+    # Time reservation for 13th attempt: 15 minutes
+    runtime: round(min(43800, max(10, attempt  + 2.0)))
+    # Max ram seen for this rule 1.18 GB
+    # Mean RAM seen for this rule: 949.34 MB ± 503.77 MB
+    # RAM reservation for 1st attempt: 1.18 GB
+    # RAM reservation for 2nd attempt: 2.12 GB
+    # RAM reservation for 13th attempt: 12.57 GB
+    mem: round(min(150000, max(750, (attempt  - 1) * 949.336  + 1174.94)))
+    # Max IO seen for this rule 2.82 KB
+    # Mean disk used for this rule: 1.46 KB ± 1.21 KB
     # Disk reservation for 1st attempt: 2 MB
     # Disk reservation for 2nd attempt: 2 MB
     # Disk reservation for 13th attempt: 13 MB
-    disk_mb: round(min(10364791554048, max(2, attempt * 1 + 0.004195588)))
+    disk_mb: round(min(5190881116160, max(2, attempt )))
     # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
     slurm_account: 'igr_hpc'
     # Cluster name: scontrol show config | grep ClusterName
     cluster: 'flamingo'
-
-
-  go_yq_include_assembly_into_agat:
-    # Max time seen for this rule: 11.32 seconds
-    # Mean time seen for this rule: 11.32 seconds ± 0 seconds
-    # Time reservation for 1st attempt: 10 minutes
-    # Time reservation for 2nd attempt: 10 minutes
-    # Time reservation for 13th attempt: 14 minutes
-    runtime: round(min(43800, max(10, attempt * 1 + 1.0)))
-    # Max ram seen for this rule 39.59 MB
-    # Mean RAM seen for this rule: 39.59 MB ± 0 bytes
-    # RAM reservation for 1st attempt: 750 MB
-    # RAM reservation for 2nd attempt: 750 MB
-    # RAM reservation for 13th attempt: 750 MB
-    mem: round(min(150000, max(750, attempt * 1 + 39.59)))
-    # Max IO seen for this rule 1.0 byte
-    # Mean disk used for this rule: 5.0 bytes ± 0 bytes
-    # Disk reservation for 1st attempt: 2 MB
-    # Disk reservation for 2nd attempt: 2 MB
-    # Disk reservation for 13th attempt: 13 MB
-    disk_mb: round(min(10364791554048, max(2, attempt * 1 + 5e-06)))
-    # Cluster account: sacctmgr -nP show assoc where user=$USER format=account
-    slurm_account: 'igr_hpc'
-    # Cluster name: scontrol show config | grep ClusterName
-    cluster: 'flamingo'
-
-  multiqc_genome_qualities:
-    mem_mb: min(attempt * 400, 1500)
-    runtime: min(attempt * 30, 240)
 

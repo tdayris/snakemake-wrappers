@@ -103,22 +103,22 @@ rule fastcat_fastq:
     input:
         unpack(get_fastq_rule_inteface),
     output:
-        fastq=temp("<temp>/fastcat_fastq/{sample}.{stream}.fastq.gz"),
+        fastq=temp("temp/fastcat_fastq/{sample}.{stream}.fastq.gz"),
         basecallers=temp(
-            "<temp>/fastcat_fastq/fastcat_{sample}.{stream}/basecallers.tsv"
+            "temp/fastcat_fastq/fastcat_{sample}.{stream}/basecallers.tsv"
         ),
-        per_file=temp("<temp>/fastcat_fastq/fastcat_{sample}.{stream}/per_file.tsv"),
-        runids=temp("<temp>/fastcat_fastq/fastcat_{sample}.{stream}/runids.tsv"),
+        per_file=temp("temp/fastcat_fastq/fastcat_{sample}.{stream}/per_file.tsv"),
+        runids=temp("temp/fastcat_fastq/fastcat_{sample}.{stream}/runids.tsv"),
         quality=temp(
-            "<temp>/fastcat_fastq/fastcat_{sample}.{stream}/histograms/quality.hist"
+            "temp/fastcat_fastq/fastcat_{sample}.{stream}/histograms/quality.hist"
         ),
         length=temp(
-            "<temp>/fastcat_fastq/fastcat_{sample}.{stream}/histograms/length.hist"
+            "temp/fastcat_fastq/fastcat_{sample}.{stream}/histograms/length.hist"
         ),
     log:
-        "<logs>/fastcat_fastq/{sample}.{stream}.log",
+        "logs/fastcat_fastq/{sample}.{stream}.log",
     benchmark:
-        "<benchmarks>/fastcat_fastq/{sample}.{stream}.tsv"
+        "benchmarks/fastcat_fastq/{sample}.{stream}.tsv"
     conda:
         workflow.source_path("resources/envs/fastcat.yaml")
     threads: 2
@@ -144,16 +144,16 @@ rule xsv_cat_fastcat_per_file:
     """aggregate fastcat per sample qc table"""
     input:
         table=expand(
-            "<temp>/fastcat_fastq/fastcat_{sample}.{stream}/per_file.tsv",
+            "temp/fastcat_fastq/fastcat_{sample}.{stream}/per_file.tsv",
             sample=samples_table.index,
             stream={1, 2},
         ),
     output:
-        temp("<results>/fastq_qc/fastcat_per_fastq_file_qc.csv"),
+        temp("results/fastq_qc/fastcat_per_fastq_file_qc.csv"),
     log:
-        "<logs>/xsv_cat_fastcat_per_file.log",
+        "logs/xsv_cat_fastcat_per_file.log",
     benchmark:
-        "<benchmarks>/xsv_cat_fastcat_per_file.tsv"
+        "benchmarks/xsv_cat_fastcat_per_file.tsv"
     threads: 1
     params:
         subcommand="cat rows",
@@ -165,13 +165,13 @@ rule xsv_cat_fastcat_per_file:
 rule xsv_frequency_fastcat_per_file:
     """summarize the fastcat aggregated table"""
     input:
-        table="<results>/fastq_qc/fastcat_per_fastq_file_qc.csv",
+        table="results/fastq_qc/fastcat_per_fastq_file_qc.csv",
     output:
-        "<results>/fastq_qc/fastcat_per_fastq_file_qc_stats.csv",
+        "results/fastq_qc/fastcat_per_fastq_file_qc_stats.csv",
     log:
-        "<logs>/xsv_frequency_fastcat_per_file.log",
+        "logs/xsv_frequency_fastcat_per_file.log",
     benchmark:
-        "<benchmarks>/xsv/frequency_fastcat_per_file.tsv"
+        "benchmarks/xsv/frequency_fastcat_per_file.tsv"
     threads: 1
     params:
         subcommand="stats",
@@ -182,13 +182,13 @@ rule xsv_frequency_fastcat_per_file:
 
 rule crabz_compress_fastq_qc:
     input:
-        "<results>/fastq_qc/fastcat_per_fastq_file_qc.csv",
+        "results/fastq_qc/fastcat_per_fastq_file_qc.csv",
     output:
-        "<results>/fastq_qc/fastcat_per_fastq_file_qc.csv.gz",
+        "results/fastq_qc/fastcat_per_fastq_file_qc.csv.gz",
     log:
-        "<logs>/crabz/compress_fastq_qc.log",
+        "logs/crabz/compress_fastq_qc.log",
     benchmark:
-        "<benchmarks>/crabz/compress_fastq_qc.tsv"
+        "benchmarks/crabz/compress_fastq_qc.tsv"
     threads: 1
     params:
         extra="--compression-level 9",
@@ -201,11 +201,11 @@ rule material_and_methods_access_fastq_pairs:
     input:
         rst=workflow.source_path("resources/reports/material_and_methods.rst"),
     output:
-        html="<results>/fastq_qc/Material_and_methods_access_fastq_file_pairs.html",
+        html="results/fastq_qc/Material_and_methods_access_fastq_file_pairs.html",
     log:
-        "<logs>/material_and_methods_access_fastq_pairs.log",
+        "logs/material_and_methods_access_fastq_pairs.log",
     benchmark:
-        "<benchmarks>/rst2html/material_and_methods_access_fastq_pairs.tsv"
+        "benchmarks/rst2html/material_and_methods_access_fastq_pairs.tsv"
     threads: 1
     params:
         extra="--embed-stylesheet --title='Material and methods for genome annotation'",

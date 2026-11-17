@@ -1,43 +1,170 @@
 set-resources:
-  agat_sp_statistics:
-    googlebatch_memory: min(attempt * 400 + 3000, 5000)
-    googlebatch_max_run_duration: str(min(attempt * 30 * 60, 240 * 60)) + "s"
-    googlebatch_boot_disk_gb: max(30, 6 * attempt)
-    googlebatch_machine_type: "c4-standard-2"
-
-  assembly_stats:
-    googlebatch_memory: min(attempt * 400 + 3000, 5000)
-    googlebatch_max_run_duration: str(min(attempt * 30 * 60, 240 * 60)) + "s"
-    googlebatch_boot_disk_gb: max(30, 6 * attempt)
-    googlebatch_machine_type: "c4-standard-2"
-
-  go_yq_format_tsv_to_yaml:
-    googlebatch_memory: min(attempt * 400 + 3000, 5000)
-    googlebatch_max_run_duration: str(min(attempt * 30 * 60, 240 * 60)) + "s"
-    googlebatch_boot_disk_gb: max(30, 6 * attempt)
-    googlebatch_machine_type: "c4-standard-2"
-
-  seqkit_stats_on_genome_sequence:
-    googlebatch_memory: min(attempt * 400 + 3000, 5000)
-    googlebatch_max_run_duration: str(min(attempt * 30 * 60, 240 * 60)) + "s"
-    googlebatch_boot_disk_gb: max(30, 6 * attempt)
-    googlebatch_machine_type: "c4-standard-2"
-
-  fastaguard_on_genome_sequence:
-    googlebatch_memory: min(attempt * 400 + 3000, 5000)
-    googlebatch_max_run_duration: str(min(attempt * 30 * 60, 240 * 60)) + "s"
-    googlebatch_boot_disk_gb: max(30, 6 * attempt)
-    googlebatch_machine_type: "c4-standard-2"
-
-  go_yq_include_assembly_into_agat:
-    googlebatch_memory: min(attempt * 400 + 3000, 5000)
-    googlebatch_max_run_duration: str(min(attempt * 30 * 60, 240 * 60)) + "s"
-    googlebatch_boot_disk_gb: max(30, 6 * attempt)
-    googlebatch_machine_type: "c4-standard-2"
-
-  multiqc_genome_qualities:
-    googlebatch_memory: min(attempt * 400 + 3000, 5000)
-    googlebatch_max_run_duration: str(min(attempt * 30 * 60, 240 * 60)) + "s"
-    googlebatch_boot_disk_gb: max(30, 6 * attempt)
-    googlebatch_machine_type: "c4-standard-2"
-
+  genome_statistics_agat_sp_statistics:
+    # Max time seen for this rule: 50.84 seconds
+    # Mean time seen for this rule: 50.84 seconds ± 0 seconds
+    # Time reservation for 1st attempt: 10 minutes
+    # Time reservation for 2nd attempt: 10 minutes
+    # Time reservation for 13th attempt: 10 minutes
+    googlebatch_max_run_duration: str(round(min(2628000, max(600, attempt  + 50.84)))) + 's'
+    # Max ram seen for this rule 253.96 MB
+    # Mean RAM seen for this rule: 253.96 MB ± 0 bytes
+    # RAM reservation for 1st attempt: 3 GB
+    # RAM reservation for 2nd attempt: 3 GB
+    # RAM reservation for 13th attempt: 13 GB
+    googlebatch_memory: round(min(100000, max(3, attempt )))
+    # Max IO seen for this rule 192.37 bytes
+    # Mean disk used for this rule: 192.37 bytes ± 0 bytes
+    # Disk reservation for 1st attempt: 30 GB
+    # Disk reservation for 2nd attempt: 30 GB
+    # Disk reservation for 13th attempt: 30 GB
+    googlebatch_boot_disk_gb: round(min(2000, max(30, attempt )))
+    # Machine typde defined on best case: n2d-highcpu-8
+    # Machine typde defined on worst case: n2d-highcpu-8
+    googlebatch_machine_type: n2d-highcpu-8
+    # Machine types are locked for google-batch-api
+    googlebatch_image_family: 'batch-cos'
+    # Disk types are locked for google-batch-api
+    googlebatch_boot_disk_image: 'hyperdisk-balanced'
+    # Image project are defined based on both keys above. See docs.
+    googlebatch_image_project: 'batch-custom-image'
+  genome_statistics_assembly_stats:
+    # Max time seen for this rule: 1 minute and 7.34 seconds
+    # Mean time seen for this rule: 34.29 seconds ± 28.77 seconds
+    # Time reservation for 1st attempt: 10 minutes
+    # Time reservation for 2nd attempt: 10 minutes
+    # Time reservation for 13th attempt: 15 minutes and 20 seconds
+    googlebatch_max_run_duration: str(round(min(2628000, max(600, attempt * 66.06  + 61.67)))) + 's'
+    # Max ram seen for this rule 510.75 MB
+    # Mean RAM seen for this rule: 377.55 MB ± 188.51 MB
+    # RAM reservation for 1st attempt: 3 GB
+    # RAM reservation for 2nd attempt: 3 GB
+    # RAM reservation for 13th attempt: 13 GB
+    googlebatch_memory: round(min(100000, max(3, attempt )))
+    # Max IO seen for this rule 2.21 KB
+    # Mean disk used for this rule: 1.66 KB ± 931.9703113189819 bytes
+    # Disk reservation for 1st attempt: 30 GB
+    # Disk reservation for 2nd attempt: 30 GB
+    # Disk reservation for 13th attempt: 30 GB
+    googlebatch_boot_disk_gb: round(min(2000, max(30, attempt )))
+    # Machine typde defined on best case: t2d-standard-1
+    # Machine typde defined on worst case: t2d-standard-1
+    googlebatch_machine_type: t2d-standard-1
+    # Machine types are locked for google-batch-api
+    googlebatch_image_family: 'batch-cos'
+    # Disk types are locked for google-batch-api
+    googlebatch_boot_disk_image: 'hyperdisk-balanced'
+    # Image project are defined based on both keys above. See docs.
+    googlebatch_image_project: 'batch-custom-image'
+  genome_statistics_fastaguard_on_genome_sequence:
+    # Max time seen for this rule: 3 minutes and 59.67 seconds
+    # Mean time seen for this rule: 2 minutes and 7.42 seconds ± 1 minute and 41.95 seconds
+    # Time reservation for 1st attempt: 10 minutes
+    # Time reservation for 2nd attempt: 11 minutes and 30 seconds
+    # Time reservation for 13th attempt: 53 minutes and 40 seconds
+    googlebatch_max_run_duration: str(round(min(2628000, max(600, attempt * 230.07  + 229.5)))) + 's'
+    # Max ram seen for this rule 52.57 MB
+    # Mean RAM seen for this rule: 47.44 MB ± 8.04 MB
+    # RAM reservation for 1st attempt: 3 GB
+    # RAM reservation for 2nd attempt: 3 GB
+    # RAM reservation for 13th attempt: 13 GB
+    googlebatch_memory: round(min(100000, max(3, attempt )))
+    # Max IO seen for this rule 5.89 KB
+    # Mean disk used for this rule: 4.28 KB ± 2.45 KB
+    # Disk reservation for 1st attempt: 30 GB
+    # Disk reservation for 2nd attempt: 30 GB
+    # Disk reservation for 13th attempt: 30 GB
+    googlebatch_boot_disk_gb: round(min(2000, max(30, attempt )))
+    # Machine typde defined on best case: t2d-standard-1
+    # Machine typde defined on worst case: t2d-standard-1
+    googlebatch_machine_type: t2d-standard-1
+    # Machine types are locked for google-batch-api
+    googlebatch_image_family: 'batch-cos'
+    # Disk types are locked for google-batch-api
+    googlebatch_boot_disk_image: 'hyperdisk-balanced'
+    # Image project are defined based on both keys above. See docs.
+    googlebatch_image_project: 'batch-custom-image'
+  genome_statistics_go_yq_format_tsv_to_yaml:
+    # Max time seen for this rule: 14.39 seconds
+    # Mean time seen for this rule: 4.73 seconds ± 4.27 seconds
+    # Time reservation for 1st attempt: 10 minutes
+    # Time reservation for 2nd attempt: 10 minutes
+    # Time reservation for 13th attempt: 10 minutes
+    googlebatch_max_run_duration: str(round(min(2628000, max(600, attempt * 13.5  + 7.345)))) + 's'
+    # Max ram seen for this rule 46 MB
+    # Mean RAM seen for this rule: 24.8 MB ± 13.88 MB
+    # RAM reservation for 1st attempt: 3 GB
+    # RAM reservation for 2nd attempt: 3 GB
+    # RAM reservation for 13th attempt: 13 GB
+    googlebatch_memory: round(min(100000, max(3, attempt )))
+    # Max IO seen for this rule 4.99 bytes
+    # Mean disk used for this rule: 3.802000000000001 bytes ± 1.450941566215342 bytes
+    # Disk reservation for 1st attempt: 30 GB
+    # Disk reservation for 2nd attempt: 30 GB
+    # Disk reservation for 13th attempt: 30 GB
+    googlebatch_boot_disk_gb: round(min(2000, max(30, attempt )))
+    # Machine typde defined on best case: t2d-standard-1
+    # Machine typde defined on worst case: t2d-standard-1
+    googlebatch_machine_type: t2d-standard-1
+    # Machine types are locked for google-batch-api
+    googlebatch_image_family: 'batch-cos'
+    # Disk types are locked for google-batch-api
+    googlebatch_boot_disk_image: 'hyperdisk-balanced'
+    # Image project are defined based on both keys above. See docs.
+    googlebatch_image_project: 'batch-custom-image'
+  genome_statistics_go_yq_include_assembly_into_agat:
+    # Max time seen for this rule: 0.99 seconds
+    # Mean time seen for this rule: 0.99 seconds ± 0 seconds
+    # Time reservation for 1st attempt: 10 minutes
+    # Time reservation for 2nd attempt: 10 minutes
+    # Time reservation for 13th attempt: 10 minutes
+    googlebatch_max_run_duration: str(round(min(2628000, max(600, attempt )))) + 's'
+    # Max ram seen for this rule 10.5 MB
+    # Mean RAM seen for this rule: 10.5 MB ± 0 bytes
+    # RAM reservation for 1st attempt: 3 GB
+    # RAM reservation for 2nd attempt: 3 GB
+    # RAM reservation for 13th attempt: 13 GB
+    googlebatch_memory: round(min(100000, max(3, attempt )))
+    # Max IO seen for this rule 2.04 bytes
+    # Mean disk used for this rule: 2.04 bytes ± 0 bytes
+    # Disk reservation for 1st attempt: 30 GB
+    # Disk reservation for 2nd attempt: 30 GB
+    # Disk reservation for 13th attempt: 30 GB
+    googlebatch_boot_disk_gb: round(min(2000, max(30, attempt )))
+    # Machine typde defined on best case: t2d-standard-1
+    # Machine typde defined on worst case: t2d-standard-1
+    googlebatch_machine_type: t2d-standard-1
+    # Machine types are locked for google-batch-api
+    googlebatch_image_family: 'batch-cos'
+    # Disk types are locked for google-batch-api
+    googlebatch_boot_disk_image: 'hyperdisk-balanced'
+    # Image project are defined based on both keys above. See docs.
+    googlebatch_image_project: 'batch-custom-image'
+  genome_statistics_seqkit_stats_on_genome_sequence:
+    # Max time seen for this rule: 1 minute and 48 seconds
+    # Mean time seen for this rule: 55.86 seconds ± 36.73 seconds
+    # Time reservation for 1st attempt: 10 minutes
+    # Time reservation for 2nd attempt: 10 minutes
+    # Time reservation for 13th attempt: 19 minutes and 49 seconds
+    googlebatch_max_run_duration: str(round(min(2628000, max(600, attempt * 85.23  + 80.61)))) + 's'
+    # Max ram seen for this rule 1.18 GB
+    # Mean RAM seen for this rule: 949.34 MB ± 503.77 MB
+    # RAM reservation for 1st attempt: 3 GB
+    # RAM reservation for 2nd attempt: 3 GB
+    # RAM reservation for 13th attempt: 15 GB
+    googlebatch_memory: round(min(100000, max(3, (attempt  - 1) * 1.139704  + 1.17494)))
+    # Max IO seen for this rule 2.82 KB
+    # Mean disk used for this rule: 1.46 KB ± 1.21 KB
+    # Disk reservation for 1st attempt: 30 GB
+    # Disk reservation for 2nd attempt: 30 GB
+    # Disk reservation for 13th attempt: 30 GB
+    googlebatch_boot_disk_gb: round(min(2000, max(30, attempt )))
+    # Machine typde defined on best case: n2d-highcpu-8
+    # Machine typde defined on worst case: n2d-highcpu-8
+    googlebatch_machine_type: n2d-highcpu-8
+    # Machine types are locked for google-batch-api
+    googlebatch_image_family: 'batch-cos'
+    # Disk types are locked for google-batch-api
+    googlebatch_boot_disk_image: 'hyperdisk-balanced'
+    # Image project are defined based on both keys above. See docs.
+    googlebatch_image_project: 'batch-custom-image'
+  

@@ -12,8 +12,6 @@ rule download_genome_sequences_reference_ensembl:
         "logs/download_genome_sequences_reference_ensembl/{species}.{build}.{release}.{datatype}.log",
     benchmark:
         "benchmarks/curl/download_genome_sequences_reference_ensembl_{species}.{build}.{release}.{datatype}.tsv"
-    group:
-        "download_and_filter_genome_sequence"
     threads: 1
     params:
         species="{species}",
@@ -34,8 +32,6 @@ rule download_genome_sequences_pyfaidx_filter:
         "logs/download_genome_sequences_pyfaidx_filter/{species}.{build}.{release}.{datatype}.log",
     benchmark:
         "benchmarks/pyfaidx/download_genome_sequences_pyfaidx_filter_{species}.{build}.{release}.{datatype}.tsv"
-    group:
-        "download_and_filter_genome_sequence"
     threads: 1
     params:
         extra="",
@@ -56,8 +52,6 @@ rule download_genome_sequences_samtools_faidx:
         "logs/download_genome_sequences_samtools_faidx/{species}.{build}.{release}.{datatype}.log",
     benchmark:
         "benchmarks/download_genome_sequences_samtools_faidx/{species}.{build}.{release}.{datatype}.tsv"
-    group:
-        "index_genome_sequence"
     threads: 1
     params:
         extra="",
@@ -110,8 +104,6 @@ rule download_genome_sequences_xan_extract_chrom_sizes:
         "logs/download_genome_sequences_xan_extract_chrom_sizes/{species}.{build}.{release}.{datatype}.log",
     benchmark:
         "benchmarks/xan/download_genome_sequences_xan_extract_chrom_sizes_{species}.{build}.{release}.{datatype}.tsv"
-    group:
-        "index_genome_sequence"
     threads: 1
     params:
         expression="select 1,2 | fmt --tabs",
@@ -134,8 +126,6 @@ rule download_genome_sequences_sed_replace_genomes_data_in_report:
         "logs/download_genome_sequences_sed_replace_genomes_data_in_report/material_and_methods_{species}_{build}_{release}.log",
     benchmark:
         "benchmarks/sed/download_genome_sequences_sed_replace_genomes_data_in_report_{species}_{build}_{release}.tsv"
-    group:
-        "genome_sequence_material_and_methods"
     threads: 1
     params:
         extra="",
@@ -154,8 +144,6 @@ rule download_genome_sequences_material_and_methods:
         "logs/download_genome_sequences_material_and_methods/{species}.{build}.{release}.log",
     benchmark:
         "benchmarks/rst2html/download_genome_sequences_material_and_methods_{species}.{build}.{release}.tsv"
-    group:
-        "genome_sequence_material_and_methods"
     threads: 1
     params:
         extra="--title='Material and methods for genome sequence preparation' --embed-stylesheet",

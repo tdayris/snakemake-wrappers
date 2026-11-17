@@ -79,7 +79,7 @@ rule genome_statistics_go_yq_format_tsv_to_yaml:
         f"{config['repo']}/utils/go-yq"
 
 
-rule seqkit_stats_on_genome_sequence:
+rule genome_statistics_seqkit_stats_on_genome_sequence:
     """get detailed information on the genome sequence with seqkit"""
     input:
         fastx=local_lookup(
@@ -127,8 +127,6 @@ rule genome_statistics_fastaguard_on_genome_sequence:
         "logs/genome_statistics_fastaguard_on_genome_sequence/{species}.{build}.{release}.log",
     benchmark:
         "benchmarks/fastaguard/genome_statistics_fastaguard_on_genome_sequence.{species}.{build}.{release}.tsv"
-    group:
-        "fastaguard_qc"
     threads: 1
     params:
         extra="--profile assembly --gate pipeline",
@@ -178,8 +176,6 @@ rule genome_statistics_multiqc_genome_qualities:
         "logs/genome_statistics_multiqc_genome_qualities/{species}.{build}.{release}.log",
     benchmark:
         "benchmarks/multiqc/genome_statistics_multiqc_genome_qualities_{species}.{build}.{release}.tsv"
-    group:
-        "fastaguard_qc"
     threads: 1
     params:
         extra="--verbose",
