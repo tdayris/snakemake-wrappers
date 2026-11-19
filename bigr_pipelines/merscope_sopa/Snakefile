@@ -1,0 +1,345 @@
+import collections.abc
+import csv
+import os.path
+import pandas
+import snakemake.iocontainers
+from snakemake_interface_storage_plugins.storage_provider import StorageProviderBase
+
+# Define user-readable types
+PandasIndexValueType = collections.abc.Hashable
+PandasColumnValueType = collections.abc.Hashable
+StorageProviderType = StorageProviderBase
+
+
+# If no samples are provided in name space, then
+# Load samples table with column separator auto-detection
+if not (("samples" in locals()) or ("samples" in globals())):
+    samples_table_path: str = config.get("samples_table", "config/samples.csv")
+    with open(samples_table_path, "r") as table_stream:
+        dialect: csv.Dialect = csv.Sniffer().sniff(table_stream.readline())
+        table_stream.seek(0)
+
+    samples_table: pandas.DataFrame = pandas.read_csv(
+        samples_table_path,
+        header=0,
+        index_col=None,
+        sep=dialect.delimiter,
+        comment="#",
+        dtype=str,
+    )
+
+# If there are any, list **all** required columns missing from samples table
+required_tables: set[str] = {"sample_id", "merscope_archive"}
+missing_cols: set[str] = required_tables - set(samples_table.columns)
+if len(missing_cols) > 0:
+    raise KeyError(f"Could not find {missing_cols=} in {samples_table.columns=}")
+samples_table.set_index("sample_id", inplace=True, drop=False)
+
+
+# Building possible storage access methods with plugins
+default_irods_env: str = os.path.expanduser("~/.irods/irods_environment.json")
+
+irods_host = config.get("irods_host", default_irods_env)
+if os.path.exists(irods_host):
+
+    storage irods_files:
+        provider="irods",
+        storage_irods_host=config.get("irods_host", default_irods_env),
+
+
+storage local_files:
+    provider="fs",
+
+
+storage http_files:
+    provider="http",
+
+
+def get_provider(path: str) -> StorageProviderType:
+    """This function select the correct storage provider"""
+    if path.startswith("http"):
+        return storage.http_files(path)
+    if path.startswith(tuple(config["irods_prefix"])):
+        return storage.irods_files(path)
+    if path.startswith(tuple(config["cold_storage"])):
+        return storage.local_files(path)
+    return path
+
+def get_merscope_rule_interface(
+    wildcards: snakemake.iocontainers.Wildcards,
+    samples_table: pandas.DataFrame = samples_table,
+) -> StorageProviderType | list[StorageProviderType]:
+    """
+    This function is an interface for rule unpacking.
+    It lists the input files with their storage providers.
+    """
+    return {"data": get_provider(samples_table.at[str(wildcards.sample_id), "merscope_archive"])}
+
+
+# Actual rules
+rule target:
+    input:
+        expand(
+            "results/sopa/{sample_id}.analysis_summary.html",
+            sample_id=samples_table.index.tolist(),
+        )
+
+rule untar_merscope_data_for_sopa:
+    input:
+        unpack(get_merscope_rule_interface),
+    output:
+        outdir=directory("temp/access_merscope_archive/{sample_id}"),
+    log:
+        "logs/untar_merscope_data_for_sopa/{sample_id}.log",
+    benchmark:
+        "benchmarks/untar_merscope_data_for_sopa/{sample_id}.tsv",
+    threads: 1
+    params:
+        extra="--extract --verbose --gzip ",
+        explicit_owner=True,
+        explicit_group=True,
+    wrapper:
+        f"{config['repo']}/utils/tar"
+
+
+rule format_merscope_data_for_sopa:
+    """or create a toy dataset"""
+    input:
+        "temp/access_merscope_archive/{sample_id}",
+    output:
+        "results/sopa/{sample_id}/.zgroup",
+    log:
+        "logs/format_merscope_data_for_sopa/{sample_id}.log",
+    benchmark:
+        "benchmark/format_merscope_data_for_sopa/{sample_id}.tsv"
+    conda:
+        "resources/environments/sopa.yaml"
+    params:
+        extra="--technology merscope",
+        dpath=lambda wildcards, input: subpath(input[0], parent=True),
+        spath=lambda wildcards, output: subpath(output[0], parent=True),
+    shell:
+        "sopa convert "
+        "{params.extra} "
+        "--sdata-path {params.spath:q} "
+        "{params.dpath:q} > {log:q} 2>&1 "
+
+
+rule tissue_segmentation_with_sopa:
+    input:
+        "results/sopa/{sample_id}/.zgroup",
+    output:
+        temp("results/sopa/{sample_id}/.sopa_cache/tissue_boundaries_done"),
+    log:
+        "logs/tissue_segmentation_with_sopa/{sample_id}.log",
+    benchmark:
+        "benchmark/tissue_segmentation_with_sopa/{sample_id}.tsv"
+    conda:
+        "resources/environments/sopa.yaml"
+    params:
+        extra="--mode 'staining'",
+        sdata=lambda wildcards, input: subpath(input[0], parent=True),
+    shell:
+        "sopa segmentation tissue "
+        "{params.extra} "
+        "{params.sdata:q} "
+        "> {log:q} 2>&1 "
+
+
+rule cell_segmentation_with_cellpose_through_sopa:
+    input:
+        patches_file="results/sopa/{sample_id}/.sopa_cache/patches_file_image",
+        patches="results/sopa/{sample_id}/.sopa_cache/patches",
+    output:
+        segmentation="results/sopa/{sample_id}/.sopa_cache/cellpose_boundaries",
+    log:
+        "logs/cell_segmentation_with_cellpose_through_sopa/{sample_id}.log",
+    benchmark:
+        "benchmark/cell_segmentation_with_cellpose_through_sopa/{sample_id}.tsv"
+    conda:
+        "resources/environments/sopa.yaml"
+    params:
+        extra="--diameter 60 --channels 'dapi' --flow-threshold 2000",
+        sdata=lambda wildcards, input: subpath(input[0], parent=True),
+    shell:
+        "sopa segmentation cellpose "
+        "{params.extra} "
+        "{params.sdata:q} "
+        "> {log:q} 2>&1 "
+
+
+rule cell_resolution_with_cellpose_through_sopa:
+    input:
+        segmentation="results/sopa/{sample_id}/.sopa_cache/cellpose_boundaries",
+    output:
+        segmentation="results/sopa/{sample_id}/.sopa_cache/cellpose_boundaries_done",
+    log:
+        "logs/cell_resolution_with_cellpose_through_sopa/{sample_id}.log",
+    benchmark:
+        "benchmark/cell_resolution_with_cellpose_through_sopa/{sample_id}.tsv"
+    conda:
+        "resources/environments/sopa.yaml"
+    params:
+        extra="",
+        sdata=lambda wildcards, input: subpath(input[0], parent=True),
+    shell:
+        "sopa resolve cellpose {params.sdata:q} > {log:q} 2>&1"
+
+
+rule patchify_image_with_sopa:
+    input:
+        zgroup="results/sopa/{sample_id}/.zgroup",
+        segmentation="results/sopa/{sample_id}/.sopa_cache/tissue_boundaries_done",
+    output:
+        patches_file="results/sopa/{sample_id}/.sopa_cache/patches_file_image",
+        patches=temp(touch("results/sopa/{sample_id}/.sopa_cache/patches")),
+    log:
+        "logs/patchify_image_with_sopa/{sample_id}.log",
+    benchmark:
+        "benchmark/patchify_image_with_sopa/{sample_id}.tsv"
+    conda:
+        "resources/environments/sopa.yaml"
+    params:
+        extra="--patch-width-pixel 6000 --patch-overlap-pixel 150",
+        sdata=lambda wildcards, input: subpath(input.zgroup, parent=True),
+    shell:
+        "sopa patchify image " "{params.extra} " "{params.sdata:q} " "> {log:q} 2>&1 "
+
+
+rule patchify_transcripts_with_sopa:
+    input:
+        zgroup="results/sopa/{sample_id}/.zgroup",
+        segmentation="results/sopa/{sample_id}/.sopa_cache/tissue_boundaries_done",
+        cellpose="results/sopa/{sample_id}/.sopa_cache/cellpose_boundaries_done",
+    output:
+        transcript_tmp_dir=directory(
+            "results/sopa/{sample_id}/.sopa_cache/transcript_patches"
+        ),
+        patches="results/sopa/{sample_id}/.sopa_cache/patches_file_transcripts",
+    log:
+        "logs/patchify_transcripts_with_sopa/{sample_id}.log",
+    benchmark:
+        "benchmark/patchify_transcripts_with_sopa/{sample_id}.tsv"
+    conda:
+        "resources/environments/sopa.yaml"
+    params:
+        extra="--patch-width-microns 1000 --patch-overlap-microns 20",
+        sdata=lambda wildcards, input: subpath(input.zgroup, parent=True),
+    shell:
+        "sopa patchify transcripts "
+        "{params.extra} "
+        "{params.sdata:q} "
+        "> {ŀog:q} 2>&1 "
+
+
+rule aggregate_segmentation_boundaries_with_sopa:
+    input:
+        zgroup="results/sopa/{sample_id}/.zgroup",
+        segmentation="results/sopa/{sample_id}/.sopa_cache/tissue_boundaries_done",
+        cellpose="results/sopa/{sample_id}/.sopa_cache/cellpose_boundaries_done",
+    output:
+        temp(touch("results/sopa/{sample_id}/.sopa_cache/aggregation")),
+    log:
+        "logs/aggregate_segmentation_boundaries_with_sopa/{sample_id}.log",
+    benchmark:
+        "ben/aggregate_segmentation_boundaries_with_sopa/{sample_id}.tsv"
+    conda:
+        "resources/environments/sopa.yaml"
+    params:
+        extra="--aggregate-channels --min-transcripts 20",
+        sdata=lambda wildcards, input: subpath(input.zgroup, parent=True),
+    shell:
+        "sopa aggregate {params.extra} {params.sdata:q} > {log:q} 2>&1"
+
+
+rule annotate_spatial_data_with_sopa:
+    input:
+        zgroup="results/sopa/{sample_id}/.zgroup",
+        segmentation="results/sopa/{sample_id}/.sopa_cache/tissue_boundaries_done",
+        cellpose="results/sopa/{sample_id}/.sopa_cache/cellpose_boundaries_done",
+        aggregation="results/sopa/{sample_id}/.sopa_cache/aggregation",
+    output:
+        cell_types=directory("results/sopa/{sample_id}/tables/obs"),
+    log:
+        "logs/annotate_aggregated_segments_with_sopa/{sample_id}.log",
+    benchmark:
+        "benchmark/annotate_aggregated_segments_with_sopa/{sample_id}.tsv"
+    conda:
+        "resources/environments/sopa.yaml"
+    params:
+        extra="",
+        sdata=lambda wildcards, input: subpath(input.zgroup, parent=True),
+    shell:
+        "sopa annotate {params.extra} {params.sdata:q} > {log:q} 2>&1"
+
+
+rule preprocess_sopa_annotated_spatial_data_with_scanpy:
+    input:
+        zgroup="results/sopa/{sample_id}/.zgroup",
+        segmentation="results/sopa/{sample_id}/.sopa_cache/tissue_boundaries_done",
+        cellpose="results/sopa/{sample_id}/.sopa_cache/cellpose_boundaries_done",
+        aggregation="results/sopa/{sample_id}/.sopa_cache/aggregation",
+        cell_types="results/sopa/{sample_id}/tables/obs",
+    output:
+        scanpy_preprocess="results/sopa/{sample_id}/.sopa_cache/scanpy_preprocess",
+    log:
+        "logs/preprocess_sopa_annotated_segments_with_scanpy/{sample_id}.log",
+    benchmark:
+        "benchmark/preprocess_sopa_annotated_segments_with_scanpy/{sample_id}.tsv"
+    conda:
+        "resources/environments/sopa.yaml"
+    params:
+        extra="",
+        sdata=lambda wildcards, input: subpath(input.zgroup, parent=True),
+    shell:
+        "sopa scanpy-preprocess {params.extra} {params.sdata:q} > {log:q} 2>&1"
+
+
+rule explore_spatial_data_with_sopa:
+    input:
+        zgroup="results/sopa/{sample_id}/.zgroup",
+        segmentation="results/sopa/{sample_id}/.sopa_cache/tissue_boundaries_done",
+        cellpose="results/sopa/{sample_id}/.sopa_cache/cellpose_boundaries_done",
+        aggregation="results/sopa/{sample_id}/.sopa_cache/aggregation",
+        cell_types="results/sopa/{sample_id}/tables/obs",
+        scanpy_preprocess="results/sopa/{sample_id}/.sopa_cache/scanpy_preprocess",
+    output:
+        explorer=directory("results/sopa/{sample_id}.explorer"),
+    log:
+        "logs/explore_preprocessed_segmented_data_with_sopa/{sample_id}.log",
+    benchmark:
+        "benchmark/explore_preprocessed_segmented_data_with_sopa/{sample_id}.tsv"
+    conda:
+        "resources/environments/sopa.yaml"
+    params:
+        extra='--mode "-it" --ram-threshold-gb 20 --pixel-size 0.108 --save-h5ad',
+        sdata=lambda wildcards, input: subpath(input.zgroup, parent=True),
+    shell:
+        "sopa explorer write "
+        "{params.extra} "
+        "--output-path {output.explorer:q} "
+        "{params.sdata:q} "
+        "> {log} 2>&1"
+
+
+rule report_spatial_data_with_sopa:
+    input:
+        zgroup="results/sopa/{sample_id}/.zgroup",
+        segmentation="results/sopa/{sample_id}/.sopa_cache/tissue_boundaries_done",
+        cellpose="results/sopa/{sample_id}/.sopa_cache/cellpose_boundaries_done",
+        aggregation="results/sopa/{sample_id}/.sopa_cache/aggregation",
+        cell_types="results/sopa/{sample_id}/tables/obs",
+        scanpy_preprocess="results/sopa/{sample_id}/.sopa_cache/scanpy_preprocess",
+    output:
+        report="results/sopa/{sample_id}.analysis_summary.html",
+    log:
+        "logs/report_spatial_data_with_sopa/{sample_id}.log",
+    benchmark:
+        "benchmark/report_spatial_data_with_sopa/{sample_id}.tsv"
+    conda:
+        "resources/environments/sopa.yaml"
+    params:
+        extra="",
+        sdata=lambda wildcards, input: subpath(input.zgroup, parent=True),
+    shell:
+        "sopa report " "{params.extra} " "{params.sdata:q} " "> {log:q} 2>&1"

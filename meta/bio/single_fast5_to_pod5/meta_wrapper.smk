@@ -73,8 +73,9 @@ rule single_fast5_to_pod5_fast5_aggregation_with_ont_api:
     benchmark:
         "benchmarks/single_to_multi_fast5/single_fast5_to_pod5_fast5_aggregation_with_ont_api/{sample}.tsv"
     container:
-        # "docker://quay.io/biocontainers/ont-fast5-api:0.4.1--py35_0"
-        "docker://nanozoo/ont-fast5-api:3.1.6--a980386"
+        #"genomicpariscentre/ont-fast5-api:1.3.0"
+        #"docker://nanozoo/ont-fast5-api:3.1.6--a980386"
+        "docker://mfurla/ont-api:v0.2"
     threads: 15
     params:
         extra="--recursive --batch_size 1000000",
@@ -97,8 +98,7 @@ rule single_fast5_to_pod5_fast5_to_pod5_conversion:
     benchmark:
         "benchmarks/pod5/single_fast5_to_pod5_fast5_to_pod5_conversion/{sample}.tsv"
     container:
-        #"docker://quay.io/biocontainers/pod5:0.3.44--pyhdfd78af_0"
-        "docker://staphb/pod5:0.3.49"
+        "docker://quay.io/biocontainers/pod5:0.3.44--pyhdfd78af_0"
     threads: 15
     params:
         extra="--recursive --force-overwrite ",

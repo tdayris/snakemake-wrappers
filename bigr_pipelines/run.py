@@ -4,11 +4,13 @@
 
 import argparse
 import os
+import os.path
 import pathlib
 import rich.console
 import rich.syntax
 import rich_argparse
 import shlex
+import shutil
 import sys
 import typing
 
@@ -67,6 +69,12 @@ def main() -> None:
         help="Don't run anything, just show final command line and check for input",
     )
     parser.add_argument(
+        "-r", "--repo",
+        action="store_true",
+        default=False,
+        help="Add path to this directory as a key to the configuration",
+    )
+    parser.add_argument(
         "-v", "--verbosity",
         type=str,
         choices={"debug", "info"},
@@ -100,6 +108,11 @@ def main() -> None:
             "be normal and expected."
         )
 
+    if str(args.profile) in ("flamingo", "slurm"):
+        partitions: pathlib.Path = profile / "partitions.yaml"
+        if partitions.exists():
+            extra += f" --slurm-partition-config '{partitions.resolve()}'"
+
 
     config: pathlib.PosixPath = pathlib.Path(args.config_file)
     if config.exists():
@@ -107,13 +120,25 @@ def main() -> None:
     else:
         raise FileNotFoundError(f"Could not find {config=}")
     logger.info("All required files found")
-    
+
+    irods_home: str = pathlib.Path(os.path.expanduser("~/.irods/irods_environment.json"))
+    if irods_home.exists():
+        extra += f" --storage-irods-home '{irods_home.resolve()}'"
+    else:
+        logger.warning("No irods default environment found.")
+
+    if args.repo:
+        repo_dir = launcher_path.parent.parent
+        extra += f" --config repo='{repo_dir.resolve()}'"
+
+
     cmd: str = str(f"snakemake {extra} ")
     logger.debug("Command line built, running Snakemake:")
     rich.console.Console().print(rich.syntax.Syntax(cmd.replace("--", "\\\n  --"), "bash", line_numbers=False, word_wrap=True,))
     if not args.dry_run:
         shell(cmd)
     else:
+        print(cmd)
         logger.debug("Dry-run mode. Stopping here.")
 
 
