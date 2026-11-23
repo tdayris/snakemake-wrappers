@@ -12,7 +12,7 @@ rule genome_statistics_agat_sp_statistics:
         gff=local_lookup(
             dpath="pathvars/genome_annotation",
             within=config,
-            default="resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.gff3",
+            default="resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.gtf",
         ),
         gs=local_lookup(
             dpath="pathvars/genome_sequence",
@@ -22,7 +22,7 @@ rule genome_statistics_agat_sp_statistics:
         config=local_lookup(
             dpath="pathvars/agat_config",
             within=config,
-            default="resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gff3_config.yaml",
+            default="resources/{species}.{build}.{release}/annotations/{species}.{build}.{release}.agat_gtf_config.yaml",
         ),
     output:
         report="resources/{species}.{build}.{release}/statistics/statistics.txt",

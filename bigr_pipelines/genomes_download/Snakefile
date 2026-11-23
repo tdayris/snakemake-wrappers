@@ -14,10 +14,13 @@ rule target:
             species_build_release=config["species_build_release"],
             ext={"chrom_sizes.tsv", "fasta.fai", "dict", "fasta", "2bit"},
         ),
-        genome_annotation=expand(
-            "resources/{species_build_release}/annotations/{species_build_release}.{gxf}",
+        genome_annotation_gtf=expand(
+            "resources/{species_build_release}/annotations/{species_build_release}.gtf",
             species_build_release=config["species_build_release"],
-            gxf={"gtf", "gff3"},
+        ),
+        genome_annotation_gff=expand(
+            "resources/{species_build_release}/annotations/{species_build_release}.gff3",
+            species_build_release=config["species_build_release"][:2],
         ),
         genome_statistics=expand(
             "resources/{species_build_release}/statistics/statistics.yaml",
