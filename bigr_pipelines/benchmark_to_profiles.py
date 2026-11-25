@@ -200,13 +200,13 @@ def cat_dataframes(
     return pandas.concat(frames, ignore_index=True)
 
 
-def compute_delta(base_res: float | int, max_res: float | int, input_size: float | int) -> str:
+def compute_delta(base_res: float | int, max_res: float | int, input_size: float | int, attempt: str) -> str:
     """Return best delta given input size and reservations"""
     if any(x == 0.0 for x in (base_res, max_res, input_size)):
         if base_res < max_res:
-            return f"attempt * {max(max_res - base_res, 0.1):.2f} + {base_res:.2f}"
-        return f"attempt * {base_res:.2f}"
-    return f"attempt * {max(max_res / input_size, 0.1):.2f} * input.size_mb"
+            return f"{attempt} * {max(max_res - base_res, 0.1):.2f} + {base_res:.2f}"
+        return f"{attempt} * {base_res:.2f} + {base_res:.2f}"
+    return f"{attempt} * {max(max_res / input_size, 0.1):.2f} * input.size_mb + {base_res:.2f}"
 
 
 def resource_function(
@@ -285,6 +285,7 @@ def resource_function(
             base_reservation = known.disk_mb.mean()
             max_reservation = known.disk_mb.max()
             min_reservation = known.disk_mb.min()
+            input_size = known.input_size_mb_total.quantile(0.75)
             # Max is max available space on disk, min is 2Go.
             max_allowed_reservation = shutil.disk_usage(script_dir).free
             min_allowed_reservation = 2
@@ -292,6 +293,7 @@ def resource_function(
             min_reservation = known.disk_gb.min()
             base_reservation = known.disk_gb.mean()
             max_reservation = known.disk_gb.max()
+            input_size = known.disk_gb.quantile(0.75)
             # Max is 2To, min is 30 GB.
             max_allowed_reservation = 2000
             min_allowed_reservation = 30
@@ -299,12 +301,13 @@ def resource_function(
             min_reservation = known.disk_mb.min()
             base_reservation = known.disk_mb.mean()
             max_reservation = known.disk_mb.max()
+            input_size = known.input_size_mb_total.quantile(0.75)
             # Max is max available space on disk, min is 0.
             max_allowed_reservation = shutil.disk_usage(script_dir).free
             min_allowed_reservation = 0
 
-    attempt = compute_delta(base_reservation, max_reservation, input_size)
-    anchored_function = f"round(min({max_allowed_reservation}, max({min_allowed_reservation}, {attempt})))"
+    delta = compute_delta(base_reservation, max_reservation, input_size, attempt)
+    anchored_function = f"round(min({max_allowed_reservation}, max({min_allowed_reservation}, {delta})))"
 
     resource_function: str = str(anchored_function)
     if resource_type == "time" and mode == "google":
@@ -317,33 +320,45 @@ def resource_function(
     if resource_type == "time":
         if mode == "google":
             attempt: int = 1
-            estimate[f"{resource_type}_attempt1"] = fmt_seconds(eval(anchored_function))
+            estimate[f"raw_{resource_type}_attempt1"] = eval(anchored_function)
+            estimate[f"{resource_type}_attempt1"] = fmt_seconds(estimate[f"raw_{resource_type}_attempt1"])
             attempt: int = 2
-            estimate[f"{resource_type}_attempt2"] = fmt_seconds(eval(anchored_function))
+            estimate[f"raw_{resource_type}_attempt2"] = eval(anchored_function)
+            estimate[f"{resource_type}_attempt2"] = fmt_seconds(estimate[f"raw_{resource_type}_attempt2"])
             attempt: int = 13
-            estimate[f"{resource_type}_attempt13"] = fmt_seconds(eval(anchored_function))
+            estimate[f"raw_{resource_type}_attempt13"] = eval(anchored_function)
+            estimate[f"{resource_type}_attempt13"] = fmt_seconds(estimate[f"raw_{resource_type}_attempt13"])
         else:
             attempt: int = 1
-            estimate[f"{resource_type}_attempt1"] = fmt_minutes(eval(anchored_function))
+            estimate[f"raw_{resource_type}_attempt1"] = eval(anchored_function)
+            estimate[f"{resource_type}_attempt1"] = fmt_minutes(estimate[f"raw_{resource_type}_attempt1"])
             attempt: int = 2
-            estimate[f"{resource_type}_attempt2"] = fmt_minutes(eval(anchored_function))
+            estimate[f"raw_{resource_type}_attempt2"] = eval(anchored_function)
+            estimate[f"{resource_type}_attempt2"] = fmt_minutes(estimate[f"raw_{resource_type}_attempt2"])
             attempt: int = 13
-            estimate[f"{resource_type}_attempt13"] = fmt_minutes(eval(anchored_function))
+            estimate[f"raw_{resource_type}_attempt13"] = eval(anchored_function)
+            estimate[f"{resource_type}_attempt13"] = fmt_minutes(estimate[f"raw_{resource_type}_attempt13"])
     else:
         if mode == "google":
             attempt: int = 1
-            estimate[f"{resource_type}_attempt1"] = fmt_gb(eval(anchored_function))
+            estimate[f"raw_{resource_type}_attempt1"] = eval(anchored_function)
+            estimate[f"{resource_type}_attempt1"] = fmt_gb(estimate[f"raw_{resource_type}_attempt1"])
             attempt: int = 2
-            estimate[f"{resource_type}_attempt2"] = fmt_gb(eval(anchored_function))
+            estimate[f"raw_{resource_type}_attempt2"] = eval(anchored_function)
+            estimate[f"{resource_type}_attempt2"] = fmt_gb(estimate[f"raw_{resource_type}_attempt2"])
             attempt: int = 13
-            estimate[f"{resource_type}_attempt13"] = fmt_gb(eval(anchored_function))
+            estimate[f"raw_{resource_type}_attempt13"] = eval(anchored_function)
+            estimate[f"{resource_type}_attempt13"] = fmt_gb(estimate[f"raw_{resource_type}_attempt13"])
         else:
             attempt: int = 1
-            estimate[f"{resource_type}_attempt1"] = fmt_mb(eval(anchored_function))
+            estimate[f"raw_{resource_type}_attempt1"] = eval(anchored_function)
+            estimate[f"{resource_type}_attempt1"] = fmt_mb(estimate[f"raw_{resource_type}_attempt1"])
             attempt: int = 2
-            estimate[f"{resource_type}_attempt2"] = fmt_mb(eval(anchored_function))
+            estimate[f"raw_{resource_type}_attempt2"] = eval(anchored_function)
+            estimate[f"{resource_type}_attempt2"] = fmt_mb(estimate[f"raw_{resource_type}_attempt2"])
             attempt: int = 13
-            estimate[f"{resource_type}_attempt13"] = fmt_mb(eval(anchored_function))
+            estimate[f"raw_{resource_type}_attempt13"] = eval(anchored_function)
+            estimate[f"{resource_type}_attempt13"] = fmt_mb(estimate[f"raw_{resource_type}_attempt13"])
 
     return estimate
 
@@ -411,7 +426,7 @@ def rule_profile(
             f"    cluster: 'flamingo'",
         ]
     elif mode == "google":
-        data["googlebatch_machine_types"] = chose_google_machine_type(
+        data["googlebatch_machine_types"], data["googlebatch_machine_prices"] = chose_google_machine_type(
             known=known,
             machine_types_path=machine_types_path,
         )
@@ -419,9 +434,9 @@ def rule_profile(
         text += [
             f"    # Max time seen for this rule: {fmt_seconds(known['s'].max())}",
             f"    # Mean time seen for this rule: {fmt_seconds(known['s'].mean())} ± {fmt_seconds(known['s'].std())}",
-            f"    # Time reservation for 1st attempt: {data['time_attempt1']}",
-            f"    # Time reservation for 2nd attempt: {data['time_attempt2']}",
-            f"    # Time reservation for 13th attempt: {data['time_attempt13']}",
+            f"    # Time reservation for 1st attempt: {data['time_attempt1']}, about {(data['raw_time_attempt1'] / 60 / 60) / data['googlebatch_machine_prices'][0]:.2f} $",
+            f"    # Time reservation for 2nd attempt: {data['time_attempt2']}, about {(data['raw_time_attempt2'] / 60 / 60) / data['googlebatch_machine_prices'][0]:.2f} $",
+            f"    # Time reservation for 13th attempt: {data['time_attempt13']}, about {(data['raw_time_attempt13'] / 60 / 60) / data['googlebatch_machine_prices'][0]:.2f} $",
             f"    googlebatch_max_run_duration: {data['time_function']}",
             f"    # Max ram seen for this rule {fmt_mb(known['max_rss'].max())}",
             f"    # Mean RAM seen for this rule: {fmt_mb(known['memory_mb'].mean())} ± {fmt_mb(known['memory_mb'].std())}",
@@ -435,8 +450,8 @@ def rule_profile(
             f"    # Disk reservation for 2nd attempt: {data['disk_attempt2']}",
             f"    # Disk reservation for 13th attempt: {data['disk_attempt13']}",
             f"    googlebatch_boot_disk_gb: {data['disk_function']}",
-            f"    # Machine typde defined on best case: {data['googlebatch_machine_types'][0]}",
-            f"    # Machine typde defined on worst case: {data['googlebatch_machine_types'][-1]}",
+            f"    # Machine typde defined on best case: {data['googlebatch_machine_types'][0]}, {data['googlebatch_machine_prices'][0]} $ / hour",
+            f"    # Machine typde defined on worst case: {data['googlebatch_machine_types'][-1]}, {data['googlebatch_machine_prices'][-1]} $ / hour",
             f"    googlebatch_machine_type: {data['googlebatch_machine_types'][1]}",
             f"    # Machine types are locked for google-batch-api",
             f"    googlebatch_image_family: 'batch-cos'",
@@ -485,12 +500,14 @@ def chose_google_machine_type(
 
     # Actually assessing best machine type
     machine_lists: list[str | None] = [None, None, None]
+    price_lists: list[str | None] = [None, None, None]
     # Best case
     cpu = known["threads"].min()
     mem_gb = known["memory_gb"].min()
     for machine in machine_types.itertuples():
         if (cpu <= machine.vCPU) and (mem_gb <= machine.Memory):
             machine_lists[0] = machine.Name
+            price_lists[0] = machine.Hour
             break
 
     # Mean case
@@ -499,6 +516,7 @@ def chose_google_machine_type(
     for machine in machine_types.itertuples():
         if (cpu <= machine.vCPU) and (mem_gb <= machine.Memory):
             machine_lists[1] = machine.Name
+            price_lists[1] = machine.Hour
             break
 
     # Worst case
@@ -507,9 +525,10 @@ def chose_google_machine_type(
     for machine in machine_types.itertuples():
         if (cpu <= machine.vCPU) and (mem_gb <= machine.Memory):
             machine_lists[2] = machine.Name
+            price_lists[2] = machine.Hour
             break
 
-    return machine_lists
+    return machine_lists, price_lists
 
 
 def find_tsv(
