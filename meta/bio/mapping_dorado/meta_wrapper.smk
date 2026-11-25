@@ -117,7 +117,7 @@ rule mapping_dorado_align_reads_with_dorado:
         "--output-dir {params.outdir:q} "
         "{input.index:q} {input.ubam:q} > {log} 2>&1 && "
         'bam=$(find {params.outdir:q} -type f -name "*.bam") && '
-        'summary=$(find {params.outdir:q} -type f -name "alignment_summary.txt") && '
+        'summary=$(find {params.outdir:q} -type f -name "*_summary.txt") && '
         "mv --verbose ${{bam}} {output.bam:q} >> {log:q} 2>&1 && "
         "mv --verbose ${{summary}} {output.summary:q} >> {log:q} 2>&1 "
 

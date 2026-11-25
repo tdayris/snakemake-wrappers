@@ -32,6 +32,7 @@ rule genome_statistics_agat_sp_statistics:
         "logs/genome_statistics_agat_sp_statistics/{species}.{build}.{release}.log",
     benchmark:
         "benchmarks/agat/genome_statistics_agat_sp_statistics_{species}.{build}.{release}.tsv"
+    shadow: 'minimal'
     threads: 6
     params:
         command="agat_sp_statistics.pl",
